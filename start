@@ -1,0 +1,15 @@
+#!/bin/bash
+trap "echo -ne '\nstopping container...' && docker stop refinery-ui-react > /dev/null 2>&1 && echo -ne '\t\t [done]\n'" EXIT
+
+docker stop refinery-ui-react
+
+docker build -t refinery-ui-react-dev -f dev.Dockerfile .
+
+docker run --rm -d \
+--name refinery-ui-react \
+-p 7068:3000 \
+--mount type=bind,source="$(pwd)"/,target=/app \
+--network dev-setup_default \
+refinery-ui-react-dev
+
+docker logs -f refinery-ui-react
