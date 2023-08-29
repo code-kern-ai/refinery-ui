@@ -1,7 +1,12 @@
 import { gql } from '@apollo/client';
 
-export const USER_ROLES = gql`
-query{
-  userRoles
+export const LOOKUP_LISTS_BY_PROJECT_ID = gql`
+query ($projectId: ID!) {
+  knowledgeBasesByProjectId(projectId: $projectId) {
+      id 
+      name
+      description
+      termCount
+  }
 }
 `;
