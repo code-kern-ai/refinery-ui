@@ -1,15 +1,29 @@
 import { useEffect } from 'react';
 import { Fragment } from 'react'
 import { Dialog, Transition } from '@headlessui/react'
-import { ModalButton, ModalButtonType, modalButtonCaption } from './modal-helper';
+import { modalButtonCaption } from './modal-helper';
 import { isStringTrue } from '@/submodules/javascript-functions/general';
+import { useDispatch, useSelector } from 'react-redux';
+import { Modal, initModal, openModal, selectModal } from '@/src/reduxStore/states/modal';
+import { ModalButton, ModalButtonType } from '@/src/types/shared/modal';
 
 
 export default function Modal(props: any) {
+    const dispatch = useDispatch();
+    const modal = useSelector(selectModal(props.modalName));
 
     useEffect(() => {
         fillButtons();
     }, [props.acceptButton, props.abortButton]);
+
+    function fullInit() {
+        dispatch(initModal(props.modalName));
+    }
+
+    function setOpen(value: boolean) {
+        if (value) dispatch(openModal(props.modalName));
+        else fullInit(); // to ensure the modal is fully reset
+    }
 
     function fillButtons() {
         if (props.acceptButton == undefined) {
@@ -46,13 +60,13 @@ export default function Modal(props: any) {
 
         if (props.observers?.length > 0) props.optionClicked.emit(button.type);
 
-        if (button.closeAfterClick) props.toggleOpen();
+        if (button.closeAfterClick) setOpen(false);
     }
 
 
     return (
-        <Transition.Root show={props.open} as={Fragment}>
-            <Dialog as="div" className="relative z-50" onClose={props.toggleOpen}>
+        <Transition.Root show={modal.open} as={Fragment}>
+            <Dialog as="div" className="relative z-50" onClose={setOpen}>
                 <Transition.Child
                     as={Fragment}
                     enter="ease-out duration-300"
@@ -83,7 +97,7 @@ export default function Modal(props: any) {
                                 <div className="mt-5 flex justify-end">
                                     {props.acceptButton?.useButton ? <button className="ml-2 bg-green-100 border border-green-400 text-green-700 text-xs font-semibold px-4 py-2 rounded-md cursor-pointer hover:bg-green-200 focus:outline-none" onClick={() => clickButton(props.acceptButton)}>{props.acceptButton.buttonCaption}</button> : null}
                                     {props.abortButton?.useButton ? <button className="ml-2 bg-red-100 border border-red-400 text-red-700 text-xs font-semibold px-4 py-2 rounded-md cursor-pointer hover:bg-red-200 focus:outline-none" onClick={() => clickButton(props.abortButton)}>{props.abortButton.buttonCaption}</button> : null}
-                                    <button className="ml-2 bg-white text-gray-700 border border-gray-300 text-xs font-semibold px-4 py-2 rounded cursor-pointer hover:bg-gray-50 focus:outline-none" onClick={props.toggleOpen}>Close</button>
+                                    <button className="ml-2 bg-white text-gray-700 border border-gray-300 text-xs font-semibold px-4 py-2 rounded cursor-pointer hover:bg-gray-50 focus:outline-none" onClick={() => setOpen(false)}>Close</button>
                                 </div>
                             </Dialog.Panel>
                         </Transition.Child>

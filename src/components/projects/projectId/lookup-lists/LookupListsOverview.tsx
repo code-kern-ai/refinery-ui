@@ -1,5 +1,5 @@
 import { selectProject } from "@/src/reduxStore/states/project";
-import { useEffect, useState } from "react"
+import React, { useEffect, useState } from "react"
 import { useDispatch, useSelector } from "react-redux";
 import { extendAllLookupLists, selectAllLookupLists, selectCheckedLookupLists, setAllLookupLists, setCheckedLookupLists } from "@/src/reduxStore/states/pages/lookup-lists";
 import { Tooltip } from "@nextui-org/react";
@@ -11,6 +11,8 @@ import { CREATE_LOOKUP_LIST, DELETE_LOOKUP_LIST } from "@/src/services/gql/mutat
 import { LookupListBE } from "@/src/types/components/projects/projectId/lookup-lists/lookup-lists";
 import { LookupListCard } from "./LookupListCard";
 import style from '../../../../styles/lookup-lists.module.css'
+import { openModal } from "@/src/reduxStore/states/modal";
+import { ModalEnum } from "@/src/types/shared/modal";
 
 export const ACTIONS_DROPDOWN_OPTIONS = ['Select all', 'Deselect all', 'Delete selected'];
 
@@ -24,7 +26,6 @@ export default function LookupListsOverview() {
     const [createLookupListMut] = useMutation(CREATE_LOOKUP_LIST);
     const [deleteLookupListMut] = useMutation(DELETE_LOOKUP_LIST);
 
-    const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectionList, setSelectionList] = useState('');
     const [countSelected, setCountSelected] = useState(0);
     const [abortButton, setAbortButton] = useState({
@@ -57,7 +58,7 @@ export default function LookupListsOverview() {
                 break;
             case 'Delete selected':
                 prepareSelectionList();
-                setIsModalOpen(true);
+                dispatch(openModal(ModalEnum.DELETE_LOOKUP_LIST));
                 break;
         }
     }
@@ -197,7 +198,7 @@ export default function LookupListsOverview() {
                             ))}
                         </div>
                     )}
-                    <Modal open={isModalOpen} toggleOpen={() => setIsModalOpen(false)} abortButton={abortButton}>
+                    <Modal modalName={ModalEnum.DELETE_LOOKUP_LIST} abortButton={abortButton}>
                         <h1 className="text-lg text-gray-900 mb-2">Warning</h1>
                         <div className="text-sm text-gray-500 my-2 flex flex-col">
                             <span>Are you sure you want to delete selected lookup {countSelected <= 1 ? 'list' : 'lists'}?</span>

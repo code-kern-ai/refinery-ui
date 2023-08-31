@@ -1,20 +1,5 @@
+import { ModalButtonType } from "@/src/types/shared/modal";
 
-
-export type ModalButton = {
-    useButton?: boolean;
-    type?: ModalButtonType; //shouldn't be set by use
-    buttonCaption?: string;
-    disabled?: boolean;
-    closeAfterClick?: boolean;
-    emitFunction?: (type: ModalButtonType) => void;
-};
-export enum ModalButtonType {
-    CLOSE = "CLOSE",
-    ACCEPT = "ACCEPT",
-    ABORT = "ABORT",
-    BACK = "BACK",
-    EDIT = "EDIT"
-}
 export function modalButtonCaption(type: ModalButtonType): string {
     switch (type) {
         case ModalButtonType.CLOSE: return "Close";
