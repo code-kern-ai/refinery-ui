@@ -19,9 +19,10 @@ export default function App({ Component, pageProps }: AppProps) {
     <Provider store={store}>
       <ApolloProvider client={client}>
         <GlobalStoreDataComponent>
-          <Layout {...pageProps}>
-            <Component {...pageProps} />
-          </Layout>
+          {/* TODO: The layout is removed because of iframe in Angular
+           <Layout {...pageProps}> */}
+          <Component {...pageProps} />
+          {/* </Layout> */}
         </GlobalStoreDataComponent>
       </ApolloProvider>
     </Provider>

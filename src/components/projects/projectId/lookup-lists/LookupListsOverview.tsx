@@ -100,7 +100,7 @@ export default function LookupListsOverview() {
 
     return (
         project?.id ? (
-            <div className="p-4 h-full bg-gray-100 flex-1 flex flex-col">
+            <div className="p-4 h-screen bg-gray-100 flex-1 flex flex-col">
                 <div className="w-full ">
                     <div className="flex-shrink-0 block sm:flex justify-between items-center">
                         <div className="text-lg leading-6 text-gray-900 font-medium inline-block">
