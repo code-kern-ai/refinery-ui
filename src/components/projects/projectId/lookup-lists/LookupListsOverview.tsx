@@ -10,6 +10,7 @@ import { LOOKUP_LISTS_BY_PROJECT_ID } from "@/src/services/gql/queries/lookup-li
 import { CREATE_LOOKUP_LIST, DELETE_LOOKUP_LIST } from "@/src/services/gql/mutations/lookup-lists";
 import { LookupListBE } from "@/src/types/components/projects/projectId/lookup-lists/lookup-lists";
 import { LookupListCard } from "./LookupListCard";
+import style from '../../../../styles/lookup-lists.module.css'
 
 export const ACTIONS_DROPDOWN_OPTIONS = ['Select all', 'Deselect all', 'Delete selected'];
 
@@ -106,7 +107,8 @@ export default function LookupListsOverview() {
                         </div>
                         <div className="grid grid-cols-1 gap-4 xs:flex xs:gap-0 flex-row items-center">
                             {lookupLists && lookupLists.length > 0 ? (
-                                <Dropdown options={ACTIONS_DROPDOWN_OPTIONS} buttonName="Actions" selectedOption={(option: any) => executeOption(option)} dropdownClasses="mr-3" />
+                                <Dropdown options={ACTIONS_DROPDOWN_OPTIONS} buttonName="Actions" disabledOptions={[false, false, checkedLookupLists.every((checked) => !checked)]}
+                                    selectedOption={(option: any) => executeOption(option)} dropdownClasses="mr-3" buttonClasses={`${style.actionsHeight} text-xs`} />
                             ) : (
                                 <Tooltip placement="left" content="At least one lookup list is needed to enable actions" color="invert">
                                     <button type="button"
