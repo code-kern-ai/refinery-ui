@@ -1,3 +1,14 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+
+@font-face {
+    font-family: "DM Sans";
+    src: url(../../public/fonts/DMSans-Regular.ttf);
+}
+
+@font-face {
+    font-family: "DM Mono";
+    src: url(../../public/fonts/DMMono-Regular.ttf);
+}

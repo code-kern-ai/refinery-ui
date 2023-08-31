@@ -1,5 +1,5 @@
 import { selectProject } from '@/src/reduxStore/states/project';
-import { selectUser } from '@/src/reduxStore/states/user';
+import { selectUser } from '@/src/reduxStore/states/general';
 import { UserRole } from '@/src/types/shared/sidebar';
 import Image from 'next/image';
 import { useSelector } from 'react-redux';

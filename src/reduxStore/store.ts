@@ -1,11 +1,13 @@
 import { configureStore } from '@reduxjs/toolkit';
-import { userReducer } from './states/user';
+import { generalReducer } from './states/general';
 import { projectReducer } from './states/project';
+import { lookupListsReducer } from './states/pages/lookup-lists';
 
 const store = configureStore({
     reducer: {
-        user: userReducer,
+        general: generalReducer,
         projects: projectReducer,
+        lookupLists: lookupListsReducer
     },
 });
 

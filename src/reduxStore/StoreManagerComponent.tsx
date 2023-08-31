@@ -1,39 +1,44 @@
-import { use, useEffect } from "react";
+import { useEffect } from "react";
 import { useRouter } from "next/router";
-import { useDispatch, useSelector } from "react-redux";
-import { selectUser, setUser } from "./states/user";
-import { getUserInfo } from "../services/gql/services/organizations.service";
-import { get } from "http";
-import { useQuery } from "@apollo/client";
+import { useDispatch } from "react-redux";
+import { setUser } from "./states/general";
 import { getUserAvatarUri, jsonCopy } from "@/submodules/javascript-functions/general";
-import { selectProject, selectProjectId, setActiveProject } from "./states/project";
-import { getProjectByProjectId } from "../services/gql/services/projects.service";
+import { setActiveProject } from "./states/project";
 import { GET_PROJECT_BY_ID } from "../services/gql/queries/projects";
+import { useLazyQuery } from "@apollo/client";
+import { openWebsocketForConversation } from "../services/base/WebSocket";
+import { GET_USER_INFO } from "../services/gql/queries/organizations";
 
 export function GlobalStoreDataComponent(props: React.PropsWithChildren) {
     const router = useRouter();
     const dispatch = useDispatch();
-    const { data: user } = getUserInfo();
-    const { data: project } = getProjectByProjectId(router.query.projectId as string);
+
+    const [refetchUserInfo] = useLazyQuery(GET_USER_INFO);
+    const [refetchProjectByProjectId] = useLazyQuery(GET_PROJECT_BY_ID);
 
     useEffect(() => {
-        if (!router.query.projectId) return;
-        if (!project) return;
+        refetchUserInfo().then((res) => {
+            const userInfo = jsonCopy(res.data["userInfo"]);
+            userInfo.avatarUri = getUserAvatarUri(res.data["userInfo"]);
+            dispatch(setUser(userInfo));
+        });
+    }, []);
+
+    useEffect(() => {
         const projectId = router.query.projectId as string;
-        if (!projectId) {
-            dispatch(setActiveProject(null));
-            return;
+        if (projectId) {
+            refetchProjectByProjectId({ variables: { projectId: projectId } }).then((res) => {
+                dispatch(setActiveProject(res.data["projectByProjectId"]));
+            });
         }
-        dispatch(setActiveProject(project["projectByProjectId"]));
-    }, [router.query.projectId, project]);
+        else {
+            dispatch(setActiveProject(null));
+        }
+        // openWebsocketForConversation(projectId, (message) => {
+        //     console.log("message", message)
+        // })
 
-    useEffect(() => {
-        if (!user) return;
-        const userInfo = jsonCopy(user["userInfo"]);
-        userInfo.avatarUri = getUserAvatarUri(user);
-        dispatch(setUser(userInfo));
-    }, [user]);
+    }, [router.query.projectId]);
 
-    if (!user) return null;
     return <>{props.children}</>;
 }

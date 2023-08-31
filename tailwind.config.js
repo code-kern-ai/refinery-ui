@@ -1,4 +1,5 @@
 const colors = require("tailwindcss/colors");
+const defaultTheme = require('tailwindcss/defaultTheme');
 
 /** @type {import('tailwindcss').Config} */
 module.exports = {
@@ -39,9 +40,6 @@ module.exports = {
       pink: colors.pink,
       rose: colors.rose,
     },
-    fontFamily: {
-      Inter: ["Inter var", "sans-serif"],
-    },
     extend: {
       colors: {
         kernindigo: {
@@ -55,9 +53,14 @@ module.exports = {
         },
       },
       fontFamily: {
-        sans: ["Inter var"],
+        sans: ['DM Sans', ...defaultTheme.fontFamily.sans],
+        mono: ['DM Mono', ...defaultTheme.fontFamily.mono],
       },
     },
+    screens: {
+      "xs": "450px",
+      ...defaultTheme.screens,
+    }
   },
   plugins: [],
 }
