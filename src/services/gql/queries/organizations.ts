@@ -11,3 +11,16 @@ query {
   }
 }
 `;
+
+export const GET_ORGANIZATION = gql`
+query {
+  userOrganization {
+    id
+    name
+    maxRows
+    maxCols
+      maxCharCount
+    gdprCompliant
+  }
+}
+`;

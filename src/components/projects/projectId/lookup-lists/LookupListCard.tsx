@@ -1,4 +1,5 @@
 import { selectAllLookupLists, selectCheckedLookupLists, setCheckedLookupLists } from "@/src/reduxStore/states/pages/lookup-lists";
+import { selectProject } from "@/src/reduxStore/states/project";
 import { LookupListCardProps } from "@/src/types/components/projects/projectId/lookup-lists/lookup-lists";
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -6,6 +7,7 @@ import { useDispatch, useSelector } from "react-redux";
 export function LookupListCard(props: LookupListCardProps) {
     const dispatch = useDispatch();
 
+    const project = useSelector(selectProject);
     const lookupLists = useSelector(selectAllLookupLists);
     const checkedLookupLists = useSelector(selectCheckedLookupLists);
 
@@ -30,7 +32,10 @@ export function LookupListCard(props: LookupListCardProps) {
                 <div className="text-gray-900 float-left italic">
                     {props.lookupList.name}
                 </div>
-                <div className="text-green-800 float-right cursor-pointer">
+                <div onClick={() => {
+                    const newURL = `http://localhost:4455/refinery/projects/${project.id}/lookup-lists/${props.lookupList.id}`
+                    window.parent.postMessage({ newURL }, `http://localhost:4455/refinery/projects/${project.id}/lookup-lists`);
+                }} className="text-green-800 float-right cursor-pointer">
                     Details
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 inline-block" fill="none"
                         viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">

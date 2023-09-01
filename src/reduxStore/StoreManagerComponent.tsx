@@ -29,14 +29,15 @@ export function GlobalStoreDataComponent(props: React.PropsWithChildren) {
         if (projectId) {
             refetchProjectByProjectId({ variables: { projectId: projectId } }).then((res) => {
                 dispatch(setActiveProject(res.data["projectByProjectId"]));
+                openWebsocketForConversation(projectId, (message) => {
+                    console.log("message", message)
+                })
             });
+
         }
         else {
             dispatch(setActiveProject(null));
         }
-        // openWebsocketForConversation(projectId, (message) => {
-        //     console.log("message", message)
-        // })
 
     }, [router.query.projectId]);
 
