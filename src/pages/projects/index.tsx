@@ -1,3 +1,4 @@
+import ProjectsList from "@/src/components/projects/list/ProjectsList"
 import { setCurrentPage } from "@/src/reduxStore/states/general"
 import { CurrentPage } from "@/src/types/shared/general"
 import { useEffect } from "react"
@@ -11,6 +12,6 @@ export default function Projects() {
     }, [])
 
     return (
-        <h1>Go to lookup lists</h1>
+        <ProjectsList />
     )
 }

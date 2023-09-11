@@ -19,7 +19,7 @@ query {
     name
     maxRows
     maxCols
-      maxCharCount
+    maxCharCount
     gdprCompliant
   }
 }

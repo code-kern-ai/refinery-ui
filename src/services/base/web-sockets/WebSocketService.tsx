@@ -3,18 +3,21 @@ import { timer } from "rxjs";
 import { webSocket } from "rxjs/webSocket";
 import { MiscInfo, NotificationSubscription } from "./misc";
 import { useLazyQuery } from "@apollo/client";
-import { GET_ORGANIZATION } from "../gql/queries/organizations";
+import { GET_ORGANIZATION } from "../../gql/queries/organizations";
+import { useDispatch } from "react-redux";
+import { setOrganization } from "@/src/reduxStore/states/general";
 
 
 function GetNotificationsServiceWrapper(props: React.PropsWithChildren) {
+    const dispatch = useDispatch();
     const [dataLoaded, setDataLoaded] = useState(false);
-    const [refetchOrganizations] = useLazyQuery(GET_ORGANIZATION);
+    const [refetchOrganization] = useLazyQuery(GET_ORGANIZATION);
 
 
     function initWsNotifications() {
         const address = findWebsocketAddress();
         if (address) {
-            MiscInfo.ws_subject = webSocket({
+            MiscInfo.ws_connection = webSocket({
                 url: address,
                 deserializer: msg => msg.data,
                 openObserver: {
@@ -30,7 +33,7 @@ function GetNotificationsServiceWrapper(props: React.PropsWithChildren) {
                     }
                 }
             });
-            MiscInfo.ws_subject.subscribe(
+            MiscInfo.ws_connection.subscribe(
                 msg => handleWebsocketNotificationMessage(msg),
                 err => handleError(err),
                 () => handleWsClosed()
@@ -106,18 +109,19 @@ function GetNotificationsServiceWrapper(props: React.PropsWithChildren) {
     }
 
     useEffect(() => {
-        refetchOrganizations().then((res) => {
+        refetchOrganization().then((res) => {
             if (res.data["userOrganization"]) {
                 initWsNotifications();
                 setDataLoaded(true);
-
+                dispatch(setOrganization(res.data["userOrganization"]));
+                MiscInfo.subscribeToNotifications = subscribeToNotification;
+                MiscInfo.unsubscribeFromNotifications = unsubscribeFromNotification;
             } else {
                 timer(60000).subscribe(() => location.reload())
             }
         })
     }, []);
 
-    if (!dataLoaded) return null;
     return props.children;
 }
 

@@ -12,3 +12,31 @@ query ($projectId: ID!) {
   }
 }
 `;
+
+export const GET_PROJECT_LIST = gql`
+query {
+    allProjects {
+      edges {
+        node {
+          id
+          name
+          description
+          status
+          projectType
+          numDataScaleUploaded
+          createdAt
+          user{
+            firstName
+            lastName
+            mail
+          }
+        }
+      }
+    }
+  }      
+`;
+
+export const GET_OVERVIEW_STATS = gql`
+query{
+  overviewStats
+}`;

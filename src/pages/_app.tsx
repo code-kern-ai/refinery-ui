@@ -7,7 +7,8 @@ import Layout from '../components/shared/layout/Layout'
 import { Provider } from 'react-redux'
 import store from '../reduxStore/store'
 import { GlobalStoreDataComponent } from '../reduxStore/StoreManagerComponent'
-import { NotificationsServiceWrapper } from '../services/base/WebSocketService'
+import { NotificationsServiceWrapper } from '../services/base/web-sockets/WebSocketService'
+import { UserManagerWrapper } from '../services/base/user-management/UserManaged'
 
 export default function App({ Component, pageProps }: AppProps) {
   return <>
@@ -20,12 +21,13 @@ export default function App({ Component, pageProps }: AppProps) {
     <Provider store={store}>
       <ApolloProvider client={client}>
         <GlobalStoreDataComponent>
-          {/* <NotificationsServiceWrapper> */}
-          {/* TODO: The layout is removed because of iframe in Angular
-           <Layout {...pageProps}> */}
-          <Component {...pageProps} />
-          {/* </Layout> */}
-          {/* </NotificationsServiceWrapper> */}
+          <UserManagerWrapper>
+            <NotificationsServiceWrapper>
+              <Layout {...pageProps}>
+                <Component {...pageProps} />
+              </Layout>
+            </NotificationsServiceWrapper>
+          </UserManagerWrapper>
         </GlobalStoreDataComponent>
       </ApolloProvider>
     </Provider>

@@ -6,7 +6,6 @@ import { getUserAvatarUri, jsonCopy } from "@/submodules/javascript-functions/ge
 import { setActiveProject } from "./states/project";
 import { GET_PROJECT_BY_ID } from "../services/gql/queries/projects";
 import { useLazyQuery } from "@apollo/client";
-import { openWebsocketForConversation } from "../services/base/WebSocket";
 import { GET_USER_INFO } from "../services/gql/queries/organizations";
 
 export function GlobalStoreDataComponent(props: React.PropsWithChildren) {
@@ -29,11 +28,7 @@ export function GlobalStoreDataComponent(props: React.PropsWithChildren) {
         if (projectId) {
             refetchProjectByProjectId({ variables: { projectId: projectId } }).then((res) => {
                 dispatch(setActiveProject(res.data["projectByProjectId"]));
-                openWebsocketForConversation(projectId, (message) => {
-                    console.log("message", message)
-                })
             });
-
         }
         else {
             dispatch(setActiveProject(null));
