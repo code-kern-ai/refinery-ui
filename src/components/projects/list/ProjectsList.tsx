@@ -106,10 +106,10 @@ export default function ProjectsList() {
                             <main className="mt-16 mx-auto max-w-7xl px-4 sm:mt-24 sm:px-6 lg:mt-32">
                                 <div className="lg:grid lg:grid-cols-12 lg:gap-8">
                                     <div className="sm:text-center md:max-w-2xl md:mx-auto lg:col-span-6 lg:text-left">
-                                        <div className="text-gray-500 font-semibold text-base uppercase">You're now on the waitlist!
+                                        <div className="text-gray-500 font-semibold text-base uppercase">You&apos;re now on the waitlist!
                                         </div>
                                         <div className="font-extrabold text-gray-900 text-5xl mt-1">
-                                            You don't want to <span className="text-green-800">wait?</span>
+                                            You don&apos;t want to <span className="text-green-800">wait?</span>
                                         </div>
                                         <div className="font-normal text-xl text-gray-500 mt-5">
                                             In a 15 minute onboarding call, we can directly assign you access. Reach out to us &nbsp;
