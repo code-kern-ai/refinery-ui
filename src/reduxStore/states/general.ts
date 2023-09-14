@@ -24,6 +24,7 @@ const initialState = {
         currentPage: '',
         isManaged: true,
         isDemo: false,
+        isAdmin: false,
         organization: null
     }
 } as {
@@ -32,6 +33,7 @@ const initialState = {
         currentPage: string;
         isManaged: boolean;
         isDemo: boolean;
+        isAdmin: boolean;
         organization: Organization;
     }
 }
@@ -53,6 +55,9 @@ const generalSlice = createSlice({
         setIsDemo(state, action: PayloadAction<boolean>) {
             state.data.isDemo = action.payload;
         },
+        setIsAdmin(state, action: PayloadAction<boolean>) {
+            state.data.isAdmin = action.payload;
+        },
         setOrganization(state, action: PayloadAction<Organization>) {
             if (action.payload) state.data.organization = { ...action.payload };
             else state.data.organization = null;
@@ -66,8 +71,9 @@ export const selectUser = (state) => state.general.data.user;
 export const selectCurrentPage = (state) => state.general.data.currentPage;
 export const selectIsManaged = (state) => state.general.data.isManaged;
 export const selectIsDemo = (state) => state.general.data.isDemo;
+export const selectIsAdmin = (state) => state.general.data.isAdmin;
 export const selectOrganization = (state) => state.general.data.organization;
 
 
-export const { setUser, setCurrentPage, setIsManaged, setIsDemo, setOrganization } = generalSlice.actions;
+export const { setUser, setCurrentPage, setIsManaged, setIsDemo, setIsAdmin, setOrganization } = generalSlice.actions;
 export const generalReducer = generalSlice.reducer;

@@ -10,12 +10,17 @@ export type Project = {
         lastName: string;
         mail: string;
     }
+    status: ProjectStatus;
+    timeStamp: string;
+    date: string;
+    time: string
 }
 
 export enum ProjectStatus {
     INIT = 'INIT',
     INIT_COMPLETE = 'INIT_COMPLETE',
-    IN_DELETION = 'IN_DELETION'
+    IN_DELETION = 'IN_DELETION',
+    INIT_SAMPLE_PROJECT = 'INIT_SAMPLE_PROJECT',
 }
 
 export type ProjectStatistics = {
@@ -25,4 +30,11 @@ export type ProjectStatistics = {
     numDataScaleProgrammatical: number;
     numDataTestManual?: number;
     numDataTestUploaded?: number;
+    manuallyLabeled: string;
+    weaklySupervised: string;
+}
+
+export type ProjectCardProps = {
+    project: Project;
+    projectStatisticsById: { [key: string]: ProjectStatistics };
 }

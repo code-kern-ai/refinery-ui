@@ -37,7 +37,12 @@ export default function Modal(props: any) {
             else if (typeof props.acceptButton == "boolean") props.acceptButton = { useButton: props.acceptButton };
             if (props.acceptButton) initButton(props.acceptButton, ModalButtonType.ACCEPT);
         }
-        if (props.abortButton == undefined) props.abortButton = { useButton: false };
+        if (props.abortButton == undefined) {
+            const newProps = {
+                ...props,
+                abortButton: { useButton: false }
+            };
+        }
         else {
             if (typeof props.abortButton == "string") props.abortButton = { useButton: isStringTrue(props.abortButton as string) };
             else if (typeof props.abortButton == "boolean") props.abortButton = { useButton: props.abortButton };

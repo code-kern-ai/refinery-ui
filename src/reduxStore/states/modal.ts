@@ -23,6 +23,10 @@ const initialState: Modals = {
     [ModalEnum.DELETE_LOOKUP_LIST]: {
         open: false,
     },
+    [ModalEnum.ADMIN_DELETE_PROJECT]: {
+        open: false,
+        projectId: null
+    },
 };
 
 const modalSlice = createSlice({

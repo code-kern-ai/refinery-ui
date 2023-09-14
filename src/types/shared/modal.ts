@@ -15,5 +15,6 @@ export enum ModalButtonType {
 }
 
 export enum ModalEnum {
+    ADMIN_DELETE_PROJECT = "ADMIN_DELETE_PROJECT",
     DELETE_LOOKUP_LIST = "DELETE_LOOKUP_LIST",
 }
