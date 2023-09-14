@@ -1,4 +1,4 @@
-import { selectIsManaged, selectOrganization } from "@/src/reduxStore/states/general"
+import { selectIsDemo, selectIsManaged, selectOrganization, selectUser } from "@/src/reduxStore/states/general"
 import { selectAllProjects, setAllProjects } from "@/src/reduxStore/states/project";
 import { MiscInfo } from "@/src/services/base/web-sockets/misc";
 import { GET_OVERVIEW_STATS, GET_PROJECT_LIST } from "@/src/services/gql/queries/projects";
@@ -6,27 +6,32 @@ import { Project, ProjectStatistics, ProjectStatus } from "@/src/types/component
 import { CurrentPage } from "@/src/types/shared/general";
 import { parseUTC } from "@/submodules/javascript-functions/date-parser";
 import { jsonCopy, percentRound } from "@/submodules/javascript-functions/general";
-import { useLazyQuery } from "@apollo/client";
+import { useLazyQuery, useMutation } from "@apollo/client";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import YoutubeIntroduction from "./YoutubeIntroduction";
 import ButtonsContainer from "./ButtonsContainer";
-import { useRouter } from "next/router";
 import ProjectCard from "./ProjectCard";
+import { GET_CAN_CREATE_LOCAL_ORG } from "@/src/services/gql/queries/organizations";
+import { ADD_USER_TO_ORGANIZATION, CREATE_ORGANIZATION } from "@/src/services/gql/mutations/organizations";
 
 export default function ProjectsList() {
     const dispatch = useDispatch();
-    const router = useRouter();
 
     const organization = useSelector(selectOrganization);
     const isManaged = useSelector(selectIsManaged);
+    const isDemo = useSelector(selectIsDemo);
     const projects = useSelector(selectAllProjects);
+    const user = useSelector(selectUser);
     const [organizationInactive, setOrganizationInactive] = useState(null);
     const [projectStatisticsById, setProjectStatisticsById] = useState({});
     const [canCreateOrg, setCanCreateOrg] = useState(false);
 
     const [refetchProjects] = useLazyQuery(GET_PROJECT_LIST, { fetchPolicy: "no-cache" });
     const [refetchStats] = useLazyQuery(GET_OVERVIEW_STATS, { fetchPolicy: "cache-and-network" });
+    const [refetchCanCreateOrg] = useLazyQuery(GET_CAN_CREATE_LOCAL_ORG, { fetchPolicy: "no-cache" });
+    const [createOrgMut] = useMutation(CREATE_ORGANIZATION);
+    const [addUserToOrgMut] = useMutation(ADD_USER_TO_ORGANIZATION);
 
     useEffect(() => {
         setOrganizationInactive(organization == null);
@@ -37,7 +42,7 @@ export default function ProjectsList() {
         if (!organizationInactive) {
             initData();
         } else {
-            createDefaultOrg(null);
+            createDefaultOrg();
         }
     }, [organizationInactive]);
 
@@ -79,9 +84,23 @@ export default function ProjectsList() {
 
     function handleWebsocketNotification(msgParts: any) {
 
+
     }
 
-    function createDefaultOrg(user: any) {
+    function createDefaultOrg() {
+        if (!isManaged && !isDemo) {
+            refetchCanCreateOrg().then((res) => {
+                setCanCreateOrg(res.data["canCreateLocalOrg"]);
+                if (canCreateOrg) {
+                    const localhostOrg = "localhost";
+                    createOrgMut({ variables: { name: localhostOrg } }).then((res) => {
+                        addUserToOrgMut({ variables: { userMail: user.mail, organizationName: localhostOrg } }).then((res) => {
+                            location.reload();
+                        });
+                    });
+                }
+            });
+        }
     }
 
     return (
@@ -190,8 +209,8 @@ export default function ProjectsList() {
                     </div>
                     <div className="h-screen overflow-y-scroll mt-3">
                         <div className="scrollable-size">
-                            {projects && projects.map((project: Project) => (
-                                <ProjectCard project={project} projectStatisticsById={projectStatisticsById}></ProjectCard>
+                            {projects && projects.map((project: Project, index: number) => (
+                                <ProjectCard project={project} projectStatisticsById={projectStatisticsById} key={index}></ProjectCard>
                             ))}
                         </div>
                     </div>

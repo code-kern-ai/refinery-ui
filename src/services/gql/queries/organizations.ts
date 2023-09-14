@@ -24,3 +24,9 @@ query {
   }
 }
 `;
+
+export const GET_CAN_CREATE_LOCAL_ORG = gql`
+query{
+  canCreateLocalOrg
+} 
+`;
