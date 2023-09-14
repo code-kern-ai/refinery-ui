@@ -12,3 +12,10 @@
     font-family: "DM Mono";
     src: url(../../public/fonts/DMMono-Regular.ttf);
 }
+
+@layer utilities {
+    .placeholder-italic::placeholder {
+        font-style: italic;
+        font-size: 14px;
+    }
+}

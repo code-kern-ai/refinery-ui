@@ -27,6 +27,11 @@ const initialState: Modals = {
         open: false,
         projectId: null
     },
+    [ModalEnum.MODAL_UPLOAD]: {
+        open: false,
+        file: null,
+        uploadFileType: null,
+    }
 };
 
 const modalSlice = createSlice({
