@@ -8,6 +8,7 @@ import UploadWrapper from "./helper-components/UploadWrapper";
 import { selectUploadData } from "@/src/reduxStore/states/upload";
 import { useMutation } from "@apollo/client";
 import { CREATE_PROJECT } from "@/src/services/gql/mutations/projects";
+import { setActiveProject } from "@/src/reduxStore/states/project";
 
 const SELECTED_TOKENIZER = 'English (en_core_web_sm)';
 
@@ -22,12 +23,10 @@ export default function Upload(props: UploadProps) {
 
     function submitUpload() {
         setSubmitted(true);
-        // if 
         if (uploadFileType == UploadFileType.RECORDS_NEW) {
             createProjectMut({ variables: { name: projectTitle, description: projectDescription } }).then((res) => {
                 const project = res.data.createProject['project'];
-
-
+                setActiveProject(project);
             })
         }
     }
