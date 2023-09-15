@@ -7,3 +7,13 @@ mutation ($projectId: ID!) {
   }
 }
 `;
+
+export const CREATE_PROJECT = gql`
+mutation ($name: String, $description: String!) {
+  createProject(name: $name, description: $description) {
+    project {
+      id
+    }
+  }
+}
+`;

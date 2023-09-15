@@ -6,12 +6,11 @@ import { useState } from "react";
 import { useSelector } from "react-redux";
 import { selectAllProjects } from "@/src/reduxStore/states/project";
 import Upload from "./Upload";
-import { selectModal } from "@/src/reduxStore/states/modal";
+import { selectUploadData } from "@/src/reduxStore/states/upload";
 
 export default function ModalUpload(props: UploadProps) {
     const projects = useSelector(selectAllProjects);
-    const modal = useSelector(selectModal(ModalEnum.MODAL_UPLOAD));
-    const uploadFileType = modal.uploadFileType;
+    const uploadFileType = useSelector(selectUploadData).uploadFileType;
 
     const title = getTitle(uploadFileType);
     const subTitle = getSubtitle(uploadFileType);

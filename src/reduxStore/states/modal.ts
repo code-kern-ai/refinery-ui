@@ -29,8 +29,6 @@ const initialState: Modals = {
     },
     [ModalEnum.MODAL_UPLOAD]: {
         open: false,
-        file: null,
-        uploadFileType: null,
     }
 };
 

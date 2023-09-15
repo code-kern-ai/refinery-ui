@@ -40,3 +40,11 @@ export const GET_OVERVIEW_STATS = gql`
 query{
   overviewStats
 }`;
+
+export const GET_ALL_TOKENIZER_OPTIONS = gql`
+query{
+  languageModels{
+    name,
+    configString
+  }
+}`;

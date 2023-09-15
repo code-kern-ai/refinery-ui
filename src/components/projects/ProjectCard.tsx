@@ -2,14 +2,14 @@ import { selectIsAdmin, selectIsDemo, selectUser } from "@/src/reduxStore/states
 import { openModal, selectModal, setModalStates } from "@/src/reduxStore/states/modal";
 import { removeFromAllProjectsById } from "@/src/reduxStore/states/project";
 import { DELETE_PROJECT } from "@/src/services/gql/mutations/projects";
-import { Project, ProjectCardProps, ProjectStatus } from "@/src/types/components/projects/list/projects-list";
+import { Project, ProjectCardProps, ProjectStatus } from "@/src/types/components/projects/projects-list";
 import { ModalEnum } from "@/src/types/shared/modal";
 import { isStringTrue } from "@/submodules/javascript-functions/general";
 import { useMutation } from "@apollo/client";
 import { Tooltip } from "@nextui-org/react";
 import { useRouter } from "next/router";
 import { useDispatch, useSelector } from "react-redux";
-import Modal from "../../shared/modal/Modal";
+import Modal from "../shared/modal/Modal";
 
 const UNKNOWN_USER: string = '<unknown user>';
 

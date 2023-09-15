@@ -1,4 +1,4 @@
-import { Project } from "../components/projects/list/projects-list";
+import { Project } from "../components/projects/projects-list";
 
 export enum UploadType {
     DEFAULT = "DEFAULT",
@@ -42,3 +42,29 @@ export type UploadOptions = {
     navigateToProject?: boolean;
     showBadPasswordMsg?: boolean;
 };
+
+export enum UploadStates {
+    PENDING = "PENDING",
+    WAITING = "WAITING",
+    IN_PROGRESS = "IN_PROGRESS",
+    DONE = "DONE",
+    ERROR = "ERROR",
+}
+
+export type UploadTask = {
+    fileAdditionalInfo: string;
+    id: string;
+    progress: number;
+    state: string;
+    userId: string;
+};
+
+export type UploadState = {
+    progress: number;
+    state: UploadStates;
+}
+
+export type UploadWrapperProps = {
+    isModal?: boolean;
+    submitUpload: () => void;
+}
