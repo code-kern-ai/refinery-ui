@@ -70,6 +70,7 @@ export type UploadWrapperProps = {
     uploadTask?: UploadTask;
     progressState?: UploadState;
     isModal?: boolean;
+    submitted?: boolean;
     submitUpload: () => void;
     sendSelectedFile: (file: File) => void;
 }

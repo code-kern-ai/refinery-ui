@@ -14,7 +14,7 @@ import ButtonsContainer from "./ButtonsContainer";
 import ProjectCard from "./ProjectCard";
 import { GET_CAN_CREATE_LOCAL_ORG } from "@/src/services/gql/queries/organizations";
 import { ADD_USER_TO_ORGANIZATION, CREATE_ORGANIZATION } from "@/src/services/gql/mutations/organizations";
-import { UploadFileType, UploadOptions } from "@/src/types/shared/upload";
+import { UploadOptions } from "@/src/types/shared/upload";
 import ModalUpload from "../shared/upload/ModalUpload";
 import style from "../../styles/projects-list.module.css"
 
@@ -29,15 +29,12 @@ export default function ProjectsList() {
     const [organizationInactive, setOrganizationInactive] = useState(null);
     const [projectStatisticsById, setProjectStatisticsById] = useState({});
     const [canCreateOrg, setCanCreateOrg] = useState(false);
-    const [showBadPasswordMsg, setShowBadPasswordMsg] = useState(false);
 
     const [refetchProjects] = useLazyQuery(GET_PROJECT_LIST, { fetchPolicy: "no-cache" });
     const [refetchStats] = useLazyQuery(GET_OVERVIEW_STATS, { fetchPolicy: "cache-and-network" });
     const [refetchCanCreateOrg] = useLazyQuery(GET_CAN_CREATE_LOCAL_ORG, { fetchPolicy: "no-cache" });
     const [createOrgMut] = useMutation(CREATE_ORGANIZATION);
     const [addUserToOrgMut] = useMutation(ADD_USER_TO_ORGANIZATION);
-
-    const uploadOptions: UploadOptions = { reloadOnFinish: false, deleteProjectOnFail: true, closeModalOnClick: true, isModal: true, navigateToProject: true, showBadPasswordMsg: showBadPasswordMsg };
 
     useEffect(() => {
         setOrganizationInactive(organization == null);
@@ -89,8 +86,11 @@ export default function ProjectsList() {
     }
 
     function handleWebsocketNotification(msgParts: any) {
-
-
+        if (['project_created', 'project_deleted', 'project_update'].includes(msgParts[1])) {
+            refetchProjects();
+            refetchStats();
+        }
+        // TODO: add logic for bad password
     }
 
     function createDefaultOrg() {
@@ -212,7 +212,6 @@ export default function ProjectsList() {
                 ) : (<div>
                     <div className="ml-4">
                         <ButtonsContainer />
-                        <ModalUpload uploadOptions={uploadOptions} />
                     </div>
                     <div className="h-screen overflow-y-scroll my-3">
                         <div className={style.scrollableSize}>

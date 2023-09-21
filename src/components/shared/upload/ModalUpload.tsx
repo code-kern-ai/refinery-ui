@@ -14,7 +14,7 @@ export default function ModalUpload(props: UploadProps) {
 
     const title = getTitle(uploadFileType);
     const subTitle = getSubtitle(uploadFileType);
-    const acceptButton = { buttonCaption: "Upload", closeAfterClick: false, disabled: false, emitFunction: () => { submitUpload() } }
+    const acceptButton = { buttonCaption: "Upload", closeAfterClick: false, useButton: true, disabled: false, emitFunction: () => { submitUpload() } }
 
     const [projectName, setProjectName] = useState<string>("");
     const [isProjectTitleDuplicate, setProjectTitleDuplicate] = useState<boolean>(false);

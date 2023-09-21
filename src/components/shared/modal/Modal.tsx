@@ -29,7 +29,7 @@ export default function Modal(props: any) {
         if (props.acceptButton == undefined) {
             const newProps = {
                 ...props,
-                acceptButton: { useButton: false }
+                acceptButton: { useButton: true }
             };
         }
         else {

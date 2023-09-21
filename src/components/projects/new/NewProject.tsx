@@ -3,10 +3,12 @@ import Upload from "../../shared/upload/Upload";
 import { useEffect, useState } from "react";
 import { useLazyQuery } from "@apollo/client";
 import { GET_ALL_TOKENIZER_OPTIONS } from "@/src/services/gql/queries/projects";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { selectIsManaged } from "@/src/reduxStore/states/general";
+import { setUploadFileType } from "@/src/reduxStore/states/upload";
 
 export default function NewProject() {
+    const dispatch = useDispatch();
     const isManaged = useSelector(selectIsManaged);
 
     const [tokenizerValues, setTokenizerValues] = useState([]);
@@ -18,6 +20,7 @@ export default function NewProject() {
     }
 
     useEffect(() => {
+        dispatch(setUploadFileType(UploadFileType.RECORDS_NEW));
         refetchTokenizerValues().then((res) => {
             setTokenizerValues(checkWhitelistTokenizer(res.data['languageModels']));
         })
