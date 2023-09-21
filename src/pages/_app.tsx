@@ -9,8 +9,15 @@ import store from '../reduxStore/store'
 import { GlobalStoreDataComponent } from '../reduxStore/StoreManagerComponent'
 import { NotificationsServiceWrapper } from '../services/base/web-sockets/WebSocketService'
 import { UserManagerWrapper } from '../services/base/user-management/UserManaged'
+import { ConfigManager } from '../services/base/config'
+import { useEffect } from 'react'
 
 export default function App({ Component, pageProps }: AppProps) {
+
+  useEffect(() => {
+    ConfigManager.refreshConfig();
+  }, []);
+
   return <>
     <Head>
       <title>Kern AI - refinery</title>

@@ -11,7 +11,7 @@ function getInitState(): UploadState {
     return {
         uploadFileType: null,
         uploadTask: null,
-        importOptions: null,
+        importOptions: ''
     };
 }
 

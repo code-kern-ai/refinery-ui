@@ -18,6 +18,7 @@ export default function ModalUpload(props: UploadProps) {
 
     const [projectName, setProjectName] = useState<string>("");
     const [isProjectTitleDuplicate, setProjectTitleDuplicate] = useState<boolean>(false);
+    const [startUpload, setStartUpload] = useState<boolean>(false);
 
     const uploadOptions: UploadOptions = {
         deleteProjectOnFail: props.uploadOptions.deleteProjectOnFail,
@@ -34,7 +35,7 @@ export default function ModalUpload(props: UploadProps) {
     }
 
     function submitUpload() {
-
+        setStartUpload(true);
     }
 
 
@@ -66,7 +67,7 @@ export default function ModalUpload(props: UploadProps) {
                     </div>
                 </div>
             )}
-            <Upload uploadOptions={uploadOptions} />
+            <Upload uploadOptions={uploadOptions} startUpload={startUpload} />
         </Modal>
     );
 }

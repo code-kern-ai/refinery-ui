@@ -1,6 +1,5 @@
 import { UploadFileType, UploadWrapperProps } from "@/src/types/shared/upload";
 import CryptedField from "./CryptedField";
-import DataSourceUpload from "./DataSourceUpload";
 import FileValidation from "./FileValidation";
 import UploadField from "./UploadField";
 import { useRef } from "react";
@@ -18,8 +17,7 @@ export default function UploadWrapper(props: UploadWrapperProps) {
     }
 
     return (<>
-        <DataSourceUpload />
-        <UploadField />
+        <UploadField uploadStarted={props.uploadStarted} doingSomething={props.doingSomething} uploadTask={props.uploadTask} progressState={props.progressState} sendSelectedFile={(file) => props.sendSelectedFile(file)} />
         <FileValidation />
         <CryptedField />
         <div className="form-group">

@@ -16,6 +16,7 @@ import { GET_CAN_CREATE_LOCAL_ORG } from "@/src/services/gql/queries/organizatio
 import { ADD_USER_TO_ORGANIZATION, CREATE_ORGANIZATION } from "@/src/services/gql/mutations/organizations";
 import { UploadFileType, UploadOptions } from "@/src/types/shared/upload";
 import ModalUpload from "../shared/upload/ModalUpload";
+import style from "../../styles/projects-list.module.css"
 
 export default function ProjectsList() {
     const dispatch = useDispatch();
@@ -213,8 +214,8 @@ export default function ProjectsList() {
                         <ButtonsContainer />
                         <ModalUpload uploadOptions={uploadOptions} />
                     </div>
-                    <div className="h-screen overflow-y-scroll mt-3">
-                        <div className="scrollable-size">
+                    <div className="h-screen overflow-y-scroll my-3">
+                        <div className={style.scrollableSize}>
                             {projects && projects.map((project: Project, index: number) => (
                                 <ProjectCard project={project} projectStatisticsById={projectStatisticsById} key={index}></ProjectCard>
                             ))}

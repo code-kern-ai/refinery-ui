@@ -1,5 +1,3 @@
-import { Project } from "../components/projects/projects-list";
-
 export enum UploadType {
     DEFAULT = "DEFAULT",
     LABEL_STUDIO = "LABEL_STUDIO"
@@ -15,6 +13,8 @@ export enum UploadFileType {
 
 export type UploadProps = {
     uploadOptions?: UploadOptions;
+    refetchProjects?: () => void;
+    startUpload?: boolean;
 }
 
 export type UploadOptions = {
@@ -65,6 +65,19 @@ export type UploadState = {
 }
 
 export type UploadWrapperProps = {
+    uploadStarted?: boolean;
+    doingSomething?: boolean;
+    uploadTask?: UploadTask;
+    progressState?: UploadState;
     isModal?: boolean;
     submitUpload: () => void;
+    sendSelectedFile: (file: File) => void;
+}
+
+export type UploadFieldProps = {
+    uploadStarted?: boolean;
+    doingSomething?: boolean;
+    uploadTask?: UploadTask;
+    progressState?: UploadState;
+    sendSelectedFile?: (file: File) => void;
 }
