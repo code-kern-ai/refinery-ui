@@ -20,7 +20,7 @@
     "aws-sdk": "^2.1460.0",
     "eslint": "8.47.0",
     "eslint-config-next": "13.4.19",
-    "graphql": "^16.8.0",
+    "graphql": "^16.8.1",
     "next": "13.4.19",
     "react": "18.2.0",
     "react-dom": "18.2.0",
