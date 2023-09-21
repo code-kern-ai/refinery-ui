@@ -33,6 +33,7 @@ export default function Upload(props: UploadProps) {
     const [selectedFile, setSelectedFile] = useState(null as File);
     const [projectTitle, setProjectTitle] = useState<string>("");
     const [projectDescription, setProjectDescription] = useState<string>("");
+    const [tokenizer, setTokenizer] = useState<string>(SELECTED_TOKENIZER_RECORD_NEW);
     const [submitted, setSubmitted] = useState<boolean>(false);
     const [uploadStarted, setUploadStarted] = useState<boolean>(false);
     const [doingSomething, setDoingSomething] = useState<boolean>(false);
@@ -40,6 +41,7 @@ export default function Upload(props: UploadProps) {
     const [uploadTask, setUploadTaskState] = useState<any>(null);
     const [isProjectTitleDuplicate, setIsProjectTitleDuplicate] = useState<boolean>(false);
     const [isProjectTitleEmpty, setIsProjectTitleEmpty] = useState<boolean>(false);
+    const [prepareTokenizedValues, setPrepareTokenizedValues] = useState<any[]>([]);
 
     const [createProjectMut] = useMutation(CREATE_PROJECT);
     const [deleteProjectMut] = useMutation(DELETE_PROJECT);
@@ -47,6 +49,16 @@ export default function Upload(props: UploadProps) {
     const [updateProjectStatusMut] = useMutation(UPDATE_PROJECT_STATUS);
     const [uploadCredentialsMut] = useLazyQuery(GET_UPLOAD_CREDENTIALS_AND_ID);
     const [getUploadTaskId] = useLazyQuery(GET_UPLOAD_TASK_BY_TASK_ID, { fetchPolicy: 'network-only' });
+
+    useEffect(() => {
+        const tokenizerValuesDisplay = [];
+        props.uploadOptions.tokenizerValues?.forEach((tokenizer: any, index: number) => {
+            const tokenizerNameContainsBrackets = tokenizer.name.includes('(') && tokenizer.name.includes(')');
+            tokenizer.name = tokenizer.name + (tokenizer.configString != undefined && !tokenizerNameContainsBrackets ? ` (${tokenizer.configString})` : '');
+            tokenizerValuesDisplay[index] = tokenizer;
+        });
+        setPrepareTokenizedValues(tokenizerValuesDisplay);
+    }, [props.uploadOptions]);
 
     useEffect(() => {
         reSubscribeToNotifications();
@@ -131,11 +143,11 @@ export default function Upload(props: UploadProps) {
     }
 
     function updateTokenizerAndProjectStatus(projectId: string) {
-        let tokenizer = "";
+        let tokenizerPrep = "";
         if (uploadFileType == UploadFileType.RECORDS_NEW) {
-            tokenizer = SELECTED_TOKENIZER_RECORD_NEW.split('(')[1].split(')')[0];
+            tokenizerPrep = tokenizer.split('(')[1].split(')')[0];
         } else {
-            tokenizer = SELECTED_TOKENIZER_PROJECT;
+            tokenizerPrep = SELECTED_TOKENIZER_PROJECT;
         }
         updateProjectTokenizerMut({ variables: { projectId: projectId, tokenizer: tokenizer } }).then((res) => {
             updateProjectStatusMut({ variables: { projectId: projectId, newStatus: ProjectStatus.INIT_COMPLETE } })
@@ -258,8 +270,8 @@ export default function Upload(props: UploadProps) {
                                 className="underline cursor-pointer">documentation</span></a> for further
                         details.
                     </label>
-                    {/* TODO add missing properties */}
-                    <Dropdown buttonName={SELECTED_TOKENIZER_RECORD_NEW} options={props.uploadOptions.tokenizerValues} />
+                    <Dropdown buttonName={tokenizer} options={prepareTokenizedValues} disabledOptions={props.uploadOptions.tokenizerValues.map((tokenizer: any) => tokenizer.disabled)}
+                        selectedOption={(option) => setTokenizer(option)} />
                 </div>
                 <UploadWrapper uploadStarted={uploadStarted} doingSomething={doingSomething} uploadTask={uploadTask} progressState={progressState} submitted={submitted}
                     isModal={props.uploadOptions.isModal} submitUpload={submitUpload} sendSelectedFile={(file) => setSelectedFile(file)} />

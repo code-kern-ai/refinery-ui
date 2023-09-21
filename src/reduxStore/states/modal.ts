@@ -29,7 +29,10 @@ const initialState: Modals = {
     },
     [ModalEnum.MODAL_UPLOAD]: {
         open: false,
-    }
+    },
+    [ModalEnum.SAMPLE_PROJECT_TITLE]: {
+        open: false,
+    },
 };
 
 const modalSlice = createSlice({

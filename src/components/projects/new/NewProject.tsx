@@ -6,6 +6,7 @@ import { GET_ALL_TOKENIZER_OPTIONS } from "@/src/services/gql/queries/projects";
 import { useDispatch, useSelector } from "react-redux";
 import { selectIsManaged } from "@/src/reduxStore/states/general";
 import { setUploadFileType } from "@/src/reduxStore/states/upload";
+import { ConfigManager } from "@/src/services/base/config";
 
 export default function NewProject() {
     const dispatch = useDispatch();
@@ -26,11 +27,13 @@ export default function NewProject() {
         })
     }, []);
 
+    useEffect(() => {
+        uploadOptions.tokenizerValues = tokenizerValues;
+    }, [tokenizerValues]);
+
     function checkWhitelistTokenizer(tokenizer) {
         tokenizer = Array.from(tokenizer);
-        // TODO: change this to the allowed configs
-        // const allowedConfigs = ConfigManager.getConfigValue("spacy_downloads");
-        const allowedConfigs = ["en_core_web_sm", "de_core_news_sm"];
+        const allowedConfigs = ConfigManager.getConfigValue("spacy_downloads");
         for (let i = 0; i < tokenizer.length; i++) {
             tokenizer[i] = { ...tokenizer[i] };
             tokenizer[i].disabled = !allowedConfigs.includes(tokenizer[i].configString);
@@ -46,7 +49,7 @@ export default function NewProject() {
                     insertPos = i;
                     firstNotAvailable = false;
                 }
-            } else t.disabled = null;
+            } else t.disabled = false;
         }
 
         if (insertPos != -1) {

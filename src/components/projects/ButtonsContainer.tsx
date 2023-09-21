@@ -8,6 +8,7 @@ import { useRouter } from "next/router";
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux"
 import ModalUpload from "../shared/upload/ModalUpload";
+import SampleProjectsDropdown from "./SampleProjectsDropdown";
 
 export default function ButtonsContainer() {
     const router = useRouter();
@@ -32,8 +33,8 @@ export default function ButtonsContainer() {
             }} className="bg-blue-700 text-white text-xs font-semibold ml-6 mt-6 mr-6 xs:mr-0 px-4 py-2.5 rounded-md cursor-pointer hover:bg-blue-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
                 Import snapshot
             </button>
+            <SampleProjectsDropdown />
             <ModalUpload uploadOptions={uploadOptions} />
-            {/* TODO: Add dropdown for sample projects */}
         </div>) : (<></>)
     )
 }

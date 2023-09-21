@@ -48,3 +48,16 @@ query{
     configString
   }
 }`;
+
+export const CREATE_SAMPLE_PROJECT = gql`
+mutation($name:String, $projectType: String){
+  createSampleProject(name: $name, projectType: $projectType){
+    ok
+    project{
+      id
+      name
+      description
+    }
+  }
+}  
+`;

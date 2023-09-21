@@ -8,7 +8,6 @@ export default function NewProjectPage() {
     const dispatch = useDispatch();
 
     useEffect(() => {
-        console.log("setting current page to new project")
         dispatch(setCurrentPage(CurrentPage.NEW_PROJECT))
     }, [])
 
