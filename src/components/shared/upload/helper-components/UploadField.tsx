@@ -2,7 +2,7 @@ import { UploadFieldProps, UploadStates } from "@/src/types/shared/upload";
 import { formatBytes } from "@/submodules/javascript-functions/general";
 import { useRef, useState } from "react";
 import LoadingIcon from "../../loading/LoadingIcon";
-import { useDispatch } from "react-redux";
+import { UploadHelper } from "../Upload";
 
 export default function UploadField(props: UploadFieldProps) {
     const fileUpload = useRef<HTMLInputElement>(null);
@@ -55,19 +55,19 @@ export default function UploadField(props: UploadFieldProps) {
                                     Remove
                                 </button></>)}
 
-                            {props.uploadStarted && !file && (props.uploadTask?.state == UploadStates.IN_PROGRESS || props.uploadTask?.state == UploadStates.WAITING || props.uploadTask?.state == UploadStates.PENDING) && <div>
+                            {props.uploadStarted && props.isFileCleared && (UploadHelper.getUploadTask()?.state == UploadStates.IN_PROGRESS || UploadHelper.getUploadTask()?.state == UploadStates.WAITING || UploadHelper.getUploadTask()?.state == UploadStates.PENDING) && <div>
                                 <div className="flex flex-row items-center flex-nowrap -mt-1 mx-2 mb-2">
                                     <span className="whitespace-nowrap">Preparing data...</span>
                                     <LoadingIcon size="btn-xs" color="blue" />
 
                                     <div className="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700">
-                                        <div className="bg-blue-700 h-2.5 rounded-full" style={{ 'width': props.uploadTask.progress + '%' }}>
+                                        <div className="bg-blue-700 h-2.5 rounded-full" style={{ 'width': UploadHelper.getUploadTask().progress + '%' }}>
                                         </div>
                                     </div>
                                 </div>
                             </div>}
 
-                            {file && props.progressState && <div className="m-2">
+                            {!props.isFileCleared && props.progressState && <div className="m-2">
                                 {!(props.progressState.state === UploadStates.ERROR) && <div className="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700">
                                     <div className="bg-green-400 h-2.5 rounded-full" style={{ 'width': props.progressState.progress + '%' }}>
                                     </div>

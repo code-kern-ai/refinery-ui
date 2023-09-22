@@ -20,7 +20,7 @@ export default function UploadWrapper(props: UploadWrapperProps) {
     }
 
     return (<>
-        <UploadField uploadStarted={props.uploadStarted} doingSomething={props.doingSomething} uploadTask={props.uploadTask} progressState={props.progressState} sendSelectedFile={(file) => {
+        <UploadField isFileCleared={props.isFileCleared} uploadStarted={props.uploadStarted} doingSomething={props.doingSomething} progressState={props.progressState} sendSelectedFile={(file) => {
             setSelectedFile(file);
             props.sendSelectedFile(file)
         }} />
@@ -64,6 +64,7 @@ export default function UploadWrapper(props: UploadWrapperProps) {
             </div>
         </div>
 
+        {/* TODO: check the condition if the embeddings that are recreated will cost */}
         {
             uploadFileType == UploadFileType.RECORDS_ADD && <div className="text-sm text-gray-500 font-normal">
                 <strong className="text-sm text-gray-700 font-medium">CAUTION:</strong> Submitting new records will automatically

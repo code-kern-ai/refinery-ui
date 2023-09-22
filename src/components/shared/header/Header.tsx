@@ -6,8 +6,10 @@ import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import style from "../../../styles/header.module.css"
 import LogoutDropdown from "./LogoutDropdown";
+import { useRouter } from "next/router";
 
 export default function Header() {
+    const router = useRouter();
     const isDemo = useSelector(selectIsDemo);
     const isManaged = useSelector(selectIsManaged);
     const currentPage = useSelector(selectCurrentPage);
@@ -50,7 +52,7 @@ export default function Header() {
                 <div className="flex flex-row flex-nowrap items-center">
                     <div className="flex items-center justify-center">
                         <Tooltip placement="left" trigger="hover" color="invert" content="Home page - Projects" >
-                            <a className="flex mr-6">
+                            <a className="flex mr-6" onClick={() => router.push('/projects')}>
                                 <svg xmlns="http://www.w3.org/2000/svg" className="icon icon-tabler icon-tabler-home" width="24"
                                     height="24" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" fill="none"
                                     strokeLinecap="round" strokeLinejoin="round">
@@ -65,7 +67,7 @@ export default function Header() {
                     {user?.role == UserRole.ENGINEER ? (
                         <div className="flex items-center justify-center">
                             <Tooltip placement="left" trigger="hover" color="invert" content="Home page - Users">
-                                <a className="flex mr-6 tooltip tooltip-left" data-tip="Home page - Users">
+                                <a className="flex mr-6" onClick={() => router.push('/users')}>
                                     <svg xmlns="http://www.w3.org/2000/svg" className="icon icon-tabler icon-tabler-hexagons" width="24"
                                         height="24" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" fill="none"
                                         strokeLinecap="round" strokeLinejoin="round">

@@ -18,9 +18,9 @@ export default function LogoutDropdown() {
     return (
         <Menu as="div" className="relative inline-block text-left">
             <div>
-                <Menu.Button className="flex items-center rounded-full bg-gray-100 text-gray-400 hover:text-gray-600 focus:outline-none mr-4">
+                {user && <Menu.Button className="flex items-center rounded-full bg-gray-100 text-gray-400 hover:text-gray-600 focus:outline-none mr-4">
                     <img className="h-8 w-8 rounded-full" src={`/refinery/avatars/${user?.avatarUri}`} />
-                </Menu.Button>
+                </Menu.Button>}
             </div>
 
             <Transition

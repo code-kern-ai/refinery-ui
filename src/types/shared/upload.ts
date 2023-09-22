@@ -13,7 +13,6 @@ export enum UploadFileType {
 
 export type UploadProps = {
     uploadOptions?: UploadOptions;
-    refetchProjects?: () => void;
     startUpload?: boolean;
 }
 
@@ -71,6 +70,7 @@ export type UploadWrapperProps = {
     progressState?: UploadState;
     isModal?: boolean;
     submitted?: boolean;
+    isFileCleared?: boolean;
     submitUpload: () => void;
     sendSelectedFile: (file: File) => void;
 }
@@ -80,5 +80,6 @@ export type UploadFieldProps = {
     doingSomething?: boolean;
     uploadTask?: UploadTask;
     progressState?: UploadState;
+    isFileCleared?: boolean;
     sendSelectedFile?: (file: File) => void;
 }
