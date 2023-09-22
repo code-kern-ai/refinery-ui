@@ -1,7 +1,6 @@
 import { UploadFileType, UploadProps, UploadState, UploadStates, UploadTask, UploadType } from "@/src/types/shared/upload";
 import { useDispatch, useSelector } from "react-redux";
 import UploadField from "./helper-components/UploadField";
-import CryptedField from "./helper-components/CryptedField";
 import { useEffect, useState } from "react";
 import Dropdown from "@/submodules/react-components/components/Dropdown";
 import UploadWrapper from "./helper-components/UploadWrapper";
@@ -16,6 +15,7 @@ import { MiscInfo } from "@/src/services/base/web-sockets/misc";
 import { jsonCopy } from "@/submodules/javascript-functions/general";
 import { useRouter } from "next/router";
 import { extendAllProjects, removeFromAllProjectsById, selectAllProjects } from "@/src/reduxStore/states/project";
+import CryptedField from "../crypted-field/CryptedField";
 
 
 const SELECTED_TOKENIZER_RECORD_NEW = 'English (en_core_web_sm)';
@@ -275,7 +275,8 @@ export default function Upload(props: UploadProps) {
         <section className={`${!props.uploadOptions.isModal ? 'p-4' : ''}`}>
             {uploadFileType == UploadFileType.PROJECT && (<>
                 <UploadField isFileCleared={selectedFile == null} uploadStarted={uploadStarted} doingSomething={doingSomething} progressState={progressState} sendSelectedFile={(file) => setSelectedFile(file)} />
-                <CryptedField />
+                {/* TODO: Add crypted field */}
+                {/* <CryptedField /> */}
                 {props.uploadOptions.showBadPasswordMsg && (<div className="text-red-700 text-xs mt-2 text-center">Wrong password</div>)}
             </>
             )}

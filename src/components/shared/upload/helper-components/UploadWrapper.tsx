@@ -1,11 +1,10 @@
 import { UploadFileType, UploadStates, UploadWrapperProps } from "@/src/types/shared/upload";
-import CryptedField from "./CryptedField";
-import FileValidation from "./FileValidation";
 import UploadField from "./UploadField";
 import { useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { selectUploadData, setImportOptions } from "@/src/reduxStore/states/upload";
 import { useRouter } from "next/router";
+import CryptedField from "../../crypted-field/CryptedField";
 
 export default function UploadWrapper(props: UploadWrapperProps) {
     const router = useRouter();
@@ -44,7 +43,8 @@ export default function UploadWrapper(props: UploadWrapperProps) {
             </div>
         </div >}
 
-        <CryptedField />
+        {/* TODO: Add crypted field */}
+        {/* <CryptedField /> */}
 
         <div className="form-group">
             <label className="text-gray-500 text-sm font-normal">
