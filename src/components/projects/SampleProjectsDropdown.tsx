@@ -31,7 +31,7 @@ export default function SampleProjectsDropdown() {
             dispatch(openModal(ModalEnum.SAMPLE_PROJECT_TITLE));
             return;
         }
-        if (projectNameInput == "") return;
+        if (projectNameInput == "" && projectName == "") return;
         const projectNameFinal = projectName ? projectName : projectNameInput;
         const projectTypeFinal = projectType ? projectType : projectTypeInput;
         createSampleProjectMut({ variables: { name: projectNameFinal, projectType: projectTypeFinal } }).then((res) => {
@@ -181,7 +181,7 @@ export default function SampleProjectsDropdown() {
                 <div className="text-sm text-gray-500 mb-4 text-center">
                     Please enter a custom title for the sample project
                 </div>
-                <div className="form-control">
+                <div className="form-control text-left">
                     <label className="text-gray-500 text-sm font-normal">Project title</label>
                     <div className="flex flex-row">
                         <input value={projectNameInput} type="text" onInput={(e: any) => {
@@ -198,7 +198,7 @@ export default function SampleProjectsDropdown() {
                     {checkIfProjectNameExists && (<div className="text-red-700 text-xs mt-2 text-left">Project title exists</div>)}
                     <div className="flex flex-row mt-2">
                         <svg xmlns="http://www.w3.org/2000/svg" className="icon icon-tabler icon-tabler-alert-triangle text-yellow-700"
-                            width="20" height="20" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none"
+                            width="20" height="20" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" fill="none"
                             strokeLinecap="round" strokeLinejoin="round">
                             <path stroke="none" d="M0 0h24v24H0z" fill="none" />
                             <path

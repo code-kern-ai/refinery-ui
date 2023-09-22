@@ -10,14 +10,14 @@ import { useRouter } from "next/router";
 export default function UploadWrapper(props: UploadWrapperProps) {
     const router = useRouter();
     const dispatch = useDispatch();
+
     const uploadFileType = useSelector(selectUploadData).uploadFileType;
-    const textareaRef = useRef<HTMLTextAreaElement>(null);
+    const importOptions = useSelector(selectUploadData).importOptions;
 
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
-    function submitUploadFile() {
-        props.submitUpload();
-    }
+    const textareaRef = useRef<HTMLTextAreaElement>(null);
+
 
     return (<>
         <UploadField isFileCleared={props.isFileCleared} uploadStarted={props.uploadStarted} doingSomething={props.doingSomething} progressState={props.progressState} sendSelectedFile={(file) => {
@@ -58,7 +58,7 @@ export default function UploadWrapper(props: UploadWrapperProps) {
                 it blank, we&apos;ll use default settings
             </label>
             <div>
-                <textarea ref={textareaRef} className="shadow mt-1 p-4 text-sm w-full placeholder-indigo rounded-md" rows={3}
+                <textarea value={importOptions} ref={textareaRef} className="shadow mt-1 p-4 text-sm w-full placeholder-indigo rounded-md" rows={3}
                     placeholder={`E.g. for uncommon CSV ${'\n'} sep=t ${'\n'} lineterminator=r`}
                     onChange={() => dispatch(setImportOptions(textareaRef.current?.value))}></textarea>
             </div>
@@ -77,7 +77,7 @@ export default function UploadWrapper(props: UploadWrapperProps) {
 
         {
             !props.isModal && <div className="mt-4 flex flex-row gap-x-2">
-                <button onClick={submitUploadFile} type="submit"
+                <button onClick={props.submitUpload} type="submit"
                     className="bg-blue-700 text-white text-xs font-semibold px-4 py-2 rounded-md hover:bg-blue-800 focus:outline-none opacity-100 cursor-pointer">
                     Proceed
                 </button>
