@@ -5,7 +5,7 @@ import CryptedField from "./helper-components/CryptedField";
 import { useEffect, useState } from "react";
 import Dropdown from "@/submodules/react-components/components/Dropdown";
 import UploadWrapper from "./helper-components/UploadWrapper";
-import { selectUploadData } from "@/src/reduxStore/states/upload";
+import { selectUploadData, setImportOptions } from "@/src/reduxStore/states/upload";
 import { useLazyQuery, useMutation } from "@apollo/client";
 import { CREATE_PROJECT, DELETE_PROJECT, GET_UPLOAD_CREDENTIALS_AND_ID, GET_UPLOAD_TASK_BY_TASK_ID, UPDATE_PROJECT_STATUS, UPDATE_PROJECT_TOKENIZER } from "@/src/services/gql/mutations/projects";
 import { ProjectStatus } from "@/src/types/components/projects/projects-list";
@@ -180,7 +180,7 @@ export default function Upload(props: UploadProps) {
         } else {
             tokenizerPrep = SELECTED_TOKENIZER_PROJECT;
         }
-        updateProjectTokenizerMut({ variables: { projectId: UploadHelper.getProjectId(), tokenizer: tokenizer } }).then((res) => {
+        updateProjectTokenizerMut({ variables: { projectId: UploadHelper.getProjectId(), tokenizer: tokenizerPrep } }).then((res) => {
             updateProjectStatusMut({ variables: { projectId: UploadHelper.getProjectId(), newStatus: ProjectStatus.INIT_COMPLETE } })
         });
     }
@@ -235,7 +235,6 @@ export default function Upload(props: UploadProps) {
 
     function handleUploadTaskResult(task: UploadTask) {
         UploadHelper.setUploadTask(task);
-        setDoingSomething(true);
         if (task.state == UploadStates.DONE || task.progress == 100) {
             clearUploadTask();
             if (props.uploadOptions.reloadOnFinish) location.reload();
@@ -254,6 +253,10 @@ export default function Upload(props: UploadProps) {
         setSelectedFile(null);
         clearUploadTask();
         setUploadStarted(false);
+        setProjectTitle("");
+        setProjectDescription("");
+        setTokenizer(SELECTED_TOKENIZER_RECORD_NEW);
+        dispatch(setImportOptions(""));
     }
 
     function deleteExistingProject() {
@@ -271,7 +274,7 @@ export default function Upload(props: UploadProps) {
     return (
         <section className={`${!props.uploadOptions.isModal ? 'p-4' : ''}`}>
             {uploadFileType == UploadFileType.PROJECT && (<>
-                <UploadField uploadStarted={uploadStarted} doingSomething={doingSomething} progressState={progressState} sendSelectedFile={(file) => setSelectedFile(file)} />
+                <UploadField isFileCleared={selectedFile == null} uploadStarted={uploadStarted} doingSomething={doingSomething} progressState={progressState} sendSelectedFile={(file) => setSelectedFile(file)} />
                 <CryptedField />
                 {props.uploadOptions.showBadPasswordMsg && (<div className="text-red-700 text-xs mt-2 text-center">Wrong password</div>)}
             </>

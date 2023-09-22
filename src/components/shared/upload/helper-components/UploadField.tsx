@@ -1,6 +1,6 @@
 import { UploadFieldProps, UploadStates } from "@/src/types/shared/upload";
 import { formatBytes } from "@/submodules/javascript-functions/general";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import LoadingIcon from "../../loading/LoadingIcon";
 import { UploadHelper } from "../Upload";
 
@@ -11,6 +11,12 @@ export default function UploadField(props: UploadFieldProps) {
 
     // TODO: add this when the crypted field is added
     // const fileEndsWithZip: boolean = file ? file.name.endsWith(".zip") : false;
+
+    useEffect(() => {
+        if (props.isFileCleared) {
+            setFile(null);
+        }
+    }, [props.isFileCleared]);
 
     function onFileInput(e: Event) {
         e.stopPropagation();
