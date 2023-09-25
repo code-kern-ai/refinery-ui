@@ -10,6 +10,7 @@ import { useRouter } from "next/router";
 
 export default function Header() {
     const router = useRouter();
+
     const isDemo = useSelector(selectIsDemo);
     const isManaged = useSelector(selectIsManaged);
     const currentPage = useSelector(selectCurrentPage);

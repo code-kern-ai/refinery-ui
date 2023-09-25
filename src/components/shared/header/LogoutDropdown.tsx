@@ -9,6 +9,7 @@ import { combineClassNames } from '@/submodules/javascript-functions/general'
 
 export default function LogoutDropdown() {
     const router = useRouter();
+
     const isManaged = useSelector(selectIsManaged);
     const user = useSelector(selectUser);
 

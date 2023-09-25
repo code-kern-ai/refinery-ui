@@ -10,9 +10,11 @@ import { ConfigManager } from "@/src/services/base/config";
 
 export default function NewProject() {
     const dispatch = useDispatch();
+
     const isManaged = useSelector(selectIsManaged);
 
     const [tokenizerValues, setTokenizerValues] = useState([]);
+
     const [refetchTokenizerValues] = useLazyQuery(GET_ALL_TOKENIZER_OPTIONS, { fetchPolicy: 'cache-first' });
 
     const uploadOptions: UploadOptions = {

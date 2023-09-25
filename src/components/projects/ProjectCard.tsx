@@ -15,8 +15,8 @@ import { useState } from "react";
 const UNKNOWN_USER: string = '<unknown user>';
 
 export default function ProjectCard(props: ProjectCardProps) {
-    const dispatch = useDispatch();
     const router = useRouter();
+    const dispatch = useDispatch();
 
     const isDemo = useSelector(selectIsDemo);
     const isAdmin = useSelector(selectIsAdmin);

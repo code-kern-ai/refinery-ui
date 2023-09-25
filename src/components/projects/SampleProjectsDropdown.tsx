@@ -13,13 +13,15 @@ import Modal from '../shared/modal/Modal';
 export default function SampleProjectsDropdown() {
     const router = useRouter();
     const dispatch = useDispatch();
+
     const projects = useSelector(selectAllProjects);
 
-    const [createSampleProjectMut] = useMutation(CREATE_SAMPLE_PROJECT);
     const [projectNameInput, setProjectNameInput] = useState<string>("");
     const [projectTypeInput, setProjectTypeInput] = useState<string>("");
     const [checkIfProjectNameExists, setCheckIfProjectNameExists] = useState<boolean>(false);
     const [acceptButton, setAcceptButton] = useState({ buttonCaption: "Create", closeAfterClick: false, useButton: true, disabled: true, emitFunction: () => { importSampleProject() } })
+
+    const [createSampleProjectMut] = useMutation(CREATE_SAMPLE_PROJECT);
 
     function importSampleProject(projectName?: string, projectType?: string) {
         const checkIfProjectExists = projects.find((project) => project.name === projectName);

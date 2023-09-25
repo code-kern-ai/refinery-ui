@@ -18,6 +18,7 @@ export const ACTIONS_DROPDOWN_OPTIONS = ['Select all', 'Deselect all', 'Delete s
 
 export default function LookupListsOverview() {
     const dispatch = useDispatch();
+
     const project = useSelector(selectProject);
     const lookupLists = useSelector(selectAllLookupLists);
     const checkedLookupLists = useSelector(selectCheckedLookupLists);
@@ -32,14 +33,12 @@ export default function LookupListsOverview() {
         useButton: true, buttonCaption: "Delete", disabled: false, closeAfterClick: true, emitFunction: () => { deleteLookupLists() }
     });
 
-
     useEffect(() => {
         if (!project) return;
         getLookupLists({ variables: { projectId: project.id } }).then((res) => {
             dispatch(setAllLookupLists(res.data["knowledgeBasesByProjectId"]));
         });
     }, [project]);
-
 
     function createLookupList() {
         createLookupListMut({ variables: { projectId: project.id } }).then((res) => {
