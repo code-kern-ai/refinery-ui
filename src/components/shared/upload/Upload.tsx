@@ -11,7 +11,7 @@ import { ProjectStatus } from "@/src/types/components/projects/projects-list";
 import { timer } from "rxjs";
 import { uploadFile } from "@/src/services/base/s3-service";
 import { CurrentPage } from "@/src/types/shared/general";
-import { MiscInfo } from "@/src/services/base/web-sockets/misc";
+import { WebSocketsService } from "@/src/services/base/web-sockets/misc";
 import { jsonCopy } from "@/submodules/javascript-functions/general";
 import { useRouter } from "next/router";
 import { extendAllProjects, removeFromAllProjectsById, selectAllProjects } from "@/src/reduxStore/states/project";
@@ -70,6 +70,18 @@ export default function Upload(props: UploadProps) {
     const [getUploadTaskId] = useLazyQuery(GET_UPLOAD_TASK_BY_TASK_ID, { fetchPolicy: 'network-only' });
 
     useEffect(() => {
+        const handleRouteChange = (url, { shallow }) => {
+            WebSocketsService.unsubscribeFromNotifications(CurrentPage.PROJECTS);
+            WebSocketsService.unsubscribeFromNotifications(CurrentPage.NEW_PROJECT);
+        };
+        router.events.on('routeChangeStart', handleRouteChange);
+        return () => {
+            router.events.off('routeChangeStart', handleRouteChange);
+        };
+    }, []);
+
+
+    useEffect(() => {
         const tokenizerValuesDisplay = [];
         props.uploadOptions.tokenizerValues?.forEach((tokenizer: any, index: number) => {
             const tokenizerNameContainsBrackets = tokenizer.name.includes('(') && tokenizer.name.includes(')');
@@ -87,12 +99,12 @@ export default function Upload(props: UploadProps) {
 
     function subscribeToNotifications(): void {
         if (uploadFileType == UploadFileType.PROJECT) {
-            MiscInfo.subscribeToNotifications(CurrentPage.PROJECTS, {
+            WebSocketsService.subscribeToNotifications(CurrentPage.PROJECTS, {
                 whitelist: ['file_upload'],
                 func: handleWebsocketNotification
             });
         } else {
-            MiscInfo.subscribeToNotifications(CurrentPage.NEW_PROJECT, {
+            WebSocketsService.subscribeToNotifications(CurrentPage.NEW_PROJECT, {
                 projectId: UploadHelper.getProjectId(),
                 whitelist: ['file_upload'],
                 func: handleWebsocketNotification
@@ -186,7 +198,8 @@ export default function Upload(props: UploadProps) {
     }
 
     function reSubscribeToNotifications() {
-        MiscInfo.unsubscribeFromNotifications(CurrentPage.NEW_PROJECT);
+        WebSocketsService.unsubscribeFromNotifications(CurrentPage.PROJECTS);
+        WebSocketsService.unsubscribeFromNotifications(CurrentPage.NEW_PROJECT);
         subscribeToNotifications();
     }
 
@@ -260,8 +273,9 @@ export default function Upload(props: UploadProps) {
     }
 
     function deleteExistingProject() {
-        deleteProjectMut({ variables: { projectId: UploadHelper.getProjectId() } }).then((res) => {
-            dispatch(removeFromAllProjectsById(UploadHelper.getProjectId()));
+        const projectId = UploadHelper.getProjectId();
+        deleteProjectMut({ variables: { projectId: projectId } }).then((res) => {
+            dispatch(removeFromAllProjectsById(projectId));
         });
     }
 

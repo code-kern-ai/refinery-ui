@@ -1,5 +1,5 @@
 import { selectIsAdmin, selectIsDemo, selectUser } from "@/src/reduxStore/states/general";
-import { openModal, selectModal, setModalStates } from "@/src/reduxStore/states/modal";
+import { closeModal, openModal } from "@/src/reduxStore/states/modal";
 import { removeFromAllProjectsById } from "@/src/reduxStore/states/project";
 import { DELETE_PROJECT } from "@/src/services/gql/mutations/projects";
 import { Project, ProjectCardProps, ProjectStatus } from "@/src/types/components/projects/projects-list";
@@ -10,6 +10,7 @@ import { Tooltip } from "@nextui-org/react";
 import { useRouter } from "next/router";
 import { useDispatch, useSelector } from "react-redux";
 import Modal from "../shared/modal/Modal";
+import { useState } from "react";
 
 const UNKNOWN_USER: string = '<unknown user>';
 
@@ -20,7 +21,8 @@ export default function ProjectCard(props: ProjectCardProps) {
     const isDemo = useSelector(selectIsDemo);
     const isAdmin = useSelector(selectIsAdmin);
     const user = useSelector(selectUser);
-    const modal = useSelector(selectModal(ModalEnum.ADMIN_DELETE_PROJECT));
+
+    const [saveProjectId, setSaveProjectId] = useState<string | null>(null);
 
     const [deleteProjectByIdMut] = useMutation(DELETE_PROJECT, { fetchPolicy: "no-cache" });
 
@@ -30,7 +32,7 @@ export default function ProjectCard(props: ProjectCardProps) {
     function adminOpenOrDeleteProject(project: Project) {
         if (!isAdmin) return;
         const deleteInstant = isStringTrue(localStorage.getItem("adminInstantDelete"));
-        dispatch(setModalStates(ModalEnum.ADMIN_DELETE_PROJECT, { projectId: project.id, open: true }))
+        setSaveProjectId(project.id);
         if (deleteInstant) adminDeleteProject();
         else {
             dispatch(openModal(ModalEnum.ADMIN_DELETE_PROJECT));
@@ -43,10 +45,10 @@ export default function ProjectCard(props: ProjectCardProps) {
     }
 
     function adminDeleteProject() {
-        if (!isAdmin || modal.projectId == null) return;
-        deleteProjectByIdMut({ variables: { projectId: modal.projectId } }).then((res) => {
-            dispatch(setModalStates(ModalEnum.ADMIN_DELETE_PROJECT, { open: false, projectId: null }));
-            dispatch(removeFromAllProjectsById(modal.projectId));
+        if (!isAdmin || saveProjectId == null) return;
+        deleteProjectByIdMut({ variables: { projectId: saveProjectId } }).then(() => {
+            dispatch(closeModal(ModalEnum.ADMIN_DELETE_PROJECT));
+            dispatch(removeFromAllProjectsById(saveProjectId));
         })
     }
 
@@ -80,7 +82,7 @@ export default function ProjectCard(props: ProjectCardProps) {
                     </div>}
                     {isAdmin &&
                         <div className="absolute top-0 left-0 cursor-pointer" onClick={() => adminOpenOrDeleteProject(props.project)}>
-                            <Tooltip content="Admin function: Quick delete project" color="invert" offset={2}>
+                            <Tooltip content="Admin function: Quick delete project" color="invert" offset={2} placement="right">
                                 <svg className="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                                     strokeWidth="1.5" stroke="currentColor" aria-hidden="true">
                                     <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />

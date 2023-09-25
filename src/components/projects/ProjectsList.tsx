@@ -1,6 +1,6 @@
 import { selectIsDemo, selectIsManaged, selectOrganization, selectUser } from "@/src/reduxStore/states/general"
 import { selectAllProjects, setAllProjects } from "@/src/reduxStore/states/project";
-import { MiscInfo } from "@/src/services/base/web-sockets/misc";
+import { WebSocketsService } from "@/src/services/base/web-sockets/misc";
 import { GET_OVERVIEW_STATS, GET_PROJECT_LIST } from "@/src/services/gql/queries/projects";
 import { Project, ProjectStatistics, ProjectStatus } from "@/src/types/components/projects/projects-list";
 import { CurrentPage } from "@/src/types/shared/general";
@@ -15,8 +15,10 @@ import ProjectCard from "./ProjectCard";
 import { GET_CAN_CREATE_LOCAL_ORG } from "@/src/services/gql/queries/organizations";
 import { ADD_USER_TO_ORGANIZATION, CREATE_ORGANIZATION } from "@/src/services/gql/mutations/organizations";
 import style from "../../styles/projects-list.module.css"
+import { useRouter } from "next/router";
 
 export default function ProjectsList() {
+    const router = useRouter();
     const dispatch = useDispatch();
 
     const organization = useSelector(selectOrganization);
@@ -33,6 +35,17 @@ export default function ProjectsList() {
     const [refetchCanCreateOrg] = useLazyQuery(GET_CAN_CREATE_LOCAL_ORG, { fetchPolicy: "no-cache" });
     const [createOrgMut] = useMutation(CREATE_ORGANIZATION);
     const [addUserToOrgMut] = useMutation(ADD_USER_TO_ORGANIZATION);
+
+    useEffect(() => {
+        const handleRouteChange = (url, { shallow }) => {
+            WebSocketsService.unsubscribeFromNotifications(CurrentPage.PROJECTS);
+        };
+        router.events.on('routeChangeStart', handleRouteChange);
+        return () => {
+            router.events.off('routeChangeStart', handleRouteChange);
+        };
+    }, []);
+
 
     useEffect(() => {
         setOrganizationInactive(organization == null);
@@ -77,7 +90,7 @@ export default function ProjectsList() {
             setProjectStatisticsById(statsDict);
         });
 
-        MiscInfo.subscribeToNotifications(CurrentPage.PROJECTS, {
+        WebSocketsService.subscribeToNotifications(CurrentPage.PROJECTS, {
             whitelist: ['project_created', 'project_deleted', 'project_update', 'file_upload', 'bad_password'],
             func: handleWebsocketNotification
         });

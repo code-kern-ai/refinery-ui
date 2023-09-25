@@ -7,7 +7,7 @@ import Layout from '../components/shared/layout/Layout'
 import { Provider } from 'react-redux'
 import store from '../reduxStore/store'
 import { GlobalStoreDataComponent } from '../reduxStore/StoreManagerComponent'
-import { NotificationsServiceWrapper } from '../services/base/web-sockets/WebSocketService'
+import { WebSocketsWrapper } from '../services/base/web-sockets/WebSocketService'
 import { ConfigManager } from '../services/base/config'
 import { useEffect } from 'react'
 
@@ -27,11 +27,11 @@ export default function App({ Component, pageProps }: AppProps) {
     <Provider store={store}>
       <ApolloProvider client={client}>
         <GlobalStoreDataComponent>
-          <NotificationsServiceWrapper>
+          <WebSocketsWrapper>
             <Layout {...pageProps}>
               <Component {...pageProps} />
             </Layout>
-          </NotificationsServiceWrapper>
+          </WebSocketsWrapper>
         </GlobalStoreDataComponent>
       </ApolloProvider>
     </Provider>

@@ -1,7 +1,7 @@
 import { memo, useEffect, useState } from "react";
 import { timer } from "rxjs";
 import { webSocket } from "rxjs/webSocket";
-import { MiscInfo, NotificationSubscription } from "./misc";
+import { WebSocketsService, NotificationSubscription } from "./misc";
 import { useLazyQuery } from "@apollo/client";
 import { GET_ORGANIZATION } from "../../gql/queries/organizations";
 import { useDispatch } from "react-redux";
@@ -37,7 +37,7 @@ function handleWsClosed() {
     console.log('ws closed')
 }
 
-function GetNotificationsServiceWrapper(props: React.PropsWithChildren) {
+function GetWebSocketsWrapper(props: React.PropsWithChildren) {
     const dispatch = useDispatch();
     const [dataLoaded, setDataLoaded] = useState(false);
     const [refetchOrganization] = useLazyQuery(GET_ORGANIZATION);
@@ -46,23 +46,23 @@ function GetNotificationsServiceWrapper(props: React.PropsWithChildren) {
     function initWsNotifications() {
         const address = findWebsocketAddress();
         if (address) {
-            MiscInfo.ws_connection = webSocket({
+            WebSocketsService.ws_connection = webSocket({
                 url: address,
                 deserializer: msg => msg.data,
                 openObserver: {
                     next: () => {
-                        if (MiscInfo.timeOutIteration) console.log("Websocket connected");
-                        MiscInfo.timeOutIteration = 0;
+                        if (WebSocketsService.timeOutIteration) console.log("Websocket connected");
+                        WebSocketsService.timeOutIteration = 0;
                     }
                 },
                 closeObserver: {
                     next: (closeEvent) => {
-                        const timeout = getTimeout(MiscInfo.timeOutIteration);
-                        timer(timeout).subscribe(() => { MiscInfo.timeOutIteration++; initWsNotifications(); })
+                        const timeout = getTimeout(WebSocketsService.timeOutIteration);
+                        timer(timeout).subscribe(() => { WebSocketsService.timeOutIteration++; initWsNotifications(); })
                     }
                 }
             });
-            MiscInfo.ws_connection.subscribe(
+            WebSocketsService.ws_connection.subscribe(
                 msg => handleWebsocketNotificationMessage(msg),
                 err => handleError(err),
                 () => handleWsClosed()
@@ -71,7 +71,7 @@ function GetNotificationsServiceWrapper(props: React.PropsWithChildren) {
     }
 
     function handleWebsocketNotificationMessage(msg: string) {
-        if (MiscInfo.registeredNotificationListeners.size == 0) return;
+        if (WebSocketsService.registeredNotificationListeners.size == 0) return;
         if (msg.includes("\n")) {
             msg.split("\n").forEach(element => handleWebsocketNotificationMessage(element));
             return;
@@ -80,9 +80,9 @@ function GetNotificationsServiceWrapper(props: React.PropsWithChildren) {
 
         const msgParts = msg.split(":");
         const projectId = msgParts[0];
-        if (!MiscInfo.registeredNotificationListeners.has(projectId)) return;
+        if (!WebSocketsService.registeredNotificationListeners.has(projectId)) return;
 
-        MiscInfo.registeredNotificationListeners.get(projectId).forEach((params, key) => {
+        WebSocketsService.registeredNotificationListeners.get(projectId).forEach((params, key) => {
             if (!params.whitelist || params.whitelist.includes(msgParts[1])) {
                 params.func.call(key, msgParts);
             }
@@ -93,17 +93,17 @@ function GetNotificationsServiceWrapper(props: React.PropsWithChildren) {
 
     function subscribeToNotification(key: Object, params: NotificationSubscription) {
         if (!params.projectId) params.projectId = "GLOBAL";
-        if (!MiscInfo.registeredNotificationListeners.has(params.projectId)) {
-            MiscInfo.registeredNotificationListeners.set(params.projectId, new Map<Object, NotificationSubscription>());
+        if (!WebSocketsService.registeredNotificationListeners.has(params.projectId)) {
+            WebSocketsService.registeredNotificationListeners.set(params.projectId, new Map<Object, NotificationSubscription>());
         }
-        const innerMap = MiscInfo.registeredNotificationListeners.get(params.projectId);
+        const innerMap = WebSocketsService.registeredNotificationListeners.get(params.projectId);
         innerMap.set(key, params);
     }
 
     function unsubscribeFromNotification(key: Object, projectId: string = null) {
         if (!projectId) projectId = "GLOBAL"
-        if (MiscInfo.registeredNotificationListeners.has(projectId)) {
-            MiscInfo.registeredNotificationListeners.get(projectId).delete(key);
+        if (WebSocketsService.registeredNotificationListeners.has(projectId)) {
+            WebSocketsService.registeredNotificationListeners.get(projectId).delete(key);
         }
     }
 
@@ -113,8 +113,8 @@ function GetNotificationsServiceWrapper(props: React.PropsWithChildren) {
                 initWsNotifications();
                 setDataLoaded(true);
                 dispatch(setOrganization(res.data["userOrganization"]));
-                MiscInfo.subscribeToNotifications = subscribeToNotification;
-                MiscInfo.unsubscribeFromNotifications = unsubscribeFromNotification;
+                WebSocketsService.subscribeToNotifications = subscribeToNotification;
+                WebSocketsService.unsubscribeFromNotifications = unsubscribeFromNotification;
             } else {
                 timer(60000).subscribe(() => location.reload())
             }
@@ -124,4 +124,4 @@ function GetNotificationsServiceWrapper(props: React.PropsWithChildren) {
     return props.children;
 }
 
-export const NotificationsServiceWrapper = memo(GetNotificationsServiceWrapper);
+export const WebSocketsWrapper = memo(GetWebSocketsWrapper);

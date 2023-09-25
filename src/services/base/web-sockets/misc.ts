@@ -1,5 +1,5 @@
 
-export class MiscInfo {
+export class WebSocketsService {
 
     public static ws_connection: any;
     public static timeOutIteration: number = 0;
