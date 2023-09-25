@@ -35,6 +35,7 @@ export default function ModalUpload(props: UploadProps) {
     }
 
     function submitUpload() {
+        if (isProjectTitleDuplicate) return;
         setStartUpload(true);
     }
 
@@ -51,7 +52,10 @@ export default function ModalUpload(props: UploadProps) {
                     <input value={projectName} type="text" onInput={(e: any) => {
                         setProjectName(e.target.value);
                         checkIfProjectNameDuplicate();
-                    }} className="h-8 w-full border-gray-300 rounded-md placeholder-italic border text-gray-900 pl-4 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100" placeholder="Enter some title here..." />
+                    }} onKeyDown={(e: any) => {
+                        if (e.key == "Enter") submitUpload();
+                    }}
+                        className="h-8 w-full border-gray-300 rounded-md placeholder-italic border text-gray-900 pl-4 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100" placeholder="Enter some title here..." />
                     {isProjectTitleDuplicate && (<div className="text-red-700 text-xs mt-2">Project title exists</div>)}
                     <div className="flex flex-row mt-2">
                         <svg xmlns="http://www.w3.org/2000/svg" className="icon icon-tabler icon-tabler-alert-triangle text-yellow-700"

@@ -7,7 +7,7 @@ import { useRouter } from 'next/router';
 import { useDispatch, useSelector } from 'react-redux';
 import { extendAllProjects, selectAllProjects } from '@/src/reduxStore/states/project';
 import { ModalEnum } from '@/src/types/shared/modal';
-import { openModal } from '@/src/reduxStore/states/modal';
+import { closeModal, openModal } from '@/src/reduxStore/states/modal';
 import Modal from '../shared/modal/Modal';
 
 export default function SampleProjectsDropdown() {
@@ -37,6 +37,7 @@ export default function SampleProjectsDropdown() {
         createSampleProjectMut({ variables: { name: projectNameFinal, projectType: projectTypeFinal } }).then((res) => {
             const project = res.data.createSampleProject['project'];
             dispatch(extendAllProjects(project));
+            dispatch(closeModal(ModalEnum.SAMPLE_PROJECT_TITLE));
             if (router.pathname.includes("/projects")) {
                 router.push(`/projects/${project.id}/overview`);
             }

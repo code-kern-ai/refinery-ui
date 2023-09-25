@@ -4,16 +4,13 @@ import { useSelector } from 'react-redux'
 import { selectIsManaged, selectUser } from '@/src/reduxStore/states/general'
 import { useRouter } from 'next/router'
 import { logoutUser } from '@/src/services/base/user-management/data-fetch'
+import { combineClassNames } from '@/submodules/javascript-functions/general'
 
 
 export default function LogoutDropdown() {
     const router = useRouter();
     const isManaged = useSelector(selectIsManaged);
     const user = useSelector(selectUser);
-
-    function classNames(...classes) {
-        return classes.filter(Boolean).join(' ')
-    }
 
     return (
         <Menu as="div" className="relative inline-block text-left">
@@ -37,7 +34,7 @@ export default function LogoutDropdown() {
                         <Menu.Item>
                             {({ active }) => (
                                 <a onClick={() => window.open('/auth/settings', '_blank')}
-                                    className={classNames(
+                                    className={combineClassNames(
                                         active ? 'bg-gray-100 text-gray-900' : 'text-gray-700',
                                         'block px-4 py-2 text-sm cursor-pointer'
                                     )}
@@ -49,7 +46,7 @@ export default function LogoutDropdown() {
                         {!isManaged && <Menu.Item>
                             {({ active }) => (
                                 <a onClick={() => router.push('/config')}
-                                    className={classNames(
+                                    className={combineClassNames(
                                         active ? 'bg-gray-100 text-gray-900' : 'text-gray-700',
                                         'block px-4 py-2 text-sm cursor-pointer'
                                     )}
@@ -61,7 +58,7 @@ export default function LogoutDropdown() {
                         <Menu.Item>
                             {({ active }) => (
                                 <a onClick={logoutUser}
-                                    className={classNames(
+                                    className={combineClassNames(
                                         active ? 'bg-gray-100 text-gray-900' : 'text-gray-700',
                                         'block px-4 py-2 text-sm cursor-pointer'
                                     )}

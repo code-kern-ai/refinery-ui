@@ -1,11 +1,11 @@
 import { useEffect } from 'react';
 import { Fragment } from 'react'
 import { Dialog, Transition } from '@headlessui/react'
-import { modalButtonCaption } from './modal-helper';
 import { isStringTrue } from '@/submodules/javascript-functions/general';
 import { useDispatch, useSelector } from 'react-redux';
 import { Modal, initModal, openModal, selectModal } from '@/src/reduxStore/states/modal';
 import { ModalButton, ModalButtonType } from '@/src/types/shared/modal';
+import { modalButtonCaption } from '@/src/util/shared/modal-helper';
 
 
 export default function Modal(props: any) {

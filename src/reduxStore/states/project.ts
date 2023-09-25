@@ -70,8 +70,6 @@ const projectSlice = createSlice({
 export const selectProject = (state) => state.projects.active;
 export const selectProjectId = (state) => state.projects.active?.id;
 export const selectAllProjects = (state) => state.projects.all;
-export const selectExampleQuestions = (state) => state.projects.active.exampleQuestions;
-
 
 export const { updateProjectState, setActiveProject, setAllProjects, extendAllProjects, removeFromAllProjectsById } = projectSlice.actions;
 export const projectReducer = projectSlice.reducer;

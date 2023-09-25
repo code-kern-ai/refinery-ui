@@ -7,6 +7,35 @@ import { GET_ORGANIZATION } from "../../gql/queries/organizations";
 import { useDispatch } from "react-redux";
 import { setOrganization } from "@/src/reduxStore/states/general";
 
+function getTimeout(iteration: number) {
+    if (iteration <= 0) return 1000;
+    else {
+        switch (iteration) {
+            case 1: return 2000;
+            case 2: return 5000;
+            case 3: return 15000;
+            case 4: return 30000;
+            case 5: return 60000;
+            default:
+                return 60 * 5 * 1000; //5 min
+        }
+    }
+}
+
+function findWebsocketAddress() {
+    let address = window.location.protocol == 'https:' ? 'wss:' : 'ws:';
+    address += '//' + window.location.host + '/notify/ws';
+    return address; //'ws://localhost:4455/notify/ws'
+}
+
+
+function handleError(err) {
+    console.log("error", err)
+}
+
+function handleWsClosed() {
+    console.log('ws closed')
+}
 
 function GetNotificationsServiceWrapper(props: React.PropsWithChildren) {
     const dispatch = useDispatch();
@@ -41,28 +70,6 @@ function GetNotificationsServiceWrapper(props: React.PropsWithChildren) {
         }
     }
 
-    function getTimeout(iteration: number) {
-        if (iteration <= 0) return 1000;
-        else {
-            switch (iteration) {
-                case 1: return 2000;
-                case 2: return 5000;
-                case 3: return 15000;
-                case 4: return 30000;
-                case 5: return 60000;
-                default:
-                    return 60 * 5 * 1000; //5 min
-            }
-        }
-    }
-
-    function findWebsocketAddress() {
-        return 'ws://localhost:4455/notify/ws';
-        let address = window.location.protocol == 'https:' ? 'wss:' : 'ws:';
-        address += '//' + window.location.host + '/notify/ws';
-        return address; //'ws://localhost:4455/notify/ws'
-    }
-
     function handleWebsocketNotificationMessage(msg: string) {
         if (MiscInfo.registeredNotificationListeners.size == 0) return;
         if (msg.includes("\n")) {
@@ -81,14 +88,6 @@ function GetNotificationsServiceWrapper(props: React.PropsWithChildren) {
             }
         });
 
-    }
-
-    function handleError(err) {
-        console.log("error", err)
-    }
-
-    function handleWsClosed() {
-        console.log('ws closed')
     }
 
 

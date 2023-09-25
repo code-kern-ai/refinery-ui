@@ -4,7 +4,6 @@ import { useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { selectUploadData, setImportOptions } from "@/src/reduxStore/states/upload";
 import { useRouter } from "next/router";
-import CryptedField from "../../crypted-field/CryptedField";
 
 export default function UploadWrapper(props: UploadWrapperProps) {
     const router = useRouter();
