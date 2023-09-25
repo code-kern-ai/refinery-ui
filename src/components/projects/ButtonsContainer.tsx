@@ -13,6 +13,7 @@ import SampleProjectsDropdown from "./SampleProjectsDropdown";
 export default function ButtonsContainer() {
     const router = useRouter();
     const dispatch = useDispatch();
+
     const user = useSelector(selectUser);
 
     const [showBadPasswordMsg, setShowBadPasswordMsg] = useState(false);
