@@ -1,4 +1,5 @@
 FROM node:18-alpine as build
+# should use base image
 
 WORKDIR /app
 COPY package*.json /app/
