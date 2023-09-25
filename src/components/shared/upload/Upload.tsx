@@ -235,6 +235,7 @@ export default function Upload(props: UploadProps) {
                 if (progress.state === UploadStates.DONE || progress.state === UploadStates.ERROR) {
                     timer(500).subscribe(() => {
                         setSelectedFile(null);
+                        props.isFileUploaded(false);
                         setSubmitted(false);
                     });
                     if (progress.state === UploadStates.ERROR && props.uploadOptions.deleteProjectOnFail) {
@@ -264,6 +265,7 @@ export default function Upload(props: UploadProps) {
 
     function resetUpload() {
         setSelectedFile(null);
+        props.isFileUploaded(false);
         clearUploadTask();
         setUploadStarted(false);
         setProjectTitle("");
@@ -288,7 +290,10 @@ export default function Upload(props: UploadProps) {
     return (
         <section className={`${!props.uploadOptions.isModal ? 'p-4' : ''}`}>
             {uploadFileType == UploadFileType.PROJECT && (<>
-                <UploadField isFileCleared={selectedFile == null} uploadStarted={uploadStarted} doingSomething={doingSomething} progressState={progressState} sendSelectedFile={(file) => setSelectedFile(file)} />
+                <UploadField isFileCleared={selectedFile == null} uploadStarted={uploadStarted} doingSomething={doingSomething} progressState={progressState} sendSelectedFile={(file) => {
+                    setSelectedFile(file);
+                    props.isFileUploaded(file != null);
+                }} />
                 {/* TODO: Add crypted field */}
                 {/* <CryptedField /> */}
                 {props.uploadOptions.showBadPasswordMsg && (<div className="text-red-700 text-xs mt-2 text-center">Wrong password</div>)}
@@ -324,7 +329,10 @@ export default function Upload(props: UploadProps) {
                         selectedOption={(option) => setTokenizer(option)} />
                 </div>
                 <UploadWrapper uploadStarted={uploadStarted} doingSomething={doingSomething} progressState={progressState} submitted={submitted} isFileCleared={selectedFile == null}
-                    isModal={props.uploadOptions.isModal} submitUpload={submitUpload} sendSelectedFile={(file) => setSelectedFile(file)} />
+                    isModal={props.uploadOptions.isModal} submitUpload={submitUpload} sendSelectedFile={(file) => {
+                        setSelectedFile(file);
+                        props.isFileUploaded(file != null);
+                    }} />
             </>
             )}
         </section>

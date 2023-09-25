@@ -19,8 +19,7 @@ export default function SampleProjectsDropdown() {
     const [projectNameInput, setProjectNameInput] = useState<string>("");
     const [projectTypeInput, setProjectTypeInput] = useState<string>("");
     const [checkIfProjectNameExists, setCheckIfProjectNameExists] = useState<boolean>(false);
-    const acceptButton = { buttonCaption: "Create", closeAfterClick: false, useButton: true, disabled: false, emitFunction: () => { importSampleProject() } }
-
+    const [acceptButton, setAcceptButton] = useState({ buttonCaption: "Create", closeAfterClick: false, useButton: true, disabled: true, emitFunction: () => { importSampleProject() } })
 
     function importSampleProject(projectName?: string, projectType?: string) {
         const checkIfProjectExists = projects.find((project) => project.name === projectName);
@@ -31,7 +30,7 @@ export default function SampleProjectsDropdown() {
             dispatch(openModal(ModalEnum.SAMPLE_PROJECT_TITLE));
             return;
         }
-        if (projectNameInput == "" && projectName == "") return;
+        if (projectNameInput == "" || projectName == "") return;
         const projectNameFinal = projectName ? projectName : projectNameInput;
         const projectTypeFinal = projectType ? projectType : projectTypeInput;
         createSampleProjectMut({ variables: { name: projectNameFinal, projectType: projectTypeFinal } }).then((res) => {
@@ -42,6 +41,21 @@ export default function SampleProjectsDropdown() {
                 router.push(`/projects/${project.id}/overview`);
             }
         });
+    }
+
+    function handleProjectName(e: any) {
+        const checkName = projects.some(project => project.name == e.target.value.trim());
+        setCheckIfProjectNameExists(checkName);
+        if (checkName || e.target.value.trim() == "") {
+            const acceptButtonCopy = { ...acceptButton };
+            acceptButtonCopy.disabled = true;
+            setAcceptButton(acceptButtonCopy);
+        } else {
+            const acceptButtonCopy = { ...acceptButton };
+            acceptButtonCopy.disabled = false;
+            setAcceptButton(acceptButtonCopy);
+        }
+        setProjectNameInput(e.target.value);
     }
 
     return (
@@ -185,16 +199,11 @@ export default function SampleProjectsDropdown() {
                 <div className="form-control text-left">
                     <label className="text-gray-500 text-sm font-normal">Project title</label>
                     <div className="flex flex-row">
-                        <input value={projectNameInput} type="text" onInput={(e: any) => {
-                            const checkName = projects.some(project => project.name == e.target.value.trim());
-                            setCheckIfProjectNameExists(checkName);
-                            setProjectNameInput(e.target.value)
-                        }} onKeyDown={(e: any) => {
+                        <input value={projectNameInput} type="text" onInput={(e: any) => handleProjectName(e)} onKeyDown={(e: any) => {
                             if (e.key == "Enter") {
                                 importSampleProject();
                             }
-                        }}
-                            className="h-8 w-full border-gray-300 rounded-md placeholder-italic border text-gray-900 pl-4 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100" placeholder="Enter some title here..." />
+                        }} className="h-8 w-full border-gray-300 rounded-md placeholder-italic border text-gray-900 pl-4 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100" placeholder="Enter some title here..." />
                     </div>
                     {checkIfProjectNameExists && (<div className="text-red-700 text-xs mt-2 text-left">Project title exists</div>)}
                     <div className="flex flex-row mt-2">

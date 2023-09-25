@@ -14,11 +14,11 @@ export default function ModalUpload(props: UploadProps) {
 
     const title = getTitle(uploadFileType);
     const subTitle = getSubtitle(uploadFileType);
-    const acceptButton = { buttonCaption: "Upload", closeAfterClick: false, useButton: true, disabled: false, emitFunction: () => { submitUpload() } }
 
     const [projectName, setProjectName] = useState<string>("");
     const [isProjectTitleDuplicate, setProjectTitleDuplicate] = useState<boolean>(false);
     const [startUpload, setStartUpload] = useState<boolean>(false);
+    const [acceptButton, setAcceptButton] = useState({ buttonCaption: "Upload", closeAfterClick: false, useButton: true, disabled: true, emitFunction: () => { submitUpload() } });
 
     const uploadOptions: UploadOptions = {
         deleteProjectOnFail: props.uploadOptions.deleteProjectOnFail,
@@ -71,7 +71,11 @@ export default function ModalUpload(props: UploadProps) {
                     </div>
                 </div>
             )}
-            <Upload uploadOptions={uploadOptions} startUpload={startUpload} />
+            <Upload uploadOptions={uploadOptions} startUpload={startUpload} isFileUploaded={(isFileUploaded: boolean) => {
+                const acceptButtonCopy = { ...acceptButton };
+                acceptButtonCopy.disabled = isFileUploaded ? false : true;
+                setAcceptButton(acceptButtonCopy);
+            }} />
         </Modal>
     );
 }

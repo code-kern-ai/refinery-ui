@@ -13,6 +13,7 @@ export enum UploadFileType {
 export type UploadProps = {
     uploadOptions?: UploadOptions;
     startUpload?: boolean;
+    isFileUploaded?: (isFileUploaded: boolean) => void;
 }
 
 export type UploadOptions = {
