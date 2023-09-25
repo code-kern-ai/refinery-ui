@@ -27,7 +27,7 @@ export type ProjectStatistics = {
     projectId: string;
     numDataScaleUploaded: number;
     numDataScaleManual: number;
-    numDataScaleProgrammatical: number;
+    numDataScaleProgrammatical: number; //spelling (if from backend remove comment/ add TODO for backend)
     numDataTestManual?: number;
     numDataTestUploaded?: number;
     manuallyLabeled: string;
