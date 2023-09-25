@@ -96,7 +96,7 @@ export default function ProjectsList() {
         });
     }
 
-    function handleWebsocketNotification(msgParts: any) {
+    function handleWebsocketNotification(msgParts: string[]) {
         if (['project_created', 'project_deleted', 'project_update'].includes(msgParts[1])) {
             refetchProjects();
             refetchStats();

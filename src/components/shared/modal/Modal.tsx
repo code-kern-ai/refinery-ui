@@ -31,6 +31,7 @@ export default function Modal(props: any) {
                 ...props,
                 acceptButton: { useButton: true }
             };
+            props = newProps;
         }
         else {
             if (typeof props.acceptButton == "string") props.acceptButton = { useButton: isStringTrue(props.acceptButton as string) };
@@ -42,6 +43,7 @@ export default function Modal(props: any) {
                 ...props,
                 abortButton: { useButton: false }
             };
+            props = newProps;
         }
         else {
             if (typeof props.abortButton == "string") props.abortButton = { useButton: isStringTrue(props.abortButton as string) };

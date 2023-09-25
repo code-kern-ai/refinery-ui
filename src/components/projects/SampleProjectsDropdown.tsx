@@ -43,10 +43,10 @@ export default function SampleProjectsDropdown() {
         });
     }
 
-    function handleProjectName(e: any) {
-        const checkName = projects.some(project => project.name == e.target.value.trim());
+    function handleProjectName(value: string) {
+        const checkName = projects.some(project => project.name == value.trim());
         setCheckIfProjectNameExists(checkName);
-        if (checkName || e.target.value.trim() == "") {
+        if (checkName || value.trim() == "") {
             const acceptButtonCopy = { ...acceptButton };
             acceptButtonCopy.disabled = true;
             setAcceptButton(acceptButtonCopy);
@@ -55,7 +55,7 @@ export default function SampleProjectsDropdown() {
             acceptButtonCopy.disabled = false;
             setAcceptButton(acceptButtonCopy);
         }
-        setProjectNameInput(e.target.value);
+        setProjectNameInput(value);
     }
 
     return (
@@ -199,7 +199,7 @@ export default function SampleProjectsDropdown() {
                 <div className="form-control text-left">
                     <label className="text-gray-500 text-sm font-normal">Project title</label>
                     <div className="flex flex-row">
-                        <input value={projectNameInput} type="text" onInput={(e: any) => handleProjectName(e)} onKeyDown={(e: any) => {
+                        <input value={projectNameInput} type="text" onInput={(e: any) => handleProjectName(e.target.value)} onKeyDown={(e: any) => {
                             if (e.key == "Enter") {
                                 importSampleProject();
                             }
