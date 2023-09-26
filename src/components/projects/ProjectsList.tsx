@@ -70,6 +70,7 @@ export default function ProjectsList() {
 
 
     function initData() {
+        // postprocessing steps in own prep function to make it easier to read
         refetchProjects().then((res) => {
             let projects = res.data["allProjects"].edges.map((edge: any) => edge.node);
             projects.sort((a, b) => a.name.localeCompare(b.name));
@@ -91,6 +92,7 @@ export default function ProjectsList() {
             if (stats == null) return;
             stats.forEach((stat: ProjectStatistics) => {
                 const statCopy = jsonCopy(stat);
+                //name of the function suggested to me that it's a basic round (not a string return)
                 stat.manuallyLabeled = percentRound(statCopy.numDataScaleManual / statCopy.numDataScaleUploaded, 2);
                 stat.weaklySupervised = percentRound(statCopy.numDataScaleProgrammatical / statCopy.numDataScaleUploaded, 2);
                 statsDict[stat.projectId] = stat;
@@ -113,6 +115,8 @@ export default function ProjectsList() {
     }
 
     function createDefaultOrg() {
+        // return option for easier reading
+        if (isManaged || isDemo) return;
         if (!isManaged && !isDemo) {
             refetchCanCreateOrg().then((res) => {
                 setCanCreateOrg(res.data["canCreateLocalOrg"]);
