@@ -10,9 +10,9 @@ import { Tooltip } from "@nextui-org/react";
 import { useRouter } from "next/router";
 import { useDispatch, useSelector } from "react-redux";
 import Modal from "../shared/modal/Modal";
-import { useState } from "react";
+import { useCallback, useState } from "react";
 
-const UNKNOWN_USER: string = '<unknown user>';
+const UNKNOWN_USER: string = '<unknown user>'; //probably a global constant (since we need something for unknown multiple time in the app)
 
 export default function ProjectCard(props: ProjectCardProps) {
     const router = useRouter();
@@ -26,8 +26,21 @@ export default function ProjectCard(props: ProjectCardProps) {
 
     const [deleteProjectByIdMut] = useMutation(DELETE_PROJECT, { fetchPolicy: "no-cache" });
 
-    const acceptButton = { buttonCaption: "Delete and never show again", useButton: true, emitFunction: () => { adminStoreInstantAndDelete() } }
-    const abortButton = { buttonCaption: "Delete", useButton: true, emitFunction: () => { adminDeleteProject() } };
+
+    const adminDeleteProject = useCallback(() => {
+        if (!isAdmin || saveProjectId == null) return;
+        deleteProjectByIdMut({ variables: { projectId: saveProjectId } }).then(() => {
+            dispatch(closeModal(ModalEnum.ADMIN_DELETE_PROJECT));
+            dispatch(removeFromAllProjectsById(saveProjectId));
+        })
+
+    }, [isAdmin, saveProjectId])
+
+    const adminStoreInstantAndDelete = useCallback(() => {
+        localStorage.setItem("adminInstantDelete", "X");
+        adminDeleteProject();
+    }, [adminDeleteProject])
+
 
     function adminOpenOrDeleteProject(project: Project) {
         if (!isAdmin) return;
@@ -39,19 +52,29 @@ export default function ProjectCard(props: ProjectCardProps) {
         }
     }
 
-    function adminStoreInstantAndDelete() {
-        localStorage.setItem("adminInstantDelete", "X");
-        adminDeleteProject();
-    }
+    // function adminStoreInstantAndDelete() {
+    //     localStorage.setItem("adminInstantDelete", "X");
+    //     adminDeleteProject();
+    // }
 
-    function adminDeleteProject() {
-        if (!isAdmin || saveProjectId == null) return;
-        deleteProjectByIdMut({ variables: { projectId: saveProjectId } }).then(() => {
-            dispatch(closeModal(ModalEnum.ADMIN_DELETE_PROJECT));
-            dispatch(removeFromAllProjectsById(saveProjectId));
-        })
-    }
+    // function adminDeleteProject() {
+    //     if (!isAdmin || saveProjectId == null) return;
+    //     deleteProjectByIdMut({ variables: { projectId: saveProjectId } }).then(() => {
+    //         dispatch(closeModal(ModalEnum.ADMIN_DELETE_PROJECT));
+    //         dispatch(removeFromAllProjectsById(saveProjectId));
+    //     })
+    // }
 
+
+    // recreated on every render => results in rerender for modal as well (should use state)
+    // + function call was wrapped in another function call 
+    // + needs useCallback function since it's passed "down"
+    // + reorder since useCallback can't be used before it's defined
+    const acceptButton = { buttonCaption: "Delete and never show again", useButton: true, emitFunction: adminStoreInstantAndDelete }
+    const abortButton = { buttonCaption: "Delete", useButton: true, emitFunction: adminDeleteProject };
+
+
+    // no need for useCallback since it's directly used in a button
     function manageProject(projectId: string, recordsInProject: Number): void {
         if (user?.role == 'ENGINEER') {
             if (recordsInProject == 0) {
@@ -136,6 +159,7 @@ export default function ProjectCard(props: ProjectCardProps) {
                     </div>
                 </div>
             ) : (<></>)}
+            {/* this create a modal for every card entry => should be on list level & collect the project id as well */}
             <Modal modalName={ModalEnum.ADMIN_DELETE_PROJECT} acceptButton={acceptButton} abortButton={abortButton}>
                 <div className="flex flex-row items-center justify-center">
                     <span className="text-lg leading-6 text-gray-900 font-medium">

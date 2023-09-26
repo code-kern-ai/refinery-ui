@@ -15,7 +15,22 @@ import ProjectCard from "./ProjectCard";
 import { GET_CAN_CREATE_LOCAL_ORG } from "@/src/services/gql/queries/organizations";
 import { ADD_USER_TO_ORGANIZATION, CREATE_ORGANIZATION } from "@/src/services/gql/mutations/organizations";
 import style from "../../styles/projects-list.module.css"
-import { useRouter } from "next/router";
+import { NextRouter, useRouter } from "next/router";
+
+//wrapper to create the change listener for routers - probably as global function, maybe with a list of pages
+function routeWrapper(router: NextRouter, page: CurrentPage): () => void {
+    return () => {
+        const handleRouteChange = (url, { shallow }) => {
+            WebSocketsService.unsubscribeFromNotifications(page);
+        };
+        router.events.on('routeChangeStart', handleRouteChange);
+        return () => {
+            router.events.off('routeChangeStart', handleRouteChange);
+        };
+    }
+}
+
+
 
 export default function ProjectsList() {
     const router = useRouter();
@@ -36,15 +51,8 @@ export default function ProjectsList() {
     const [createOrgMut] = useMutation(CREATE_ORGANIZATION);
     const [addUserToOrgMut] = useMutation(ADD_USER_TO_ORGANIZATION);
 
-    useEffect(() => {
-        const handleRouteChange = (url, { shallow }) => {
-            WebSocketsService.unsubscribeFromNotifications(CurrentPage.PROJECTS);
-        };
-        router.events.on('routeChangeStart', handleRouteChange);
-        return () => {
-            router.events.off('routeChangeStart', handleRouteChange);
-        };
-    }, []);
+    // i think something like this will be used quite often for the websockets so maybe we can create a wrapper function?
+    useEffect(routeWrapper(router, CurrentPage.PROJECTS), []);
 
 
     useEffect(() => {

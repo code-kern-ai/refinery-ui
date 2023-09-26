@@ -5,10 +5,13 @@ import { ModalEnum } from "@/src/types/shared/modal";
 import { UserRole } from "@/src/types/shared/sidebar";
 import { UploadFileType, UploadOptions } from "@/src/types/shared/upload";
 import { useRouter } from "next/router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux"
 import ModalUpload from "../shared/upload/ModalUpload";
 import SampleProjectsDropdown from "./SampleProjectsDropdown";
+
+
+const BASE_OPTIONS = { reloadOnFinish: false, deleteProjectOnFail: true, closeModalOnClick: true, isModal: true, navigateToProject: true, showBadPasswordMsg: null }
 
 export default function ButtonsContainer() {
     const router = useRouter();
@@ -18,7 +21,16 @@ export default function ButtonsContainer() {
 
     const [showBadPasswordMsg, setShowBadPasswordMsg] = useState(false);
 
-    const uploadOptions: UploadOptions = { reloadOnFinish: false, deleteProjectOnFail: true, closeModalOnClick: true, isModal: true, navigateToProject: true, showBadPasswordMsg: showBadPasswordMsg };
+    // upload options is recreated on every render. Maybe this is a state and a default + copy to indicate that most of this is defaulted & only rerendered when necessary
+
+    // const uploadOptions: UploadOptions = { reloadOnFinish: false, deleteProjectOnFail: true, closeModalOnClick: true, isModal: true, navigateToProject: true, showBadPasswordMsg: showBadPasswordMsg };
+
+    const [uploadOptions, setUploadOptions] = useState<UploadOptions>(BASE_OPTIONS);
+
+    useEffect(() => {
+        setUploadOptions({ ...BASE_OPTIONS, showBadPasswordMsg: showBadPasswordMsg })
+    }, [showBadPasswordMsg])
+
 
     return (
         user && user.role === UserRole.ENGINEER ? (<div>

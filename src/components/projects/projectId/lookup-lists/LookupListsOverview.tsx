@@ -14,7 +14,7 @@ import style from '../../../../styles/lookup-lists.module.css'
 import { openModal } from "@/src/reduxStore/states/modal";
 import { ModalEnum } from "@/src/types/shared/modal";
 
-export const ACTIONS_DROPDOWN_OPTIONS = ['Select all', 'Deselect all', 'Delete selected'];
+const ACTIONS_DROPDOWN_OPTIONS = ['Select all', 'Deselect all', 'Delete selected'];
 
 export default function LookupListsOverview() {
     const dispatch = useDispatch();
@@ -44,6 +44,7 @@ export default function LookupListsOverview() {
         createLookupListMut({ variables: { projectId: project.id } }).then((res) => {
             const lookupList = res.data?.createKnowledgeBase["knowledgeBase"];
             dispatch(extendAllLookupLists(lookupList));
+            // these seem wrong
             const newURL = `http://localhost:4455/refinery/projects/${project.id}/lookup-lists/${lookupList.id}`
             window.parent.postMessage({ newURL }, `http://localhost:4455/refinery/projects/${project.id}/lookup-lists`);
         });
@@ -151,6 +152,7 @@ export default function LookupListsOverview() {
                             <div className="flex justify-center overflow-visible">
                                 <Tooltip placement="left" content="Go to the model callbacks" color="invert">
                                     <button onClick={() => {
+                                        //old version
                                         const newURL = `http://localhost:4455/refinery/projects/${project.id}/model-callbacks`
                                         window.parent.postMessage({ newURL }, `http://localhost:4455/refinery/projects/${project.id}/lookup-lists`);
                                     }} className=" bg-white text-gray-700 text-xs font-medium mr-3 px-4 py-2 rounded-md border border-gray-300 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
