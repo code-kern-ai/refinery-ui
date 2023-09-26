@@ -1,6 +1,8 @@
 import { LoadingIconProps } from "@/src/types/shared/loading";
 import { useEffect, useState } from "react";
 
+
+//maybe we should memo this component
 export default function LoadingIcon({ size = 'btn-xs', color = 'yellow' }, props: LoadingIconProps) {
     const background = `bg-${color ? color : props.color}-100`;
     const text = `text-${color ? color : props.color}-700`;

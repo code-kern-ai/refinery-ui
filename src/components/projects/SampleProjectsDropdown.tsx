@@ -18,12 +18,17 @@ export default function SampleProjectsDropdown() {
 
     const [projectNameInput, setProjectNameInput] = useState<string>("");
     const [projectTypeInput, setProjectTypeInput] = useState<string>("");
+
+    //project Name exists the check indicates a function but this is a state
     const [checkIfProjectNameExists, setCheckIfProjectNameExists] = useState<boolean>(false);
+
+    // uses state but also function pointer without useCallback => rerender
     const [acceptButton, setAcceptButton] = useState({ buttonCaption: "Create", closeAfterClick: false, useButton: true, disabled: true, emitFunction: () => { importSampleProject() } })
 
     const [createSampleProjectMut] = useMutation(CREATE_SAMPLE_PROJECT);
 
     function importSampleProject(projectName?: string, projectType?: string) {
+        //didn't work
         const checkIfProjectExists = projects.find((project) => project.name === projectName);
         if (checkIfProjectExists) {
             setProjectNameInput(projectName);
@@ -91,6 +96,7 @@ export default function SampleProjectsDropdown() {
                                     onClick={() => {
                                         importSampleProject("Clickbait", "Clickbait");
                                     }}>
+                                    {/* Table icon (from the classname at least) maybe we can use Icons instead (part of base image) */}
                                     <svg xmlns="http://www.w3.org/2000/svg" className="icon icon-tabler icon-tabler-fish-hook inline-block"
                                         width="20" height="20" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" fill="none"
                                         strokeLinecap="round">
