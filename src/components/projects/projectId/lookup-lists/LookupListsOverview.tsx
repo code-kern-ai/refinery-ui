@@ -1,5 +1,5 @@
 import { selectProject } from "@/src/reduxStore/states/project";
-import React, { useEffect, useState } from "react"
+import React, { useCallback, useEffect, useState } from "react"
 import { useDispatch, useSelector } from "react-redux";
 import { extendAllLookupLists, selectAllLookupLists, selectCheckedLookupLists, setAllLookupLists, setCheckedLookupLists } from "@/src/reduxStore/states/pages/lookup-lists";
 import { Tooltip } from "@nextui-org/react";
@@ -13,10 +13,12 @@ import { LookupListCard } from "./LookupListCard";
 import style from '../../../../styles/lookup-lists.module.css'
 import { openModal } from "@/src/reduxStore/states/modal";
 import { ModalEnum } from "@/src/types/shared/modal";
+import { useRouter } from "next/router";
 
-export const ACTIONS_DROPDOWN_OPTIONS = ['Select all', 'Deselect all', 'Delete selected'];
+const ACTIONS_DROPDOWN_OPTIONS = ['Select all', 'Deselect all', 'Delete selected'];
 
 export default function LookupListsOverview() {
+    const router = useRouter();
     const dispatch = useDispatch();
 
     const project = useSelector(selectProject);
@@ -29,8 +31,25 @@ export default function LookupListsOverview() {
 
     const [selectionList, setSelectionList] = useState('');
     const [countSelected, setCountSelected] = useState(0);
+
+    const deleteLookupLists = useCallback(() => {
+        checkedLookupLists.forEach((checked, index) => {
+            if (checked) {
+                const lookupList = lookupLists[index];
+                deleteLookupListMut({
+                    variables: {
+                        projectId: project?.id,
+                        lookupListId: lookupList.id
+                    }
+                }).then((res) => {
+
+                });
+            }
+        });
+    }, [checkedLookupLists]);
+
     const [abortButton, setAbortButton] = useState({
-        useButton: true, buttonCaption: "Delete", disabled: false, closeAfterClick: true, emitFunction: () => { deleteLookupLists() }
+        useButton: true, buttonCaption: "Delete", disabled: false, closeAfterClick: true, emitFunction: deleteLookupLists
     });
 
     useEffect(() => {
@@ -44,8 +63,6 @@ export default function LookupListsOverview() {
         createLookupListMut({ variables: { projectId: project.id } }).then((res) => {
             const lookupList = res.data?.createKnowledgeBase["knowledgeBase"];
             dispatch(extendAllLookupLists(lookupList));
-            const newURL = `http://localhost:4455/refinery/projects/${project.id}/lookup-lists/${lookupList.id}`
-            window.parent.postMessage({ newURL }, `http://localhost:4455/refinery/projects/${project.id}/lookup-lists`);
         });
     }
 
@@ -67,22 +84,6 @@ export default function LookupListsOverview() {
     function selectLookupLists(checked: boolean) {
         dispatch(setCheckedLookupLists(Array(checkedLookupLists.length).fill(checked)));
         prepareSelectionList();
-    }
-
-    function deleteLookupLists() {
-        checkedLookupLists.forEach((checked, index) => {
-            if (checked) {
-                const lookupList = lookupLists[index];
-                deleteLookupListMut({
-                    variables: {
-                        projectId: project?.id,
-                        lookupListId: lookupList.id
-                    }
-                }).then((res) => {
-
-                });
-            }
-        });
     }
 
     function prepareSelectionList() {
@@ -140,8 +141,7 @@ export default function LookupListsOverview() {
                             <div className="flex justify-center overflow-visible">
                                 <Tooltip placement="left" content="Go to heuristics overview" color="invert">
                                     <button onClick={() => {
-                                        const newURL = `http://localhost:4455/refinery/projects/${project.id}/heuristics`
-                                        window.parent.postMessage({ newURL }, `http://localhost:4455/refinery/projects/${project.id}/lookup-lists`);
+                                        router.push(`/projects/${project.id}/heuristics`)
                                     }} className="bg-white text-gray-700 text-xs font-medium mr-3 px-4 py-2 rounded-md border border-gray-300 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
                                         Heuristics
                                     </button>
@@ -151,8 +151,7 @@ export default function LookupListsOverview() {
                             <div className="flex justify-center overflow-visible">
                                 <Tooltip placement="left" content="Go to the model callbacks" color="invert">
                                     <button onClick={() => {
-                                        const newURL = `http://localhost:4455/refinery/projects/${project.id}/model-callbacks`
-                                        window.parent.postMessage({ newURL }, `http://localhost:4455/refinery/projects/${project.id}/lookup-lists`);
+                                        router.push(`/projects/${project.id}/model-callbacks`)
                                     }} className=" bg-white text-gray-700 text-xs font-medium mr-3 px-4 py-2 rounded-md border border-gray-300 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
                                         Model callbacks
                                     </button>

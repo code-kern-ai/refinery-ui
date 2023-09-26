@@ -3,6 +3,7 @@ import { formatBytes } from "@/submodules/javascript-functions/general";
 import { useEffect, useRef, useState } from "react";
 import LoadingIcon from "../../loading/LoadingIcon";
 import { UploadHelper } from "../Upload";
+import { IconDatabase } from "@tabler/icons-react";
 
 export default function UploadField(props: UploadFieldProps) {
     const fileUpload = useRef<HTMLInputElement>(null);
@@ -44,11 +45,7 @@ export default function UploadField(props: UploadFieldProps) {
                     <div className="flex flex-grow items-center overflow-x-hidden">
                         <div onClick={() => fileUpload.current?.click()}
                             className={`w-full border-4 border-dashed rounded-lg h-36 my-6 cursor-pointer ${file || props.uploadStarted ? 'bg-white' : 'border-slate-400'}`} style={{ 'pointerEvents': props.uploadStarted ? 'none' : 'auto' }}>
-                            <svg xmlns="http://www.w3.org/2000/svg" className="h-9 w-8 m-auto block text-gray-500 mt-6" fill="none"
-                                viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-                                <path strokeLinecap="round" strokeLinejoin="round"
-                                    d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4" />
-                            </svg>
+                            <IconDatabase className="h-9 w-8 m-auto block text-gray-500 mt-6" />
                             {file == null && !props.uploadStarted ? (<div className="text-gray-600 text-sm font-medium text-center mb-6">
                                 <button className="text-indigo-700 mt-1">Click to select a file</button>
                                 <div className="text-xs font-normal text-gray-500 mt-1">or drag and drop</div>

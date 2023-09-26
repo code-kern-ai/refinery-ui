@@ -1,11 +1,14 @@
 import { selectAllLookupLists, selectCheckedLookupLists, setCheckedLookupLists } from "@/src/reduxStore/states/pages/lookup-lists";
 import { selectProject } from "@/src/reduxStore/states/project";
 import { LookupListCardProps } from "@/src/types/components/projects/projectId/lookup-lists/lookup-lists";
+import { IconArrowRight } from "@tabler/icons-react";
+import { useRouter } from "next/router";
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
 export function LookupListCard(props: LookupListCardProps) {
     const dispatch = useDispatch();
+    const router = useRouter();
 
     const project = useSelector(selectProject);
     const lookupLists = useSelector(selectAllLookupLists);
@@ -33,15 +36,10 @@ export function LookupListCard(props: LookupListCardProps) {
                     {props.lookupList.name}
                 </div>
                 <div onClick={() => {
-                    const newURL = `http://localhost:4455/refinery/projects/${project.id}/lookup-lists/${props.lookupList.id}`
-                    window.parent.postMessage({ newURL }, `http://localhost:4455/refinery/projects/${project.id}/lookup-lists`);
+                    router.push(`/projects/${project.id}/lookup-lists/${props.lookupList.id}`);
                 }} className="text-green-800 float-right cursor-pointer">
                     Details
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 inline-block" fill="none"
-                        viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-                        <path strokeLinecap="round" strokeLinejoin="round"
-                            d="M13 7l5 5m0 0l-5 5m5-5H6" />
-                    </svg>
+                    <IconArrowRight className="h-5 w-5 inline-block text-green-800" />
                 </div>
             </div>
             <div className={`flex-row gap-16 font-normal text-gray-500 ${props.lookupList.description ? 'flex' : 'block'}`}>

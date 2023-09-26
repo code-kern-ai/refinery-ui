@@ -5,7 +5,7 @@ import Image from 'next/image';
 import { useDispatch, useSelector } from 'react-redux';
 import { Tooltip } from '@nextui-org/react';
 import { CurrentPage } from '@/src/types/shared/general';
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import AppSelectionDropdown from '@/submodules/react-components/components/AppSelectionDropdown';
 import { ModalEnum } from '@/src/types/shared/modal';
 import { closeModal, openModal } from '@/src/reduxStore/states/modal';
@@ -16,6 +16,8 @@ import Modal from '../modal/Modal';
 import LoadingIcon from '../loading/LoadingIcon';
 import style from '@/src/styles/sidebar.module.css';
 import { copyToClipboard } from '@/submodules/javascript-functions/general';
+import { IconAlertCircle, IconArrowRight, IconBrandDiscord, IconBulb, IconChartPie, IconExternalLink, IconMaximize, IconMinimize, IconTriangleSquareCircle, IconUserCircle } from '@tabler/icons-react';
+import { IconSettings } from '@tabler/icons-react';
 
 export default function Sidebar() {
     const dispatch = useDispatch();
@@ -34,8 +36,18 @@ export default function Sidebar() {
     const [refetchVersionOverview] = useLazyQuery(GET_VERSION_OVERVIEW, { fetchPolicy: 'no-cache' });
     const [refetchHasUpdates] = useLazyQuery(GET_HAS_UPDATES, { fetchPolicy: 'no-cache' });
 
-    const acceptButton = { buttonCaption: "How to update", useButton: !isManaged, emitFunction: () => { howToUpdate() } };
-    const backButton = { buttonCaption: "Back", useButton: true, emitFunction: () => goBack() };
+    const howToUpdate = useCallback(() => {
+        dispatch(closeModal(ModalEnum.VERSION_OVERVIEW));
+        dispatch(openModal(ModalEnum.HOW_TO_UPDATE));
+    }, []);
+
+    const goBack = useCallback(() => {
+        dispatch(closeModal(ModalEnum.HOW_TO_UPDATE));
+        dispatch(openModal(ModalEnum.VERSION_OVERVIEW));
+    }, []);
+
+    const acceptButton = { buttonCaption: "How to update", useButton: !isManaged, emitFunction: howToUpdate };
+    const backButton = { buttonCaption: "Back", useButton: true, emitFunction: goBack };
 
 
     function openFullScreen() {
@@ -85,16 +97,6 @@ export default function Sidebar() {
         });
     }
 
-    function howToUpdate() {
-        dispatch(closeModal(ModalEnum.VERSION_OVERVIEW));
-        dispatch(openModal(ModalEnum.HOW_TO_UPDATE));
-    }
-
-    function goBack() {
-        dispatch(closeModal(ModalEnum.HOW_TO_UPDATE));
-        dispatch(openModal(ModalEnum.VERSION_OVERVIEW));
-    }
-
     function toggleTabs(index: number) {
         setOpenTab(index);
     }
@@ -125,11 +127,7 @@ export default function Sidebar() {
                                                 <div className={`relative z-50 ${project.numDataScaleUploaded == 0 ? 'opacity-50 cursor-not-allowed pointer-events-none' : 'opacity-100 cursor-pointer'}`}>
                                                     <a rel="noopener noreferrer" href={`/refinery/projects/${project.id}/overview`}
                                                         className={`circle ${currentPage == CurrentPage.PROJECT_OVERVIEW ? 'text-kernpurple' : 'text-white'}`}>
-                                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20"
-                                                            fill="currentColor">
-                                                            <path d="M2 10a8 8 0 018-8v8h8a8 8 0 11-16 0z" />
-                                                            <path d="M12 2.252A8.014 8.014 0 0117.748 8H12V2.252z" />
-                                                        </svg>
+                                                        <IconChartPie className="w-5 h-5" />
                                                     </a>
                                                 </div>
                                             </Tooltip>
@@ -140,17 +138,7 @@ export default function Sidebar() {
                                                 <div className={`relative z-50 ${project.numDataScaleUploaded == 0 ? 'opacity-50 cursor-not-allowed pointer-events-none' : 'opacity-100 cursor-pointer'}`}>
                                                     <a rel="noopener noreferrer" href={`/refinery/projects/${project.id}/data`}
                                                         className={`circle ${currentPage == CurrentPage.DATA_BROWSER ? 'text-kernpurple' : 'text-white'}`}>
-                                                        <svg xmlns="http://www.w3.org/2000/svg"
-                                                            className="icon icon-tabler icon-tabler-icons" width="24" height="24"
-                                                            viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" fill="none"
-                                                            strokeLinecap="round" strokeLinejoin="round">
-                                                            <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
-                                                            <circle cx="6.5" cy="6.5" r="3.5"></circle>
-                                                            <path d="M2.5 21h8l-4 -7z"></path>
-                                                            <path d="M14 3l7 7"></path>
-                                                            <path d="M14 10l7 -7"></path>
-                                                            <path d="M14 14h7v7h-7z"></path>
-                                                        </svg>
+                                                        <IconTriangleSquareCircle className="w-5 h-5" />
                                                     </a>
                                                 </div>
                                             </Tooltip>
@@ -176,11 +164,7 @@ export default function Sidebar() {
                                                 <div className={`relative z-50 ${project.numDataScaleUploaded == 0 ? 'opacity-50 cursor-not-allowed pointer-events-none' : 'opacity-100 cursor-pointer'}`}>
                                                     <a rel="noopener noreferrer" href={`/refinery/projects/${project.id}/heuristics`}
                                                         className={`circle ${currentPage == CurrentPage.HEURISTICS || currentPage == CurrentPage.LOOKUP_LISTS_OVERVIEW ? 'text-kernpurple' : 'text-white'}`}>
-                                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20"
-                                                            fill="currentColor">
-                                                            <path
-                                                                d="M11 3a1 1 0 10-2 0v1a1 1 0 102 0V3zM15.657 5.757a1 1 0 00-1.414-1.414l-.707.707a1 1 0 001.414 1.414l.707-.707zM18 10a1 1 0 01-1 1h-1a1 1 0 110-2h1a1 1 0 011 1zM5.05 6.464A1 1 0 106.464 5.05l-.707-.707a1 1 0 00-1.414 1.414l.707.707zM5 10a1 1 0 01-1 1H3a1 1 0 110-2h1a1 1 0 011 1zM8 16v-1h4v1a2 2 0 11-4 0zM12 14c.015-.34.208-.646.477-.859a4 4 0 10-4.954 0c.27.213.462.519.476.859h4.002z" />
-                                                        </svg>
+                                                        <IconBulb className="w-5 h-5" />
                                                     </a>
                                                 </div>
                                             </Tooltip>
@@ -191,12 +175,7 @@ export default function Sidebar() {
                                                 <div className={`relative z-50 ${project.numDataScaleUploaded == 0 ? 'opacity-50 cursor-not-allowed pointer-events-none' : 'opacity-100 cursor-pointer'}`}>
                                                     <a rel="noopener noreferrer" href={`/refinery/projects/${project.id}/settings`}
                                                         className={`circle ${currentPage == CurrentPage.SETTINGS ? 'text-kernpurple' : 'text-white'}`}>
-                                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20"
-                                                            fill="currentColor">
-                                                            <path fillRule="evenodd"
-                                                                d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z"
-                                                                clipRule="evenodd" />
-                                                        </svg>
+                                                        <IconSettings className="w-5 h-5" />
                                                     </a>
                                                 </div>
                                             </Tooltip>
@@ -207,16 +186,7 @@ export default function Sidebar() {
                                                 <div className={`relative z-50 opacity-100 cursor-pointer`}>
                                                     <a rel="noopener noreferrer" href={`/refinery/projects/${project.id}/admin`}
                                                         className={`circle ${currentPage == CurrentPage.ADMIN_PAGE ? 'text-kernpurple' : 'text-white'}`}>
-                                                        <svg xmlns="http://www.w3.org/2000/svg"
-                                                            className="icon icon-tabler icon-tabler-user-circle" width="20" height="20"
-                                                            viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" fill="none"
-                                                            strokeLinecap="round" strokeLinejoin="round">
-                                                            <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
-                                                            <circle cx="12" cy="12" r="9"></circle>
-                                                            <circle cx="12" cy="10" r="3"></circle>
-                                                            <path d="M6.168 18.849a4 4 0 0 1 3.832 -2.849h4a4 4 0 0 1 3.834 2.855">
-                                                            </path>
-                                                        </svg>
+                                                        <IconUserCircle className="w-5 h-5" />
                                                     </a>
                                                 </div>
                                             </Tooltip>
@@ -237,22 +207,7 @@ export default function Sidebar() {
                                         <div className="relative z-50">
                                             <a href="https://discord.com/invite/qf4rGCEphW" target="_blank" rel="noopener noreferrer"
                                                 className="circle text-white">
-                                                <svg xmlns="http://www.w3.org/2000/svg"
-                                                    className="icon icon-tabler icon-tabler-brand-discord" width="24" height="24"
-                                                    viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" fill="none"
-                                                    strokeLinecap="round" strokeLinejoin="round">
-                                                    <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
-                                                    <circle cx="9" cy="12" r="1"></circle>
-                                                    <circle cx="15" cy="12" r="1"></circle>
-                                                    <path d="M7.5 7.5c3.5 -1 5.5 -1 9 0"></path>
-                                                    <path d="M7 16.5c3.5 1 6.5 1 10 0"></path>
-                                                    <path
-                                                        d="M15.5 17c0 1 1.5 3 2 3c1.5 0 2.833 -1.667 3.5 -3c.667 -1.667 .5 -5.833 -1.5 -11.5c-1.457 -1.015 -3 -1.34 -4.5 -1.5l-1 2.5">
-                                                    </path>
-                                                    <path
-                                                        d="M8.5 17c0 1 -1.356 3 -1.832 3c-1.429 0 -2.698 -1.667 -3.333 -3c-.635 -1.667 -.476 -5.833 1.428 -11.5c1.388 -1.015 2.782 -1.34 4.237 -1.5l1 2.5">
-                                                    </path>
-                                                </svg>
+                                                <IconBrandDiscord className="w-5 h-5" />
                                             </a>
                                         </div>
                                     </Tooltip>
@@ -262,15 +217,7 @@ export default function Sidebar() {
                                 <Tooltip placement="right" trigger="hover" color="invert" content="Maximize screen">
                                     <button onClick={openFullScreen}
                                         className="z-50 cursor-pointer">
-                                        <svg xmlns="http://www.w3.org/2000/svg" className="text-white icon icon-tabler icon-tabler-maximize"
-                                            width="24" height="24" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor"
-                                            fill="none" strokeLinecap="round" strokeLinejoin="round">
-                                            <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
-                                            <path d="M4 8v-2a2 2 0 0 1 2 -2h2"></path>
-                                            <path d="M4 16v2a2 2 0 0 0 2 2h2"></path>
-                                            <path d="M16 4h2a2 2 0 0 1 2 2v2"></path>
-                                            <path d="M16 20h2a2 2 0 0 0 2 -2v-2"></path>
-                                        </svg>
+                                        <IconMaximize className="text-white" />
                                     </button>
                                 </Tooltip>
                             </div>}
@@ -279,15 +226,7 @@ export default function Sidebar() {
                                 <Tooltip placement="right" trigger="hover" color="invert" content="Minimize screen">
                                     <button onClick={closeFullScreen}
                                         className="z-50 cursor-pointer">
-                                        <svg xmlns="http://www.w3.org/2000/svg" className="text-white icon icon-tabler icon-tabler-minimize"
-                                            width="24" height="24" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor"
-                                            fill="none" strokeLinecap="round" strokeLinejoin="round">
-                                            <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
-                                            <path d="M15 19v-2a2 2 0 0 1 2 -2h2"></path>
-                                            <path d="M15 5v2a2 2 0 0 0 2 2h2"></path>
-                                            <path d="M5 15h2a2 2 0 0 1 2 2v2"></path>
-                                            <path d="M5 9h2a2 2 0 0 0 2 -2v-2"></path>
-                                        </svg>
+                                        <IconMinimize className="text-white" />
                                     </button>
                                 </Tooltip>
                             </div>}
@@ -299,17 +238,10 @@ export default function Sidebar() {
                             <div className="flex-shrink-0 flex pt-3 pb-10 justify-center">
                                 <Tooltip placement="right" trigger="hover" color="invert" content="Version overview">
                                     <div onClick={requestVersionOverview} id="refineryVersion"
-                                        className="z-50 tooltip tooltip-right cursor-pointer select-none text-white flex items-center">
+                                        className="z-50 tooltip tooltip-right cursor-pointer select-none text-white flex items-center mr-1">
                                         v1.12.0
                                         {hasUpdates && <Tooltip placement="right" trigger="hover" color="invert" content="Newer version available">
-                                            <svg xmlns="http://www.w3.org/2000/svg" className="icon icon-tabler icon-tabler-alert-circle inline-block text-yellow-700 align-top ml-1"
-                                                width="16" height="16" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor"
-                                                fill="none" strokeLinecap="round" strokeLinejoin="round">
-                                                <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
-                                                <circle cx="12" cy="12" r="9"></circle>
-                                                <line x1="12" y1="8" x2="12" y2="12"></line>
-                                                <line x1="12" y1="16" x2="12.01" y2="16"></line>
-                                            </svg>
+                                            <IconAlertCircle className="h-5 w-5 text-yellow-700" />
                                         </Tooltip>}
                                     </div>
                                 </Tooltip>
@@ -323,10 +255,7 @@ export default function Sidebar() {
 
                         <a className="text-green-800 text-base font-medium ml-3" href="https://changelog.kern.ai/" target="_blank">
                             <span className="leading-5">Changelog</span>
-                            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 inline-block" fill="none" viewBox="0 0 24 24"
-                                stroke="currentColor" strokeWidth="2">
-                                <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
-                            </svg>
+                            <IconArrowRight className="h-4 w-4 inline-block text-green-800" />
                         </a>
                     </div>
                     {versionOverviewData ? (<div className="inline-block min-w-full align-middle mt-3">
@@ -360,27 +289,14 @@ export default function Sidebar() {
                                                 <div className="flex flex-row items-center justify-center">
                                                     <div className="mr-2">{service.remoteVersion}</div>
                                                     {service.remoteHasNewer && <Tooltip placement="right" trigger="hover" color="invert" content="Newer version available">
-                                                        <svg xmlns="http://www.w3.org/2000/svg"
-                                                            className="icon icon-tabler icon-tabler-alert-circle inline-block text-yellow-700 align-top"
-                                                            width="20" height="20" viewBox="0 0 24 24" strokeWidth="2"
-                                                            stroke="currentColor" fill="none" strokeLinecap="round"
-                                                            strokeLinejoin="round">
-                                                            <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
-                                                            <circle cx="12" cy="12" r="9"></circle>
-                                                            <line x1="12" y1="8" x2="12" y2="12"></line>
-                                                            <line x1="12" y1="16" x2="12.01" y2="16"></line>
-                                                        </svg>
+                                                        <IconAlertCircle className="h-5 w-5 text-yellow-700" />
                                                     </Tooltip>}
                                                 </div>
                                             </td>
                                             <td className="text-center px-3 py-2 text-sm text-gray-500">{service.parseDate}</td>
                                             <td className="text-center px-3 py-2 text-sm text-gray-500">
                                                 <a href={service.link} target="_blank" rel="noopener noreferrer" className="h-4 w-4 m-auto block p-0">
-                                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 m-auto"
-                                                        fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-                                                        <path strokeLinecap="round" strokeLinejoin="round"
-                                                            d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                                                    </svg>
+                                                    <IconExternalLink className="h-4 w-4 m-auto" />
                                                 </a>
                                             </td>
                                         </tr>

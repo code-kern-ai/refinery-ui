@@ -25,6 +25,7 @@ const initialState: Modals = {
     },
     [ModalEnum.ADMIN_DELETE_PROJECT]: {
         open: false,
+        projectId: '',
     },
     [ModalEnum.MODAL_UPLOAD]: {
         open: false,

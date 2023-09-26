@@ -1,14 +1,16 @@
 import { selectUser } from "@/src/reduxStore/states/general"
-import { openModal, setModalStates } from "@/src/reduxStore/states/modal";
+import { openModal } from "@/src/reduxStore/states/modal";
 import { setUploadFileType } from "@/src/reduxStore/states/upload";
 import { ModalEnum } from "@/src/types/shared/modal";
 import { UserRole } from "@/src/types/shared/sidebar";
 import { UploadFileType, UploadOptions } from "@/src/types/shared/upload";
 import { useRouter } from "next/router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux"
 import ModalUpload from "../shared/upload/ModalUpload";
 import SampleProjectsDropdown from "./SampleProjectsDropdown";
+
+const BASE_OPTIONS = { reloadOnFinish: false, deleteProjectOnFail: true, closeModalOnClick: true, isModal: true, navigateToProject: true, showBadPasswordMsg: null };
 
 export default function ButtonsContainer() {
     const router = useRouter();
@@ -16,9 +18,13 @@ export default function ButtonsContainer() {
 
     const user = useSelector(selectUser);
 
+    // TODO : Display the bad password message when the user tries to upload a project with a bad password
     const [showBadPasswordMsg, setShowBadPasswordMsg] = useState(false);
+    const [uploadOptions, setUploadOptions] = useState<UploadOptions>(BASE_OPTIONS);
 
-    const uploadOptions: UploadOptions = { reloadOnFinish: false, deleteProjectOnFail: true, closeModalOnClick: true, isModal: true, navigateToProject: true, showBadPasswordMsg: showBadPasswordMsg };
+    useEffect(() => {
+        setUploadOptions({ ...BASE_OPTIONS, showBadPasswordMsg });
+    }, [showBadPasswordMsg]);
 
     return (
         user && user.role === UserRole.ENGINEER ? (<div>

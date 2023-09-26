@@ -7,5 +7,6 @@ export function modalButtonCaption(type: ModalButtonType): string {
         case ModalButtonType.ABORT: return "Abort";
         case ModalButtonType.BACK: return "Back";
         case ModalButtonType.EDIT: return "Edit";
+        default: return "Unknown";
     }
 }

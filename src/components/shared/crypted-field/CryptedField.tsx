@@ -1,4 +1,5 @@
 import { CryptoFieldProps } from "@/src/types/shared/crypted-field";
+import { IconEye, IconEyeOff } from "@tabler/icons-react";
 import { useRef, useState } from "react";
 
 export default function CryptedField({ label = 'Password', placeholder = 'Enter some password here...', displayOptionalAsText = true }, props: CryptoFieldProps) {
@@ -25,25 +26,9 @@ export default function CryptedField({ label = 'Password', placeholder = 'Enter 
                     }} />
                 <button onClick={toggleKey} disabled={!key}>
                     {!show ? (
-                        <svg xmlns="http://www.w3.org/2000/svg"
-                            className={`icon icon-tabler icon-tabler-eye text-gray-500 absolute top-1 right-3 cursor-pointer ${!key ? 'cursor-not-allowed opacity-50' : 'cursor-pointer opacity-100'}`}
-                            width="24" height="24" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" fill="none"
-                            strokeLinecap="round" strokeLinejoin="round">
-                            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                            <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" />
-                            <path d="M21 12c-2.4 4 -5.4 6 -9 6c-3.6 0 -6.6 -2 -9 -6c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6" />
-                        </svg>
+                        <IconEye className={` text-gray-500 absolute top-1 right-3 cursor-pointer ${!key ? 'cursor-not-allowed opacity-50' : 'cursor-pointer opacity-100'}`} />
                     ) : (
-                        <svg xmlns="http://www.w3.org/2000/svg"
-                            className={`icon icon-tabler icon-tabler-eye-off text-gray-500 absolute top-1 right-3 ${!key ? 'cursor-not-allowed opacity-50' : 'cursor-pointer opacity-100'}`}
-                            width="24" height="24" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" fill="none"
-                            strokeLinecap="round" strokeLinejoin="round">
-                            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                            <path d="M10.585 10.587a2 2 0 0 0 2.829 2.828" />
-                            <path
-                                d="M16.681 16.673a8.717 8.717 0 0 1 -4.681 1.327c-3.6 0 -6.6 -2 -9 -6c1.272 -2.12 2.712 -3.678 4.32 -4.674m2.86 -1.146a9.055 9.055 0 0 1 1.82 -.18c3.6 0 6.6 2 9 6c-.666 1.11 -1.379 2.067 -2.138 2.87" />
-                            <path d="M3 3l18 18" />
-                        </svg>
+                        <IconEyeOff className={`text-gray-500 absolute top-1 right-3 ${!key ? 'cursor-not-allowed opacity-50' : 'cursor-pointer opacity-100'}`} />
                     )}
                 </button>
             </div>

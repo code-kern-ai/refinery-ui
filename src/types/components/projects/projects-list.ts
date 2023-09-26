@@ -37,4 +37,5 @@ export type ProjectStatistics = {
 export type ProjectCardProps = {
     project: Project;
     projectStatisticsById: { [key: string]: ProjectStatistics };
+    adminDeleteProject: () => void;
 }

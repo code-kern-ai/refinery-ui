@@ -11,11 +11,12 @@ import { ProjectStatus } from "@/src/types/components/projects/projects-list";
 import { timer } from "rxjs";
 import { uploadFile } from "@/src/services/base/s3-service";
 import { CurrentPage } from "@/src/types/shared/general";
-import { WebSocketsService } from "@/src/services/base/web-sockets/misc";
+import { WebSocketsService } from "@/src/services/base/web-sockets/WebSocketsService";
 import { jsonCopy } from "@/submodules/javascript-functions/general";
 import { useRouter } from "next/router";
 import { extendAllProjects, removeFromAllProjectsById, selectAllProjects } from "@/src/reduxStore/states/project";
 import CryptedField from "../crypted-field/CryptedField";
+import { unsubscribeWSOnDestroy } from "@/src/services/base/web-sockets/web-sockets-helper";
 
 
 const SELECTED_TOKENIZER_RECORD_NEW = 'English (en_core_web_sm)';
@@ -69,17 +70,7 @@ export default function Upload(props: UploadProps) {
     const [uploadCredentialsMut] = useLazyQuery(GET_UPLOAD_CREDENTIALS_AND_ID);
     const [getUploadTaskId] = useLazyQuery(GET_UPLOAD_TASK_BY_TASK_ID, { fetchPolicy: 'network-only' });
 
-    useEffect(() => {
-        const handleRouteChange = (url, { shallow }) => {
-            WebSocketsService.unsubscribeFromNotifications(CurrentPage.PROJECTS);
-            WebSocketsService.unsubscribeFromNotifications(CurrentPage.NEW_PROJECT);
-        };
-        router.events.on('routeChangeStart', handleRouteChange);
-        return () => {
-            router.events.off('routeChangeStart', handleRouteChange);
-        };
-    }, []);
-
+    useEffect(unsubscribeWSOnDestroy(router, [CurrentPage.PROJECTS, CurrentPage.NEW_PROJECT]), []);
 
     useEffect(() => {
         const tokenizerValuesDisplay = [];
@@ -104,12 +95,12 @@ export default function Upload(props: UploadProps) {
 
     function subscribeToNotifications(): void {
         if (uploadFileType == UploadFileType.PROJECT) {
-            WebSocketsService.subscribeToNotifications(CurrentPage.PROJECTS, {
+            WebSocketsService.subscribeToNotification(CurrentPage.PROJECTS, {
                 whitelist: ['file_upload'],
                 func: handleWebsocketNotification
             });
         } else {
-            WebSocketsService.subscribeToNotifications(CurrentPage.NEW_PROJECT, {
+            WebSocketsService.subscribeToNotification(CurrentPage.NEW_PROJECT, {
                 projectId: UploadHelper.getProjectId(),
                 whitelist: ['file_upload'],
                 func: handleWebsocketNotification
@@ -203,8 +194,8 @@ export default function Upload(props: UploadProps) {
     }
 
     function reSubscribeToNotifications() {
-        WebSocketsService.unsubscribeFromNotifications(CurrentPage.PROJECTS);
-        WebSocketsService.unsubscribeFromNotifications(CurrentPage.NEW_PROJECT);
+        WebSocketsService.unsubscribeFromNotification(CurrentPage.PROJECTS);
+        WebSocketsService.unsubscribeFromNotification(CurrentPage.NEW_PROJECT);
         subscribeToNotifications();
     }
 

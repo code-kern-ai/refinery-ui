@@ -1,4 +1,4 @@
-import { Fragment, useState } from 'react'
+import { Fragment, useCallback, useEffect, useState } from 'react'
 import { Menu, Transition } from '@headlessui/react'
 import { ChevronDownIcon } from '@heroicons/react/20/solid'
 import { useMutation } from '@apollo/client';
@@ -9,6 +9,7 @@ import { extendAllProjects, selectAllProjects } from '@/src/reduxStore/states/pr
 import { ModalEnum } from '@/src/types/shared/modal';
 import { closeModal, openModal } from '@/src/reduxStore/states/modal';
 import Modal from '../shared/modal/Modal';
+import { IconAlertTriangle, IconFishHook, IconMessageCircle, IconNews } from '@tabler/icons-react';
 
 export default function SampleProjectsDropdown() {
     const router = useRouter();
@@ -18,22 +19,20 @@ export default function SampleProjectsDropdown() {
 
     const [projectNameInput, setProjectNameInput] = useState<string>("");
     const [projectTypeInput, setProjectTypeInput] = useState<string>("");
-    const [checkIfProjectNameExists, setCheckIfProjectNameExists] = useState<boolean>(false);
-    const [acceptButton, setAcceptButton] = useState({ buttonCaption: "Create", closeAfterClick: false, useButton: true, disabled: true, emitFunction: () => { importSampleProject() } })
+    const [projectNameExists, setProjectNameExists] = useState<boolean>(false);
 
     const [createSampleProjectMut] = useMutation(CREATE_SAMPLE_PROJECT);
 
-    function importSampleProject(projectName?: string, projectType?: string) {
+    const importSampleProject = useCallback((projectName?: string, projectType?: string) => {
         const checkIfProjectExists = projects.find((project) => project.name === projectName);
         if (checkIfProjectExists) {
             setProjectNameInput(projectName);
             setProjectTypeInput(projectType);
-            setCheckIfProjectNameExists(true);
+            setProjectNameExists(true);
             dispatch(openModal(ModalEnum.SAMPLE_PROJECT_TITLE));
             return;
         }
-        if (projectNameInput == "" || projectName == "") return;
-        const projectNameFinal = projectName ? projectName : projectNameInput;
+        const projectNameFinal = projectName && projectName ? projectName : projectNameInput;
         const projectTypeFinal = projectType ? projectType : projectTypeInput;
         createSampleProjectMut({ variables: { name: projectNameFinal, projectType: projectTypeFinal } }).then((res) => {
             const project = res.data.createSampleProject['project'];
@@ -43,22 +42,20 @@ export default function SampleProjectsDropdown() {
                 router.push(`/projects/${project.id}/overview`);
             }
         });
-    }
+    }, [projectNameInput, projectTypeInput]);
 
     function handleProjectName(value: string) {
-        const checkName = projects.some(project => project.name == value.trim());
-        setCheckIfProjectNameExists(checkName);
+        const checkName = projects.some(project => project.name == value);
+        setProjectNameExists(checkName);
         if (checkName || value.trim() == "") {
-            const acceptButtonCopy = { ...acceptButton };
-            acceptButtonCopy.disabled = true;
-            setAcceptButton(acceptButtonCopy);
+            setAcceptButton({ ...acceptButton, disabled: true });
         } else {
-            const acceptButtonCopy = { ...acceptButton };
-            acceptButtonCopy.disabled = false;
-            setAcceptButton(acceptButtonCopy);
+            setAcceptButton({ ...acceptButton, disabled: false });
         }
         setProjectNameInput(value);
     }
+
+    const [acceptButton, setAcceptButton] = useState({ buttonCaption: "Create", closeAfterClick: false, useButton: true, disabled: true, emitFunction: importSampleProject })
 
     return (
         <Menu as="div" className="relative inline-block text-left">
@@ -91,14 +88,7 @@ export default function SampleProjectsDropdown() {
                                     onClick={() => {
                                         importSampleProject("Clickbait", "Clickbait");
                                     }}>
-                                    <svg xmlns="http://www.w3.org/2000/svg" className="icon icon-tabler icon-tabler-fish-hook inline-block"
-                                        width="20" height="20" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" fill="none"
-                                        strokeLinecap="round">
-                                        <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
-                                        <path d="M16 9v6a5 5 0 0 1 -10 0v-4l3 3"></path>
-                                        <circle cx="16" cy="7" r="2"></circle>
-                                        <path d="M16 5v-2"></path>
-                                    </svg>
+                                    <IconFishHook className="h-5 w-5 inline-block" />
                                     <span className="ml-2">Clickbait</span>
                                     <div className="mt-2">Binary classification for detecting nudging articles.</div>
                                 </a>
@@ -122,15 +112,7 @@ export default function SampleProjectsDropdown() {
                                     onClick={() => {
                                         importSampleProject("Conversational AI", "Conversational AI");
                                     }}>
-                                    <svg xmlns="http://www.w3.org/2000/svg" className="icon icon-tabler icon-tabler-message-circle inline-block"
-                                        width="20" height="20" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" fill="none"
-                                        strokeLinecap="round" strokeLinejoin="round">
-                                        <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
-                                        <path d="M3 20l1.3 -3.9a9 8 0 1 1 3.4 2.9l-4.7 1"></path>
-                                        <line x1="12" y1="12" x2="12" y2="12.01"></line>
-                                        <line x1="8" y1="12" x2="8" y2="12.01"></line>
-                                        <line x1="16" y1="12" x2="16" y2="12.01"></line>
-                                    </svg>
+                                    <IconMessageCircle className="h-5 w-5 inline-block" />
                                     <span className="ml-2">Conversational AI</span>
                                     <div className="mt-2">Detecting intent within conversational lines.</div>
                                 </a>
@@ -154,17 +136,7 @@ export default function SampleProjectsDropdown() {
                                     onClick={() => {
                                         importSampleProject("AG News", "AG News");
                                     }}>
-                                    <svg xmlns="http://www.w3.org/2000/svg" className="icon icon-tabler icon-tabler-news inline-block" width="20"
-                                        height="20" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" fill="none"
-                                        strokeLinecap="round" strokeLinejoin="round">
-                                        <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
-                                        <path
-                                            d="M16 6h3a1 1 0 0 1 1 1v11a2 2 0 0 1 -4 0v-13a1 1 0 0 0 -1 -1h-10a1 1 0 0 0 -1 1v12a3 3 0 0 0 3 3h11">
-                                        </path>
-                                        <line x1="8" y1="8" x2="12" y2="8"></line>
-                                        <line x1="8" y1="12" x2="12" y2="12"></line>
-                                        <line x1="8" y1="16" x2="12" y2="16"></line>
-                                    </svg>
+                                    <IconNews className="h-5 w-5 inline-block" />
                                     <span className="ml-2">AG News</span>
                                     <div className="mt-2">Modelling topics of headline news.</div>
                                 </a>
@@ -207,17 +179,9 @@ export default function SampleProjectsDropdown() {
                             }
                         }} className="h-8 w-full border-gray-300 rounded-md placeholder-italic border text-gray-900 pl-4 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100" placeholder="Enter some title here..." />
                     </div>
-                    {checkIfProjectNameExists && (<div className="text-red-700 text-xs mt-2 text-left">Project title exists</div>)}
+                    {projectNameExists && (<div className="text-red-700 text-xs mt-2 text-left">Project title exists</div>)}
                     <div className="flex flex-row mt-2">
-                        <svg xmlns="http://www.w3.org/2000/svg" className="icon icon-tabler icon-tabler-alert-triangle text-yellow-700"
-                            width="20" height="20" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" fill="none"
-                            strokeLinecap="round" strokeLinejoin="round">
-                            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                            <path
-                                d="M10.24 3.957l-8.422 14.06a1.989 1.989 0 0 0 1.7 2.983h16.845a1.989 1.989 0 0 0 1.7 -2.983l-8.423 -14.06a1.989 1.989 0 0 0 -3.4 0z" />
-                            <path d="M12 9v4" />
-                            <path d="M12 17h.01" />
-                        </svg>
+                        <IconAlertTriangle className="h-5 w-5 text-yellow-700" />
                         <label className="text-yellow-700 text-xs italic ml-2 text-left">The first sample project of a specific type can use the
                             default name, but after the name is taken, the user needs a custom name.</label>
                     </div>

@@ -1,13 +1,12 @@
-import { selectIsDemo, selectIsManaged, selectOrganization, selectUser } from "@/src/reduxStore/states/general"
-import { selectAllProjects, setAllProjects } from "@/src/reduxStore/states/project";
-import { WebSocketsService } from "@/src/services/base/web-sockets/misc";
+import { selectIsAdmin, selectIsDemo, selectIsManaged, selectOrganization, selectUser } from "@/src/reduxStore/states/general"
+import { removeFromAllProjectsById, selectAllProjects, setAllProjects } from "@/src/reduxStore/states/project";
+import { WebSocketsService } from "@/src/services/base/web-sockets/WebSocketsService";
 import { GET_OVERVIEW_STATS, GET_PROJECT_LIST } from "@/src/services/gql/queries/projects";
-import { Project, ProjectStatistics, ProjectStatus } from "@/src/types/components/projects/projects-list";
+import { Project, ProjectStatistics } from "@/src/types/components/projects/projects-list";
 import { CurrentPage } from "@/src/types/shared/general";
-import { parseUTC } from "@/submodules/javascript-functions/date-parser";
-import { jsonCopy, percentRound } from "@/submodules/javascript-functions/general";
+import { jsonCopy, percentRoundString } from "@/submodules/javascript-functions/general";
 import { useLazyQuery, useMutation } from "@apollo/client";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import YoutubeIntroduction from "./YoutubeIntroduction";
 import ButtonsContainer from "./ButtonsContainer";
@@ -16,6 +15,12 @@ import { GET_CAN_CREATE_LOCAL_ORG } from "@/src/services/gql/queries/organizatio
 import { ADD_USER_TO_ORGANIZATION, CREATE_ORGANIZATION } from "@/src/services/gql/mutations/organizations";
 import style from "../../styles/projects-list.module.css"
 import { useRouter } from "next/router";
+import Modal from "../shared/modal/Modal";
+import { ModalEnum } from "@/src/types/shared/modal";
+import { DELETE_PROJECT } from "@/src/services/gql/mutations/projects";
+import { closeModal, selectModal } from "@/src/reduxStore/states/modal";
+import { unsubscribeWSOnDestroy } from "@/src/services/base/web-sockets/web-sockets-helper";
+import { postProcessProjectsList } from "@/src/util/projects/project-list-helper";
 
 export default function ProjectsList() {
     const router = useRouter();
@@ -24,8 +29,11 @@ export default function ProjectsList() {
     const organization = useSelector(selectOrganization);
     const isManaged = useSelector(selectIsManaged);
     const isDemo = useSelector(selectIsDemo);
+    const isAdmin = useSelector(selectIsAdmin);
     const projects = useSelector(selectAllProjects);
     const user = useSelector(selectUser);
+    const modal = useSelector(selectModal(ModalEnum.ADMIN_DELETE_PROJECT));
+
     const [organizationInactive, setOrganizationInactive] = useState(null);
     const [projectStatisticsById, setProjectStatisticsById] = useState({});
     const [canCreateOrg, setCanCreateOrg] = useState(false);
@@ -35,17 +43,9 @@ export default function ProjectsList() {
     const [refetchCanCreateOrg] = useLazyQuery(GET_CAN_CREATE_LOCAL_ORG, { fetchPolicy: "no-cache" });
     const [createOrgMut] = useMutation(CREATE_ORGANIZATION);
     const [addUserToOrgMut] = useMutation(ADD_USER_TO_ORGANIZATION);
+    const [deleteProjectByIdMut] = useMutation(DELETE_PROJECT, { fetchPolicy: "no-cache" });
 
-    useEffect(() => {
-        const handleRouteChange = (url, { shallow }) => {
-            WebSocketsService.unsubscribeFromNotifications(CurrentPage.PROJECTS);
-        };
-        router.events.on('routeChangeStart', handleRouteChange);
-        return () => {
-            router.events.off('routeChangeStart', handleRouteChange);
-        };
-    }, []);
-
+    useEffect(unsubscribeWSOnDestroy(router, [CurrentPage.PROJECTS]), []);
 
     useEffect(() => {
         setOrganizationInactive(organization == null);
@@ -60,21 +60,28 @@ export default function ProjectsList() {
         }
     }, [organizationInactive]);
 
+    const adminDeleteProject = useCallback(() => {
+        if (!isAdmin) return;
+        const projectId = modal.projectId;
+        deleteProjectByIdMut({ variables: { projectId: projectId } }).then(() => {
+            dispatch(closeModal(ModalEnum.ADMIN_DELETE_PROJECT));
+            dispatch(removeFromAllProjectsById(projectId));
+        })
+    }, [isAdmin, modal]);
+
+    const adminStoreInstantAndDelete = useCallback(() => {
+        localStorage.setItem("adminInstantDelete", "X");
+        adminDeleteProject();
+    }, [adminDeleteProject]);
+
+    const acceptButton = { buttonCaption: "Delete and never show again", useButton: true, emitFunction: adminStoreInstantAndDelete }
+    const abortButton = { buttonCaption: "Delete", useButton: true, emitFunction: adminDeleteProject };
+
 
     function initData() {
         refetchProjects().then((res) => {
-            let projects = res.data["allProjects"].edges.map((edge: any) => edge.node);
-            projects.sort((a, b) => a.name.localeCompare(b.name));
-            projects = projects.filter(a => a.status != ProjectStatus.IN_DELETION);
-            projects = projects.map((project: Project) => {
-                const projectItemCopy = jsonCopy(project);
-                projectItemCopy.timeStamp = parseUTC(projectItemCopy.createdAt);
-                const splitDateTime = projectItemCopy.timeStamp.split(',');
-                projectItemCopy.date = splitDateTime[0].trim();
-                projectItemCopy.time = splitDateTime[1];
-                return projectItemCopy;
-            })
-            dispatch(setAllProjects(projects));
+            const projects = res.data["allProjects"].edges.map((edge: any) => edge.node);
+            dispatch(setAllProjects(postProcessProjectsList(projects)));
         });
 
         refetchStats().then((res) => {
@@ -83,14 +90,14 @@ export default function ProjectsList() {
             if (stats == null) return;
             stats.forEach((stat: ProjectStatistics) => {
                 const statCopy = jsonCopy(stat);
-                stat.manuallyLabeled = percentRound(statCopy.numDataScaleManual / statCopy.numDataScaleUploaded, 2);
-                stat.weaklySupervised = percentRound(statCopy.numDataScaleProgrammatical / statCopy.numDataScaleUploaded, 2);
+                stat.manuallyLabeled = percentRoundString(statCopy.numDataScaleManual / statCopy.numDataScaleUploaded, 2);
+                stat.weaklySupervised = percentRoundString(statCopy.numDataScaleProgrammatical / statCopy.numDataScaleUploaded, 2);
                 statsDict[stat.projectId] = stat;
             });
             setProjectStatisticsById(statsDict);
         });
 
-        WebSocketsService.subscribeToNotifications(CurrentPage.PROJECTS, {
+        WebSocketsService.subscribeToNotification(CurrentPage.PROJECTS, {
             whitelist: ['project_created', 'project_deleted', 'project_update', 'file_upload', 'bad_password'],
             func: handleWebsocketNotification
         });
@@ -105,19 +112,17 @@ export default function ProjectsList() {
     }
 
     function createDefaultOrg() {
-        if (!isManaged && !isDemo) {
-            refetchCanCreateOrg().then((res) => {
-                setCanCreateOrg(res.data["canCreateLocalOrg"]);
-                if (canCreateOrg) {
-                    const localhostOrg = "localhost";
-                    createOrgMut({ variables: { name: localhostOrg } }).then((res) => {
-                        addUserToOrgMut({ variables: { userMail: user.mail, organizationName: localhostOrg } }).then((res) => {
-                            location.reload();
-                        });
-                    });
-                }
+        if (isManaged || isDemo) return;
+        refetchCanCreateOrg().then((res) => {
+            setCanCreateOrg(res.data["canCreateLocalOrg"]);
+            if (!canCreateOrg) return;
+            const localhostOrg = "localhost";
+            createOrgMut({ variables: { name: localhostOrg } }).then((res) => {
+                addUserToOrgMut({ variables: { userMail: user.mail, organizationName: localhostOrg } }).then((res) => {
+                    location.reload();
+                });
             });
-        }
+        });
     }
 
     return (
@@ -227,9 +232,17 @@ export default function ProjectsList() {
                     <div className="h-screen overflow-y-scroll my-3">
                         <div className={style.scrollableSize}>
                             {projects && projects.map((project: Project, index: number) => (
-                                <ProjectCard project={project} projectStatisticsById={projectStatisticsById} key={index}></ProjectCard>
+                                <ProjectCard project={project} projectStatisticsById={projectStatisticsById} key={index} adminDeleteProject={adminDeleteProject}></ProjectCard>
                             ))}
                         </div>
+                        <Modal modalName={ModalEnum.ADMIN_DELETE_PROJECT} acceptButton={acceptButton} abortButton={abortButton}>
+                            <div className="flex flex-row items-center justify-center">
+                                <span className="text-lg leading-6 text-gray-900 font-medium">
+                                    Admin Function - Quick delete
+                                </span>
+                            </div>
+                            Are you sure?<div>This will delete the project and all its data.</div>
+                        </Modal>
                     </div>
                 </div>)}
             </>)
