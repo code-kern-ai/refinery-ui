@@ -14,7 +14,7 @@ export default function Modal(props: any) {
 
     useEffect(() => {
         fillButtons();
-    }, [props.acceptButton, props.abortButton]);
+    }, [props.acceptButton, props.abortButton, props.backButton]);
 
     function fullInit() {
         dispatch(initModal(props.modalName));
@@ -49,6 +49,18 @@ export default function Modal(props: any) {
             if (typeof props.abortButton == "string") props.abortButton = { useButton: isStringTrue(props.abortButton as string) };
             else if (typeof props.abortButton == "boolean") props.abortButton = { useButton: props.abortButton };
             if (props.abortButton) initButton(props.abortButton, ModalButtonType.ABORT);
+        }
+        if (props.backButton == undefined) {
+            const newProps = {
+                ...props,
+                backButton: { useButton: false }
+            };
+            props = newProps;
+        }
+        else {
+            if (typeof props.backButton == "string") props.backButton = { useButton: isStringTrue(props.backButton as string) };
+            else if (typeof props.backButton == "boolean") props.backButton = { useButton: props.backButton };
+            if (props.backButton) initButton(props.backButton, ModalButtonType.BACK);
         }
 
     }
@@ -108,6 +120,9 @@ export default function Modal(props: any) {
                                     {props.abortButton?.useButton ?
                                         <button className={`ml-2 bg-red-100 border border-red-400 text-red-700 text-xs font-semibold px-4 py-2 rounded-md ${props.abortButton.disabled ? 'cursor-not-allowed opacity-50' : 'cursor-pointer opacity-100'} hover:bg-red-200 focus:outline-none`}
                                             onClick={() => clickButton(props.abortButton)}>{props.abortButton.buttonCaption}</button> : null}
+                                    {props.backButton?.useButton ?
+                                        <button className={`ml-2 bg-white border border-gray-300 text-gray-700 text-xs font-semibold px-4 py-2 rounded-md ${props.backButton.disabled ? 'cursor-not-allowed opacity-50' : 'cursor-pointer opacity-100'} hover:bg-gray-50 focus:outline-none`}
+                                            onClick={() => clickButton(props.backButton)}>{props.backButton.buttonCaption}</button> : null}
                                     <button className="ml-2 bg-white text-gray-700 border border-gray-300 text-xs font-semibold px-4 py-2 rounded cursor-pointer hover:bg-gray-50 focus:outline-none"
                                         onClick={() => setOpen(false)}>Close</button>
                                 </div>

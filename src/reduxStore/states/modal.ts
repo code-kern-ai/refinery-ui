@@ -32,6 +32,12 @@ const initialState: Modals = {
     [ModalEnum.SAMPLE_PROJECT_TITLE]: {
         open: false,
     },
+    [ModalEnum.VERSION_OVERVIEW]: {
+        open: false,
+    },
+    [ModalEnum.HOW_TO_UPDATE]: {
+        open: false,
+    },
 };
 
 const modalSlice = createSlice({

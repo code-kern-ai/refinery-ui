@@ -1,6 +1,6 @@
 import { selectIsAdmin, selectIsDemo, selectUser } from "@/src/reduxStore/states/general";
 import { closeModal, openModal } from "@/src/reduxStore/states/modal";
-import { removeFromAllProjectsById } from "@/src/reduxStore/states/project";
+import { removeFromAllProjectsById, setActiveProject } from "@/src/reduxStore/states/project";
 import { DELETE_PROJECT } from "@/src/services/gql/mutations/projects";
 import { Project, ProjectCardProps, ProjectStatus } from "@/src/types/components/projects/projects-list";
 import { ModalEnum } from "@/src/types/shared/modal";
@@ -52,9 +52,11 @@ export default function ProjectCard(props: ProjectCardProps) {
         })
     }
 
-    function manageProject(projectId: string, recordsInProject: Number): void {
+    function manageProject(project: Project): void {
+        const projectId = project.id;
+        dispatch(setActiveProject(project));
         if (user?.role == 'ENGINEER') {
-            if (recordsInProject == 0) {
+            if (project.numDataScaleUploaded == 0) {
                 router.push(`/projects/${projectId}/settings`);
             } else {
                 router.push(`/projects/${projectId}/overview`);
@@ -123,7 +125,7 @@ export default function ProjectCard(props: ProjectCardProps) {
                             </div>}
                         </div>
                         <div>
-                            {props.project.status !== ProjectStatus.INIT_SAMPLE_PROJECT && <button onClick={() => manageProject(props.project.id, props.project.numDataScaleUploaded)}
+                            {props.project.status !== ProjectStatus.INIT_SAMPLE_PROJECT && <button onClick={() => manageProject(props.project)}
                                 className="text-green-800 text-sm font-medium">
                                 <span className="leading-5">Continue project</span>
                                 <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 inline-block" fill="none"

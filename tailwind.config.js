@@ -51,6 +51,9 @@ module.exports = {
           "dark-1": "#0000F5",
           "dark-2": "#4338CA",
         },
+        kernpurple: {
+          DEFAULT: "#ae28ae"
+        },
       },
       fontFamily: {
         sans: ['DM Sans', ...defaultTheme.fontFamily.sans],

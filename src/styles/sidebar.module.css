@@ -1,0 +1,8 @@
+.scrollableSize {
+  max-height: calc(100vh - 230px);
+  overflow-y: auto;
+}
+
+.listLetters {
+  list-style: lower-alpha;
+}

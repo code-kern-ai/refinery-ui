@@ -59,6 +59,5 @@ export function GlobalStoreDataComponent(props: React.PropsWithChildren) {
 
     }, [router.query.projectId]);
 
-    if (!dataLoaded) return null;
     return <div>{props.children}</div>;
 }
