@@ -5,8 +5,8 @@ import { useEffect } from "react";
 import { useDispatch } from "react-redux";
 
 export default function ProjectOverviewPage() {
-
     const dispatch = useDispatch();
+
     useEffect(() => {
         dispatch(setCurrentPage(CurrentPage.PROJECT_OVERVIEW))
     }, [])

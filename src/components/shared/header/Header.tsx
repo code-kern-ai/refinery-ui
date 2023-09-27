@@ -8,6 +8,7 @@ import style from "../../../styles/header.module.css"
 import LogoutDropdown from "./LogoutDropdown";
 import { useRouter } from "next/router";
 import { IconHexagons, IconHome, IconPlayCard } from "@tabler/icons-react";
+import { selectProject } from "@/src/reduxStore/states/project";
 
 export default function Header() {
     const router = useRouter();
@@ -17,6 +18,7 @@ export default function Header() {
     const currentPage = useSelector(selectCurrentPage);
     const organization = useSelector(selectOrganization);
     const user = useSelector(selectUser);
+    const project = useSelector(selectProject);
 
     const [organizationInactive, setOrganizationInactive] = useState(null);
 
@@ -41,6 +43,9 @@ export default function Header() {
                     </div>) : (<></>)}
                     {currentPage == CurrentPage.NEW_PROJECT && <div className="ml-6 text-gray-500 text-sm font-normal">
                         Add a new project to <span className="font-bold text-gray-900">{organization?.name}</span>.
+                    </div>}
+                    {currentPage == CurrentPage.PROJECT_OVERVIEW && <div className="ml-6 text-gray-700 text-sm font-normal">
+                        {project?.name} - <span className="text-gray-500 font-normal">{project?.numDataScaleUploaded} records</span>
                     </div>}
                 </div>
                 <div className="flex flex-row flex-nowrap items-center">

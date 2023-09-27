@@ -1,0 +1,5 @@
+.filtersUnderline {
+    text-decoration-style: dotted;
+    text-underline-offset: 2px;
+    text-decoration-color: #22c55e;
+}
