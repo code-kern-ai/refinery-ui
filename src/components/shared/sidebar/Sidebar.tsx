@@ -5,9 +5,9 @@ import Image from 'next/image';
 import { useDispatch, useSelector } from 'react-redux';
 import { Tooltip } from '@nextui-org/react';
 import { CurrentPage } from '@/src/types/shared/general';
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import AppSelectionDropdown from '@/submodules/react-components/components/AppSelectionDropdown';
-import { ModalEnum } from '@/src/types/shared/modal';
+import { ModalButton, ModalEnum } from '@/src/types/shared/modal';
 import { closeModal, openModal } from '@/src/reduxStore/states/modal';
 import { useLazyQuery } from '@apollo/client';
 import { GET_HAS_UPDATES, GET_VERSION_OVERVIEW } from '@/src/services/gql/queries/config';
@@ -18,6 +18,9 @@ import style from '@/src/styles/sidebar.module.css';
 import { copyToClipboard } from '@/submodules/javascript-functions/general';
 import { IconAlertCircle, IconApi, IconArrowRight, IconBrandDiscord, IconBulb, IconChartPie, IconClipboard, IconExternalLink, IconMaximize, IconMinimize, IconTriangleSquareCircle, IconUserCircle } from '@tabler/icons-react';
 import { IconSettings } from '@tabler/icons-react';
+
+const ACCEPT_BUTTON = { buttonCaption: "How to update", useButton: true };
+const ABORT_BUTTON = { buttonCaption: "Back", useButton: true };
 
 export default function Sidebar() {
     const dispatch = useDispatch();
@@ -46,9 +49,13 @@ export default function Sidebar() {
         dispatch(openModal(ModalEnum.VERSION_OVERVIEW));
     }, []);
 
-    const acceptButton = { buttonCaption: "How to update", useButton: !isManaged, emitFunction: howToUpdate };
-    const backButton = { buttonCaption: "Back", useButton: true, emitFunction: goBack };
+    useEffect(() => {
+        setAcceptButton({ ...ACCEPT_BUTTON, useButton: !isManaged, emitFunction: howToUpdate });
+        setBackButton({ ...ABORT_BUTTON, emitFunction: goBack });
+    }, [howToUpdate, goBack]);
 
+    const [acceptButton, setAcceptButton] = useState<ModalButton>(ACCEPT_BUTTON);
+    const [backButton, setBackButton] = useState<ModalButton>(ABORT_BUTTON);
 
     function openFullScreen() {
         setIsFullScreen(true);

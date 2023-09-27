@@ -1,4 +1,4 @@
-import { ModalEnum } from "@/src/types/shared/modal";
+import { ModalButton, ModalEnum } from "@/src/types/shared/modal";
 import Modal from "../modal/Modal";
 import { UploadFileType, UploadOptions, UploadProps } from "@/src/types/shared/upload";
 import { getSubtitle, getTitle } from "@/src/util/shared/upload/modal-upload-helper";
@@ -8,6 +8,8 @@ import { selectAllProjects } from "@/src/reduxStore/states/project";
 import Upload from "./Upload";
 import { selectUploadData } from "@/src/reduxStore/states/upload";
 import { IconAlertTriangle } from "@tabler/icons-react";
+
+const ACCEPT_BUTTON = { buttonCaption: "Upload", closeAfterClick: false, useButton: true, disabled: true };
 
 export default function ModalUpload(props: UploadProps) {
     const projects = useSelector(selectAllProjects);
@@ -22,7 +24,7 @@ export default function ModalUpload(props: UploadProps) {
         setStartUpload(true);
     }, []);
 
-    const [acceptButton, setAcceptButton] = useState({ buttonCaption: "Upload", closeAfterClick: false, useButton: true, disabled: true, emitFunction: submitUpload });
+    const [acceptButton, setAcceptButton] = useState<ModalButton>({ ...ACCEPT_BUTTON, emitFunction: submitUpload });
 
     const title = getTitle(uploadFileType);
     const subTitle = getSubtitle(uploadFileType);

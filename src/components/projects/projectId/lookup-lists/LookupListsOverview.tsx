@@ -16,6 +16,7 @@ import { ModalEnum } from "@/src/types/shared/modal";
 import { useRouter } from "next/router";
 
 const ACTIONS_DROPDOWN_OPTIONS = ['Select all', 'Deselect all', 'Delete selected'];
+const ABORT_BUTTON = { buttonCaption: "Delete", useButton: true, disabled: false, closeAfterClick: true };
 
 export default function LookupListsOverview() {
     const router = useRouter();
@@ -48,9 +49,7 @@ export default function LookupListsOverview() {
         });
     }, [checkedLookupLists]);
 
-    const [abortButton, setAbortButton] = useState({
-        useButton: true, buttonCaption: "Delete", disabled: false, closeAfterClick: true, emitFunction: deleteLookupLists
-    });
+    const [abortButton, setAbortButton] = useState({ ...ABORT_BUTTON, emitFunction: deleteLookupLists });
 
     useEffect(() => {
         if (!project) return;

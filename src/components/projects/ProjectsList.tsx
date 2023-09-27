@@ -16,11 +16,14 @@ import { ADD_USER_TO_ORGANIZATION, CREATE_ORGANIZATION } from "@/src/services/gq
 import style from "../../styles/projects-list.module.css"
 import { useRouter } from "next/router";
 import Modal from "../shared/modal/Modal";
-import { ModalEnum } from "@/src/types/shared/modal";
+import { ModalButton, ModalEnum } from "@/src/types/shared/modal";
 import { DELETE_PROJECT } from "@/src/services/gql/mutations/projects";
 import { closeModal, selectModal } from "@/src/reduxStore/states/modal";
 import { unsubscribeWSOnDestroy } from "@/src/services/base/web-sockets/web-sockets-helper";
 import { postProcessProjectsList } from "@/src/util/projects/project-list-helper";
+
+const ACCEPT_BUTTON = { buttonCaption: "Delete and never show again", useButton: true };
+const ABORT_BUTTON = { buttonCaption: "Delete", useButton: true };
 
 export default function ProjectsList() {
     const router = useRouter();
@@ -70,9 +73,13 @@ export default function ProjectsList() {
         adminDeleteProject();
     }, [adminDeleteProject]);
 
-    const acceptButton = { buttonCaption: "Delete and never show again", useButton: true, emitFunction: adminStoreInstantAndDelete }
-    const abortButton = { buttonCaption: "Delete", useButton: true, emitFunction: adminDeleteProject };
+    const [acceptButton, setAcceptButton] = useState<ModalButton>(ACCEPT_BUTTON);
+    const [abortButton, setAbortButton] = useState<ModalButton>(ABORT_BUTTON);
 
+    useEffect(() => {
+        setAcceptButton({ ...ACCEPT_BUTTON, emitFunction: adminStoreInstantAndDelete });
+        setAbortButton({ ...ABORT_BUTTON, emitFunction: adminDeleteProject });
+    }, [modal]);
 
     function initData() {
         refetchProjects().then((res) => {

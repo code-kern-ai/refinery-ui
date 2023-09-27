@@ -6,10 +6,12 @@ import { CREATE_SAMPLE_PROJECT } from '@/src/services/gql/queries/projects';
 import { useRouter } from 'next/router';
 import { useDispatch, useSelector } from 'react-redux';
 import { extendAllProjects, selectAllProjects } from '@/src/reduxStore/states/project';
-import { ModalEnum } from '@/src/types/shared/modal';
+import { ModalButton, ModalEnum } from '@/src/types/shared/modal';
 import { closeModal, openModal } from '@/src/reduxStore/states/modal';
 import Modal from '../shared/modal/Modal';
 import { IconAlertTriangle, IconFishHook, IconMessageCircle, IconNews } from '@tabler/icons-react';
+
+const ACCEPT_BUTTON = { buttonCaption: "Create", closeAfterClick: false, useButton: true, disabled: true };
 
 export default function SampleProjectsDropdown() {
     const router = useRouter();
@@ -44,6 +46,8 @@ export default function SampleProjectsDropdown() {
         });
     }, []);
 
+    const [acceptButton, setAcceptButton] = useState<ModalButton>(ACCEPT_BUTTON);
+
     function handleProjectName(value: string) {
         const checkName = projects.some(project => project.name == value);
         setProjectNameExists(checkName);
@@ -55,7 +59,6 @@ export default function SampleProjectsDropdown() {
         setProjectNameInput(value);
     }
 
-    const [acceptButton, setAcceptButton] = useState({ buttonCaption: "Create", closeAfterClick: false, useButton: true, disabled: true, emitFunction: importSampleProject })
 
     useEffect(() => {
         setAcceptButton({ ...acceptButton, emitFunction: () => importSampleProject(projectNameInput, projectTypeInput) });
