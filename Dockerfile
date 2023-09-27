@@ -1,4 +1,4 @@
-FROM node:18-alpine as build
+FROM kernai/refinery-parent-images:v1.11.0-next
 
 WORKDIR /app
 COPY package*.json /app/

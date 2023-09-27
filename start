@@ -9,6 +9,8 @@ docker run --rm -d \
 --name refinery-ui \
 -p 7068:3000 \
 --mount type=bind,source="$(pwd)"/,target=/app \
+-v /app/node_modules \
+-v /app/.next \
 --network dev-setup_default \
 refinery-ui-dev
 
