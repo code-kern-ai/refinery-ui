@@ -8,4 +8,14 @@ export enum CurrentPage {
     HEURISTICS = 'HEURISTICS',
     SETTINGS = 'SETTINGS',
     ADMIN_PAGE = 'ADMIN_PAGE',
+    USERS = 'USERS',
+}
+
+export type User = {
+    id: string;
+    firstName: string;
+    lastName: string;
+    mail: string;
+    role: string;
+    avatarUri: string;
 }

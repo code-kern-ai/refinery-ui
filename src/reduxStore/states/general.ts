@@ -1,13 +1,5 @@
+import { User } from "@/src/types/shared/general";
 import { PayloadAction, createSlice } from "@reduxjs/toolkit";
-
-export type User = {
-    id: string;
-    firstName: string;
-    lastName: string;
-    mail: string;
-    role: string;
-    avatarUri: string;
-}
 
 export type Organization = {
     gdprCompliant: boolean;
@@ -25,7 +17,8 @@ const initialState = {
         isManaged: true,
         isDemo: false,
         isAdmin: false,
-        organization: null
+        organization: null,
+        organizationInactive: null,
     }
 } as {
     data: {
@@ -35,6 +28,7 @@ const initialState = {
         isDemo: boolean;
         isAdmin: boolean;
         organization: Organization;
+        organizationInactive: boolean;
     }
 }
 
@@ -61,6 +55,7 @@ const generalSlice = createSlice({
         setOrganization(state, action: PayloadAction<Organization>) {
             if (action.payload) state.data.organization = { ...action.payload };
             else state.data.organization = null;
+            state.data.organizationInactive = action.payload == null;
         }
     },
 })
@@ -73,6 +68,7 @@ export const selectIsManaged = (state) => state.general.data.isManaged;
 export const selectIsDemo = (state) => state.general.data.isDemo;
 export const selectIsAdmin = (state) => state.general.data.isAdmin;
 export const selectOrganization = (state) => state.general.data.organization;
+export const selectInactiveOrganization = (state) => state.general.data.organizationInactive;
 
 
 export const { setUser, setCurrentPage, setIsManaged, setIsDemo, setIsAdmin, setOrganization } = generalSlice.actions;

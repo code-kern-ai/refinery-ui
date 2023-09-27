@@ -30,3 +30,15 @@ query{
   canCreateLocalOrg
 } 
 `;
+
+export const GET_ORGANIZATION_USERS = gql`
+query($userRole:String){
+  allUsers(userRole:$userRole) {
+    id
+    mail
+    firstName
+    lastName
+    role
+  }
+}
+`;

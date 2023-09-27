@@ -50,6 +50,7 @@ export function GlobalStoreDataComponent(props: React.PropsWithChildren) {
                 setDataLoaded(true);
                 dispatch(setOrganization(res.data["userOrganization"]));
             } else {
+                dispatch(setOrganization(null));
                 timer(60000).subscribe(() => location.reload())
             }
         })

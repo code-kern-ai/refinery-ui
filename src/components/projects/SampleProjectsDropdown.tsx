@@ -42,7 +42,7 @@ export default function SampleProjectsDropdown() {
                 router.push(`/projects/${project.id}/overview`);
             }
         });
-    }, [projectNameInput, projectTypeInput]);
+    }, []);
 
     function handleProjectName(value: string) {
         const checkName = projects.some(project => project.name == value);
@@ -56,6 +56,10 @@ export default function SampleProjectsDropdown() {
     }
 
     const [acceptButton, setAcceptButton] = useState({ buttonCaption: "Create", closeAfterClick: false, useButton: true, disabled: true, emitFunction: importSampleProject })
+
+    useEffect(() => {
+        setAcceptButton({ ...acceptButton, emitFunction: () => importSampleProject(projectNameInput, projectTypeInput) });
+    }, [projectNameInput]);
 
     return (
         <Menu as="div" className="relative inline-block text-left">

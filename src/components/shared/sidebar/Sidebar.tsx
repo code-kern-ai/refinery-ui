@@ -16,7 +16,7 @@ import Modal from '../modal/Modal';
 import LoadingIcon from '../loading/LoadingIcon';
 import style from '@/src/styles/sidebar.module.css';
 import { copyToClipboard } from '@/submodules/javascript-functions/general';
-import { IconAlertCircle, IconArrowRight, IconBrandDiscord, IconBulb, IconChartPie, IconExternalLink, IconMaximize, IconMinimize, IconTriangleSquareCircle, IconUserCircle } from '@tabler/icons-react';
+import { IconAlertCircle, IconApi, IconArrowRight, IconBrandDiscord, IconBulb, IconChartPie, IconClipboard, IconExternalLink, IconMaximize, IconMinimize, IconTriangleSquareCircle, IconUserCircle } from '@tabler/icons-react';
 import { IconSettings } from '@tabler/icons-react';
 
 export default function Sidebar() {
@@ -127,7 +127,7 @@ export default function Sidebar() {
                                                 <div className={`relative z-50 ${project.numDataScaleUploaded == 0 ? 'opacity-50 cursor-not-allowed pointer-events-none' : 'opacity-100 cursor-pointer'}`}>
                                                     <a rel="noopener noreferrer" href={`/refinery/projects/${project.id}/overview`}
                                                         className={`circle ${currentPage == CurrentPage.PROJECT_OVERVIEW ? 'text-kernpurple' : 'text-white'}`}>
-                                                        <IconChartPie className="w-5 h-5" />
+                                                        <IconChartPie className="w-6 h-6" />
                                                     </a>
                                                 </div>
                                             </Tooltip>
@@ -138,7 +138,7 @@ export default function Sidebar() {
                                                 <div className={`relative z-50 ${project.numDataScaleUploaded == 0 ? 'opacity-50 cursor-not-allowed pointer-events-none' : 'opacity-100 cursor-pointer'}`}>
                                                     <a rel="noopener noreferrer" href={`/refinery/projects/${project.id}/data`}
                                                         className={`circle ${currentPage == CurrentPage.DATA_BROWSER ? 'text-kernpurple' : 'text-white'}`}>
-                                                        <IconTriangleSquareCircle className="w-5 h-5" />
+                                                        <IconTriangleSquareCircle className="w-6 h-6" />
                                                     </a>
                                                 </div>
                                             </Tooltip>
@@ -148,7 +148,7 @@ export default function Sidebar() {
                                                 <div className={`relative z-50 ${project.numDataScaleUploaded == 0 ? 'opacity-50 cursor-not-allowed pointer-events-none' : 'opacity-100 cursor-pointer'}`}>
                                                     <a rel="noopener noreferrer" href={`/refinery/projects/${project.id}/labeling`}
                                                         className={`circle ${currentPage == CurrentPage.LABELING ? 'text-kernpurple' : 'text-white'}`}>
-                                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20"
+                                                        <svg xmlns="http://www.w3.org/2000/svg" className="w-6 h-6" viewBox="0 0 20 20"
                                                             fill="currentColor">
                                                             <path fillRule="evenodd"
                                                                 d="M17.707 9.293a1 1 0 010 1.414l-7 7a1 1 0 01-1.414 0l-7-7A.997.997 0 012 10V5a3 3 0 013-3h5c.256 0 .512.098.707.293l7 7zM5 6a1 1 0 100-2 1 1 0 000 2z"
@@ -164,7 +164,7 @@ export default function Sidebar() {
                                                 <div className={`relative z-50 ${project.numDataScaleUploaded == 0 ? 'opacity-50 cursor-not-allowed pointer-events-none' : 'opacity-100 cursor-pointer'}`}>
                                                     <a rel="noopener noreferrer" href={`/refinery/projects/${project.id}/heuristics`}
                                                         className={`circle ${currentPage == CurrentPage.HEURISTICS || currentPage == CurrentPage.LOOKUP_LISTS_OVERVIEW ? 'text-kernpurple' : 'text-white'}`}>
-                                                        <IconBulb className="w-5 h-5" />
+                                                        <IconBulb className="w-6 h-6" />
                                                     </a>
                                                 </div>
                                             </Tooltip>
@@ -175,7 +175,7 @@ export default function Sidebar() {
                                                 <div className={`relative z-50 ${project.numDataScaleUploaded == 0 ? 'opacity-50 cursor-not-allowed pointer-events-none' : 'opacity-100 cursor-pointer'}`}>
                                                     <a rel="noopener noreferrer" href={`/refinery/projects/${project.id}/settings`}
                                                         className={`circle ${currentPage == CurrentPage.SETTINGS ? 'text-kernpurple' : 'text-white'}`}>
-                                                        <IconSettings className="w-5 h-5" />
+                                                        <IconSettings className="w-6 h-6" />
                                                     </a>
                                                 </div>
                                             </Tooltip>
@@ -186,7 +186,7 @@ export default function Sidebar() {
                                                 <div className={`relative z-50 opacity-100 cursor-pointer`}>
                                                     <a rel="noopener noreferrer" href={`/refinery/projects/${project.id}/admin`}
                                                         className={`circle ${currentPage == CurrentPage.ADMIN_PAGE ? 'text-kernpurple' : 'text-white'}`}>
-                                                        <IconUserCircle className="w-5 h-5" />
+                                                        <IconUserCircle className="w-6 h-6" />
                                                     </a>
                                                 </div>
                                             </Tooltip>
@@ -200,6 +200,23 @@ export default function Sidebar() {
                                             </svg>
                                         </div>}
                                     </div>) : (<></>)}
+                                    {user.role == UserRole.ENGINEER && <>
+                                        {!isManaged && <div className={`flex items-center justify-center overflow-visible ${project?.id !== null ? 'mt-6' : ''}`}>
+                                            <Tooltip placement="right" trigger="hover" color="invert" content="Documentation" className="relative z-50">
+                                                <a href="https://docs.kern.ai/" target="_blank" rel="noopener noreferrer" className="circle text-white">
+                                                    <IconClipboard className="w-6 h-6" />
+                                                </a>
+                                            </Tooltip>
+                                        </div>}
+                                    </>}
+                                    <div className={`flex items-center justify-center overflow-visible ${isManaged ? (project?.id !== null ? 'mt-6' : '') : 'mt-10 2xl:mt-12'}`}>
+                                        <Tooltip placement="right" trigger="hover" color="invert" content="API" className="relative z-50">
+                                            <a href="https://github.com/code-kern-ai/kern-python" target="_blank"
+                                                rel="noopener noreferrer" className="circle text-white">
+                                                <IconApi className="w-6 h-6" />
+                                            </a>
+                                        </Tooltip>
+                                    </div>
                                 </div>
 
                                 {user.role === UserRole.ENGINEER && !isManaged && <div className="flex items-center justify-center overflow-visible mt-10 2xl:mt-12">
@@ -207,7 +224,7 @@ export default function Sidebar() {
                                         <div className="relative z-50">
                                             <a href="https://discord.com/invite/qf4rGCEphW" target="_blank" rel="noopener noreferrer"
                                                 className="circle text-white">
-                                                <IconBrandDiscord className="w-5 h-5" />
+                                                <IconBrandDiscord className="w-6 h-6" />
                                             </a>
                                         </div>
                                     </Tooltip>

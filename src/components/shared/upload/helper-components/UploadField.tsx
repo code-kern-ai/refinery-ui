@@ -61,7 +61,7 @@ export default function UploadField(props: UploadFieldProps) {
                             {props.uploadStarted && props.isFileCleared && (UploadHelper.getUploadTask()?.state == UploadStates.IN_PROGRESS || UploadHelper.getUploadTask()?.state == UploadStates.WAITING || UploadHelper.getUploadTask()?.state == UploadStates.PENDING) && <div>
                                 <div className="flex flex-row items-center flex-nowrap -mt-1 mx-2 mb-2">
                                     <span className="whitespace-nowrap">Preparing data...</span>
-                                    <LoadingIcon size="btn-xs" color="blue" />
+                                    <LoadingIcon color="blue" />
 
                                     <div className="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700">
                                         <div className="bg-blue-700 h-2.5 rounded-full" style={{ 'width': UploadHelper.getUploadTask().progress + '%' }}>

@@ -13,7 +13,7 @@ type ProjectState = {
 
 function getInitState(): ProjectState {
     return {
-        all: [],
+        all: null,
         active: null
     };
 }
