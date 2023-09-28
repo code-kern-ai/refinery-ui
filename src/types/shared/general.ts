@@ -19,3 +19,12 @@ export type User = {
     role: string;
     avatarUri: string;
 }
+
+export enum DataTypeEnum {
+    INTEGER = "INTEGER",
+    CATEGORY = "CATEGORY",
+    TEXT = "TEXT",
+    FLOAT = "FLOAT",
+    BOOLEAN = "BOOLEAN",
+    EMBEDDING_LIST = "EMBEDDING_LIST",
+}

@@ -50,3 +50,25 @@ query($projectId:ID!,$labelingTaskId:ID,$sliceId:ID){
   generalProjectStats(projectId:$projectId,labelingTaskId:$labelingTaskId,sliceId:$sliceId)
 }
 `;
+
+export const GET_ATTRIBUTES_BY_PROJECT_ID = gql`
+query($projectId: ID!, $stateFilter: [String!]) {
+  attributesByProjectId(projectId: $projectId, stateFilter: $stateFilter) {
+    id
+    name
+    dataType
+    isPrimaryKey
+    relativePosition    
+    userCreated
+    sourceCode
+    state
+    logs
+    visibility
+  }
+}  
+`;
+
+export const CHECK_COMPOSITE_KEY = gql`
+query($projectId:ID!){
+  checkCompositeKey(projectId:$projectId)
+}`;

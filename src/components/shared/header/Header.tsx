@@ -44,7 +44,7 @@ export default function Header() {
                     {currentPage == CurrentPage.NEW_PROJECT && <div className="ml-6 text-gray-500 text-sm font-normal">
                         Add a new project to <span className="font-bold text-gray-900">{organization?.name}</span>.
                     </div>}
-                    {currentPage == CurrentPage.PROJECT_OVERVIEW && <div className="ml-6 text-gray-700 text-sm font-normal">
+                    {(currentPage == CurrentPage.PROJECT_OVERVIEW || currentPage == CurrentPage.SETTINGS) && <div className="ml-6 text-gray-700 text-sm font-normal">
                         {project?.name} - <span className="text-gray-500 font-normal">{project?.numDataScaleUploaded} records</span>
                     </div>}
                 </div>

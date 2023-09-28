@@ -13,7 +13,7 @@ import ButtonsContainer from "./ButtonsContainer";
 import ProjectCard from "./ProjectCard";
 import { GET_CAN_CREATE_LOCAL_ORG } from "@/src/services/gql/queries/organizations";
 import { ADD_USER_TO_ORGANIZATION, CREATE_ORGANIZATION } from "@/src/services/gql/mutations/organizations";
-import style from "../../styles/projects-list.module.css"
+import style from "@/src/styles/components/projects/projects-list.module.css";
 import { useRouter } from "next/router";
 import Modal from "../shared/modal/Modal";
 import { ModalButton, ModalEnum } from "@/src/types/shared/modal";

@@ -64,6 +64,6 @@ export default function ProjectOverview() {
                 <div className={`mt-2 shadow w-full ${style.stats} bg-white place-content-center p-4`}>
                     <div className={`${style.statsTitle}`}>Add Labels to display charts</div>
                 </div></div>)}
-        </div >}
+        </div>}
     </div>);
 }
