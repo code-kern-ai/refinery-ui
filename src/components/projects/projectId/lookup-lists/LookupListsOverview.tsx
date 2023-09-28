@@ -8,7 +8,7 @@ import Modal from "@/src/components/shared/modal/Modal";
 import { useLazyQuery, useMutation } from "@apollo/client";
 import { LOOKUP_LISTS_BY_PROJECT_ID } from "@/src/services/gql/queries/lookup-lists";
 import { CREATE_LOOKUP_LIST, DELETE_LOOKUP_LIST } from "@/src/services/gql/mutations/lookup-lists";
-import { LookupListBE } from "@/src/types/components/projects/projectId/lookup-lists/lookup-lists";
+import { LookupListBE } from "@/src/types/components/projects/projectId/lookup-lists";
 import { LookupListCard } from "./LookupListCard";
 import style from '../../../../styles/lookup-lists.module.css'
 import { openModal } from "@/src/reduxStore/states/modal";

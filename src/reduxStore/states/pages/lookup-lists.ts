@@ -1,4 +1,4 @@
-import { LookupListBE } from '@/src/types/components/projects/projectId/lookup-lists/lookup-lists';
+import { LookupListBE } from '@/src/types/components/projects/projectId/lookup-lists';
 import { createSlice } from '@reduxjs/toolkit'
 import type { PayloadAction } from '@reduxjs/toolkit'
 

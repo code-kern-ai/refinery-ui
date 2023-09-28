@@ -20,7 +20,7 @@ import { ModalButton, ModalEnum } from "@/src/types/shared/modal";
 import { DELETE_PROJECT } from "@/src/services/gql/mutations/projects";
 import { closeModal, selectModal } from "@/src/reduxStore/states/modal";
 import { unsubscribeWSOnDestroy } from "@/src/services/base/web-sockets/web-sockets-helper";
-import { postProcessProjectsList } from "@/src/util/projects/project-list-helper";
+import { postProcessProjectsList } from "@/src/util/components/projects/projects-list-helper";
 
 const ACCEPT_BUTTON = { buttonCaption: "Delete and never show again", useButton: true };
 const ABORT_BUTTON = { buttonCaption: "Delete", useButton: true };

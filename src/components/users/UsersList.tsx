@@ -4,7 +4,7 @@ import YoutubeIntroduction from "../projects/YoutubeIntroduction";
 import { useEffect, useState } from "react";
 import { useLazyQuery } from "@apollo/client";
 import { GET_ORGANIZATION_USERS } from "@/src/services/gql/queries/organizations";
-import { postProcessUsersList } from "@/src/util/users/users-list-helper";
+import { postProcessUsersList } from "@/src/util/components/users/users-list-helper";
 import { User } from "@/src/types/shared/general";
 import { IconCheck, IconUsersGroup } from "@tabler/icons-react";
 

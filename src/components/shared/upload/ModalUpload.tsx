@@ -1,7 +1,7 @@
 import { ModalButton, ModalEnum } from "@/src/types/shared/modal";
 import Modal from "../modal/Modal";
 import { UploadFileType, UploadOptions, UploadProps } from "@/src/types/shared/upload";
-import { getSubtitle, getTitle } from "@/src/util/shared/upload/modal-upload-helper";
+import { getSubtitle, getTitle } from "@/src/util/shared/modal-upload-helper";
 import { useCallback, useState } from "react";
 import { useSelector } from "react-redux";
 import { selectAllProjects } from "@/src/reduxStore/states/project";

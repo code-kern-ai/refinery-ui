@@ -3,3 +3,17 @@
     text-underline-offset: 2px;
     text-decoration-color: #22c55e;
 }
+
+.stats {
+    display: inline-grid;
+    overflow: hidden;
+    overflow-x: auto;
+    grid-auto-flow: column;
+    border-radius: 12px;
+}
+
+.statsTitle {
+    white-space: nowrap;
+    grid-column-start: 1;
+    opacity: .5;
+}

@@ -1,6 +1,6 @@
 import { selectAllLookupLists, selectCheckedLookupLists, setCheckedLookupLists } from "@/src/reduxStore/states/pages/lookup-lists";
 import { selectProject } from "@/src/reduxStore/states/project";
-import { LookupListCardProps } from "@/src/types/components/projects/projectId/lookup-lists/lookup-lists";
+import { LookupListCardProps } from "@/src/types/components/projects/projectId/lookup-lists";
 import { IconArrowRight } from "@tabler/icons-react";
 import { useRouter } from "next/router";
 import { useEffect } from "react";
