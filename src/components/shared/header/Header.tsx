@@ -4,7 +4,7 @@ import { UserRole } from "@/src/types/shared/sidebar";
 import { Tooltip } from "@nextui-org/react";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-import style from "../../../styles/header.module.css"
+import style from "@/src/styles/shared/header.module.css";
 import LogoutDropdown from "./LogoutDropdown";
 import { useRouter } from "next/router";
 import { IconHexagons, IconHome, IconPlayCard } from "@tabler/icons-react";

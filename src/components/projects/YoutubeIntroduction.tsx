@@ -1,6 +1,5 @@
 import { useState } from 'react';
-import style from '../../styles/projects-list.module.css'
-
+import style from '@/src/styles/components/projects/projects-list.module.css';
 
 const YOUTUBE_URL = "https://www.youtube.com/embed/Hwlu6GWzDH8?autoplay=1&enablejsapi=1";
 

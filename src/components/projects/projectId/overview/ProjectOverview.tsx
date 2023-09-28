@@ -10,7 +10,7 @@ import { getEmptyProjectStats, postProcessingStats } from '@/src/util/components
 import ProjectOverviewCards from './ProjectOverviewCards';
 import { jsonCopy } from '@/submodules/javascript-functions/general';
 import { ProjectStats } from '@/src/types/components/projects/projectId/overview';
-import style from '@/src/styles/project-overview.module.css';
+import style from '@/src/styles/components/projects/projectId/project-overview.module.css';
 
 const PROJECT_STATS_INITIAL_STATE: ProjectStats = getEmptyProjectStats();
 
@@ -59,7 +59,7 @@ export default function ProjectOverview() {
                 <div className="mt-8 text-lg leading-6 text-gray-900 font-medium inline-block">
                     Monitoring
                 </div>
-                <div className="mt-1 text-sm leading-5 font-medium text-gray-700 inline-block block">Go to the settings page to add a
+                <div className="mt-1 text-sm leading-5 font-medium text-gray-700 block">Go to the settings page to add a
                     labeling task.</div>
                 <div className={`mt-2 shadow w-full ${style.stats} bg-white place-content-center p-4`}>
                     <div className={`${style.statsTitle}`}>Add Labels to display charts</div>

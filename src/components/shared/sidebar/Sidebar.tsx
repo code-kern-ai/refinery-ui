@@ -14,7 +14,7 @@ import { GET_HAS_UPDATES, GET_VERSION_OVERVIEW } from '@/src/services/gql/querie
 import { parseUTC } from '@/submodules/javascript-functions/date-parser';
 import Modal from '../modal/Modal';
 import LoadingIcon from '../loading/LoadingIcon';
-import style from '@/src/styles/sidebar.module.css';
+import style from '@/src/styles/shared/sidebar.module.css';
 import { copyToClipboard } from '@/submodules/javascript-functions/general';
 import { IconAlertCircle, IconApi, IconArrowRight, IconBrandDiscord, IconBulb, IconChartPie, IconClipboard, IconExternalLink, IconMaximize, IconMinimize, IconTriangleSquareCircle, IconUserCircle } from '@tabler/icons-react';
 import { IconSettings } from '@tabler/icons-react';

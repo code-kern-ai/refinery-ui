@@ -2,7 +2,7 @@ import { getDisplayGraphValueArray } from "@/src/util/components/projects/projec
 import Dropdown from "@/submodules/react-components/components/Dropdown";
 import { Tooltip } from "@nextui-org/react";
 import { useState } from "react";
-import style from '@/src/styles/project-overview.module.css';
+import style from '@/src/styles/components/projects/projectId/project-overview.module.css';
 
 const DISPLAY_GRAPHS_VALUE_ARRAY = getDisplayGraphValueArray();
 

@@ -10,7 +10,7 @@ import { LOOKUP_LISTS_BY_PROJECT_ID } from "@/src/services/gql/queries/lookup-li
 import { CREATE_LOOKUP_LIST, DELETE_LOOKUP_LIST } from "@/src/services/gql/mutations/lookup-lists";
 import { LookupListBE } from "@/src/types/components/projects/projectId/lookup-lists";
 import { LookupListCard } from "./LookupListCard";
-import style from '../../../../styles/lookup-lists.module.css'
+import style from '@/src/styles/components/projects/projectId/lookup-lists.module.css';
 import { openModal } from "@/src/reduxStore/states/modal";
 import { ModalEnum } from "@/src/types/shared/modal";
 import { useRouter } from "next/router";
