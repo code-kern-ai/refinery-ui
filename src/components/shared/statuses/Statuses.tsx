@@ -44,7 +44,7 @@ export default function Statuses({ status, tooltipPosition = DEFAULT_TOOLTIP_POS
                     setColor('green');
                     break;
                 case Status.FAILED:
-                    setDataTip(page === 'heuristics' ? 'Heuristic' : 'Attribute') + ' ran into errors.';
+                    setDataTip((page === 'heuristics' ? 'Heuristic' : 'Attribute') + ' ran into errors.');
                     setStatusName('Error');
                     setColor('red');
                     break;
@@ -69,7 +69,7 @@ export default function Statuses({ status, tooltipPosition = DEFAULT_TOOLTIP_POS
                     setColor('gray');
                     break;
                 default:
-                    setDataTip(page === 'heuristics' ? 'Heuristic' : 'Attribute') + ' was successfully registered.';
+                    setDataTip((page === 'heuristics' ? 'Heuristic' : 'Attribute') + ' was successfully registered.');
                     setStatusName(initialCaption);
                     setColor('gray');
                     break;

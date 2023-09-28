@@ -2,7 +2,7 @@ import LoadingIcon from "@/src/components/shared/loading/LoadingIcon";
 import Statuses from "@/src/components/shared/statuses/Statuses";
 import { selectAttributes, updateAttributeById } from "@/src/reduxStore/states/pages/settings";
 import { selectProject } from "@/src/reduxStore/states/project";
-import { UPDATE_ATTRIBUTE } from "@/src/services/gql/mutations/projects";
+import { UPDATE_ATTRIBUTE } from "@/src/services/gql/mutations/project";
 import { Attribute, DataSchemaProps } from "@/src/types/components/projects/projectId/settings";
 import { ATTRIBUTES_VISIBILITY_STATES, getTooltipVisibilityState } from "@/src/util/components/projects/projectId/settings-helper";
 import { jsonCopy } from "@/submodules/javascript-functions/general";

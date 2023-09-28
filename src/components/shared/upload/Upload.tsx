@@ -6,7 +6,7 @@ import Dropdown from "@/submodules/react-components/components/Dropdown";
 import UploadWrapper from "./helper-components/UploadWrapper";
 import { selectUploadData, setImportOptions } from "@/src/reduxStore/states/upload";
 import { useLazyQuery, useMutation } from "@apollo/client";
-import { CREATE_PROJECT, DELETE_PROJECT, GET_UPLOAD_CREDENTIALS_AND_ID, GET_UPLOAD_TASK_BY_TASK_ID, UPDATE_PROJECT_STATUS, UPDATE_PROJECT_TOKENIZER } from "@/src/services/gql/mutations/projects";
+import { CREATE_PROJECT, DELETE_PROJECT, UPDATE_PROJECT_STATUS, UPDATE_PROJECT_TOKENIZER } from "@/src/services/gql/mutations/projects";
 import { ProjectStatus } from "@/src/types/components/projects/projects-list";
 import { timer } from "rxjs";
 import { uploadFile } from "@/src/services/base/s3-service";
@@ -17,6 +17,7 @@ import { useRouter } from "next/router";
 import { extendAllProjects, removeFromAllProjectsById, selectAllProjects } from "@/src/reduxStore/states/project";
 import CryptedField from "../crypted-field/CryptedField";
 import { unsubscribeWSOnDestroy } from "@/src/services/base/web-sockets/web-sockets-helper";
+import { GET_UPLOAD_CREDENTIALS_AND_ID, GET_UPLOAD_TASK_BY_TASK_ID } from "@/src/services/gql/queries/projects";
 
 
 const SELECTED_TOKENIZER_RECORD_NEW = 'English (en_core_web_sm)';

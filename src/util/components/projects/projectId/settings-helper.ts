@@ -22,7 +22,7 @@ export function getTooltipVisibilityState(state: AttributeVisibility): string {
     return 'UNKNOWN';
 }
 
-const DATA_TYPES = [
+export const DATA_TYPES = [
     { name: 'Category', value: 'CATEGORY' },
     { name: 'Text', value: 'TEXT' },
     { name: 'Integer', value: 'INTEGER' },

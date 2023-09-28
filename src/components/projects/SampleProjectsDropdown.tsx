@@ -2,7 +2,6 @@ import { Fragment, useCallback, useEffect, useState } from 'react'
 import { Menu, Transition } from '@headlessui/react'
 import { ChevronDownIcon } from '@heroicons/react/20/solid'
 import { useMutation } from '@apollo/client';
-import { CREATE_SAMPLE_PROJECT } from '@/src/services/gql/queries/projects';
 import { useRouter } from 'next/router';
 import { useDispatch, useSelector } from 'react-redux';
 import { extendAllProjects, selectAllProjects } from '@/src/reduxStore/states/project';
@@ -10,6 +9,7 @@ import { ModalButton, ModalEnum } from '@/src/types/shared/modal';
 import { closeModal, openModal } from '@/src/reduxStore/states/modal';
 import Modal from '../shared/modal/Modal';
 import { IconAlertTriangle, IconFishHook, IconMessageCircle, IconNews } from '@tabler/icons-react';
+import { CREATE_SAMPLE_PROJECT } from '@/src/services/gql/mutations/projects';
 
 const ACCEPT_BUTTON = { buttonCaption: "Create", closeAfterClick: false, useButton: true, disabled: true };
 
@@ -51,11 +51,7 @@ export default function SampleProjectsDropdown() {
     function handleProjectName(value: string) {
         const checkName = projects.some(project => project.name == value);
         setProjectNameExists(checkName);
-        if (checkName || value.trim() == "") {
-            setAcceptButton({ ...acceptButton, disabled: true });
-        } else {
-            setAcceptButton({ ...acceptButton, disabled: false });
-        }
+        setAcceptButton({ ...acceptButton, disabled: checkName || value.trim() == "" })
         setProjectNameInput(value);
     }
 

@@ -39,6 +39,9 @@ const initialState: Modals = {
     [ModalEnum.HOW_TO_UPDATE]: {
         open: false,
     },
+    [ModalEnum.CREATE_NEW_ATTRIBUTE]: {
+        open: false,
+    }
 };
 
 const modalSlice = createSlice({

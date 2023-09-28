@@ -49,15 +49,20 @@ query{
   }
 }`;
 
-export const CREATE_SAMPLE_PROJECT = gql`
-mutation($name:String, $projectType: String){
-  createSampleProject(name: $name, projectType: $projectType){
-    ok
-    project{
-      id
-      name
-      description
-    }
+export const GET_UPLOAD_CREDENTIALS_AND_ID = gql`
+query ($projectId: ID!, $fileName: String!, $fileType: String!,$fileImportOptions:String!,$uploadType:String, $key: String) {
+  uploadCredentialsAndId(projectId: $projectId, fileName: $fileName, fileType: $fileType,fileImportOptions:$fileImportOptions,uploadType:$uploadType, key: $key)
+}
+`;
+
+export const GET_UPLOAD_TASK_BY_TASK_ID = gql`
+query ($projectId: ID!, $uploadTaskId: ID!) {
+  uploadTaskById(projectId: $projectId, uploadTaskId: $uploadTaskId) {
+    id
+    userId
+    state
+    progress
+    fileAdditionalInfo
   }
-}  
+}
 `;
