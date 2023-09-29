@@ -106,8 +106,8 @@ export default function DataSchema(props: DataSchemaProps) {
                                 </th>
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-gray-200">
-                            {!somethingLoading ? (<> {
+                        {!somethingLoading ? <tbody className="divide-y divide-gray-200">
+                            {
                                 attributes.map((attribute: Attribute, index: number) => (
                                     <tr key={attribute.id} className={`${index % 2 != 0 ? 'bg-gray-50' : 'bg-white'}`}>
                                         <td className="whitespace-nowrap text-center px-3 py-2 text-sm text-gray-500">
@@ -138,13 +138,13 @@ export default function DataSchema(props: DataSchemaProps) {
                                     </tr>
                                 ))
                             }
-                            </>
-                            ) : (<tr>
+                        </tbody> : <tbody>
+                            <tr>
                                 <td colSpan={6} className="text-center p-1">
                                     <LoadingIcon />
                                 </td>
-                            </tr>)}
-                        </tbody>
+                            </tr>
+                        </tbody>}
                     </table>
                 </div>
             </div >

@@ -14,7 +14,7 @@ import { CurrentPage } from "@/src/types/shared/general";
 import { WebSocketsService } from "@/src/services/base/web-sockets/WebSocketsService";
 import { jsonCopy } from "@/submodules/javascript-functions/general";
 import { useRouter } from "next/router";
-import { extendAllProjects, removeFromAllProjectsById, selectAllProjects } from "@/src/reduxStore/states/project";
+import { extendAllProjects, removeFromAllProjectsById, selectAllProjects, selectProject } from "@/src/reduxStore/states/project";
 import CryptedField from "../crypted-field/CryptedField";
 import { unsubscribeWSOnDestroy } from "@/src/services/base/web-sockets/web-sockets-helper";
 import { GET_UPLOAD_CREDENTIALS_AND_ID, GET_UPLOAD_TASK_BY_TASK_ID } from "@/src/services/gql/queries/projects";
@@ -51,6 +51,7 @@ export default function Upload(props: UploadProps) {
     const uploadFileType = useSelector(selectUploadData).uploadFileType;
     const importOptions = useSelector(selectUploadData).importOptions;
     const projects = useSelector(selectAllProjects);
+    const project = useSelector(selectProject);
 
     const [selectedFile, setSelectedFile] = useState(null as File);
     const [projectTitle, setProjectTitle] = useState<string>("");
@@ -171,6 +172,9 @@ export default function Upload(props: UploadProps) {
                 UploadHelper.setProjectId(project.id);
                 executeUploadFile();
             });
+        } else if (uploadFileType == UploadFileType.RECORDS_ADD) {
+            UploadHelper.setProjectId(project.id);
+            executeUploadFile();
         }
     }
 
@@ -328,6 +332,16 @@ export default function Upload(props: UploadProps) {
                     }} />
             </>
             )}
+
+            {uploadFileType == UploadFileType.RECORDS_ADD && (<>
+                <div className="text-lg leading-6 text-gray-900 font-medium inline-block">
+                    Record upload
+                </div>
+                <div className="text-sm text-gray-500 font-normal mt-2">Add additional records to your project</div>
+                <UploadWrapper uploadStarted={uploadStarted} doingSomething={doingSomething} progressState={progressState} submitted={submitted} isFileCleared={selectedFile == null}
+                    isModal={props.uploadOptions.isModal} submitUpload={submitUpload} sendSelectedFile={(file) => {
+                        setSelectedFile(file);
+                    }} /></>)}
         </section>
     )
 }

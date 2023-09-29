@@ -4,7 +4,7 @@ import { CurrentPage } from "@/src/types/shared/general"
 import { useEffect } from "react"
 import { useDispatch } from "react-redux"
 
-export default function Projects() {
+export default function ProjectsPage() {
 
     const dispatch = useDispatch()
     useEffect(() => {

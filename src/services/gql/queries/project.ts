@@ -72,3 +72,15 @@ export const CHECK_COMPOSITE_KEY = gql`
 query($projectId:ID!){
   checkCompositeKey(projectId:$projectId)
 }`;
+
+export const GET_PROJECT_SIZE = gql`
+query ($projectId: ID!) {
+  projectSize(projectId: $projectId) {
+    table
+    description
+    default
+    byteSize
+    byteReadable
+  }
+}  
+`;

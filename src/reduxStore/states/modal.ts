@@ -41,6 +41,9 @@ const initialState: Modals = {
     },
     [ModalEnum.CREATE_NEW_ATTRIBUTE]: {
         open: false,
+    },
+    [ModalEnum.PROJECT_SNAPSHOT]: {
+        open: false,
     }
 };
 

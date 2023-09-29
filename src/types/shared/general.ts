@@ -9,6 +9,8 @@ export enum CurrentPage {
     SETTINGS = 'SETTINGS',
     ADMIN_PAGE = 'ADMIN_PAGE',
     USERS = 'USERS',
+    UPLOAD_RECORDS = 'UPLOAD_RECORDS',
+    PROJECT_SETTINGS = "PROJECT_SETTINGS"
 }
 
 export type User = {

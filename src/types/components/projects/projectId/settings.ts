@@ -43,3 +43,12 @@ export enum AttributeState {
     FAILED = 'FAILED',
     QUEUED = 'QUEUED', //special state since not in db but "overwritten" if queue entry exists
 }
+
+export type ProjectSize = {
+    desc: string;
+    export: boolean;
+    moveRight: boolean;
+    name: string;
+    sizeReadable: string;
+    sizeNumber: number;
+}

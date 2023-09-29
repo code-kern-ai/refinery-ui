@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { Fragment } from 'react'
 import { Dialog, Transition } from '@headlessui/react'
 import { isStringTrue } from '@/submodules/javascript-functions/general';
@@ -12,9 +12,15 @@ export default function Modal(props: any) {
     const dispatch = useDispatch();
     const modal = useSelector(selectModal(props.modalName));
 
+    const [useButtons, setUseButtons] = useState(true);
+
     useEffect(() => {
         fillButtons();
     }, [props.acceptButton, props.abortButton, props.backButton]);
+
+    useEffect(() => {
+        if (props.useButtons != undefined) setUseButtons(props.useButtons);
+    }, [props.useButtons]);
 
     function fullInit() {
         dispatch(initModal(props.modalName));
@@ -113,7 +119,7 @@ export default function Modal(props: any) {
                                 <div className="mt-3 text-center sm:mt-0">
                                     <div>{props.children}</div>
                                 </div>
-                                <div className="mt-5 flex justify-end">
+                                {useButtons && <div className="mt-5 flex justify-end">
                                     {props.acceptButton?.useButton ?
                                         <button className={`ml-2 bg-green-100 border border-green-400 text-green-700 text-xs font-semibold px-4 py-2 rounded-md ${props.acceptButton.disabled ? 'cursor-not-allowed opacity-50' : 'cursor-pointer opacity-100'} hover:bg-green-200 focus:outline-none`}
                                             onClick={() => clickButton(props.acceptButton)}>{props.acceptButton.buttonCaption}</button> : null}
@@ -125,7 +131,7 @@ export default function Modal(props: any) {
                                             onClick={() => clickButton(props.backButton)}>{props.backButton.buttonCaption}</button> : null}
                                     <button className="ml-2 bg-white text-gray-700 border border-gray-300 text-xs font-semibold px-4 py-2 rounded cursor-pointer hover:bg-gray-50 focus:outline-none"
                                         onClick={() => setOpen(false)}>Close</button>
-                                </div>
+                                </div>}
                             </Dialog.Panel>
                         </Transition.Child>
                     </div>
