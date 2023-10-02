@@ -88,7 +88,7 @@ export default function GatesIntegration() {
 
                 {gatesIntegrationData?.status === GatesIntegratorStatus.UPDATING && <span>This project is currently updated to be used with Gates.</span>}
                 {gatesIntegrationData?.status === GatesIntegratorStatus.NOT_READY && <span> This project is not ready to be used with Gates. You can update the project to make it ready.
-                    This will rerun the project's embeddings and heuristics to create the necessary data for Gates.
+                    This will rerun the project&apos;s embeddings and heuristics to create the necessary data for Gates.
                     <button type="button" onClick={() => dispatch(openModal(ModalEnum.GATES_INTEGRATION_WARNING))}
                         className="mr-1 mt-2 flex items-center px-2.5 py-1.5 border border-gray-300 shadow-sm text-xs font-semibold rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none cursor-pointer">
                         <IconReload className="h-4 w-4" />
