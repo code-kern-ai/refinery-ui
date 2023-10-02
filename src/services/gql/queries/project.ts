@@ -94,3 +94,19 @@ export const PREPARE_PROJECT_EXPORT = gql`
 query ($projectId: ID!, $exportOptions: JSONString, $key: String) {
   prepareProjectExport(projectId: $projectId, exportOptions: $exportOptions, key: $key)
 }`;
+
+export const GET_PROJECT_TOKENIZATION = gql`
+query ($projectId: ID!) {
+  projectTokenization(projectId: $projectId) {
+    id
+    projectId
+    userId
+    type
+    state
+    progress
+    workload
+    startedAt
+    finishedAt
+  }
+}  
+`;

@@ -2,16 +2,15 @@ import { useDispatch, useSelector } from "react-redux";
 import DataSchema from "./DataSchema";
 import { selectProject, setActiveProject } from "@/src/reduxStore/states/project";
 import { useLazyQuery, useMutation } from "@apollo/client";
-import { CHECK_COMPOSITE_KEY, GET_ATTRIBUTES_BY_PROJECT_ID } from "@/src/services/gql/queries/project";
+import { CHECK_COMPOSITE_KEY, GET_ATTRIBUTES_BY_PROJECT_ID, GET_PROJECT_TOKENIZATION } from "@/src/services/gql/queries/project";
 import { useCallback, useEffect, useState } from "react";
 import { selectAttributes, setAllAttributes } from "@/src/reduxStore/states/pages/settings";
 import { DATA_TYPES, postProcessingAttributes } from "@/src/util/components/projects/projectId/settings-helper";
 import { timer } from "rxjs";
-import { IconCamera, IconPlus, IconUpload } from "@tabler/icons-react";
+import { IconCamera, IconCheck, IconDots, IconPlus, IconUpload } from "@tabler/icons-react";
 import Modal from "@/src/components/shared/modal/Modal";
 import { ModalButton, ModalEnum } from "@/src/types/shared/modal";
 import { openModal } from "@/src/reduxStore/states/modal";
-import { Tooltip } from "@nextui-org/react";
 import Dropdown from "@/submodules/react-components/components/Dropdown";
 import { CREATE_USER_ATTRIBUTE } from "@/src/services/gql/mutations/project";
 import { useRouter } from "next/router";
@@ -22,6 +21,8 @@ import { GET_PROJECT_BY_ID } from "@/src/services/gql/queries/projects";
 import { WebSocketsService } from "@/src/services/base/web-sockets/WebSocketsService";
 import { CurrentPage } from "@/src/types/shared/general";
 import ProjectSnapshotExport from "./ProjectSnapshotExport";
+import { Tooltip } from "@nextui-org/react";
+import { AttributeCalculationState } from "@/src/types/components/projects/projectId/settings";
 
 const ACCEPT_BUTTON = { buttonCaption: "Accept", useButton: true, disabled: true }
 
@@ -38,21 +39,24 @@ export default function ProjectSettings() {
     const [attributeType, setAttributeType] = useState("Text");
     const [duplicateNameExists, setDuplicateNameExists] = useState(false);
     const [isAcRunning, setIsAcRunning] = useState(false);
-    const [tokenizationProgress, setTokenizationProgress] = useState(1);
+    const [tokenizationProgress, setTokenizationProgress] = useState(0);
+    const [checkIfAcUploadedRecords, setCheckIfAcUploadedRecords] = useState(false);
 
     const [refetchAttributes] = useLazyQuery(GET_ATTRIBUTES_BY_PROJECT_ID, { fetchPolicy: "network-only" });
     const [refetchPrimaryKey] = useLazyQuery(CHECK_COMPOSITE_KEY, { fetchPolicy: "no-cache" });
     const [createAttributeMut] = useMutation(CREATE_USER_ATTRIBUTE);
     const [refetchProjectByProjectId] = useLazyQuery(GET_PROJECT_BY_ID, { fetchPolicy: "no-cache" });
+    const [refetchProjectTokenization] = useLazyQuery(GET_PROJECT_TOKENIZATION, { fetchPolicy: "no-cache" });
 
     useEffect(() => {
         if (!project) return;
         refetchAttributes({ variables: { projectId: project.id, stateFilter: ['ALL'] } }).then((res) => {
             dispatch(setAllAttributes(postProcessingAttributes(res.data['attributesByProjectId'])));
         });
+        checkProjectTokenization();
         WebSocketsService.subscribeToNotification(CurrentPage.PROJECT_SETTINGS, {
             projectId: project.id,
-            whitelist: ['project_update'],
+            whitelist: ['project_update', 'tokenization', 'calculate_attribute'],
             func: handleWebsocketNotification
         });
     }, [project]);
@@ -107,13 +111,51 @@ export default function ProjectSettings() {
         return false;
     }
 
+    function checkProjectTokenization() {
+        refetchProjectTokenization({ variables: { projectId: project.id } }).then((res) => {
+            setTokenizationProgress(res.data['projectTokenization']?.progress);
+            setIsAcRunning(checkIfAcRunning());
+        });
+    }
+
+    function checkIfAcRunning() {
+        return attributes.some(a => a.state == AttributeCalculationState.RUNNING) || checkIfAcUploadedRecords;
+    }
+
     function handleWebsocketNotification(msgParts: string[]) {
         if (msgParts[1] == 'project_update' && msgParts[2] == project.id) {
             refetchProjectByProjectId({ variables: { projectId: project.id } }).then((res) => {
                 dispatch(setActiveProject(res.data["projectByProjectId"]));
             });
+        } else if (msgParts[1] == 'tokenization' && msgParts[2] == 'docbin') {
+            if (msgParts[3] == 'progress') {
+                setTokenizationProgress(Number(msgParts[4]));
+            } else if (msgParts[3] == 'state') {
+                if (msgParts[4] == 'IN_PROGRESS') setTokenizationProgress(0);
+                else if (msgParts[4] == 'FINISHED') {
+                    timer(5000).subscribe(() => checkProjectTokenization());
+                }
+            }
+        }
+        else if (msgParts[1] == 'calculate_attribute') {
+            if (msgParts[2] == 'started' && msgParts[3] == 'all') {
+                setCheckIfAcUploadedRecords(true);
+                setIsAcRunning(checkIfAcRunning());
+
+            } else if (msgParts[2] == 'finished' && msgParts[3] == 'all') {
+                setCheckIfAcUploadedRecords(false);
+                setIsAcRunning(checkIfAcRunning());
+                timer(5000).subscribe(() => checkProjectTokenization());
+            } else {
+                refetchAttributes({ variables: { projectId: project.id, stateFilter: ['ALL'] } }).then((res) => {
+                    dispatch(setAllAttributes(postProcessingAttributes(res.data['attributesByProjectId'])));
+                    setIsAcRunning(checkIfAcRunning());
+                });
+                if (msgParts[2] == 'finished') timer(5000).subscribe(() => checkProjectTokenization());
+            }
         }
     }
+
 
     return (<div>
         {project != null && <div className="p-4 bg-gray-100 h-screen overflow-y-auto flex-1 flex flex-col">
@@ -146,6 +188,31 @@ export default function ProjectSettings() {
                             Create project snapshot
                         </button>
                     </Tooltip>
+                </div>
+                <div className="text-left lg:text-right flex flex-row items-center">
+                    <Tooltip content={project.tokenizer} color="invert" placement="bottom">
+                        <div className="font-medium inline-block">
+                            <span className="cursor-help underline filtersUnderline">Tokenization</span>
+                        </div>
+                    </Tooltip>
+                    <div className="ml-2 w-full items-center px-2.5 py-1.5 border border-gray-300 shadow-sm text-xs font-medium rounded text-gray-700 bg-white relative">
+                        {tokenizationProgress != 0 && <div className="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700">
+                            <div className="bg-green-300 h-2.5 rounded-full" style={{ 'width': (tokenizationProgress * 100) + '%' }}>
+                            </div>
+                        </div>}
+                        {tokenizationProgress == 1 && <div className="absolute top-0 left-0 right-0 bottom-0 flex flex-row items-center justify-center" style={{ backgroundColor: '#f4f4f5bf' }}>
+                            <IconCheck className="h-4 w-4 text-green-700" />
+                            <span className="text-sm font-medium text-green-700">Completed</span>
+                        </div>}
+                        {tokenizationProgress == -1 && <div className="absolute top-0 left-0 right-0 bottom-0 flex flex-row items-center justify-center" style={{ backgroundColor: '#f4f4f5bf' }}>
+                            <IconDots className="h-4 w-4 text-gray-700" />
+                            <span className="text-sm font-medium text-gray-700">Queued</span>
+                        </div>}
+                        {!tokenizationProgress && <div className="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700">
+                            <div className="bg-green-300 h-2.5 rounded-full" style={{ 'width': '0%' }}>
+                            </div>
+                        </div>}
+                    </div>
                 </div>
             </div>
 

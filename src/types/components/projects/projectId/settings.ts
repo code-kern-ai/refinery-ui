@@ -60,3 +60,12 @@ export enum DownloadState {
     COMPLETED,
     ERROR,
 }
+
+export enum AttributeCalculationState {
+    UPLOADED = 'UPLOADED',
+    AUTOMATICALLY_CREATED = 'AUTOMATICALLY_CREATED',
+    USABLE = 'USABLE',
+    RUNNING = 'RUNNING',
+    FAILED = 'FAILED',
+    QUEUED = 'QUEUED', //special state since not in db but "overwritten" if queue entry exists
+};
