@@ -24,6 +24,8 @@ import ProjectSnapshotExport from "./ProjectSnapshotExport";
 import { Tooltip } from "@nextui-org/react";
 import { AttributeCalculationState } from "@/src/types/components/projects/projectId/settings";
 import ProjectMetaData from "./ProjectMetaData";
+import GatesIntegration from "./GatesIntegration";
+import { selectIsManaged } from "@/src/reduxStore/states/general";
 
 const ACCEPT_BUTTON = { buttonCaption: "Accept", useButton: true, disabled: true }
 
@@ -33,6 +35,7 @@ export default function ProjectSettings() {
 
     const project = useSelector(selectProject);
     const attributes = useSelector(selectAttributes);
+    const isManaged = useSelector(selectIsManaged);
 
     const [pKeyValid, setPKeyValid] = useState<boolean | null>(null);
     const [pKeyCheckTimer, setPKeyCheckTimer] = useState(null);
@@ -159,7 +162,7 @@ export default function ProjectSettings() {
 
 
     return (<div>
-        {project != null && <div className="p-4 bg-gray-100 h-screen overflow-y-auto flex-1 flex flex-col">
+        {project != null && <div className="p-4 bg-gray-100 pb-10 h-screen overflow-y-auto flex-1 flex flex-col">
             <DataSchema isAcOrTokenizationRunning={isAcRunning || tokenizationProgress < 1} pKeyValid={pKeyValid} />
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-2 mt-1 align-top">
@@ -217,6 +220,7 @@ export default function ProjectSettings() {
                 </div>
             </div>
 
+            {isManaged && <GatesIntegration />}
             <ProjectMetaData />
 
             <Modal modalName={ModalEnum.CREATE_NEW_ATTRIBUTE} acceptButton={acceptButton}>

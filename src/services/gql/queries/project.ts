@@ -110,3 +110,13 @@ query ($projectId: ID!) {
   }
 }  
 `;
+
+export const GET_GATES_INTEGRATION_DATA = gql`
+query ($projectId: ID!) {
+  getGatesIntegrationData(projectId: $projectId) {
+    status
+    missingTokenizer
+    missingEmbeddings
+    missingInformationSources
+  }
+}`;

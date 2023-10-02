@@ -32,3 +32,11 @@ mutation ($projectId: ID!, $name: String, $description: String) {
   }
 }  
 `;
+
+export const UPDATE_PROJECT_FOR_GATES = gql`
+mutation($projectId: ID!) {
+  updateProjectForGates(projectId: $projectId){
+    ok
+  } 
+}
+`;

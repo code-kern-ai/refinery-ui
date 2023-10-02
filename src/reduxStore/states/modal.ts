@@ -44,7 +44,10 @@ const initialState: Modals = {
     },
     [ModalEnum.PROJECT_SNAPSHOT]: {
         open: false,
-    }
+    },
+    [ModalEnum.GATES_INTEGRATION_WARNING]: {
+        open: false,
+    },
 };
 
 const modalSlice = createSlice({

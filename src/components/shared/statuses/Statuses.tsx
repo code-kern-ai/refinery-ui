@@ -75,7 +75,7 @@ export default function Statuses({ status, tooltipPosition = DEFAULT_TOOLTIP_POS
                     break;
             }
         }
-    }, []);
+    }, [status, page]);
 
     return (<>
         {statusName && <>
