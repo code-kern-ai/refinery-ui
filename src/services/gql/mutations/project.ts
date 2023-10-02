@@ -24,3 +24,11 @@ mutation($projectId: ID!, $attributeId: ID!, $dataType: String, $isPrimaryKey: B
   }
 }
 `;
+
+export const UPDATE_PROJECT_NAME_AND_DESCRIPTION = gql`
+mutation ($projectId: ID!, $name: String, $description: String) {
+  updateProjectNameAndDescription(projectId: $projectId, name: $name, description: $description) {
+    ok
+  }
+}  
+`;

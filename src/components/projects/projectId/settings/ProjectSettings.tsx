@@ -23,6 +23,7 @@ import { CurrentPage } from "@/src/types/shared/general";
 import ProjectSnapshotExport from "./ProjectSnapshotExport";
 import { Tooltip } from "@nextui-org/react";
 import { AttributeCalculationState } from "@/src/types/components/projects/projectId/settings";
+import ProjectMetaData from "./ProjectMetaData";
 
 const ACCEPT_BUTTON = { buttonCaption: "Accept", useButton: true, disabled: true }
 
@@ -170,7 +171,7 @@ export default function ProjectSettings() {
                             Add new attribute
                         </label>
                     </Tooltip>
-                    <Tooltip content={isAcRunning ? 'Attribute calculation in progress' : tokenizationProgress < 1 ? 'Tokenization in progress' : 'Upload more records to the project'} placement="bottom" color="invert">
+                    <Tooltip content={isAcRunning ? 'Attribute calculation in progress' : tokenizationProgress < 1 ? 'Tokenization in progress' : 'Upload more records to the project'} placement="right" color="invert">
                         <button disabled={isAcRunning || tokenizationProgress < 1} onClick={() => {
                             dispatch(setUploadFileType(UploadFileType.RECORDS_ADD));
                             router.push(`/projects/${project.id}/upload-records`);
@@ -215,6 +216,8 @@ export default function ProjectSettings() {
                     </div>
                 </div>
             </div>
+
+            <ProjectMetaData />
 
             <Modal modalName={ModalEnum.CREATE_NEW_ATTRIBUTE} acceptButton={acceptButton}>
                 <div className="flex flex-grow justify-center text-lg leading-6 text-gray-900 font-medium">
