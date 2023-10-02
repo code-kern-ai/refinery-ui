@@ -52,3 +52,45 @@ export function uploadFile(credentialsAndUploadIdParsed: any, file: File, filena
         });
     })
 }
+
+export function downloadFile(credentialBlock: any, isStringData: boolean = true) {
+
+    const credentials = credentialBlock["Credentials"];
+    const object = credentialBlock["objectName"];
+    const bucket = credentialBlock["bucket"];
+    const s3Endpoint = ConfigManager.getConfigValue("KERN_S3_ENDPOINT");
+    const s3Region = ConfigManager.getConfigValue('S3_REGION');
+
+    const s3Client = new S3({
+        endpoint: s3Endpoint,
+        accessKeyId: credentials["AccessKeyId"],
+        secretAccessKey: credentials["SecretAccessKey"],
+        sessionToken: credentials["SessionToken"],
+        region: s3Region,
+        s3BucketEndpoint: false,
+        s3ForcePathStyle: true,
+        signatureVersion: 'v4',
+    });
+
+    var getParams = {
+        Bucket: bucket,
+        Key: object
+    }
+    return new Observable((subscriber) => {
+        const managedDownload = s3Client.getObject(getParams, function (err, data) {
+            // Handle any error and exit
+            if (err) {
+                subscriber.error(null)
+            }
+            if (isStringData) {
+                let objectData = data.Body.toString('utf-8'); // Use the encoding necessary
+                subscriber.next(objectData)
+            } else {
+                subscriber.next(data.Body)
+            }
+            subscriber.complete();
+        });
+
+    });
+
+}

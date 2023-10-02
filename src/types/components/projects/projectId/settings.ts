@@ -52,3 +52,11 @@ export type ProjectSize = {
     sizeReadable: string;
     sizeNumber: number;
 }
+
+export enum DownloadState {
+    NONE,
+    PREPARATION,
+    DOWNLOAD,
+    COMPLETED,
+    ERROR,
+}

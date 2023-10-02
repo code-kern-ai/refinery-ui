@@ -84,3 +84,13 @@ query ($projectId: ID!) {
   }
 }  
 `;
+
+export const LAST_PROJECT_EXPORT_CREDENTIALS = gql`
+query ($projectId: ID!) {
+  lastProjectExportCredentials(projectId:$projectId)
+}`;
+
+export const PREPARE_PROJECT_EXPORT = gql`
+query ($projectId: ID!, $exportOptions: JSONString, $key: String) {
+  prepareProjectExport(projectId: $projectId, exportOptions: $exportOptions, key: $key)
+}`;
