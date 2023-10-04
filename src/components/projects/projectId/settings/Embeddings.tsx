@@ -1,29 +1,39 @@
 import LoadingIcon from "@/src/components/shared/loading/LoadingIcon";
 import Modal from "@/src/components/shared/modal/Modal";
 import { selectIsManaged } from "@/src/reduxStore/states/general";
-import { openModal, setModalStates } from "@/src/reduxStore/states/modal";
-import { selectEmbeddings } from "@/src/reduxStore/states/pages/settings";
+import { openModal, selectModal, setModalStates } from "@/src/reduxStore/states/modal";
+import { removeFromAllEmbeddingsById, selectEmbeddings } from "@/src/reduxStore/states/pages/settings";
+import { selectProject } from "@/src/reduxStore/states/project";
 import { WebSocketsService } from "@/src/services/base/web-sockets/WebSocketsService";
-import { Embedding, EmbeddingState } from "@/src/types/components/projects/projectId/settings";
+import { DELETE_EMBEDDING, DELETE_FROM_TASK_QUEUE } from "@/src/services/gql/mutations/project";
+import { Embedding, EmbeddingState } from "@/src/types/components/projects/projectId/settings/embeddings";
 import { CurrentPage } from "@/src/types/shared/general";
-import { ModalEnum } from "@/src/types/shared/modal";
-import { DATA_TYPES, getColorForDataType } from "@/src/util/components/projects/projectId/settings-helper";
+import { ModalButton, ModalEnum } from "@/src/types/shared/modal";
+import { DATA_TYPES, getColorForDataType } from "@/src/util/components/projects/projectId/settings/data-schema-helper";
 import { jsonCopy } from "@/submodules/javascript-functions/general";
+import { useMutation } from "@apollo/client";
 import { Tooltip } from "@nextui-org/react";
-import { IconAlertTriangleFilled, IconArrowAutofitContent, IconArrowAutofitDown, IconCircleCheckFilled, IconNotes, IconPlus, IconTrash } from "@tabler/icons-react";
+import { IconAlertTriangleFilled, IconArrowAutofitDown, IconCircleCheckFilled, IconNotes, IconPlus, IconTrash } from "@tabler/icons-react";
 import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+
+const ABORT_BUTTON = { useButton: true, disabled: false };
 
 export default function Embeddings() {
     const dispatch = useDispatch();
     const router = useRouter();
+    const modalDeleteEmbedding = useSelector(selectModal(ModalEnum.DELETE_EMBEDDING));
 
     const isManaged = useSelector(selectIsManaged);
     const embeddings = useSelector(selectEmbeddings);
+    const project = useSelector(selectProject);
 
     const [somethingLoading, setSomethingLoading] = useState(false);
     const [loadingEmbeddingsDict, setLoadingEmbeddingsDict] = useState<{ [key: string]: boolean }>({});
+
+    const [refetchDeleteEmbedding] = useMutation(DELETE_EMBEDDING);
+    const [refetchDeleteTaskQueue] = useMutation(DELETE_FROM_TASK_QUEUE);
 
     useEffect(() => {
         setSomethingLoading(false); // TODO add the condition
@@ -32,6 +42,29 @@ export default function Embeddings() {
             func: handleWebsocketNotification
         });
     }, []);
+
+    const deleteEmbedding = useCallback(() => {
+        const embeddingId = modalDeleteEmbedding.embeddingId;
+        if (!embeddingId) return;
+        if (modalDeleteEmbedding.isQueuedElement) {
+            refetchDeleteTaskQueue({ variables: { projectId: project.id, taskId: embeddingId } }).then((res) => {
+                dispatch(removeFromAllEmbeddingsById(embeddingId));
+            });
+        } else {
+            refetchDeleteEmbedding({ variables: { projectId: project.id, embeddingId: embeddingId } }).then((res) => {
+                dispatch(removeFromAllEmbeddingsById(embeddingId));
+            });
+        }
+    }, [modalDeleteEmbedding]);
+
+    useEffect(() => {
+        const abortButtonCopy = jsonCopy(abortButton);
+        abortButtonCopy.buttonCaption = modalDeleteEmbedding.isQueuedElement ? 'Dequeue embedding' : 'Delete embedding';
+        abortButtonCopy.emitFunction = deleteEmbedding;
+        setAbortButton(abortButtonCopy);
+    }, [modalDeleteEmbedding]);
+
+    const [abortButton, setAbortButton] = useState<ModalButton>(ABORT_BUTTON);
 
     function handleWebsocketNotification(msgParts: string[]) {
         if (msgParts[1] == 'embedding_updated') {
@@ -172,8 +205,11 @@ export default function Embeddings() {
         <Modal modalName={ModalEnum.FILTERED_ATTRIBUTES}>
 
         </Modal>
-        <Modal modalName={ModalEnum.DELETE_EMBEDDING}>
-
+        <Modal modalName={ModalEnum.DELETE_EMBEDDING} abortButton={abortButton}>
+            <div className="flex flex-grow justify-center text-lg leading-6 text-gray-900 font-medium">
+                Warning </div>
+            <p className="mt-2 text-gray-500 text-sm">Are you sure you want to {modalDeleteEmbedding.isQueuedElement ? 'dequeue' : 'delete'} this embedding?</p>
+            {!modalDeleteEmbedding.isQueuedElement && <p className="mt-2 text-gray-500 text-sm">This will delete all corresponding tensors!</p>}
         </Modal>
         <Modal modalName={ModalEnum.ADD_EMBEDDING}>
         </Modal>

@@ -40,3 +40,19 @@ mutation($projectId: ID!) {
   } 
 }
 `;
+
+export const DELETE_FROM_TASK_QUEUE = gql`
+mutation ($projectId: ID!, $taskId: ID!) {
+  deleteFromTaskQueue(projectId: $projectId, taskId: $taskId) {
+    ok
+  }
+}
+`;
+
+export const DELETE_EMBEDDING = gql`
+mutation ($projectId: ID!, $embeddingId: ID!) {
+  deleteEmbedding(projectId: $projectId, embeddingId: $embeddingId) {
+    ok
+  }
+}
+`;

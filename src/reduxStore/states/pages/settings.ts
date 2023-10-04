@@ -1,4 +1,5 @@
-import { Attribute, Embedding } from '@/src/types/components/projects/projectId/settings';
+import { Attribute } from '@/src/types/components/projects/projectId/settings/data-schema';
+import { Embedding } from '@/src/types/components/projects/projectId/settings/embeddings';
 import { createSlice } from '@reduxjs/toolkit'
 import type { PayloadAction } from '@reduxjs/toolkit'
 
@@ -47,6 +48,9 @@ const settingsSlice = createSlice({
         setAllEmbeddings(state, action: PayloadAction<Embedding[]>) {
             if (action.payload) state.embeddings.all = action.payload;
             else state.embeddings.all = [];
+        },
+        removeFromAllEmbeddingsById(state, action: PayloadAction<string>) {
+            if (action.payload) state.embeddings.all = state.embeddings.all.filter((embedding) => embedding.id !== action.payload);
         }
     },
 })
@@ -57,5 +61,5 @@ export const selectAttributes = (state) => state.settings.attributes.all;
 export const selectEmbeddings = (state) => state.settings.embeddings.all;
 
 
-export const { setAllAttributes, extendAllAttributes, removeFromAllAttributesById, updateAttributeById, setAllEmbeddings } = settingsSlice.actions;
+export const { setAllAttributes, extendAllAttributes, removeFromAllAttributesById, updateAttributeById, setAllEmbeddings, removeFromAllEmbeddingsById } = settingsSlice.actions;
 export const settingsReducer = settingsSlice.reducer;
