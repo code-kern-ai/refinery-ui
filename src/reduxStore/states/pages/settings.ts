@@ -1,11 +1,13 @@
-import { Attribute } from '@/src/types/components/projects/projectId/settings/data-schema';
+import { Attribute, AttributeState } from '@/src/types/components/projects/projectId/settings/data-schema';
 import { Embedding } from '@/src/types/components/projects/projectId/settings/embeddings';
+import { DataTypeEnum } from '@/src/types/shared/general';
 import { createSlice } from '@reduxjs/toolkit'
 import type { PayloadAction } from '@reduxjs/toolkit'
 
 type SettingsState = {
     attributes: {
         all: Attribute[];
+        useableEmbedableAttributes: Attribute[];
     },
     embeddings: {
         all: Embedding[];
@@ -15,7 +17,8 @@ type SettingsState = {
 function getInitState(): SettingsState {
     return {
         attributes: {
-            all: []
+            all: [],
+            useableEmbedableAttributes: []
         },
         embeddings: {
             all: []
@@ -51,6 +54,12 @@ const settingsSlice = createSlice({
         },
         removeFromAllEmbeddingsById(state, action: PayloadAction<string>) {
             if (action.payload) state.embeddings.all = state.embeddings.all.filter((embedding) => embedding.id !== action.payload);
+        },
+        setUseableEmbedableAttributes(state, action: PayloadAction<Attribute[]>) {
+            if (action.payload) state.attributes.useableEmbedableAttributes =
+                state.attributes.all.filter((attribute) => (attribute.dataType === DataTypeEnum.TEXT || attribute.dataType === DataTypeEnum.EMBEDDING_LIST) &&
+                    (attribute.state === AttributeState.UPLOADED || attribute.state === AttributeState.AUTOMATICALLY_CREATED || attribute.state === AttributeState.USABLE));
+            else state.attributes.useableEmbedableAttributes = [];
         }
     },
 })
@@ -59,7 +68,8 @@ const settingsSlice = createSlice({
 //selectors
 export const selectAttributes = (state) => state.settings.attributes.all;
 export const selectEmbeddings = (state) => state.settings.embeddings.all;
+export const selectUseableEmbedableAttributes = (state) => state.settings.attributes.useableEmbedableAttributes;
 
 
-export const { setAllAttributes, extendAllAttributes, removeFromAllAttributesById, updateAttributeById, setAllEmbeddings, removeFromAllEmbeddingsById } = settingsSlice.actions;
+export const { setAllAttributes, extendAllAttributes, removeFromAllAttributesById, updateAttributeById, setAllEmbeddings, removeFromAllEmbeddingsById, setUseableEmbedableAttributes } = settingsSlice.actions;
 export const settingsReducer = settingsSlice.reducer;

@@ -157,3 +157,12 @@ query ($projectId: ID!,$taskType: String!) {
   }
 }
 `;
+
+export const GET_EMBEDDING_PLATFORMS = gql`
+query {
+  embeddingPlatforms {
+    platform
+    terms
+    link
+  }
+}`;

@@ -4,7 +4,7 @@ import { selectProject, setActiveProject } from "@/src/reduxStore/states/project
 import { useLazyQuery, useMutation } from "@apollo/client";
 import { CHECK_COMPOSITE_KEY, GET_ATTRIBUTES_BY_PROJECT_ID, GET_EMBEDDING_SCHEMA_BY_PROJECT_ID, GET_PROJECT_TOKENIZATION, GET_QUEUED_TASKS } from "@/src/services/gql/queries/project";
 import { useCallback, useEffect, useState } from "react";
-import { selectAttributes, setAllAttributes, setAllEmbeddings } from "@/src/reduxStore/states/pages/settings";
+import { selectAttributes, setAllAttributes, setAllEmbeddings, setUseableEmbedableAttributes } from "@/src/reduxStore/states/pages/settings";
 import { timer } from "rxjs";
 import { IconCamera, IconCheck, IconDots, IconPlus, IconUpload } from "@tabler/icons-react";
 import Modal from "@/src/components/shared/modal/Modal";
@@ -24,7 +24,7 @@ import { Tooltip } from "@nextui-org/react";
 import ProjectMetaData from "./ProjectMetaData";
 import GatesIntegration from "./GatesIntegration";
 import { selectIsManaged } from "@/src/reduxStore/states/general";
-import Embeddings from "./Embeddings";
+import Embeddings from "./embeddings/Embeddings";
 import { DATA_TYPES, postProcessingAttributes } from "@/src/util/components/projects/projectId/settings/data-schema-helper";
 import { postProcessingEmbeddings } from "@/src/util/components/projects/projectId/settings/embeddings-helper";
 import { AttributeState } from "@/src/types/components/projects/projectId/settings/data-schema";
@@ -60,6 +60,7 @@ export default function ProjectSettings() {
         if (!project) return;
         refetchAttributes({ variables: { projectId: project.id, stateFilter: ['ALL'] } }).then((res) => {
             dispatch(setAllAttributes(postProcessingAttributes(res.data['attributesByProjectId'])));
+            dispatch(setUseableEmbedableAttributes(attributes));
         });
         refetchEmbeddings({ variables: { projectId: project.id } }).then((res) => {
             refetchQueuedTasks({ variables: { projectId: project.id, taskType: "EMBEDDING" } }).then((queuedTasks) => {
@@ -167,6 +168,7 @@ export default function ProjectSettings() {
             } else {
                 refetchAttributes({ variables: { projectId: project.id, stateFilter: ['ALL'] } }).then((res) => {
                     dispatch(setAllAttributes(postProcessingAttributes(res.data['attributesByProjectId'])));
+                    dispatch(setUseableEmbedableAttributes(attributes));
                     setIsAcRunning(checkIfAcRunning());
                 });
                 if (msgParts[2] == 'finished') timer(5000).subscribe(() => checkProjectTokenization());

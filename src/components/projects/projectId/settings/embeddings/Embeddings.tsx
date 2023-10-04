@@ -17,6 +17,7 @@ import { IconAlertTriangleFilled, IconArrowAutofitDown, IconCircleCheckFilled, I
 import { useRouter } from "next/router";
 import { useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import AddNewEmbedding from "./AddNewEmbedding";
 
 const ABORT_BUTTON = { useButton: true, disabled: false };
 
@@ -211,7 +212,6 @@ export default function Embeddings() {
             <p className="mt-2 text-gray-500 text-sm">Are you sure you want to {modalDeleteEmbedding.isQueuedElement ? 'dequeue' : 'delete'} this embedding?</p>
             {!modalDeleteEmbedding.isQueuedElement && <p className="mt-2 text-gray-500 text-sm">This will delete all corresponding tensors!</p>}
         </Modal>
-        <Modal modalName={ModalEnum.ADD_EMBEDDING}>
-        </Modal>
+        <AddNewEmbedding />
     </div>);
 }
