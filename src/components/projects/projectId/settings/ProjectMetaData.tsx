@@ -1,4 +1,4 @@
-import { selectProject, setActiveProject } from "@/src/reduxStore/states/project";
+import { removeFromAllProjectsById, selectProject, setActiveProject } from "@/src/reduxStore/states/project";
 import { UPDATE_PROJECT_NAME_AND_DESCRIPTION } from "@/src/services/gql/mutations/project";
 import { DELETE_PROJECT } from "@/src/services/gql/mutations/projects";
 import { jsonCopy } from "@/submodules/javascript-functions/general";
@@ -36,6 +36,7 @@ export default function ProjectMetaData() {
 
     function deleteProject() {
         deleteProjectMut({ variables: { projectId: project.id } }).then(() => {
+            dispatch(removeFromAllProjectsById(project.id));
             router.push('/projects');
         });
     }

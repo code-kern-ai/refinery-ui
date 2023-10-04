@@ -1,5 +1,14 @@
-import { Attribute, AttributeVisibility, ProjectSize } from "@/src/types/components/projects/projectId/settings";
+import { Attribute, AttributeVisibility } from "@/src/types/components/projects/projectId/settings/data-schema";
 import { jsonCopy } from "@/submodules/javascript-functions/general";
+
+export const DATA_TYPES = [
+    { name: 'Category', value: 'CATEGORY' },
+    { name: 'Text', value: 'TEXT' },
+    { name: 'Integer', value: 'INTEGER' },
+    { name: 'Float', value: 'FLOAT' },
+    { name: 'Boolean', value: 'BOOLEAN' },
+    { name: 'Embedding List', value: 'EMBEDDING_LIST' },
+];
 
 export const ATTRIBUTES_VISIBILITY_STATES = [
     { name: 'Do not hide', value: AttributeVisibility.DO_NOT_HIDE },
@@ -22,15 +31,6 @@ export function getTooltipVisibilityState(state: AttributeVisibility): string {
     return 'UNKNOWN';
 }
 
-export const DATA_TYPES = [
-    { name: 'Category', value: 'CATEGORY' },
-    { name: 'Text', value: 'TEXT' },
-    { name: 'Integer', value: 'INTEGER' },
-    { name: 'Float', value: 'FLOAT' },
-    { name: 'Boolean', value: 'BOOLEAN' },
-    { name: 'Embedding List', value: 'EMBEDDING_LIST' },
-];
-
 export function postProcessingAttributes(attributes: Attribute[]): Attribute[] {
     const preparedAttributes: Attribute[] = jsonCopy(attributes);
     preparedAttributes.forEach((attribute: any) => {
@@ -40,33 +40,14 @@ export function postProcessingAttributes(attributes: Attribute[]): Attribute[] {
     return preparedAttributes;
 }
 
-export function getMoveRight(tblName: string): boolean {
-    //at some point a better grouping would be useful
-    switch (tblName) {
-        case "embedding tensors":
-        case "information sources payloads":
-            return true;
-        default:
-            return false;
+export function getColorForDataType(dataType): string {
+    switch (dataType) {
+        case 'CATEGORY': return 'amber';
+        case 'TEXT': return 'lime';
+        case 'BOOLEAN': return 'cyan';
+        case 'INTEGER': return 'indigo';
+        case 'FLOAT': return 'purple';
+        case 'EMBEDDING_LIST': return 'gray';
+        default: return 'gray';
     }
-}
-
-export function postProcessingFormGroups(projectSize: any): ProjectSize[] {
-    const projectExportArray = [];
-    projectSize.forEach((element: any) => {
-        let hasGdpr = false;
-        if (element.table == 'embedding tensors') {
-            // hasGdpr = TODO: filter for embeddings
-        }
-        let group = {
-            export: element.default,
-            moveRight: getMoveRight(element.table),
-            name: element.table,
-            desc: hasGdpr ? null : element.description,
-            sizeNumber: element.byteSize,
-            sizeReadable: element.byteReadable,
-        };
-        projectExportArray.push(group);
-    });
-    return projectExportArray;
 }

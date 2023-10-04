@@ -120,3 +120,40 @@ query ($projectId: ID!) {
     missingInformationSources
   }
 }`;
+
+export const GET_EMBEDDING_SCHEMA_BY_PROJECT_ID = gql`
+query ($projectId: ID!) {
+  projectByProjectId(projectId: $projectId) {
+    id
+    embeddings {
+      edges {
+        node {
+          id
+          name
+          custom
+          type
+          state
+          progress
+          dimension
+          count
+          platform
+          model
+          filterAttributes
+          attributeId
+        }
+      }
+    }
+  }
+}
+`;
+
+export const GET_QUEUED_TASKS = gql`
+query ($projectId: ID!,$taskType: String!) {
+  queuedTasks(projectId: $projectId, taskType: $taskType) {
+    id
+    projectId
+    taskType
+    taskInfo
+  }
+}
+`;

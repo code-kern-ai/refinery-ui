@@ -48,6 +48,19 @@ const initialState: Modals = {
     [ModalEnum.GATES_INTEGRATION_WARNING]: {
         open: false,
     },
+    [ModalEnum.FILTERED_ATTRIBUTES]: {
+        open: false,
+        embeddingId: '',
+        attributeNames: [],
+    },
+    [ModalEnum.DELETE_EMBEDDING]: {
+        open: false,
+        embeddingId: '',
+        isQueuedElement: false,
+    },
+    [ModalEnum.ADD_EMBEDDING]: {
+        open: false
+    },
 };
 
 const modalSlice = createSlice({

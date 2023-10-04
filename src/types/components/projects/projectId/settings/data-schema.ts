@@ -1,5 +1,3 @@
-import { DataTypeEnum } from "@/src/types/shared/general";
-
 export type DataSchemaProps = {
     isAcOrTokenizationRunning: boolean;
     pKeyValid: boolean;
@@ -35,6 +33,7 @@ export enum AttributeVisibility {
     DO_NOT_HIDE = 'DO_NOT_HIDE',
 }
 
+
 export enum AttributeState {
     UPLOADED = 'UPLOADED',
     AUTOMATICALLY_CREATED = 'AUTOMATICALLY_CREATED',
@@ -43,29 +42,3 @@ export enum AttributeState {
     FAILED = 'FAILED',
     QUEUED = 'QUEUED', //special state since not in db but "overwritten" if queue entry exists
 }
-
-export type ProjectSize = {
-    desc: string;
-    export: boolean;
-    moveRight: boolean;
-    name: string;
-    sizeReadable: string;
-    sizeNumber: number;
-}
-
-export enum DownloadState {
-    NONE,
-    PREPARATION,
-    DOWNLOAD,
-    COMPLETED,
-    ERROR,
-}
-
-export enum AttributeCalculationState {
-    UPLOADED = 'UPLOADED',
-    AUTOMATICALLY_CREATED = 'AUTOMATICALLY_CREATED',
-    USABLE = 'USABLE',
-    RUNNING = 'RUNNING',
-    FAILED = 'FAILED',
-    QUEUED = 'QUEUED', //special state since not in db but "overwritten" if queue entry exists
-};

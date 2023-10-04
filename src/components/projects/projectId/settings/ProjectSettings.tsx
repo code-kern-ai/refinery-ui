@@ -2,10 +2,9 @@ import { useDispatch, useSelector } from "react-redux";
 import DataSchema from "./DataSchema";
 import { selectProject, setActiveProject } from "@/src/reduxStore/states/project";
 import { useLazyQuery, useMutation } from "@apollo/client";
-import { CHECK_COMPOSITE_KEY, GET_ATTRIBUTES_BY_PROJECT_ID, GET_PROJECT_TOKENIZATION } from "@/src/services/gql/queries/project";
+import { CHECK_COMPOSITE_KEY, GET_ATTRIBUTES_BY_PROJECT_ID, GET_EMBEDDING_SCHEMA_BY_PROJECT_ID, GET_PROJECT_TOKENIZATION, GET_QUEUED_TASKS } from "@/src/services/gql/queries/project";
 import { useCallback, useEffect, useState } from "react";
-import { selectAttributes, setAllAttributes } from "@/src/reduxStore/states/pages/settings";
-import { DATA_TYPES, postProcessingAttributes } from "@/src/util/components/projects/projectId/settings-helper";
+import { selectAttributes, setAllAttributes, setAllEmbeddings } from "@/src/reduxStore/states/pages/settings";
 import { timer } from "rxjs";
 import { IconCamera, IconCheck, IconDots, IconPlus, IconUpload } from "@tabler/icons-react";
 import Modal from "@/src/components/shared/modal/Modal";
@@ -22,10 +21,13 @@ import { WebSocketsService } from "@/src/services/base/web-sockets/WebSocketsSer
 import { CurrentPage } from "@/src/types/shared/general";
 import ProjectSnapshotExport from "./ProjectSnapshotExport";
 import { Tooltip } from "@nextui-org/react";
-import { AttributeCalculationState } from "@/src/types/components/projects/projectId/settings";
 import ProjectMetaData from "./ProjectMetaData";
 import GatesIntegration from "./GatesIntegration";
 import { selectIsManaged } from "@/src/reduxStore/states/general";
+import Embeddings from "./Embeddings";
+import { DATA_TYPES, postProcessingAttributes } from "@/src/util/components/projects/projectId/settings/data-schema-helper";
+import { postProcessingEmbeddings } from "@/src/util/components/projects/projectId/settings/embeddings-helper";
+import { AttributeState } from "@/src/types/components/projects/projectId/settings/data-schema";
 
 const ACCEPT_BUTTON = { buttonCaption: "Accept", useButton: true, disabled: true }
 
@@ -51,11 +53,23 @@ export default function ProjectSettings() {
     const [createAttributeMut] = useMutation(CREATE_USER_ATTRIBUTE);
     const [refetchProjectByProjectId] = useLazyQuery(GET_PROJECT_BY_ID, { fetchPolicy: "no-cache" });
     const [refetchProjectTokenization] = useLazyQuery(GET_PROJECT_TOKENIZATION, { fetchPolicy: "no-cache" });
+    const [refetchEmbeddings] = useLazyQuery(GET_EMBEDDING_SCHEMA_BY_PROJECT_ID, { fetchPolicy: "network-only" });
+    const [refetchQueuedTasks] = useLazyQuery(GET_QUEUED_TASKS, { fetchPolicy: "no-cache" });
 
     useEffect(() => {
         if (!project) return;
         refetchAttributes({ variables: { projectId: project.id, stateFilter: ['ALL'] } }).then((res) => {
             dispatch(setAllAttributes(postProcessingAttributes(res.data['attributesByProjectId'])));
+        });
+        refetchEmbeddings({ variables: { projectId: project.id } }).then((res) => {
+            refetchQueuedTasks({ variables: { projectId: project.id, taskType: "EMBEDDING" } }).then((queuedTasks) => {
+                const queuedEmbeddings = queuedTasks.data['queuedTasks'].map((task) => {
+                    const copy = { ...task };
+                    copy.taskInfo = JSON.parse(task.taskInfo);
+                    return copy;
+                })
+                dispatch(setAllEmbeddings(postProcessingEmbeddings(res.data['projectByProjectId']['embeddings']['edges'].map((e) => e['node']), queuedEmbeddings)));
+            });
         });
         checkProjectTokenization();
         WebSocketsService.subscribeToNotification(CurrentPage.PROJECT_SETTINGS, {
@@ -123,7 +137,7 @@ export default function ProjectSettings() {
     }
 
     function checkIfAcRunning() {
-        return attributes.some(a => a.state == AttributeCalculationState.RUNNING) || checkIfAcUploadedRecords;
+        return attributes.some(a => a.state == AttributeState.RUNNING) || checkIfAcUploadedRecords;
     }
 
     function handleWebsocketNotification(msgParts: string[]) {
@@ -220,6 +234,7 @@ export default function ProjectSettings() {
                 </div>
             </div>
 
+            <Embeddings />
             {isManaged && <GatesIntegration />}
             <ProjectMetaData />
 
