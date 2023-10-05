@@ -10,8 +10,6 @@ export type Embedding = {
     configString: string;
     description: string;
     tokenizers: string[];
-    hidden?: boolean;
-    forceHidden?: boolean;
     state?: string;
     progress?: number;
     name?: string;
@@ -44,4 +42,19 @@ export enum PlatformType {
     COHERE = "cohere",
     PYTHON = "python",
     AZURE = "azure"
+}
+
+export type RecommendedEncoder = {
+    applicability: string;
+    configString: string;
+    description: string;
+    platform: string;
+    tokenizers: string[];
+}
+
+export type SuggestionsProps = {
+    options: string[];
+    selectedOption: (value: any) => void;
+    name?: string;
+    tooltip?: string;
 }

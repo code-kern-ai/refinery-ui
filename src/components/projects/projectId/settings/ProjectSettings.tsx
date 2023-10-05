@@ -2,9 +2,9 @@ import { useDispatch, useSelector } from "react-redux";
 import DataSchema from "./DataSchema";
 import { selectProject, setActiveProject } from "@/src/reduxStore/states/project";
 import { useLazyQuery, useMutation } from "@apollo/client";
-import { CHECK_COMPOSITE_KEY, GET_ATTRIBUTES_BY_PROJECT_ID, GET_EMBEDDING_SCHEMA_BY_PROJECT_ID, GET_PROJECT_TOKENIZATION, GET_QUEUED_TASKS } from "@/src/services/gql/queries/project";
+import { CHECK_COMPOSITE_KEY, GET_ATTRIBUTES_BY_PROJECT_ID, GET_EMBEDDING_SCHEMA_BY_PROJECT_ID, GET_PROJECT_TOKENIZATION, GET_QUEUED_TASKS, GET_RECOMMENDED_ENCODERS_FOR_EMBEDDINGS } from "@/src/services/gql/queries/project";
 import { useCallback, useEffect, useState } from "react";
-import { selectAttributes, setAllAttributes, setAllEmbeddings, setUseableEmbedableAttributes } from "@/src/reduxStore/states/pages/settings";
+import { selectAttributes, setAllAttributes, setAllEmbeddings, setAllRecommendedEncodersDict, setRecommendedEncodersAll, setUseableEmbedableAttributes, setUseableNonTextAttributes } from "@/src/reduxStore/states/pages/settings";
 import { timer } from "rxjs";
 import { IconCamera, IconCheck, IconDots, IconPlus, IconUpload } from "@tabler/icons-react";
 import Modal from "@/src/components/shared/modal/Modal";
@@ -26,8 +26,9 @@ import GatesIntegration from "./GatesIntegration";
 import { selectIsManaged } from "@/src/reduxStore/states/general";
 import Embeddings from "./embeddings/Embeddings";
 import { DATA_TYPES, postProcessingAttributes } from "@/src/util/components/projects/projectId/settings/data-schema-helper";
-import { postProcessingEmbeddings } from "@/src/util/components/projects/projectId/settings/embeddings-helper";
+import { postProcessingEmbeddings, postProcessingRecommendedEncoders } from "@/src/util/components/projects/projectId/settings/embeddings-helper";
 import { AttributeState } from "@/src/types/components/projects/projectId/settings/data-schema";
+import { RecommendedEncoder } from "@/src/types/components/projects/projectId/settings/embeddings";
 
 const ACCEPT_BUTTON = { buttonCaption: "Accept", useButton: true, disabled: true }
 
@@ -55,12 +56,14 @@ export default function ProjectSettings() {
     const [refetchProjectTokenization] = useLazyQuery(GET_PROJECT_TOKENIZATION, { fetchPolicy: "no-cache" });
     const [refetchEmbeddings] = useLazyQuery(GET_EMBEDDING_SCHEMA_BY_PROJECT_ID, { fetchPolicy: "network-only" });
     const [refetchQueuedTasks] = useLazyQuery(GET_QUEUED_TASKS, { fetchPolicy: "no-cache" });
+    const [refetchRecommendedEncodersForEmbeddings] = useLazyQuery(GET_RECOMMENDED_ENCODERS_FOR_EMBEDDINGS, { fetchPolicy: "no-cache" });
 
     useEffect(() => {
         if (!project) return;
         refetchAttributes({ variables: { projectId: project.id, stateFilter: ['ALL'] } }).then((res) => {
             dispatch(setAllAttributes(postProcessingAttributes(res.data['attributesByProjectId'])));
             dispatch(setUseableEmbedableAttributes(attributes));
+            dispatch(setUseableNonTextAttributes(attributes));
         });
         refetchEmbeddings({ variables: { projectId: project.id } }).then((res) => {
             refetchQueuedTasks({ variables: { projectId: project.id, taskType: "EMBEDDING" } }).then((queuedTasks) => {
@@ -81,7 +84,12 @@ export default function ProjectSettings() {
     }, [project]);
 
     useEffect(() => {
+        if (!project) return;
         requestPKeyCheck();
+        refetchRecommendedEncodersForEmbeddings({ variables: { projectId: project.id } }).then((encoder) => {
+            dispatch(setRecommendedEncodersAll(encoder['data']['recommendedEncoders'] as RecommendedEncoder[]));
+            dispatch(setAllRecommendedEncodersDict(postProcessingRecommendedEncoders(attributes, project.tokenizer, encoder['data']['recommendedEncoders'])));
+        });
     }, [attributes]);
 
     const createUserAttribute = useCallback((attributeName: string) => {
@@ -169,6 +177,7 @@ export default function ProjectSettings() {
                 refetchAttributes({ variables: { projectId: project.id, stateFilter: ['ALL'] } }).then((res) => {
                     dispatch(setAllAttributes(postProcessingAttributes(res.data['attributesByProjectId'])));
                     dispatch(setUseableEmbedableAttributes(attributes));
+                    dispatch(setUseableNonTextAttributes(attributes));
                     setIsAcRunning(checkIfAcRunning());
                 });
                 if (msgParts[2] == 'finished') timer(5000).subscribe(() => checkProjectTokenization());

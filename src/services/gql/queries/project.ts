@@ -166,3 +166,15 @@ query {
     link
   }
 }`;
+
+export const GET_RECOMMENDED_ENCODERS_FOR_EMBEDDINGS = gql`
+query ($projectId: ID) {
+  recommendedEncoders(projectId: $projectId) {
+    configString
+    description
+    tokenizers
+    applicability
+    platform
+  }
+} 
+`;

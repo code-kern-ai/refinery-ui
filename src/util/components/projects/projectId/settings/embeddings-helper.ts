@@ -1,5 +1,9 @@
-import { Embedding, EmbeddingPlatform, EmbeddingState, EmbeddingType, PlatformType } from "@/src/types/components/projects/projectId/settings/embeddings";
+import { Organization } from "@/src/reduxStore/states/general";
+import { Attribute } from "@/src/types/components/projects/projectId/settings/data-schema";
+import { Embedding, EmbeddingPlatform, EmbeddingState, EmbeddingType, PlatformType, RecommendedEncoder } from "@/src/types/components/projects/projectId/settings/embeddings";
 import { jsonCopy } from "@/submodules/javascript-functions/general";
+
+export const DEFAULT_AZURE_TYPE = 'azure';
 
 export function postProcessingEmbeddings(embeddings: Embedding[], queuedEmbeddings: any[]): Embedding[] {
     const preparedEmbeddings: Embedding[] = jsonCopy(embeddings);
@@ -23,8 +27,19 @@ export const GRANULARITY_TYPES_ARRAY = [
     { name: 'Token', value: EmbeddingType.ON_TOKEN }
 ];
 
-export function postProcessingEmbeddingPlatforms(platforms: EmbeddingPlatform[]) {
-    const preparedPlatforms: EmbeddingPlatform[] = jsonCopy(platforms);
+export function postProcessingEmbeddingPlatforms(platforms: EmbeddingPlatform[], organization: Organization) {
+    const preparedPlatforms: EmbeddingPlatform[] = [];
+    if (organization.gdprCompliant) {
+        platforms = platforms.filter((platform) => platform.terms == null);
+    }
+    platforms.forEach((platform: EmbeddingPlatform) => {
+        platform = { ...platform, name: platformNamesDict[platform.platform] };
+        if (platform.terms != null) {
+            platform.splitTerms = platform.terms.split('@@PLACEHOLDER@@');
+            platform.splitTerms[1] = platform.splitTerms[1].substring(1);
+        }
+        preparedPlatforms.push(platform);
+    });
     return preparedPlatforms;
 }
 
@@ -34,4 +49,22 @@ export const platformNamesDict = {
     [PlatformType.COHERE]: "Cohere",
     [PlatformType.PYTHON]: "Python",
     [PlatformType.AZURE]: "Azure"
+}
+
+export function postProcessingRecommendedEncoders(attributes: Attribute[], tokenizer: string, encoderSuggestions: any): { [embeddingId: string]: RecommendedEncoder } {
+    let embeddingHandles: { [embeddingId: string]: any } = {};
+    let encoderSuggestionsCopy = [];
+    encoderSuggestions = encoderSuggestions.filter(e => e.tokenizers.includes("all") || e.tokenizers.includes(tokenizer));
+    if (!encoderSuggestions.length) return;
+    if (encoderSuggestions) encoderSuggestions.forEach(element => {
+        element = { ...element };
+        if (typeof element.applicability === 'string' || element.applicability instanceof String) {
+            element.applicability = JSON.parse(element.applicability);
+        }
+        encoderSuggestionsCopy.push(element);
+    });
+    attributes.forEach(att => {
+        embeddingHandles[att.name] = encoderSuggestionsCopy;
+    });
+    return embeddingHandles;
 }

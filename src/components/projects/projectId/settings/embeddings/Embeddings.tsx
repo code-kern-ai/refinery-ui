@@ -150,7 +150,7 @@ export default function Embeddings() {
                                             {embedding.state != EmbeddingState.FINISHED && embedding.state != EmbeddingState.FAILED && <div>
                                                 <div className="items-center">
                                                     <div className="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700">
-                                                        <div className="bg-green-300 h-2.5 rounded-full" style={{ 'width': (embedding.progress * 100) + '%' }}>
+                                                        <div className="bg-green-500 h-2.5 rounded-full" style={{ 'width': (embedding.progress * 100) + '%' }}>
                                                         </div>
                                                     </div>
                                                 </div>

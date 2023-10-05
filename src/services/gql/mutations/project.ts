@@ -56,3 +56,11 @@ mutation ($projectId: ID!, $embeddingId: ID!) {
   }
 }
 `;
+
+export const CREATE_EMBEDDING = gql`
+mutation($projectId: ID!, $attributeId: ID!, $config: JSONString!) {
+  createEmbedding(projectId: $projectId, attributeId: $attributeId, config: $config) {
+    ok
+  }
+}  
+`;
