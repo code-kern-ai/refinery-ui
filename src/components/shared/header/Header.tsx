@@ -47,6 +47,9 @@ export default function Header() {
                     {(currentPage == CurrentPage.PROJECT_OVERVIEW || currentPage == CurrentPage.SETTINGS || currentPage == CurrentPage.UPLOAD_RECORDS) && <div className="ml-6 text-gray-700 text-sm font-normal">
                         {project?.name} - <span className="text-gray-500 font-normal">{project?.numDataScaleUploaded} records</span>
                     </div>}
+                    {currentPage == CurrentPage.MODELS_DOWNLOAD && <div className="ml-6 text-gray-500 text-sm font-normal">
+                        Welcome <span className="font-bold text-gray-900">{user?.firstName}</span>! See your downloaded models.
+                    </div>}
                 </div>
                 <div className="flex flex-row flex-nowrap items-center">
                     <div className="flex items-center justify-center">

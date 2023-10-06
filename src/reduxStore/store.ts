@@ -5,6 +5,7 @@ import { lookupListsReducer } from './states/pages/lookup-lists';
 import { modalReducer } from './states/modal';
 import { uploadReducer } from './states/upload';
 import { settingsReducer } from './states/pages/settings';
+import { modelsDownloadedSliceReducer } from './states/pages/models-downloaded';
 
 const store = configureStore({
     reducer: {
@@ -14,6 +15,7 @@ const store = configureStore({
         lookupLists: lookupListsReducer,
         upload: uploadReducer,
         settings: settingsReducer,
+        modelsDownloaded: modelsDownloadedSliceReducer
     },
 });
 

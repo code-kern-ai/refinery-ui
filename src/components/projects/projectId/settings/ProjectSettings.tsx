@@ -4,7 +4,7 @@ import { selectProject, setActiveProject } from "@/src/reduxStore/states/project
 import { useLazyQuery, useMutation } from "@apollo/client";
 import { CHECK_COMPOSITE_KEY, GET_ATTRIBUTES_BY_PROJECT_ID, GET_EMBEDDING_SCHEMA_BY_PROJECT_ID, GET_PROJECT_TOKENIZATION, GET_QUEUED_TASKS, GET_RECOMMENDED_ENCODERS_FOR_EMBEDDINGS } from "@/src/services/gql/queries/project";
 import { useCallback, useEffect, useState } from "react";
-import { selectAttributes, setAllAttributes, setAllEmbeddings, setAllRecommendedEncodersDict, setRecommendedEncodersAll, setUseableEmbedableAttributes, setUseableNonTextAttributes } from "@/src/reduxStore/states/pages/settings";
+import { selectAttributes, selectEmbeddings, setAllAttributes, setAllEmbeddings, setAllRecommendedEncodersDict, setRecommendedEncodersAll, setUseableEmbedableAttributes, setUseableNonTextAttributes } from "@/src/reduxStore/states/pages/settings";
 import { timer } from "rxjs";
 import { IconCamera, IconCheck, IconDots, IconPlus, IconUpload } from "@tabler/icons-react";
 import Modal from "@/src/components/shared/modal/Modal";
@@ -39,6 +39,7 @@ export default function ProjectSettings() {
     const project = useSelector(selectProject);
     const attributes = useSelector(selectAttributes);
     const isManaged = useSelector(selectIsManaged);
+    const embeddings = useSelector(selectEmbeddings);
 
     const [pKeyValid, setPKeyValid] = useState<boolean | null>(null);
     const [pKeyCheckTimer, setPKeyCheckTimer] = useState(null);
@@ -54,31 +55,18 @@ export default function ProjectSettings() {
     const [createAttributeMut] = useMutation(CREATE_USER_ATTRIBUTE);
     const [refetchProjectByProjectId] = useLazyQuery(GET_PROJECT_BY_ID, { fetchPolicy: "no-cache" });
     const [refetchProjectTokenization] = useLazyQuery(GET_PROJECT_TOKENIZATION, { fetchPolicy: "no-cache" });
-    const [refetchEmbeddings] = useLazyQuery(GET_EMBEDDING_SCHEMA_BY_PROJECT_ID, { fetchPolicy: "network-only" });
+    const [refetchEmbeddings] = useLazyQuery(GET_EMBEDDING_SCHEMA_BY_PROJECT_ID, { fetchPolicy: "no-cache" });
     const [refetchQueuedTasks] = useLazyQuery(GET_QUEUED_TASKS, { fetchPolicy: "no-cache" });
     const [refetchRecommendedEncodersForEmbeddings] = useLazyQuery(GET_RECOMMENDED_ENCODERS_FOR_EMBEDDINGS, { fetchPolicy: "no-cache" });
 
     useEffect(() => {
         if (!project) return;
-        refetchAttributes({ variables: { projectId: project.id, stateFilter: ['ALL'] } }).then((res) => {
-            dispatch(setAllAttributes(postProcessingAttributes(res.data['attributesByProjectId'])));
-            dispatch(setUseableEmbedableAttributes(attributes));
-            dispatch(setUseableNonTextAttributes(attributes));
-        });
-        refetchEmbeddings({ variables: { projectId: project.id } }).then((res) => {
-            refetchQueuedTasks({ variables: { projectId: project.id, taskType: "EMBEDDING" } }).then((queuedTasks) => {
-                const queuedEmbeddings = queuedTasks.data['queuedTasks'].map((task) => {
-                    const copy = { ...task };
-                    copy.taskInfo = JSON.parse(task.taskInfo);
-                    return copy;
-                })
-                dispatch(setAllEmbeddings(postProcessingEmbeddings(res.data['projectByProjectId']['embeddings']['edges'].map((e) => e['node']), queuedEmbeddings)));
-            });
-        });
+        refetchAttributesAndPostProcess();
+        refetchEmbeddingsAndPostProcess();
         checkProjectTokenization();
         WebSocketsService.subscribeToNotification(CurrentPage.PROJECT_SETTINGS, {
             projectId: project.id,
-            whitelist: ['project_update', 'tokenization', 'calculate_attribute'],
+            whitelist: ['project_update', 'tokenization', 'calculate_attribute', 'embedding', 'attributes_updated'],
             func: handleWebsocketNotification
         });
     }, [project]);
@@ -104,6 +92,27 @@ export default function ProjectSettings() {
     }, [attributeName, attributeType, duplicateNameExists]);
 
     const [acceptButton, setAcceptButton] = useState<ModalButton>(ACCEPT_BUTTON);
+
+    function refetchAttributesAndPostProcess() {
+        refetchAttributes({ variables: { projectId: project.id, stateFilter: ['ALL'] } }).then((res) => {
+            dispatch(setAllAttributes(postProcessingAttributes(res.data['attributesByProjectId'])));
+            dispatch(setUseableEmbedableAttributes(attributes));
+            dispatch(setUseableNonTextAttributes(attributes));
+        });
+    }
+
+    function refetchEmbeddingsAndPostProcess() {
+        refetchEmbeddings({ variables: { projectId: project.id } }).then((res) => {
+            refetchQueuedTasks({ variables: { projectId: project.id, taskType: "EMBEDDING" } }).then((queuedTasks) => {
+                const queuedEmbeddings = queuedTasks.data['queuedTasks'].map((task) => {
+                    const copy = { ...task };
+                    copy.taskInfo = JSON.parse(task.taskInfo);
+                    return copy;
+                })
+                dispatch(setAllEmbeddings(postProcessingEmbeddings(res.data['projectByProjectId']['embeddings']['edges'].map((e) => e['node']), queuedEmbeddings)));
+            });
+        });
+    }
 
     function handleAttributeName(value: string) {
         const checkName = attributes.some(attribute => attribute.name == value);
@@ -150,10 +159,29 @@ export default function ProjectSettings() {
     }
 
     function handleWebsocketNotification(msgParts: string[]) {
-        if (msgParts[1] == 'project_update' && msgParts[2] == project.id) {
-            refetchProjectByProjectId({ variables: { projectId: project.id } }).then((res) => {
-                dispatch(setActiveProject(res.data["projectByProjectId"]));
-            });
+        if (msgParts[1] == 'embedding') {
+            if (!embeddings) return;
+            if (["queued", "dequeued"].includes(msgParts[2])) {
+                refetchAttributesAndPostProcess();
+                refetchEmbeddingsAndPostProcess();
+                return;
+            }
+            if (msgParts[4] == "INITIALIZING" || msgParts[4] == "WAITING") {
+                timer(100).subscribe(() => refetchEmbeddingsAndPostProcess());
+            }
+            for (let e of embeddings) {
+                if (e.id == msgParts[2]) {
+                    if (msgParts[3] == "state") {
+                        if (msgParts[4] == "FINISHED") {
+                            refetchEmbeddingsAndPostProcess();
+                        }
+                        else e.state = msgParts[4];
+                    }
+                    else if (msgParts[3] == "progress") e.progress = Number(msgParts[4])
+                    else console.log("unknown websocket message in part 3:" + msgParts[3], "full message:", msgParts)
+                    return;
+                }
+            }
         } else if (msgParts[1] == 'tokenization' && msgParts[2] == 'docbin') {
             if (msgParts[3] == 'progress') {
                 setTokenizationProgress(Number(msgParts[4]));
@@ -163,6 +191,12 @@ export default function ProjectSettings() {
                     timer(5000).subscribe(() => checkProjectTokenization());
                 }
             }
+        } else if (msgParts[1] == 'attributes_updated') {
+            refetchAttributesAndPostProcess();
+        } else if (msgParts[1] == 'project_update' && msgParts[2] == project.id) {
+            refetchProjectByProjectId({ variables: { projectId: project.id } }).then((res) => {
+                dispatch(setActiveProject(res.data["projectByProjectId"]));
+            });
         }
         else if (msgParts[1] == 'calculate_attribute') {
             if (msgParts[2] == 'started' && msgParts[3] == 'all') {

@@ -2,10 +2,10 @@ import LoadingIcon from "@/src/components/shared/loading/LoadingIcon";
 import Modal from "@/src/components/shared/modal/Modal";
 import { selectIsManaged } from "@/src/reduxStore/states/general";
 import { openModal, selectModal, setModalStates } from "@/src/reduxStore/states/modal";
-import { removeFromAllEmbeddingsById, selectEmbeddings } from "@/src/reduxStore/states/pages/settings";
+import { removeFromAllEmbeddingsById, selectAttributes, selectEmbeddings } from "@/src/reduxStore/states/pages/settings";
 import { selectProject } from "@/src/reduxStore/states/project";
 import { WebSocketsService } from "@/src/services/base/web-sockets/WebSocketsService";
-import { DELETE_EMBEDDING, DELETE_FROM_TASK_QUEUE } from "@/src/services/gql/mutations/project";
+import { DELETE_EMBEDDING, DELETE_FROM_TASK_QUEUE, UPDATE_EMBEDDING_PAYLOAD } from "@/src/services/gql/mutations/project";
 import { Embedding, EmbeddingState } from "@/src/types/components/projects/projectId/settings/embeddings";
 import { CurrentPage } from "@/src/types/shared/general";
 import { ModalButton, ModalEnum } from "@/src/types/shared/modal";
@@ -18,23 +18,31 @@ import { useRouter } from "next/router";
 import { useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import AddNewEmbedding from "./AddNewEmbedding";
+import Dropdown from "@/submodules/react-components/components/Dropdown";
 
 const ABORT_BUTTON = { useButton: true, disabled: false };
+const EDIT_BUTTON = { buttonCaption: 'Edit', useButton: true, disabled: false, closeAfterClick: false };
+const ACCEPT_BUTTON = { buttonCaption: 'Save', useButton: false, disabled: false, closeAfterClick: false };
 
 export default function Embeddings() {
     const dispatch = useDispatch();
     const router = useRouter();
-    const modalDeleteEmbedding = useSelector(selectModal(ModalEnum.DELETE_EMBEDDING));
 
+    const modalDeleteEmbedding = useSelector(selectModal(ModalEnum.DELETE_EMBEDDING));
+    const modalFilteredAttributes = useSelector(selectModal(ModalEnum.FILTERED_ATTRIBUTES));
+    const attributes = useSelector(selectAttributes);
     const isManaged = useSelector(selectIsManaged);
     const embeddings = useSelector(selectEmbeddings);
     const project = useSelector(selectProject);
 
     const [somethingLoading, setSomethingLoading] = useState(false);
     const [loadingEmbeddingsDict, setLoadingEmbeddingsDict] = useState<{ [key: string]: boolean }>({});
+    const [showEditOption, setShowEditOption] = useState(false);
+    const [filterAttributesUpdate, setFilterAttributesUpdate] = useState([]);
 
     const [refetchDeleteEmbedding] = useMutation(DELETE_EMBEDDING);
     const [refetchDeleteTaskQueue] = useMutation(DELETE_FROM_TASK_QUEUE);
+    const [updateEmbeddingPayloadMut] = useMutation(UPDATE_EMBEDDING_PAYLOAD);
 
     useEffect(() => {
         setSomethingLoading(false); // TODO add the condition
@@ -65,7 +73,39 @@ export default function Embeddings() {
         setAbortButton(abortButtonCopy);
     }, [modalDeleteEmbedding]);
 
+    const saveFilteredAttributes = useCallback(() => {
+        setShowEditOption(false);
+        dispatch(setModalStates(ModalEnum.FILTERED_ATTRIBUTES, { showEditOption: false }));
+        updateEmbeddingPayloadMut({ variables: { projectId: project.id, embeddingId: modalFilteredAttributes.embeddingId, filterAttributes: JSON.stringify(filterAttributesUpdate) } }).then((res) => {
+
+        });
+    }, [modalFilteredAttributes]);
+
+    const editFilteredAttributes = useCallback(() => {
+        setShowEditOption(true);
+        dispatch(setModalStates(ModalEnum.FILTERED_ATTRIBUTES, { showEditOption: true }));
+    }, [modalFilteredAttributes]);
+
+    useEffect(() => {
+        const editButtonCopy = jsonCopy(editButton);
+        editButtonCopy.emitFunction = editFilteredAttributes;
+        setEditButton(editButtonCopy);
+    }, [modalFilteredAttributes]);
+
+    useEffect(() => {
+        const editButtonCopy = jsonCopy(editButton);
+        editButtonCopy.useButton = !showEditOption;
+        setEditButton(editButtonCopy);
+        const acceptButtonCopy = jsonCopy(acceptButton);
+        acceptButtonCopy.useButton = showEditOption;
+        acceptButtonCopy.emitFunction = saveFilteredAttributes;
+        setAcceptButton(acceptButtonCopy);
+    }, [showEditOption]);
+
     const [abortButton, setAbortButton] = useState<ModalButton>(ABORT_BUTTON);
+    const [editButton, setEditButton] = useState<ModalButton>(EDIT_BUTTON);
+    const [acceptButton, setAcceptButton] = useState<ModalButton>(ACCEPT_BUTTON);
+
 
     function handleWebsocketNotification(msgParts: string[]) {
         if (msgParts[1] == 'embedding_updated') {
@@ -83,14 +123,16 @@ export default function Embeddings() {
 
     function prepareAttributeDataByNames(attributesNames: string[]) {
         if (!attributesNames) return [];
-        const attributes = [];
+        const attributesNew = [];
         for (let name of attributesNames) {
             const attribute = attributes.find((a) => a.name == name);
-            attribute.color = getColorForDataType(attribute.dataType);
-            attribute.dataTypeName = DATA_TYPES.find((type) => type.value === attribute.dataType).name;
-            attributes.push(attribute);
+            const attributeCopy = jsonCopy(attribute);
+            attributeCopy.color = getColorForDataType(attribute.dataType);
+            attributeCopy.dataTypeName = DATA_TYPES.find((type) => type.value === attribute.dataType).name;
+            attributeCopy.checked = true;
+            attributesNew.push(attributeCopy);
         }
-        return attributes;
+        return attributesNew;
     }
 
     return (<div className="mt-8">
@@ -137,7 +179,7 @@ export default function Embeddings() {
                                         {!loadingEmbeddingsDict[embedding.id] ?
                                             <td className="whitespace-nowrap text-center px-3 py-2 text-sm text-gray-500 flex justify-center">
                                                 <Tooltip content={embedding.filterAttributes && embedding.filterAttributes.length > 0 ? 'Has filtered attributes' : 'No filter attributes'} color="invert" >
-                                                    <IconNotes onClick={() => dispatch(setModalStates(ModalEnum.FILTERED_ATTRIBUTES, { embeddingId: embedding.id, open: true, attributeName: prepareAttributeDataByNames(embedding.filterAttributes) }))}
+                                                    <IconNotes onClick={() => dispatch(setModalStates(ModalEnum.FILTERED_ATTRIBUTES, { embeddingId: embedding.id, open: true, attributeNames: prepareAttributeDataByNames(embedding.filterAttributes), showEditOption: showEditOption }))}
                                                         className={`h-6 w-6 ${embedding.filterAttributes ? 'text-gray-700' : 'text-gray-300'}`} />
                                                 </Tooltip>
                                             </td> : <td><LoadingIcon /></td>}
@@ -195,7 +237,7 @@ export default function Embeddings() {
                     </button>
                 </Tooltip>
                 <Tooltip content={!isManaged ? 'Check out our hosted version to use this function' : 'See which models are downloaded'} color="invert" placement="right">
-                    <button disabled={!isManaged} onClick={() => router.push('/model-download')}
+                    <button disabled={!isManaged} onClick={() => router.push('/models-download')}
                         className={`"ml-1 inline-block items-center px-2.5 py-1.5 border border-gray-300 shadow-sm text-xs font-semibold rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none cursor-pointer ${!isManaged ? 'opacity-50 cursor-not-allowed' : 'opacity-100 cursor-pointer'}`}>
                         <IconArrowAutofitDown className="h-5 w-5 inline-block mr-1" />
                         See downloaded models
@@ -203,14 +245,33 @@ export default function Embeddings() {
                 </Tooltip>
             </div>
         </div>
-        <Modal modalName={ModalEnum.FILTERED_ATTRIBUTES}>
-
+        <Modal modalName={ModalEnum.FILTERED_ATTRIBUTES} acceptButton={acceptButton} backButton={editButton}>
+            <div className="flex flex-grow justify-center text-lg leading-6 text-gray-900 font-medium">
+                Edit embedding with filter attributes</div>
+            <div className="my-2 flex flex-grow justify-center text-sm text-gray-500 text-center">
+                List of filter attributes selected when creating an embedding</div>
+            {modalFilteredAttributes.attributeNames && modalFilteredAttributes.attributeNames.length == 0 ? <div className="text-xs text-gray-500 text-center italic">No filter attributes selected</div> : <div className="flex justify-center items-center">
+                {modalFilteredAttributes.attributeNames.map((attribute) => (
+                    <Tooltip content={attribute.dataType} color="invert" placement="top" key={attribute.id}>
+                        <span className={`border items-center px-2 py-0.5 rounded text-xs font-medium text-center mr-2 bg-${attribute.color}-100 text-${attribute.color}-700 border-${attribute.color}-400 hover:bg-${attribute.color}-200`}>{attribute.name}</span>
+                    </Tooltip>
+                ))}
+            </div>}
+            {modalFilteredAttributes.showEditOption && <div className="mt-3">
+                <div className="text-xs text-gray-500 text-center italic">Add or remove filter attributes</div>
+                <Dropdown options={modalFilteredAttributes.attributeNames.map(a => a.name)} buttonName={modalFilteredAttributes.attributeNames.length == 0 ? 'None selected' : modalFilteredAttributes.attributeNames.map(a => a.name).join(',')} hasCheckboxes={true}
+                    selectedCheckboxes={modalFilteredAttributes.attributeNames.map(a => a.checked)}
+                    selectedOption={(option: any) => {
+                        setFilterAttributesUpdate(option.filter((a: any) => a.checked).map((a: any) => a.name));
+                    }} />
+            </div>}
         </Modal>
         <Modal modalName={ModalEnum.DELETE_EMBEDDING} abortButton={abortButton}>
             <div className="flex flex-grow justify-center text-lg leading-6 text-gray-900 font-medium">
                 Warning </div>
             <p className="mt-2 text-gray-500 text-sm">Are you sure you want to {modalDeleteEmbedding.isQueuedElement ? 'dequeue' : 'delete'} this embedding?</p>
             {!modalDeleteEmbedding.isQueuedElement && <p className="mt-2 text-gray-500 text-sm">This will delete all corresponding tensors!</p>}
+
         </Modal>
         <AddNewEmbedding />
     </div>);

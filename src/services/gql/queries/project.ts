@@ -178,3 +178,9 @@ query ($projectId: ID) {
   }
 } 
 `;
+
+export const GET_ZERO_SHOT_RECOMMENDATIONS = gql`
+query ($projectId: ID) {
+  zeroShotRecommendations(projectId: $projectId)
+}
+`;

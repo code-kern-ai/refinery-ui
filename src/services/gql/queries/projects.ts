@@ -66,3 +66,17 @@ query ($projectId: ID!, $uploadTaskId: ID!) {
   }
 }
 `;
+
+export const GET_MODEL_PROVIDER_INFO = gql`
+query{
+  modelProviderInfo {
+    name
+    revision
+    link
+    date
+    size
+    status
+    zeroShotPipeline
+  }
+}
+`;

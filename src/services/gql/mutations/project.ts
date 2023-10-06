@@ -64,3 +64,11 @@ mutation($projectId: ID!, $attributeId: ID!, $config: JSONString!) {
   }
 }  
 `;
+
+export const UPDATE_EMBEDDING_PAYLOAD = gql`
+mutation($projectId: ID!, $embeddingId: ID!, $filterAttributes: JSONString!) {
+  updateEmbeddingPayload(projectId: $projectId, embeddingId: $embeddingId, filterAttributes: $filterAttributes) {
+    ok
+  }
+}
+`;

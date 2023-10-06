@@ -52,6 +52,7 @@ const initialState: Modals = {
         open: false,
         embeddingId: '',
         attributeNames: [],
+        showEditOption: false
     },
     [ModalEnum.DELETE_EMBEDDING]: {
         open: false,
@@ -61,6 +62,13 @@ const initialState: Modals = {
     [ModalEnum.ADD_EMBEDDING]: {
         open: false
     },
+    [ModalEnum.DELETE_MODEL_DOWNLOAD]: {
+        open: false,
+        modelName: '',
+    },
+    [ModalEnum.ADD_MODEL_DOWNLOAD]: {
+        open: false
+    }
 };
 
 const modalSlice = createSlice({
