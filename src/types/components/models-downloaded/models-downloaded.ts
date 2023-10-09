@@ -8,6 +8,7 @@ export type ModelsDownloaded = {
     zeroShotPipeline: boolean;
     sizeFormatted: string;
     parseDate: string;
+    prio: number;
 };
 
 export enum ModelsDownloadedStatus {

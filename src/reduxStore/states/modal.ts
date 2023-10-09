@@ -67,7 +67,8 @@ const initialState: Modals = {
         modelName: '',
     },
     [ModalEnum.ADD_MODEL_DOWNLOAD]: {
-        open: false
+        open: false,
+        modelName: '',
     }
 };
 
