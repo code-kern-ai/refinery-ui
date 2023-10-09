@@ -79,6 +79,13 @@ const initialState: Modals = {
         targetAttribute: '',
         taskName: ''
     },
+    [ModalEnum.ADD_LABEL]: {
+        open: false,
+    },
+    [ModalEnum.DELETE_LABEL]: {
+        open: false,
+        labelId: '',
+    },
 };
 
 const modalSlice = createSlice({

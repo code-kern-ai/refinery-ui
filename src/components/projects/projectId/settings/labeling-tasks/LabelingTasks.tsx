@@ -4,7 +4,7 @@ import { removeFromAllLabelingTasksById, selectLabelingTasksAll, selectUsableAtt
 import { selectProject } from "@/src/reduxStore/states/project";
 import { CREATE_LABELING_TASK, DELETE_LABELING_TASK, UPDATE_LABELING_TASK } from "@/src/services/gql/mutations/project";
 import { GET_LABELING_TASKS_BY_PROJECT_ID } from "@/src/services/gql/queries/project";
-import { LabelingTask, LabelingTaskTaskType } from "@/src/types/components/projects/projectId/settings/labeling-tasks";
+import { LabelColors, LabelType, LabelingTask, LabelingTaskTaskType } from "@/src/types/components/projects/projectId/settings/labeling-tasks";
 import { ModalButton, ModalEnum } from "@/src/types/shared/modal";
 import { LabelHelper } from "@/src/util/classes/label-helper";
 import { labelingTaskFromString, labelingTaskToString, postProcessLabelingTasks, postProcessLabelingTasksSchema } from "@/src/util/components/projects/projectId/settings/labeling-tasks-helper";
@@ -12,12 +12,15 @@ import { jsonCopy } from "@/submodules/javascript-functions/general";
 import Dropdown from "@/submodules/react-components/components/Dropdown";
 import { useLazyQuery, useMutation } from "@apollo/client";
 import { Tooltip } from "@nextui-org/react";
-import { IconPlus, IconTrash } from "@tabler/icons-react";
+import { IconColorPicker, IconPlus, IconTrash } from "@tabler/icons-react";
 import { use, useCallback, useEffect, useState } from "react"
 import { useDispatch, useSelector } from "react-redux";
 
 const ABORT_BUTTON = { buttonCaption: 'Delete labeling task', disabled: false, useButton: true };
 const ACCEPT_BUTTON = { buttonCaption: 'Add labeling task', useButton: true };
+
+const ABORT_BUTTON_LABEL = { buttonCaption: 'Delete label', disabled: false, useButton: true };
+const ACCEPT_BUTTON_LABEL = { buttonCaption: 'Add label', useButton: true };
 
 export default function LabelingTasks() {
     const dispatch = useDispatch();
@@ -25,6 +28,8 @@ export default function LabelingTasks() {
     const labelingTasksSchema = useSelector(selectLabelingTasksAll);
     const modalDeleteLabelingTask = useSelector(selectModal(ModalEnum.DELETE_LABELING_TASK));
     const modalAddLabelingTask = useSelector(selectModal(ModalEnum.ADD_LABELING_TASK));
+    const modalDeleteLabel = useSelector(selectModal(ModalEnum.DELETE_LABEL));
+    const modalAddLabel = useSelector(selectModal(ModalEnum.ADD_LABEL));
     const usableAttributes = useSelector(selectUsableAttributes);
 
     const [labelingTasksDropdownArray, setLabelingTasksDropdownArray] = useState<{ name: string, value: string }[]>([]);
@@ -73,13 +78,23 @@ export default function LabelingTasks() {
         });
     }, [modalAddLabelingTask]);
 
+    const deleteLabel = useCallback(() => {
+    }, [modalDeleteLabel]);
+
+    const addLabel = useCallback(() => {
+    }, [modalAddLabel]);
+
     useEffect(() => {
         setAbortButton({ ...ABORT_BUTTON, emitFunction: deleteLabelingTask });
         setAcceptButton({ ...ACCEPT_BUTTON, emitFunction: addLabelingTask, disabled: (modalAddLabelingTask.taskName == '' || modalAddLabelingTask.targetAttribute == '') || !isTaskNameUnique(modalAddLabelingTask.taskName) });
-    }, [modalDeleteLabelingTask, modalAddLabelingTask]);
+        setAcceptButtonLabel({ ...ACCEPT_BUTTON_LABEL, emitFunction: addLabel });
+        setAbortButtonLabel({ ...ABORT_BUTTON_LABEL, emitFunction: deleteLabel });
+    }, [modalDeleteLabelingTask, modalAddLabelingTask, modalAddLabel, modalDeleteLabel]);
 
     const [abortButton, setAbortButton] = useState<ModalButton>(ABORT_BUTTON);
     const [acceptButton, setAcceptButton] = useState<ModalButton>(ACCEPT_BUTTON);
+    const [abortButtonLabel, setAbortButtonLabel] = useState<ModalButton>(ABORT_BUTTON_LABEL);
+    const [acceptButtonLabel, setAcceptButtonLabel] = useState<ModalButton>(ACCEPT_BUTTON_LABEL);
 
     function onlyLabelsChanged(tasks: any): boolean {
         if (labelingTasksSchema.length == 0) return false;
@@ -195,7 +210,19 @@ export default function LabelingTasks() {
                                             selectedOption={(option: string) => updateLabelingTaskType(task, index, labelingTaskFromString(option))} />
                                     </td>
                                     <td className="flex flex-wrap justify-center items-center px-3 py-2 text-sm text-gray-500">
-                                        ADD LABELS
+                                        {task.labels.map((label: LabelType) => (
+                                            <div className={`inline-flex border items-center mx-1.5 px-1.5 py-0.5 rounded-md text-sm font-medium ${label.color.backgroundColor} ${label.color.textColor} ${label.color.borderColor} ${label.color.hoverColor}`}>
+                                                <IconColorPicker className="h-4 w-4 mr-1 cursor-pointer" />
+                                                <span>{label.name}</span>
+                                                {label.hotkey && <kbd className="ml-2 uppercase inline-flex items-center border bg-white border-gray-200 rounded px-2 text-sm font-sans font-medium text-gray-400">{label.hotkey}</kbd>}
+                                                <IconTrash className="h-4 w-4 ml-1 cursor-pointer" />
+                                            </div>
+                                        ))}
+
+                                        <span
+                                            className="bg-gray-100 text-gray-800 cursor-pointer p-1 rounded-md hover:bg-gray-300">
+                                            <IconPlus className="cursor-pointer" />
+                                        </span>
                                     </td>
                                     <td className="whitespace-nowrap text-center px-3 py-2 text-sm text-gray-500">
                                         <IconTrash onClick={() => dispatch(setModalStates(ModalEnum.DELETE_LABELING_TASK, { taskId: task.id, open: true }))}
@@ -246,6 +273,14 @@ export default function LabelingTasks() {
                     if (event.key == 'Enter') addLabelingTask();
                 }} className="h-8 w-full border-gray-300 rounded-md placeholder-italic border text-gray-900 pl-4 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100" />
             </div>
+        </Modal>
+
+        <Modal modalName={ModalEnum.DELETE_LABEL} abortButton={abortButtonLabel}>
+
+        </Modal>
+
+        <Modal modalName={ModalEnum.ADD_LABEL} acceptButton={acceptButtonLabel}>
+
         </Modal>
     </div>
     )

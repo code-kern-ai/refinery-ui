@@ -14,6 +14,13 @@ export type LabelingTask = {
     targetName?: string;
 };
 
+export type LabelType = {
+    id: string;
+    name: string;
+    color: LabelColors;
+    hotkey: string;
+}
+
 export type LabelColors = {
     name: string,
     backgroundColor: string,
