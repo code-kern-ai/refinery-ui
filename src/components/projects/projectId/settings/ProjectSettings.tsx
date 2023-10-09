@@ -4,7 +4,7 @@ import { selectProject, setActiveProject } from "@/src/reduxStore/states/project
 import { useLazyQuery, useMutation } from "@apollo/client";
 import { CHECK_COMPOSITE_KEY, GET_ATTRIBUTES_BY_PROJECT_ID, GET_EMBEDDING_SCHEMA_BY_PROJECT_ID, GET_PROJECT_TOKENIZATION, GET_QUEUED_TASKS, GET_RECOMMENDED_ENCODERS_FOR_EMBEDDINGS } from "@/src/services/gql/queries/project";
 import { useCallback, useEffect, useState } from "react";
-import { selectAttributes, selectEmbeddings, setAllAttributes, setAllEmbeddings, setAllRecommendedEncodersDict, setRecommendedEncodersAll, setUseableEmbedableAttributes, setUseableNonTextAttributes } from "@/src/reduxStore/states/pages/settings";
+import { selectAttributes, selectEmbeddings, setAllAttributes, setAllEmbeddings, setAllRecommendedEncodersDict, setAllUsableAttributes, setRecommendedEncodersAll, setUseableEmbedableAttributes, setUseableNonTextAttributes } from "@/src/reduxStore/states/pages/settings";
 import { timer } from "rxjs";
 import { IconCamera, IconCheck, IconDots, IconPlus, IconUpload } from "@tabler/icons-react";
 import Modal from "@/src/components/shared/modal/Modal";
@@ -29,6 +29,7 @@ import { DATA_TYPES, postProcessingAttributes } from "@/src/util/components/proj
 import { postProcessingEmbeddings, postProcessingRecommendedEncoders } from "@/src/util/components/projects/projectId/settings/embeddings-helper";
 import { AttributeState } from "@/src/types/components/projects/projectId/settings/data-schema";
 import { RecommendedEncoder } from "@/src/types/components/projects/projectId/settings/embeddings";
+import LabelingTasks from "./labeling-tasks/LabelingTasks";
 
 const ACCEPT_BUTTON = { buttonCaption: "Accept", useButton: true, disabled: true }
 
@@ -98,6 +99,7 @@ export default function ProjectSettings() {
             dispatch(setAllAttributes(postProcessingAttributes(res.data['attributesByProjectId'])));
             dispatch(setUseableEmbedableAttributes(attributes));
             dispatch(setUseableNonTextAttributes(attributes));
+            dispatch(setAllUsableAttributes(attributes));
         });
     }
 
@@ -212,6 +214,7 @@ export default function ProjectSettings() {
                     dispatch(setAllAttributes(postProcessingAttributes(res.data['attributesByProjectId'])));
                     dispatch(setUseableEmbedableAttributes(attributes));
                     dispatch(setUseableNonTextAttributes(attributes));
+                    dispatch(setAllUsableAttributes(attributes));
                     setIsAcRunning(checkIfAcRunning());
                 });
                 if (msgParts[2] == 'finished') timer(5000).subscribe(() => checkProjectTokenization());
@@ -243,7 +246,7 @@ export default function ProjectSettings() {
                             Upload records
                         </button>
                     </Tooltip>
-                    {/* TODO: Add option to export records */}
+                    {/* TODO: Add option to export records -> together with data browser */}
                     <Tooltip content="Creates a snapshot compressed file of your current project" placement="bottom" color="invert">
                         <button onClick={() => dispatch(openModal(ModalEnum.PROJECT_SNAPSHOT))}
                             className="mr-1 inline-flex items-center px-2.5 py-1.5 border border-gray-300 shadow-sm text-xs font-semibold rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none cursor-pointer">
@@ -280,6 +283,7 @@ export default function ProjectSettings() {
             </div>
 
             <Embeddings />
+            <LabelingTasks />
             {isManaged && <GatesIntegration />}
             <ProjectMetaData />
 

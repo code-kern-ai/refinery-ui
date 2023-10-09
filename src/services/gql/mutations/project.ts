@@ -72,3 +72,27 @@ mutation($projectId: ID!, $embeddingId: ID!, $filterAttributes: JSONString!) {
   }
 }
 `;
+
+export const UPDATE_LABELING_TASK = gql`
+mutation ($projectId: ID!, $labelingTaskId: ID!, $labelingTaskName: String!, $labelingTaskType: String!, $labelingTaskTargetId: ID) {
+  updateLabelingTask(projectId: $projectId, labelingTaskId: $labelingTaskId, labelingTaskName: $labelingTaskName, labelingTaskType: $labelingTaskType, labelingTaskTargetId: $labelingTaskTargetId) {
+    ok
+  }
+}
+`;
+
+export const DELETE_LABELING_TASK = gql`
+mutation ($projectId: ID!, $labelingTaskId: ID!) {
+  deleteLabelingTask(projectId: $projectId, labelingTaskId: $labelingTaskId) {
+    ok
+  }
+}
+`;
+
+export const CREATE_LABELING_TASK = gql`
+mutation ($projectId: ID!, $labelingTaskName: String!,$labelingTaskType:String!, $labelingTaskTargetId: ID) {
+  createLabelingTask(projectId: $projectId, labelingTaskName: $labelingTaskName,labelingTaskType:$labelingTaskType, labelingTaskTargetId: $labelingTaskTargetId) {
+    ok
+  }
+}
+`;

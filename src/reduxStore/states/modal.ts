@@ -69,7 +69,16 @@ const initialState: Modals = {
     [ModalEnum.ADD_MODEL_DOWNLOAD]: {
         open: false,
         modelName: '',
-    }
+    },
+    [ModalEnum.DELETE_LABELING_TASK]: {
+        open: false,
+        taskId: '',
+    },
+    [ModalEnum.ADD_LABELING_TASK]: {
+        open: false,
+        targetAttribute: '',
+        taskName: ''
+    },
 };
 
 const modalSlice = createSlice({

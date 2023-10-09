@@ -1,5 +1,6 @@
 import { Attribute, AttributeState } from '@/src/types/components/projects/projectId/settings/data-schema';
 import { Embedding, RecommendedEncoder } from '@/src/types/components/projects/projectId/settings/embeddings';
+import { LabelingTask } from '@/src/types/components/projects/projectId/settings/labeling-tasks';
 import { DataTypeEnum } from '@/src/types/shared/general';
 import { createSlice } from '@reduxjs/toolkit'
 import type { PayloadAction } from '@reduxjs/toolkit'
@@ -9,12 +10,16 @@ type SettingsState = {
         all: Attribute[];
         useableEmbedableAttributes: Attribute[];
         useableNonTextAttributes: Attribute[];
+        usableAttributes: any[];
     },
     embeddings: {
         all: Embedding[];
     },
     recommendedEncodersDict: { [embeddingId: string]: RecommendedEncoder };
     recommendedEncodersAll: RecommendedEncoder[];
+    labelingTasks: {
+        all: LabelingTask[];
+    }
 }
 
 function getInitState(): SettingsState {
@@ -22,13 +27,17 @@ function getInitState(): SettingsState {
         attributes: {
             all: [],
             useableEmbedableAttributes: [],
-            useableNonTextAttributes: []
+            useableNonTextAttributes: [],
+            usableAttributes: []
         },
         embeddings: {
             all: []
         },
         recommendedEncodersDict: {},
-        recommendedEncodersAll: []
+        recommendedEncodersAll: [],
+        labelingTasks: {
+            all: []
+        }
     };
 }
 
@@ -80,6 +89,24 @@ const settingsSlice = createSlice({
                 state.attributes.all.filter((attribute) => attribute.dataType !== DataTypeEnum.TEXT &&
                     (attribute.state === AttributeState.UPLOADED || attribute.state === AttributeState.AUTOMATICALLY_CREATED || attribute.state === AttributeState.USABLE));
             else state.attributes.useableNonTextAttributes = [];
+        },
+        setLabelingTasksAll(state, action: PayloadAction<LabelingTask[]>) {
+            if (action.payload) state.labelingTasks.all = action.payload;
+            else state.labelingTasks.all = [];
+        },
+        removeFromAllLabelingTasksById(state, action: PayloadAction<string>) {
+            if (action.payload) state.labelingTasks.all = state.labelingTasks.all.filter((labelingTask) => labelingTask.id !== action.payload);
+        },
+        setAllUsableAttributes(state, action: PayloadAction<Attribute[]>) {
+            if (action.payload) {
+                const fullRecordEl = {
+                    id: '@@NO_ATTRIBUTE@@',
+                    name: 'Full Record'
+                }
+                const filterFromAll = state.attributes.all.filter((attribute) => (attribute.state === AttributeState.UPLOADED || attribute.state === AttributeState.AUTOMATICALLY_CREATED || attribute.state === AttributeState.USABLE));
+                state.attributes.usableAttributes = [fullRecordEl, ...filterFromAll];
+            }
+            else state.attributes.usableAttributes = [];
         }
     }
 });
@@ -91,6 +118,8 @@ export const selectUseableEmbedableAttributes = (state) => state.settings.attrib
 export const selectRecommendedEncodersDict = (state) => state.settings.recommendedEncodersDict;
 export const selectRecommendedEncodersAll = (state) => state.settings.recommendedEncodersAll;
 export const selectUsableNonTextAttributes = (state) => state.settings.attributes.useableNonTextAttributes;
+export const selectLabelingTasksAll = (state) => state.settings.labelingTasks.all;
+export const selectUsableAttributes = (state) => state.settings.attributes.usableAttributes;
 
-export const { setAllAttributes, extendAllAttributes, removeFromAllAttributesById, updateAttributeById, setAllEmbeddings, removeFromAllEmbeddingsById, setUseableEmbedableAttributes, setAllRecommendedEncodersDict, setRecommendedEncodersAll, setUseableNonTextAttributes } = settingsSlice.actions;
+export const { setAllAttributes, extendAllAttributes, removeFromAllAttributesById, updateAttributeById, setAllEmbeddings, removeFromAllEmbeddingsById, setUseableEmbedableAttributes, setAllRecommendedEncodersDict, setRecommendedEncodersAll, setUseableNonTextAttributes, setLabelingTasksAll, removeFromAllLabelingTasksById, setAllUsableAttributes } = settingsSlice.actions;
 export const settingsReducer = settingsSlice.reducer;

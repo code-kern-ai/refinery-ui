@@ -20,7 +20,6 @@ export default function ProjectOverview() {
     const [projectStats, setProjectStats] = useState<ProjectStats>(PROJECT_STATS_INITIAL_STATE);
     const [graphsHaveValues, setGraphsHaveValues] = useState<boolean>(false);
 
-    const [refetchLabelingTasksByProjectId] = useLazyQuery(GET_LABELING_TASKS_BY_PROJECT_ID, { fetchPolicy: "network-only" });
     const [refetchProjectStats] = useLazyQuery(GET_GENERAL_PROJECT_STATS, { fetchPolicy: "no-cache" });
 
     useEffect(() => {
