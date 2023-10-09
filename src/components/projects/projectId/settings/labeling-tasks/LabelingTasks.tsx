@@ -211,7 +211,7 @@ export default function LabelingTasks() {
                                     </td>
                                     <td className="flex flex-wrap justify-center items-center px-3 py-2 text-sm text-gray-500">
                                         {task.labels.map((label: LabelType) => (
-                                            <div className={`inline-flex border items-center mx-1.5 px-1.5 py-0.5 rounded-md text-sm font-medium ${label.color.backgroundColor} ${label.color.textColor} ${label.color.borderColor} ${label.color.hoverColor}`}>
+                                            <div key={label.id} className={`inline-flex border items-center mx-1.5 px-1.5 py-0.5 rounded-md text-sm font-medium ${label.color.backgroundColor} ${label.color.textColor} ${label.color.borderColor} ${label.color.hoverColor}`}>
                                                 <IconColorPicker className="h-4 w-4 mr-1 cursor-pointer" />
                                                 <span>{label.name}</span>
                                                 {label.hotkey && <kbd className="ml-2 uppercase inline-flex items-center border bg-white border-gray-200 rounded px-2 text-sm font-sans font-medium text-gray-400">{label.hotkey}</kbd>}
