@@ -127,7 +127,7 @@ export default function Sidebar() {
                                     </a>
                                 </div>
                                 <div>
-                                    {project && project.id ? (<div>
+                                    {project && project.id && currentPage ? (<div>
                                         {user.role === UserRole.ENGINEER && <div
                                             className="flex items-center justify-center overflow-visible">
                                             <Tooltip placement="right" trigger="hover" color="invert" content="Overview">
@@ -181,7 +181,7 @@ export default function Sidebar() {
                                             <Tooltip placement="right" trigger="hover" color="invert" content="Settings">
                                                 <div className={`relative z-50 ${project.numDataScaleUploaded == 0 ? 'opacity-50 cursor-not-allowed pointer-events-none' : 'opacity-100 cursor-pointer'}`}>
                                                     <a rel="noopener noreferrer" href={`/refinery/projects/${project.id}/settings`}
-                                                        className={`circle ${currentPage == CurrentPage.SETTINGS ? 'text-kernpurple' : 'text-white'}`}>
+                                                        className={`circle ${(currentPage == CurrentPage.SETTINGS || currentPage == CurrentPage.ATTRIBUTE_CALCULATION) ? 'text-kernpurple' : 'text-white'}`}>
                                                         <IconSettings className="w-6 h-6" />
                                                     </a>
                                                 </div>

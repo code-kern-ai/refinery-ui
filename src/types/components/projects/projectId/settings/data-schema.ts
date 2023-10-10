@@ -19,6 +19,7 @@ export type Attribute = {
     active?: boolean;
     negate?: boolean;
     color?: string;
+    visibilityName?: string;
 }
 
 export type AttributeVisibilityStates = {

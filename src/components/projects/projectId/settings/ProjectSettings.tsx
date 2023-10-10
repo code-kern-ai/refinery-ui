@@ -23,7 +23,7 @@ import ProjectSnapshotExport from "./ProjectSnapshotExport";
 import { Tooltip } from "@nextui-org/react";
 import ProjectMetaData from "./ProjectMetaData";
 import GatesIntegration from "./GatesIntegration";
-import { selectIsManaged } from "@/src/reduxStore/states/general";
+import { selectIsManaged, setCurrentPage } from "@/src/reduxStore/states/general";
 import Embeddings from "./embeddings/Embeddings";
 import { DATA_TYPES, findFreeAttributeName, postProcessingAttributes } from "@/src/util/components/projects/projectId/settings/data-schema-helper";
 import { postProcessingEmbeddings, postProcessingRecommendedEncoders } from "@/src/util/components/projects/projectId/settings/embeddings-helper";
@@ -86,6 +86,7 @@ export default function ProjectSettings() {
             const id = res?.data?.createUserAttribute.attributeId;
             if (id) {
                 localStorage.setItem('isNewAttribute', "X");
+                dispatch(setCurrentPage(CurrentPage.ATTRIBUTE_CALCULATION));
                 router.push(`/projects/${project.id}/attributes/${id}`);
             }
         });

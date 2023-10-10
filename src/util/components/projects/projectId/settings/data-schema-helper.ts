@@ -36,6 +36,7 @@ export function postProcessingAttributes(attributes: Attribute[]): Attribute[] {
     preparedAttributes.forEach((attribute: any) => {
         attribute.dataTypeName = DATA_TYPES.find((type) => type.value === attribute?.dataType).name;
         attribute.visibilityIndex = ATTRIBUTES_VISIBILITY_STATES.findIndex((type) => type.value === attribute?.visibility);
+        attribute.visibilityName = ATTRIBUTES_VISIBILITY_STATES.find((type) => type.value === attribute.visibility).name;
     });
     return preparedAttributes;
 }
@@ -59,6 +60,5 @@ export function findFreeAttributeName(attributes: Attribute[]): string {
         const match = item.name.match(regEx);
         if (match) counterList.push(parseInt(match[1]));
     }
-    console.log("attribute_" + (counterList.length > 0 ? (Math.max(...counterList) + 1) : (attributes.length + 1)))
     return "attribute_" + (counterList.length > 0 ? (Math.max(...counterList) + 1) : (attributes.length + 1));
 }

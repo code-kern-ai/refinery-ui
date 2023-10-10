@@ -1,9 +1,11 @@
 import LoadingIcon from "@/src/components/shared/loading/LoadingIcon";
 import Statuses from "@/src/components/shared/statuses/Statuses";
+import { setCurrentPage } from "@/src/reduxStore/states/general";
 import { selectAttributes, updateAttributeById } from "@/src/reduxStore/states/pages/settings";
 import { selectProject } from "@/src/reduxStore/states/project";
 import { UPDATE_ATTRIBUTE } from "@/src/services/gql/mutations/project";
 import { Attribute, DataSchemaProps } from "@/src/types/components/projects/projectId/settings/data-schema";
+import { CurrentPage } from "@/src/types/shared/general";
 import { ATTRIBUTES_VISIBILITY_STATES, getTooltipVisibilityState } from "@/src/util/components/projects/projectId/settings/data-schema-helper";
 import { jsonCopy } from "@/submodules/javascript-functions/general";
 import Dropdown from "@/submodules/react-components/components/Dropdown";
@@ -130,7 +132,10 @@ export default function DataSchema(props: DataSchemaProps) {
                                         </td>
                                         <td className="text-center px-3 py-2 text-sm text-gray-500">
                                             {attribute.userCreated ? <button type="button" className="text-green-800 text-sm font-medium"
-                                                onClick={() => router.push(`/projects/${project.id}/attributes/${attribute.id}`)}>
+                                                onClick={() => {
+                                                    dispatch(setCurrentPage(CurrentPage.ATTRIBUTE_CALCULATION));
+                                                    router.push(`/projects/${project.id}/attributes/${attribute.id}`);
+                                                }}>
                                                 <span className="leading-5">Details</span>
                                                 <IconArrowRight className="h-5 w-5 inline-block text-green-800" />
                                             </button> : <label className="text-gray-500 italic">Not changeable</label>}
