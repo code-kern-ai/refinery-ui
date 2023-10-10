@@ -29,16 +29,19 @@ export default function GatesIntegration() {
     useEffect(() => {
         setGatesLink(window.location.origin + '/gates/project/' + project.id + "/prediction");
         refetchAndSetGatesIntegrationData();
-        WebSocketsService.subscribeToNotification(CurrentPage.SETTINGS, {
-            projectId: project.id,
-            whitelist: ['gates_integration', 'information_source_deleted', 'information_source_updated', 'tokenization', 'embedding', 'embedding_deleted'],
-            func: handleWebsocketNotification
-        })
     }, []);
 
     const updateProjectForGates = useCallback(() => {
         updateProjectsGatesMut({ variables: { projectId: project.id } }).then(() => { });
     }, []);
+
+    useEffect(() => {
+        WebSocketsService.subscribeToNotification(CurrentPage.SETTINGS, {
+            projectId: project.id,
+            whitelist: ['gates_integration', 'information_source_deleted', 'information_source_updated', 'tokenization', 'embedding', 'embedding_deleted'],
+            func: handleWebsocketNotification
+        })
+    }, [updateProjectForGates]);
 
     useEffect(() => {
         setAcceptButton({ ...ACCEPT_BUTTON, emitFunction: updateProjectForGates });

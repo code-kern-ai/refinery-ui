@@ -51,3 +51,14 @@ export function getColorForDataType(dataType): string {
         default: return 'gray';
     }
 }
+
+export function findFreeAttributeName(attributes: Attribute[]): string {
+    const regEx = "^attribute_([0-9]+)$"
+    let counterList = [];
+    for (const item of attributes) {
+        const match = item.name.match(regEx);
+        if (match) counterList.push(parseInt(match[1]));
+    }
+    console.log("attribute_" + (counterList.length > 0 ? (Math.max(...counterList) + 1) : (attributes.length + 1)))
+    return "attribute_" + (counterList.length > 0 ? (Math.max(...counterList) + 1) : (attributes.length + 1));
+}

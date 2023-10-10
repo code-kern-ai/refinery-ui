@@ -27,15 +27,6 @@ export class LabelHelper {
         LabelHelper.colorOptions.forEach(color => LabelHelper.labelColorOptions.push(LabelHelper.getColorStruct(color)));
     }
 
-    public static setLabelMap(tasks: any[]) {
-        this.labelMap.clear();
-        tasks.forEach((task) => {
-            task.labels.sort((a, b) => a.name.localeCompare(b.name));
-            task.labels = task.labels.map((label) => LabelHelper.extendLabelForColor({ ...label }));
-            this.labelMap.set(task.id, task.labels);
-        });
-    }
-
     public static addLabel(
         taskId: string,
         labelName: string,
@@ -56,14 +47,6 @@ export class LabelHelper {
         }
         return labelColor;
     }
-
-    public static handleLabelRenameWarning(warning: any) {
-        if (warning == null) return;
-        // this.projectApolloService
-        //     .handleLabelRenameWarning(this.settings.project.id, JSON.stringify(warning)).pipe(first())
-        //     .subscribe((x) => this.checkRenameLabel());
-    }
-
 
     public static extendLabelForColor(label: any): any {
         if (label.color) label.color = this.getColorStruct(label.color);

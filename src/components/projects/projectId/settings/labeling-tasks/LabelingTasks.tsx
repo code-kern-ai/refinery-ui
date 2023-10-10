@@ -2,9 +2,11 @@ import Modal from "@/src/components/shared/modal/Modal";
 import { openModal, selectModal, setModalStates } from "@/src/reduxStore/states/modal";
 import { removeFromAllLabelingTasksById, removeLabelFromLabelingTask, selectLabelingTasksAll, selectUsableAttributes, setLabelingTasksAll } from "@/src/reduxStore/states/pages/settings";
 import { selectProject } from "@/src/reduxStore/states/project";
+import { WebSocketsService } from "@/src/services/base/web-sockets/WebSocketsService";
 import { CREATE_LABEL, CREATE_LABELING_TASK, DELETE_LABEL, DELETE_LABELING_TASK, HANDLE_LABEL_RENAME_WARNING, UPDATE_LABELING_TASK, UPDATE_LABEL_COLOR, UPDATE_LABEL_HOTKEY, UPDATE_LABEL_NAME } from "@/src/services/gql/mutations/project";
 import { CHECK_RENAME_LABEL, GET_LABELING_TASKS_BY_PROJECT_ID } from "@/src/services/gql/queries/project";
 import { LabelColors, LabelType, LabelingTask, LabelingTaskTaskType } from "@/src/types/components/projects/projectId/settings/labeling-tasks";
+import { CurrentPage } from "@/src/types/shared/general";
 import { ModalButton, ModalEnum } from "@/src/types/shared/modal";
 import { LabelHelper } from "@/src/util/classes/label-helper";
 import { labelingTaskFromString, labelingTaskToString, postProcessLabelingTasks, postProcessLabelingTasksSchema } from "@/src/util/components/projects/projectId/settings/labeling-tasks-helper";
@@ -12,7 +14,7 @@ import { jsonCopy } from "@/submodules/javascript-functions/general";
 import Dropdown from "@/submodules/react-components/components/Dropdown";
 import { useLazyQuery, useMutation } from "@apollo/client";
 import { Tooltip } from "@nextui-org/react";
-import { IconAlertTriangleFilled, IconCircle, IconColorPicker, IconInfoCircleFilled, IconPencil, IconPlus, IconTrash, IconTriangleInverted } from "@tabler/icons-react";
+import { IconAlertTriangleFilled, IconColorPicker, IconInfoCircleFilled, IconPencil, IconPlus, IconTrash, IconTriangleInverted } from "@tabler/icons-react";
 import { useCallback, useEffect, useState } from "react"
 import { useDispatch, useSelector } from "react-redux";
 
@@ -27,6 +29,7 @@ const ACCEPT_BUTTON_RENAME = { buttonCaption: 'Rename', useButton: true }
 export default function LabelingTasks() {
     const dispatch = useDispatch();
     const project = useSelector(selectProject);
+
     const labelingTasksSchema = useSelector(selectLabelingTasksAll);
     const modalDeleteLabelingTask = useSelector(selectModal(ModalEnum.DELETE_LABELING_TASK));
     const modalAddLabelingTask = useSelector(selectModal(ModalEnum.ADD_LABELING_TASK));
@@ -50,6 +53,22 @@ export default function LabelingTasks() {
     const [handleRenameWarningMut] = useMutation(HANDLE_LABEL_RENAME_WARNING);
     const [updateLabelNameMut] = useMutation(UPDATE_LABEL_NAME);
 
+    useEffect(() => {
+        LabelHelper.setLabelColorOptions();
+        refetchLabelingTasksAndProcess();
+    }, [project]);
+
+    useEffect(() => {
+        setLabelingTasksDropdownArray(labelingTasksDropdownValues());
+    }, [labelingTasksSchema]);
+
+    function refetchLabelingTasksAndProcess() {
+        refetchLabelingTasksByProjectId({ variables: { projectId: project.id } }).then((res) => {
+            const labelingTasks = postProcessLabelingTasks(res['data']['projectByProjectId']['labelingTasks']['edges']);
+            dispatch(setLabelingTasksAll(postProcessLabelingTasksSchema(labelingTasks)))
+        });
+    }
+
     function handleKeyboardEvent(event: KeyboardEvent) {
         if (!modalChangeColor.open) return;
         const changedLabel = LabelHelper.checkAndSetLabelHotkey(event, modalChangeColor.label);
@@ -63,7 +82,6 @@ export default function LabelingTasks() {
                 dispatch(setLabelingTasksAll(labelingTasksSchemaCopy));
             });
         }
-
     }
 
     useEffect(() => {
@@ -73,21 +91,6 @@ export default function LabelingTasks() {
         };
     }, [modalChangeColor]);
 
-    useEffect(() => {
-        LabelHelper.setLabelColorOptions();
-        refetchLabelingTasksByProjectId({ variables: { projectId: project.id } }).then((res) => {
-            const labelingTasks = postProcessLabelingTasks(res['data']['projectByProjectId']['labelingTasks']['edges']);
-            if (onlyLabelsChanged(labelingTasks)) {
-                LabelHelper.setLabelMap(labelingTasks);
-            } else {
-                dispatch(setLabelingTasksAll(postProcessLabelingTasksSchema(labelingTasks)))
-            }
-        });
-    }, [project]);
-
-    useEffect(() => {
-        setLabelingTasksDropdownArray(labelingTasksDropdownValues());
-    }, [labelingTasksSchema]);
 
     const deleteLabelingTask = useCallback(() => {
         deleteLabelingTaskMut({ variables: { projectId: project.id, labelingTaskId: modalDeleteLabelingTask.taskId } }).then((res) => {
@@ -100,22 +103,18 @@ export default function LabelingTasks() {
         if (modalAddLabelingTask.targetAttribute !== 'Full Record') {
             taskTarget = usableAttributes.find((attribute) => attribute.name == modalAddLabelingTask.targetAttribute).id;;
         }
-
         createLabelingTaskMut({
             variables: {
-                projectId: project.id,
-                labelingTaskName: modalAddLabelingTask.taskName,
-                labelingTaskType: LabelingTaskTaskType.MULTICLASS_CLASSIFICATION,
-                labelingTaskTargetId: taskTarget
+                projectId: project.id, labelingTaskName: modalAddLabelingTask.taskName, labelingTaskType: LabelingTaskTaskType.MULTICLASS_CLASSIFICATION, labelingTaskTargetId: taskTarget
             }
         }).then((res) => {
-            // TODO: return from BE and add to redux
+            // TODO: Currently fixed with websockets and refetching but another option would be to return from BE and add to redux
         });
     }, [modalAddLabelingTask]);
 
     const deleteLabel = useCallback(() => {
         LabelHelper.removeLabel(modalDeleteLabel.taskId, modalDeleteLabel.labelColor);
-        deleteLabelMut({ variables: { projectId: project.id, labelId: modalDeleteLabel.labelId } }).then((res) => {
+        deleteLabelMut({ variables: { projectId: project.id, labelId: modalDeleteLabel.labelId } }).then(() => {
             dispatch(removeLabelFromLabelingTask({ taskId: modalDeleteLabel.taskId, labelId: modalDeleteLabel.labelId }));
         });
     }, [modalDeleteLabel]);
@@ -124,7 +123,7 @@ export default function LabelingTasks() {
         const labelColor = LabelHelper.addLabel(modalAddLabel.taskId, modalAddLabel.labelName);
         dispatch(setModalStates(ModalEnum.ADD_LABEL, { ...modalAddLabel, labelName: '', open: true }));
         createLabelMut({ variables: { projectId: project.id, labelingTaskId: modalAddLabel.taskId, labelName: modalAddLabel.labelName, labelColor: labelColor } }).then((res) => {
-            // TODO: return from BE and add to redux
+            // TODO: Currently fixed with websockets and refetching but another option would be to return from BE and add to redux
         })
     }, [modalAddLabel]);
 
@@ -139,6 +138,14 @@ export default function LabelingTasks() {
     }, [modalRenameLabel]);
 
     useEffect(() => {
+        WebSocketsService.subscribeToNotification(CurrentPage.SETTINGS, {
+            projectId: project.id,
+            whitelist: ['label_created', 'labeling_task_created'],
+            func: handleWebsocketNotification
+        });
+    }, [project, addLabel, addLabelingTask]);
+
+    useEffect(() => {
         setAbortButton({ ...ABORT_BUTTON, emitFunction: deleteLabelingTask });
         setAcceptButton({ ...ACCEPT_BUTTON, emitFunction: addLabelingTask, disabled: (modalAddLabelingTask.taskName == '' || modalAddLabelingTask.targetAttribute == '') || !isTaskNameUnique(modalAddLabelingTask.taskName) });
         setAcceptButtonLabel({ ...ACCEPT_BUTTON_LABEL, emitFunction: addLabel, disabled: modalAddLabel.labelName == '' || !LabelHelper.isLabelNameUnique(modalAddLabel.taskId, modalAddLabel.labelName) });
@@ -151,26 +158,6 @@ export default function LabelingTasks() {
     const [abortButtonLabel, setAbortButtonLabel] = useState<ModalButton>(ABORT_BUTTON_LABEL);
     const [acceptButtonLabel, setAcceptButtonLabel] = useState<ModalButton>(ACCEPT_BUTTON_LABEL);
     const [acceptButtonRename, setAcceptButtonRename] = useState<ModalButton>(ACCEPT_BUTTON_RENAME);
-
-    function onlyLabelsChanged(tasks: any): boolean {
-        if (labelingTasksSchema.length == 0) return false;
-        if (labelingTasksSchema != tasks.length) return false;
-        for (const task of tasks) {
-            if (getTaskArrayAttribute(task.id, 'id') == 'UNKNOWN') return false;
-            if (getTaskArrayAttribute(task.id, 'taskType') != task.taskType)
-                return false;
-            if (getTaskArrayAttribute(task.id, 'name') != task.name)
-                return false;
-        }
-        return true;
-    }
-
-    function getTaskArrayAttribute(taskId: string, valueID: string) {
-        for (let task of labelingTasksSchema) {
-            if (task.id == taskId) return task[valueID];
-        }
-        return 'UNKNOWN';
-    }
 
     function openTaskName(index: number) {
         const labelingTasksSchemaCopy = jsonCopy(labelingTasksSchema);
@@ -252,6 +239,12 @@ export default function LabelingTasks() {
         });
     }
 
+    function handleWebsocketNotification(msgParts: string[]) {
+        if (['label_created', 'labeling_task_created'].includes(msgParts[1])) {
+            refetchLabelingTasksAndProcess();
+        }
+    }
+
     return (<div className="mt-8">
         <div className="text-lg leading-6 text-gray-900 font-medium inline-block">
             Labeling tasks
@@ -302,7 +295,7 @@ export default function LabelingTasks() {
                                     </td>
                                     <td className="flex flex-wrap justify-center items-center px-3 py-2 text-sm text-gray-500">
                                         {task.labels.map((label: LabelType) => (
-                                            <div key={label.id} className={`inline-flex border items-center mx-1.5 px-1.5 py-0.5 rounded-md text-sm font-medium ${label.color.backgroundColor} ${label.color.textColor} ${label.color.borderColor} ${label.color.hoverColor}`}>
+                                            <div key={label.id} className={`inline-flex border items-center m-1 px-1.5 py-0.5 rounded-md text-sm font-medium ${label.color.backgroundColor} ${label.color.textColor} ${label.color.borderColor} ${label.color.hoverColor}`}>
                                                 <IconColorPicker className="h-4 w-4 mr-1 cursor-pointer" onClick={() => dispatch(setModalStates(ModalEnum.CHANGE_COLOR, { taskId: task.id, label: label, open: true }))} />
                                                 <span>{label.name}</span>
                                                 {label.hotkey && <kbd className="ml-2 uppercase inline-flex items-center border bg-white border-gray-200 rounded px-2 text-sm font-sans font-medium text-gray-400">{label.hotkey}</kbd>}

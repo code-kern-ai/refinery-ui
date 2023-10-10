@@ -9,7 +9,7 @@ import { timer } from "rxjs";
 import { IconCamera, IconCheck, IconDots, IconPlus, IconUpload } from "@tabler/icons-react";
 import Modal from "@/src/components/shared/modal/Modal";
 import { ModalButton, ModalEnum } from "@/src/types/shared/modal";
-import { openModal } from "@/src/reduxStore/states/modal";
+import { openModal, selectModal, setModalStates } from "@/src/reduxStore/states/modal";
 import Dropdown from "@/submodules/react-components/components/Dropdown";
 import { CREATE_USER_ATTRIBUTE } from "@/src/services/gql/mutations/project";
 import { useRouter } from "next/router";
@@ -25,7 +25,7 @@ import ProjectMetaData from "./ProjectMetaData";
 import GatesIntegration from "./GatesIntegration";
 import { selectIsManaged } from "@/src/reduxStore/states/general";
 import Embeddings from "./embeddings/Embeddings";
-import { DATA_TYPES, postProcessingAttributes } from "@/src/util/components/projects/projectId/settings/data-schema-helper";
+import { DATA_TYPES, findFreeAttributeName, postProcessingAttributes } from "@/src/util/components/projects/projectId/settings/data-schema-helper";
 import { postProcessingEmbeddings, postProcessingRecommendedEncoders } from "@/src/util/components/projects/projectId/settings/embeddings-helper";
 import { AttributeState } from "@/src/types/components/projects/projectId/settings/data-schema";
 import { RecommendedEncoder } from "@/src/types/components/projects/projectId/settings/embeddings";
@@ -41,12 +41,11 @@ export default function ProjectSettings() {
     const attributes = useSelector(selectAttributes);
     const isManaged = useSelector(selectIsManaged);
     const embeddings = useSelector(selectEmbeddings);
+    const modalCreateNewAtt = useSelector(selectModal(ModalEnum.CREATE_NEW_ATTRIBUTE));
 
     const [pKeyValid, setPKeyValid] = useState<boolean | null>(null);
     const [pKeyCheckTimer, setPKeyCheckTimer] = useState(null);
-    const [attributeName, setAttributeName] = useState("");
     const [attributeType, setAttributeType] = useState("Text");
-    const [duplicateNameExists, setDuplicateNameExists] = useState(false);
     const [isAcRunning, setIsAcRunning] = useState(false);
     const [tokenizationProgress, setTokenizationProgress] = useState(0);
     const [checkIfAcUploadedRecords, setCheckIfAcUploadedRecords] = useState(false);
@@ -81,16 +80,16 @@ export default function ProjectSettings() {
         });
     }, [attributes]);
 
-    const createUserAttribute = useCallback((attributeName: string) => {
+    const createUserAttribute = useCallback(() => {
         const attributeTypeFinal = DATA_TYPES.find((type) => type.name === attributeType).value;
-        createAttributeMut({ variables: { projectId: project.id, name: attributeName, dataType: attributeTypeFinal } }).then((res) => {
+        createAttributeMut({ variables: { projectId: project.id, name: modalCreateNewAtt.attributeName, dataType: attributeTypeFinal } }).then((res) => {
             const id = res?.data?.createUserAttribute.attributeId;
             if (id) {
                 localStorage.setItem('isNewAttribute', "X");
                 router.push(`/projects/${project.id}/attributes/${id}`);
             }
         });
-    }, [attributeName, attributeType, duplicateNameExists]);
+    }, [modalCreateNewAtt]);
 
     const [acceptButton, setAcceptButton] = useState<ModalButton>(ACCEPT_BUTTON);
 
@@ -118,14 +117,12 @@ export default function ProjectSettings() {
 
     function handleAttributeName(value: string) {
         const checkName = attributes.some(attribute => attribute.name == value);
-        setDuplicateNameExists(checkName);
-        setAcceptButton({ ...acceptButton, disabled: checkName || value.trim() == "" })
-        setAttributeName(toPythonFunctionName(value));
+        dispatch(setModalStates(ModalEnum.CREATE_NEW_ATTRIBUTE, { attributeName: toPythonFunctionName(value), duplicateNameExists: checkName }))
     }
 
     useEffect(() => {
-        setAcceptButton({ ...acceptButton, emitFunction: () => createUserAttribute(attributeName) });
-    }, [attributeName, attributeType, duplicateNameExists]);
+        setAcceptButton({ ...acceptButton, emitFunction: createUserAttribute, disabled: modalCreateNewAtt.duplicateNameExists || modalCreateNewAtt.attributeName.trim() == "" });
+    }, [modalCreateNewAtt]);
 
     function requestPKeyCheck() {
         if (!project) return;
@@ -222,7 +219,6 @@ export default function ProjectSettings() {
         }
     }
 
-
     return (<div>
         {project != null && <div className="p-4 bg-gray-100 pb-10 h-screen overflow-y-auto flex-1 flex flex-col">
             <DataSchema isAcOrTokenizationRunning={isAcRunning || tokenizationProgress < 1} pKeyValid={pKeyValid} />
@@ -230,8 +226,7 @@ export default function ProjectSettings() {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-2 mt-1 align-top">
                 <div className="items-center flex flex-row">
                     <Tooltip content="Add new attribute" color="invert" placement="bottom">
-                        <label onClick={() => dispatch(openModal(ModalEnum.CREATE_NEW_ATTRIBUTE))}
-                            className="mr-1 inline-flex items-center px-2.5 py-1.5 border border-gray-300 shadow-sm text-xs font-semibold rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none cursor-pointer">
+                        <label onClick={() => dispatch(setModalStates(ModalEnum.CREATE_NEW_ATTRIBUTE, { open: true, attributeName: findFreeAttributeName(attributes) }))} className="mr-1 inline-flex items-center px-2.5 py-1.5 border border-gray-300 shadow-sm text-xs font-semibold rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none cursor-pointer">
                             <IconPlus className="mr-1 h-5 w-5 inline-block" />
                             Add new attribute
                         </label>
@@ -296,17 +291,21 @@ export default function ProjectSettings() {
                     <Tooltip content="Enter an attribute name" color="invert" placement="right">
                         <span className="cursor-help  card-title mb-0 label-text font-normal"><span className="underline filtersUnderline">Attribute name</span></span>
                     </Tooltip>
-                    <input type="text" value={attributeName} onInput={(e: any) => {
-                        handleAttributeName(e.target.value);
-                    }} onKeyDown={(e) => { if (e.key == 'Enter') createUserAttribute(attributeName) }}
+                    <input type="text" defaultValue={modalCreateNewAtt.attributeName} onInput={(e: any) => handleAttributeName(e.target.value)}
+                        onKeyDown={(e) => { if (e.key == 'Enter') createUserAttribute() }}
                         className="h-9 w-full border-gray-300 rounded-md placeholder-italic border text-gray-900 pl-4 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100" placeholder="Enter an attribute name..." />
-                    {duplicateNameExists && <div className="text-red-700 text-xs mt-2">Attribute name exists</div>}
                     <Tooltip content="Select an attribute type" color="invert" placement="right">
                         <span className="cursor-help card-title mb-0 label-text font-normal"><span className="underline filtersUnderline">Attribute type</span></span>
                     </Tooltip>
                     <Dropdown buttonName={attributeType} options={DATA_TYPES} selectedOption={(option: string) => setAttributeType(option)} />
                 </div>
-                {/* TODO: Add condition for embedding lists */}
+                {modalCreateNewAtt.duplicateNameExists && <div className="text-red-700 text-xs mt-2">Attribute name exists</div>}
+                {attributeType == 'Embedding List' && <div className="border border-gray-300 text-xs text-gray-500 p-2.5 rounded-lg text-justify mt-2 max-w-2xl">
+                    <label className="text-gray-700">
+                        Embedding lists are special. They can only be used for similarity search. If a list
+                        entry is matched, the whole record is considered matched.
+                    </label>
+                </div>}
             </Modal>
 
             <ProjectSnapshotExport ></ProjectSnapshotExport>
