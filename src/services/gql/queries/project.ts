@@ -184,3 +184,9 @@ query ($projectId: ID) {
   zeroShotRecommendations(projectId: $projectId)
 }
 `;
+
+export const CHECK_RENAME_LABEL = gql`
+query ($projectId: ID!, $labelId: ID!, $newName: String!) {
+  checkRenameLabel(projectId: $projectId, labelId: $labelId, newName: $newName)
+}
+`;

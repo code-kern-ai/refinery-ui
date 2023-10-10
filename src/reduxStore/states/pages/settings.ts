@@ -107,6 +107,15 @@ const settingsSlice = createSlice({
                 state.attributes.usableAttributes = [fullRecordEl, ...filterFromAll];
             }
             else state.attributes.usableAttributes = [];
+        },
+        removeLabelFromLabelingTask(state, action: PayloadAction<{ taskId: string, labelId: string }>) {
+            if (action.payload) {
+                const { taskId, labelId } = action.payload;
+                const labelingTask = state.labelingTasks.all.find((labelingTask) => labelingTask.id === taskId);
+                if (labelingTask) {
+                    labelingTask.labels = labelingTask.labels.filter((label) => label.id !== labelId);
+                }
+            }
         }
     }
 });
@@ -121,5 +130,5 @@ export const selectUsableNonTextAttributes = (state) => state.settings.attribute
 export const selectLabelingTasksAll = (state) => state.settings.labelingTasks.all;
 export const selectUsableAttributes = (state) => state.settings.attributes.usableAttributes;
 
-export const { setAllAttributes, extendAllAttributes, removeFromAllAttributesById, updateAttributeById, setAllEmbeddings, removeFromAllEmbeddingsById, setUseableEmbedableAttributes, setAllRecommendedEncodersDict, setRecommendedEncodersAll, setUseableNonTextAttributes, setLabelingTasksAll, removeFromAllLabelingTasksById, setAllUsableAttributes } = settingsSlice.actions;
+export const { setAllAttributes, extendAllAttributes, removeFromAllAttributesById, updateAttributeById, setAllEmbeddings, removeFromAllEmbeddingsById, setUseableEmbedableAttributes, setAllRecommendedEncodersDict, setRecommendedEncodersAll, setUseableNonTextAttributes, setLabelingTasksAll, removeFromAllLabelingTasksById, setAllUsableAttributes, removeLabelFromLabelingTask } = settingsSlice.actions;
 export const settingsReducer = settingsSlice.reducer;

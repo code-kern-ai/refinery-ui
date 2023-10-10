@@ -81,10 +81,25 @@ const initialState: Modals = {
     },
     [ModalEnum.ADD_LABEL]: {
         open: false,
+        taskId: '',
+        labelName: ''
     },
     [ModalEnum.DELETE_LABEL]: {
         open: false,
+        taskId: '',
         labelId: '',
+        labelColor: '',
+    },
+    [ModalEnum.CHANGE_COLOR]: {
+        open: false,
+        taskId: '',
+        label: {}
+    },
+    [ModalEnum.RENAME_LABEL]: {
+        open: false,
+        label: {},
+        taskId: '',
+        newLabelName: ''
     },
 };
 

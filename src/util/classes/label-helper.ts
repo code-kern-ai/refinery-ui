@@ -1,7 +1,6 @@
 import { CurrentLabel, LabelColors, RenameLabelData } from "@/src/types/components/projects/projectId/settings/labeling-tasks";
-import { Subject, timer } from "rxjs";
-import { first } from "rxjs/operators";
-
+import { jsonCopy } from "@/submodules/javascript-functions/general";
+import { timer } from "rxjs";
 
 export class LabelHelper {
     private static ALLOWED_KEYS = "abcdefghijklmnopqrstuvwxyzöäüß<>|,.;:-_#'\"~+*?\\{}[]()=/&%$§!@^°€";
@@ -23,7 +22,8 @@ export class LabelHelper {
 
     public static renameLabelData: RenameLabelData;
 
-    constructor() {
+    public static setLabelColorOptions() {
+        if (LabelHelper.labelColorOptions.length > 0) return;
         LabelHelper.colorOptions.forEach(color => LabelHelper.labelColorOptions.push(LabelHelper.getColorStruct(color)));
     }
 
@@ -37,14 +37,11 @@ export class LabelHelper {
     }
 
     public static addLabel(
-        projectId: string,
         taskId: string,
-        labelInput: HTMLInputElement,
-        timeOutWrapper: { requestTimeOut: boolean }
-    ): void {
-        if (timeOutWrapper.requestTimeOut) return;
-        if (!labelInput.value) return;
-        if (!LabelHelper.isLabelNameUnique(taskId, labelInput.value)) return;
+        labelName: string,
+    ): string {
+        if (!labelName) return;
+        if (!LabelHelper.isLabelNameUnique(taskId, labelName)) return;
         let labelColor = "yellow"
         let colorsInTask = this.labelingTaskColors.get(taskId);
         if (colorsInTask.length > 0) {
@@ -57,39 +54,7 @@ export class LabelHelper {
         } else {
             this.labelingTaskColors.set(taskId, [labelColor])
         }
-        // this.projectApolloService
-        //     .createLabel(projectId, taskId, labelInput.value, labelColor).pipe(first())
-        //     .subscribe();
-
-        labelInput.value = '';
-        labelInput.focus();
-
-        timeOutWrapper.requestTimeOut = true;
-        timer(100).subscribe(() => {
-            timeOutWrapper.requestTimeOut = false;
-        });
-    }
-
-    public static checkRenameLabel() {
-        if (!this.renameLabelData.canCheck || !this.renameLabelData.newLabelName) return;
-        this.renameLabelData.checkResults = null;
-
-        // this.projectApolloService
-        //     .checkRenameLabel(this.settings.project.id, this.currentLabel.label.id, this.renameLabelData.newLabelName.trim()).pipe(first())
-        //     .subscribe((r) => {
-        //         r.warnings.forEach(e => {
-        //             e.open = false;
-        //             e.oldParsed = this.prepareSourceCode(e.old, e.information_source_name);
-        //             e.newParsed = this.prepareSourceCode(e.new, e.information_source_name);
-        //         });
-        //         this.renameLabelData.checkResults = r;
-        //     });
-    }
-
-    public static updateLabelName() {
-        // this.projectApolloService
-        //     .updateLabelName(this.settings.project.id, this.currentLabel.label.id, this.renameLabelData.newLabelName.trim()).pipe(first())
-        //     .subscribe((x) => this.currentLabel.label.name = this.renameLabelData.newLabelName.trim());
+        return labelColor;
     }
 
     public static handleLabelRenameWarning(warning: any) {
@@ -114,24 +79,22 @@ export class LabelHelper {
             hoverColor: LabelHelper.getHoverColor(color)
         }
     }
-    public static setCurrentLabel(label: any, labelingTaskId: string) {
-        this.currentLabel = { label: label, taskId: labelingTaskId };
-        // this.modalOpen.changeColor = true;
-    }
+
     public static openRenameLabel() {
-        // this.modalOpen.changeColor = false;
-        // this.modalOpen.changeName = true;
-        this.renameLabelData = {
-            checkResults: null,
-            newLabelName: '',
-            canCheck: false
-        };
+        if (!LabelHelper.renameLabelData) {
+            LabelHelper.renameLabelData = {
+                checkResults: null,
+                newLabelName: '',
+                canCheck: false
+            };
+        }
     }
-    public static checkInputRenameLabel(event: InputEvent) {
+
+    public static checkInputRenameLabel(event: InputEvent, currentLabel: any) {
         const input = event.target as HTMLInputElement;
         this.renameLabelData.checkResults = null;
         this.renameLabelData.canCheck = this.isValidNewName(input.value);
-        if (this.renameLabelData.canCheck && !this.isLabelNameUnique(this.currentLabel.taskId, input.value)) {
+        if (this.renameLabelData.canCheck && !this.isLabelNameUnique(currentLabel.taskId, input.value)) {
             this.renameLabelData.canCheck = false;
             this.renameLabelData.checkResults = { "errors": [{ "msg": "Label with name already exists" }], "warnings": [], "infos": [] };
         }
@@ -150,12 +113,10 @@ export class LabelHelper {
             this.labelHotkeyError = '';
             this.renameLabelData = null;
         })
-        // this.modalOpen.changeColor = false;
-        // this.modalOpen.changeName = false;
     }
 
 
-    public static updateLabelColor(projectId: string, labelingTaskId: string, labelId: string, oldLabelColor: string, newLabelColor: any) {
+    public static updateLabelColor(labelingTaskId: string, oldLabelColor: string, newLabelColor: any) {
         let colorsInTask = this.labelingTaskColors.get(labelingTaskId);
         const index = colorsInTask.indexOf(oldLabelColor);
         if (index > -1) {
@@ -163,17 +124,12 @@ export class LabelHelper {
         }
         colorsInTask.push(newLabelColor.name);
         this.labelingTaskColors.set(labelingTaskId, colorsInTask);
-
-        // this.projectApolloService
-        //     .updateLabelColor(projectId, labelId, newLabelColor.name).pipe(first())
-        //     .subscribe();
-        this.currentLabel.label.color = newLabelColor;
     }
-    public static checkAndSetLabelHotkey(event: KeyboardEvent) {
+
+    public static checkAndSetLabelHotkey(event: KeyboardEvent, currentLabel: any) {
         this.labelHotkeyError = null;
-        this.currentLabel = { ...this.currentLabel };
         const key = event.key.toLowerCase();
-        if (key == this.currentLabel.label.hotkey) return;
+        if (key == currentLabel.hotkey) return;
         const usedHotkeys = this.getUsedHotkey();
         if (key == 'ArrowRight' || key == 'ArrowLeft') {
             this.labelHotkeyError = "Key " + key + " is used to navigate between records."
@@ -188,12 +144,9 @@ export class LabelHelper {
             this.labelHotkeyError = "Key " + key + " not in whitelist."
             return;
         }
-        this.currentLabel.label.hotkey = this.labelHotkeyError ? "" : key;
-        if (!this.labelHotkeyError) {
-            // this.projectApolloService
-            //     .updateLabelHotkey(this.settings.project.id, this.currentLabel.label.id, key).pipe(first())
-            //     .subscribe();
-        }
+        const currentLabelCopy = jsonCopy(currentLabel);
+        currentLabelCopy.hotkey = this.labelHotkeyError ? "" : key;
+        return currentLabelCopy;
 
     }
 
@@ -207,7 +160,7 @@ export class LabelHelper {
         return true;
     }
 
-    public static removeLabel(projectId: string, taskId: string, labelId: string, labelColor: string) {
+    public static removeLabel(taskId: string, labelColor: string) {
         let colorsInTask = this.labelingTaskColors.get(taskId);
 
         const index = colorsInTask.indexOf(labelColor);
@@ -215,10 +168,6 @@ export class LabelHelper {
             colorsInTask.splice(index, 1); // 2nd parameter means remove one item only
         }
         this.labelingTaskColors.set(taskId, colorsInTask);
-
-        // this.projectApolloService
-        //     .deleteLabel(projectId, labelId).pipe(first())
-        //     .subscribe();
     }
 
     public static prepareSourceCode(sourceCode: string, function_name: string): string {
@@ -228,11 +177,9 @@ export class LabelHelper {
         );
     }
 
-
     private static isValidKey(key: string): boolean {
         return LabelHelper.ALLOWED_KEYS.includes(key.toLowerCase());
     }
-
 
     private static getUsedHotkey(): string[] {
         let usedHotkeys = [];

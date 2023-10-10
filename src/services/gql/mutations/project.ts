@@ -96,3 +96,52 @@ mutation ($projectId: ID!, $labelingTaskName: String!,$labelingTaskType:String!,
   }
 }
 `;
+
+export const DELETE_LABEL = gql`
+mutation ($projectId: ID!, $labelId: ID!) {
+  deleteLabel(projectId: $projectId, labelId: $labelId) {
+    ok
+  }
+}
+`;
+
+export const CREATE_LABEL = gql`
+mutation ($projectId: ID!, $labelingTaskId: ID!, $labelName: String!, $labelColor: String!) {
+  createLabel(projectId: $projectId, labelingTaskId: $labelingTaskId, labelName: $labelName, labelColor: $labelColor) {
+    label {
+      id
+      name
+    }
+  }
+}
+`;
+
+export const UPDATE_LABEL_COLOR = gql`
+mutation ($projectId: ID!, $labelingTaskLabelId: ID!, $labelColor: String!) {
+  updateLabelColor(projectId: $projectId, labelingTaskLabelId: $labelingTaskLabelId, labelColor: $labelColor) {
+    ok
+  }
+}
+`;
+
+export const UPDATE_LABEL_HOTKEY = gql`
+mutation ($projectId: ID!, $labelingTaskLabelId: ID!, $labelHotkey: String!) {
+  updateLabelHotkey(projectId: $projectId, labelingTaskLabelId: $labelingTaskLabelId, labelHotkey: $labelHotkey) {
+    ok
+  }
+}
+`;
+
+export const HANDLE_LABEL_RENAME_WARNING = gql`
+mutation ($projectId: ID!, $warningData: JSONString!) {
+  handleLabelRenameWarnings(projectId: $projectId, warningData: $warningData) {
+    ok
+  }
+} `;
+
+export const UPDATE_LABEL_NAME = gql`
+mutation ($projectId: ID!, $labelId: ID!, $newName: String!) {
+  updateLabelName(projectId: $projectId, labelingTaskLabelId: $labelId, newName: $newName) {
+    ok
+  }
+}  `;
