@@ -61,3 +61,11 @@ modelProviderDownloadModel(modelName: $modelName) {
 }
 }
 `;
+
+export const DELETE_USER_ATTRIBUTE = gql`
+mutation($projectId:ID!,$attributeId:ID!){
+  deleteUserAttribute(projectId:$projectId,attributeId:$attributeId){
+    ok
+  }
+}
+`;

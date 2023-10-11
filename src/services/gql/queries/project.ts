@@ -190,3 +190,12 @@ query ($projectId: ID!, $labelId: ID!, $newName: String!) {
   checkRenameLabel(projectId: $projectId, labelId: $labelId, newName: $newName)
 }
 `;
+
+export const CALCULATE_USER_ATTRIBUTE_SAMPLE_RECORDS = gql`
+query($projectId: ID!, $attributeId: ID!){
+  calculateUserAttributeSampleRecords(projectId: $projectId, attributeId: $attributeId) {
+    recordIds
+    calculatedAttributes 
+  }
+}
+`;

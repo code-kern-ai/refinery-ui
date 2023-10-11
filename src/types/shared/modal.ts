@@ -35,4 +35,6 @@ export enum ModalEnum {
     DELETE_LABEL = "DELETE_LABEL",
     CHANGE_COLOR = "CHANGE_COLOR",
     RENAME_LABEL = "RENAME_LABEL",
+    EXECUTE_ATTRIBUTE_CALCULATION = "EXECUTE_ATTRIBUTE_CALCULATION",
+    DELETE_ELEMENT = "DELETE_ELEMENT", // can be attribute, heuristic, lookup-list, data slice
 }

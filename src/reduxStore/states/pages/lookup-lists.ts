@@ -1,10 +1,10 @@
-import { LookupListBE } from '@/src/types/components/projects/projectId/lookup-lists';
+import { LookupList } from '@/src/types/components/projects/projectId/lookup-lists';
 import { createSlice } from '@reduxjs/toolkit'
 import type { PayloadAction } from '@reduxjs/toolkit'
 
 type LookupListsState = {
-    all: LookupListBE[];
-    active: LookupListBE | null;
+    all: LookupList[];
+    active: LookupList | null;
     checked: boolean[];
 }
 
@@ -28,7 +28,7 @@ const lookupListsSlice = createSlice({
     name: 'lookupLists',
     initialState,
     reducers: {
-        setActiveLookupList(state, action: PayloadAction<LookupListBE>) {
+        setActiveLookupList(state, action: PayloadAction<LookupList>) {
             if (action.payload) state.active = { ...action.payload };
             else state.active = null;
         },
@@ -48,11 +48,11 @@ const lookupListsSlice = createSlice({
                 };
             },
         },
-        setAllLookupLists(state, action: PayloadAction<LookupListBE[]>) {
+        setAllLookupLists(state, action: PayloadAction<LookupList[]>) {
             if (action.payload) state.all = action.payload;
             else state.all = [];
         },
-        extendAllLookupLists(state, action: PayloadAction<LookupListBE>) {
+        extendAllLookupLists(state, action: PayloadAction<LookupList>) {
             if (action.payload) state.all.push(action.payload);
         },
         removeFromAllLookupListById(state, action: PayloadAction<string>) {

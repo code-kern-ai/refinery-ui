@@ -103,6 +103,13 @@ const initialState: Modals = {
         taskId: '',
         newLabelName: ''
     },
+    [ModalEnum.EXECUTE_ATTRIBUTE_CALCULATION]: {
+        open: false
+    },
+    [ModalEnum.DELETE_ELEMENT]: {
+        open: false,
+        id: '',
+    }
 };
 
 const modalSlice = createSlice({

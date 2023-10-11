@@ -8,12 +8,13 @@ import Modal from "@/src/components/shared/modal/Modal";
 import { useLazyQuery, useMutation } from "@apollo/client";
 import { LOOKUP_LISTS_BY_PROJECT_ID } from "@/src/services/gql/queries/lookup-lists";
 import { CREATE_LOOKUP_LIST, DELETE_LOOKUP_LIST } from "@/src/services/gql/mutations/lookup-lists";
-import { LookupListBE } from "@/src/types/components/projects/projectId/lookup-lists";
+import { LookupList } from "@/src/types/components/projects/projectId/lookup-lists";
 import { LookupListCard } from "./LookupListCard";
 import style from '@/src/styles/components/projects/projectId/lookup-lists.module.css';
 import { openModal } from "@/src/reduxStore/states/modal";
 import { ModalEnum } from "@/src/types/shared/modal";
 import { useRouter } from "next/router";
+import { postProcessLookupLists } from "@/src/util/components/projects/projectId/lookup-lists-helper";
 
 const ACTIONS_DROPDOWN_OPTIONS = ['Select all', 'Deselect all', 'Delete selected'];
 const ABORT_BUTTON = { buttonCaption: "Delete", useButton: true, disabled: false, closeAfterClick: true };
@@ -54,7 +55,7 @@ export default function LookupListsOverview() {
     useEffect(() => {
         if (!project) return;
         getLookupLists({ variables: { projectId: project.id } }).then((res) => {
-            dispatch(setAllLookupLists(res.data["knowledgeBasesByProjectId"]));
+            dispatch(setAllLookupLists(postProcessLookupLists(res.data["knowledgeBasesByProjectId"])));
         });
     }, [project]);
 
@@ -199,7 +200,7 @@ export default function LookupListsOverview() {
                     ) : (
 
                         <div className="grid grid-cols-1 gap-6 mt-8 md:grid-cols-2 lg:grid-cols-3">
-                            {lookupLists?.map((lookupList: LookupListBE, index: number) => (
+                            {lookupLists?.map((lookupList: LookupList, index: number) => (
                                 <LookupListCard key={lookupList.id} lookupList={lookupList} index={index} />
                             ))}
                         </div>

@@ -1,20 +1,28 @@
-import LoadingIcon from "@/src/components/shared/loading/LoadingIcon";
 import Statuses from "@/src/components/shared/statuses/Statuses";
-import { selectAttributes, setAllAttributes, updateAttributeById } from "@/src/reduxStore/states/pages/settings";
+import { selectAllLookupLists, setAllLookupLists } from "@/src/reduxStore/states/pages/lookup-lists";
+import { selectAttributes, selectUsableAttributes, setAllAttributes, setAllUsableAttributes, updateAttributeById } from "@/src/reduxStore/states/pages/settings";
 import { selectProject } from "@/src/reduxStore/states/project"
 import { UPDATE_ATTRIBUTE } from "@/src/services/gql/mutations/project";
+import { LOOKUP_LISTS_BY_PROJECT_ID } from "@/src/services/gql/queries/lookup-lists";
 import { GET_ATTRIBUTES_BY_PROJECT_ID } from "@/src/services/gql/queries/project";
 import { Attribute, AttributeState } from "@/src/types/components/projects/projectId/settings/data-schema";
 import { DataTypeEnum } from "@/src/types/shared/general";
+import { postProcessLookupLists } from "@/src/util/components/projects/projectId/lookup-lists-helper";
+import { postProcessCurrentAttribute } from "@/src/util/components/projects/projectId/settings/attribute-calculation-helper";
 import { ATTRIBUTES_VISIBILITY_STATES, DATA_TYPES, getTooltipVisibilityState, postProcessingAttributes } from "@/src/util/components/projects/projectId/settings/data-schema-helper";
-import { jsonCopy } from "@/submodules/javascript-functions/general";
+import { copyToClipboard, jsonCopy } from "@/submodules/javascript-functions/general";
 import Dropdown from "@/submodules/react-components/components/Dropdown";
 import { useLazyQuery, useMutation } from "@apollo/client";
+import { Editor } from "@monaco-editor/react";
 import { Tooltip } from "@nextui-org/react";
 import { IconArrowLeft } from "@tabler/icons-react";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux"
+import ExecutionContainer from "./ExecutionContainer";
+import { getPythonFunctionRegExMatch } from "@/submodules/javascript-functions/python-functions-parser";
+import DangerZone from "@/src/components/shared/danger-zone/DangerZone";
+import { DangerZoneEnum } from "@/src/types/shared/danger-zone";
 
 export default function AttributeCalculation() {
     const router = useRouter();
@@ -22,21 +30,24 @@ export default function AttributeCalculation() {
 
     const project = useSelector(selectProject);
     const attributes = useSelector(selectAttributes);
+    const usableAttributes = useSelector(selectUsableAttributes).filter((attribute) => attribute.id != '@@NO_ATTRIBUTE@@');
+    const lookupLists = useSelector(selectAllLookupLists);
 
     const [currentAttribute, setCurrentAttribute] = useState<Attribute>(null);
     const [isHeaderNormal, setIsHeaderNormal] = useState(true);
     const [isNameOpen, setIsNameOpen] = useState(false);
-    const [isNameLoading, setIsNameLoading] = useState(false);
     const [duplicateNameExists, setDuplicateNameExists] = useState(false);
     const [tooltipsArray, setTooltipsArray] = useState<string[]>([]);
+    const [isInitial, setIsInitial] = useState(null);  //null as add state to differentiate between initial, not and unchecked
 
     const [refetchAttributes] = useLazyQuery(GET_ATTRIBUTES_BY_PROJECT_ID, { fetchPolicy: "network-only" });
     const [updateAttributeMut] = useMutation(UPDATE_ATTRIBUTE);
+    const [refetchLookupLists] = useLazyQuery(LOOKUP_LISTS_BY_PROJECT_ID);
 
 
     useEffect(() => {
         if (!router.query.attributeId) return;
-        setCurrentAttribute(attributes.find((attribute) => attribute.id === router.query.attributeId));
+        setCurrentAttribute(postProcessCurrentAttribute(attributes.find((attribute) => attribute.id === router.query.attributeId)));
     }, [attributes, router.query.attributeId]);
 
     useEffect(() => {
@@ -44,10 +55,16 @@ export default function AttributeCalculation() {
         if (!currentAttribute && attributes.length == 0) {
             refetchAttributes({ variables: { projectId: project.id, stateFilter: ['ALL'] } }).then((res) => {
                 dispatch(setAllAttributes(postProcessingAttributes(res.data['attributesByProjectId'])));
-                setCurrentAttribute(attributes.find((attribute) => attribute.id === router.query.attributeId));
+                dispatch(setAllUsableAttributes(postProcessingAttributes(res.data['attributesByProjectId']).filter((attribute) => attribute.id != '@@NO_ATTRIBUTE@@')));
+                setCurrentAttribute(postProcessCurrentAttribute(attributes.find((attribute) => attribute.id === router.query.attributeId)));
             });
         }
-    }, [project, currentAttribute]);
+        if (lookupLists.length == 0) {
+            refetchLookupLists({ variables: { projectId: project.id } }).then((res) => {
+                dispatch(setAllLookupLists(postProcessLookupLists(res.data['knowledgeBasesByProjectId'])));
+            });
+        }
+    }, [project]);
 
     useEffect(() => {
         if (!attributes) return;
@@ -63,6 +80,20 @@ export default function AttributeCalculation() {
     }
 
     function changeAttributeName(name: string) {
+        if (name == currentAttribute.name) return;
+        if (name == '') return;
+        const duplicateNameExists = attributes.find((attribute) => attribute.name == name);
+        if (duplicateNameExists) {
+            setDuplicateNameExists(true);
+            return;
+        }
+        const attributeNew = jsonCopy(currentAttribute);
+        attributeNew.name = name;
+        updateAttributeMut({ variables: { projectId: project.id, attributeId: currentAttribute.id, name: attributeNew.name } }).then(() => {
+            setCurrentAttribute(postProcessCurrentAttribute(attributeNew));
+            dispatch(updateAttributeById(attributeNew));
+            setDuplicateNameExists(false);
+        });
     }
 
     function updateVisibility(option: string) {
@@ -70,16 +101,42 @@ export default function AttributeCalculation() {
         const attributeNew = jsonCopy(currentAttribute);
         attributeNew.visibility = visibility;
         attributeNew.visibilityIndex = ATTRIBUTES_VISIBILITY_STATES.findIndex((state) => state.name === option);
+        attributeNew.visibilityName = option;
         updateAttributeMut({ variables: { projectId: project.id, attributeId: currentAttribute.id, visibility: attributeNew.visibility } }).then(() => {
-            setCurrentAttribute(attributeNew);
+            setCurrentAttribute(postProcessCurrentAttribute(attributeNew));
             dispatch(updateAttributeById(attributeNew));
         });
     }
 
     function updateDataType(option: string) {
+        const dataType = DATA_TYPES.find((state) => state.name === option).value;
+        const attributeNew = jsonCopy(currentAttribute);
+        attributeNew.dataType = dataType;
+        attributeNew.dataTypeName = option;
+        updateAttributeMut({ variables: { projectId: project.id, attributeId: currentAttribute.id, dataType: attributeNew.dataType } }).then(() => {
+            setCurrentAttribute(postProcessCurrentAttribute(attributeNew));
+            dispatch(updateAttributeById(attributeNew));
+        });
     }
 
-    return (project && <div className="bg-white p-4 overflow-y-auto h-screen">
+    function openBricksIntegrator() {
+        // TODO: add it when the bricks integrator is ready
+    }
+
+    function onScrollEvent(event: any) {
+        if (!(event.target instanceof HTMLElement)) return;
+        if ((event.target as HTMLElement).scrollTop > 0) {
+            setIsHeaderNormal(false);
+        } else {
+            setIsHeaderNormal(true);
+        }
+    }
+
+    function updateSourceCode(value: string) {
+        updateAttributeMut({ variables: { projectId: project.id, attributeId: currentAttribute.id, sourceCode: value } });
+    }
+
+    return (project && <div className="bg-white p-4 pb-16 overflow-y-auto h-screen" onScroll={(e: any) => onScrollEvent(e)}>
         {currentAttribute && <div>
             <div className={`sticky z-40 h-12 ${isHeaderNormal ? 'top-1' : '-top-5'}`}>
                 <div className={`bg-white flex-grow ${isHeaderNormal ? '' : 'shadow'}`}>
@@ -109,7 +166,6 @@ export default function AttributeCalculation() {
                                     onBlur={() => openName(false)} onKeyDown={(e) => { if (e.key == 'Enter') openName(false) }}
                                     className="h-8 border-gray-300 rounded-md placeholder-italic border text-gray-700 pl-4 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100" />)
                                 : (<div className="mr-4 text-sm leading-5 font-medium text-gray-500 inline-block">{currentAttribute.name}</div>)}
-                            {isNameLoading && <LoadingIcon />}
                         </div>
                     </div>}
                 </div>
@@ -119,18 +175,88 @@ export default function AttributeCalculation() {
                     <Dropdown buttonName={currentAttribute.visibilityName} options={ATTRIBUTES_VISIBILITY_STATES} dropdownWidth="w-52"
                         selectedOption={(option: string) => updateVisibility(option)} tooltipsArray={tooltipsArray} tooltipArrayPlacement="right" />
                     <div className="text-sm leading-5 font-medium text-gray-700">Data type</div>
-                    <div>
+                    <div className="flex flex-row items-center">
                         <Tooltip color="invert" placement="right" content={currentAttribute.state == AttributeState.USABLE || currentAttribute.state == AttributeState.RUNNING ? 'Cannot edit data type' : 'Edit your data type'}>
                             <Dropdown buttonName={currentAttribute.dataTypeName} options={DATA_TYPES} dropdownWidth="w-52"
                                 selectedOption={(option: string) => updateDataType(option)} />
                         </Tooltip>
-                        {currentAttribute.dataType == DataTypeEnum.EMBEDDING_LIST && <div className="text-gray-700 text-sm">Only useable for similarity search</div>}
+                        {currentAttribute.dataType == DataTypeEnum.EMBEDDING_LIST && <div className="text-gray-700 text-sm ml-3">Only useable for similarity search</div>}
                     </div>
                     <div className="text-sm leading-5 font-medium text-gray-700 inline-block">Attributes</div>
-                    <div className="flex flex-row items-center"></div>
+                    <div className="flex flex-row items-center">
+                        {usableAttributes.length == 0 && <div className="text-sm font-normal text-gray-500">No usable attributes.</div>}
+                        {usableAttributes.map((attribute: Attribute) => (
+                            <Tooltip key={attribute.id} content={attribute.dataTypeName + ' - Click to copy'} color="invert" placement="top">
+                                <span onClick={() => copyToClipboard(attribute.name)}></span>
+                                <div className={`cursor-pointer border items-center px-2 py-0.5 rounded text-xs font-medium text-center mr-2 ${'bg-' + attribute.color + '-100'} ${'text-' + attribute.color + '-700'} ${'border-' + attribute.color + '-400'} ${'hover:bg-' + attribute.color + '-200'}`}>
+                                    {attribute.name}
+                                </div>
+                            </Tooltip>
+                        ))}
+                    </div>
 
+                    <div className="text-sm leading-5 font-medium text-gray-700 inline-block">
+                        {lookupLists.length == 0 ? 'No lookup lists in project' : 'Lookup lists'}</div>
+                    <div className="flex flex-row items-center">
+                        {lookupLists.map((lookupList) => (
+                            <Tooltip key={lookupList.id} content='Click to copy import statement' color="invert" placement="top">
+                                <span onClick={() => copyToClipboard("from knowledge import " + lookupList.pythonVariable)}>
+                                    <div className="cursor-pointer border items-center px-2 py-0.5 rounded text-xs font-medium text-center mr-2">
+                                        {lookupList.pythonVariable} - {lookupList.termCount}
+                                    </div>
+                                </span>
+                            </Tooltip>
+                        ))}
+                    </div>
                 </div>
-            </div>
-        </div>}
-    </div>)
+                <div className="flex flex-row items-center justify-between my-3">
+                    <div className="text-sm leading-5 font-medium text-gray-700 inline-block mr-2">Editor</div>
+                    <div className="flex flex-row flex-nowrap">
+                        {/* TODO: Add bricks integrator */}
+                        <Tooltip content="See available libraries for this attribute calculation" placement="left" color="invert">
+                            <a href="https://github.com/code-kern-ai/refinery-ac-exec-env/blob/dev/requirements.txt"
+                                target="_blank"
+                                className="ml-2 bg-white text-gray-700 text-xs font-semibold  px-4 py-2 rounded-md border border-gray-300 hover:bg-gray-50 focus:outline-none">
+                                See installed libraries
+                            </a>
+                        </Tooltip>
+                    </div>
+                </div>
+
+                <div className="border mt-1 relative">
+                    {isInitial && <div
+                        className="absolute top-0 bottom-0 left-0 right-0 bg-gray-200 flex items-center justify-center z-10" style={{ opacity: '0.7' }}>
+                        <div className="flex flex-col gap-2">
+                            <button onClick={openBricksIntegrator}
+                                className="bg-white text-gray-700 text font-semibold px-4 py-2 rounded-md border border-gray-300 hover:bg-gray-50 focus:outline-none">
+                                Search in bricks
+                            </button>
+                            <button onClick={() => setIsInitial(false)}
+                                className="bg-white text-gray-900 text font-semibold px-4 py-2 rounded-md border border-gray-300 hover:bg-gray-50 focus:outline-none">
+                                Start from scratch
+                            </button>
+                        </div>
+                    </div>}
+                    <Editor
+                        height="400px"
+                        defaultLanguage={'python'}
+                        value={currentAttribute.sourceCode}
+                        options={{
+                            readOnly: false,
+                            theme: 'vs-light'
+                        }}
+                        onChange={(value) => {
+                            const regMatch: any = getPythonFunctionRegExMatch(value);
+                            changeAttributeName(regMatch ? regMatch[2] : '');
+                            setCurrentAttribute({ ...currentAttribute, sourceCode: value });
+                            updateSourceCode(value);
+                        }}
+                    />
+                </div>
+
+                <ExecutionContainer currentAttribute={currentAttribute} tokenizationProgress={1} />
+                <DangerZone elementType={DangerZoneEnum.ATTRIBUTE} name={currentAttribute.name} id={currentAttribute.id} />
+            </div >
+        </div >}
+    </div >)
 }
