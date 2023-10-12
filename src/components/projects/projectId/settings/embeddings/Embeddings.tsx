@@ -6,7 +6,7 @@ import { removeFromAllEmbeddingsById, selectAttributes, selectEmbeddings } from 
 import { selectProject } from "@/src/reduxStore/states/project";
 import { WebSocketsService } from "@/src/services/base/web-sockets/WebSocketsService";
 import { DELETE_EMBEDDING, DELETE_FROM_TASK_QUEUE, UPDATE_EMBEDDING_PAYLOAD } from "@/src/services/gql/mutations/project";
-import { Embedding, EmbeddingState } from "@/src/types/components/projects/projectId/settings/embeddings";
+import { Embedding, EmbeddingProps, EmbeddingState } from "@/src/types/components/projects/projectId/settings/embeddings";
 import { CurrentPage } from "@/src/types/shared/general";
 import { ModalButton, ModalEnum } from "@/src/types/shared/modal";
 import { DATA_TYPES, getColorForDataType } from "@/src/util/components/projects/projectId/settings/data-schema-helper";
@@ -24,7 +24,7 @@ const ABORT_BUTTON = { useButton: true, disabled: false };
 const EDIT_BUTTON = { buttonCaption: 'Edit', useButton: true, disabled: false, closeAfterClick: false };
 const ACCEPT_BUTTON = { buttonCaption: 'Save', useButton: false, disabled: false, closeAfterClick: false };
 
-export default function Embeddings() {
+export default function Embeddings(props: EmbeddingProps) {
     const dispatch = useDispatch();
     const router = useRouter();
 
@@ -273,6 +273,6 @@ export default function Embeddings() {
             {!modalDeleteEmbedding.isQueuedElement && <p className="mt-2 text-gray-500 text-sm">This will delete all corresponding tensors!</p>}
 
         </Modal>
-        <AddNewEmbedding />
+        <AddNewEmbedding refetchWS={props.refetchWS} />
     </div>);
 }

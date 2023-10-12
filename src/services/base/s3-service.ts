@@ -53,7 +53,7 @@ export function uploadFile(credentialsAndUploadIdParsed: any, file: File, filena
     })
 }
 
-export function downloadFile(credentialBlock: any, isStringData: boolean = true) {
+export function downloadFile(credentialBlock: any, isStringData: boolean = true): any {
 
     const credentials = credentialBlock["Credentials"];
     const object = credentialBlock["objectName"];
@@ -77,7 +77,7 @@ export function downloadFile(credentialBlock: any, isStringData: boolean = true)
         Key: object
     }
     return new Observable((subscriber) => {
-        const managedDownload = s3Client.getObject(getParams, function (err, data) {
+        s3Client.getObject(getParams, function (err, data) {
             // Handle any error and exit
             if (err) {
                 subscriber.error(null)
@@ -90,7 +90,6 @@ export function downloadFile(credentialBlock: any, isStringData: boolean = true)
             }
             subscriber.complete();
         });
-
     });
 
 }

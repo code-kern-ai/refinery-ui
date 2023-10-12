@@ -58,3 +58,7 @@ export type SuggestionsProps = {
     name?: string;
     tooltip?: string;
 }
+
+export type EmbeddingProps = {
+    refetchWS(): void;
+}

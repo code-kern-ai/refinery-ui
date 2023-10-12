@@ -1,14 +1,15 @@
 import Modal from "@/src/components/shared/modal/Modal";
 import { selectOrganization } from "@/src/reduxStore/states/general";
-import { selectRecommendedEncodersAll, selectRecommendedEncodersDict, selectUsableNonTextAttributes, selectUseableEmbedableAttributes, setAllRecommendedEncodersDict } from "@/src/reduxStore/states/pages/settings";
+import { selectModal } from "@/src/reduxStore/states/modal";
+import { selectEmbeddings, selectRecommendedEncodersAll, selectRecommendedEncodersDict, selectUsableNonTextAttributes, selectUseableEmbedableAttributes, setAllRecommendedEncodersDict } from "@/src/reduxStore/states/pages/settings";
 import { selectProject } from "@/src/reduxStore/states/project";
 import { CREATE_EMBEDDING } from "@/src/services/gql/mutations/project";
 import { GET_EMBEDDING_PLATFORMS } from "@/src/services/gql/queries/project";
 import { Attribute } from "@/src/types/components/projects/projectId/settings/data-schema";
-import { EmbeddingPlatform, EmbeddingType, PlatformType, SuggestionsProps } from "@/src/types/components/projects/projectId/settings/embeddings";
+import { EmbeddingPlatform, EmbeddingProps, EmbeddingType, PlatformType, SuggestionsProps } from "@/src/types/components/projects/projectId/settings/embeddings";
 import { DataTypeEnum } from "@/src/types/shared/general";
 import { ModalButton, ModalEnum } from "@/src/types/shared/modal";
-import { DEFAULT_AZURE_TYPE, GRANULARITY_TYPES_ARRAY, platformNamesDict, postProcessingEmbeddingPlatforms } from "@/src/util/components/projects/projectId/settings/embeddings-helper";
+import { DEFAULT_AZURE_TYPE, GRANULARITY_TYPES_ARRAY, checkDuplicates, platformNamesDict, postProcessingEmbeddingPlatforms } from "@/src/util/components/projects/projectId/settings/embeddings-helper";
 import { jsonCopy } from "@/submodules/javascript-functions/general";
 import Dropdown from "@/submodules/react-components/components/Dropdown";
 import { useLazyQuery, useMutation } from "@apollo/client";
@@ -19,15 +20,17 @@ import { useDispatch, useSelector } from "react-redux";
 
 const ACCEPT_BUTTON = { buttonCaption: 'Add embedding', disabled: false, useButton: true };
 
-export default function AddNewEmbedding() {
+export default function AddNewEmbedding(props: EmbeddingProps) {
     const dispatch = useDispatch();
 
     const useableEmbedableAttributes = useSelector(selectUseableEmbedableAttributes);
     const embeddingHandles = useSelector(selectRecommendedEncodersDict);
-    const embeddingHandlesAll = useSelector(selectRecommendedEncodersAll)
+    const embeddingHandlesAll = useSelector(selectRecommendedEncodersAll);
     const organization = useSelector(selectOrganization);
     const project = useSelector(selectProject);
     const useableNonTextAttributes = useSelector(selectUsableNonTextAttributes);
+    const modalEmbedding = useSelector(selectModal(ModalEnum.ADD_EMBEDDING));
+    const embeddings = useSelector(selectEmbeddings);
 
     const [targetAttribute, setTargetAttribute] = useState(null);
     const [platform, setPlatform] = useState(null);
@@ -62,9 +65,18 @@ export default function AddNewEmbedding() {
     }, []);
 
     useEffect(() => {
+        if (useableEmbedableAttributes.length == 0) return;
+        setTargetAttribute(useableEmbedableAttributes[0].name);
+        setPlatform(embeddingPlatforms[0].name);
+        setGranularity(GRANULARITY_TYPES_ARRAY[0].name);
+    }, [useableEmbedableAttributes]);
+
+    useEffect(() => {
         if (!platform) return;
+        if (embeddingHandlesAll.length == 0) return;
+        prepareSuggestions();
         changePlatformOrGranularity();
-    }, [platform]);
+    }, [platform, embeddingHandlesAll]);
 
     useEffect(() => {
         const filteredAttributesArrayCopy = [];
@@ -114,12 +126,36 @@ export default function AddNewEmbedding() {
             }
         }
         checkIfAttributeHasToken();
-        checkIfCreateEmbeddingIsDisabled();
+        const acceptButtonCopy = jsonCopy(ACCEPT_BUTTON);
+        acceptButtonCopy.disabled = checkIfCreateEmbeddingIsDisabled();
+        setAcceptButton(acceptButtonCopy);
         setTermsAccepted(false);
+        setModel(null);
+        setApiToken('');
     }
 
     function checkIfCreateEmbeddingIsDisabled() {
-
+        let checkFormFields: boolean = false;
+        if (platform == platformNamesDict[PlatformType.HUGGING_FACE] || platform == platformNamesDict[PlatformType.PYTHON]) {
+            checkFormFields = model == null || model == "";
+        } else if (platform == platformNamesDict[PlatformType.OPEN_AI]) {
+            checkFormFields = model == null || apiToken == null || apiToken == "" || !termsAccepted;
+        } else if (platform == platformNamesDict[PlatformType.COHERE]) {
+            checkFormFields = apiToken == null || apiToken == "" || !termsAccepted;
+        } else if (platform == platformNamesDict[PlatformType.AZURE]) {
+            checkFormFields = apiToken == null || apiToken == "" || url == null || url == "" || version == null || version == "" || !termsAccepted || !engine;
+        }
+        const data = {
+            targetAttribute: targetAttribute,
+            platform: embeddingPlatforms.find((p: EmbeddingPlatform) => p.name == platform)?.platform,
+            granularity: granularity,
+            model: model,
+            apiToken: apiToken,
+            engine: engine,
+            url: url,
+            version: version
+        }
+        return checkFormFields || !checkDuplicates(embeddings, data);
     }
 
     function checkIfPlatformHasToken() {
@@ -183,15 +219,19 @@ export default function AddNewEmbedding() {
 
         const attributeId = useableEmbedableAttributes.find((a) => a.name == targetAttribute).id;
         createEmbeddingMut({ variables: { projectId: project.id, attributeId: attributeId, config: JSON.stringify(config) } }).then((res) => {
-            // TODO: add embedding to redux, BE changes to return the embedding
+            // TODO: return embedding on the BE, so we can add it to the store, because that is used in the websocket
         });
 
-    }, [embeddingPlatforms, platform, granularity, model, apiToken, engine, url, version, termsAccepted]);
+    }, [embeddingPlatforms, platform, granularity, model, apiToken, engine, url, version, termsAccepted, modalEmbedding]);
+
+    useEffect(() => {
+        props.refetchWS();
+    }, [addEmbedding]);
 
     const [acceptButton, setAcceptButton] = useState<ModalButton>(ACCEPT_BUTTON);
 
     useEffect(() => {
-        setAcceptButton({ ...acceptButton, emitFunction: addEmbedding });
+        setAcceptButton({ ...acceptButton, emitFunction: addEmbedding, disabled: checkIfCreateEmbeddingIsDisabled() });
     }, [embeddingPlatforms, platform, granularity, model, apiToken, engine, url, version, termsAccepted]);
 
     return (

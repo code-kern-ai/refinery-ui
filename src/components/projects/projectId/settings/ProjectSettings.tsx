@@ -30,6 +30,7 @@ import { postProcessingEmbeddings, postProcessingRecommendedEncoders } from "@/s
 import { AttributeState } from "@/src/types/components/projects/projectId/settings/data-schema";
 import { RecommendedEncoder } from "@/src/types/components/projects/projectId/settings/embeddings";
 import LabelingTasks from "./labeling-tasks/LabelingTasks";
+import { jsonCopy } from "@/submodules/javascript-functions/general";
 
 const ACCEPT_BUTTON = { buttonCaption: "Accept", useButton: true, disabled: true }
 
@@ -175,9 +176,17 @@ export default function ProjectSettings() {
                         if (msgParts[4] == "FINISHED") {
                             refetchEmbeddingsAndPostProcess();
                         }
-                        else e.state = msgParts[4];
+                        else {
+                            const embedding = jsonCopy(e);
+                            embedding.state = msgParts[4];
+                            dispatch(setAllEmbeddings(embeddings.map((e) => e.id == embedding.id ? embedding : e)));
+                        }
                     }
-                    else if (msgParts[3] == "progress") e.progress = Number(msgParts[4])
+                    else if (msgParts[3] == "progress") {
+                        const embedding = jsonCopy(e);
+                        embedding.progress = Number(msgParts[4]);
+                        dispatch(setAllEmbeddings(embeddings.map((e) => e.id == embedding.id ? embedding : e)));
+                    }
                     else console.log("unknown websocket message in part 3:" + msgParts[3], "full message:", msgParts)
                     return;
                 }
@@ -218,6 +227,14 @@ export default function ProjectSettings() {
                 if (msgParts[2] == 'finished') timer(5000).subscribe(() => checkProjectTokenization());
             }
         }
+    }
+
+    function refetchWS() {
+        WebSocketsService.subscribeToNotification(CurrentPage.PROJECT_SETTINGS, {
+            projectId: project.id,
+            whitelist: ['project_update', 'tokenization', 'calculate_attribute', 'embedding', 'attributes_updated'],
+            func: handleWebsocketNotification
+        });
     }
 
     return (<div>
@@ -278,7 +295,7 @@ export default function ProjectSettings() {
                 </div>
             </div>
 
-            <Embeddings />
+            <Embeddings refetchWS={refetchWS} />
             <LabelingTasks />
             {isManaged && <GatesIntegration />}
             <ProjectMetaData />

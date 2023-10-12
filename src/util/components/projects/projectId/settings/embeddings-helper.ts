@@ -68,3 +68,35 @@ export function postProcessingRecommendedEncoders(attributes: Attribute[], token
     });
     return embeddingHandles;
 }
+
+function buildExpectedEmbeddingName(data: any): string {
+    let toReturn = data.targetAttribute;
+    toReturn += "-" + (data.granularity == 'Attribute' ? 'classification' : 'extraction');
+    const platform = data.platform;
+    if (platform == PlatformType.HUGGING_FACE || platform == PlatformType.PYTHON) {
+        toReturn += "-" + platform + "-" + data.model;
+    } else if (platform == PlatformType.OPEN_AI || platform == PlatformType.COHERE || platform == PlatformType.AZURE) {
+        toReturn += buildEmbeddingNameWithApiToken(data);
+    }
+    return toReturn;
+}
+
+function buildEmbeddingNameWithApiToken(data: any) {
+    if (data.apiToken == null) return "";
+    if (data.platform == PlatformType.AZURE) data.model = data.engine;
+    const platformStr = "-" + data + "-";
+    const apiTokenCut = data.apiToken.substring(0, 3) + "..." + data.apiToken.substring(data.apiToken.length - 4, data.apiToken.length);
+    if (data.platform == PlatformType.OPEN_AI || data.platform == PlatformType.AZURE) return platformStr + data.model + "-" + apiTokenCut;
+    else return platformStr + apiTokenCut;
+}
+
+export function checkDuplicates(embeddings: any, data: any): boolean {
+    const currentName = buildExpectedEmbeddingName(data);
+    if (currentName.slice(-1) == "-") return false;
+    else {
+        for (const embedding of embeddings) {
+            if (embedding.name == currentName) return false;
+        }
+    }
+    return true;
+}
