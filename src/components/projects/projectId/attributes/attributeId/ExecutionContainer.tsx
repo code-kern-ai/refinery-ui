@@ -149,7 +149,7 @@ export default function ExecutionContainer(props: ExecutionContainerProps) {
                         {props.currentAttribute.dataType != DataTypeEnum.EMBEDDING_LIST ? <span>
                             {sampleRecords.calculatedAttributes[modalViewRecordDetails.recordIdx]}
                         </span> : <div className="flex flex-col gap-y-2 divide-y">
-                            {sampleRecords.calculatedAttributesList[modalViewRecordDetails.recordIdx].map((item: string, index: number) => <span className="mt-1">
+                            {sampleRecords.calculatedAttributesList[modalViewRecordDetails.recordIdx].map((item: string, index: number) => <span key={item} className="mt-1">
                                 {sampleRecords.calculatedAttributesList[modalViewRecordDetails.recordIdx]}
                             </span>)}
                         </div>}
