@@ -145,3 +145,11 @@ mutation ($projectId: ID!, $labelId: ID!, $newName: String!) {
     ok
   }
 }  `;
+
+export const CALCULATE_USER_ATTRIBUTE_ALL_RECORDS = gql`
+mutation($projectId: ID!, $attributeId: ID!){
+  calculateUserAttributeAllRecords(projectId: $projectId, attributeId: $attributeId) {
+    ok
+  } 
+}
+`;

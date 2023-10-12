@@ -4,9 +4,9 @@ import { selectAttributes, selectUsableAttributes, setAllAttributes, setAllUsabl
 import { selectProject } from "@/src/reduxStore/states/project"
 import { UPDATE_ATTRIBUTE } from "@/src/services/gql/mutations/project";
 import { LOOKUP_LISTS_BY_PROJECT_ID } from "@/src/services/gql/queries/lookup-lists";
-import { GET_ATTRIBUTES_BY_PROJECT_ID } from "@/src/services/gql/queries/project";
+import { GET_ATTRIBUTES_BY_PROJECT_ID, GET_PROJECT_TOKENIZATION } from "@/src/services/gql/queries/project";
 import { Attribute, AttributeState } from "@/src/types/components/projects/projectId/settings/data-schema";
-import { DataTypeEnum } from "@/src/types/shared/general";
+import { CurrentPage, DataTypeEnum } from "@/src/types/shared/general";
 import { postProcessLookupLists } from "@/src/util/components/projects/projectId/lookup-lists-helper";
 import { postProcessCurrentAttribute } from "@/src/util/components/projects/projectId/settings/attribute-calculation-helper";
 import { ATTRIBUTES_VISIBILITY_STATES, DATA_TYPES, getTooltipVisibilityState, postProcessingAttributes } from "@/src/util/components/projects/projectId/settings/data-schema-helper";
@@ -15,7 +15,7 @@ import Dropdown from "@/submodules/react-components/components/Dropdown";
 import { useLazyQuery, useMutation } from "@apollo/client";
 import { Editor } from "@monaco-editor/react";
 import { Tooltip } from "@nextui-org/react";
-import { IconArrowLeft } from "@tabler/icons-react";
+import { IconAlertTriangleFilled, IconArrowLeft, IconCircleCheckFilled } from "@tabler/icons-react";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux"
@@ -23,7 +23,12 @@ import ExecutionContainer from "./ExecutionContainer";
 import { getPythonFunctionRegExMatch } from "@/submodules/javascript-functions/python-functions-parser";
 import DangerZone from "@/src/components/shared/danger-zone/DangerZone";
 import { DangerZoneEnum } from "@/src/types/shared/danger-zone";
-import ContainerLogs from "../../../../shared/logs/ContainerLogs";
+import ContainerLogs from "@/src/components/shared/logs/ContainerLogs";
+import LoadingIcon from "@/src/components/shared/loading/LoadingIcon";
+import { WebSocketsService } from "@/src/services/base/web-sockets/WebSocketsService";
+import { timer } from "rxjs";
+
+const EDITOR_OPTIONS = { theme: 'vs-light', language: 'python', readOnly: false };
 
 export default function AttributeCalculation() {
     const router = useRouter();
@@ -40,20 +45,18 @@ export default function AttributeCalculation() {
     const [duplicateNameExists, setDuplicateNameExists] = useState(false);
     const [tooltipsArray, setTooltipsArray] = useState<string[]>([]);
     const [isInitial, setIsInitial] = useState(null);  //null as add state to differentiate between initial, not and unchecked
+    const [editorOptions, setEditorOptions] = useState(EDITOR_OPTIONS);
+    const [tokenizationProgress, setTokenizationProgress] = useState(0);
 
     const [refetchAttributes] = useLazyQuery(GET_ATTRIBUTES_BY_PROJECT_ID, { fetchPolicy: "network-only" });
     const [updateAttributeMut] = useMutation(UPDATE_ATTRIBUTE);
     const [refetchLookupLists] = useLazyQuery(LOOKUP_LISTS_BY_PROJECT_ID);
+    const [refetchProjectTokenization] = useLazyQuery(GET_PROJECT_TOKENIZATION, { fetchPolicy: "no-cache" });
 
-
-    useEffect(() => {
-        if (!router.query.attributeId) return;
-        setCurrentAttribute(postProcessCurrentAttribute(attributes.find((attribute) => attribute.id === router.query.attributeId)));
-    }, [attributes, router.query.attributeId]);
 
     useEffect(() => {
         if (!project) return;
-        if (!currentAttribute && attributes.length == 0) {
+        if (!currentAttribute || attributes.length == 0) {
             refetchAttributes({ variables: { projectId: project.id, stateFilter: ['ALL'] } }).then((res) => {
                 dispatch(setAllAttributes(postProcessingAttributes(res.data['attributesByProjectId'])));
                 dispatch(setAllUsableAttributes(postProcessingAttributes(res.data['attributesByProjectId']).filter((attribute) => attribute.id != '@@NO_ATTRIBUTE@@')));
@@ -65,7 +68,13 @@ export default function AttributeCalculation() {
                 dispatch(setAllLookupLists(postProcessLookupLists(res.data['knowledgeBasesByProjectId'])));
             });
         }
-    }, [project]);
+        checkProjectTokenization();
+        WebSocketsService.subscribeToNotification(CurrentPage.ATTRIBUTE_CALCULATION, {
+            projectId: project.id,
+            whitelist: ['attributes_updated', 'calculate_attribute', 'tokenization', 'knowledge_base_updated', 'knowledge_base_deleted', 'knowledge_base_created'],
+            func: handleWebsocketNotification
+        });
+    }, [project, attributes, lookupLists]);
 
     useEffect(() => {
         if (!attributes) return;
@@ -75,6 +84,16 @@ export default function AttributeCalculation() {
         });
         setTooltipsArray(tooltipsPreps);
     }, [attributes]);
+
+    useEffect(() => {
+        if (!currentAttribute) return;
+        if (currentAttribute.saveSourceCode) {
+            updateSourceCode(currentAttribute.sourceCode);
+        }
+        if (currentAttribute.state == AttributeState.USABLE) {
+            setEditorOptions({ ...EDITOR_OPTIONS, readOnly: true });
+        }
+    }, [currentAttribute]);
 
     function openName(open: boolean) {
         setIsNameOpen(open);
@@ -90,6 +109,7 @@ export default function AttributeCalculation() {
         }
         const attributeNew = jsonCopy(currentAttribute);
         attributeNew.name = name;
+        attributeNew.saveSourceCode = false;
         updateAttributeMut({ variables: { projectId: project.id, attributeId: currentAttribute.id, name: attributeNew.name } }).then(() => {
             setCurrentAttribute(postProcessCurrentAttribute(attributeNew));
             dispatch(updateAttributeById(attributeNew));
@@ -103,6 +123,7 @@ export default function AttributeCalculation() {
         attributeNew.visibility = visibility;
         attributeNew.visibilityIndex = ATTRIBUTES_VISIBILITY_STATES.findIndex((state) => state.name === option);
         attributeNew.visibilityName = option;
+        attributeNew.saveSourceCode = false;
         updateAttributeMut({ variables: { projectId: project.id, attributeId: currentAttribute.id, visibility: attributeNew.visibility } }).then(() => {
             setCurrentAttribute(postProcessCurrentAttribute(attributeNew));
             dispatch(updateAttributeById(attributeNew));
@@ -114,6 +135,7 @@ export default function AttributeCalculation() {
         const attributeNew = jsonCopy(currentAttribute);
         attributeNew.dataType = dataType;
         attributeNew.dataTypeName = option;
+        attributeNew.saveSourceCode = false;
         updateAttributeMut({ variables: { projectId: project.id, attributeId: currentAttribute.id, dataType: attributeNew.dataType } }).then(() => {
             setCurrentAttribute(postProcessCurrentAttribute(attributeNew));
             dispatch(updateAttributeById(attributeNew));
@@ -134,7 +156,49 @@ export default function AttributeCalculation() {
     }
 
     function updateSourceCode(value: string) {
-        updateAttributeMut({ variables: { projectId: project.id, attributeId: currentAttribute.id, sourceCode: value } });
+        var regMatch: any = getPythonFunctionRegExMatch(value);
+        const finalSourceCode = value.replace(regMatch[0], 'def ac(record)');
+        updateAttributeMut({ variables: { projectId: project.id, attributeId: currentAttribute.id, sourceCode: finalSourceCode } });
+    }
+
+    function checkProjectTokenization() {
+        refetchProjectTokenization({ variables: { projectId: project.id } }).then((res) => {
+            setTokenizationProgress(res.data['projectTokenization']?.progress);
+        });
+    }
+
+    function handleWebsocketNotification(msgParts: string[]) {
+        if (msgParts[1] == 'attributes_updated' && msgParts[2] == currentAttribute.id) {
+
+        } else if (msgParts[1] == 'calculate_attribute') {
+            if (msgParts[2] == 'progress' && msgParts[3] == currentAttribute.id) {
+                const currentAttributeCopy = jsonCopy(currentAttribute);
+                currentAttributeCopy.progress = Number(msgParts[4]);
+                setCurrentAttribute(currentAttributeCopy);
+            } else {
+                refetchAttributes({ variables: { projectId: project.id, stateFilter: ['ALL'] } }).then((res) => {
+                    dispatch(setAllAttributes(postProcessingAttributes(res.data['attributesByProjectId'])));
+                    dispatch(setAllUsableAttributes(postProcessingAttributes(res.data['attributesByProjectId']).filter((attribute) => attribute.id != '@@NO_ATTRIBUTE@@')));
+                    setCurrentAttribute(postProcessCurrentAttribute(attributes.find((attribute) => attribute.id === router.query.attributeId)));
+                });
+                if (msgParts[2] == "finished") timer(2000).subscribe(() => checkProjectTokenization());
+
+            }
+        } else if (['knowledge_base_updated', 'knowledge_base_deleted', 'knowledge_base_created'].includes(msgParts[1])) {
+            refetchLookupLists({ variables: { projectId: project.id } }).then((res) => {
+                dispatch(setAllLookupLists(postProcessLookupLists(res.data['knowledgeBasesByProjectId'])));
+            });
+        } else if (msgParts[1] == 'tokenization' && msgParts[2] == 'docbin') {
+            if (msgParts[3] == 'progress') {
+                setTokenizationProgress(Number(msgParts[4]));
+            } else if (msgParts[3] == 'state') {
+                if (msgParts[4] == 'IN_PROGRESS') setTokenizationProgress(0);
+                else if (msgParts[4] == 'FINISHED') {
+                    timer(2000).subscribe(() => checkProjectTokenization());
+                }
+            }
+
+        }
     }
 
     return (project && <div className="bg-white p-4 pb-16 overflow-y-auto h-screen" onScroll={(e: any) => onScrollEvent(e)}>
@@ -173,13 +237,13 @@ export default function AttributeCalculation() {
                 {duplicateNameExists && <div className="text-red-700 text-xs mt-2">Attribute name exists</div>}
                 <div className="grid grid-cols-2 gap-2 items-center mt-8" style={{ gridTemplateColumns: 'max-content auto' }}>
                     <div className="text-sm leading-5 font-medium text-gray-700">Visibility</div>
-                    <Dropdown buttonName={currentAttribute.visibilityName} options={ATTRIBUTES_VISIBILITY_STATES} dropdownWidth="w-52"
-                        selectedOption={(option: string) => updateVisibility(option)} tooltipsArray={tooltipsArray} tooltipArrayPlacement="right" />
+                    <Dropdown buttonName={currentAttribute.visibilityName} options={ATTRIBUTES_VISIBILITY_STATES} dropdownWidth="w-52" tooltipArrayPlacement="right" tooltipsArray={tooltipsArray}
+                        selectedOption={(option: string) => updateVisibility(option)} disabled={currentAttribute.state == AttributeState.USABLE} />
                     <div className="text-sm leading-5 font-medium text-gray-700">Data type</div>
                     <div className="flex flex-row items-center">
                         <Tooltip color="invert" placement="right" content={currentAttribute.state == AttributeState.USABLE || currentAttribute.state == AttributeState.RUNNING ? 'Cannot edit data type' : 'Edit your data type'}>
                             <Dropdown buttonName={currentAttribute.dataTypeName} options={DATA_TYPES} dropdownWidth="w-52"
-                                selectedOption={(option: string) => updateDataType(option)} />
+                                selectedOption={(option: string) => updateDataType(option)} disabled={currentAttribute.state == AttributeState.USABLE} />
                         </Tooltip>
                         {currentAttribute.dataType == DataTypeEnum.EMBEDDING_LIST && <div className="text-gray-700 text-sm ml-3">Only useable for similarity search</div>}
                     </div>
@@ -242,11 +306,8 @@ export default function AttributeCalculation() {
                     <Editor
                         height="400px"
                         defaultLanguage={'python'}
-                        value={currentAttribute.sourceCode}
-                        options={{
-                            readOnly: false,
-                            theme: 'vs-light'
-                        }}
+                        value={currentAttribute.sourceCodeToDisplay}
+                        options={editorOptions}
                         onChange={(value) => {
                             const regMatch: any = getPythonFunctionRegExMatch(value);
                             changeAttributeName(regMatch ? regMatch[2] : '');
@@ -256,8 +317,41 @@ export default function AttributeCalculation() {
                     />
                 </div>
 
-                <ExecutionContainer currentAttribute={currentAttribute} tokenizationProgress={1} />
+                <ExecutionContainer currentAttribute={currentAttribute} tokenizationProgress={tokenizationProgress} />
                 <ContainerLogs currentAttribute={currentAttribute} />
+
+                <div className="mt-8">
+                    <div className="text-sm leading-5 font-medium text-gray-700 inline-block">Calculation progress</div>
+                    {currentAttribute.progress == 0 && currentAttribute.state == AttributeState.INITIAL && <div className="bg-white">
+                        <div className="py-6 text-sm leading-5 font-normal text-gray-500">This attribute was not yet run.</div>
+                    </div>}
+                    {currentAttribute.progress < 1 && currentAttribute.state == AttributeState.RUNNING &&
+                        <div className=" mb-4 card border border-gray-200 bg-white flex-grow overflow-visible">
+                            <div className="card-body">
+                                <div className="flex flex-row items-center">
+                                    <Tooltip content="Currently being executed" color="invert" placement="right" className="relative z-10"><LoadingIcon /></Tooltip>
+                                    <div className="text-sm leading-5 font-normal text-gray-500 w-full">
+                                        <div className="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700">
+                                            <div className="bg-green-400 h-2.5 rounded-full" style={{ 'width': currentAttribute.progress + '%' }}>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>}
+                    {currentAttribute.state !== AttributeState.RUNNING && currentAttribute.state !== AttributeState.INITIAL && <div className="flex flex-row items-center">
+                        {currentAttribute.state == AttributeState.USABLE && <Tooltip content="Successfully executed" color="invert">
+                            <IconCircleCheckFilled className="h-6 w-6 text-green-500" />
+                        </Tooltip>}
+                        {currentAttribute.state == AttributeState.FAILED && <Tooltip content="Execution ran into errors" color="invert">
+                            <IconAlertTriangleFilled className="h-6 w-6 text-red-500" />
+                        </Tooltip>}
+                        <div className="py-6 text-sm leading-5 font-normal text-gray-500">
+                            {currentAttribute.state === 'FAILED' ? 'Attribute calculation ran into errors.' : 'Attribute calculation finished successfully.'}
+                        </div>
+                    </div>}
+                </div>
+
                 <DangerZone elementType={DangerZoneEnum.ATTRIBUTE} name={currentAttribute.name} id={currentAttribute.id} />
             </div >
         </div >}

@@ -20,6 +20,9 @@ export type Attribute = {
     negate?: boolean;
     color?: string;
     visibilityName?: string;
+    progress?: number;
+    sourceCodeToDisplay?: string;
+    saveSourceCode: boolean;
 }
 
 export type AttributeVisibilityStates = {
@@ -42,4 +45,5 @@ export enum AttributeState {
     RUNNING = 'RUNNING',
     FAILED = 'FAILED',
     QUEUED = 'QUEUED', //special state since not in db but "overwritten" if queue entry exists
+    INITIAL = 'INITIAL',
 }

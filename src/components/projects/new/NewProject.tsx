@@ -1,5 +1,4 @@
 import { UploadFileType, UploadOptions } from "@/src/types/shared/upload";
-import Upload from "../../shared/upload/Upload";
 import { useEffect, useState } from "react";
 import { useLazyQuery } from "@apollo/client";
 import { GET_ALL_TOKENIZER_OPTIONS } from "@/src/services/gql/queries/projects";
@@ -7,6 +6,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { selectIsManaged } from "@/src/reduxStore/states/general";
 import { setUploadFileType } from "@/src/reduxStore/states/upload";
 import { ConfigManager } from "@/src/services/base/config";
+import Upload from "../../shared/upload/Upload";
 
 export default function NewProject() {
     const dispatch = useDispatch();

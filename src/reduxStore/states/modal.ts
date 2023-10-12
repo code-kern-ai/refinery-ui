@@ -109,6 +109,11 @@ const initialState: Modals = {
     [ModalEnum.DELETE_ELEMENT]: {
         open: false,
         id: '',
+    },
+    [ModalEnum.VIEW_RECORD_DETAILS]: {
+        open: false,
+        record: '',
+        recordIdx: 0,
     }
 };
 

@@ -4,6 +4,7 @@ export type DangerZoneProps = {
     id: string;
 };
 
+// used with small letters because the same name is used in the display
 export enum DangerZoneEnum {
-    ATTRIBUTE = "ATTRIBUTE",
+    ATTRIBUTE = "attribute",
 }

@@ -50,7 +50,7 @@ export default function Statuses({ status, tooltipPosition = DEFAULT_TOOLTIP_POS
                     break;
                 case Status.USABLE:
                     setDataTip('Attribute can be used');
-                    setStatusName
+                    setStatusName('Usable');
                     setColor('green');
                     break;
                 case Status.UPLOADED:

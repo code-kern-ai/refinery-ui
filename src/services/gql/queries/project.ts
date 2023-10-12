@@ -199,3 +199,14 @@ query($projectId: ID!, $attributeId: ID!){
   }
 }
 `;
+
+export const GET_RECORD_BY_RECORD_ID = gql`
+query ($projectId: ID!, $recordId: ID!) {
+  recordByRecordId(projectId: $projectId, recordId: $recordId) {
+    id
+    data
+    projectId
+    category      
+  }
+} 
+`;

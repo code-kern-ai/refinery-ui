@@ -1,16 +1,21 @@
 import LoadingIcon from "@/src/components/shared/loading/LoadingIcon";
 import Modal from "@/src/components/shared/modal/Modal";
-import { openModal, selectModal } from "@/src/reduxStore/states/modal";
+import { openModal, selectModal, setModalStates } from "@/src/reduxStore/states/modal";
 import { selectProject } from "@/src/reduxStore/states/project";
-import { CALCULATE_USER_ATTRIBUTE_SAMPLE_RECORDS } from "@/src/services/gql/queries/project";
+import { CALCULATE_USER_ATTRIBUTE_SAMPLE_RECORDS, GET_RECORD_BY_RECORD_ID } from "@/src/services/gql/queries/project";
 import { ExecutionContainerProps, SampleRecord } from "@/src/types/components/projects/projectId/settings/attribute-calculation";
 import { AttributeState } from "@/src/types/components/projects/projectId/settings/data-schema";
 import { ModalButton, ModalEnum } from "@/src/types/shared/modal";
+import { postProcessRecordByRecordId } from "@/src/util/components/projects/projectId/settings/attribute-calculation-helper";
 import { jsonCopy } from "@/submodules/javascript-functions/general";
-import { useLazyQuery } from "@apollo/client";
+import { useLazyQuery, useMutation } from "@apollo/client";
 import { Tooltip } from "@nextui-org/react";
 import { useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import style from '@/src/styles/components/projects/projectId/attribute-calculation.module.css';
+import { DataTypeEnum } from "@/src/types/shared/general";
+import { CALCULATE_USER_ATTRIBUTE_ALL_RECORDS } from "@/src/services/gql/mutations/project";
+
 
 const ACCEPT_BUTTON = { buttonCaption: 'Accept', useButton: true };
 
@@ -19,22 +24,25 @@ export default function ExecutionContainer(props: ExecutionContainerProps) {
     const dispatch = useDispatch();
 
     const modalExecuteAll = useSelector(selectModal(ModalEnum.EXECUTE_ATTRIBUTE_CALCULATION));
+    const modalViewRecordDetails = useSelector(selectModal(ModalEnum.VIEW_RECORD_DETAILS));
 
     const [requestedSomething, setRequestedSomething] = useState(false);
     const [runOn10HasError, setRunOn10HasError] = useState(false);
-    const [sampleRecords, setSampleRecords] = useState<SampleRecord[]>(null);
+    const [sampleRecords, setSampleRecords] = useState<SampleRecord>(null);
     const [checkIfAtLeastRunning, setCheckIfAtLeastRunning] = useState(false);
     const [checkIfAtLeastQueued, setCheckIfAtLeastQueued] = useState(false);
 
     const [refetchSampleRecords] = useLazyQuery(CALCULATE_USER_ATTRIBUTE_SAMPLE_RECORDS, { fetchPolicy: 'no-cache' });
+    const [refetchRecordByRecordId] = useLazyQuery(GET_RECORD_BY_RECORD_ID);
+    const [executeAttributeCalculation] = useMutation(CALCULATE_USER_ATTRIBUTE_ALL_RECORDS);
 
     const calculateUserAttributeAllRecords = useCallback(() => {
-
+        executeAttributeCalculation({ variables: { projectId: project.id, attributeId: props.currentAttribute.id } }).then((res) => {
+        });
     }, [modalExecuteAll]);
 
     useEffect(() => {
         setAcceptButton({ ...ACCEPT_BUTTON, emitFunction: calculateUserAttributeAllRecords, disabled: requestedSomething });
-
     }, [modalExecuteAll]);
 
     const [acceptButton, setAcceptButton] = useState<ModalButton>(ACCEPT_BUTTON);
@@ -50,9 +58,15 @@ export default function ExecutionContainer(props: ExecutionContainerProps) {
                 sampleRecordsFinal.calculatedAttributesList = sampleRecordsFinal.calculatedAttributes.map((record: string) => JSON.parse(record));
             }
             setSampleRecords(sampleRecordsFinal);
-        }, (error) => {
+        }, () => {
             setRequestedSomething(false);
         })
+    }
+
+    function recordByRecordId(recordId: string) {
+        refetchRecordByRecordId({ variables: { projectId: project.id, recordId: recordId } }).then((res) => {
+            dispatch(setModalStates(ModalEnum.VIEW_RECORD_DETAILS, { record: postProcessRecordByRecordId(res.data['recordByRecordId']) }));
+        });
     }
 
     return (<div>
@@ -86,6 +100,35 @@ export default function ExecutionContainer(props: ExecutionContainerProps) {
                 </Tooltip>
             </div>
         </div>
+
+        {sampleRecords && sampleRecords.calculatedAttributes.length > 0 && <div className="mt-4 flex flex-col">
+            <div className="overflow-x-auto">
+                <div className="inline-block min-w-full align-middle">
+                    <div className="overflow-hidden shadow ring-1 ring-black ring-opacity-5 md:rounded-lg">
+                        <div className="min-w-full border divide-y divide-gray-300">
+                            {sampleRecords.calculatedAttributes.map((record: string, index: number) => (
+                                <div key={record} className="divide-y divide-gray-200 bg-white">
+                                    <div className="flex-shrink-0 border-b border-gray-200 shadow-sm flex justify-between items-center">
+                                        <div className="flex items-center text-xs leading-5 text-gray-500 font-normal mx-4 my-3 text-justify">
+                                            {record}
+                                        </div>
+                                        <div className="flex items-center justify-center mr-5 ml-auto">
+                                            <button onClick={() => {
+                                                dispatch(setModalStates(ModalEnum.VIEW_RECORD_DETAILS, { open: true, recordIdx: index }));
+                                                recordByRecordId(sampleRecords.recordIds[index]);
+                                            }} className="bg-white text-gray-700 text-xs font-semibold px-4 py-1 rounded border border-gray-300 cursor-pointer hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 inline-block">
+                                                View
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div >}
+
         <Modal modalName={ModalEnum.EXECUTE_ATTRIBUTE_CALCULATION} acceptButton={acceptButton}>
             <h1 className="text-lg text-gray-900 mb-2 text-center">Attribute calculation</h1>
             <div className="text-sm text-gray-500 my-2">
@@ -96,5 +139,24 @@ export default function ExecutionContainer(props: ExecutionContainerProps) {
             </div>
         </Modal>
 
-    </div>)
+        <Modal modalName={ModalEnum.VIEW_RECORD_DETAILS}>
+            <h1 className="text-lg text-gray-900 mb-2 text-center">View details</h1>
+            {modalViewRecordDetails.record ? (
+                <div className={`overflow-y-auto max-height-modal text-sm text-gray-500 my-2 ${style.scrollableSize}`}>
+                    {/* TODO: Add the attribute when the component RECORD-DISPLAY is implemented */}
+                    <div className="text-sm leading-5 text-left text-gray-900 font-bold">Calculated value</div>
+                    <div className="text-sm leading-5 text-left text-gray-500 font-normal">
+                        {props.currentAttribute.dataType != DataTypeEnum.EMBEDDING_LIST ? <span>
+                            {sampleRecords.calculatedAttributes[modalViewRecordDetails.recordIdx]}
+                        </span> : <div className="flex flex-col gap-y-2 divide-y">
+                            {sampleRecords.calculatedAttributesList[modalViewRecordDetails.recordIdx].map((item: string, index: number) => <span className="mt-1">
+                                {sampleRecords.calculatedAttributesList[modalViewRecordDetails.recordIdx]}
+                            </span>)}
+                        </div>}
+                    </div>
+                </div>
+            ) : (<LoadingIcon />)}
+        </Modal>
+
+    </div >)
 }
