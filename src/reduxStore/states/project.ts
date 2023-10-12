@@ -61,7 +61,7 @@ const projectSlice = createSlice({
         },
         removeFromAllProjectsById(state, action: PayloadAction<string>) {
             if (action.payload) state.all = state.all.filter((project) => project.id !== action.payload);
-        },
+        }
     },
 })
 

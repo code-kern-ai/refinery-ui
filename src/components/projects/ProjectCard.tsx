@@ -1,6 +1,6 @@
 import { selectIsAdmin, selectIsDemo, selectUser } from "@/src/reduxStore/states/general";
-import { setModalStates } from "@/src/reduxStore/states/modal";
-import { setActiveProject } from "@/src/reduxStore/states/project";
+import { closeModal, setModalStates } from "@/src/reduxStore/states/modal";
+import { removeFromAllProjectsById, setActiveProject } from "@/src/reduxStore/states/project";
 import { Project, ProjectCardProps, ProjectStatus } from "@/src/types/components/projects/projects-list";
 import { ModalEnum } from "@/src/types/shared/modal";
 import { isStringTrue } from "@/submodules/javascript-functions/general";
@@ -9,38 +9,49 @@ import { useRouter } from "next/router";
 import { useDispatch, useSelector } from "react-redux";
 import { UNKNOWN_USER } from "@/src/util/constants";
 import { IconArrowRight, IconX } from "@tabler/icons-react";
+import { useEffect, useState } from "react";
+import { useMutation } from "@apollo/client";
+import { DELETE_PROJECT } from "@/src/services/gql/mutations/projects";
 
 export default function ProjectCard(props: ProjectCardProps) {
-    const router = useRouter();
     const dispatch = useDispatch();
 
     const isDemo = useSelector(selectIsDemo);
     const isAdmin = useSelector(selectIsAdmin);
     const user = useSelector(selectUser);
 
+    const [link, setLink] = useState<string>(null);
+
+    const [deleteProjectByIdMut] = useMutation(DELETE_PROJECT, { fetchPolicy: "no-cache" });
+
+    useEffect(() => {
+        setLink(getLink());
+    }, [props.project]);
+
     function adminOpenOrDeleteProject(project: Project) {
         if (!isAdmin) return;
         const deleteInstant = isStringTrue(localStorage.getItem("adminInstantDelete"));
         if (deleteInstant) {
-            dispatch(setModalStates(ModalEnum.ADMIN_DELETE_PROJECT, { projectId: project.id, open: false }));
-            props.adminDeleteProject();
+            deleteProjectByIdMut({ variables: { projectId: project.id } }).then(() => {
+                dispatch(closeModal(ModalEnum.ADMIN_DELETE_PROJECT));
+                dispatch(removeFromAllProjectsById(project.id));
+            })
         }
         else {
             dispatch(setModalStates(ModalEnum.ADMIN_DELETE_PROJECT, { projectId: project.id, open: true }));
         }
     }
 
-    function manageProject(project: Project): void {
-        const projectId = project.id;
-        dispatch(setActiveProject(project));
+    function getLink(): string {
+        const projectId = props.project.id;
         if (user?.role == 'ENGINEER') {
-            if (project.numDataScaleUploaded == 0) {
-                router.push(`/projects/${projectId}/settings`);
+            if (props.project.numDataScaleUploaded == 0) {
+                return `/refinery/projects/${projectId}/settings`
             } else {
-                router.push(`/projects/${projectId}/overview`);
+                return `/refinery/projects/${projectId}/overview`
             }
         } else {
-            router.push(`/projects/${projectId}/labeling`);
+            return `/refinery/projects/${projectId}/labeling`
         }
     }
 
@@ -100,11 +111,11 @@ export default function ProjectCard(props: ProjectCardProps) {
                             </div>}
                         </div>
                         <div>
-                            {props.project.status !== ProjectStatus.INIT_SAMPLE_PROJECT && <button onClick={() => manageProject(props.project)}
+                            {props.project.status !== ProjectStatus.INIT_SAMPLE_PROJECT && <a href={link}
                                 className="text-green-800 text-sm font-medium">
                                 <span className="leading-5">Continue project</span>
                                 <IconArrowRight className="h-5 w-5 inline-block text-green-800" />
-                            </button>}
+                            </a>}
                         </div>
                     </div>
                 </div>

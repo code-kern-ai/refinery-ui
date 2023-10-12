@@ -1,7 +1,7 @@
 import LoadingIcon from "@/src/components/shared/loading/LoadingIcon";
 import { selectProject } from "@/src/reduxStore/states/project";
 import { CardStats, CardStatsEnum, ProjectOverviewCardsProps } from "@/src/types/components/projects/projectId/overview";
-import { Card, Tooltip } from "@nextui-org/react";
+import { Tooltip } from "@nextui-org/react";
 import { IconBottle, IconBulb, IconClick, IconScale } from "@tabler/icons-react";
 import { useSelector } from "react-redux";
 
@@ -29,7 +29,7 @@ export default function ProjectOverviewCards(props: ProjectOverviewCardsProps) {
                         <p className="ml-16 text-sm font-medium text-gray-500 truncate">{card.label}</p>
                     </dt>
                     <dd className="ml-16 pb-6 flex items-baseline sm:pb-7">
-                        {props.projectStats.generalLoading ? (<LoadingIcon />) : (
+                        {props.projectStats.generalLoading ? (<LoadingIcon color={card.color} />) : (
                             <Tooltip content={card.stats !== CardStatsEnum.INTER_ANNOTATOR ? props.projectStats.general[card.stats] : props.projectStats.interAnnotator}
                                 placement="top" color="invert">
                                 {(card.stats == CardStatsEnum.MANUAL || card.stats == CardStatsEnum.WEAK_SUPERVISION) &&

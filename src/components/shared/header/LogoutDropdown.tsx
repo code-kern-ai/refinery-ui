@@ -3,7 +3,7 @@ import { Menu, Transition } from '@headlessui/react'
 import { useSelector } from 'react-redux'
 import { selectIsManaged, selectUser } from '@/src/reduxStore/states/general'
 import { useRouter } from 'next/router'
-import { logoutUser } from '@/src/services/base/user-management/data-fetch'
+import { logoutUser } from '@/src/services/base/data-fetch'
 import { combineClassNames } from '@/submodules/javascript-functions/general'
 
 

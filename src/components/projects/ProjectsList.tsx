@@ -154,7 +154,7 @@ export default function ProjectsList() {
                         <div className="relative pt-6 pb-16 sm:pb-24 lg:pb-32">
                             <main className="mt-16 mx-auto px-4 sm:mt-24 sm:px-6 lg:mt-32">
                                 <div className="lg:grid lg:grid-cols-12 lg:gap-8">
-                                    <div className="sm:text-center md:max-w-2xl md:mx-auto lg:col-span-6 lg:text-left">
+                                    <div className="sm:text-center md:mx-auto lg:col-span-6 lg:text-left">
                                         {isManaged ? (<div>
                                             <div className="text-gray-500 font-semibold text-base uppercase">You&apos;re now on the waitlist!
                                             </div>
@@ -167,7 +167,7 @@ export default function ProjectsList() {
                                                     className="underline cursor-pointer">here</span></a>.
                                             </div>
                                             <div className="text-gray-500 mt-5">
-                                                In the meantime, feel free to take a look at a product demo or check out our &nbsp;
+                                                In the meantime, feel free to take a look at a product demo or check out our&nbsp;
                                                 <a href="https://docs.kern.ai/" target="_blank"><span
                                                     className="underline cursor-pointer">documentation</span></a>. If you have any
                                                 questions, contact us any time.
@@ -217,13 +217,13 @@ export default function ProjectsList() {
                                 <div className="relative pt-6 pb-16 sm:pb-24 lg:pb-32">
                                     <main className="mt-16 mx-auto px-4 sm:mt-24 sm:px-6 lg:mt-32">
                                         <div className="lg:grid lg:grid-cols-12 lg:gap-8">
-                                            <div className="sm:text-center md:max-w-2xl md:mx-auto lg:col-span-6 lg:text-left">
+                                            <div className="sm:text-center md:mx-auto lg:col-span-6 lg:text-left">
                                                 <div className="text-gray-500 font-semibold text-base uppercase">Ready to launch!</div>
                                                 <div className="font-extrabold text-gray-900 text-5xl mt-1">
                                                     Start your <span className="text-green-800">first project</span>
                                                 </div>
                                                 <div className="font-normal text-xl text-gray-500 mt-5">
-                                                    Feel free to take a look at a product demo or check out our &nbsp;
+                                                    Feel free to take a look at a product demo or check out our&nbsp;
                                                     <a href="https://docs.kern.ai/" target="_blank"><span
                                                         className="underline cursor-pointer">documentation</span></a>. If you have any
                                                     questions, you can reach out to us.
@@ -242,7 +242,7 @@ export default function ProjectsList() {
                             <div className="h-screen overflow-y-scroll my-3">
                                 <div className={style.scrollableSize}>
                                     {projects && projects.map((project: Project, index: number) => (
-                                        <ProjectCard project={project} projectStatisticsById={projectStatisticsById} key={index} adminDeleteProject={adminDeleteProject}></ProjectCard>
+                                        <ProjectCard project={project} projectStatisticsById={projectStatisticsById} key={index}></ProjectCard>
                                     ))}
                                 </div>
                                 <Modal modalName={ModalEnum.ADMIN_DELETE_PROJECT} acceptButton={acceptButton} abortButton={abortButton}>

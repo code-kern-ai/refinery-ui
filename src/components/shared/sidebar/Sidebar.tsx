@@ -4,7 +4,6 @@ import { UserRole, VersionOverview } from '@/src/types/shared/sidebar';
 import Image from 'next/image';
 import { useDispatch, useSelector } from 'react-redux';
 import { Tooltip } from '@nextui-org/react';
-import { CurrentPage } from '@/src/types/shared/general';
 import { useCallback, useEffect, useState } from 'react';
 import AppSelectionDropdown from '@/submodules/react-components/components/AppSelectionDropdown';
 import { ModalButton, ModalEnum } from '@/src/types/shared/modal';
@@ -18,16 +17,18 @@ import style from '@/src/styles/shared/sidebar.module.css';
 import { copyToClipboard } from '@/submodules/javascript-functions/general';
 import { IconAlertCircle, IconApi, IconArrowRight, IconBrandDiscord, IconBulb, IconChartPie, IconClipboard, IconExternalLink, IconMaximize, IconMinimize, IconTriangleSquareCircle, IconUserCircle } from '@tabler/icons-react';
 import { IconSettings } from '@tabler/icons-react';
+import { RouteManager } from '@/src/services/base/route-manager';
+import { useRouter } from 'next/router';
 
 const ACCEPT_BUTTON = { buttonCaption: "How to update", useButton: true };
 const ABORT_BUTTON = { buttonCaption: "Back", useButton: true };
 
 export default function Sidebar() {
+    const router = useRouter();
     const dispatch = useDispatch();
 
     const user = useSelector(selectUser);
     const project = useSelector(selectProject);
-    const currentPage = useSelector(selectCurrentPage);
     const isAdmin = useSelector(selectIsAdmin);
     const isManaged = useSelector(selectIsManaged);
 
@@ -35,9 +36,14 @@ export default function Sidebar() {
     const [hasUpdates, setHasUpdates] = useState(false);
     const [versionOverviewData, setVersionOverviewData] = useState<any>(null);
     const [openTab, setOpenTab] = useState(0);
+    const [routeColor, setRouteColor] = useState(null);
 
     const [refetchVersionOverview] = useLazyQuery(GET_VERSION_OVERVIEW, { fetchPolicy: 'no-cache' });
     const [refetchHasUpdates] = useLazyQuery(GET_HAS_UPDATES, { fetchPolicy: 'no-cache' });
+
+    useEffect(() => {
+        setRouteColor(RouteManager.routeColor);
+    }, []);
 
     const howToUpdate = useCallback(() => {
         dispatch(closeModal(ModalEnum.VERSION_OVERVIEW));
@@ -127,13 +133,13 @@ export default function Sidebar() {
                                     </a>
                                 </div>
                                 <div>
-                                    {project && project.id && currentPage ? (<div>
+                                    {project && project.id ? (<div>
                                         {user.role === UserRole.ENGINEER && <div
                                             className="flex items-center justify-center overflow-visible">
                                             <Tooltip placement="right" trigger="hover" color="invert" content="Overview">
                                                 <div className={`relative z-50 ${project.numDataScaleUploaded == 0 ? 'opacity-50 cursor-not-allowed pointer-events-none' : 'opacity-100 cursor-pointer'}`}>
                                                     <a rel="noopener noreferrer" href={`/refinery/projects/${project.id}/overview`}
-                                                        className={`circle ${currentPage == CurrentPage.PROJECT_OVERVIEW ? 'text-kernpurple' : 'text-white'}`}>
+                                                        className={`circle ${routeColor.overview.active ? 'text-kernpurple' : 'text-white'}`}>
                                                         <IconChartPie className="w-6 h-6" />
                                                     </a>
                                                 </div>
@@ -144,7 +150,7 @@ export default function Sidebar() {
                                             <Tooltip placement="right" trigger="hover" color="invert" content="Data Browser">
                                                 <div className={`relative z-50 ${project.numDataScaleUploaded == 0 ? 'opacity-50 cursor-not-allowed pointer-events-none' : 'opacity-100 cursor-pointer'}`}>
                                                     <a rel="noopener noreferrer" href={`/refinery/projects/${project.id}/data`}
-                                                        className={`circle ${currentPage == CurrentPage.DATA_BROWSER ? 'text-kernpurple' : 'text-white'}`}>
+                                                        className={`circle ${routeColor.data.active ? 'text-kernpurple' : 'text-white'}`}>
                                                         <IconTriangleSquareCircle className="w-6 h-6" />
                                                     </a>
                                                 </div>
@@ -154,7 +160,7 @@ export default function Sidebar() {
                                             <Tooltip placement="right" trigger="hover" color="invert" content="Labeling">
                                                 <div className={`relative z-50 ${project.numDataScaleUploaded == 0 ? 'opacity-50 cursor-not-allowed pointer-events-none' : 'opacity-100 cursor-pointer'}`}>
                                                     <a rel="noopener noreferrer" href={`/refinery/projects/${project.id}/labeling`}
-                                                        className={`circle ${currentPage == CurrentPage.LABELING ? 'text-kernpurple' : 'text-white'}`}>
+                                                        className={`circle ${routeColor.labeling.active ? 'text-kernpurple' : 'text-white'}`}>
                                                         <svg xmlns="http://www.w3.org/2000/svg" className="w-6 h-6" viewBox="0 0 20 20"
                                                             fill="currentColor">
                                                             <path fillRule="evenodd"
@@ -170,7 +176,7 @@ export default function Sidebar() {
                                             <Tooltip placement="right" trigger="hover" color="invert" content="Heuristics">
                                                 <div className={`relative z-50 ${project.numDataScaleUploaded == 0 ? 'opacity-50 cursor-not-allowed pointer-events-none' : 'opacity-100 cursor-pointer'}`}>
                                                     <a rel="noopener noreferrer" href={`/refinery/projects/${project.id}/heuristics`}
-                                                        className={`circle ${currentPage == CurrentPage.HEURISTICS || currentPage == CurrentPage.LOOKUP_LISTS_OVERVIEW ? 'text-kernpurple' : 'text-white'}`}>
+                                                        className={`circle ${routeColor.heuristics.active ? 'text-kernpurple' : 'text-white'}`}>
                                                         <IconBulb className="w-6 h-6" />
                                                     </a>
                                                 </div>
@@ -181,7 +187,7 @@ export default function Sidebar() {
                                             <Tooltip placement="right" trigger="hover" color="invert" content="Settings">
                                                 <div className={`relative z-50 ${project.numDataScaleUploaded == 0 ? 'opacity-50 cursor-not-allowed pointer-events-none' : 'opacity-100 cursor-pointer'}`}>
                                                     <a rel="noopener noreferrer" href={`/refinery/projects/${project.id}/settings`}
-                                                        className={`circle ${(currentPage == CurrentPage.SETTINGS || currentPage == CurrentPage.ATTRIBUTE_CALCULATION) ? 'text-kernpurple' : 'text-white'}`}>
+                                                        className={`circle ${routeColor.settings.active ? 'text-kernpurple' : 'text-white'}`}>
                                                         <IconSettings className="w-6 h-6" />
                                                     </a>
                                                 </div>
@@ -192,7 +198,7 @@ export default function Sidebar() {
                                             <Tooltip placement="right" trigger="hover" color="invert" content="Admin">
                                                 <div className={`relative z-50 opacity-100 cursor-pointer`}>
                                                     <a rel="noopener noreferrer" href={`/refinery/projects/${project.id}/admin`}
-                                                        className={`circle ${currentPage == CurrentPage.ADMIN_PAGE ? 'text-kernpurple' : 'text-white'}`}>
+                                                        className={`circle ${routeColor.admin.active ? 'text-kernpurple' : 'text-white'}`}>
                                                         <IconUserCircle className="w-6 h-6" />
                                                     </a>
                                                 </div>
@@ -208,7 +214,7 @@ export default function Sidebar() {
                                         </div>}
                                     </div>) : (<></>)}
                                     {user.role == UserRole.ENGINEER && <>
-                                        {!isManaged && <div className={`flex items-center justify-center overflow-visible ${project?.id !== null ? 'mt-6' : ''}`}>
+                                        {!isManaged && <div className={`flex items-center justify-center overflow-visible ${project?.id !== undefined ? 'mt-6' : ''}`}>
                                             <Tooltip placement="right" trigger="hover" color="invert" content="Documentation" className="relative z-50">
                                                 <a href="https://docs.kern.ai/" target="_blank" rel="noopener noreferrer" className="circle text-white">
                                                     <IconClipboard className="w-6 h-6" />
@@ -216,7 +222,7 @@ export default function Sidebar() {
                                             </Tooltip>
                                         </div>}
                                     </>}
-                                    <div className={`flex items-center justify-center overflow-visible ${isManaged ? (project?.id !== null ? 'mt-6' : '') : 'mt-10 2xl:mt-12'}`}>
+                                    <div className={`flex items-center justify-center overflow-visible ${isManaged ? (project?.id !== undefined ? 'mt-6' : '') : 'mt-10 2xl:mt-12'}`}>
                                         <Tooltip placement="right" trigger="hover" color="invert" content="API" className="relative z-50">
                                             <a href="https://github.com/code-kern-ai/kern-python" target="_blank"
                                                 rel="noopener noreferrer" className="circle text-white">

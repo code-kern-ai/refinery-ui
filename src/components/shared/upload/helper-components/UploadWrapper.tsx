@@ -5,6 +5,9 @@ import { useDispatch, useSelector } from "react-redux";
 import { selectUploadData, setImportOptions } from "@/src/reduxStore/states/upload";
 import { useRouter } from "next/router";
 import { IconAlertTriangle } from "@tabler/icons-react";
+import { selectEmbeddings } from "@/src/reduxStore/states/pages/settings";
+import { Embedding, PlatformType } from "@/src/types/components/projects/projectId/settings/embeddings";
+import { UploadHelper } from "../Upload";
 
 export default function UploadWrapper(props: UploadWrapperProps) {
     const router = useRouter();
@@ -12,6 +15,9 @@ export default function UploadWrapper(props: UploadWrapperProps) {
 
     const uploadFileType = useSelector(selectUploadData).uploadFileType;
     const importOptions = useSelector(selectUploadData).importOptions;
+    const embeddings = useSelector(selectEmbeddings);
+    const recalculationCosts = embeddings.some((e: Embedding) => e.platform == PlatformType.COHERE || e.platform == PlatformType.OPEN_AI || e.platform == PlatformType.AZURE);
+
 
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
@@ -26,7 +32,7 @@ export default function UploadWrapper(props: UploadWrapperProps) {
         {props.submitted && !selectedFile && props.uploadTask?.state !== UploadStates.IN_PROGRESS && <div className="rounded-md bg-yellow-50 p-4">
             <div className="flex">
                 <div className="flex-shrink-0">
-                    <IconAlertTriangle className="h-5 w-5 text-yellow-400" />
+                    <IconAlertTriangle className="h-5 w-5 text-yellow-800" />
                 </div>
                 <div className="ml-3">
                     <h3 className="text-sm font-medium text-yellow-800">File required</h3>
@@ -63,9 +69,8 @@ export default function UploadWrapper(props: UploadWrapperProps) {
         {
             uploadFileType == UploadFileType.RECORDS_ADD && <div className="text-sm text-gray-500 font-normal">
                 <strong className="text-sm text-gray-700 font-medium">CAUTION:</strong> Submitting new records will automatically
-                run attribute calculation and embeddings (recreation of
-                the
-                embeddings will calculate them one more time and could cause additional fees)
+                run attribute calculation and embeddings
+                {recalculationCosts && <span>recreation of the embeddings will calculate them one more time and could cause additional fees</span>}
                 for all records
             </div>
         }
@@ -76,7 +81,7 @@ export default function UploadWrapper(props: UploadWrapperProps) {
                     className="bg-blue-700 text-white text-xs font-semibold px-4 py-2 rounded-md hover:bg-blue-800 focus:outline-none opacity-100 cursor-pointer">
                     Proceed
                 </button>
-                <button type="button" onClick={() => uploadFileType == UploadFileType.RECORDS_NEW ? router.push('/projects') : router.push('../settings')}
+                <button type="button" onClick={() => uploadFileType == UploadFileType.RECORDS_NEW ? router.push('/projects') : router.back()}
                     className="bg-red-100 border border-red-400 text-red-700 text-xs font-semibold px-4 py-2 rounded-md cursor-pointer hover:bg-red-200 focus:outline-none">
                     {uploadFileType == UploadFileType.RECORDS_NEW ? 'Cancel project creation' : 'Cancel'}
                 </button>

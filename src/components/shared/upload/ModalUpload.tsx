@@ -39,8 +39,8 @@ export default function ModalUpload(props: UploadProps) {
         projectName: projectName,
     }
 
-    function checkIfProjectNameDuplicate() {
-        setProjectTitleDuplicate(projects.some(project => project.name == projectName));
+    function checkIfProjectNameDuplicate(value: string) {
+        setProjectTitleDuplicate(projects.some(project => project.name == value));
     }
 
     return (
@@ -54,7 +54,7 @@ export default function ModalUpload(props: UploadProps) {
                     <label className="text-gray-500 text-sm font-normal">Project title<em> - optional</em></label>
                     <input value={projectName} type="text" onInput={(e: any) => {
                         setProjectName(e.target.value);
-                        checkIfProjectNameDuplicate();
+                        checkIfProjectNameDuplicate(e.target.value);
                     }} onKeyDown={(e: any) => {
                         if (e.key == "Enter") submitUpload();
                     }}

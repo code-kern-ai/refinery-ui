@@ -8,7 +8,7 @@ import { GET_PROJECT_BY_ID } from "../services/gql/queries/projects";
 import { useLazyQuery } from "@apollo/client";
 import { GET_ORGANIZATION, GET_USER_INFO } from "../services/gql/queries/organizations";
 import { GET_IS_ADMIN } from "../services/gql/queries/config";
-import { getIsDemo, getIsManaged } from "../services/base/user-management/data-fetch";
+import { getIsDemo, getIsManaged } from "../services/base/data-fetch";
 import { WebSocketsService } from "../services/base/web-sockets/WebSocketsService";
 import { timer } from "rxjs";
 

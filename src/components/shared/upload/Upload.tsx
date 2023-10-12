@@ -188,7 +188,7 @@ export default function Upload(props: UploadProps) {
 
     function updateTokenizerAndProjectStatus() {
         let tokenizerPrep = "";
-        if (uploadFileType == UploadFileType.RECORDS_NEW) {
+        if (uploadFileType == UploadFileType.RECORDS_NEW || uploadFileType == UploadFileType.RECORDS_ADD) {
             tokenizerPrep = tokenizer.split('(')[1].split(')')[0];
         } else {
             tokenizerPrep = SELECTED_TOKENIZER_PROJECT;
@@ -280,7 +280,7 @@ export default function Upload(props: UploadProps) {
         });
     }
 
-    function checkIfProjectTitleExists() {
+    function checkIfProjectTitleExists(projectTitle: string) {
         const findProjectName = projects.find((project) => project.name == projectTitle);
         if (findProjectName) setIsProjectTitleDuplicate(true);
         else setIsProjectTitleDuplicate(false);
@@ -303,8 +303,8 @@ export default function Upload(props: UploadProps) {
                     <div className="flex flex-row">
                         <input type="text" value={projectTitle} onInput={(e: any) => {
                             if (e.target.value == "") setIsProjectTitleEmpty(true); else setIsProjectTitleEmpty(false);
+                            checkIfProjectTitleExists(e.target.value);
                             setProjectTitle(e.target.value);
-                            checkIfProjectTitleExists();
                         }} onKeyDown={(e) => { if (e.key == 'Enter') submitUpload() }}
                             className="h-9 w-full border-gray-300 rounded-md placeholder-italic border text-gray-900 pl-4 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100" placeholder="Enter some title here..." />
                     </div>

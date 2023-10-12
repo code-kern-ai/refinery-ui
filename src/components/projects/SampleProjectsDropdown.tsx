@@ -4,7 +4,7 @@ import { ChevronDownIcon } from '@heroicons/react/20/solid'
 import { useMutation } from '@apollo/client';
 import { useRouter } from 'next/router';
 import { useDispatch, useSelector } from 'react-redux';
-import { extendAllProjects, selectAllProjects } from '@/src/reduxStore/states/project';
+import { extendAllProjects, selectAllProjects, updateProjectState } from '@/src/reduxStore/states/project';
 import { ModalButton, ModalEnum } from '@/src/types/shared/modal';
 import { closeModal, openModal } from '@/src/reduxStore/states/modal';
 import Modal from '../shared/modal/Modal';
@@ -36,12 +36,18 @@ export default function SampleProjectsDropdown() {
         }
         const projectNameFinal = projectName && projectName ? projectName : projectNameInput;
         const projectTypeFinal = projectType ? projectType : projectTypeInput;
+        const projectSample = {
+            name: projectNameFinal,
+            id: "sample"
+        }
+        dispatch(extendAllProjects(projectSample));
+        dispatch(closeModal(ModalEnum.SAMPLE_PROJECT_TITLE));
         createSampleProjectMut({ variables: { name: projectNameFinal, projectType: projectTypeFinal } }).then((res) => {
-            const project = res.data.createSampleProject['project'];
-            dispatch(extendAllProjects(project));
+            const projectUpdated = res.data.createSampleProject['project'];
+            dispatch(updateProjectState('sample', { ...projectUpdated }));
             dispatch(closeModal(ModalEnum.SAMPLE_PROJECT_TITLE));
             if (router.pathname.includes("/projects")) {
-                router.push(`/projects/${project.id}/overview`);
+                router.push(`/projects/${projectUpdated.id}/overview`);
             }
         });
     }, []);
