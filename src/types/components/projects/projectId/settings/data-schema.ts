@@ -12,7 +12,7 @@ export type Attribute = {
     visibility: AttributeVisibility;
     userCreated: boolean;
     state: string;
-    logs: any[];
+    logs: string[];
     relativePosition: number;
     dataTypeName?: string;
     visibilityIndex?: number;

@@ -10,3 +10,7 @@ export type SampleRecord = {
     recordIds: string[];
     calculatedAttributesList: string[];
 };
+
+export type ContainerLogsProps = {
+    currentAttribute: Attribute;
+}

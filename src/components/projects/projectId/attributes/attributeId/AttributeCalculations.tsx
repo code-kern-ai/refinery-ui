@@ -23,6 +23,7 @@ import ExecutionContainer from "./ExecutionContainer";
 import { getPythonFunctionRegExMatch } from "@/submodules/javascript-functions/python-functions-parser";
 import DangerZone from "@/src/components/shared/danger-zone/DangerZone";
 import { DangerZoneEnum } from "@/src/types/shared/danger-zone";
+import ContainerLogs from "../../../../shared/logs/ContainerLogs";
 
 export default function AttributeCalculation() {
     const router = useRouter();
@@ -187,10 +188,11 @@ export default function AttributeCalculation() {
                         {usableAttributes.length == 0 && <div className="text-sm font-normal text-gray-500">No usable attributes.</div>}
                         {usableAttributes.map((attribute: Attribute) => (
                             <Tooltip key={attribute.id} content={attribute.dataTypeName + ' - Click to copy'} color="invert" placement="top">
-                                <span onClick={() => copyToClipboard(attribute.name)}></span>
-                                <div className={`cursor-pointer border items-center px-2 py-0.5 rounded text-xs font-medium text-center mr-2 ${'bg-' + attribute.color + '-100'} ${'text-' + attribute.color + '-700'} ${'border-' + attribute.color + '-400'} ${'hover:bg-' + attribute.color + '-200'}`}>
-                                    {attribute.name}
-                                </div>
+                                <span onClick={() => copyToClipboard(attribute.name)}>
+                                    <div className={`cursor-pointer border items-center px-2 py-0.5 rounded text-xs font-medium text-center mr-2 ${'bg-' + attribute.color + '-100'} ${'text-' + attribute.color + '-700'} ${'border-' + attribute.color + '-400'} ${'hover:bg-' + attribute.color + '-200'}`}>
+                                        {attribute.name}
+                                    </div>
+                                </span>
                             </Tooltip>
                         ))}
                     </div>
@@ -255,6 +257,7 @@ export default function AttributeCalculation() {
                 </div>
 
                 <ExecutionContainer currentAttribute={currentAttribute} tokenizationProgress={1} />
+                <ContainerLogs currentAttribute={currentAttribute} />
                 <DangerZone elementType={DangerZoneEnum.ATTRIBUTE} name={currentAttribute.name} id={currentAttribute.id} />
             </div >
         </div >}
