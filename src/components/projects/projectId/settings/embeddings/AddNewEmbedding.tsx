@@ -67,7 +67,7 @@ export default function AddNewEmbedding(props: EmbeddingProps) {
     useEffect(() => {
         if (useableEmbedableAttributes.length == 0) return;
         setTargetAttribute(useableEmbedableAttributes[0].name);
-        setPlatform(embeddingPlatforms[0].name);
+        setPlatform(embeddingPlatforms[0]?.name);
         setGranularity(GRANULARITY_TYPES_ARRAY[0].name);
     }, [useableEmbedableAttributes]);
 

@@ -210,3 +210,21 @@ query ($projectId: ID!, $recordId: ID!) {
   }
 } 
 `;
+
+export const GET_ATTRIBUTE_BY_ATTRIBUTE_ID = gql`
+query($projectId: ID!, $attributeId: ID!){
+  attributeByAttributeId(projectId: $projectId, attributeId: $attributeId) {
+    id
+    name
+    dataType
+    isPrimaryKey
+    relativePosition    
+    userCreated
+    sourceCode
+    state
+    logs
+    visibility
+    progress
+  }
+}
+`;

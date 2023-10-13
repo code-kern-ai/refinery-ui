@@ -12,6 +12,7 @@ export default function AttributeCalculationPage() {
     }, [])
 
     return (
+        // <div>Test</div>
         <AttributeCalculation />
     )
 }

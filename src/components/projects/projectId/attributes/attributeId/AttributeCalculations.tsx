@@ -4,7 +4,7 @@ import { selectAttributes, selectUsableAttributes, setAllAttributes, setAllUsabl
 import { selectProject } from "@/src/reduxStore/states/project"
 import { UPDATE_ATTRIBUTE } from "@/src/services/gql/mutations/project";
 import { LOOKUP_LISTS_BY_PROJECT_ID } from "@/src/services/gql/queries/lookup-lists";
-import { GET_ATTRIBUTES_BY_PROJECT_ID, GET_PROJECT_TOKENIZATION } from "@/src/services/gql/queries/project";
+import { GET_ATTRIBUTES_BY_PROJECT_ID, GET_ATTRIBUTE_BY_ATTRIBUTE_ID, GET_PROJECT_TOKENIZATION } from "@/src/services/gql/queries/project";
 import { Attribute, AttributeState } from "@/src/types/components/projects/projectId/settings/data-schema";
 import { CurrentPage, DataTypeEnum } from "@/src/types/shared/general";
 import { postProcessLookupLists } from "@/src/util/components/projects/projectId/lookup-lists-helper";
@@ -50,8 +50,9 @@ export default function AttributeCalculation() {
 
     const [refetchAttributes] = useLazyQuery(GET_ATTRIBUTES_BY_PROJECT_ID, { fetchPolicy: "network-only" });
     const [updateAttributeMut] = useMutation(UPDATE_ATTRIBUTE);
-    const [refetchLookupLists] = useLazyQuery(LOOKUP_LISTS_BY_PROJECT_ID);
+    const [refetchLookupLists] = useLazyQuery(LOOKUP_LISTS_BY_PROJECT_ID, { fetchPolicy: "no-cache" });
     const [refetchProjectTokenization] = useLazyQuery(GET_PROJECT_TOKENIZATION, { fetchPolicy: "no-cache" });
+    const [refetchAttributeByAttributeId] = useLazyQuery(GET_ATTRIBUTE_BY_ATTRIBUTE_ID, { fetchPolicy: "no-cache" });
 
 
     useEffect(() => {
@@ -65,7 +66,7 @@ export default function AttributeCalculation() {
         }
         if (lookupLists.length == 0) {
             refetchLookupLists({ variables: { projectId: project.id } }).then((res) => {
-                dispatch(setAllLookupLists(postProcessLookupLists(res.data['knowledgeBasesByProjectId'])));
+                dispatch(setAllLookupLists(res.data['knowledgeBasesByProjectId']));
             });
         }
         checkProjectTokenization();
@@ -74,7 +75,7 @@ export default function AttributeCalculation() {
             whitelist: ['attributes_updated', 'calculate_attribute', 'tokenization', 'knowledge_base_updated', 'knowledge_base_deleted', 'knowledge_base_created'],
             func: handleWebsocketNotification
         });
-    }, [project, attributes, lookupLists]);
+    }, [project, attributes]);
 
     useEffect(() => {
         if (!attributes) return;
@@ -87,6 +88,7 @@ export default function AttributeCalculation() {
 
     useEffect(() => {
         if (!currentAttribute) return;
+        if (currentAttribute.state == AttributeState.USABLE) return
         if (currentAttribute.saveSourceCode) {
             updateSourceCode(currentAttribute.sourceCode);
         }
@@ -168,21 +170,26 @@ export default function AttributeCalculation() {
     }
 
     function handleWebsocketNotification(msgParts: string[]) {
-        if (msgParts[1] == 'attributes_updated' && msgParts[2] == currentAttribute.id) {
-
-        } else if (msgParts[1] == 'calculate_attribute') {
+        if (!currentAttribute) return;
+        if (msgParts[1] == 'calculate_attribute') {
             if (msgParts[2] == 'progress' && msgParts[3] == currentAttribute.id) {
                 const currentAttributeCopy = jsonCopy(currentAttribute);
                 currentAttributeCopy.progress = Number(msgParts[4]);
+                currentAttributeCopy.state = AttributeState.RUNNING;
                 setCurrentAttribute(currentAttributeCopy);
             } else {
                 refetchAttributes({ variables: { projectId: project.id, stateFilter: ['ALL'] } }).then((res) => {
                     dispatch(setAllAttributes(postProcessingAttributes(res.data['attributesByProjectId'])));
                     dispatch(setAllUsableAttributes(postProcessingAttributes(res.data['attributesByProjectId']).filter((attribute) => attribute.id != '@@NO_ATTRIBUTE@@')));
-                    setCurrentAttribute(postProcessCurrentAttribute(attributes.find((attribute) => attribute.id === router.query.attributeId)));
                 });
-                if (msgParts[2] == "finished") timer(2000).subscribe(() => checkProjectTokenization());
-
+                refetchAttributeByAttributeId({ variables: { projectId: project.id, attributeId: currentAttribute?.id } }).then((res) => {
+                    const attribute = res.data['attributeByAttributeId'];
+                    if (attribute == null) setCurrentAttribute(null);
+                    else setCurrentAttribute(postProcessCurrentAttribute(attribute));
+                });
+                if (msgParts[2] == "finished") {
+                    timer(2000).subscribe(() => checkProjectTokenization());
+                }
             }
         } else if (['knowledge_base_updated', 'knowledge_base_deleted', 'knowledge_base_created'].includes(msgParts[1])) {
             refetchLookupLists({ variables: { projectId: project.id } }).then((res) => {
@@ -275,10 +282,10 @@ export default function AttributeCalculation() {
                         ))}
                     </div>
                 </div>
+                {/* TODO Add bricks integrator */}
                 <div className="flex flex-row items-center justify-between my-3">
                     <div className="text-sm leading-5 font-medium text-gray-700 inline-block mr-2">Editor</div>
                     <div className="flex flex-row flex-nowrap">
-                        {/* TODO: Add bricks integrator */}
                         <Tooltip content="See available libraries for this attribute calculation" placement="left" color="invert">
                             <a href="https://github.com/code-kern-ai/refinery-ac-exec-env/blob/dev/requirements.txt"
                                 target="_blank"
@@ -317,7 +324,13 @@ export default function AttributeCalculation() {
                     />
                 </div>
 
-                <ExecutionContainer currentAttribute={currentAttribute} tokenizationProgress={tokenizationProgress} />
+                <ExecutionContainer currentAttribute={currentAttribute} tokenizationProgress={tokenizationProgress} refetchCurrentAttribute={() => {
+                    refetchAttributeByAttributeId({ variables: { projectId: project.id, attributeId: currentAttribute?.id } }).then((res) => {
+                        const attribute = res.data['attributeByAttributeId'];
+                        if (attribute == null) setCurrentAttribute(null);
+                        else setCurrentAttribute(postProcessCurrentAttribute(attribute));
+                    });
+                }} />
                 <ContainerLogs currentAttribute={currentAttribute} />
 
                 <div className="mt-8">
@@ -326,8 +339,8 @@ export default function AttributeCalculation() {
                         <div className="py-6 text-sm leading-5 font-normal text-gray-500">This attribute was not yet run.</div>
                     </div>}
                     {currentAttribute.progress < 1 && currentAttribute.state == AttributeState.RUNNING &&
-                        <div className=" mb-4 card border border-gray-200 bg-white flex-grow overflow-visible">
-                            <div className="card-body">
+                        <div className=" mb-4 card border border-gray-200 bg-white flex-grow overflow-visible rounded-2xl">
+                            <div className="card-body p-6">
                                 <div className="flex flex-row items-center">
                                     <Tooltip content="Currently being executed" color="invert" placement="right" className="relative z-10"><LoadingIcon /></Tooltip>
                                     <div className="text-sm leading-5 font-normal text-gray-500 w-full">

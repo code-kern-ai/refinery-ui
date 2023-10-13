@@ -58,6 +58,7 @@ export default function ExecutionContainer(props: ExecutionContainerProps) {
                 sampleRecordsFinal.calculatedAttributesList = sampleRecordsFinal.calculatedAttributes.map((record: string) => JSON.parse(record));
             }
             setSampleRecords(sampleRecordsFinal);
+            props.refetchCurrentAttribute();
         }, () => {
             setRequestedSomething(false);
         })
@@ -149,7 +150,7 @@ export default function ExecutionContainer(props: ExecutionContainerProps) {
                         {props.currentAttribute.dataType != DataTypeEnum.EMBEDDING_LIST ? <span>
                             {sampleRecords.calculatedAttributes[modalViewRecordDetails.recordIdx]}
                         </span> : <div className="flex flex-col gap-y-2 divide-y">
-                            {sampleRecords.calculatedAttributesList[modalViewRecordDetails.recordIdx].map((item: string, index: number) => <span key={item} className="mt-1">
+                            {sampleRecords.calculatedAttributesList[modalViewRecordDetails.recordIdx].map((item: string, index: number) => <span key={index} className="mt-1">
                                 {sampleRecords.calculatedAttributesList[modalViewRecordDetails.recordIdx]}
                             </span>)}
                         </div>}

@@ -3,6 +3,7 @@ import { Attribute } from "./data-schema";
 export type ExecutionContainerProps = {
     currentAttribute: Attribute;
     tokenizationProgress: number;
+    refetchCurrentAttribute: () => void;
 }
 
 export type SampleRecord = {
