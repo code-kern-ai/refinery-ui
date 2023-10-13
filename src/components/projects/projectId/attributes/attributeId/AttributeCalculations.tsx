@@ -27,6 +27,7 @@ import ContainerLogs from "@/src/components/shared/logs/ContainerLogs";
 import LoadingIcon from "@/src/components/shared/loading/LoadingIcon";
 import { WebSocketsService } from "@/src/services/base/web-sockets/WebSocketsService";
 import { timer } from "rxjs";
+import { unsubscribeWSOnDestroy } from "@/src/services/base/web-sockets/web-sockets-helper";
 
 const EDITOR_OPTIONS = { theme: 'vs-light', language: 'python', readOnly: false };
 
@@ -54,6 +55,7 @@ export default function AttributeCalculation() {
     const [refetchProjectTokenization] = useLazyQuery(GET_PROJECT_TOKENIZATION, { fetchPolicy: "no-cache" });
     const [refetchAttributeByAttributeId] = useLazyQuery(GET_ATTRIBUTE_BY_ATTRIBUTE_ID, { fetchPolicy: "no-cache" });
 
+    useEffect(unsubscribeWSOnDestroy(router, [CurrentPage.ATTRIBUTE_CALCULATION]), []);
 
     useEffect(() => {
         if (!project) return;

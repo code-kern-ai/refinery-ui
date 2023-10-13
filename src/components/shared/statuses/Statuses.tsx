@@ -87,10 +87,12 @@ export default function Statuses({ status, tooltipPosition = DEFAULT_TOOLTIP_POS
 }
 
 function StatusBadge({ color, statusName }) {
-    return <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${color === 'green' ? 'bg-green-300' : 'bg-' + color + '-100'} ${color === 'green' ? '' : 'text-' + color + '-800'} `}>
-        <svg className={`mr-1.5 h-2 w-2 ${'text-' + color + '-400'} `} fill="currentColor" viewBox="0 0 8 8">
+    return <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${color === 'green'
+        ? 'bg-green-300'
+        : 'bg-' + color + '-100'} `}>
+        <svg className={`mr-1.5 h-2 w-2 ${'text-' + color + '-800'} `} fill="currentColor" viewBox="0 0 8 8">
             <circle cx="4" cy="4" r="3" />
         </svg>
-        {statusName}
+        <span className={' text-' + color + '-800'}>{statusName}</span>
     </span>
 }

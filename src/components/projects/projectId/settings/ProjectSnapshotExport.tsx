@@ -4,6 +4,7 @@ import { closeModal, selectModal } from "@/src/reduxStore/states/modal";
 import { selectProject } from "@/src/reduxStore/states/project";
 import { downloadFile } from "@/src/services/base/s3-service";
 import { WebSocketsService } from "@/src/services/base/web-sockets/WebSocketsService";
+import { unsubscribeWSOnDestroy } from "@/src/services/base/web-sockets/web-sockets-helper";
 import { GET_PROJECT_SIZE, LAST_PROJECT_EXPORT_CREDENTIALS, PREPARE_PROJECT_EXPORT } from "@/src/services/gql/queries/project";
 import { DownloadState, ProjectSize } from "@/src/types/components/projects/projectId/settings/project-export";
 import { CurrentPage } from "@/src/types/shared/general";
@@ -14,11 +15,13 @@ import { formatBytes } from "@/submodules/javascript-functions/general";
 import { useLazyQuery } from "@apollo/client";
 import { Tooltip } from "@nextui-org/react";
 import { IconDownload, IconInfoCircle } from "@tabler/icons-react";
+import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { timer } from "rxjs";
 
 export default function ProjectSnapshotExport() {
+    const router = useRouter();
     const dispatch = useDispatch();
     const project = useSelector(selectProject);
     const modal = useSelector(selectModal(ModalEnum.PROJECT_SNAPSHOT))
@@ -32,6 +35,8 @@ export default function ProjectSnapshotExport() {
     const [refetchProjectSize] = useLazyQuery(GET_PROJECT_SIZE, { fetchPolicy: "network-only" });
     const [refetchLastProjectExportCredentials] = useLazyQuery(LAST_PROJECT_EXPORT_CREDENTIALS, { fetchPolicy: "no-cache" });
     const [refetchProjectExport] = useLazyQuery(PREPARE_PROJECT_EXPORT, { fetchPolicy: "network-only" });
+
+    useEffect(unsubscribeWSOnDestroy(router, [CurrentPage.PROJECT_SETTINGS]), []);
 
     useEffect(() => {
         if (!modal || !modal.open) return;

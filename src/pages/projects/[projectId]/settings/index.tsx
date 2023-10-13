@@ -8,7 +8,7 @@ export default function ProjectSettingsPage() {
     const dispatch = useDispatch();
 
     useEffect(() => {
-        dispatch(setCurrentPage(CurrentPage.SETTINGS))
+        dispatch(setCurrentPage(CurrentPage.PROJECT_SETTINGS))
     }, [])
 
     return (<ProjectSettings />)

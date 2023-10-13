@@ -3,6 +3,7 @@ import { openModal, selectModal, setModalStates } from "@/src/reduxStore/states/
 import { removeFromAllLabelingTasksById, removeLabelFromLabelingTask, selectLabelingTasksAll, selectUsableAttributes, setLabelingTasksAll } from "@/src/reduxStore/states/pages/settings";
 import { selectProject } from "@/src/reduxStore/states/project";
 import { WebSocketsService } from "@/src/services/base/web-sockets/WebSocketsService";
+import { unsubscribeWSOnDestroy } from "@/src/services/base/web-sockets/web-sockets-helper";
 import { CREATE_LABEL, CREATE_LABELING_TASK, DELETE_LABEL, DELETE_LABELING_TASK, HANDLE_LABEL_RENAME_WARNING, UPDATE_LABELING_TASK, UPDATE_LABEL_COLOR, UPDATE_LABEL_HOTKEY, UPDATE_LABEL_NAME } from "@/src/services/gql/mutations/project";
 import { CHECK_RENAME_LABEL, GET_LABELING_TASKS_BY_PROJECT_ID } from "@/src/services/gql/queries/project";
 import { LabelColors, LabelType, LabelingTask, LabelingTaskTaskType } from "@/src/types/components/projects/projectId/settings/labeling-tasks";
@@ -15,6 +16,7 @@ import Dropdown from "@/submodules/react-components/components/Dropdown";
 import { useLazyQuery, useMutation } from "@apollo/client";
 import { Tooltip } from "@nextui-org/react";
 import { IconAlertTriangleFilled, IconColorPicker, IconInfoCircleFilled, IconPencil, IconPlus, IconTrash, IconTriangleInverted } from "@tabler/icons-react";
+import { useRouter } from "next/router";
 import { useCallback, useEffect, useState } from "react"
 import { useDispatch, useSelector } from "react-redux";
 
@@ -27,9 +29,10 @@ const ACCEPT_BUTTON_LABEL = { buttonCaption: 'Add label', useButton: true, close
 const ACCEPT_BUTTON_RENAME = { buttonCaption: 'Rename', useButton: true }
 
 export default function LabelingTasks() {
+    const router = useRouter();
     const dispatch = useDispatch();
-    const project = useSelector(selectProject);
 
+    const project = useSelector(selectProject);
     const labelingTasksSchema = useSelector(selectLabelingTasksAll);
     const modalDeleteLabelingTask = useSelector(selectModal(ModalEnum.DELETE_LABELING_TASK));
     const modalAddLabelingTask = useSelector(selectModal(ModalEnum.ADD_LABELING_TASK));
@@ -137,8 +140,10 @@ export default function LabelingTasks() {
         });
     }, [modalRenameLabel]);
 
+    useEffect(unsubscribeWSOnDestroy(router, [CurrentPage.PROJECT_SETTINGS]), []);
+
     useEffect(() => {
-        WebSocketsService.subscribeToNotification(CurrentPage.SETTINGS, {
+        WebSocketsService.subscribeToNotification(CurrentPage.PROJECT_SETTINGS, {
             projectId: project.id,
             whitelist: ['label_created', 'labeling_task_created'],
             func: handleWebsocketNotification

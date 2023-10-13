@@ -3,6 +3,7 @@ import Statuses from "@/src/components/shared/statuses/Statuses"
 import { openModal } from "@/src/reduxStore/states/modal";
 import { selectProject } from "@/src/reduxStore/states/project";
 import { WebSocketsService } from "@/src/services/base/web-sockets/WebSocketsService";
+import { unsubscribeWSOnDestroy } from "@/src/services/base/web-sockets/web-sockets-helper";
 import { UPDATE_PROJECT_FOR_GATES } from "@/src/services/gql/mutations/project";
 import { GET_GATES_INTEGRATION_DATA } from "@/src/services/gql/queries/project";
 import { CurrentPage } from "@/src/types/shared/general";
@@ -10,12 +11,14 @@ import { ModalButton, ModalEnum } from "@/src/types/shared/modal";
 import { GatesIntegratorStatus } from "@/src/types/shared/statuses";
 import { useLazyQuery, useMutation } from "@apollo/client";
 import { IconReload } from "@tabler/icons-react";
+import { useRouter } from "next/router";
 import { useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
 const ACCEPT_BUTTON = { buttonCaption: 'Accept', useButton: true, disabled: false };
 
 export default function GatesIntegration() {
+    const router = useRouter();
     const dispatch = useDispatch();
 
     const project = useSelector(selectProject);
@@ -25,6 +28,8 @@ export default function GatesIntegration() {
 
     const [refetchGatesIntegrationData] = useLazyQuery(GET_GATES_INTEGRATION_DATA, { fetchPolicy: 'no-cache' });
     const [updateProjectsGatesMut] = useMutation(UPDATE_PROJECT_FOR_GATES);
+
+    useEffect(unsubscribeWSOnDestroy(router, [CurrentPage.PROJECT_SETTINGS]), []);
 
     useEffect(() => {
         setGatesLink(window.location.origin + '/gates/project/' + project.id + "/prediction");
@@ -36,7 +41,7 @@ export default function GatesIntegration() {
     }, []);
 
     useEffect(() => {
-        WebSocketsService.subscribeToNotification(CurrentPage.SETTINGS, {
+        WebSocketsService.subscribeToNotification(CurrentPage.PROJECT_SETTINGS, {
             projectId: project.id,
             whitelist: ['gates_integration', 'information_source_deleted', 'information_source_updated', 'tokenization', 'embedding', 'embedding_deleted'],
             func: handleWebsocketNotification

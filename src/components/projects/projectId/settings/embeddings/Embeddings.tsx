@@ -19,6 +19,7 @@ import { useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import AddNewEmbedding from "./AddNewEmbedding";
 import Dropdown from "@/submodules/react-components/components/Dropdown";
+import { unsubscribeWSOnDestroy } from "@/src/services/base/web-sockets/web-sockets-helper";
 
 const ABORT_BUTTON = { useButton: true, disabled: false };
 const EDIT_BUTTON = { buttonCaption: 'Edit', useButton: true, disabled: false, closeAfterClick: false };
@@ -44,9 +45,11 @@ export default function Embeddings(props: EmbeddingProps) {
     const [refetchDeleteTaskQueue] = useMutation(DELETE_FROM_TASK_QUEUE);
     const [updateEmbeddingPayloadMut] = useMutation(UPDATE_EMBEDDING_PAYLOAD);
 
+    useEffect(unsubscribeWSOnDestroy(router, [CurrentPage.PROJECT_SETTINGS]), []);
+
     useEffect(() => {
         setSomethingLoading(false); // TODO add the condition
-        WebSocketsService.subscribeToNotification(CurrentPage.SETTINGS, {
+        WebSocketsService.subscribeToNotification(CurrentPage.PROJECT_SETTINGS, {
             whitelist: ['embedding_updated', 'upload_embedding_payload'],
             func: handleWebsocketNotification
         });

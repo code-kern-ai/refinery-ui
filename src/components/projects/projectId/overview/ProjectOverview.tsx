@@ -11,10 +11,13 @@ import ProjectOverviewCards from './ProjectOverviewCards';
 import { jsonCopy } from '@/submodules/javascript-functions/general';
 import { ProjectStats } from '@/src/types/components/projects/projectId/overview';
 import style from '@/src/styles/components/projects/projectId/project-overview.module.css';
+import { unsubscribeWSOnDestroy } from '@/src/services/base/web-sockets/web-sockets-helper';
+import { useRouter } from 'next/router';
 
 const PROJECT_STATS_INITIAL_STATE: ProjectStats = getEmptyProjectStats();
 
 export default function ProjectOverview() {
+    const router = useRouter();
     const project = useSelector(selectProject);
 
     const [projectStats, setProjectStats] = useState<ProjectStats>(PROJECT_STATS_INITIAL_STATE);
@@ -22,9 +25,10 @@ export default function ProjectOverview() {
 
     const [refetchProjectStats] = useLazyQuery(GET_GENERAL_PROJECT_STATS, { fetchPolicy: "no-cache" });
 
+    useEffect(unsubscribeWSOnDestroy(router, [CurrentPage.PROJECT_OVERVIEW]), []);
+
     useEffect(() => {
         getProjectStats();
-
         WebSocketsService.subscribeToNotification(CurrentPage.PROJECT_OVERVIEW, {
             whitelist: ['label_created', 'label_deleted', 'labeling_task_deleted', 'labeling_task_updated', 'labeling_task_created', 'weak_supervision_finished', 'data_slice_created', 'data_slice_updated', 'data_slice_deleted'],
             func: handleWebsocketNotification

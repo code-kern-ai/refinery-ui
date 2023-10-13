@@ -31,6 +31,7 @@ import { AttributeState } from "@/src/types/components/projects/projectId/settin
 import { RecommendedEncoder } from "@/src/types/components/projects/projectId/settings/embeddings";
 import LabelingTasks from "./labeling-tasks/LabelingTasks";
 import { jsonCopy } from "@/submodules/javascript-functions/general";
+import { unsubscribeWSOnDestroy } from "@/src/services/base/web-sockets/web-sockets-helper";
 
 const ACCEPT_BUTTON = { buttonCaption: "Accept", useButton: true, disabled: true }
 
@@ -59,6 +60,8 @@ export default function ProjectSettings() {
     const [refetchEmbeddings] = useLazyQuery(GET_EMBEDDING_SCHEMA_BY_PROJECT_ID, { fetchPolicy: "no-cache" });
     const [refetchQueuedTasks] = useLazyQuery(GET_QUEUED_TASKS, { fetchPolicy: "no-cache" });
     const [refetchRecommendedEncodersForEmbeddings] = useLazyQuery(GET_RECOMMENDED_ENCODERS_FOR_EMBEDDINGS, { fetchPolicy: "no-cache" });
+
+    useEffect(unsubscribeWSOnDestroy(router, [CurrentPage.PROJECT_SETTINGS]), []);
 
     useEffect(() => {
         if (!project) return;

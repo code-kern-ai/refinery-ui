@@ -22,6 +22,7 @@ import { CurrentPage } from "@/src/types/shared/general";
 import { jsonCopy } from "@/submodules/javascript-functions/general";
 import { dateAsUTCDate } from "@/submodules/javascript-functions/date-parser";
 import { timer } from "rxjs";
+import { unsubscribeWSOnDestroy } from "@/src/services/base/web-sockets/web-sockets-helper";
 
 const ABORT_BUTTON = { buttonCaption: 'Delete', useButton: true, disabled: false };
 const ACCEPT_BUTTON = { buttonCaption: 'Accept', useButton: true };
@@ -44,6 +45,8 @@ export default function ModelsDownload() {
     const [refetchZeroShotRecommendations] = useLazyQuery(GET_ZERO_SHOT_RECOMMENDATIONS, { fetchPolicy: 'network-only', nextFetchPolicy: 'cache-first' });
     const [refetchRecommendedEncoders] = useLazyQuery(GET_RECOMMENDED_ENCODERS_FOR_EMBEDDINGS, { fetchPolicy: 'network-only', nextFetchPolicy: 'cache-first' });
     const [downloadModelMut] = useMutation(MODEL_PROVIDER_DOWNLOAD_MODEL);
+
+    useEffect(unsubscribeWSOnDestroy(router, [CurrentPage.MODELS_DOWNLOAD]), []);
 
     useEffect(() => {
         refetchModels();
