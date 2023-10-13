@@ -4,8 +4,8 @@ import { removeFromAllLabelingTasksById, removeLabelFromLabelingTask, selectLabe
 import { selectProject } from "@/src/reduxStore/states/project";
 import { WebSocketsService } from "@/src/services/base/web-sockets/WebSocketsService";
 import { unsubscribeWSOnDestroy } from "@/src/services/base/web-sockets/web-sockets-helper";
-import { CREATE_LABEL, CREATE_LABELING_TASK, DELETE_LABEL, DELETE_LABELING_TASK, HANDLE_LABEL_RENAME_WARNING, UPDATE_LABELING_TASK, UPDATE_LABEL_COLOR, UPDATE_LABEL_HOTKEY, UPDATE_LABEL_NAME } from "@/src/services/gql/mutations/project";
-import { CHECK_RENAME_LABEL, GET_LABELING_TASKS_BY_PROJECT_ID } from "@/src/services/gql/queries/project";
+import { CREATE_LABEL, CREATE_LABELING_TASK, DELETE_LABEL, DELETE_LABELING_TASK, HANDLE_LABEL_RENAME_WARNING, UPDATE_LABELING_TASK, UPDATE_LABEL_COLOR, UPDATE_LABEL_HOTKEY, UPDATE_LABEL_NAME } from "@/src/services/gql/mutations/project-settings";
+import { CHECK_RENAME_LABEL, GET_LABELING_TASKS_BY_PROJECT_ID } from "@/src/services/gql/queries/project-setting";
 import { LabelColors, LabelType, LabelingTask, LabelingTaskTaskType } from "@/src/types/components/projects/projectId/settings/labeling-tasks";
 import { CurrentPage } from "@/src/types/shared/general";
 import { ModalButton, ModalEnum } from "@/src/types/shared/modal";

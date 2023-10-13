@@ -3,7 +3,7 @@ import Statuses from "@/src/components/shared/statuses/Statuses";
 import { setCurrentPage } from "@/src/reduxStore/states/general";
 import { selectAttributes, updateAttributeById } from "@/src/reduxStore/states/pages/settings";
 import { selectProject } from "@/src/reduxStore/states/project";
-import { UPDATE_ATTRIBUTE } from "@/src/services/gql/mutations/project";
+import { UPDATE_ATTRIBUTE } from "@/src/services/gql/mutations/project-settings";
 import { Attribute, DataSchemaProps } from "@/src/types/components/projects/projectId/settings/data-schema";
 import { CurrentPage } from "@/src/types/shared/general";
 import { ATTRIBUTES_VISIBILITY_STATES, getTooltipVisibilityState } from "@/src/util/components/projects/projectId/settings/data-schema-helper";

@@ -1,6 +1,5 @@
 import { selectProject } from '@/src/reduxStore/states/project';
 import { WebSocketsService } from '@/src/services/base/web-sockets/WebSocketsService';
-import { GET_GENERAL_PROJECT_STATS, GET_LABELING_TASKS_BY_PROJECT_ID } from '@/src/services/gql/queries/project';
 import { CurrentPage } from '@/src/types/shared/general';
 import { useLazyQuery } from '@apollo/client';
 import { useEffect, useState } from 'react';
@@ -13,6 +12,7 @@ import { ProjectStats } from '@/src/types/components/projects/projectId/overview
 import style from '@/src/styles/components/projects/projectId/project-overview.module.css';
 import { unsubscribeWSOnDestroy } from '@/src/services/base/web-sockets/web-sockets-helper';
 import { useRouter } from 'next/router';
+import { GET_GENERAL_PROJECT_STATS } from '@/src/services/gql/queries/project';
 
 const PROJECT_STATS_INITIAL_STATE: ProjectStats = getEmptyProjectStats();
 

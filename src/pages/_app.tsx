@@ -13,6 +13,9 @@ import { RouteManager } from '../services/base/route-manager'
 
 export default function App({ Component, pageProps }: AppProps) {
 
+  // TODO: point to discuss -> the idea for the store is that we try to use data from the store, if not refetch (ex. if the user visit the projects page, there is no need to refetch some of the data)
+  // but if the user rerefresh the page, do the refetch
+  // if store ? use store : refetch
   useEffect(() => {
     ConfigManager.refreshConfig();
     RouteManager.initRouterListener();

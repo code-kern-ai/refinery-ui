@@ -2,7 +2,7 @@ import LoadingIcon from "@/src/components/shared/loading/LoadingIcon";
 import Modal from "@/src/components/shared/modal/Modal";
 import { openModal, selectModal, setModalStates } from "@/src/reduxStore/states/modal";
 import { selectProject } from "@/src/reduxStore/states/project";
-import { CALCULATE_USER_ATTRIBUTE_SAMPLE_RECORDS, GET_RECORD_BY_RECORD_ID } from "@/src/services/gql/queries/project";
+import { CALCULATE_USER_ATTRIBUTE_SAMPLE_RECORDS, GET_RECORD_BY_RECORD_ID } from "@/src/services/gql/queries/project-setting";
 import { ExecutionContainerProps, SampleRecord } from "@/src/types/components/projects/projectId/settings/attribute-calculation";
 import { AttributeState } from "@/src/types/components/projects/projectId/settings/data-schema";
 import { ModalButton, ModalEnum } from "@/src/types/shared/modal";
@@ -14,7 +14,7 @@ import { useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import style from '@/src/styles/components/projects/projectId/attribute-calculation.module.css';
 import { DataTypeEnum } from "@/src/types/shared/general";
-import { CALCULATE_USER_ATTRIBUTE_ALL_RECORDS } from "@/src/services/gql/mutations/project";
+import { CALCULATE_USER_ATTRIBUTE_ALL_RECORDS } from "@/src/services/gql/mutations/project-settings";
 
 
 const ACCEPT_BUTTON = { buttonCaption: 'Accept', useButton: true };

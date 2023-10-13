@@ -15,7 +15,7 @@ import Modal from "../shared/modal/Modal";
 import { MODEL_PROVIDER_DELETE_MODEL, MODEL_PROVIDER_DOWNLOAD_MODEL } from "@/src/services/gql/mutations/projects";
 import { selectIsManaged } from "@/src/reduxStore/states/general";
 import Dropdown from "@/submodules/react-components/components/Dropdown";
-import { GET_RECOMMENDED_ENCODERS_FOR_EMBEDDINGS, GET_ZERO_SHOT_RECOMMENDATIONS } from "@/src/services/gql/queries/project";
+import { GET_RECOMMENDED_ENCODERS_FOR_EMBEDDINGS, GET_ZERO_SHOT_RECOMMENDATIONS } from "@/src/services/gql/queries/project-setting";
 import { selectRecommendedEncodersAll } from "@/src/reduxStore/states/pages/settings";
 import { WebSocketsService } from "@/src/services/base/web-sockets/WebSocketsService";
 import { CurrentPage } from "@/src/types/shared/general";

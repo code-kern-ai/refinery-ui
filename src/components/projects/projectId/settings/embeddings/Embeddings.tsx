@@ -5,7 +5,7 @@ import { openModal, selectModal, setModalStates } from "@/src/reduxStore/states/
 import { removeFromAllEmbeddingsById, selectAttributes, selectEmbeddings } from "@/src/reduxStore/states/pages/settings";
 import { selectProject } from "@/src/reduxStore/states/project";
 import { WebSocketsService } from "@/src/services/base/web-sockets/WebSocketsService";
-import { DELETE_EMBEDDING, DELETE_FROM_TASK_QUEUE, UPDATE_EMBEDDING_PAYLOAD } from "@/src/services/gql/mutations/project";
+import { DELETE_EMBEDDING, DELETE_FROM_TASK_QUEUE, UPDATE_EMBEDDING_PAYLOAD } from "@/src/services/gql/mutations/project-settings";
 import { Embedding, EmbeddingProps, EmbeddingState } from "@/src/types/components/projects/projectId/settings/embeddings";
 import { CurrentPage } from "@/src/types/shared/general";
 import { ModalButton, ModalEnum } from "@/src/types/shared/modal";

@@ -2,9 +2,9 @@ import Statuses from "@/src/components/shared/statuses/Statuses";
 import { selectAllLookupLists, setAllLookupLists } from "@/src/reduxStore/states/pages/lookup-lists";
 import { selectAttributes, selectUsableAttributes, setAllAttributes, setAllUsableAttributes, updateAttributeById } from "@/src/reduxStore/states/pages/settings";
 import { selectProject } from "@/src/reduxStore/states/project"
-import { UPDATE_ATTRIBUTE } from "@/src/services/gql/mutations/project";
+import { UPDATE_ATTRIBUTE } from "@/src/services/gql/mutations/project-settings";
 import { LOOKUP_LISTS_BY_PROJECT_ID } from "@/src/services/gql/queries/lookup-lists";
-import { GET_ATTRIBUTES_BY_PROJECT_ID, GET_ATTRIBUTE_BY_ATTRIBUTE_ID, GET_PROJECT_TOKENIZATION } from "@/src/services/gql/queries/project";
+import { GET_ATTRIBUTES_BY_PROJECT_ID, GET_ATTRIBUTE_BY_ATTRIBUTE_ID, GET_PROJECT_TOKENIZATION } from "@/src/services/gql/queries/project-setting";
 import { Attribute, AttributeState } from "@/src/types/components/projects/projectId/settings/data-schema";
 import { CurrentPage, DataTypeEnum } from "@/src/types/shared/general";
 import { postProcessLookupLists } from "@/src/util/components/projects/projectId/lookup-lists-helper";

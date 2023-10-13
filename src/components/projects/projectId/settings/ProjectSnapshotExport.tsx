@@ -5,7 +5,7 @@ import { selectProject } from "@/src/reduxStore/states/project";
 import { downloadFile } from "@/src/services/base/s3-service";
 import { WebSocketsService } from "@/src/services/base/web-sockets/WebSocketsService";
 import { unsubscribeWSOnDestroy } from "@/src/services/base/web-sockets/web-sockets-helper";
-import { GET_PROJECT_SIZE, LAST_PROJECT_EXPORT_CREDENTIALS, PREPARE_PROJECT_EXPORT } from "@/src/services/gql/queries/project";
+import { GET_PROJECT_SIZE, LAST_PROJECT_EXPORT_CREDENTIALS, PREPARE_PROJECT_EXPORT } from "@/src/services/gql/queries/project-setting";
 import { DownloadState, ProjectSize } from "@/src/types/components/projects/projectId/settings/project-export";
 import { CurrentPage } from "@/src/types/shared/general";
 import { ModalEnum } from "@/src/types/shared/modal";

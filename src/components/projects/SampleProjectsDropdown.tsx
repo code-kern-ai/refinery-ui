@@ -10,6 +10,7 @@ import { closeModal, openModal } from '@/src/reduxStore/states/modal';
 import Modal from '../shared/modal/Modal';
 import { IconAlertTriangle, IconFishHook, IconMessageCircle, IconNews } from '@tabler/icons-react';
 import { CREATE_SAMPLE_PROJECT } from '@/src/services/gql/mutations/projects';
+import { ProjectStatus } from '@/src/types/components/projects/projects-list';
 
 const ACCEPT_BUTTON = { buttonCaption: "Create", closeAfterClick: false, useButton: true, disabled: true };
 
@@ -38,7 +39,8 @@ export default function SampleProjectsDropdown() {
         const projectTypeFinal = projectType ? projectType : projectTypeInput;
         const projectSample = {
             name: projectNameFinal,
-            id: "sample"
+            id: "sample",
+            status: ProjectStatus.INIT_SAMPLE_PROJECT
         }
         dispatch(extendAllProjects(projectSample));
         dispatch(closeModal(ModalEnum.SAMPLE_PROJECT_TITLE));
