@@ -1,7 +1,7 @@
 import { Attribute } from "@/src/types/components/projects/projectId/settings/data-schema";
 import { AttributeCalculationExamples, AttributeCodeLookup } from "@/src/util/classes/attribute-calculation";
 import { jsonCopy } from "@/submodules/javascript-functions/general";
-import { parseLogData } from "@/submodules/javascript-functions/logs-parser";
+import { parseContainerLogsData } from "@/submodules/javascript-functions/logs-parser";
 import { getPythonFunctionRegExMatch } from "@/submodules/javascript-functions/python-functions-parser";
 import { Record } from "@/src/types/components/projects/projectId/settings/attribute-calculation";
 import { ATTRIBUTES_VISIBILITY_STATES, DATA_TYPES } from "./data-schema-helper";
@@ -9,7 +9,7 @@ import { ATTRIBUTES_VISIBILITY_STATES, DATA_TYPES } from "./data-schema-helper";
 export function postProcessCurrentAttribute(attribute: Attribute): Attribute {
     if (!attribute) return null;
     const prepareAttribute = jsonCopy(attribute);
-    prepareAttribute.logs = parseLogData(prepareAttribute.logs);
+    prepareAttribute.logs = parseContainerLogsData(prepareAttribute.logs);
     prepareAttribute.progress = Number(prepareAttribute.progress?.toFixed(2));
     prepareAttribute.dataTypeName = DATA_TYPES.find((type) => type.value === attribute?.dataType).name;
     prepareAttribute.visibilityIndex = ATTRIBUTES_VISIBILITY_STATES.findIndex((type) => type.value === attribute?.visibility);
