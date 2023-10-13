@@ -16,6 +16,7 @@ export class RouteManager {
         RouteManager.checkRouteHighlight(location.pathname);
     }
 
+    // TODO: discuss the router.push and the href navigation
     private static checkRouteHighlight(url: string) {
         url = url.split('?')[0];
         RouteManager.currentPage = '';

@@ -108,6 +108,7 @@ export default function ModelsDownload() {
         }
     }
 
+    // TODO: add the hover box and the colors after the dropdown review is done
     return (<div className="p-4 bg-gray-100 h-screen overflow-y-auto flex-1 flex flex-col">
         <div className="flex flex-row items-center">
             <button onClick={() => router.back()} className="text-green-800 text-sm font-medium">

@@ -240,6 +240,8 @@ export default function ProjectSettings() {
         });
     }
 
+    // TODO: there are some todos comments that an option could be returning the entity from BE and automatically update the store instead of refetching
+
     return (<div>
         {project != null && <div className="p-4 bg-gray-100 pb-10 h-screen overflow-y-auto flex-1 flex flex-col">
             <DataSchema isAcOrTokenizationRunning={isAcRunning || tokenizationProgress < 1} pKeyValid={pKeyValid} />

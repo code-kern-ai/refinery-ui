@@ -234,6 +234,7 @@ export default function LabelingTasks() {
                 e.newParsed = LabelHelper.prepareSourceCode(e.new, e.information_source_name);
             });
             LabelHelper.renameLabelData.checkResults = result;
+            dispatch(setModalStates(ModalEnum.RENAME_LABEL, { ...modalRenameLabel, checkResults: result, open: true }));
         });
     }
 
@@ -435,25 +436,25 @@ export default function LabelingTasks() {
                             className={`ml-2 flex-shrink-0 bg-green-100 text-green-700 border border-green-400 text-xs font-semibold px-4 py-2 rounded-md hover:bg-green-200 focus:outline-none ${LabelHelper.renameLabelData.canCheck ? 'opacity-100 cursor-pointer' : 'opacity-50 cursor-not-allowed'}`}>
                             Check Rename</button>
                     </div>
-                    {LabelHelper.renameLabelData.checkResults?.errors.length > 0 && <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative flex flex-col">
+                    {modalRenameLabel?.checkResults?.errors?.length > 0 && <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative flex flex-col">
                         <div className="self-center flex flex-row flex-nowrap items-center -mt-1 mb-1">
                             <strong className="font-bold">Errors detected</strong>
                             <IconAlertTriangleFilled className="h-5 w-5 text-red-400" />
                         </div>
-                        {LabelHelper.renameLabelData.checkResults.errors.map((error: any) => (
+                        {modalRenameLabel?.checkResults?.errors.map((error: any) => (
                             <pre key={error.msg} className="text-sm overflow-x-auto">{error.msg}</pre>
                         ))}
                     </div>}
-                    {LabelHelper.renameLabelData.checkResults?.infos.length > 0 && <div className="bg-blue-100 border border-blue-400 text-blue-700 px-4 py-3 rounded relative flex flex-col">
+                    {modalRenameLabel?.checkResults?.infos.length > 0 && <div className="bg-blue-100 border border-blue-400 text-blue-700 px-4 py-3 rounded relative flex flex-col">
                         <div className="self-center flex flex-row flex-nowrap items-center -mt-1 mb-1">
                             <strong className="font-bold">Information</strong>
                             <IconInfoCircleFilled className="h-5 w-5 text-blue-400" />
                         </div>
-                        {LabelHelper.renameLabelData.checkResults.infos.map((info: any) => (
+                        {modalRenameLabel?.checkResults?.infos.map((info: any) => (
                             <pre key={info.msg} className="text-sm overflow-x-auto">{info.msg}</pre>
                         ))}
                     </div>}
-                    {LabelHelper.renameLabelData.checkResults?.warnings.length > 0 && <div className="bg-yellow-100 border border-yellow-400 text-yellow-700 px-4 py-3 rounded relative flex flex-col">
+                    {modalRenameLabel?.checkResults?.warnings?.length > 0 && <div className="bg-yellow-100 border border-yellow-400 text-yellow-700 px-4 py-3 rounded relative flex flex-col">
                         <div className="self-center flex flex-row flex-nowrap items-center -mt-1 mb-1">
                             <strong className="font-bold">Warning</strong>
                             <IconAlertTriangleFilled className="h-5 w-5 text-yellow-400" />
@@ -466,10 +467,15 @@ export default function LabelingTasks() {
                                 <p className="text-center">Please check them carefully before applying!</p>
                             </span>
                         </div>
-                        {LabelHelper.renameLabelData.checkResults.warnings.map((warning: any) => (
+                        {modalRenameLabel?.checkResults?.warnings?.map((warning: any) => (
                             <div key={warning.msg} className={`flex flex-col gap-y-1 ${warning.open ? 'border border-yellow-400' : ''} `}>
                                 <div className="flex flex-row items-center cursor-pointer" onClick={() => {
-                                    // TODO: fix this
+                                    const warnings = jsonCopy(modalRenameLabel.checkResults.warnings);
+                                    const index = warnings.findIndex((e: any) => e.msg == warning.msg);
+                                    warnings[index].open = !warnings[index].open;
+                                    const checkResults = jsonCopy(modalRenameLabel.checkResults);
+                                    checkResults.warnings = warnings;
+                                    dispatch(setModalStates(ModalEnum.RENAME_LABEL, { ...modalRenameLabel, checkResults: checkResults }));
                                 }}>
                                     <div className="mr-1">
                                         <IconTriangleInverted className={`h-3 w-3 ${warning.open ? 'transform rotate-180' : ''}`} />
