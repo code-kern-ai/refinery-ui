@@ -18,7 +18,6 @@ export default function App({ Component, pageProps }: AppProps) {
   // if store ? use store : refetch
   useEffect(() => {
     ConfigManager.refreshConfig();
-    RouteManager.initRouterListener();
   }, []);
 
   return <>

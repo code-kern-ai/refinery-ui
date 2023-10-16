@@ -29,7 +29,7 @@ export const GRANULARITY_TYPES_ARRAY = [
 
 export function postProcessingEmbeddingPlatforms(platforms: EmbeddingPlatform[], organization: Organization) {
     const preparedPlatforms: EmbeddingPlatform[] = [];
-    if (organization.gdprCompliant) {
+    if (organization?.gdprCompliant) {
         platforms = platforms.filter((platform) => platform.terms == null);
     }
     platforms.forEach((platform: EmbeddingPlatform) => {
@@ -99,4 +99,29 @@ export function checkDuplicates(embeddings: any, data: any): boolean {
         }
     }
     return true;
+}
+
+// TODO: Add one type for all the data
+export function checkIfCreateEmbeddingIsDisabled(platform: string, model: string, apiToken: string, termsAccepted: boolean, embeddings: any, targetAttribute: string, granularity: string, engine: string, url: string, version: string, embeddingPlatforms: EmbeddingPlatform[]) {
+    let checkFormFields: boolean = false;
+    if (platform == platformNamesDict[PlatformType.HUGGING_FACE] || platform == platformNamesDict[PlatformType.PYTHON]) {
+        checkFormFields = model == null || model == "";
+    } else if (platform == platformNamesDict[PlatformType.OPEN_AI]) {
+        checkFormFields = model == null || apiToken == null || apiToken == "" || !termsAccepted;
+    } else if (platform == platformNamesDict[PlatformType.COHERE]) {
+        checkFormFields = apiToken == null || apiToken == "" || !termsAccepted;
+    } else if (platform == platformNamesDict[PlatformType.AZURE]) {
+        checkFormFields = apiToken == null || apiToken == "" || url == null || url == "" || version == null || version == "" || !termsAccepted || !engine;
+    }
+    const data = {
+        targetAttribute: targetAttribute,
+        platform: embeddingPlatforms.find((p: EmbeddingPlatform) => p.name == platform)?.platform,
+        granularity: granularity,
+        model: model,
+        apiToken: apiToken,
+        engine: engine,
+        url: url,
+        version: version
+    }
+    return checkFormFields || !checkDuplicates(embeddings, data);
 }

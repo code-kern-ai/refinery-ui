@@ -11,13 +11,12 @@ import { CREATE_LOOKUP_LIST, DELETE_LOOKUP_LIST } from "@/src/services/gql/mutat
 import { LookupList } from "@/src/types/components/projects/projectId/lookup-lists";
 import { LookupListCard } from "./LookupListCard";
 import style from '@/src/styles/components/projects/projectId/lookup-lists.module.css';
-import { openModal } from "@/src/reduxStore/states/modal";
-import { ModalEnum } from "@/src/types/shared/modal";
+import { openModal, selectModal } from "@/src/reduxStore/states/modal";
+import { ModalButton, ModalEnum } from "@/src/types/shared/modal";
 import { useRouter } from "next/router";
-import { postProcessLookupLists } from "@/src/util/components/projects/projectId/lookup-lists-helper";
+import { ACTIONS_DROPDOWN_OPTIONS, postProcessLookupLists } from "@/src/util/components/projects/projectId/lookup-lists-helper";
 
-const ACTIONS_DROPDOWN_OPTIONS = ['Select all', 'Deselect all', 'Delete selected'];
-const ABORT_BUTTON = { buttonCaption: "Delete", useButton: true, disabled: false, closeAfterClick: true };
+const ABORT_BUTTON = { buttonCaption: "Delete", useButton: true, disabled: false };
 
 export default function LookupListsOverview() {
     const router = useRouter();
@@ -26,6 +25,7 @@ export default function LookupListsOverview() {
     const project = useSelector(selectProject);
     const lookupLists = useSelector(selectAllLookupLists);
     const checkedLookupLists = useSelector(selectCheckedLookupLists);
+    const modalDelete = useSelector(selectModal(ModalEnum.DELETE_LOOKUP_LIST));
 
     const [getLookupLists] = useLazyQuery(LOOKUP_LISTS_BY_PROJECT_ID);
     const [createLookupListMut] = useMutation(CREATE_LOOKUP_LIST);
@@ -50,7 +50,12 @@ export default function LookupListsOverview() {
         });
     }, [checkedLookupLists]);
 
-    const [abortButton, setAbortButton] = useState({ ...ABORT_BUTTON, emitFunction: deleteLookupLists });
+    useEffect(() => {
+        setAbortButton({ ...ABORT_BUTTON, emitFunction: deleteLookupLists });
+        prepareSelectionList();
+    }, [modalDelete]);
+
+    const [abortButton, setAbortButton] = useState<ModalButton>(ABORT_BUTTON);
 
     useEffect(() => {
         if (!project) return;

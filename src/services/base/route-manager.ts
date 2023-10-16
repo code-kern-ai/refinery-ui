@@ -12,12 +12,7 @@ export class RouteManager {
         admin: { active: false, checkFor: ['admin'] },
     }
 
-    public static initRouterListener() {
-        RouteManager.checkRouteHighlight(location.pathname);
-    }
-
-    // TODO: discuss the router.push and the href navigation
-    private static checkRouteHighlight(url: string) {
+    public static checkRouteHighlight(url: string) {
         url = url.split('?')[0];
         RouteManager.currentPage = '';
         for (const key in RouteManager.routeColor) {

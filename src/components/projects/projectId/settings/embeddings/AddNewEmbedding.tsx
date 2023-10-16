@@ -9,7 +9,7 @@ import { Attribute } from "@/src/types/components/projects/projectId/settings/da
 import { EmbeddingPlatform, EmbeddingProps, EmbeddingType, PlatformType, SuggestionsProps } from "@/src/types/components/projects/projectId/settings/embeddings";
 import { DataTypeEnum } from "@/src/types/shared/general";
 import { ModalButton, ModalEnum } from "@/src/types/shared/modal";
-import { DEFAULT_AZURE_TYPE, GRANULARITY_TYPES_ARRAY, checkDuplicates, platformNamesDict, postProcessingEmbeddingPlatforms } from "@/src/util/components/projects/projectId/settings/embeddings-helper";
+import { DEFAULT_AZURE_TYPE, GRANULARITY_TYPES_ARRAY, checkIfCreateEmbeddingIsDisabled, platformNamesDict, postProcessingEmbeddingPlatforms } from "@/src/util/components/projects/projectId/settings/embeddings-helper";
 import { jsonCopy } from "@/submodules/javascript-functions/general";
 import Dropdown from "@/submodules/react-components/components/Dropdown";
 import { useLazyQuery, useMutation } from "@apollo/client";
@@ -79,12 +79,7 @@ export default function AddNewEmbedding(props: EmbeddingProps) {
     }, [platform, embeddingHandlesAll]);
 
     useEffect(() => {
-        const filteredAttributesArrayCopy = [];
-        useableNonTextAttributes.forEach((a) => {
-            filteredAttributesArrayCopy.push(a.name);
-        });
-        filteredAttributesArrayCopy.push('Select all');
-        setFilteredAttributesArray(filteredAttributesArrayCopy);
+        setFilteredAttributesArray(useableNonTextAttributes.map((a) => a.name));
     }, [useableNonTextAttributes]);
 
     function prepareSuggestions() {
@@ -127,35 +122,11 @@ export default function AddNewEmbedding(props: EmbeddingProps) {
         }
         checkIfAttributeHasToken();
         const acceptButtonCopy = jsonCopy(ACCEPT_BUTTON);
-        acceptButtonCopy.disabled = checkIfCreateEmbeddingIsDisabled();
+        acceptButtonCopy.disabled = checkIfCreateEmbeddingIsDisabled(platform, model, apiToken, termsAccepted, embeddings, targetAttribute, granularity, engine, url, version, embeddingPlatforms);
         setAcceptButton(acceptButtonCopy);
         setTermsAccepted(false);
         setModel(null);
         setApiToken('');
-    }
-
-    function checkIfCreateEmbeddingIsDisabled() {
-        let checkFormFields: boolean = false;
-        if (platform == platformNamesDict[PlatformType.HUGGING_FACE] || platform == platformNamesDict[PlatformType.PYTHON]) {
-            checkFormFields = model == null || model == "";
-        } else if (platform == platformNamesDict[PlatformType.OPEN_AI]) {
-            checkFormFields = model == null || apiToken == null || apiToken == "" || !termsAccepted;
-        } else if (platform == platformNamesDict[PlatformType.COHERE]) {
-            checkFormFields = apiToken == null || apiToken == "" || !termsAccepted;
-        } else if (platform == platformNamesDict[PlatformType.AZURE]) {
-            checkFormFields = apiToken == null || apiToken == "" || url == null || url == "" || version == null || version == "" || !termsAccepted || !engine;
-        }
-        const data = {
-            targetAttribute: targetAttribute,
-            platform: embeddingPlatforms.find((p: EmbeddingPlatform) => p.name == platform)?.platform,
-            granularity: granularity,
-            model: model,
-            apiToken: apiToken,
-            engine: engine,
-            url: url,
-            version: version
-        }
-        return checkFormFields || !checkDuplicates(embeddings, data);
     }
 
     function checkIfPlatformHasToken() {
@@ -231,8 +202,8 @@ export default function AddNewEmbedding(props: EmbeddingProps) {
     const [acceptButton, setAcceptButton] = useState<ModalButton>(ACCEPT_BUTTON);
 
     useEffect(() => {
-        setAcceptButton({ ...acceptButton, emitFunction: addEmbedding, disabled: checkIfCreateEmbeddingIsDisabled() });
-    }, [embeddingPlatforms, platform, granularity, model, apiToken, engine, url, version, termsAccepted]);
+        setAcceptButton({ ...acceptButton, emitFunction: addEmbedding, disabled: checkIfCreateEmbeddingIsDisabled(platform, model, apiToken, termsAccepted, embeddings, targetAttribute, granularity, engine, url, version, embeddingPlatforms) });
+    }, [addEmbedding, embeddingPlatforms]);
 
     return (
         <Modal modalName={ModalEnum.ADD_EMBEDDING} acceptButton={acceptButton}>
@@ -253,15 +224,13 @@ export default function AddNewEmbedding(props: EmbeddingProps) {
                     <Tooltip content="Filter attributes that will be encoded" placement="right" color="invert">
                         <span className="card-title mb-0 label-text flex"><span className="cursor-help underline filtersUnderline">Filter Attributes</span></span>
                     </Tooltip>
-                    <Dropdown options={filteredAttributesArray} buttonName={filteredAttributes.length == 0 ? 'None selected' : filteredAttributes.join(',')} hasCheckboxes={true}
+                    <Dropdown options={filteredAttributesArray} buttonName={filteredAttributes.length == 0 ? 'None selected' : filteredAttributes.join(',')} hasCheckboxes={true} hasSelectAll={true}
                         selectedOption={(option: any) => {
-                            const filteredAttributesCopy = [];
-                            option.forEach((o: any) => {
-                                if (o.checked && o.name != 'Select all') {
-                                    filteredAttributesCopy.push(o.name);
-                                }
+                            const filteredAttributes = [];
+                            option.forEach((a: any) => {
+                                if (a.checked) filteredAttributes.push(a.name);
                             });
-                            setFilteredAttributes(filteredAttributesCopy);
+                            setFilteredAttributes(filteredAttributes);
                         }} />
 
                     <Tooltip content="Choose the platform to embed records" placement="right" color="invert">

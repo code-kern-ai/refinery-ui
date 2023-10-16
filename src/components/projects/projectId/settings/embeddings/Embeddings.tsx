@@ -79,7 +79,8 @@ export default function Embeddings(props: EmbeddingProps) {
     const saveFilteredAttributes = useCallback(() => {
         setShowEditOption(false);
         dispatch(setModalStates(ModalEnum.FILTERED_ATTRIBUTES, { showEditOption: false }));
-        updateEmbeddingPayloadMut({ variables: { projectId: project.id, embeddingId: modalFilteredAttributes.embeddingId, filterAttributes: JSON.stringify(filterAttributesUpdate) } }).then((res) => {
+        const updatedAttributes = modalFilteredAttributes.attributeNames.filter((a) => a.checked).map((a) => a.name);
+        updateEmbeddingPayloadMut({ variables: { projectId: project.id, embeddingId: modalFilteredAttributes.embeddingId, filterAttributes: JSON.stringify(updatedAttributes) } }).then((res) => {
 
         });
     }, [modalFilteredAttributes]);
@@ -135,6 +136,7 @@ export default function Embeddings(props: EmbeddingProps) {
             attributeCopy.checked = true;
             attributesNew.push(attributeCopy);
         }
+        setFilterAttributesUpdate(attributesNames);
         return attributesNew;
     }
 
@@ -183,7 +185,7 @@ export default function Embeddings(props: EmbeddingProps) {
                                             <td className="whitespace-nowrap text-center px-3 py-2 text-sm text-gray-500 flex justify-center">
                                                 <Tooltip content={embedding.filterAttributes && embedding.filterAttributes.length > 0 ? 'Has filtered attributes' : 'No filter attributes'} color="invert" >
                                                     <IconNotes onClick={() => dispatch(setModalStates(ModalEnum.FILTERED_ATTRIBUTES, { embeddingId: embedding.id, open: true, attributeNames: prepareAttributeDataByNames(embedding.filterAttributes), showEditOption: showEditOption }))}
-                                                        className={`h-6 w-6 ${embedding.filterAttributes ? 'text-gray-700' : 'text-gray-300'}`} />
+                                                        className={`h-6 w-6 ${embedding.filterAttributes && embedding.filterAttributes.length > 0 ? 'text-gray-700' : 'text-gray-300'}`} />
                                                 </Tooltip>
                                             </td> : <td><LoadingIcon /></td>}
                                         <td className="whitespace-nowrap text-center px-3 py-2 text-sm text-gray-500">
@@ -262,10 +264,18 @@ export default function Embeddings(props: EmbeddingProps) {
             </div>}
             {modalFilteredAttributes.showEditOption && <div className="mt-3">
                 <div className="text-xs text-gray-500 text-center italic">Add or remove filter attributes</div>
-                <Dropdown options={modalFilteredAttributes.attributeNames.map(a => a.name)} buttonName={modalFilteredAttributes.attributeNames.length == 0 ? 'None selected' : modalFilteredAttributes.attributeNames.map(a => a.name).join(',')} hasCheckboxes={true}
-                    selectedCheckboxes={modalFilteredAttributes.attributeNames.map(a => a.checked)}
+                <Dropdown options={modalFilteredAttributes.attributeNames.map(a => a.name)} buttonName={filterAttributesUpdate.length == 0 ? 'None selected' : filterAttributesUpdate.join(',')} hasCheckboxes={true}
+                    selectedCheckboxes={modalFilteredAttributes.attributeNames.map(a => a.checked)} hasSelectAll={true}
                     selectedOption={(option: any) => {
-                        setFilterAttributesUpdate(option.filter((a: any) => a.checked).map((a: any) => a.name));
+                        setFilterAttributesUpdate(option.filter((o: any) => o.checked).map((o: any) => o.name));
+                        const updated = [];
+                        option.forEach((att: any) => {
+                            const attribute = attributes.find((a: any) => a.name == att.name);
+                            const attributeCopy = jsonCopy(attribute);
+                            attributeCopy.checked = att.checked;
+                            updated.push(attributeCopy);
+                        });
+                        dispatch(setModalStates(ModalEnum.FILTERED_ATTRIBUTES, { attributeNames: updated }));
                     }} />
             </div>}
         </Modal>

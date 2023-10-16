@@ -11,6 +11,7 @@ import { GET_IS_ADMIN } from "../services/gql/queries/config";
 import { getIsDemo, getIsManaged } from "../services/base/data-fetch";
 import { WebSocketsService } from "../services/base/web-sockets/WebSocketsService";
 import { timer } from "rxjs";
+import { RouteManager } from "../services/base/route-manager";
 
 export function GlobalStoreDataComponent(props: React.PropsWithChildren) {
     const router = useRouter();
@@ -54,6 +55,16 @@ export function GlobalStoreDataComponent(props: React.PropsWithChildren) {
                 timer(60000).subscribe(() => location.reload())
             }
         })
+    }, []);
+
+    useEffect(() => {
+        RouteManager.checkRouteHighlight(router.asPath);
+        const something = (url: any) => {
+            RouteManager.checkRouteHighlight(url);
+        }
+        return () => {
+            router.events.off('routeChangeComplete', something)
+        }
     }, []);
 
     useEffect(() => {
