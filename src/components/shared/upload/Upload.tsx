@@ -19,7 +19,7 @@ import CryptedField from "../crypted-field/CryptedField";
 import { unsubscribeWSOnDestroy } from "@/src/services/base/web-sockets/web-sockets-helper";
 import { GET_UPLOAD_CREDENTIALS_AND_ID, GET_UPLOAD_TASK_BY_TASK_ID } from "@/src/services/gql/queries/projects";
 
-
+// might run into issues if we change the wording so a prepped dict with selection could improve future changes
 const SELECTED_TOKENIZER_RECORD_NEW = 'English (en_core_web_sm)';
 const SELECTED_TOKENIZER_PROJECT = '(en_core_web_sm)';
 

@@ -97,6 +97,9 @@ const settingsSlice = createSlice({
         removeFromAllLabelingTasksById(state, action: PayloadAction<string>) {
             if (action.payload) state.labelingTasks.all = state.labelingTasks.all.filter((labelingTask) => labelingTask.id !== action.payload);
         },
+
+        // unsure if this should be a setter or a selector (e.g. only set all & then select with filter)
+        // alternatively we should only set all (which in turn sets multiple states) so the selector doesn't need to filter
         setAllUsableAttributes(state, action: PayloadAction<Attribute[]>) {
             if (action.payload) {
                 const fullRecordEl = {
@@ -108,13 +111,14 @@ const settingsSlice = createSlice({
             }
             else state.attributes.usableAttributes = [];
         },
+
+        // usually with a prepare function so we can call this with named parameters 
         removeLabelFromLabelingTask(state, action: PayloadAction<{ taskId: string, labelId: string }>) {
-            if (action.payload) {
-                const { taskId, labelId } = action.payload;
-                const labelingTask = state.labelingTasks.all.find((labelingTask) => labelingTask.id === taskId);
-                if (labelingTask) {
-                    labelingTask.labels = labelingTask.labels.filter((label) => label.id !== labelId);
-                }
+            if (!action.payload) return;
+            const { taskId, labelId } = action.payload;
+            const labelingTask = state.labelingTasks.all.find((labelingTask) => labelingTask.id === taskId);
+            if (labelingTask) {
+                labelingTask.labels = labelingTask.labels.filter((label) => label.id !== labelId);
             }
         }
     }
@@ -129,6 +133,14 @@ export const selectRecommendedEncodersAll = (state) => state.settings.recommende
 export const selectUsableNonTextAttributes = (state) => state.settings.attributes.useableNonTextAttributes;
 export const selectLabelingTasksAll = (state) => state.settings.labelingTasks.all;
 export const selectUsableAttributes = (state) => state.settings.attributes.usableAttributes;
+
+
+//higher order selectors
+
+// in theory we could also change the structure of our arrays to dictionaries during the reduce function to make the lookup faster
+export function selectLabelById(taskId: string, labelId: string) {
+    return (state) => state.settings.labelingTasks.all.find((item) => item.id === taskId)?.labels.find((label) => label.id === labelId);
+}
 
 export const { setAllAttributes, extendAllAttributes, removeFromAllAttributesById, updateAttributeById, setAllEmbeddings, removeFromAllEmbeddingsById, setUseableEmbedableAttributes, setAllRecommendedEncodersDict, setRecommendedEncodersAll, setUseableNonTextAttributes, setLabelingTasksAll, removeFromAllLabelingTasksById, setAllUsableAttributes, removeLabelFromLabelingTask } = settingsSlice.actions;
 export const settingsReducer = settingsSlice.reducer;

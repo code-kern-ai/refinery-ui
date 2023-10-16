@@ -16,6 +16,7 @@ export default function UsersList() {
     const [annotators, setAnnotators] = useState([]);
     const [experts, setExperts] = useState([]);
 
+    //state vs query. Since we need the users on the data browser/labeling page as well i think a state makes sense
     const [refetchOrganizationUsers] = useLazyQuery(GET_ORGANIZATION_USERS);
 
     useEffect(() => {

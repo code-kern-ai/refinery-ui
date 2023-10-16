@@ -34,6 +34,8 @@ export default function LabelingTasks() {
 
     const project = useSelector(selectProject);
     const labelingTasksSchema = useSelector(selectLabelingTasksAll);
+
+    // (not now) imo we can should put some of these as their own components so we find them easily & have a clear distinction of what is needed for what
     const modalDeleteLabelingTask = useSelector(selectModal(ModalEnum.DELETE_LABELING_TASK));
     const modalAddLabelingTask = useSelector(selectModal(ModalEnum.ADD_LABELING_TASK));
     const modalDeleteLabel = useSelector(selectModal(ModalEnum.DELETE_LABEL));

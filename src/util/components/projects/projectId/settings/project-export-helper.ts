@@ -15,6 +15,7 @@ export function postProcessingFormGroups(projectSize: any): ProjectSize[] {
     const projectExportArray = [];
     projectSize.forEach((element: any) => {
         let hasGdpr = false;
+        // comparison with a string has some problems maybe we can create either an enum or some constants for this 
         if (element.table == 'embedding tensors') {
             // hasGdpr = TODO: filter for embeddings
         }

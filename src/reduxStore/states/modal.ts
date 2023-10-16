@@ -90,7 +90,7 @@ const initialState: Modals = {
         open: false,
         taskId: '',
         labelId: '',
-        labelColor: '',
+        labelColor: '', // not sure why this is needed for deletion. With labelid & taskid we should be able to create a selector for label by id 
     },
     [ModalEnum.CHANGE_COLOR]: {
         open: false,

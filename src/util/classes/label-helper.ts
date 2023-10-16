@@ -7,6 +7,7 @@ export class LabelHelper {
 
     public static labelColorOptions = []
 
+    // color options are constant (no need inside the class) i'd go with an export const LABEL_COLOR_OPTIONS = [...] (outside)
     public static colorOptions = [
         "red", "orange", "amber",
         "yellow", "lime", "green",

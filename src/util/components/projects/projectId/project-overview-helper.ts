@@ -1,6 +1,8 @@
 import { DisplayGraphs, ProjectStats } from "@/src/types/components/projects/projectId/overview";
 import { percentRoundString } from "@/submodules/javascript-functions/general";
 
+
+// probably an enum function once we have the enums in the submodule
 export function displayGraphsTypeToString(source: DisplayGraphs) {
     switch (source) {
         case DisplayGraphs.ALL: return "All";
@@ -25,11 +27,18 @@ export function getDisplayGraphValueArray(): [{ value: number, name: string }] {
 
 export function getEmptyProjectStats(): ProjectStats {
     return {
-        generalLoading: false, general: {}, generalPercent: {
+        generalLoading: false,
+        general: {},
+        generalPercent: {
+            // dict with enum value for key would help for future changes though i could't find the enum yet
             "INFORMATION_SOURCE": "n/a",
             "WEAK_SUPERVISION": "n/a",
             "MANUAL": "n/a"
-        }, generalStats: {}, interAnnotatorLoading: false, interAnnotator: "n/a", interAnnotatorStat: -1
+        },
+        generalStats: {},
+        interAnnotatorLoading: false,
+        interAnnotator: "n/a",
+        interAnnotatorStat: -1
     }
 }
 

@@ -231,6 +231,7 @@ export default function AddNewEmbedding(props: EmbeddingProps) {
     const [acceptButton, setAcceptButton] = useState<ModalButton>(ACCEPT_BUTTON);
 
     useEffect(() => {
+        // might run into some issues since checkIfCreateEmeddingISDisabled is not a dependency. Simply adding it wouldn't suffice imo  since it's a function that is recreated on every render so this would run on every render as well
         setAcceptButton({ ...acceptButton, emitFunction: addEmbedding, disabled: checkIfCreateEmbeddingIsDisabled() });
     }, [embeddingPlatforms, platform, granularity, model, apiToken, engine, url, version, termsAccepted]);
 
@@ -267,11 +268,11 @@ export default function AddNewEmbedding(props: EmbeddingProps) {
                     <Tooltip content="Choose the platform to embed records" placement="right" color="invert">
                         <span className="card-title mb-0 label-text flex"><span className="cursor-help underline filtersUnderline">Platform</span></span>
                     </Tooltip>
-                    <Dropdown options={embeddingPlatforms} buttonName={platform ? platform : 'Choose'} selectedOption={(option: string) => {
+                    <Dropdown options={embeddingPlatforms} buttonName={platform ?? 'Choose'} selectedOption={(option: string) => {
                         setPlatform(option);
                         setSelectedPlatform(embeddingPlatforms.find((p: EmbeddingPlatform) => p.name == option));
                     }} />
-
+                    {/* (Not now) I think we should create some local tooltip content lookup function so it's easy to identify the place if we need to change something*/}
                     <Tooltip content="One embedding per attribute vs. per token" placement="right" color="invert">
                         <span className="card-title mb-0 label-text flex"><span className="cursor-help underline filtersUnderline">Granularity</span></span>
                     </Tooltip>
