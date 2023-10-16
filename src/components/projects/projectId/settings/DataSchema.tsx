@@ -24,7 +24,7 @@ export default function DataSchema(props: DataSchemaProps) {
     const attributes = useSelector(selectAttributes);
 
     const [somethingLoading, setSomethingLoading] = useState(false);
-    const [tooltipsArray, setTooltipsArray] = useState<string[]>([]);
+    const [tooltipsArray, setTooltipsArray] = useState<string[]>(null);
 
     const [updateAttributeMut] = useMutation(UPDATE_ATTRIBUTE);
 

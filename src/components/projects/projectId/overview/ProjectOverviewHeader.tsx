@@ -2,7 +2,6 @@ import { getDisplayGraphValueArray } from "@/src/util/components/projects/projec
 import Dropdown from "@/submodules/react-components/components/Dropdown";
 import { Tooltip } from "@nextui-org/react";
 import { useState } from "react";
-import style from '@/src/styles/components/projects/projectId/project-overview.module.css';
 
 const DISPLAY_GRAPHS_VALUE_ARRAY = getDisplayGraphValueArray();
 
@@ -51,7 +50,7 @@ export default function ProjectOverviewHeader() {
                             fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
                             <path d="M5.555 17.776l8-16 .894.448-8 16-.894-.448z" />
                         </svg>
-                        <Tooltip placement="bottom" color="invert" content="Choose a static data slice. Only static ones can be used" className="z-10 relative">
+                        <Tooltip placement="bottom" color="invert" content="Choose a static data slice" className="z-10 relative">
                             <span className={`cursor-help mr-2 underline text-black-800 filtersUnderline`}>Data slice</span>
                         </Tooltip>
                     </div>

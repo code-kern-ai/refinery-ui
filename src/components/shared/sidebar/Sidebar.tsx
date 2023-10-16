@@ -122,7 +122,7 @@ export default function Sidebar() {
                         <div className="flex-1 flex flex-col min-h-0 overflow-y-auto bg-kernindigo overflow-initial">
                             <div className="flex-1 flex flex-col">
                                 <div className="flex-shrink-0 bg-kernindigo pt-4 pb-10 flex items-center justify-center">
-                                    <a href="/refinery/projects"
+                                    <button onClick={() => router.push('/')}
                                         className="inline-flex items-center p-2 rounded-full hover:bg-kernindigo-dark focus:outline-none">
                                         <Image
                                             width={40}
@@ -130,7 +130,7 @@ export default function Sidebar() {
                                             src="/refinery/images/refinery-icon.png"
                                             alt="Kern AI"
                                         />
-                                    </a>
+                                    </button>
                                 </div>
                                 <div>
                                     {project && project.id ? (<div>
@@ -138,10 +138,10 @@ export default function Sidebar() {
                                             className="flex items-center justify-center overflow-visible">
                                             <Tooltip placement="right" trigger="hover" color="invert" content="Overview">
                                                 <div className={`relative z-50 ${project.numDataScaleUploaded == 0 ? 'opacity-50 cursor-not-allowed pointer-events-none' : 'opacity-100 cursor-pointer'}`}>
-                                                    <a rel="noopener noreferrer" href={`/refinery/projects/${project.id}/overview`}
+                                                    <button onClick={() => router.push(`/projects/${project.id}/overview`)}
                                                         className={`circle ${routeColor.overview.active ? 'text-kernpurple' : 'text-white'}`}>
                                                         <IconChartPie className="w-6 h-6" />
-                                                    </a>
+                                                    </button>
                                                 </div>
                                             </Tooltip>
                                         </div>}
@@ -149,17 +149,17 @@ export default function Sidebar() {
                                             className="flex items-center justify-center overflow-visible mt-10 2xl:mt-12">
                                             <Tooltip placement="right" trigger="hover" color="invert" content="Data Browser">
                                                 <div className={`relative z-50 ${project.numDataScaleUploaded == 0 ? 'opacity-50 cursor-not-allowed pointer-events-none' : 'opacity-100 cursor-pointer'}`}>
-                                                    <a rel="noopener noreferrer" href={`/refinery/projects/${project.id}/data`}
+                                                    <button onClick={() => router.push(`/projects/${project.id}/data`)}
                                                         className={`circle ${routeColor.data.active ? 'text-kernpurple' : 'text-white'}`}>
                                                         <IconTriangleSquareCircle className="w-6 h-6" />
-                                                    </a>
+                                                    </button>
                                                 </div>
                                             </Tooltip>
                                         </div>}
                                         <div className={`flex items-center justify-center overflow-visible ${user?.role == 'ENGINEER' ? 'mt-10 2xl:mt-12' : ''}`}>
                                             <Tooltip placement="right" trigger="hover" color="invert" content="Labeling">
                                                 <div className={`relative z-50 ${project.numDataScaleUploaded == 0 ? 'opacity-50 cursor-not-allowed pointer-events-none' : 'opacity-100 cursor-pointer'}`}>
-                                                    <a rel="noopener noreferrer" href={`/refinery/projects/${project.id}/labeling`}
+                                                    <button onClick={() => router.push(`/projects/${project.id}/labeling`)}
                                                         className={`circle ${routeColor.labeling.active ? 'text-kernpurple' : 'text-white'}`}>
                                                         <svg xmlns="http://www.w3.org/2000/svg" className="w-6 h-6" viewBox="0 0 20 20"
                                                             fill="currentColor">
@@ -167,7 +167,7 @@ export default function Sidebar() {
                                                                 d="M17.707 9.293a1 1 0 010 1.414l-7 7a1 1 0 01-1.414 0l-7-7A.997.997 0 012 10V5a3 3 0 013-3h5c.256 0 .512.098.707.293l7 7zM5 6a1 1 0 100-2 1 1 0 000 2z"
                                                                 clipRule="evenodd" />
                                                         </svg>
-                                                    </a>
+                                                    </button>
                                                 </div>
                                             </Tooltip>
                                         </div>
@@ -175,10 +175,10 @@ export default function Sidebar() {
                                             className="flex items-center justify-center overflow-visible mt-10 2xl:mt-12">
                                             <Tooltip placement="right" trigger="hover" color="invert" content="Heuristics">
                                                 <div className={`relative z-50 ${project.numDataScaleUploaded == 0 ? 'opacity-50 cursor-not-allowed pointer-events-none' : 'opacity-100 cursor-pointer'}`}>
-                                                    <a rel="noopener noreferrer" href={`/refinery/projects/${project.id}/heuristics`}
+                                                    <button onClick={() => router.push(`/projects/${project.id}/heuristics`)}
                                                         className={`circle ${routeColor.heuristics.active ? 'text-kernpurple' : 'text-white'}`}>
                                                         <IconBulb className="w-6 h-6" />
-                                                    </a>
+                                                    </button>
                                                 </div>
                                             </Tooltip>
                                         </div>}
@@ -186,10 +186,10 @@ export default function Sidebar() {
                                             className="flex items-center justify-center overflow-visible mt-10 2xl:mt-12">
                                             <Tooltip placement="right" trigger="hover" color="invert" content="Settings">
                                                 <div className={`relative z-50 ${project.numDataScaleUploaded == 0 ? 'opacity-50 cursor-not-allowed pointer-events-none' : 'opacity-100 cursor-pointer'}`}>
-                                                    <a rel="noopener noreferrer" href={`/refinery/projects/${project.id}/settings`}
+                                                    <button onClick={() => router.push(`/projects/${project.id}/settings`)}
                                                         className={`circle ${routeColor.settings.active ? 'text-kernpurple' : 'text-white'}`}>
                                                         <IconSettings className="w-6 h-6" />
-                                                    </a>
+                                                    </button>
                                                 </div>
                                             </Tooltip>
                                         </div>}
@@ -197,10 +197,10 @@ export default function Sidebar() {
                                             className="flex items-center justify-center overflow-visible mt-10 2xl:mt-12">
                                             <Tooltip placement="right" trigger="hover" color="invert" content="Admin">
                                                 <div className={`relative z-50 opacity-100 cursor-pointer`}>
-                                                    <a rel="noopener noreferrer" href={`/refinery/projects/${project.id}/admin`}
+                                                    <button onClick={() => router.push(`/projects/${project.id}/admin`)}
                                                         className={`circle ${routeColor.admin.active ? 'text-kernpurple' : 'text-white'}`}>
                                                         <IconUserCircle className="w-6 h-6" />
-                                                    </a>
+                                                    </button>
                                                 </div>
                                             </Tooltip>
                                         </div>}

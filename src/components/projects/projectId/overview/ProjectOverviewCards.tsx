@@ -3,6 +3,7 @@ import { selectProject } from "@/src/reduxStore/states/project";
 import { CardStats, CardStatsEnum, ProjectOverviewCardsProps } from "@/src/types/components/projects/projectId/overview";
 import { Tooltip } from "@nextui-org/react";
 import { IconBottle, IconBulb, IconClick, IconScale } from "@tabler/icons-react";
+import { useRouter } from "next/router";
 import { useSelector } from "react-redux";
 
 const CARDS_DATA = [
@@ -13,6 +14,7 @@ const CARDS_DATA = [
 ];
 
 export default function ProjectOverviewCards(props: ProjectOverviewCardsProps) {
+    const router = useRouter();
     const project = useSelector(selectProject);
 
     return (<div>
@@ -46,8 +48,8 @@ export default function ProjectOverviewCards(props: ProjectOverviewCardsProps) {
                         )}
                         <div className="absolute bottom-0 inset-x-0 bg-gray-50 px-4 py-4 sm:px-6">
                             <div className="text-sm">
-                                <a className="font-medium text-green-700 hover:text-green-500"
-                                    href={`/refinery/projects/${project.id}/${card.link}`}>{card.linkLabel}</a>
+                                <button className="font-medium text-green-700 hover:text-green-500"
+                                    onClick={() => router.push(`/projects/${project.id}/${card.link}`)}>{card.linkLabel}</button>
                             </div>
                         </div>
                     </dd>

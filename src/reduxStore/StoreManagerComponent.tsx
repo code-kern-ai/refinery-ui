@@ -62,6 +62,7 @@ export function GlobalStoreDataComponent(props: React.PropsWithChildren) {
         const something = (url: any) => {
             RouteManager.checkRouteHighlight(url);
         }
+        router.events.on('routeChangeComplete', something)
         return () => {
             router.events.off('routeChangeComplete', something)
         }

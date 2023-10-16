@@ -14,19 +14,14 @@ import { useMutation } from "@apollo/client";
 import { DELETE_PROJECT } from "@/src/services/gql/mutations/projects";
 
 export default function ProjectCard(props: ProjectCardProps) {
+    const router = useRouter();
     const dispatch = useDispatch();
 
     const isDemo = useSelector(selectIsDemo);
     const isAdmin = useSelector(selectIsAdmin);
     const user = useSelector(selectUser);
 
-    const [link, setLink] = useState<string>(null);
-
     const [deleteProjectByIdMut] = useMutation(DELETE_PROJECT, { fetchPolicy: "no-cache" });
-
-    useEffect(() => {
-        setLink(getLink());
-    }, [props.project]);
 
     function adminOpenOrDeleteProject(project: Project) {
         if (!isAdmin) return;
@@ -42,16 +37,16 @@ export default function ProjectCard(props: ProjectCardProps) {
         }
     }
 
-    function getLink(): string {
+    function manageProject(): void {
         const projectId = props.project.id;
         if (user?.role == 'ENGINEER') {
             if (props.project.numDataScaleUploaded == 0) {
-                return `/refinery/projects/${projectId}/settings`
+                router.push(`/projects/${projectId}/settings`)
             } else {
-                return `/refinery/projects/${projectId}/overview`
+                router.push(`/projects/${projectId}/overview`)
             }
         } else {
-            return `/refinery/projects/${projectId}/labeling`
+            router.push(`/projects/${projectId}/labeling`)
         }
     }
 
@@ -96,7 +91,7 @@ export default function ProjectCard(props: ProjectCardProps) {
                                 <div className="text-sm text-gray-500 font-normal">
                                     {props.projectStatisticsById[props.project.id]?.numDataScaleManual}
                                     &nbsp;records
-                                    ({props.projectStatisticsById[props.project.id]?.manuallyLabeled})
+                                    ({props.projectStatisticsById[props.project.id]?.manuallyLabeled || 'n/a'})
                                 </div>
                             </div>}
                         </div>
@@ -106,16 +101,16 @@ export default function ProjectCard(props: ProjectCardProps) {
                                 <div className="text-sm text-gray-500 font-normal">
                                     {props.projectStatisticsById[props.project.id]?.numDataScaleProgrammatical}
                                     &nbsp;records
-                                    ({props.projectStatisticsById[props.project.id]?.weaklySupervised})
+                                    ({props.projectStatisticsById[props.project.id]?.weaklySupervised || 'n/a'})
                                 </div>
                             </div>}
                         </div>
                         <div>
-                            {props.project.status !== ProjectStatus.INIT_SAMPLE_PROJECT && <a href={link}
+                            {props.project.status !== ProjectStatus.INIT_SAMPLE_PROJECT && <button onClick={manageProject}
                                 className="text-green-800 text-sm font-medium">
                                 <span className="leading-5">Continue project</span>
                                 <IconArrowRight className="h-5 w-5 inline-block text-green-800" />
-                            </a>}
+                            </button>}
                         </div>
                     </div>
                 </div>
