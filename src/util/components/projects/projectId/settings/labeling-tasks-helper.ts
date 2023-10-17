@@ -85,3 +85,7 @@ export function getAttributeArrayAttribute(attributeId: string, valueKey: string
     }
     return 'UNKNOWN';
 }
+
+export function isTaskNameUnique(labelingTasksSchema: LabelingTask[], value: string): boolean {
+    return !labelingTasksSchema.some((task: LabelingTask) => task.name == value);
+}
