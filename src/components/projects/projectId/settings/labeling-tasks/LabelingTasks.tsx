@@ -393,7 +393,7 @@ export default function LabelingTasks() {
                             dispatch(setModalStates(ModalEnum.CHANGE_COLOR, { ...modalChangeColor, open: false }));
                             dispatch(setModalStates(ModalEnum.RENAME_LABEL, { ...modalRenameLabel, label: modalChangeColor.label, taskId: modalChangeColor.taskId, open: true }));
                         }}
-                            className={`inline-flex items-center border rounded-md py-1 px-2 text-sm font-medium shadow-sm text-gray-900 text-center cursor-pointer ${modalChangeColor.label.color?.backgroundColor} ${modalChangeColor.label.color?.textColor} ${modalChangeColor.label.color?.borderColor} ${modalChangeColor.label.color?.hoverColor}`}>
+                            className={`inline-flex items-center border rounded-md py-1 px-2 text-sm font-medium shadow-sm text-center cursor-pointer ${modalChangeColor.label.color?.backgroundColor} ${modalChangeColor.label.color?.textColor} ${modalChangeColor.label.color?.borderColor} ${modalChangeColor.label.color?.hoverColor}`}>
                             {modalChangeColor.label.name}
                             <IconPencil className="h-5 w-5 ml-2" />
                         </span>
@@ -403,7 +403,7 @@ export default function LabelingTasks() {
                 <div className="mt-2 grid grid-cols-5 gap-2">
                     {LabelHelper.labelColorOptions.map((color: LabelColors) => (
                         <label key={color.name} onClick={() => updateLabelColor(color.name)}
-                            className={`w-full group border rounded-md py-1 px-2 text-sm font-medium hover:bg-gray-50 focus:outline-none shadow-sm text-gray-900 cursor-pointer text-center ${color.backgroundColor} ${color.textColor} ${color.borderColor} ${color.hoverColor}`}>
+                            className={`w-full group border rounded-md py-1 px-2 text-sm font-medium focus:outline-none shadow-sm cursor-pointer text-center ${color.backgroundColor} ${color.textColor} ${color.borderColor} ${color.hoverColor}`}>
                             {color.name}
                         </label>
                     ))}

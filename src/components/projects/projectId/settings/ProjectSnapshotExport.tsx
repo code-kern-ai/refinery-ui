@@ -16,7 +16,7 @@ import { useLazyQuery } from "@apollo/client";
 import { Tooltip } from "@nextui-org/react";
 import { IconDownload, IconInfoCircle } from "@tabler/icons-react";
 import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { timer } from "rxjs";
 
@@ -135,7 +135,7 @@ export default function ProjectSnapshotExport() {
                         <div className="flex flex-row justify-center items-center gap-2">
                             <span className="card-title mb-0 label-text">Export</span>
                         </div>
-                        {projectExportArray.map((item: ProjectSize, index: number) => (<>
+                        {projectExportArray.map((item: ProjectSize, index: number) => (<Fragment key={item.name}>
                             <div className="contents" >
                                 <div className="flex">
                                     <p className={`break-words cursor-default capitalize-first ${item.moveRight ? 'ml-4' : null}`}>{item.name}</p>
@@ -158,7 +158,7 @@ export default function ProjectSnapshotExport() {
                                     </label>
                                 </div>
                             </div>
-                        </>
+                        </Fragment>
                         ))}
                     </div>
                 </form>
