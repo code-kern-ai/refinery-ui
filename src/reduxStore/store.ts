@@ -17,6 +17,7 @@ const store = configureStore({
         settings: settingsReducer,
         modelsDownloaded: modelsDownloadedSliceReducer
     },
+    devTools: process.env.IS_DEV == '1',
 });
 
 export default store;
