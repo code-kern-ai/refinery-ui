@@ -1,32 +1,15 @@
-import { selectInactiveOrganization, selectIsManaged } from "@/src/reduxStore/states/general";
+import { selectAnnotators, selectEngineers, selectExperts, selectInactiveOrganization, selectIsManaged } from "@/src/reduxStore/states/general";
 import { useSelector } from "react-redux"
 import YoutubeIntroduction from "../projects/YoutubeIntroduction";
-import { useEffect, useState } from "react";
-import { useLazyQuery } from "@apollo/client";
-import { GET_ORGANIZATION_USERS } from "@/src/services/gql/queries/organizations";
-import { postProcessUsersList } from "@/src/util/components/users/users-list-helper";
 import { User } from "@/src/types/shared/general";
 import { IconCheck, IconUsersGroup } from "@tabler/icons-react";
 
 export default function UsersList() {
     const isManaged = useSelector(selectIsManaged);
     const organizationInactive = useSelector(selectInactiveOrganization);
-
-    const [engineers, setEngineers] = useState([]);
-    const [annotators, setAnnotators] = useState([]);
-    const [experts, setExperts] = useState([]);
-
-    const [refetchOrganizationUsers] = useLazyQuery(GET_ORGANIZATION_USERS);
-
-    useEffect(() => {
-        if (!isManaged) return;
-        refetchOrganizationUsers().then((res) => {
-            const users = postProcessUsersList(res.data['allUsers']);
-            setEngineers(users.filter((user) => user.role === 'ENGINEER'));
-            setAnnotators(users.filter((user) => user.role === 'ANNOTATOR'));
-            setExperts(users.filter((user) => user.role === 'EXPERT'));
-        })
-    }, [isManaged]);
+    const engineers = useSelector(selectEngineers);
+    const annotators = useSelector(selectAnnotators);
+    const experts = useSelector(selectExperts);
 
     return <div className="bg-slate-50 h-screen overflow-y-auto">
         {!isManaged && <div>

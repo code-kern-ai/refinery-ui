@@ -1,16 +1,8 @@
-import { DisplayGraphs, ProjectStats } from "@/src/types/components/projects/projectId/overview";
+import { ProjectStats } from "@/src/types/components/projects/projectId/overview";
+import { NOT_AVAILABLE } from "@/src/util/constants";
+import { displayGraphsTypeToString } from "@/submodules/javascript-functions/enums/enum-functions";
+import { DisplayGraphs, LabelSource } from "@/submodules/javascript-functions/enums/enums";
 import { percentRoundString } from "@/submodules/javascript-functions/general";
-
-export function displayGraphsTypeToString(source: DisplayGraphs) {
-    switch (source) {
-        case DisplayGraphs.ALL: return "All";
-        case DisplayGraphs.CONFUSION_MATRIX: return "Confusion Matrix";
-        case DisplayGraphs.INTER_ANNOTATOR: return "Inter Annotator";
-        case DisplayGraphs.LABEL_DISTRIBUTION: return "Label Distribution";
-        case DisplayGraphs.CONFIDENCE_DISTRIBUTION: return "Confidence Distribution";
-        default: return "";
-    }
-}
 
 export function getDisplayGraphValueArray(): [{ value: number, name: string }] {
     let toReturn = [];
@@ -25,11 +17,17 @@ export function getDisplayGraphValueArray(): [{ value: number, name: string }] {
 
 export function getEmptyProjectStats(): ProjectStats {
     return {
-        generalLoading: false, general: {}, generalPercent: {
-            "INFORMATION_SOURCE": "n/a",
-            "WEAK_SUPERVISION": "n/a",
-            "MANUAL": "n/a"
-        }, generalStats: {}, interAnnotatorLoading: false, interAnnotator: "n/a", interAnnotatorStat: -1
+        generalLoading: false,
+        general: {},
+        generalPercent: {
+            [LabelSource.INFORMATION_SOURCE]: NOT_AVAILABLE,
+            [LabelSource.WEAK_SUPERVISION]: NOT_AVAILABLE,
+            [LabelSource.MANUAL]: NOT_AVAILABLE
+        },
+        generalStats: {},
+        interAnnotatorLoading: false,
+        interAnnotator: NOT_AVAILABLE,
+        interAnnotatorStat: -1
     }
 }
 

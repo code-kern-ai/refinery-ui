@@ -1,17 +1,18 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { useDispatch, useSelector } from "react-redux";
-import { selectIsAdmin, selectIsDemo, selectIsManaged, setIsAdmin, setIsDemo, setIsManaged, setOrganization, setUser } from "./states/general";
+import { selectIsAdmin, selectIsDemo, selectIsManaged, setAllUsers, setIsAdmin, setIsDemo, setIsManaged, setOrganization, setUser } from "./states/general";
 import { getUserAvatarUri, jsonCopy } from "@/submodules/javascript-functions/general";
 import { setActiveProject } from "./states/project";
 import { GET_PROJECT_BY_ID } from "../services/gql/queries/projects";
 import { useLazyQuery } from "@apollo/client";
-import { GET_ORGANIZATION, GET_USER_INFO } from "../services/gql/queries/organizations";
+import { GET_ORGANIZATION, GET_ORGANIZATION_USERS, GET_USER_INFO } from "../services/gql/queries/organizations";
 import { GET_IS_ADMIN } from "../services/gql/queries/config";
 import { getIsDemo, getIsManaged } from "../services/base/data-fetch";
 import { WebSocketsService } from "../services/base/web-sockets/WebSocketsService";
 import { timer } from "rxjs";
 import { RouteManager } from "../services/base/route-manager";
+import { postProcessUsersList } from "../util/components/users/users-list-helper";
 
 export function GlobalStoreDataComponent(props: React.PropsWithChildren) {
     const router = useRouter();
@@ -27,6 +28,7 @@ export function GlobalStoreDataComponent(props: React.PropsWithChildren) {
     const [refetchUserInfo] = useLazyQuery(GET_USER_INFO);
     const [refetchProjectByProjectId] = useLazyQuery(GET_PROJECT_BY_ID);
     const [refetchOrganization] = useLazyQuery(GET_ORGANIZATION);
+    const [refetchOrganizationUsers] = useLazyQuery(GET_ORGANIZATION_USERS);
 
     useEffect(() => {
         getIsManaged((data) => {
@@ -54,7 +56,10 @@ export function GlobalStoreDataComponent(props: React.PropsWithChildren) {
                 dispatch(setOrganization(null));
                 timer(60000).subscribe(() => location.reload())
             }
-        })
+        });
+        refetchOrganizationUsers().then((res) => {
+            dispatch(setAllUsers(postProcessUsersList(res.data["allUsers"])));
+        });
     }, []);
 
     useEffect(() => {

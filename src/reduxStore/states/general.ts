@@ -1,4 +1,5 @@
 import { User } from "@/src/types/shared/general";
+import { UserRole } from "@/src/types/shared/sidebar";
 import { PayloadAction, createSlice } from "@reduxjs/toolkit";
 
 export type Organization = {
@@ -11,24 +12,32 @@ export type Organization = {
 }
 
 const initialState = {
-    data: {
-        user: null,
-        currentPage: '',
-        isManaged: true,
-        isDemo: false,
-        isAdmin: false,
-        organization: null,
-        organizationInactive: null,
+    user: null,
+    currentPage: '',
+    isManaged: true,
+    isDemo: false,
+    isAdmin: false,
+    organization: null,
+    organizationInactive: null,
+    users: {
+        all: [],
+        engineers: [],
+        annotators: [],
+        experts: [],
     }
 } as {
-    data: {
-        user: User;
-        currentPage: string;
-        isManaged: boolean;
-        isDemo: boolean;
-        isAdmin: boolean;
-        organization: Organization;
-        organizationInactive: boolean;
+    user: User;
+    currentPage: string;
+    isManaged: boolean;
+    isDemo: boolean;
+    isAdmin: boolean;
+    organization: Organization;
+    organizationInactive: boolean;
+    users: {
+        all: User[];
+        engineers: User[];
+        annotators: User[];
+        experts: User[];
     }
 }
 
@@ -37,39 +46,50 @@ const generalSlice = createSlice({
     initialState,
     reducers: {
         setUser(state, action: PayloadAction<User>) {
-            if (action.payload) state.data.user = { ...action.payload };
-            else state.data.user = null;
+            if (action.payload) state.user = { ...action.payload };
+            else state.user = null;
         },
         setCurrentPage(state, action: PayloadAction<string>) {
-            state.data.currentPage = action.payload;
+            state.currentPage = action.payload;
         },
         setIsManaged(state, action: PayloadAction<boolean>) {
-            state.data.isManaged = action.payload;
+            state.isManaged = action.payload;
         },
         setIsDemo(state, action: PayloadAction<boolean>) {
-            state.data.isDemo = action.payload;
+            state.isDemo = action.payload;
         },
         setIsAdmin(state, action: PayloadAction<boolean>) {
-            state.data.isAdmin = action.payload;
+            state.isAdmin = action.payload;
         },
         setOrganization(state, action: PayloadAction<Organization>) {
-            if (action.payload) state.data.organization = { ...action.payload };
-            else state.data.organization = null;
-            state.data.organizationInactive = action.payload == null;
+            if (action.payload) state.organization = { ...action.payload };
+            else state.organization = null;
+            state.organizationInactive = action.payload == null;
+        },
+        setAllUsers(state, action: PayloadAction<User[]>) {
+            if (action.payload) state.users.all = [...action.payload];
+            else state.users.all = [];
+            state.users.engineers = state.users.all.filter(user => user.role == UserRole.ENGINEER);
+            state.users.annotators = state.users.all.filter(user => user.role == UserRole.ANNOTATOR);
+            state.users.experts = state.users.all.filter(user => user.role == UserRole.EXPERT);
         }
     },
 })
 
 
 //selectors
-export const selectUser = (state) => state.general.data.user;
-export const selectCurrentPage = (state) => state.general.data.currentPage;
-export const selectIsManaged = (state) => state.general.data.isManaged;
-export const selectIsDemo = (state) => state.general.data.isDemo;
-export const selectIsAdmin = (state) => state.general.data.isAdmin;
-export const selectOrganization = (state) => state.general.data.organization;
-export const selectInactiveOrganization = (state) => state.general.data.organizationInactive;
+export const selectUser = (state) => state.general.user;
+export const selectCurrentPage = (state) => state.general.currentPage;
+export const selectIsManaged = (state) => state.general.isManaged;
+export const selectIsDemo = (state) => state.general.isDemo;
+export const selectIsAdmin = (state) => state.general.isAdmin;
+export const selectOrganization = (state) => state.general.organization;
+export const selectInactiveOrganization = (state) => state.general.organizationInactive;
+export const selectAllUsers = (state) => state.general.users.all;
+export const selectEngineers = (state) => state.general.users.engineers;
+export const selectAnnotators = (state) => state.general.users.annotators;
+export const selectExperts = (state) => state.general.users.experts;
 
 
-export const { setUser, setCurrentPage, setIsManaged, setIsDemo, setIsAdmin, setOrganization } = generalSlice.actions;
+export const { setUser, setCurrentPage, setIsManaged, setIsDemo, setIsAdmin, setOrganization, setAllUsers } = generalSlice.actions;
 export const generalReducer = generalSlice.reducer;

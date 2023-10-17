@@ -89,8 +89,7 @@ const initialState: Modals = {
     [ModalEnum.DELETE_LABEL]: {
         open: false,
         taskId: '',
-        labelId: '',
-        labelColor: '',
+        label: {}
     },
     [ModalEnum.CHANGE_COLOR]: {
         open: false,

@@ -1,21 +1,12 @@
 import { CurrentLabel, LabelColors, RenameLabelData } from "@/src/types/components/projects/projectId/settings/labeling-tasks";
 import { jsonCopy } from "@/submodules/javascript-functions/general";
 import { timer } from "rxjs";
+import { COLOR_OPTIONS } from "../constants";
 
 export class LabelHelper {
     private static ALLOWED_KEYS = "abcdefghijklmnopqrstuvwxyzöäüß<>|,.;:-_#'\"~+*?\\{}[]()=/&%$§!@^°€";
 
-    public static labelColorOptions = []
-
-    public static colorOptions = [
-        "red", "orange", "amber",
-        "yellow", "lime", "green",
-        "emerald", "teal", "cyan",
-        "sky", "blue", "indigo",
-        "violet", "purple", "fuchsia",
-        "pink", "rose"];
-
-    public static currentLabel: CurrentLabel = null;
+    public static labelColorOptions = [];
     public static labelingTaskColors: Map<string, string[]> = new Map<string, string[]>(); //still needed?
     public static labelHotkeyError: string;
     public static labelMap: Map<string, string[]> = new Map<string, string[]>();
@@ -24,7 +15,7 @@ export class LabelHelper {
 
     public static setLabelColorOptions() {
         if (LabelHelper.labelColorOptions.length > 0) return;
-        LabelHelper.colorOptions.forEach(color => LabelHelper.labelColorOptions.push(LabelHelper.getColorStruct(color)));
+        COLOR_OPTIONS.forEach(color => LabelHelper.labelColorOptions.push(LabelHelper.getColorStruct(color)));
     }
 
     public static addLabel(
@@ -36,7 +27,7 @@ export class LabelHelper {
         let labelColor = "yellow"
         let colorsInTask = this.labelingTaskColors.get(taskId);
         if (colorsInTask.length > 0) {
-            const availableColors = this.colorOptions.filter(x => !colorsInTask.includes(x));
+            const availableColors = COLOR_OPTIONS.filter(x => !colorsInTask.includes(x));
             if (availableColors.length > 0) {
                 labelColor = availableColors[0]
                 colorsInTask.push(labelColor);
@@ -88,16 +79,6 @@ export class LabelHelper {
         if (name.trim() == '') return false;
         return true;
     }
-
-    public static clearCurrentLabel() {
-        //delay to prevent issues with label display on closing modal
-        timer(250).subscribe(() => {
-            this.currentLabel = null;
-            this.labelHotkeyError = '';
-            this.renameLabelData = null;
-        })
-    }
-
 
     public static updateLabelColor(labelingTaskId: string, oldLabelColor: string, newLabelColor: any) {
         let colorsInTask = this.labelingTaskColors.get(labelingTaskId);

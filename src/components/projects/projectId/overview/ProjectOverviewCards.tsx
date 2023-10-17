@@ -1,6 +1,7 @@
 import LoadingIcon from "@/src/components/shared/loading/LoadingIcon";
 import { selectProject } from "@/src/reduxStore/states/project";
 import { CardStats, CardStatsEnum, ProjectOverviewCardsProps } from "@/src/types/components/projects/projectId/overview";
+import { NOT_AVAILABLE } from "@/src/util/constants";
 import { Tooltip } from "@nextui-org/react";
 import { IconBottle, IconBulb, IconClick, IconScale } from "@tabler/icons-react";
 import { useRouter } from "next/router";
@@ -42,7 +43,7 @@ export default function ProjectOverviewCards(props: ProjectOverviewCardsProps) {
                                     {props.projectStats.generalPercent[card.stats]}
                                 </p>}
                                 {card.stats == CardStatsEnum.INTER_ANNOTATOR && <p className="text-2xl font-semibold text-gray-900">
-                                    {props.projectStats.interAnnotatorStat == -1 ? 'n/a' : props.projectStats.interAnnotatorStat}
+                                    {props.projectStats.interAnnotatorStat == -1 ? NOT_AVAILABLE : props.projectStats.interAnnotatorStat}
                                 </p>}
                             </Tooltip>
                         )}

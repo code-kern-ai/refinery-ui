@@ -10,6 +10,7 @@ import { EmbeddingPlatform, EmbeddingProps, EmbeddingType, PlatformType, Suggest
 import { DataTypeEnum } from "@/src/types/shared/general";
 import { ModalButton, ModalEnum } from "@/src/types/shared/modal";
 import { DEFAULT_AZURE_TYPE, GRANULARITY_TYPES_ARRAY, checkIfCreateEmbeddingIsDisabled, platformNamesDict, postProcessingEmbeddingPlatforms } from "@/src/util/components/projects/projectId/settings/embeddings-helper";
+import { TOOLTIPS_DICT } from "@/src/util/tooltip-contants";
 import { jsonCopy } from "@/submodules/javascript-functions/general";
 import Dropdown from "@/submodules/react-components/components/Dropdown";
 import { useLazyQuery, useMutation } from "@apollo/client";
@@ -122,7 +123,7 @@ export default function AddNewEmbedding(props: EmbeddingProps) {
         }
         checkIfAttributeHasToken();
         const acceptButtonCopy = jsonCopy(ACCEPT_BUTTON);
-        acceptButtonCopy.disabled = checkIfCreateEmbeddingIsDisabled(platform, model, apiToken, termsAccepted, embeddings, targetAttribute, granularity, engine, url, version, embeddingPlatforms);
+        acceptButtonCopy.disabled = checkIfCreateEmbeddingIsDisabled({ platform, model, apiToken, termsAccepted, embeddings, targetAttribute, granularity, engine, url, version, embeddingPlatforms });
         setAcceptButton(acceptButtonCopy);
         setTermsAccepted(false);
         setModel(null);
@@ -202,7 +203,7 @@ export default function AddNewEmbedding(props: EmbeddingProps) {
     const [acceptButton, setAcceptButton] = useState<ModalButton>(ACCEPT_BUTTON);
 
     useEffect(() => {
-        setAcceptButton({ ...acceptButton, emitFunction: addEmbedding, disabled: checkIfCreateEmbeddingIsDisabled(platform, model, apiToken, termsAccepted, embeddings, targetAttribute, granularity, engine, url, version, embeddingPlatforms) });
+        setAcceptButton({ ...acceptButton, emitFunction: addEmbedding, disabled: checkIfCreateEmbeddingIsDisabled({ platform, model, apiToken, termsAccepted, embeddings, targetAttribute, granularity, engine, url, version, embeddingPlatforms }) });
     }, [addEmbedding, embeddingPlatforms]);
 
     return (
@@ -214,14 +215,14 @@ export default function AddNewEmbedding(props: EmbeddingProps) {
             </div>
             <form>
                 <div className="grid grid-cols-2 gap-2 items-center" style={{ gridTemplateColumns: 'max-content auto' }}>
-                    <Tooltip content="Choose attribute that will be encoded" placement="right" color="invert">
+                    <Tooltip content={TOOLTIPS_DICT.PROJECT_SETTINGS.EMBEDDINGS.TARGET_ATTRIBUTE} placement="right" color="invert">
                         <span className="card-title mb-0 label-text flex"><span className="cursor-help underline filtersUnderline">Target Attribute</span></span>
                     </Tooltip>
-                    <Dropdown options={useableEmbedableAttributes} buttonName={targetAttribute ? targetAttribute : 'Choose'} selectedOption={(option: string) => {
+                    <Dropdown options={useableEmbedableAttributes} buttonName={targetAttribute ?? 'Choose'} selectedOption={(option: string) => {
                         setTargetAttribute(option);
                     }} />
 
-                    <Tooltip content="Filter attributes that will be encoded" placement="right" color="invert">
+                    <Tooltip content={TOOLTIPS_DICT.PROJECT_SETTINGS.EMBEDDINGS.FILTER_ATTRIBUTES} placement="right" color="invert">
                         <span className="card-title mb-0 label-text flex"><span className="cursor-help underline filtersUnderline">Filter Attributes</span></span>
                     </Tooltip>
                     <Dropdown options={filteredAttributesArray} buttonName={filteredAttributes.length == 0 ? 'None selected' : filteredAttributes.join(',')} hasCheckboxes={true} hasSelectAll={true}
@@ -233,31 +234,31 @@ export default function AddNewEmbedding(props: EmbeddingProps) {
                             setFilteredAttributes(filteredAttributes);
                         }} />
 
-                    <Tooltip content="Choose the platform to embed records" placement="right" color="invert">
+                    <Tooltip content={TOOLTIPS_DICT.PROJECT_SETTINGS.EMBEDDINGS.PLATFORM} placement="right" color="invert">
                         <span className="card-title mb-0 label-text flex"><span className="cursor-help underline filtersUnderline">Platform</span></span>
                     </Tooltip>
-                    <Dropdown options={embeddingPlatforms} buttonName={platform ? platform : 'Choose'} selectedOption={(option: string) => {
+                    <Dropdown options={embeddingPlatforms} buttonName={platform ?? 'Choose'} selectedOption={(option: string) => {
                         setPlatform(option);
                         setSelectedPlatform(embeddingPlatforms.find((p: EmbeddingPlatform) => p.name == option));
                     }} />
 
-                    <Tooltip content="One embedding per attribute vs. per token" placement="right" color="invert">
+                    <Tooltip content={TOOLTIPS_DICT.PROJECT_SETTINGS.EMBEDDINGS.GRANULARITY} placement="right" color="invert">
                         <span className="card-title mb-0 label-text flex"><span className="cursor-help underline filtersUnderline">Granularity</span></span>
                     </Tooltip>
-                    <Dropdown options={granularityArray} buttonName={granularity ? granularity : 'Choose'} selectedOption={(option: string) => {
+                    <Dropdown options={granularityArray} buttonName={granularity ?? 'Choose'} selectedOption={(option: string) => {
                         setGranularity(option);
                     }} />
                     {platform == platformNamesDict[PlatformType.HUGGING_FACE] && <SuggestionsModel options={embeddingHandles[targetAttribute]} selectedOption={(model: string) => setModel(model)} />}
                     {platform == platformNamesDict[PlatformType.OPEN_AI] && <>
                         <SuggestionsModel options={embeddingHandles[targetAttribute]} selectedOption={(model: string) => setModel(model)} />
-                        <Tooltip content="Enter your API token" placement="right" color="invert">
+                        <Tooltip content={TOOLTIPS_DICT.PROJECT_SETTINGS.EMBEDDINGS.API_TOKEN} placement="right" color="invert">
                             <span className="card-title mb-0 label-text flex"><span className="cursor-help underline filtersUnderline">API token</span></span>
                         </Tooltip>
                         <input placeholder="Enter your API token" onChange={(e) => setApiToken(e.target.value)} value={apiToken}
                             className="h-9 w-full border-gray-300 rounded-md placeholder-italic border text-gray-900 pl-4 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100" />
                     </>}
                     {platform == platformNamesDict[PlatformType.COHERE] && <>
-                        <Tooltip content="Enter your API token" placement="right" color="invert">
+                        <Tooltip content={TOOLTIPS_DICT.PROJECT_SETTINGS.EMBEDDINGS.API_TOKEN} placement="right" color="invert">
                             <span className="card-title mb-0 label-text flex"><span className="cursor-help underline filtersUnderline">API token</span></span>
                         </Tooltip>
                         <input placeholder="Enter your API token" onChange={(e) => setApiToken(e.target.value)} value={apiToken}
@@ -266,14 +267,14 @@ export default function AddNewEmbedding(props: EmbeddingProps) {
                     {platform == platformNamesDict[PlatformType.PYTHON] && <SuggestionsModel options={embeddingHandles[targetAttribute]} selectedOption={(option: string) => setModel(option)} />}
 
                     {platform == platformNamesDict[PlatformType.AZURE] && <>
-                        <Tooltip content="Enter your API token" placement="right" color="invert">
+                        <Tooltip content={TOOLTIPS_DICT.PROJECT_SETTINGS.EMBEDDINGS.API_TOKEN} placement="right" color="invert">
                             <span className="card-title mb-0 label-text flex"><span className="cursor-help underline filtersUnderline">API token</span></span>
                         </Tooltip>
                         <input placeholder="Enter your API token" onChange={(e) => setApiToken(e.target.value)} value={apiToken}
                             className="h-9 w-full border-gray-300 rounded-md placeholder-italic border text-gray-900 pl-4 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100" />
 
                         {azureEngines.length == 0 ? <>
-                            <Tooltip content="This will be your custom engine name. You can find this in the Azure OpenAI studio in the deployments section." placement="right" color="invert">
+                            <Tooltip content={TOOLTIPS_DICT.PROJECT_SETTINGS.EMBEDDINGS.ENGINE} placement="right" color="invert">
                                 <span className="card-title mb-0 label-text flex"><span className="cursor-help underline filtersUnderline">Engine</span></span>
                             </Tooltip>
                             <input placeholder="Enter Azure engine" onChange={(e) => setEngine(e.target.value)} value={engine}
@@ -283,7 +284,7 @@ export default function AddNewEmbedding(props: EmbeddingProps) {
                         </>}
 
                         {azureUrls.length == 0 ? <>
-                            <Tooltip content="This will be your custom URL, which looks like this: https://<your-api-base>.openai.azure.com/" placement="right" color="invert">
+                            <Tooltip content={TOOLTIPS_DICT.PROJECT_SETTINGS.EMBEDDINGS.URL} placement="right" color="invert">
                                 <span className="card-title mb-0 label-text flex"><span className="cursor-help underline filtersUnderline">Azure URL</span></span>
                             </Tooltip>
                             <input placeholder="Enter Azure URL" onChange={(e) => setUrl(e.target.value)} value={url}
@@ -295,7 +296,7 @@ export default function AddNewEmbedding(props: EmbeddingProps) {
                         {azureVersions.length == 0 ? <>
                             <div className="flex flex-row items-center">
                                 <span className="card-title mb-0 label-text flex"><span className="cursor-help underline filtersUnderline">Version</span></span>
-                                <Tooltip content="The latest version of the Azure OpenAI service can also be found here." placement="right" color="invert">
+                                <Tooltip content={TOOLTIPS_DICT.PROJECT_SETTINGS.EMBEDDINGS.VERSION} placement="right" color="invert">
                                     <a href="https://learn.microsoft.com/en-us/rest/api/cognitiveservices/azureopenaistable/models/list?tabs=HTTP" target="_blank">
                                         <IconExternalLink className="cursor-help ml-1 h-5 w-5" /></a>
                                 </Tooltip>
@@ -330,7 +331,7 @@ export default function AddNewEmbedding(props: EmbeddingProps) {
 }
 
 function SuggestionsModel(props: SuggestionsProps) {
-    return <><Tooltip content="Choose your model" placement="right" color="invert">
+    return <><Tooltip content={TOOLTIPS_DICT.PROJECT_SETTINGS.EMBEDDINGS.MODEL} placement="right" color="invert">
         <span className="card-title mb-0 label-text flex"><span className="cursor-help underline filtersUnderline">Model</span></span>
     </Tooltip>
         <Dropdown options={props.options.map((option: any) => option.configString)} hasSearchBar={true} selectedOption={(option: string) => props.selectedOption(option)} />

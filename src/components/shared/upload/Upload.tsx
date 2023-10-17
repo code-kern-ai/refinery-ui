@@ -18,31 +18,8 @@ import { extendAllProjects, removeFromAllProjectsById, selectAllProjects, select
 import CryptedField from "../crypted-field/CryptedField";
 import { unsubscribeWSOnDestroy } from "@/src/services/base/web-sockets/web-sockets-helper";
 import { GET_UPLOAD_CREDENTIALS_AND_ID, GET_UPLOAD_TASK_BY_TASK_ID } from "@/src/services/gql/queries/projects";
-
-
-const SELECTED_TOKENIZER_RECORD_NEW = 'English (en_core_web_sm)';
-const SELECTED_TOKENIZER_PROJECT = '(en_core_web_sm)';
-
-export class UploadHelper {
-    private static projectId: string | null = null;
-    private static uploadTask: UploadTask | null = null;
-    public static setProjectId(projectId: string) {
-        UploadHelper.projectId = projectId;
-    }
-
-    public static getProjectId() {
-        return UploadHelper.projectId;
-    }
-
-    public static setUploadTask(uploadTask: UploadTask) {
-        UploadHelper.uploadTask = uploadTask;
-    }
-
-    public static getUploadTask() {
-        return UploadHelper.uploadTask;
-    }
-}
-
+import { UPLOAD_TOKENIZERS } from "@/src/util/constants";
+import { UploadHelper } from "@/src/util/classes/upload-helper";
 
 export default function Upload(props: UploadProps) {
     const router = useRouter();
@@ -56,7 +33,7 @@ export default function Upload(props: UploadProps) {
     const [selectedFile, setSelectedFile] = useState(null as File);
     const [projectTitle, setProjectTitle] = useState<string>("");
     const [projectDescription, setProjectDescription] = useState<string>("");
-    const [tokenizer, setTokenizer] = useState<string>(SELECTED_TOKENIZER_RECORD_NEW);
+    const [tokenizer, setTokenizer] = useState<string>(UPLOAD_TOKENIZERS.ENGLISH.FULL_NAME);
     const [submitted, setSubmitted] = useState<boolean>(false);
     const [uploadStarted, setUploadStarted] = useState<boolean>(false);
     const [doingSomething, setDoingSomething] = useState<boolean>(false);
@@ -191,7 +168,7 @@ export default function Upload(props: UploadProps) {
         if (uploadFileType == UploadFileType.RECORDS_NEW || uploadFileType == UploadFileType.RECORDS_ADD) {
             tokenizerPrep = tokenizer.split('(')[1].split(')')[0];
         } else {
-            tokenizerPrep = SELECTED_TOKENIZER_PROJECT;
+            tokenizerPrep = '(' + UPLOAD_TOKENIZERS.ENGLISH.TOKENIZER + ')';
         }
         updateProjectTokenizerMut({ variables: { projectId: UploadHelper.getProjectId(), tokenizer: tokenizerPrep } }).then((res) => {
             updateProjectStatusMut({ variables: { projectId: UploadHelper.getProjectId(), newStatus: ProjectStatus.INIT_COMPLETE } })
@@ -269,7 +246,7 @@ export default function Upload(props: UploadProps) {
         setUploadStarted(false);
         setProjectTitle("");
         setProjectDescription("");
-        setTokenizer(SELECTED_TOKENIZER_RECORD_NEW);
+        setTokenizer(UPLOAD_TOKENIZERS.ENGLISH.FULL_NAME);
         dispatch(setImportOptions(""));
     }
 

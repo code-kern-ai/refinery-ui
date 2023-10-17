@@ -62,3 +62,17 @@ export type SuggestionsProps = {
 export type EmbeddingProps = {
     refetchWS(): void;
 }
+
+export type EmbeddingCreationEnabledProps = {
+    platform: string;
+    model: string;
+    apiToken: string;
+    termsAccepted: boolean;
+    embeddings: Embedding[];
+    targetAttribute: string;
+    granularity: string;
+    engine: string;
+    url: string;
+    version: string;
+    embeddingPlatforms: EmbeddingPlatform[];
+};

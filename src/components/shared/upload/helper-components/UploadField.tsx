@@ -2,8 +2,8 @@ import { UploadFieldProps, UploadStates } from "@/src/types/shared/upload";
 import { formatBytes } from "@/submodules/javascript-functions/general";
 import { useEffect, useRef, useState } from "react";
 import LoadingIcon from "../../loading/LoadingIcon";
-import { UploadHelper } from "../Upload";
 import { IconDatabase } from "@tabler/icons-react";
+import { UploadHelper } from "@/src/util/classes/upload-helper";
 
 export default function UploadField(props: UploadFieldProps) {
     const fileUpload = useRef<HTMLInputElement>(null);

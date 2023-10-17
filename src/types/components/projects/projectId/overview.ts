@@ -1,12 +1,3 @@
-//int based enough since not used outside of frontend
-export enum DisplayGraphs {
-    ALL,
-    CONFUSION_MATRIX,
-    INTER_ANNOTATOR,
-    LABEL_DISTRIBUTION,
-    CONFIDENCE_DISTRIBUTION,
-}
-
 export type ProjectStats = {
     generalLoading: boolean;
     general: {};

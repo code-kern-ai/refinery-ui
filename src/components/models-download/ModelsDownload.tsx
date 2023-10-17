@@ -23,6 +23,7 @@ import { jsonCopy } from "@/submodules/javascript-functions/general";
 import { dateAsUTCDate } from "@/submodules/javascript-functions/date-parser";
 import { timer } from "rxjs";
 import { unsubscribeWSOnDestroy } from "@/src/services/base/web-sockets/web-sockets-helper";
+import { TOOLTIPS_DICT } from "@/src/util/tooltip-contants";
 
 const ABORT_BUTTON = { buttonCaption: 'Delete', useButton: true, disabled: false };
 const ACCEPT_BUTTON = { buttonCaption: 'Accept', useButton: true };
@@ -158,9 +159,9 @@ export default function ModelsDownload() {
                                         <span className="inline-block mr-2">{model.name}</span>
                                     </td>
                                     <td className="text-center px-3 py-2 text-sm text-gray-500 flex justify-center">
-                                        {model.zeroShotPipeline ? <Tooltip content="Can be used for zero-shot" color="invert" placement="top">
+                                        {model.zeroShotPipeline ? <Tooltip content={TOOLTIPS_DICT.MODELS_DOWNLOAD.USED_ZS} color="invert" placement="top">
                                             <IconCheckbox className="h-5 w-5"></IconCheckbox>
-                                        </Tooltip> : <Tooltip content="Cannot be used for zero-shot" color="invert" placement="top">
+                                        </Tooltip> : <Tooltip content={TOOLTIPS_DICT.MODELS_DOWNLOAD.NOT_USED_ZS} color="invert" placement="top">
                                             <IconBan className="h-5 w-5"></IconBan>
                                         </Tooltip>}
                                     </td>
@@ -180,16 +181,16 @@ export default function ModelsDownload() {
                                         {model.status === ModelsDownloadedStatus.FINISHED ? model.sizeFormatted : '-'}
                                     </td>
                                     <td className="whitespace-nowrap text-center px-3 py-2 text-sm text-gray-500 justify-center flex">
-                                        {model.status === ModelsDownloadedStatus.FINISHED && <Tooltip content="Successfully created" color="invert" placement="top">
+                                        {model.status === ModelsDownloadedStatus.FINISHED && <Tooltip content={TOOLTIPS_DICT.MODELS_DOWNLOAD.SUCCESS} color="invert" placement="top">
                                             <IconCircleCheckFilled className="h-6 w-6 text-green-500" />
                                         </Tooltip>}
-                                        {model.status === ModelsDownloadedStatus.FAILED && <Tooltip content="Model ran into errors" color="invert" placement="top">
+                                        {model.status === ModelsDownloadedStatus.FAILED && <Tooltip content={TOOLTIPS_DICT.MODELS_DOWNLOAD.ERROR} color="invert" placement="top">
                                             <IconAlertTriangleFilled className="h-6 w-6 text-red-500" />
                                         </Tooltip>}
-                                        {model.status === ModelsDownloadedStatus.DOWNLOADING && <Tooltip content="Model is downloading" color="invert" placement="top">
+                                        {model.status === ModelsDownloadedStatus.DOWNLOADING && <Tooltip content={TOOLTIPS_DICT.MODELS_DOWNLOAD.DOWNLOADING} color="invert" placement="top">
                                             <LoadingIcon />
                                         </Tooltip>}
-                                        {model.status === ModelsDownloadedStatus.INITIALIZING && <Tooltip content="Model is initializing" color="invert" placement="top">
+                                        {model.status === ModelsDownloadedStatus.INITIALIZING && <Tooltip content={TOOLTIPS_DICT.MODELS_DOWNLOAD.INITIALIZING} color="invert" placement="top">
                                             <IconLoader className="h-6 w-6 text-gray-500" />
                                         </Tooltip>}
                                     </td>
@@ -226,7 +227,7 @@ export default function ModelsDownload() {
                 Add new model</div>
             <form className="mt-3">
                 <div className="grid grid-cols-2 gap-2 items-center" style={{ gridTemplateColumns: 'max-content auto' }}>
-                    <Tooltip content="Name of your Hugging Face model" placement="right" color="invert">
+                    <Tooltip content={TOOLTIPS_DICT.MODELS_DOWNLOAD.MODEL} placement="right" color="invert">
                         <span className="card-title mb-0 label-text flex"><span className="cursor-help underline filtersUnderline">Name</span></span>
                     </Tooltip>
                     <Dropdown options={modelsList.map((model: any) => model.configString)} hasSearchBar={true} selectedOption={(option: string) => {

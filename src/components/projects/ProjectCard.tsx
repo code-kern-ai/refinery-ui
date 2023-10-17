@@ -7,11 +7,11 @@ import { isStringTrue } from "@/submodules/javascript-functions/general";
 import { Tooltip } from "@nextui-org/react";
 import { useRouter } from "next/router";
 import { useDispatch, useSelector } from "react-redux";
-import { UNKNOWN_USER } from "@/src/util/constants";
+import { NOT_AVAILABLE, UNKNOWN_USER } from "@/src/util/constants";
 import { IconArrowRight, IconX } from "@tabler/icons-react";
-import { useEffect, useState } from "react";
 import { useMutation } from "@apollo/client";
 import { DELETE_PROJECT } from "@/src/services/gql/mutations/projects";
+import { TOOLTIPS_DICT } from "@/src/util/tooltip-contants";
 
 export default function ProjectCard(props: ProjectCardProps) {
     const router = useRouter();
@@ -68,7 +68,7 @@ export default function ProjectCard(props: ProjectCardProps) {
                     </div>}
                     {isAdmin &&
                         <div className="absolute top-0 left-0 cursor-pointer" onClick={() => adminOpenOrDeleteProject(props.project)}>
-                            <Tooltip content="Admin function: Quick delete project" color="invert" offset={2} placement="right">
+                            <Tooltip content={TOOLTIPS_DICT.PROJECTS.QUICK_DELETE} color="invert" offset={2} placement="right">
                                 <IconX className="h-6 w-6 text-gray-500" />
                             </Tooltip>
                         </div>
@@ -91,7 +91,7 @@ export default function ProjectCard(props: ProjectCardProps) {
                                 <div className="text-sm text-gray-500 font-normal">
                                     {props.projectStatisticsById[props.project.id]?.numDataScaleManual}
                                     &nbsp;records
-                                    ({props.projectStatisticsById[props.project.id]?.manuallyLabeled || 'n/a'})
+                                    ({props.projectStatisticsById[props.project.id]?.manuallyLabeled || NOT_AVAILABLE})
                                 </div>
                             </div>}
                         </div>
@@ -101,7 +101,7 @@ export default function ProjectCard(props: ProjectCardProps) {
                                 <div className="text-sm text-gray-500 font-normal">
                                     {props.projectStatisticsById[props.project.id]?.numDataScaleProgrammatical}
                                     &nbsp;records
-                                    ({props.projectStatisticsById[props.project.id]?.weaklySupervised || 'n/a'})
+                                    ({props.projectStatisticsById[props.project.id]?.weaklySupervised || NOT_AVAILABLE})
                                 </div>
                             </div>}
                         </div>

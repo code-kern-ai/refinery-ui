@@ -9,10 +9,8 @@ export function postProcessingModelsDownload(modelsDownloaded: ModelsDownloaded[
 }
 
 export function postProcessingZeroShotEncoders(zeroShotModels: ModelsDownloaded[], encoders: ModelsDownloaded[]): any {
-    let prepareModelsList = [];
-    prepareModelsList = encoders.filter((el: any) =>
+    const prepareModelsList = encoders.filter((el: any) =>
         el.configString != 'bag-of-characters' && el.configString != 'bag-of-words' && el.configString != 'tf-idf');
     zeroShotModels.sort((a, b) => a.prio - b.prio);
-    prepareModelsList = prepareModelsList.concat(zeroShotModels);
-    return prepareModelsList;
+    return prepareModelsList.concat(zeroShotModels);
 }

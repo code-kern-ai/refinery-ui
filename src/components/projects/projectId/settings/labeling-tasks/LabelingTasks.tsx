@@ -116,9 +116,9 @@ export default function LabelingTasks() {
     }, [modalAddLabelingTask]);
 
     const deleteLabel = useCallback(() => {
-        LabelHelper.removeLabel(modalDeleteLabel.taskId, modalDeleteLabel.labelColor);
-        deleteLabelMut({ variables: { projectId: project.id, labelId: modalDeleteLabel.labelId } }).then(() => {
-            dispatch(removeLabelFromLabelingTask({ taskId: modalDeleteLabel.taskId, labelId: modalDeleteLabel.labelId }));
+        LabelHelper.removeLabel(modalDeleteLabel.taskId, modalDeleteLabel.label.color.name);
+        deleteLabelMut({ variables: { projectId: project.id, labelId: modalDeleteLabel.label.id } }).then(() => {
+            dispatch(removeLabelFromLabelingTask({ taskId: modalDeleteLabel.taskId, labelId: modalDeleteLabel.label.id }));
         });
     }, [modalDeleteLabel]);
 
@@ -305,7 +305,7 @@ export default function LabelingTasks() {
                                                 <IconColorPicker className="h-4 w-4 mr-1 cursor-pointer" onClick={() => dispatch(setModalStates(ModalEnum.CHANGE_COLOR, { taskId: task.id, label: label, open: true }))} />
                                                 <span>{label.name}</span>
                                                 {label.hotkey && <kbd className="ml-2 uppercase inline-flex items-center border bg-white border-gray-200 rounded px-2 text-sm font-sans font-medium text-gray-400">{label.hotkey}</kbd>}
-                                                <IconTrash className="h-4 w-4 ml-1 cursor-pointer" onClick={() => dispatch(setModalStates(ModalEnum.DELETE_LABEL, { taskId: task.id, labelId: label.id, labelColor: label.color.name, open: true }))} />
+                                                <IconTrash className="h-4 w-4 ml-1 cursor-pointer" onClick={() => dispatch(setModalStates(ModalEnum.DELETE_LABEL, { taskId: task.id, label: label, open: true }))} />
                                             </div>
                                         ))}
 

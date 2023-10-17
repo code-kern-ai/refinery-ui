@@ -1,6 +1,6 @@
 import { Organization } from "@/src/reduxStore/states/general";
 import { Attribute } from "@/src/types/components/projects/projectId/settings/data-schema";
-import { Embedding, EmbeddingPlatform, EmbeddingState, EmbeddingType, PlatformType, RecommendedEncoder } from "@/src/types/components/projects/projectId/settings/embeddings";
+import { Embedding, EmbeddingCreationEnabledProps, EmbeddingPlatform, EmbeddingState, EmbeddingType, PlatformType, RecommendedEncoder } from "@/src/types/components/projects/projectId/settings/embeddings";
 import { jsonCopy } from "@/submodules/javascript-functions/general";
 
 export const DEFAULT_AZURE_TYPE = 'azure';
@@ -101,9 +101,15 @@ export function checkDuplicates(embeddings: any, data: any): boolean {
     return true;
 }
 
-// TODO: Add one type for all the data
-export function checkIfCreateEmbeddingIsDisabled(platform: string, model: string, apiToken: string, termsAccepted: boolean, embeddings: any, targetAttribute: string, granularity: string, engine: string, url: string, version: string, embeddingPlatforms: EmbeddingPlatform[]) {
+export function checkIfCreateEmbeddingIsDisabled(props: EmbeddingCreationEnabledProps) {
     let checkFormFields: boolean = false;
+    const platform = props.platform;
+    const model = props.model;
+    const apiToken = props.apiToken;
+    const termsAccepted = props.termsAccepted;
+    const engine = props.engine;
+    const version = props.version;
+    const url = props.url;
     if (platform == platformNamesDict[PlatformType.HUGGING_FACE] || platform == platformNamesDict[PlatformType.PYTHON]) {
         checkFormFields = model == null || model == "";
     } else if (platform == platformNamesDict[PlatformType.OPEN_AI]) {
@@ -114,14 +120,14 @@ export function checkIfCreateEmbeddingIsDisabled(platform: string, model: string
         checkFormFields = apiToken == null || apiToken == "" || url == null || url == "" || version == null || version == "" || !termsAccepted || !engine;
     }
     const data = {
-        targetAttribute: targetAttribute,
-        platform: embeddingPlatforms.find((p: EmbeddingPlatform) => p.name == platform)?.platform,
-        granularity: granularity,
+        targetAttribute: props.targetAttribute,
+        platform: props.embeddingPlatforms.find((p: EmbeddingPlatform) => p.name == platform)?.platform,
+        granularity: props.granularity,
         model: model,
         apiToken: apiToken,
         engine: engine,
         url: url,
         version: version
     }
-    return checkFormFields || !checkDuplicates(embeddings, data);
+    return checkFormFields || !checkDuplicates(props.embeddings, data);
 }
