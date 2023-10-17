@@ -1,6 +1,6 @@
 import Statuses from "@/src/components/shared/statuses/Statuses";
 import { selectAllLookupLists, setAllLookupLists } from "@/src/reduxStore/states/pages/lookup-lists";
-import { selectAttributes, selectUsableAttributes, setAllAttributes, setAllUsableAttributes, updateAttributeById } from "@/src/reduxStore/states/pages/settings";
+import { selectAttributes, selectUsableAttributes, setAllAttributes, updateAttributeById } from "@/src/reduxStore/states/pages/settings";
 import { selectProject } from "@/src/reduxStore/states/project"
 import { UPDATE_ATTRIBUTE } from "@/src/services/gql/mutations/project-settings";
 import { LOOKUP_LISTS_BY_PROJECT_ID } from "@/src/services/gql/queries/lookup-lists";
@@ -62,7 +62,6 @@ export default function AttributeCalculation() {
         if (!currentAttribute || attributes.length == 0) {
             refetchAttributes({ variables: { projectId: project.id, stateFilter: ['ALL'] } }).then((res) => {
                 dispatch(setAllAttributes(postProcessingAttributes(res.data['attributesByProjectId'])));
-                dispatch(setAllUsableAttributes(postProcessingAttributes(res.data['attributesByProjectId']).filter((attribute) => attribute.id != '@@NO_ATTRIBUTE@@')));
                 setCurrentAttribute(postProcessCurrentAttribute(attributes.find((attribute) => attribute.id === router.query.attributeId)));
             });
         }
@@ -182,7 +181,6 @@ export default function AttributeCalculation() {
             } else {
                 refetchAttributes({ variables: { projectId: project.id, stateFilter: ['ALL'] } }).then((res) => {
                     dispatch(setAllAttributes(postProcessingAttributes(res.data['attributesByProjectId'])));
-                    dispatch(setAllUsableAttributes(postProcessingAttributes(res.data['attributesByProjectId']).filter((attribute) => attribute.id != '@@NO_ATTRIBUTE@@')));
                 });
                 refetchAttributeByAttributeId({ variables: { projectId: project.id, attributeId: currentAttribute?.id } }).then((res) => {
                     const attribute = res.data['attributeByAttributeId'];
