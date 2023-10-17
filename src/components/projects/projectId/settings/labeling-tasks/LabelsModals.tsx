@@ -35,7 +35,7 @@ export default function LabelsModals(props: LabelingTasksProps) {
     const deleteLabel = useCallback(() => {
         LabelHelper.removeLabel(modalDeleteLabel.taskId, modalDeleteLabel.label.color.name);
         deleteLabelMut({ variables: { projectId: project.id, labelId: modalDeleteLabel.label.id } }).then(() => {
-            dispatch(removeLabelFromLabelingTask({ taskId: modalDeleteLabel.taskId, labelId: modalDeleteLabel.label.id }));
+            dispatch(removeLabelFromLabelingTask(modalDeleteLabel.taskId, modalDeleteLabel.label.id));
         });
     }, [modalDeleteLabel]);
 

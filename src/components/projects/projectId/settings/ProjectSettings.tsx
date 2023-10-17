@@ -4,7 +4,7 @@ import { selectProject, setActiveProject } from "@/src/reduxStore/states/project
 import { useLazyQuery, useMutation } from "@apollo/client";
 import { CHECK_COMPOSITE_KEY, GET_ATTRIBUTES_BY_PROJECT_ID, GET_EMBEDDING_SCHEMA_BY_PROJECT_ID, GET_PROJECT_TOKENIZATION, GET_QUEUED_TASKS, GET_RECOMMENDED_ENCODERS_FOR_EMBEDDINGS } from "@/src/services/gql/queries/project-setting";
 import { useCallback, useEffect, useState } from "react";
-import { selectAttributes, selectEmbeddings, setAllAttributes, setAllEmbeddings, setAllRecommendedEncodersDict, setAllUsableAttributes, setRecommendedEncodersAll, setUseableEmbedableAttributes, setUseableNonTextAttributes } from "@/src/reduxStore/states/pages/settings";
+import { selectAttributes, selectEmbeddings, setAllAttributes, setAllEmbeddings, setAllRecommendedEncodersDict, setRecommendedEncodersAll } from "@/src/reduxStore/states/pages/settings";
 import { timer } from "rxjs";
 import { IconCamera, IconCheck, IconDots, IconPlus, IconUpload } from "@tabler/icons-react";
 import Modal from "@/src/components/shared/modal/Modal";
@@ -101,9 +101,6 @@ export default function ProjectSettings() {
     function refetchAttributesAndPostProcess() {
         refetchAttributes({ variables: { projectId: project.id, stateFilter: ['ALL'] } }).then((res) => {
             dispatch(setAllAttributes(postProcessingAttributes(res.data['attributesByProjectId'])));
-            dispatch(setUseableEmbedableAttributes(attributes));
-            dispatch(setUseableNonTextAttributes(attributes));
-            dispatch(setAllUsableAttributes(attributes));
         });
     }
 
@@ -222,9 +219,6 @@ export default function ProjectSettings() {
             } else {
                 refetchAttributes({ variables: { projectId: project.id, stateFilter: ['ALL'] } }).then((res) => {
                     dispatch(setAllAttributes(postProcessingAttributes(res.data['attributesByProjectId'])));
-                    dispatch(setUseableEmbedableAttributes(attributes));
-                    dispatch(setUseableNonTextAttributes(attributes));
-                    dispatch(setAllUsableAttributes(attributes));
                     setIsAcRunning(checkIfAcRunning());
                 });
                 if (msgParts[2] == 'finished') timer(5000).subscribe(() => checkProjectTokenization());
