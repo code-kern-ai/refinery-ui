@@ -100,7 +100,6 @@ const initialState: Modals = {
         open: false,
         label: {},
         taskId: '',
-        newLabelName: ''
     },
     [ModalEnum.EXECUTE_ATTRIBUTE_CALCULATION]: {
         open: false

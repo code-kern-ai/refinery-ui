@@ -23,19 +23,21 @@ export default function RenameLabelModal(props: LabelingTasksProps) {
     const labelingTasksSchema = useSelector(selectLabelingTasksAll);
     const modalRenameLabel = useSelector(selectModal(ModalEnum.RENAME_LABEL));
 
+    const [newLabelName, setNewLabelName] = useState<string>('');
+
     const [refetchCheckRenameLabel] = useLazyQuery(CHECK_RENAME_LABEL, { fetchPolicy: "no-cache" });
     const [updateLabelNameMut] = useMutation(UPDATE_LABEL_NAME);
     const [handleRenameWarningMut] = useMutation(HANDLE_LABEL_RENAME_WARNING);
 
     const renameLabel = useCallback(() => {
-        updateLabelNameMut({ variables: { projectId: project.id, labelId: modalRenameLabel.label.id, newName: modalRenameLabel.newLabelName } }).then((res) => {
+        updateLabelNameMut({ variables: { projectId: project.id, labelId: modalRenameLabel.label.id, newName: newLabelName } }).then((res) => {
             const labelingTasksSchemaCopy = jsonCopy(labelingTasksSchema);
             const labelingTask = labelingTasksSchemaCopy.find((task: LabelingTask) => task.id == modalRenameLabel.taskId);
             const label = labelingTask.labels.find((label: LabelType) => label.id == modalRenameLabel.label.id);
-            label.name = modalRenameLabel.newLabelName;
+            label.name = newLabelName;
             dispatch(setLabelingTasksAll(labelingTasksSchemaCopy));
         });
-    }, [modalRenameLabel]);
+    }, [modalRenameLabel, newLabelName]);
 
     useEffect(() => {
         props.refetchWS();
@@ -48,7 +50,7 @@ export default function RenameLabelModal(props: LabelingTasksProps) {
     const [acceptButtonRename, setAcceptButtonRename] = useState<ModalButton>(ACCEPT_BUTTON);
 
     function checkRenameLabel() {
-        refetchCheckRenameLabel({ variables: { projectId: project.id, labelId: modalRenameLabel.label.id, newName: modalRenameLabel.newLabelName } }).then((res: any) => {
+        refetchCheckRenameLabel({ variables: { projectId: project.id, labelId: modalRenameLabel.label.id, newName: newLabelName } }).then((res: any) => {
             const result = JSON.parse(res.data['checkRenameLabel']);
             result.warnings.forEach(e => {
                 e.open = false;
@@ -76,7 +78,7 @@ export default function RenameLabelModal(props: LabelingTasksProps) {
                 </div>
                 <div className="flex flex-col gap-y-2" style={{ maxHeight: 'calc(80vh - 100px)' }}>
                     <div className="flex flex-row flex-nowrap items-center">
-                        <input defaultValue={modalRenameLabel.label.name} onChange={(event) => dispatch(setModalStates(ModalEnum.RENAME_LABEL, { ...modalRenameLabel, newLabelName: event.target.value }))}
+                        <input defaultValue={modalRenameLabel.label.name} onChange={(event) => setNewLabelName(event.target.value)}
                             onInput={(event: any) => LabelHelper.checkInputRenameLabel(event, modalRenameLabel)} onKeyDown={(event: any) => {
                                 if (event.key == 'Enter') checkRenameLabel();
                             }}
