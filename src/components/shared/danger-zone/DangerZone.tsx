@@ -11,6 +11,8 @@ import { removeFromAllAttributesById } from "@/src/reduxStore/states/pages/setti
 import { useRouter } from "next/router";
 import LoadingIcon from "../loading/LoadingIcon";
 import { selectProject } from "@/src/reduxStore/states/project";
+import { DELETE_LOOKUP_LIST } from "@/src/services/gql/mutations/lookup-lists";
+import { removeFromAllLookupListById } from "@/src/reduxStore/states/pages/lookup-lists";
 
 const ABORT_BUTTON = { buttonCaption: 'Delete', disabled: false, useButton: true };
 
@@ -24,6 +26,7 @@ export default function DangerZone(props: DangerZoneProps) {
     const [isDeleting, setIsDeleting] = useState(false);
 
     const [deleteAttributeMut] = useMutation(DELETE_USER_ATTRIBUTE)
+    const [deleteLookupListMut] = useMutation(DELETE_LOOKUP_LIST);
 
     const deleteElement = useCallback(() => {
         setIsDeleting(true);
@@ -33,6 +36,12 @@ export default function DangerZone(props: DangerZoneProps) {
                     setIsDeleting(false);
                     dispatch(removeFromAllAttributesById(props.id));
                     router.push(`/projects/${project.id}/settings`);
+                });
+            case DangerZoneEnum.LOOKUP_LIST:
+                deleteLookupListMut({ variables: { projectId: project.id, knowledgeBaseId: props.id } }).then(() => {
+                    setIsDeleting(false);
+                    dispatch(removeFromAllLookupListById(props.id));
+                    router.push(`/projects/${project.id}/lookup-lists`);
                 });
         }
 

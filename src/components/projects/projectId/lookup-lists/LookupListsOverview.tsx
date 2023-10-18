@@ -1,7 +1,7 @@
 import { selectProject } from "@/src/reduxStore/states/project";
 import React, { useCallback, useEffect, useState } from "react"
 import { useDispatch, useSelector } from "react-redux";
-import { extendAllLookupLists, selectAllLookupLists, selectCheckedLookupLists, setAllLookupLists, setCheckedLookupLists } from "@/src/reduxStore/states/pages/lookup-lists";
+import { extendAllLookupLists, removeFromAllLookupListById, selectAllLookupLists, selectCheckedLookupLists, setAllLookupLists, setCheckedLookupLists } from "@/src/reduxStore/states/pages/lookup-lists";
 import { Tooltip } from "@nextui-org/react";
 import Dropdown from "@/submodules/react-components/components/Dropdown";
 import Modal from "@/src/components/shared/modal/Modal";
@@ -15,6 +15,8 @@ import { openModal, selectModal } from "@/src/reduxStore/states/modal";
 import { ModalButton, ModalEnum } from "@/src/types/shared/modal";
 import { useRouter } from "next/router";
 import { ACTIONS_DROPDOWN_OPTIONS, postProcessLookupLists } from "@/src/util/components/projects/projectId/lookup-lists-helper";
+import { WebSocketsService } from "@/src/services/base/web-sockets/WebSocketsService";
+import { CurrentPage } from "@/src/types/shared/general";
 
 const ABORT_BUTTON = { buttonCaption: "Delete", useButton: true, disabled: false };
 
@@ -41,10 +43,10 @@ export default function LookupListsOverview() {
                 deleteLookupListMut({
                     variables: {
                         projectId: project?.id,
-                        lookupListId: lookupList.id
+                        knowledgeBaseId: lookupList.id
                     }
                 }).then((res) => {
-
+                    dispatch(removeFromAllLookupListById(lookupList.id));
                 });
             }
         });
@@ -62,12 +64,17 @@ export default function LookupListsOverview() {
         getLookupLists({ variables: { projectId: project.id } }).then((res) => {
             dispatch(setAllLookupLists(postProcessLookupLists(res.data["knowledgeBasesByProjectId"])));
         });
+        WebSocketsService.subscribeToNotification(CurrentPage.LOOKUP_LISTS_OVERVIEW, {
+            whitelist: ['knowledge_base_updated', 'knowledge_base_deleted', 'knowledge_base_created'],
+            func: handleWebsocketNotification
+        })
     }, [project]);
 
     function createLookupList() {
         createLookupListMut({ variables: { projectId: project.id } }).then((res) => {
             const lookupList = res.data?.createKnowledgeBase["knowledgeBase"];
             dispatch(extendAllLookupLists(lookupList));
+            router.push(`/projects/${project.id}/lookup-lists/${lookupList.id}`);
         });
     }
 
@@ -103,6 +110,14 @@ export default function LookupListsOverview() {
         });
         setCountSelected(countSelected)
         setSelectionList(selectionListFinal);
+    }
+
+    function handleWebsocketNotification(msgParts: string[]) {
+        if (['knowledge_base_updated', 'knowledge_base_deleted', 'knowledge_base_created'].includes(msgParts[1])) {
+            getLookupLists({ variables: { projectId: project.id } }).then((res) => {
+                dispatch(setAllLookupLists(postProcessLookupLists(res.data["knowledgeBasesByProjectId"])));
+            });
+        }
     }
 
     return (

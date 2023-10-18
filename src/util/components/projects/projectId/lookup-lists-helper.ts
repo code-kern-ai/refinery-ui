@@ -4,10 +4,16 @@ import { asPythonVariable } from "@/submodules/javascript-functions/python-funct
 
 export const ACTIONS_DROPDOWN_OPTIONS = ['Select all', 'Deselect all', 'Delete selected'];
 
-export function postProcessLookupLists(lookupLists: LookupList) {
+export function postProcessLookupLists(lookupLists: LookupList[]) {
     const prepareLookupLists = jsonCopy(lookupLists);
     prepareLookupLists.forEach((lookupList: LookupList) => {
         lookupList.pythonVariable = asPythonVariable(lookupList.name);
     });
     return prepareLookupLists;
+}
+
+export function postProcessLookupList(lookupList: LookupList) {
+    const prepareLookupList = jsonCopy(lookupList);
+    prepareLookupList.pythonVariable = asPythonVariable(lookupList.name);
+    return prepareLookupList;
 }

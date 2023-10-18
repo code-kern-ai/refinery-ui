@@ -112,7 +112,16 @@ const initialState: Modals = {
         open: false,
         record: '',
         recordIdx: 0,
-    }
+    },
+    [ModalEnum.UPLOAD_LOOKUP_LIST]: {
+        open: false
+    },
+    [ModalEnum.PASTE_LOOKUP_LIST]: {
+        open: false
+    },
+    [ModalEnum.REMOVE_LOOKUP_LIST]: {
+        open: false
+    },
 };
 
 const modalSlice = createSlice({

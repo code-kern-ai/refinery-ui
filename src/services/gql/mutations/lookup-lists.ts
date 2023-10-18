@@ -20,3 +20,11 @@ mutation ($projectId: ID!, $knowledgeBaseId: ID!) {
   }
 }
 `;
+
+export const UPDATE_KNOWLEDGE_BASE = gql`
+mutation ($projectId: ID!, $knowledgeBaseId: ID!, $name: String, $description: String) {
+  updateKnowledgeBase(projectId: $projectId, knowledgeBaseId: $knowledgeBaseId, name: $name, description: $description) {
+    ok
+  }
+}
+`;

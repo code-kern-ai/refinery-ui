@@ -25,5 +25,15 @@ export const TOOLTIPS_DICT = {
     },
     [CurrentPage.PROJECTS]: {
         ['QUICK_DELETE']: 'Admin function: Quick delete project'
+    },
+    [CurrentPage.LOOKUP_LISTS_DETAILS]: {
+        'EDIT_NAME': 'Edit your lookup list name',
+        'EDIT_DESCRIPTION': 'Edit your lookup list description',
+        'PYTHON_VARIABLE': 'The variable name can be used inside a labeling function',
+        'IMPORT': 'Copy import statement to clipboard',
+        'UPLOAD_LOOKUP_LIST': 'Please ensure that the column is called "value"',
+        'DOWNLOAD_LOOKUP_LIST': 'Download your lookup list to your local machine',
+        'PASTE_LOOKUP_LIST': 'Paste your lookup list here',
+        'DELETE_LOOKUP_LIST': 'Delete your lookup list',
     }
 }

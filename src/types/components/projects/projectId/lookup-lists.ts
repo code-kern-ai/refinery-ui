@@ -10,3 +10,16 @@ export type LookupList = {
     description: string;
     pythonVariable: string;
 }
+
+export type Term = {
+    blacklisted: boolean;
+    comment: string;
+    id: string;
+    value: string;
+}
+
+// small letters because they are also used as properties
+export enum LookupListProperty {
+    NAME = 'name',
+    DESCRIPTION = 'description',
+}
