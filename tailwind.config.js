@@ -8,8 +8,10 @@ module.exports = {
     "./submodules/**/*.{js,ts,jsx,tsx}",
   ],
   safelist: [
-    // 'text-lime-300',
-    { pattern: /(bg)-(red|orange|amber|yellow|lime|green|emerald|teal|cyan|sky|blue|indigo|violet|purple|fuchsia|pink|rose)-(100|200|500)/, },
+    {
+      pattern: /(bg)-(red|orange|amber|yellow|lime|green|emerald|teal|cyan|sky|blue|indigo|violet|purple|fuchsia|pink|rose)-(100|200|500)/,
+      variants: ['hover']
+    },
     { pattern: /(border)-(red|orange|amber|yellow|lime|green|emerald|teal|cyan|sky|blue|indigo|violet|purple|fuchsia|pink|rose|gray)-(400|800)/, },
     { pattern: /(text)-(red|orange|amber|yellow|lime|green|emerald|teal|cyan|sky|blue|indigo|violet|purple|fuchsia|pink|rose)-(700|800)/, },
     { pattern: /(bg)-(gray)-(700)/, },
