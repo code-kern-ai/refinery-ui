@@ -160,7 +160,7 @@ export default function Terms(props: TermsProps) {
         <div className="mt-8">
             <span className="text-gray-900 text-lg leading-6 font-medium mr-4">Blacklisted terms</span>
             <span className="text-sm leading-5 font-medium text-gray-500">Not part of the lookup list in a function and
-                won't
+                won&apos;t
                 be added any longer on text selection</span>
             {terms.length > 0 && <div className="grid grid-cols-1 gap-6 mt-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3">
                 {terms.map((term: Term, index: number) => (<Fragment key={term.id}>
