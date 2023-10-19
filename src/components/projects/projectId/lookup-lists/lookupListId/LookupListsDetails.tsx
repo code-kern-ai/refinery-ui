@@ -166,7 +166,7 @@ export default function LookupListsDetails() {
                 </Tooltip>
                 <LookupListOperations refetchWS={refetchWS} />
             </div>
-            <Terms terms={terms} finalSize={finalSize} refetchTerms={refetchTerms} />
+            <Terms terms={terms} finalSize={finalSize} refetchTerms={refetchTerms} setTerms={(terms: Term[]) => setTerms(terms)} />
             <DangerZone elementType={DangerZoneEnum.LOOKUP_LIST} name={lookupList.name} id={lookupList.id} />
         </div>}
     </div>)

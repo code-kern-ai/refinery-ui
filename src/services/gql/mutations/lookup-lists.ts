@@ -61,3 +61,11 @@ mutation ($projectId: ID!, $knowledgeBaseId: ID!, $values: String!, $split: Stri
 }
 
 `;
+
+export const UPDATE_TERM = gql`
+mutation ($projectId: ID!, $termId: ID!, $value: String, $comment: String) {
+  updateTerm(projectId: $projectId, termId: $termId, value: $value, comment: $comment) {
+    ok
+  }
+}
+`;

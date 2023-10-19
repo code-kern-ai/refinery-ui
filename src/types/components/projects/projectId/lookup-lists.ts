@@ -28,6 +28,7 @@ export type TermsProps = {
     terms: Term[];
     finalSize: number;
     refetchTerms: () => void;
+    setTerms: (terms: Term[]) => void;
 }
 
 export type LookupListOperationsProps = {
