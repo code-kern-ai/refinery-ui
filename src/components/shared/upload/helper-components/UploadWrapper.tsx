@@ -46,23 +46,25 @@ export default function UploadWrapper(props: UploadWrapperProps) {
         {/* TODO: Add crypted field */}
         {/* <CryptedField /> */}
 
-        <div className="form-group">
-            <label className="text-gray-500 text-sm font-normal">
-                You can specify import file upload options for your file. See how this is done for <a
-                    href="https://pandas.pydata.org/docs/reference/api/pandas.read_json.html" target="_blank"><span
-                        className="underline cursor-pointer">JSON</span></a>, <a
-                            href="https://pandas.pydata.org/docs/reference/api/pandas.read_csv.html" target="_blank"><span
-                                className="underline cursor-pointer">CSV</span></a> and <a
-                                    href="https://pandas.pydata.org/docs/reference/api/pandas.read_excel.html" target="_blank"><span
-                                        className="underline cursor-pointer">spreadsheets</span></a>. If you leave
-                it blank, we&apos;ll use default settings
-            </label>
-            <div>
-                <textarea value={importOptions} ref={textareaRef} className="shadow mt-1 p-4 text-sm w-full placeholder-indigo rounded-md" rows={3}
-                    placeholder={`E.g. for uncommon CSV ${'\n'} sep=t ${'\n'} lineterminator=r`}
-                    onChange={() => dispatch(setImportOptions(textareaRef.current?.value))}></textarea>
+        {
+            uploadFileType != UploadFileType.KNOWLEDGE_BASE && <div className="form-group">
+                <label className="text-gray-500 text-sm font-normal">
+                    You can specify import file upload options for your file. See how this is done for <a
+                        href="https://pandas.pydata.org/docs/reference/api/pandas.read_json.html" target="_blank"><span
+                            className="underline cursor-pointer">JSON</span></a>, <a
+                                href="https://pandas.pydata.org/docs/reference/api/pandas.read_csv.html" target="_blank"><span
+                                    className="underline cursor-pointer">CSV</span></a> and <a
+                                        href="https://pandas.pydata.org/docs/reference/api/pandas.read_excel.html" target="_blank"><span
+                                            className="underline cursor-pointer">spreadsheets</span></a>. If you leave
+                    it blank, we&apos;ll use default settings
+                </label>
+                <div>
+                    <textarea value={importOptions} ref={textareaRef} className="shadow mt-1 p-4 text-sm w-full placeholder-indigo rounded-md" rows={3}
+                        placeholder={`E.g. for uncommon CSV ${'\n'} sep=t ${'\n'} lineterminator=r`}
+                        onChange={() => dispatch(setImportOptions(textareaRef.current?.value))}></textarea>
+                </div>
             </div>
-        </div>
+        }
 
         {/* TODO: check the condition if the embeddings that are recreated will cost */}
         {

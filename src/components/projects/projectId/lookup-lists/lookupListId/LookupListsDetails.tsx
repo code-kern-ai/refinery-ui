@@ -3,7 +3,7 @@ import { selectProject } from "@/src/reduxStore/states/project"
 import { UPDATE_KNOWLEDGE_BASE } from "@/src/services/gql/mutations/lookup-lists";
 import { LOOKUP_LIST_BY_LOOKUP_LIST_ID, TERMS_BY_KNOWLEDGE_BASE_ID } from "@/src/services/gql/queries/lookup-lists";
 import { LookupList, LookupListProperty, Term } from "@/src/types/components/projects/projectId/lookup-lists";
-import { postProcessLookupList } from "@/src/util/components/projects/projectId/lookup-lists-helper";
+import { postProcessLookupList, postProcessTerms } from "@/src/util/components/projects/projectId/lookup-lists-helper";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-contants";
 import { copyToClipboard, jsonCopy } from "@/submodules/javascript-functions/general";
 import { useLazyQuery, useMutation } from "@apollo/client";
@@ -15,6 +15,9 @@ import { useDispatch, useSelector } from "react-redux"
 import LookupListOperations from "./LookupListOperations";
 import DangerZone from "@/src/components/shared/danger-zone/DangerZone";
 import { DangerZoneEnum } from "@/src/types/shared/danger-zone";
+import Terms from "./Terms";
+import { WebSocketsService } from "@/src/services/base/web-sockets/WebSocketsService";
+import { CurrentPage } from "@/src/types/shared/general";
 
 export default function LookupListsDetails() {
     const router = useRouter();
@@ -27,22 +30,35 @@ export default function LookupListsDetails() {
     const [isHeaderNormal, setIsHeaderNormal] = useState(true);
     const [isNameOpen, setIsNameOpen] = useState(false);
     const [isDescriptionOpen, setIsDescriptionOpen] = useState(false);
+    const [finalSize, setFinalSize] = useState(0);
 
     const [refetchCurrentLookupList] = useLazyQuery(LOOKUP_LIST_BY_LOOKUP_LIST_ID, { fetchPolicy: 'network-only', nextFetchPolicy: 'cache-first' });
     const [refetchTermsLookupList] = useLazyQuery(TERMS_BY_KNOWLEDGE_BASE_ID, { fetchPolicy: 'cache-and-network' });
     const [updateLookupListMut] = useMutation(UPDATE_KNOWLEDGE_BASE);
-
 
     useEffect(() => {
         if (!project) return;
         refetchCurrentLookupList({ variables: { projectId: project.id, knowledgeBaseId: router.query.lookupListId } }).then((res) => {
             setLookupList(postProcessLookupList(res.data['knowledgeBaseByKnowledgeBaseId']));
         });
-        refetchTermsLookupList({ variables: { projectId: project.id, knowledgeBaseId: router.query.lookupListId } }).then((res) => {
-            setTerms(res.data['termsByKnowledgeBaseId'])
-        });
-
+        refetchTerms();
+        refetchWS();
     }, [project, router.query.lookupListId]);
+
+    function refetchWS() {
+        WebSocketsService.subscribeToNotification(CurrentPage.LOOKUP_LISTS_DETAILS, {
+            projectId: project.id,
+            whitelist: ['knowledge_base_updated', 'knowledge_base_deleted', 'knowledge_base_term_updated'],
+            func: handleWebsocketNotification
+        });
+    }
+
+    function refetchTerms() {
+        refetchTermsLookupList({ variables: { projectId: project.id, knowledgeBaseId: router.query.lookupListId } }).then((res) => {
+            setFinalSize(res.data['termsByKnowledgeBaseId'].length);
+            setTerms(postProcessTerms(res.data['termsByKnowledgeBaseId']));
+        });
+    }
 
     function onScrollEvent(event: any) {
         if (!(event.target instanceof HTMLElement)) return;
@@ -73,6 +89,21 @@ export default function LookupListsDetails() {
         const lookupListCopy = jsonCopy(lookupList);
         lookupListCopy[property] = name;
         setLookupList(lookupListCopy);
+    }
+
+    function handleWebsocketNotification(msgParts: string[]) {
+        if (msgParts[2] == router.query.lookupListId) {
+            if (msgParts[1] == 'knowledge_base_updated') {
+                refetchCurrentLookupList({ variables: { projectId: project.id, knowledgeBaseId: router.query.lookupListId } }).then((res) => {
+                    setLookupList(postProcessLookupList(res.data['knowledgeBaseByKnowledgeBaseId']));
+                });
+            } else if (msgParts[1] == 'knowledge_base_deleted') {
+                alert('Lookup list was deleted');
+                router.push(`/projects/${project.id}/lookup-lists`);
+            } else if (msgParts[1] == 'knowledge_base_term_updated') {
+                refetchTerms();
+            }
+        }
     }
 
     return (project && <div className="bg-white p-4 pb-16 overflow-y-auto h-screen" onScroll={(e: any) => onScrollEvent(e)}>
@@ -133,8 +164,9 @@ export default function LookupListsDetails() {
                         className="font-dmMono px-4 py-2 rounded-none rounded-r-md border border-gray-300 text-gray-500 sm:text-sm bg-gray-100 cursor-pointer">
                         {lookupList.pythonVariable}</span>
                 </Tooltip>
-                <LookupListOperations />
+                <LookupListOperations refetchWS={refetchWS} />
             </div>
+            <Terms terms={terms} finalSize={finalSize} refetchTerms={refetchTerms} />
             <DangerZone elementType={DangerZoneEnum.LOOKUP_LIST} name={lookupList.name} id={lookupList.id} />
         </div>}
     </div>)

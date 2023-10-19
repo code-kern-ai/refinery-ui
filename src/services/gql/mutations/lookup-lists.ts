@@ -28,3 +28,36 @@ mutation ($projectId: ID!, $knowledgeBaseId: ID!, $name: String, $description: S
   }
 }
 `;
+
+export const ADD_TERM_TO_LOOKUP_LIST = gql`
+mutation ($projectId: ID!, $value: String!, $comment: String, $knowledgeBaseId: ID!) {
+  addTermToKnowledgeBase(projectId: $projectId, value: $value, comment: $comment, knowledgeBaseId: $knowledgeBaseId) {
+    ok
+  }
+}
+`;
+
+export const REMOVE_TERM = gql`
+mutation ($projectId: ID!, $termId: ID!) {
+  deleteTerm(projectId: $projectId, termId: $termId) {
+    ok
+  }
+}
+`;
+
+export const BLACKLIST_TERM = gql`
+mutation ($projectId: ID!, $termId: ID!) {
+  blacklistTerm(projectId: $projectId, termId: $termId) {
+    ok
+  }
+}
+`;
+
+export const PASTE_TERM = gql`
+mutation ($projectId: ID!, $knowledgeBaseId: ID!, $values: String!, $split: String, $delete: Boolean) {
+  pasteKnowledgeTerms(projectId: $projectId, knowledgeBaseId: $knowledgeBaseId, values: $values, split: $split, delete: $delete) {
+    ok
+  }
+}
+
+`;

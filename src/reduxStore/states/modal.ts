@@ -113,9 +113,6 @@ const initialState: Modals = {
         record: '',
         recordIdx: 0,
     },
-    [ModalEnum.UPLOAD_LOOKUP_LIST]: {
-        open: false
-    },
     [ModalEnum.PASTE_LOOKUP_LIST]: {
         open: false
     },

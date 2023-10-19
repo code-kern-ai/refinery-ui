@@ -23,3 +23,13 @@ export enum LookupListProperty {
     NAME = 'name',
     DESCRIPTION = 'description',
 }
+
+export type TermsProps = {
+    terms: Term[];
+    finalSize: number;
+    refetchTerms: () => void;
+}
+
+export type LookupListOperationsProps = {
+    refetchWS: () => void;
+}

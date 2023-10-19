@@ -67,7 +67,7 @@ export default function LookupListsOverview() {
         WebSocketsService.subscribeToNotification(CurrentPage.LOOKUP_LISTS_OVERVIEW, {
             whitelist: ['knowledge_base_updated', 'knowledge_base_deleted', 'knowledge_base_created'],
             func: handleWebsocketNotification
-        })
+        });
     }, [project]);
 
     function createLookupList() {

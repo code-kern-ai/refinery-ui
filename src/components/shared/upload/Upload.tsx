@@ -152,6 +152,9 @@ export default function Upload(props: UploadProps) {
         } else if (uploadFileType == UploadFileType.RECORDS_ADD) {
             UploadHelper.setProjectId(project.id);
             executeUploadFile();
+        } else if (uploadFileType == UploadFileType.KNOWLEDGE_BASE) {
+            UploadHelper.setProjectId(project.id);
+            executeUploadFile();
         }
     }
 
@@ -187,7 +190,7 @@ export default function Upload(props: UploadProps) {
             case UploadFileType.RECORDS_NEW || UploadFileType.RECORDS_ADD:
                 return fileName + "_SCALE";
             case UploadFileType.KNOWLEDGE_BASE:
-                return fileName + "_KB"; // TODO : add knowledge base id
+                return fileName + "_" + props.uploadOptions.knowledgeBaseId;
             default:
                 return fileName;
         }
@@ -319,6 +322,13 @@ export default function Upload(props: UploadProps) {
                     isModal={props.uploadOptions.isModal} submitUpload={submitUpload} sendSelectedFile={(file) => {
                         setSelectedFile(file);
                     }} /></>)}
-        </section>
+
+            {uploadFileType == UploadFileType.KNOWLEDGE_BASE && (
+                <UploadWrapper uploadStarted={uploadStarted} doingSomething={doingSomething} progressState={progressState} submitted={submitted} isFileCleared={selectedFile == null}
+                    isModal={props.uploadOptions.isModal} submitUpload={submitUpload} sendSelectedFile={(file) => {
+                        setSelectedFile(file);
+                    }} />)
+            }
+        </section >
     )
 }
