@@ -65,6 +65,7 @@ export default function LookupListsOverview() {
             dispatch(setAllLookupLists(postProcessLookupLists(res.data["knowledgeBasesByProjectId"])));
         });
         WebSocketsService.subscribeToNotification(CurrentPage.LOOKUP_LISTS_OVERVIEW, {
+            projectId: project.id,
             whitelist: ['knowledge_base_updated', 'knowledge_base_deleted', 'knowledge_base_created'],
             func: handleWebsocketNotification
         });

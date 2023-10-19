@@ -35,5 +35,8 @@ export const TOOLTIPS_DICT = {
         'DOWNLOAD_LOOKUP_LIST': 'Download your lookup list to your local machine',
         'PASTE_LOOKUP_LIST': 'Paste your lookup list here',
         'DELETE_LOOKUP_LIST': 'Delete your lookup list',
+    },
+    [CurrentPage.MODEL_CALLBACKS]: {
+        'ADD_LABELING_TASK': 'Add new labeling task',
     }
 }

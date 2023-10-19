@@ -1,0 +1,7 @@
+.actionsHeight {
+    height: 34px;
+}
+
+.widthLine {
+    width: calc(100vw - 450px);
+}
