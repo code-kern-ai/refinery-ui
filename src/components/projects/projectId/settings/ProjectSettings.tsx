@@ -32,6 +32,7 @@ import { RecommendedEncoder } from "@/src/types/components/projects/projectId/se
 import LabelingTasks from "./labeling-tasks/LabelingTasks";
 import { jsonCopy } from "@/submodules/javascript-functions/general";
 import { unsubscribeWSOnDestroy } from "@/src/services/base/web-sockets/web-sockets-helper";
+import { TOOLTIPS_DICT } from "@/src/util/tooltip-contants";
 
 const ACCEPT_BUTTON = { buttonCaption: "Accept", useButton: true, disabled: true }
 
@@ -242,7 +243,7 @@ export default function ProjectSettings() {
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-2 mt-1 align-top">
                 <div className="items-center flex flex-row">
-                    <Tooltip content="Add new attribute" color="invert" placement="bottom">
+                    <Tooltip content={TOOLTIPS_DICT.PROJECT_SETTINGS.ADD_NEW_ATTRIBUTE} color="invert" placement="bottom">
                         <label onClick={() => dispatch(setModalStates(ModalEnum.CREATE_NEW_ATTRIBUTE, { open: true, attributeName: findFreeAttributeName(attributes) }))} className="mr-1 inline-flex items-center px-2.5 py-1.5 border border-gray-300 shadow-sm text-xs font-semibold rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none cursor-pointer">
                             <IconPlus className="mr-1 h-5 w-5 inline-block" />
                             Add new attribute
@@ -259,7 +260,7 @@ export default function ProjectSettings() {
                         </button>
                     </Tooltip>
                     {/* TODO: Add option to export records -> together with data browser */}
-                    <Tooltip content="Creates a snapshot compressed file of your current project" placement="bottom" color="invert">
+                    <Tooltip content={TOOLTIPS_DICT.PROJECT_SETTINGS.PROJECT_SNAPSHOT} placement="bottom" color="invert">
                         <button onClick={() => dispatch(openModal(ModalEnum.PROJECT_SNAPSHOT))}
                             className="mr-1 inline-flex items-center px-2.5 py-1.5 border border-gray-300 shadow-sm text-xs font-semibold rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none cursor-pointer">
                             <IconCamera className="mr-1 h-5 w-5 inline-block" />
@@ -305,13 +306,13 @@ export default function ProjectSettings() {
                 <div className="mb-2 flex flex-grow justify-center text-sm text-gray-500">
                     Choose a name for your attribute and pick a datatype you want to use</div>
                 <div className="grid grid-cols-2  gap-2 items-center" style={{ gridTemplateColumns: 'max-content auto' }}>
-                    <Tooltip content="Enter an attribute name" color="invert" placement="right">
+                    <Tooltip content={TOOLTIPS_DICT.PROJECT_SETTINGS.ATTRIBUTE_NAME} color="invert" placement="right">
                         <span className="cursor-help  card-title mb-0 label-text font-normal"><span className="underline filtersUnderline">Attribute name</span></span>
                     </Tooltip>
                     <input type="text" defaultValue={modalCreateNewAtt.attributeName} onInput={(e: any) => handleAttributeName(e.target.value)}
                         onKeyDown={(e) => { if (e.key == 'Enter') createUserAttribute() }}
                         className="h-9 w-full border-gray-300 rounded-md placeholder-italic border text-gray-900 pl-4 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100" placeholder="Enter an attribute name..." />
-                    <Tooltip content="Select an attribute type" color="invert" placement="right">
+                    <Tooltip content={TOOLTIPS_DICT.PROJECT_SETTINGS.SELECT_ATTRIBUTE_TYPE} color="invert" placement="right">
                         <span className="cursor-help card-title mb-0 label-text font-normal"><span className="underline filtersUnderline">Attribute type</span></span>
                     </Tooltip>
                     <Dropdown buttonName={attributeType} options={DATA_TYPES} selectedOption={(option: string) => setAttributeType(option)} />

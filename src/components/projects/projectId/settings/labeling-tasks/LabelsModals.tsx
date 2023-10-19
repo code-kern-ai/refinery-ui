@@ -6,6 +6,7 @@ import { CREATE_LABEL, DELETE_LABEL, UPDATE_LABEL_COLOR, UPDATE_LABEL_HOTKEY } f
 import { LabelColors, LabelType, LabelingTask, LabelingTasksProps } from "@/src/types/components/projects/projectId/settings/labeling-tasks";
 import { ModalButton, ModalEnum } from "@/src/types/shared/modal";
 import { LabelHelper } from "@/src/util/classes/label-helper";
+import { TOOLTIPS_DICT } from "@/src/util/tooltip-contants";
 import { jsonCopy } from "@/submodules/javascript-functions/general";
 import { useMutation } from "@apollo/client";
 import { Tooltip } from "@nextui-org/react";
@@ -123,7 +124,7 @@ export default function LabelsModals(props: LabelingTasksProps) {
             {modalChangeColor.label && <div>
                 <div className="self-center flex flex-row flex-nowrap items-center justify-center">
                     <p className="mr-2 font-bold">Label:</p>
-                    <Tooltip content="Rename label" color="invert" placement="bottom">
+                    <Tooltip content={TOOLTIPS_DICT.PROJECT_SETTINGS.LABELING_TASK.RENAME_LABEL} color="invert" placement="bottom">
                         <span onClick={() => {
                             LabelHelper.openRenameLabel();
                             dispatch(setModalStates(ModalEnum.CHANGE_COLOR, { ...modalChangeColor, open: false }));

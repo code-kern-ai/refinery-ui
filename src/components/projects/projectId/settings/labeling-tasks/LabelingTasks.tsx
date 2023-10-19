@@ -21,6 +21,7 @@ import LabelingTasksModals from "./LabelingTasksModals";
 import LabelsModals from "./LabelsModals";
 import RenameLabelModal from "./RenameLabelModal";
 import { UPDATE_LABELING_TASK } from "@/src/services/gql/mutations/project-settings";
+import { TOOLTIPS_DICT } from "@/src/util/tooltip-contants";
 
 export default function LabelingTasks() {
     const router = useRouter();
@@ -183,7 +184,7 @@ export default function LabelingTasks() {
             </div>
         </div>
         <div className="mt-1 flex items-center gap-1">
-            <Tooltip content="Currently supporting classifications and extractions" color="invert" placement="right">
+            <Tooltip content={TOOLTIPS_DICT.PROJECT_SETTINGS.LABELING_TASK.NEW_LABELING_TASK} color="invert" placement="right">
                 <button onClick={() => dispatch(openModal(ModalEnum.ADD_LABELING_TASK))}
                     className="inline-block items-center px-2.5 py-1.5 border border-gray-300 shadow-sm text-xs font-semibold rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none cursor-pointer">
                     <IconPlus className="h-5 w-5 inline-block mr-1" />

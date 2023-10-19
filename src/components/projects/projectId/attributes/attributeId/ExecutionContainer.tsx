@@ -15,6 +15,7 @@ import { useDispatch, useSelector } from "react-redux";
 import style from '@/src/styles/components/projects/projectId/attribute-calculation.module.css';
 import { DataTypeEnum } from "@/src/types/shared/general";
 import { CALCULATE_USER_ATTRIBUTE_ALL_RECORDS } from "@/src/services/gql/mutations/project-settings";
+import { TOOLTIPS_DICT } from "@/src/util/tooltip-contants";
 
 
 const ACCEPT_BUTTON = { buttonCaption: 'Accept', useButton: true };
@@ -85,7 +86,7 @@ export default function ExecutionContainer(props: ExecutionContainerProps) {
                     <LoadingIcon color="indigo" />
                 </div>}
 
-                <Tooltip content="Execute the attribute on 10 records" color="invert" placement="left" className="ml-auto">
+                <Tooltip content={TOOLTIPS_DICT.ATTRIBUTE_CALCULATION.EXECUTE_10_RECORDS} color="invert" placement="left" className="ml-auto">
                     <button onClick={calculateUserAttributeSampleRecords} disabled={props.currentAttribute.state == AttributeState.USABLE || props.currentAttribute.state == AttributeState.RUNNING || requestedSomething}
                         className={`bg-white text-gray-700 text-xs font-semibold px-4 py-2 rounded-md border border-gray-300 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 ${(props.currentAttribute.state == AttributeState.USABLE || props.currentAttribute.state == AttributeState.RUNNING || requestedSomething) ? 'cursor-not-allowed opacity-50' : 'cursor-pointer opacity-100'}`}>
                         Run on 10

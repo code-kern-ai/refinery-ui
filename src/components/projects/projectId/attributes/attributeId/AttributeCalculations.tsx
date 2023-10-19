@@ -28,6 +28,7 @@ import LoadingIcon from "@/src/components/shared/loading/LoadingIcon";
 import { WebSocketsService } from "@/src/services/base/web-sockets/WebSocketsService";
 import { timer } from "rxjs";
 import { unsubscribeWSOnDestroy } from "@/src/services/base/web-sockets/web-sockets-helper";
+import { TOOLTIPS_DICT } from "@/src/util/tooltip-contants";
 
 const EDITOR_OPTIONS = { theme: 'vs-light', language: 'python', readOnly: false };
 
@@ -226,7 +227,7 @@ export default function AttributeCalculation() {
             <div className="w-full">
                 <div className={`grid gap-4 ${isHeaderNormal ? 'grid-cols-2' : 'grid-cols-1'}`}>
                     {isHeaderNormal && <div className="flex items-center mt-2">
-                        <Tooltip color="invert" placement="right" content={currentAttribute.state == AttributeState.USABLE || currentAttribute.state == AttributeState.RUNNING ? 'Cannot edit attribute\'s name, attribute is in use' : 'Edit your attribute\'s name'}>
+                        <Tooltip color="invert" placement="right" content={currentAttribute.state == AttributeState.USABLE || currentAttribute.state == AttributeState.RUNNING ? TOOLTIPS_DICT.ATTRIBUTE_CALCULATION.CANNOT_EDIT_NAME : TOOLTIPS_DICT.ATTRIBUTE_CALCULATION.EDIT_NAME}>
                             <button onClick={() => openName(true)} disabled={currentAttribute.state == AttributeState.USABLE || currentAttribute.state == AttributeState.RUNNING}
                                 className={`flex-shrink-0 bg-white text-gray-700 text-xs font-semibold mr-3 px-4 py-2 rounded-md border border-gray-300 block float-left hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 ${currentAttribute.state == AttributeState.USABLE || currentAttribute.state == AttributeState.RUNNING}`}>
                                 Edit name
@@ -248,7 +249,7 @@ export default function AttributeCalculation() {
                         selectedOption={(option: string) => updateVisibility(option)} disabled={currentAttribute.state == AttributeState.USABLE} />
                     <div className="text-sm leading-5 font-medium text-gray-700">Data type</div>
                     <div className="flex flex-row items-center">
-                        <Tooltip color="invert" placement="right" content={currentAttribute.state == AttributeState.USABLE || currentAttribute.state == AttributeState.RUNNING ? 'Cannot edit data type' : 'Edit your data type'}>
+                        <Tooltip color="invert" placement="right" content={currentAttribute.state == AttributeState.USABLE || currentAttribute.state == AttributeState.RUNNING ? TOOLTIPS_DICT.ATTRIBUTE_CALCULATION.CANNOT_EDIT_DATATYPE : TOOLTIPS_DICT.ATTRIBUTE_CALCULATION.EDIT_DATATYPE}>
                             <Dropdown buttonName={currentAttribute.dataTypeName} options={DATA_TYPES} dropdownWidth="w-52"
                                 selectedOption={(option: string) => updateDataType(option)} disabled={currentAttribute.state == AttributeState.USABLE} />
                         </Tooltip>
@@ -258,7 +259,7 @@ export default function AttributeCalculation() {
                     <div className="flex flex-row items-center">
                         {usableAttributes.length == 0 && <div className="text-sm font-normal text-gray-500">No usable attributes.</div>}
                         {usableAttributes.map((attribute: Attribute) => (
-                            <Tooltip key={attribute.id} content={attribute.dataTypeName + ' - Click to copy'} color="invert" placement="top">
+                            <Tooltip key={attribute.id} content={attribute.dataTypeName + ' - ' + TOOLTIPS_DICT.ATTRIBUTE_CALCULATION.CLICK_TO_COPY} color="invert" placement="top">
                                 <span onClick={() => copyToClipboard(attribute.name)}>
                                     <div className={`cursor-pointer border items-center px-2 py-0.5 rounded text-xs font-medium text-center mr-2 ${'bg-' + attribute.color + '-100'} ${'text-' + attribute.color + '-700'} ${'border-' + attribute.color + '-400'} ${'hover:bg-' + attribute.color + '-200'}`}>
                                         {attribute.name}
@@ -272,7 +273,7 @@ export default function AttributeCalculation() {
                         {lookupLists.length == 0 ? 'No lookup lists in project' : 'Lookup lists'}</div>
                     <div className="flex flex-row items-center">
                         {lookupLists.map((lookupList) => (
-                            <Tooltip key={lookupList.id} content='Click to copy import statement' color="invert" placement="top">
+                            <Tooltip key={lookupList.id} content={TOOLTIPS_DICT.ATTRIBUTE_CALCULATION.IMPORT_STATEMENT} color="invert" placement="top">
                                 <span onClick={() => copyToClipboard("from knowledge import " + lookupList.pythonVariable)}>
                                     <div className="cursor-pointer border items-center px-2 py-0.5 rounded text-xs font-medium text-center mr-2">
                                         {lookupList.pythonVariable} - {lookupList.termCount}
@@ -286,7 +287,7 @@ export default function AttributeCalculation() {
                 <div className="flex flex-row items-center justify-between my-3">
                     <div className="text-sm leading-5 font-medium text-gray-700 inline-block mr-2">Editor</div>
                     <div className="flex flex-row flex-nowrap">
-                        <Tooltip content="See available libraries for this attribute calculation" placement="left" color="invert">
+                        <Tooltip content={TOOLTIPS_DICT.ATTRIBUTE_CALCULATION.AVAILABLE_LIBRARIES} placement="left" color="invert">
                             <a href="https://github.com/code-kern-ai/refinery-ac-exec-env/blob/dev/requirements.txt"
                                 target="_blank"
                                 className="ml-2 bg-white text-gray-700 text-xs font-semibold  px-4 py-2 rounded-md border border-gray-300 hover:bg-gray-50 focus:outline-none">
@@ -342,7 +343,7 @@ export default function AttributeCalculation() {
                         <div className=" mb-4 card border border-gray-200 bg-white flex-grow overflow-visible rounded-2xl">
                             <div className="card-body p-6">
                                 <div className="flex flex-row items-center">
-                                    <Tooltip content="Currently being executed" color="invert" placement="right" className="relative z-10"><LoadingIcon /></Tooltip>
+                                    <Tooltip content={TOOLTIPS_DICT.ATTRIBUTE_CALCULATION.BEING_EXECUTED} color="invert" placement="right" className="relative z-10"><LoadingIcon /></Tooltip>
                                     <div className="text-sm leading-5 font-normal text-gray-500 w-full">
                                         <div className="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700">
                                             <div className="bg-green-400 h-2.5 rounded-full" style={{ 'width': currentAttribute.progress + '%' }}>
@@ -353,10 +354,10 @@ export default function AttributeCalculation() {
                             </div>
                         </div>}
                     {currentAttribute.state !== AttributeState.RUNNING && currentAttribute.state !== AttributeState.INITIAL && <div className="flex flex-row items-center">
-                        {currentAttribute.state == AttributeState.USABLE && <Tooltip content="Successfully executed" color="invert">
+                        {currentAttribute.state == AttributeState.USABLE && <Tooltip content={TOOLTIPS_DICT.ATTRIBUTE_CALCULATION.SUCCESS} color="invert">
                             <IconCircleCheckFilled className="h-6 w-6 text-green-500" />
                         </Tooltip>}
-                        {currentAttribute.state == AttributeState.FAILED && <Tooltip content="Execution ran into errors" color="invert">
+                        {currentAttribute.state == AttributeState.FAILED && <Tooltip content={TOOLTIPS_DICT.ATTRIBUTE_CALCULATION.ERROR} color="invert">
                             <IconAlertTriangleFilled className="h-6 w-6 text-red-500" />
                         </Tooltip>}
                         <div className="py-6 text-sm leading-5 font-normal text-gray-500">

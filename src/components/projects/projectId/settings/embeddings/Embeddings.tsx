@@ -20,6 +20,7 @@ import { useDispatch, useSelector } from "react-redux";
 import AddNewEmbedding from "./AddNewEmbedding";
 import Dropdown from "@/submodules/react-components/components/Dropdown";
 import { unsubscribeWSOnDestroy } from "@/src/services/base/web-sockets/web-sockets-helper";
+import { TOOLTIPS_DICT } from "@/src/util/tooltip-contants";
 
 const ABORT_BUTTON = { useButton: true, disabled: false };
 const EDIT_BUTTON = { buttonCaption: 'Edit', useButton: true, disabled: false, closeAfterClick: false };
@@ -183,7 +184,7 @@ export default function Embeddings(props: EmbeddingProps) {
                                         </td>
                                         {!loadingEmbeddingsDict[embedding.id] ?
                                             <td className="whitespace-nowrap text-center px-3 py-2 text-sm text-gray-500 flex justify-center">
-                                                <Tooltip content={embedding.filterAttributes && embedding.filterAttributes.length > 0 ? 'Has filtered attributes' : 'No filter attributes'} color="invert" >
+                                                <Tooltip content={embedding.filterAttributes && embedding.filterAttributes.length > 0 ? TOOLTIPS_DICT.PROJECT_SETTINGS.EMBEDDINGS.HAS_FILTER_ATTRIBUTES : TOOLTIPS_DICT.PROJECT_SETTINGS.EMBEDDINGS.NO_FILTER_ATTRIBUTES} color="invert" >
                                                     <IconNotes onClick={() => dispatch(setModalStates(ModalEnum.FILTERED_ATTRIBUTES, { embeddingId: embedding.id, open: true, attributeNames: prepareAttributeDataByNames(embedding.filterAttributes), showEditOption: showEditOption }))}
                                                         className={`h-6 w-6 ${embedding.filterAttributes && embedding.filterAttributes.length > 0 ? 'text-gray-700' : 'text-gray-300'}`} />
                                                 </Tooltip>
@@ -203,10 +204,10 @@ export default function Embeddings(props: EmbeddingProps) {
                                                 </div>
                                                 <p className="text-xs italic">{embedding.state}</p>
                                             </div>}
-                                            {embedding.state == EmbeddingState.FINISHED && <Tooltip content="Successfully created" color="invert">
+                                            {embedding.state == EmbeddingState.FINISHED && <Tooltip content={TOOLTIPS_DICT.PROJECT_SETTINGS.EMBEDDINGS.SUCCESSFULLY_CREATED} color="invert">
                                                 <IconCircleCheckFilled className="h-6 w-6 text-green-500" />
                                             </Tooltip>}
-                                            {embedding.state == EmbeddingState.FAILED && <Tooltip content="Embedding creation ran into errors" color="invert">
+                                            {embedding.state == EmbeddingState.FAILED && <Tooltip content={TOOLTIPS_DICT.PROJECT_SETTINGS.EMBEDDINGS.ERROR} color="invert">
                                                 <IconAlertTriangleFilled className="h-6 w-6 text-red-500" />
                                             </Tooltip>}
                                         </td>
@@ -234,14 +235,14 @@ export default function Embeddings(props: EmbeddingProps) {
                 </div>
             </div>
             <div className="mt-1 flex items-center gap-1">
-                <Tooltip content="Vectorize your attributes. Integration to Hugging Face available" color="invert" placement="right">
+                <Tooltip content={TOOLTIPS_DICT.PROJECT_SETTINGS.EMBEDDINGS.GENERATE_EMBEDDING} color="invert" placement="right">
                     <button onClick={() => dispatch(openModal(ModalEnum.ADD_EMBEDDING))}
                         className="inline-block items-center px-2.5 py-1.5 border border-gray-300 shadow-sm text-xs font-semibold rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none cursor-pointer">
                         <IconPlus className="h-5 w-5 inline-block mr-1" />
                         Generate embedding
                     </button>
                 </Tooltip>
-                <Tooltip content={!isManaged ? 'Check out our hosted version to use this function' : 'See which models are downloaded'} color="invert" placement="right">
+                <Tooltip content={!isManaged ? TOOLTIPS_DICT.PROJECT_SETTINGS.EMBEDDINGS.HOSTED_VERSION : TOOLTIPS_DICT.PROJECT_SETTINGS.EMBEDDINGS.NAVIGATE_MODELS_DOWNLOADED} color="invert" placement="right">
                     <button disabled={!isManaged} onClick={() => router.push('/models-download')}
                         className={`"ml-1 inline-block items-center px-2.5 py-1.5 border border-gray-300 shadow-sm text-xs font-semibold rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none cursor-pointer ${!isManaged ? 'opacity-50 cursor-not-allowed' : 'opacity-100 cursor-pointer'}`}>
                         <IconArrowAutofitDown className="h-5 w-5 inline-block mr-1" />

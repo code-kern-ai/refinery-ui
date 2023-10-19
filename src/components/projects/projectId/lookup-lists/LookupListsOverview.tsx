@@ -17,6 +17,7 @@ import { useRouter } from "next/router";
 import { ACTIONS_DROPDOWN_OPTIONS, postProcessLookupLists } from "@/src/util/components/projects/projectId/lookup-lists-helper";
 import { WebSocketsService } from "@/src/services/base/web-sockets/WebSocketsService";
 import { CurrentPage } from "@/src/types/shared/general";
+import { TOOLTIPS_DICT } from "@/src/util/tooltip-contants";
 
 const ABORT_BUTTON = { buttonCaption: "Delete", useButton: true, disabled: false };
 
@@ -134,7 +135,7 @@ export default function LookupListsOverview() {
                                 <Dropdown options={ACTIONS_DROPDOWN_OPTIONS} buttonName="Actions" disabledOptions={[false, false, checkedLookupLists.every((checked) => !checked)]}
                                     selectedOption={(option: string) => executeOption(option)} dropdownClasses="mr-3" buttonClasses={`${style.actionsHeight} text-xs`} />
                             ) : (
-                                <Tooltip placement="left" content="At least one lookup list is needed to enable actions" color="invert">
+                                <Tooltip placement="left" content={TOOLTIPS_DICT.LOOKUP_LISTS_OVERVIEW.ENABLE_ACTIONS} color="invert">
                                     <button type="button"
                                         className="mr-3 inline-flex items-center justify-center w-full rounded-md border border-gray-300 shadow-sm px-4 py-1.5 bg-white text-xs font-medium text-gray-700 opacity-50 cursor-not-allowed focus:ring-offset-2 focus:ring-offset-gray-400"
                                         id="menu-button" aria-expanded="true" aria-haspopup="true">
@@ -150,7 +151,7 @@ export default function LookupListsOverview() {
                             )}
 
                             <div className="flex justify-center overflow-visible">
-                                <Tooltip placement="left" content="Create a new lookup list" color="invert">
+                                <Tooltip placement="left" content={TOOLTIPS_DICT.LOOKUP_LISTS_OVERVIEW.CREATE_LOOKUP_LIST} color="invert">
                                     <button onClick={createLookupList}
                                         className="bg-white text-gray-700 text-xs font-medium mr-3 px-4 py-2 rounded-md border border-gray-300 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
                                         New list
@@ -160,7 +161,7 @@ export default function LookupListsOverview() {
                             </div>
 
                             <div className="flex justify-center overflow-visible">
-                                <Tooltip placement="left" content="Go to heuristics overview" color="invert">
+                                <Tooltip placement="left" content={TOOLTIPS_DICT.LOOKUP_LISTS_OVERVIEW.NAVIGATE_HEURISTICS} color="invert">
                                     <button onClick={() => {
                                         router.push(`/projects/${project.id}/heuristics`)
                                     }} className="bg-white text-gray-700 text-xs font-medium mr-3 px-4 py-2 rounded-md border border-gray-300 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
@@ -170,7 +171,7 @@ export default function LookupListsOverview() {
                             </div>
 
                             <div className="flex justify-center overflow-visible">
-                                <Tooltip placement="left" content="Go to the model callbacks" color="invert">
+                                <Tooltip placement="left" content={TOOLTIPS_DICT.LOOKUP_LISTS_OVERVIEW.NAVIGATE_MODEL_CALLBACKS} color="invert">
                                     <button onClick={() => {
                                         router.push(`/projects/${project.id}/model-callbacks`)
                                     }} className=" bg-white text-gray-700 text-xs font-medium mr-3 px-4 py-2 rounded-md border border-gray-300 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">

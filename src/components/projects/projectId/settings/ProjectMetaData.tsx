@@ -1,6 +1,7 @@
 import { removeFromAllProjectsById, selectProject, setActiveProject } from "@/src/reduxStore/states/project";
 import { UPDATE_PROJECT_NAME_AND_DESCRIPTION } from "@/src/services/gql/mutations/project-settings";
 import { DELETE_PROJECT } from "@/src/services/gql/mutations/projects";
+import { TOOLTIPS_DICT } from "@/src/util/tooltip-contants";
 import { jsonCopy } from "@/submodules/javascript-functions/general";
 import { useMutation } from "@apollo/client";
 import { Tooltip } from "@nextui-org/react";
@@ -68,7 +69,7 @@ export default function ProjectMetaData() {
                         <div
                             className="border-t bg-gray-50 border-gray-200 px-2 py-2 flex justify-between items-center space-x-3 sm:px-3">
                             <div className="flex-shrink-0">
-                                <Tooltip content="Stores the changes" color="invert" placement="right">
+                                <Tooltip content={TOOLTIPS_DICT.PROJECT_SETTINGS.META_DATA.STORE_CHANGES} color="invert" placement="right">
                                     <button onClick={updateProjectNameAndDescription}
                                         disabled={projectName === '' && projectDescription === ''} type="button"
                                         className={`inline-flex items-center px-2.5 py-1.5 border border-gray-300 shadow-sm text-xs font-medium rounded text-gray-700 bg-white hover:bg-gray-50 focus:outline-none ${projectName === '' && projectDescription === '' ? 'cursor-not-allowed opacity-50' : 'cursor-pointer opacity-100'}`}>
@@ -91,7 +92,7 @@ export default function ProjectMetaData() {
                         value={projectNameDelete} type="text" placeholder="Please enter the project name to enable deletion" onChange={(e) => setProjectNameDelete(e.target.value)}
                         onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); (projectNameDelete === project.name) ? deleteProject() : null } }} />
 
-                    <Tooltip content="This can't be reverted!" placement="left" color="invert">
+                    <Tooltip content={TOOLTIPS_DICT.PROJECT_SETTINGS.META_DATA.CANNOT_BE_REVERTED} placement="left" color="invert">
                         <button onClick={deleteProject} disabled={!(projectNameDelete === project.name)} type="button"
                             className={`inline-flex text-xs items-center bg-red-100 border border-red-400 text-red-700 font-semibold px-4 py-2 rounded-md ml-6 hover:bg-red-200 focus:outline-none ${!(projectNameDelete === project.name) ? 'opacity-50 cursor-not-allowed' : 'opacity-100 cursor-pointer'} `}>
                             <IconWreckingBall className="h-4 w-4 mr-2" />

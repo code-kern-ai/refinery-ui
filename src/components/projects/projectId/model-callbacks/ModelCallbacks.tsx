@@ -143,7 +143,7 @@ export default function ModelCallbacks() {
                         <Dropdown options={ACTIONS_DROPDOWN_OPTIONS} buttonName="Actions" disabledOptions={[false, false, modelCallbacks.every((checked) => !checked)]}
                             selectedOption={(option: string) => executeOption(option)} dropdownClasses="mr-3" buttonClasses={`${style.actionsHeight} text-xs`} />
                     ) : (
-                        <Tooltip placement="left" content="At least one model callback is needed to enable actions" color="invert">
+                        <Tooltip placement="left" content={TOOLTIPS_DICT.MODEL_CALLBACKS.ENABLE_ACTIONS} color="invert">
                             <button type="button"
                                 className="mr-3 inline-flex items-center justify-center w-full rounded-md border border-gray-300 shadow-sm px-4 py-1.5 bg-white text-xs font-medium text-gray-700 opacity-50 cursor-not-allowed focus:ring-offset-2 focus:ring-offset-gray-400"
                                 id="menu-button" aria-expanded="true" aria-haspopup="true">
@@ -159,7 +159,7 @@ export default function ModelCallbacks() {
                     )}
 
                     <div className="flex justify-center overflow-visible">
-                        <Tooltip placement="left" content="Go to heuristics overview" color="invert">
+                        <Tooltip placement="left" content={TOOLTIPS_DICT.MODEL_CALLBACKS.NAVIGATE_HEURISTICS} color="invert">
                             <button onClick={() => {
                                 router.push(`/projects/${project.id}/heuristics`)
                             }} className="bg-white text-gray-700 text-xs font-medium mr-3 px-4 py-2 rounded-md border border-gray-300 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
@@ -169,7 +169,7 @@ export default function ModelCallbacks() {
                     </div>
 
                     <div className="flex justify-center overflow-visible">
-                        <Tooltip placement="left" content="Go to the model callbacks" color="invert">
+                        <Tooltip placement="left" content={TOOLTIPS_DICT.MODEL_CALLBACKS.NAVIGATE_LOOKUP_LISTS} color="invert">
                             <button onClick={() => {
                                 router.push(`/projects/${project.id}/lookup-lists`)
                             }} className=" bg-white text-gray-700 text-xs font-medium mr-3 px-4 py-2 rounded-md border border-gray-300 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">

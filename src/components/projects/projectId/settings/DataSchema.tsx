@@ -7,6 +7,7 @@ import { UPDATE_ATTRIBUTE } from "@/src/services/gql/mutations/project-settings"
 import { Attribute, DataSchemaProps } from "@/src/types/components/projects/projectId/settings/data-schema";
 import { CurrentPage } from "@/src/types/shared/general";
 import { ATTRIBUTES_VISIBILITY_STATES, getTooltipVisibilityState } from "@/src/util/components/projects/projectId/settings/data-schema-helper";
+import { TOOLTIPS_DICT } from "@/src/util/tooltip-contants";
 import { jsonCopy } from "@/submodules/javascript-functions/general";
 import Dropdown from "@/submodules/react-components/components/Dropdown";
 import { useMutation } from "@apollo/client";
@@ -84,10 +85,10 @@ export default function DataSchema(props: DataSchemaProps) {
                                         <span>Primary Key</span>
                                         <div className="inline-block w-4 h-3.5">
                                             {props.pKeyValid != null && <>
-                                                {props.pKeyValid ? <Tooltip content="Key combination is unique" color="invert" placement="bottom">
+                                                {props.pKeyValid ? <Tooltip content={TOOLTIPS_DICT.PROJECT_SETTINGS.DATA_SCHEMA.UNIQUE_COMBINATION} color="invert" placement="bottom">
                                                     <IconCheck className="h-5 w-5 -mt-1" />
                                                 </Tooltip> :
-                                                    <Tooltip content="Key combination isn't unique!" color="invert" placement="bottom">
+                                                    <Tooltip content={TOOLTIPS_DICT.PROJECT_SETTINGS.DATA_SCHEMA.NOT_UNIQUE_COMBINATION} color="invert" placement="bottom">
                                                         <IconX className="h-5 w-5 -mt-1" />
                                                     </Tooltip>}
                                             </>}

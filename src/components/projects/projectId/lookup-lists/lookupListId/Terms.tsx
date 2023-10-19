@@ -2,6 +2,7 @@ import { selectProject } from "@/src/reduxStore/states/project";
 import { ADD_TERM_TO_LOOKUP_LIST, BLACKLIST_TERM, REMOVE_TERM, UPDATE_TERM } from "@/src/services/gql/mutations/lookup-lists";
 import { Term, TermsProps } from "@/src/types/components/projects/projectId/lookup-lists";
 import { BLACKLISTED_TERMS_DROPDOWN_OPTIONS, TERMS_DROPDOWN_OPTIONS, isTermUnique } from "@/src/util/components/projects/projectId/lookup-lists-helper";
+import { TOOLTIPS_DICT } from "@/src/util/tooltip-contants";
 import { jsonCopy } from "@/submodules/javascript-functions/general";
 import Dropdown from "@/submodules/react-components/components/Dropdown";
 import { useMutation } from "@apollo/client";
@@ -130,12 +131,12 @@ export default function Terms(props: TermsProps) {
                                     className="h-8 w-full border-gray-300 rounded-md placeholder-italic border text-gray-900 pl-4 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100" />
                             </div>
                             <div className="mt-2 flex">
-                                <Tooltip content="Submit" placement="top" color="invert">
+                                <Tooltip content={TOOLTIPS_DICT.LOOKUP_LISTS_DETAILS.SUBMIT} placement="top" color="invert">
                                     <button className="mx-2" onClick={() => openTermEditor(false, term.id, term.value, term.comment)}>
                                         <IconCircleCheckFilled />
                                     </button>
                                 </Tooltip>
-                                <Tooltip content="Cancel" placement="top" color="invert">
+                                <Tooltip content={TOOLTIPS_DICT.LOOKUP_LISTS_DETAILS.CANCEL} placement="top" color="invert">
                                     <button onClick={cancelTermEditor}>
                                         <IconCircleMinus />
                                     </button>

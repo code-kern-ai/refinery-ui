@@ -10,6 +10,7 @@ import { DownloadState, ProjectSize } from "@/src/types/components/projects/proj
 import { CurrentPage } from "@/src/types/shared/general";
 import { ModalEnum } from "@/src/types/shared/modal";
 import { postProcessingFormGroups } from "@/src/util/components/projects/projectId/settings/project-export-helper";
+import { TOOLTIPS_DICT } from "@/src/util/tooltip-contants";
 import { downloadByteData } from "@/submodules/javascript-functions/export";
 import { formatBytes } from "@/submodules/javascript-functions/general";
 import { useLazyQuery } from "@apollo/client";
@@ -176,7 +177,7 @@ export default function ProjectSnapshotExport() {
         </div>}
 
         <div className="flex mt-6 justify-end">
-            {projectExportCredentials && projectExportCredentials.downloadFileName && <Tooltip content="Latest prepared export file" color="invert">
+            {projectExportCredentials && projectExportCredentials.downloadFileName && <Tooltip content={TOOLTIPS_DICT.PROJECT_SETTINGS.LATEST_SNAPSHOT} color="invert">
                 <button onClick={exportViaFile} className="bg-white text-gray-700 text-xs font-semibold mr-4 px-4 py-2 rounded-md border border-gray-300 cursor-pointer hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
                     <IconDownload className="mr-1 h-5 w-5 inline-block" />
                     {projectExportCredentials.downloadFileName}
