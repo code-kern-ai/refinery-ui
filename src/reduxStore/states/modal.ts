@@ -121,6 +121,15 @@ const initialState: Modals = {
     },
     [ModalEnum.DELETE_MODEL_CALLBACKS]: {
         open: false
+    },
+    [ModalEnum.DELETE_HEURISTICS]: {
+        open: false
+    },
+    [ModalEnum.ADD_LABELING_FUNCTION]: {
+        open: false
+    },
+    [ModalEnum.ADD_ACTIVE_LEARNER]: {
+        open: false
     }
 };
 

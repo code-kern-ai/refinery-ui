@@ -19,6 +19,7 @@ import { openModal, selectModal } from "@/src/reduxStore/states/modal";
 import Modal from "@/src/components/shared/modal/Modal";
 import { WebSocketsService } from "@/src/services/base/web-sockets/WebSocketsService";
 import { CurrentPage } from "@/src/types/shared/general";
+import GridCards from "@/src/components/shared/grid-cards/GridCards";
 
 const ABORT_BUTTON = { buttonCaption: "Delete", useButton: true, disabled: false };
 
@@ -35,6 +36,7 @@ export default function ModelCallbacks() {
     const [checkedModelCallbacks, setCheckedModelCallbacks] = useState([]);
     const [selectionList, setSelectionList] = useState('');
     const [countSelected, setCountSelected] = useState(0);
+    const [filteredList, setFilteredList] = useState([]);
 
     const [refetchLabelingTasksByProjectId] = useLazyQuery(GET_LABELING_TASKS_BY_PROJECT_ID, { fetchPolicy: "network-only" });
     const [refetchModelCallbacks] = useLazyQuery(GET_MODEL_CALLBACKS_OVERVIEW_DATA, { fetchPolicy: "network-only" });
@@ -63,6 +65,7 @@ export default function ModelCallbacks() {
 
     function toggleTabs(index: number, labelingTask: LabelingTask | null) {
         setOpenTab(index);
+        setFilteredList(labelingTask != null ? modelCallbacks.filter((modelCallback) => modelCallback.labelingTaskId == labelingTask.id) : modelCallbacks);
     }
 
     function refetchLabelingTasksAndProcess() {
@@ -74,7 +77,9 @@ export default function ModelCallbacks() {
 
     function refetchModelCallbacksAndProcess() {
         refetchModelCallbacks({ variables: { projectId: project.id } }).then((res) => {
-            setModelCallbacks(postProcessModelCallbacks(res['data']['modelCallbacksOverviewData']))
+            const modelCallbacks = postProcessModelCallbacks(res['data']['modelCallbacksOverviewData']);
+            setModelCallbacks(modelCallbacks);
+            setFilteredList(modelCallbacks);
         });
     }
 
@@ -128,9 +133,9 @@ export default function ModelCallbacks() {
         <div className="w-full h-full">
             <div className="flex-shrink-0 block xl:flex justify-between items-center">
                 <div className={`flex ${style.widthLine} border-b-2 border-b-gray-200 max-w-full overflow-x-auto`}>
-                    <div className={`cursor-pointer text-sm leading-5 font-medium mr-10 py-5 ${openTab == -1 ? 'text-indigo-700 border-bottom' : 'text-gray-500'}`} onClick={() => toggleTabs(-1, null)}>All</div>
+                    <div className={`cursor-pointer text-sm leading-5 font-medium mr-10 py-5 ${openTab == -1 ? 'text-indigo-700 ' + style.borderBottom : 'text-gray-500'}`} onClick={() => toggleTabs(-1, null)}>All</div>
                     {labelingTasks.map((labelingTask, index) => <div key={labelingTask.id}>
-                        <div className={`cursor-pointer text-sm leading-5 font-medium mr-10 py-5 ${openTab == index ? 'text-indigo-700 border-bottom' : 'text-gray-500'}`} onClick={() => toggleTabs(index, labelingTask)}>{labelingTask.name}</div>
+                        <div className={`cursor-pointer text-sm leading-5 font-medium mr-10 py-5 ${openTab == index ? 'text-indigo-700 ' + style.borderBottom : 'text-gray-500'}`} onClick={() => toggleTabs(index, labelingTask)}>{labelingTask.name}</div>
                     </div>)}
                     <Tooltip color="invert" placement="right" content={TOOLTIPS_DICT.MODEL_CALLBACKS.ADD_LABELING_TASK} >
                         <button onClick={() => router.push(`/projects/${project.id}/settings`)}>
@@ -189,7 +194,12 @@ export default function ModelCallbacks() {
                         to dive deeper.</p>
                 </div>
             ) : (<>
-                {/* TODO: import the shared component grid (used for model callbacks and heuristics) */}
+                <div className="overflow-y-auto" style={{ maxHeight: '93%' }}>
+                    <div className={`mt-8 ${filteredList.length > 3 ? style.flexContainer : 'grid gap-6 grid-cols-3'}`}>
+                        {filteredList.length == 0 && <span className="text-gray-500 text-base leading-6 font-normal mt-4">No model callbacks for this labeling task</span>}
+                        <GridCards filteredList={filteredList} refetch={refetchModelCallbacksAndProcess} />
+                    </div>
+                </div>
 
                 <Modal modalName={ModalEnum.DELETE_MODEL_CALLBACKS} abortButton={abortButton}>
                     <h1 className="text-lg text-gray-900 mb-2">Warning</h1>

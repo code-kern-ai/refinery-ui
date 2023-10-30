@@ -98,5 +98,19 @@ export const TOOLTIPS_DICT = {
         'LABELING_TASK': 'Choose the labeling task',
         'STATIC_DATA_SLICE': 'Choose a static data slice',
 
+    },
+    [CurrentPage.HEURISTICS]: {
+        'ADD_LABELING_TASK': 'Add new labeling task',
+        'NAVIGATE_MODEL_CALLBACKS': 'Go to the model callbacks',
+        'NAVIGATE_LOOKUP_LISTS': 'Go to lookup lists overview',
+        'LABELING_FUNCTION': 'Labeling function',
+        'ACTIVE_LEARNING': 'Active learning',
+        'ZERO_SHOT': 'Zero-shot',
+        'CROWD_LABELING': 'Crowd labeling',
+        'CHOOSE_LABELING_TASK': 'Choose a labeling task',
+        'ENTER_FUNCTION_NAME': 'Enter a function name',
+        'ENTER_DESCRIPTION': 'Enter a description',
+        'ENTER_CLASS_NAME': 'Enter a class name',
+        'CHOOSE_EMBEDDING': 'Choose an embedding'
     }
 }

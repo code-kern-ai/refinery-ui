@@ -5,3 +5,7 @@
 .widthLine {
     width: calc(100vw - 450px);
 }
+
+.borderBottom {
+    border-bottom: 1px solid #4F46E5;
+}
