@@ -106,6 +106,15 @@ export function HeuristicsOverview() {
             case 'Active learning':
                 setHeuristicType(InformationSourceType.ACTIVE_LEARNING);
                 dispatch(openModal(ModalEnum.ADD_ACTIVE_LEARNER));
+                break;
+            case 'Zero-shot':
+                setHeuristicType(InformationSourceType.ZERO_SHOT);
+                dispatch(openModal(ModalEnum.ADD_ZERO_SHOT));
+                break;
+            case 'Crowd labeler':
+                setHeuristicType(InformationSourceType.CROWD_LABELER);
+                dispatch(openModal(ModalEnum.ADD_CROWD_LABELER));
+                break;
             case 'Select all':
                 selectHeuristics(true);
                 break;

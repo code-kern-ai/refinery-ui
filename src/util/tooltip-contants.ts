@@ -111,6 +111,9 @@ export const TOOLTIPS_DICT = {
         'ENTER_FUNCTION_NAME': 'Enter a function name',
         'ENTER_DESCRIPTION': 'Enter a description',
         'ENTER_CLASS_NAME': 'Enter a class name',
-        'CHOOSE_EMBEDDING': 'Choose an embedding'
+        'CHOOSE_EMBEDDING': 'Choose an embedding',
+        'ENTER_HEURISTIC_NAME': 'Enter heuristic name',
+        'CHOOSE_ATTRIBUTE': 'Choose an input attribute for inference',
+        'CHOOSE_MODEL': 'Choose a model',
     }
 }

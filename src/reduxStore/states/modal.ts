@@ -130,7 +130,13 @@ const initialState: Modals = {
     },
     [ModalEnum.ADD_ACTIVE_LEARNER]: {
         open: false
-    }
+    },
+    [ModalEnum.ADD_ZERO_SHOT]: {
+        open: false
+    },
+    [ModalEnum.ADD_CROWD_LABELER]: {
+        open: false
+    },
 };
 
 const modalSlice = createSlice({

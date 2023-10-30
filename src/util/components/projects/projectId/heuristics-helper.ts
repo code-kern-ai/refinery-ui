@@ -81,6 +81,10 @@ export function getFunctionName(heuristicType: InformationSourceType) {
             return 'my_labeling_function';
         case InformationSourceType.ACTIVE_LEARNING:
             return 'MyActiveLearner';
+        case InformationSourceType.ZERO_SHOT:
+            return 'Zero Shot module';
+        case InformationSourceType.CROWD_LABELER:
+            return 'Crowd Heuristic';
     }
 }
 

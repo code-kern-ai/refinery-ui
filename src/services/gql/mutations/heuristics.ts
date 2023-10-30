@@ -43,3 +43,11 @@ mutation ($projectId: ID!, $labelingTaskId: ID!, $description: String!, $sourceC
   }
 }
 `;
+
+export const CREATE_ZERO_SHOT_INFORMATION_SOURCE = gql`
+mutation ($projectId: ID!, $targetConfig: String!, $labelingTaskId: ID!, $attributeId: ID) {
+  createZeroShotInformationSource(projectId: $projectId, targetConfig: $targetConfig, labelingTaskId: $labelingTaskId, attributeId: $attributeId) {
+    id
+  }
+}  
+`;
