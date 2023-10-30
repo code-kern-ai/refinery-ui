@@ -1,7 +1,7 @@
 import { selectProject } from "@/src/reduxStore/states/project";
 import { useDispatch, useSelector } from "react-redux";
 import style from '@/src/styles/components/projects/projectId/heuristics.module.css';
-import { use, useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { selectLabelingTasksAll, setLabelingTasksAll } from "@/src/reduxStore/states/pages/settings";
 import { CurrentPage } from "@/src/types/shared/general";
 import { WebSocketsService } from "@/src/services/base/web-sockets/WebSocketsService";
@@ -24,6 +24,7 @@ import GridCards from "@/src/components/shared/grid-cards/GridCards";
 import { DELETE_HEURISTIC, SET_ALL_HEURISTICS } from "@/src/services/gql/mutations/heuristics";
 import HeuristicsCreationModals from "./HeuristicsCreationModals";
 import { InformationSourceType } from "@/submodules/javascript-functions/enums/enums";
+import { selectIsManaged } from "@/src/reduxStore/states/general";
 
 const ABORT_BUTTON = { buttonCaption: "Delete", useButton: true, disabled: false };
 
@@ -31,6 +32,7 @@ export function HeuristicsOverview() {
     const router = useRouter();
     const dispatch = useDispatch();
 
+    const isManaged = useSelector(selectIsManaged);
     const project = useSelector(selectProject);
     const heuristics = useSelector(selectAllHeuristics);
     const labelingTasks = useSelector(selectLabelingTasksAll);
@@ -161,13 +163,29 @@ export function HeuristicsOverview() {
                     </Tooltip>
                 </div>
                 <div className="grid grid-cols-1 gap-4 xs:flex xs:gap-0 flex-row items-center">
-                    <Dropdown options={NEW_HEURISTICS} buttonName="New heuristic" selectedOption={(option: string) => executeOption(option)} buttonClasses={`${style.actionsHeight} text-xs whitespace-nowrap`} dropdownClasses="mr-3" />
+                    {labelingTasks && labelingTasks.length > 0 ? (<Tooltip content={TOOLTIPS_DICT.HEURISTICS.ENABLED_NEW_HEURISTIC} color="invert" placement="right">
+                        <Dropdown options={NEW_HEURISTICS} buttonName="New heuristic" tooltipsArray={[null, null, null, isManaged ? null : 'Only available for managed projects']}
+                            disabledOptions={[false, false, !(labelingTasks && labelingTasks.length > 0), !isManaged]}
+                            selectedOption={(option: string) => executeOption(option)} buttonClasses={`${style.actionsHeight} text-xs whitespace-nowrap`} dropdownClasses="mr-3" />
+                    </Tooltip>) : (<Tooltip content={TOOLTIPS_DICT.HEURISTICS.DISABLED_NEW_HEURISTIC} color="invert">
+                        <button type="button"
+                            className="mr-3 inline-flex items-center justify-center w-full rounded-md border border-gray-300 shadow-sm px-4 py-1.5 bg-white text-xs font-medium text-gray-700 opacity-50 cursor-not-allowed focus:ring-offset-2 focus:ring-offset-gray-400"
+                            id="menu-button" aria-expanded="true" aria-haspopup="true">
+                            New heuristic
+                            <svg className="-mr-1 ml-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
+                                fill="currentColor" aria-hidden="true">
+                                <path fillRule="evenodd"
+                                    d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
+                                    clipRule="evenodd" />
+                            </svg>
+                        </button>
+                    </Tooltip>)}
 
                     {heuristics && heuristics.length > 0 ? (
                         <Dropdown options={ACTIONS_DROPDOWN_OPTIONS} buttonName="Actions" disabledOptions={[false, false, heuristics.every((checked) => !checked), heuristics.every((checked) => !checked)]}
                             selectedOption={(option: string) => executeOption(option)} dropdownClasses="mr-3" buttonClasses={`${style.actionsHeight} text-xs`} />
                     ) : (
-                        <Tooltip placement="left" content={TOOLTIPS_DICT.MODEL_CALLBACKS.ENABLE_ACTIONS} color="invert">
+                        <Tooltip placement="left" content={TOOLTIPS_DICT.HEURISTICS.ENABLE_ACTIONS} color="invert">
                             <button type="button"
                                 className="mr-3 inline-flex items-center justify-center w-full rounded-md border border-gray-300 shadow-sm px-4 py-1.5 bg-white text-xs font-medium text-gray-700 opacity-50 cursor-not-allowed focus:ring-offset-2 focus:ring-offset-gray-400"
                                 id="menu-button" aria-expanded="true" aria-haspopup="true">
@@ -228,7 +246,7 @@ export function HeuristicsOverview() {
                         </div>
                         <div>
                             <div className="text-gray-900 text-xl leading-7 font-semibold">How to use templates</div>
-                            <div className="text-gray-500 text-base leading-6 font-normal mt-3">You don't need to re-invent the
+                            <div className="text-gray-500 text-base leading-6 font-normal mt-3">You don&apos;t need to re-invent the
                                 wheel in some cases, as labeling functions often share some of their structure. We have a
                                 public GitHub repository containing some template functions, so you can look into this.
                             </div>

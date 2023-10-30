@@ -115,5 +115,8 @@ export const TOOLTIPS_DICT = {
         'ENTER_HEURISTIC_NAME': 'Enter heuristic name',
         'CHOOSE_ATTRIBUTE': 'Choose an input attribute for inference',
         'CHOOSE_MODEL': 'Choose a model',
+        'ENABLE_ACTIONS': 'Enable actions',
+        'ENABLED_NEW_HEURISTIC': 'Heuristics are noisy label signals',
+        'DISABLED_NEW_HEURISTIC': 'At least one labeling task is needed to create heuristics',
     }
 }
