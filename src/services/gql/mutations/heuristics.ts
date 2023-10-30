@@ -51,3 +51,28 @@ mutation ($projectId: ID!, $targetConfig: String!, $labelingTaskId: ID!, $attrib
   }
 }  
 `;
+
+export const START_WEAK_SUPERVISIONS = gql`
+mutation ($projectId: ID!) {
+  initiateWeakSupervisionByProjectId(projectId: $projectId) {
+    ok
+  }
+}
+`;
+
+export const CREATE_INFORMATION_SOURCE_PAYLOAD = gql`
+mutation ($projectId: ID!, $informationSourceId: ID!) {
+  createPayload(projectId: $projectId, informationSourceId: $informationSourceId) {
+    queueId
+  }
+}
+`;
+
+export const RUN_ZERO_SHOT_PROJECT = gql`
+mutation ($projectId: ID!, $informationSourceId: ID!) {
+  zeroShotProject(projectId: $projectId, informationSourceId: $informationSourceId) {
+    ok
+  }
+}
+
+`;

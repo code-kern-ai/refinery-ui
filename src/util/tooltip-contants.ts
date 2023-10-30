@@ -118,5 +118,9 @@ export const TOOLTIPS_DICT = {
         'ENABLE_ACTIONS': 'Enable actions',
         'ENABLED_NEW_HEURISTIC': 'Heuristics are noisy label signals',
         'DISABLED_NEW_HEURISTIC': 'At least one labeling task is needed to create heuristics',
+        'SELECT_AT_LEAST_ONE_HEURISTIC': 'Please select at least one heuristic',
+        'SELECT_AT_LEAST_ONE_VALID_HEURISTIC': 'At least one invalid heuristic is selected',
+        'WEAK_SUPERVISION': 'Calculation of denoised labels can take up to a few minutes!',
+        'LAST_WEAK_SUPERVISION_INFO': 'Last weak supervision run information'
     }
 }

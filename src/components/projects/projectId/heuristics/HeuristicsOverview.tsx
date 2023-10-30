@@ -1,68 +1,31 @@
 import { selectProject } from "@/src/reduxStore/states/project";
 import { useDispatch, useSelector } from "react-redux";
 import style from '@/src/styles/components/projects/projectId/heuristics.module.css';
-import { useCallback, useEffect, useState } from "react";
-import { selectLabelingTasksAll, setLabelingTasksAll } from "@/src/reduxStore/states/pages/settings";
+import { useEffect, useState } from "react";
+import { setLabelingTasksAll } from "@/src/reduxStore/states/pages/settings";
 import { CurrentPage } from "@/src/types/shared/general";
 import { WebSocketsService } from "@/src/services/base/web-sockets/WebSocketsService";
 import { LabelingTask } from "@/src/types/components/projects/projectId/settings/labeling-tasks";
 import { GET_LABELING_TASKS_BY_PROJECT_ID } from "@/src/services/gql/queries/project-setting";
-import { useLazyQuery, useMutation } from "@apollo/client";
+import { useLazyQuery } from "@apollo/client";
 import { postProcessLabelingTasks, postProcessLabelingTasksSchema } from "@/src/util/components/projects/projectId/settings/labeling-tasks-helper";
-import { Tooltip } from "@nextui-org/react";
-import { TOOLTIPS_DICT } from "@/src/util/tooltip-contants";
-import { IconPlus } from "@tabler/icons-react";
-import { useRouter } from "next/router";
-import { ACTIONS_DROPDOWN_OPTIONS, NEW_HEURISTICS, postProcessHeuristics } from "@/src/util/components/projects/projectId/heuristics-helper";
-import Dropdown from "@/submodules/react-components/components/Dropdown";
-import Modal from "@/src/components/shared/modal/Modal";
-import { ModalButton, ModalEnum } from "@/src/types/shared/modal";
-import { openModal, selectModal } from "@/src/reduxStore/states/modal";
+import { postProcessHeuristics } from "@/src/util/components/projects/projectId/heuristics-helper";
 import { GET_HEURISTICS_OVERVIEW_DATA } from "@/src/services/gql/queries/heuristics";
-import { selectAllHeuristics, setAllHeuristics } from "@/src/reduxStore/states/pages/heuristics";
+import { selectHeuristicsAll, setAllHeuristics } from "@/src/reduxStore/states/pages/heuristics";
 import GridCards from "@/src/components/shared/grid-cards/GridCards";
-import { DELETE_HEURISTIC, SET_ALL_HEURISTICS } from "@/src/services/gql/mutations/heuristics";
 import HeuristicsCreationModals from "./HeuristicsCreationModals";
-import { InformationSourceType } from "@/submodules/javascript-functions/enums/enums";
-import { selectIsManaged } from "@/src/reduxStore/states/general";
-
-const ABORT_BUTTON = { buttonCaption: "Delete", useButton: true, disabled: false };
+import HeuristicsHeader from "./HeuristicsHeader";
 
 export function HeuristicsOverview() {
-    const router = useRouter();
     const dispatch = useDispatch();
 
-    const isManaged = useSelector(selectIsManaged);
     const project = useSelector(selectProject);
-    const heuristics = useSelector(selectAllHeuristics);
-    const labelingTasks = useSelector(selectLabelingTasksAll);
-    const modalDelete = useSelector(selectModal(ModalEnum.DELETE_HEURISTICS));
+    const heuristics = useSelector(selectHeuristicsAll);
 
-    const [openTab, setOpenTab] = useState(-1);
-    const [selectionList, setSelectionList] = useState('');
-    const [countSelected, setCountSelected] = useState(0);
     const [filteredList, setFilteredList] = useState([]);
-    const [heuristicType, setHeuristicType] = useState(null);
 
     const [refetchLabelingTasksByProjectId] = useLazyQuery(GET_LABELING_TASKS_BY_PROJECT_ID, { fetchPolicy: "network-only" });
     const [refetchHeuristics] = useLazyQuery(GET_HEURISTICS_OVERVIEW_DATA, { fetchPolicy: "network-only" });
-    const [setHeuristicsMut] = useMutation(SET_ALL_HEURISTICS);
-    const [deleteHeuristicMut] = useMutation(DELETE_HEURISTIC);
-
-    const deleteHeuristics = useCallback(() => {
-        heuristics.forEach((heuristic) => {
-            if (heuristic.selected) {
-                deleteHeuristicMut({ variables: { projectId: project.id, informationSourceId: heuristic.id } }).then(() => refetchHeuristicsAndProcess());
-            }
-        });
-    }, [modalDelete]);
-
-    useEffect(() => {
-        setAbortButton({ ...ABORT_BUTTON, emitFunction: deleteHeuristics });
-        prepareSelectionList();
-    }, [modalDelete]);
-
-    const [abortButton, setAbortButton] = useState<ModalButton>(ABORT_BUTTON);
 
     useEffect(() => {
         if (!project) return;
@@ -70,15 +33,10 @@ export function HeuristicsOverview() {
         refetchHeuristicsAndProcess();
         WebSocketsService.subscribeToNotification(CurrentPage.HEURISTICS, {
             projectId: project.id,
-            whitelist: [],
+            whitelist: ['labeling_task_updated', 'labeling_task_created', 'labeling_task_deleted', 'information_source_created', 'information_source_updated', 'information_source_deleted', 'payload_finished', 'payload_failed', 'payload_created', 'payload_update_statistics'],
             func: handleWebsocketNotification
         });
     }, [project]);
-
-    function toggleTabs(index: number, labelingTask: LabelingTask | null) {
-        setOpenTab(index);
-        setFilteredList(labelingTask != null ? heuristics.filter((heuristic) => heuristic.labelingTaskId === labelingTask.id) : heuristics);
-    }
 
     function refetchLabelingTasksAndProcess() {
         refetchLabelingTasksByProjectId({ variables: { projectId: project.id } }).then((res) => {
@@ -95,132 +53,23 @@ export function HeuristicsOverview() {
         });
     }
 
-    function handleWebsocketNotification() {
-
-    }
-
-    function executeOption(option: string) {
-        switch (option) {
-            case 'Labeling function':
-                setHeuristicType(InformationSourceType.LABELING_FUNCTION);
-                dispatch(openModal(ModalEnum.ADD_LABELING_FUNCTION));
-                break;
-            case 'Active learning':
-                setHeuristicType(InformationSourceType.ACTIVE_LEARNING);
-                dispatch(openModal(ModalEnum.ADD_ACTIVE_LEARNER));
-                break;
-            case 'Zero-shot':
-                setHeuristicType(InformationSourceType.ZERO_SHOT);
-                dispatch(openModal(ModalEnum.ADD_ZERO_SHOT));
-                break;
-            case 'Crowd labeler':
-                setHeuristicType(InformationSourceType.CROWD_LABELER);
-                dispatch(openModal(ModalEnum.ADD_CROWD_LABELER));
-                break;
-            case 'Select all':
-                selectHeuristics(true);
-                break;
-            case 'Deselect all':
-                selectHeuristics(false);
-                break;
-            case 'Delete selected':
-                prepareSelectionList();
-                dispatch(openModal(ModalEnum.DELETE_HEURISTICS));
-                break;
+    function handleWebsocketNotification(msgParts: string[]) {
+        if (['labeling_task_updated', 'labeling_task_created'].includes(msgParts[1])) {
+            refetchLabelingTasksAndProcess();
         }
-    }
-
-    function selectHeuristics(checked: boolean) {
-        setHeuristicsMut({ variables: { projectId: project.id, value: checked } }).then(() => { refetchHeuristicsAndProcess() });
-    }
-
-    function prepareSelectionList() {
-        let selectionListFinal = '';
-        let countSelected = 0;
-        heuristics.forEach((heuristic, index) => {
-            if (heuristic.selected) {
-                selectionListFinal += heuristics[index].name;
-                selectionListFinal += '\n';
-                countSelected++;
-            }
-        });
-        setCountSelected(countSelected)
-        setSelectionList(selectionListFinal);
+        if ('labeling_task_deleted' == msgParts[1]) {
+            refetchLabelingTasksAndProcess();
+            refetchHeuristicsAndProcess();
+        }
+        if (['information_source_created', 'information_source_updated', 'information_source_deleted', 'payload_finished', 'payload_failed', 'payload_created', 'payload_update_statistics', 'weak_supervision_started', 'weak_supervision_finished']) {
+            refetchHeuristicsAndProcess();
+        }
     }
 
     return (project && <div className="p-4 bg-gray-100 h-full flex-1 flex flex-col">
         <div className="w-full h-full -mr-4">
-            <div className="flex-shrink-0 block xl:flex justify-between items-center">
-                <div className={`flex ${style.widthLine} border-b-2 border-b-gray-200 max-w-full overflow-x-auto`}>
-                    <div className={`cursor-pointer text-sm leading-5 font-medium mr-10 py-5 ${openTab == -1 ? 'text-indigo-700 ' + style.borderBottom : 'text-gray-500'}`} onClick={() => toggleTabs(-1, null)}>All</div>
-                    {labelingTasks.map((labelingTask, index) => <div key={labelingTask.id}>
-                        <div className={`cursor-pointer text-sm leading-5 font-medium mr-10 py-5 ${openTab == index ? 'text-indigo-700 ' + style.borderBottom : 'text-gray-500'}`} onClick={() => toggleTabs(index, labelingTask)}>{labelingTask.name}</div>
-                    </div>)}
-                    <Tooltip color="invert" placement="right" content={TOOLTIPS_DICT.HEURISTICS.ADD_LABELING_TASK} >
-                        <button onClick={() => router.push(`/projects/${project.id}/settings`)}>
-                            <IconPlus size={20} strokeWidth={1.5} className="text-gray-500 cursor-pointer" />
-                        </button>
-                    </Tooltip>
-                </div>
-                <div className="grid grid-cols-1 gap-4 xs:flex xs:gap-0 flex-row items-center">
-                    {labelingTasks && labelingTasks.length > 0 ? (<Tooltip content={TOOLTIPS_DICT.HEURISTICS.ENABLED_NEW_HEURISTIC} color="invert" placement="right">
-                        <Dropdown options={NEW_HEURISTICS} buttonName="New heuristic" tooltipsArray={[null, null, null, isManaged ? null : 'Only available for managed projects']}
-                            disabledOptions={[false, false, !(labelingTasks && labelingTasks.length > 0), !isManaged]}
-                            selectedOption={(option: string) => executeOption(option)} buttonClasses={`${style.actionsHeight} text-xs whitespace-nowrap`} dropdownClasses="mr-3" />
-                    </Tooltip>) : (<Tooltip content={TOOLTIPS_DICT.HEURISTICS.DISABLED_NEW_HEURISTIC} color="invert">
-                        <button type="button"
-                            className="mr-3 inline-flex items-center justify-center w-full rounded-md border border-gray-300 shadow-sm px-4 py-1.5 bg-white text-xs font-medium text-gray-700 opacity-50 cursor-not-allowed focus:ring-offset-2 focus:ring-offset-gray-400"
-                            id="menu-button" aria-expanded="true" aria-haspopup="true">
-                            New heuristic
-                            <svg className="-mr-1 ml-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
-                                fill="currentColor" aria-hidden="true">
-                                <path fillRule="evenodd"
-                                    d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
-                                    clipRule="evenodd" />
-                            </svg>
-                        </button>
-                    </Tooltip>)}
-
-                    {heuristics && heuristics.length > 0 ? (
-                        <Dropdown options={ACTIONS_DROPDOWN_OPTIONS} buttonName="Actions" disabledOptions={[false, false, heuristics.every((checked) => !checked), heuristics.every((checked) => !checked)]}
-                            selectedOption={(option: string) => executeOption(option)} dropdownClasses="mr-3" buttonClasses={`${style.actionsHeight} text-xs`} />
-                    ) : (
-                        <Tooltip placement="left" content={TOOLTIPS_DICT.HEURISTICS.ENABLE_ACTIONS} color="invert">
-                            <button type="button"
-                                className="mr-3 inline-flex items-center justify-center w-full rounded-md border border-gray-300 shadow-sm px-4 py-1.5 bg-white text-xs font-medium text-gray-700 opacity-50 cursor-not-allowed focus:ring-offset-2 focus:ring-offset-gray-400"
-                                id="menu-button" aria-expanded="true" aria-haspopup="true">
-                                Actions
-                                <svg className="-mr-1 ml-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
-                                    fill="currentColor" aria-hidden="true">
-                                    <path fillRule="evenodd"
-                                        d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
-                                        clipRule="evenodd" />
-                                </svg>
-                            </button>
-                        </Tooltip>
-                    )}
-
-                    <div className="flex justify-center overflow-visible">
-                        <Tooltip placement="left" content={TOOLTIPS_DICT.HEURISTICS.NAVIGATE_MODEL_CALLBACKS} color="invert">
-                            <button onClick={() => {
-                                router.push(`/projects/${project.id}/model-callbacks`)
-                            }} className="bg-white text-gray-700 text-xs font-medium mr-3 px-4 py-2 rounded-md border border-gray-300 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-                                Model callbacks
-                            </button>
-                        </Tooltip>
-                    </div>
-
-                    <div className="flex justify-center overflow-visible">
-                        <Tooltip placement="left" content={TOOLTIPS_DICT.HEURISTICS.NAVIGATE_LOOKUP_LISTS} color="invert">
-                            <button onClick={() => {
-                                router.push(`/projects/${project.id}/lookup-lists`)
-                            }} className=" bg-white text-gray-700 text-xs font-medium mr-3 px-4 py-2 rounded-md border border-gray-300 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-                                Lookup lists
-                            </button>
-                        </Tooltip>
-                    </div>
-                </div>
-            </div >
+            <HeuristicsHeader refetch={refetchHeuristicsAndProcess}
+                filterList={(labelingTask: LabelingTask) => setFilteredList(labelingTask != null ? heuristics.filter((heuristic) => heuristic.labelingTaskId === labelingTask.id) : heuristics)} />
 
             {heuristics && heuristics.length == 0 ? (
                 <div>
@@ -290,17 +139,9 @@ export function HeuristicsOverview() {
                         <GridCards filteredList={filteredList} refetch={refetchHeuristicsAndProcess} />
                     </div>
                 </div>
-                <Modal modalName={ModalEnum.DELETE_HEURISTICS} abortButton={abortButton}>
-                    <h1 className="text-lg text-gray-900 mb-2">Warning</h1>
-                    <div className="text-sm text-gray-500 my-2 flex flex-col">
-                        <span>Are you sure you want to delete selected model {countSelected <= 1 ? 'callback' : 'callbacks'}?</span>
-                        <span>Currently selected {countSelected <= 1 ? 'is' : 'are'}:</span>
-                        <span className="whitespace-pre-line font-bold">{selectionList}</span>
-                    </div>
-                </Modal>
             </>)}
 
-            <HeuristicsCreationModals heuristicType={heuristicType} />
+            <HeuristicsCreationModals />
         </div >
     </div >)
 }

@@ -11,6 +11,7 @@ export enum Status {
     NOT_READY = 'NOT_READY',
     QUEUED = 'QUEUED',
     AUTOMATICALLY_CREATED = 'AUTOMATICALLY_CREATED',
+    NOT_YET_RUN = 'NOT_YET_RUN',
 }
 
 export enum GatesIntegratorStatus {

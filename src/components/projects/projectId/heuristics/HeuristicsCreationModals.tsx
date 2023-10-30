@@ -1,11 +1,13 @@
 import Modal from "@/src/components/shared/modal/Modal";
 import { selectModal } from "@/src/reduxStore/states/modal";
+import { selectHeuristicType } from "@/src/reduxStore/states/pages/heuristics";
 import { selectEmbeddings, selectLabelingTasksAll, selectUsableNonTextAttributes, setAllAttributes, setAllEmbeddings } from "@/src/reduxStore/states/pages/settings";
 import { selectProject } from "@/src/reduxStore/states/project";
+import { WebSocketsService } from "@/src/services/base/web-sockets/WebSocketsService";
 import { CREATE_HEURISTIC, CREATE_ZERO_SHOT_INFORMATION_SOURCE } from "@/src/services/gql/mutations/heuristics";
 import { GET_ATTRIBUTES_BY_PROJECT_ID, GET_EMBEDDING_SCHEMA_BY_PROJECT_ID, GET_ZERO_SHOT_RECOMMENDATIONS } from "@/src/services/gql/queries/project-setting";
-import { HeuristicCreationModalsProps } from "@/src/types/components/projects/projectId/heuristics";
 import { LabelingTaskTaskType } from "@/src/types/components/projects/projectId/settings/labeling-tasks";
+import { CurrentPage } from "@/src/types/shared/general";
 import { ModalButton, ModalEnum } from "@/src/types/shared/modal";
 import { DEFAULT_DESCRIPTION, getFunctionName, getInformationSourceTemplate, getRouterLinkHeuristic } from "@/src/util/components/projects/projectId/heuristics-helper";
 import { postProcessingAttributes } from "@/src/util/components/projects/projectId/settings/data-schema-helper";
@@ -20,7 +22,7 @@ import { useDispatch, useSelector } from "react-redux";
 
 const ACCEPT_BUTTON = { buttonCaption: 'Create', useButton: true, disabled: true };
 
-export default function HeuristicsCreationModals(props: HeuristicCreationModalsProps) {
+export default function HeuristicsCreationModals() {
     const dispatch = useDispatch();
     const router = useRouter();
 
@@ -32,6 +34,7 @@ export default function HeuristicsCreationModals(props: HeuristicCreationModalsP
     const modalAl = useSelector(selectModal(ModalEnum.ADD_ACTIVE_LEARNER));
     const modalZs = useSelector(selectModal(ModalEnum.ADD_ZERO_SHOT));
     const modalCl = useSelector(selectModal(ModalEnum.ADD_CROWD_LABELER));
+    const heuristicType = useSelector(selectHeuristicType);
 
     const [labelingTask, setLabelingTask] = useState('');
     const [name, setName] = useState('');
@@ -52,7 +55,7 @@ export default function HeuristicsCreationModals(props: HeuristicCreationModalsP
     const createHeuristic = useCallback(() => {
         const labelingTaskId = labelingTasks.find(lt => lt.name == labelingTask)?.id;
         const matching = labelingTasks.filter(e => e.id == labelingTaskId);
-        const codeData = getInformationSourceTemplate(matching, props.heuristicType, embedding);
+        const codeData = getInformationSourceTemplate(matching, heuristicType, embedding);
         if (!codeData) return;
         createHeuristicMut({
             variables: {
@@ -61,14 +64,14 @@ export default function HeuristicsCreationModals(props: HeuristicCreationModalsP
                 sourceCode: codeData.code,
                 name: name,
                 description: description,
-                type: props.heuristicType
+                type: heuristicType
             }
         }).then((res) => {
             let id = res['data']?.['createInformationSource']?.['informationSource']?.['id'];
             if (id) {
-                router.push(getRouterLinkHeuristic(props.heuristicType, project.id, id))
+                router.push(getRouterLinkHeuristic(heuristicType, project.id, id))
             } else {
-                console.log("can't find newly created id for " + props.heuristicType + " --> can't open");
+                console.log("can't find newly created id for " + heuristicType + " --> can't open");
             }
         });
     }, [modalLf, modalAl, modalCl, labelingTask, name, description]);
@@ -79,9 +82,9 @@ export default function HeuristicsCreationModals(props: HeuristicCreationModalsP
         createZeroShotMut({ variables: { projectId: project.id, targetConfig: model, labelingTaskId: labelingTaskId, attributeId: attributeId } }).then((res) => {
             let id = res['data']?.['createZeroShotInformationSource']['id'];
             if (id) {
-                router.push(getRouterLinkHeuristic(props.heuristicType, project.id, id))
+                router.push(getRouterLinkHeuristic(heuristicType, project.id, id))
             } else {
-                console.log("can't find newly created id for " + props.heuristicType + " --> can't open");
+                console.log("can't find newly created id for " + heuristicType + " --> can't open");
             }
         });
     }, [modalZs, labelingTask, attribute, model]);
@@ -100,11 +103,17 @@ export default function HeuristicsCreationModals(props: HeuristicCreationModalsP
 
     useEffect(() => {
         if (!project) return;
+        WebSocketsService.subscribeToNotification(CurrentPage.HEURISTICS, {
+            projectId: project.id,
+            whitelist: ['embedding_deleted'],
+            func: handleWebsocketNotification
+        });
+    }, [project]);
+
+    useEffect(() => {
+        if (!project) return;
         if (embeddings.length == 0) {
-            refetchEmbeddings({ variables: { projectId: project.id } }).then((res) => {
-                const embeddingsFinal = postProcessingEmbeddings(res.data['projectByProjectId']['embeddings']['edges'].map((e) => e['node']), []);
-                dispatch(setAllEmbeddings(embeddingsFinal));
-            });
+            refetchEmbeddingsAndProcess();
         }
         if (attributes.length == 0) {
             refetchAttributes({ variables: { projectId: project.id, stateFilter: ['ALL'] } }).then((res) => {
@@ -122,10 +131,10 @@ export default function HeuristicsCreationModals(props: HeuristicCreationModalsP
         if (labelingTasks.length == 0) return;
         if (embeddings.length == 0) return;
         setLabelingTask(labelingTasks[0].name);
-        setName(getFunctionName(props.heuristicType));
+        setName(getFunctionName(heuristicType));
         setDescription(DEFAULT_DESCRIPTION);
         setEmbedding(embeddings[0].name);
-        if (props.heuristicType == 'ZERO_SHOT') {
+        if (heuristicType == 'ZERO_SHOT') {
             const labelingTasksCopy = labelingTasks.filter(t => t.taskType == LabelingTaskTaskType.MULTICLASS_CLASSIFICATION);
             if (labelingTasksCopy.length) {
                 setShowZSAttribute(!(labelingTasksCopy[0].taskTarget == 'ON_ATTRIBUTE'));
@@ -134,11 +143,24 @@ export default function HeuristicsCreationModals(props: HeuristicCreationModalsP
                 return task.taskTarget == 'ON_WHOLE_RECORD' ? ('Full Record - ' + task.name) : task.name
             }));
         }
-    }, [labelingTasks, embedding, props.heuristicType]);
+    }, [labelingTasks, embedding, heuristicType]);
 
     useEffect(() => {
         setLabelingTask(labelingTasksClassification[0]);
     }, [labelingTasksClassification]);
+
+    function refetchEmbeddingsAndProcess() {
+        refetchEmbeddings({ variables: { projectId: project.id } }).then((res) => {
+            const embeddingsFinal = postProcessingEmbeddings(res.data['projectByProjectId']['embeddings']['edges'].map((e) => e['node']), []);
+            dispatch(setAllEmbeddings(embeddingsFinal));
+        });
+    }
+
+    function handleWebsocketNotification(msgParts: string[]) {
+        if (msgParts[1] == 'embedding_deleted' || (msgParts[1] == 'embedding' && msgParts[3] == 'state')) {
+            refetchEmbeddingsAndProcess();
+        }
+    }
 
     return (<>
         <Modal modalName={ModalEnum.ADD_LABELING_FUNCTION} acceptButton={acceptButtonLF}>

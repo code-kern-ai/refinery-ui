@@ -137,6 +137,9 @@ const initialState: Modals = {
     [ModalEnum.ADD_CROWD_LABELER]: {
         open: false
     },
+    [ModalEnum.LAST_WEAK_SUPERVISION_RUN]: {
+        open: false
+    },
 };
 
 const modalSlice = createSlice({

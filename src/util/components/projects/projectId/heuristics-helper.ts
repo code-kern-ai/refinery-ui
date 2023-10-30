@@ -1,9 +1,11 @@
-import { Heuristic } from "@/src/types/components/projects/projectId/heuristics";
+import { CurrentWeakSupervision, Heuristic } from "@/src/types/components/projects/projectId/heuristics";
 import { InformationSourceType, LabelSource } from "@/submodules/javascript-functions/enums/enums";
 import { Color } from "@/src/types/components/projects/projectId/heuristics";
-import { percentRoundString } from "@/submodules/javascript-functions/general";
+import { jsonCopy, percentRoundString } from "@/submodules/javascript-functions/general";
 import { InformationSourceCodeLookup, InformationSourceExamples } from "@/src/util/classes/heuristics";
 import { LabelingTaskTaskType } from "@/src/types/components/projects/projectId/settings/labeling-tasks";
+import { UNKNOWN_USER } from "@/src/util/constants";
+import { parseUTC } from "@/submodules/javascript-functions/date-parser";
 
 export const ACTIONS_DROPDOWN_OPTIONS = ['Select all', 'Deselect all', 'Run selected', 'Delete selected'];
 export const NEW_HEURISTICS = ['Labeling function', 'Active learning', 'Zero-shot', 'Crowd labeler'];
@@ -126,4 +128,29 @@ export function getRouterLinkHeuristic(heuristicType: InformationSourceType, pro
             break;
     }
     return startingLink;
+}
+
+export function checkSelectedHeuristics(heuristics: Heuristic[], onlyValid: boolean) {
+    const selected = heuristics.filter((i) => i.selected).length;
+    if (onlyValid) {
+        const selectedFinished = heuristics.filter((i) => i.selected && ['FINISHED', 'STARTED'].includes(i?.state)).length;
+        return selected > 0 && selected == selectedFinished;
+    }
+    return selected > 0;
+}
+
+export function postProcessCurrentWeakSupervisionRun(currentWeakSupervision: CurrentWeakSupervision): CurrentWeakSupervision {
+    const prepareWeakSupervision = jsonCopy(currentWeakSupervision);
+    if (currentWeakSupervision.user.firstName) {
+        prepareWeakSupervision.displayName = currentWeakSupervision.user.firstName[0] + '. ' + currentWeakSupervision.user.lastName;
+    } else {
+        prepareWeakSupervision.displayName = UNKNOWN_USER;
+    }
+    prepareWeakSupervision.createdAtDisplay = parseUTC(currentWeakSupervision.createdAt);
+    if (currentWeakSupervision.finishedAt) {
+        prepareWeakSupervision.finishedAtDisplay = parseUTC(currentWeakSupervision.finishedAt);
+    } else {
+        prepareWeakSupervision.finishedAtDisplay = 'Not finished yet';
+    }
+    return prepareWeakSupervision;
 }

@@ -1,4 +1,5 @@
 import { InformationSourceType } from "@/submodules/javascript-functions/enums/enums";
+import { LabelingTask } from "./settings/labeling-tasks";
 
 export type Heuristic = {
     id: string;
@@ -58,6 +59,26 @@ export type Color = {
     hoverColor: string;
 };
 
-export type HeuristicCreationModalsProps = {
-    heuristicType: InformationSourceType;
+export type HeuristicsHeaderProps = {
+    filterList: (labelingTask: LabelingTask) => void;
+    refetch: () => void;
+}
+
+export type CurrentWeakSupervision = {
+    user: {
+        id: string;
+        firstName: string;
+        lastName: string;
+        mail: string;
+    }
+    displayName: string;
+    createdAt: string;
+    createdAtDisplay: string;
+    finishedAt: string;
+    finishedAtDisplay: string;
+    distinctRecords: number;
+    resultCount: number;
+    selectedInformationSources: string;
+    selectedLabelingTasks: string;
+    state: string;
 }
