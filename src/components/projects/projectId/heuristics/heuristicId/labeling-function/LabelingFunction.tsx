@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { selectProject } from "@/src/reduxStore/states/project";
 import { use, useEffect, useState } from "react";
 import { useLazyQuery, useMutation } from "@apollo/client";
-import { GET_HEURISTICS_BY_ID, GET_TASK_BY_TASK_ID } from "@/src/services/gql/queries/heuristics";
+import { GET_HEURISTICS_BY_ID, GET_LABELING_FUNCTION_ON_10_RECORDS, GET_TASK_BY_TASK_ID } from "@/src/services/gql/queries/heuristics";
 import { selectHeuristic, setActiveHeuristics, updateHeuristicsState } from "@/src/reduxStore/states/pages/heuristics";
 import { postProcessCurrentHeuristic, postProcessLastTaskLogs } from "@/src/util/components/projects/projectId/heuristics/heuristicId/heuristics-details-helper";
 import Dropdown from "@/submodules/react-components/components/Dropdown";
@@ -12,7 +12,7 @@ import { Tooltip } from "@nextui-org/react";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-contants";
 import { GET_LABELING_TASKS_BY_PROJECT_ID } from "@/src/services/gql/queries/project-setting";
 import { postProcessLabelingTasks, postProcessLabelingTasksSchema } from "@/src/util/components/projects/projectId/settings/labeling-tasks-helper";
-import { selectLabelingTasksAll, setLabelingTasksAll } from "@/src/reduxStore/states/pages/settings";
+import { selectAttributes, selectLabelingTasksAll, setLabelingTasksAll } from "@/src/reduxStore/states/pages/settings";
 import { UPDATE_INFORMATION_SOURCE } from "@/src/services/gql/mutations/heuristics";
 import HeuristicsEditor from "../shared/HeuristicsEditor";
 import DangerZone from "@/src/components/shared/danger-zone/DangerZone";
@@ -21,6 +21,9 @@ import ContainerLogs from "@/src/components/shared/logs/ContainerLogs";
 import HeuristicStatistics from "../shared/HeuristicStatistics";
 import { DangerZoneEnum } from "@/src/types/shared/danger-zone";
 import { Status } from "@/src/types/shared/statuses";
+import { postProcessSampleRecords } from "@/src/util/components/projects/projectId/heuristics/heuristicId/labeling-functions-helper";
+import SampleRecords from "./SampleRecords";
+import { SampleRecord } from "@/src/types/components/projects/projectId/heuristics/heuristicId/labeling-function";
 
 export default function LabelingFunction() {
     const dispatch = useDispatch();
@@ -29,13 +32,17 @@ export default function LabelingFunction() {
     const project = useSelector(selectProject);
     const currentHeuristic = useSelector(selectHeuristic);
     const labelingTasks = useSelector(selectLabelingTasksAll);
+    const attributes = useSelector(selectAttributes);
 
     const [lastTaskLogs, setLastTaskLogs] = useState<string[]>([]);
+    const [selectedAttribute, setSelectedAttribute] = useState<string>(null);
+    const [sampleRecords, setSampleRecords] = useState<SampleRecord>(null);
 
     const [refetchCurrentHeuristic] = useLazyQuery(GET_HEURISTICS_BY_ID);
     const [refetchLabelingTasksByProjectId] = useLazyQuery(GET_LABELING_TASKS_BY_PROJECT_ID, { fetchPolicy: "network-only" });
     const [updateHeuristicMut] = useMutation(UPDATE_INFORMATION_SOURCE);
     const [refetchTaskByTaskId] = useLazyQuery(GET_TASK_BY_TASK_ID, { fetchPolicy: "no-cache" });
+    const [refetchRunOn10] = useLazyQuery(GET_LABELING_FUNCTION_ON_10_RECORDS, { fetchPolicy: "no-cache" })
 
     useEffect(() => {
         if (!project) return;
@@ -90,6 +97,12 @@ export default function LabelingFunction() {
         });
     }
 
+    function getLabelingFunctionOn10Records() {
+        refetchRunOn10({ variables: { projectId: project.id, informationSourceId: currentHeuristic.id } }).then((res) => {
+            setSampleRecords(postProcessSampleRecords(res['data']['getLabelingFunctionOn10Records'], labelingTasks, currentHeuristic.labelingTaskId));
+        });
+    }
+
     return (
         <HeuristicsLayout updateSourceCode={(code: string) => updateSourceCodeToDisplay(code)}>
             {currentHeuristic && <div>
@@ -126,9 +139,20 @@ export default function LabelingFunction() {
 
                 <div className="mt-2 flex flex-grow justify-between items-center float-right">
                     <div className="flex items-center">
+                        <div className="flex items-center mr-2">
+                            <Dropdown options={attributes} buttonName={selectedAttribute ?? 'Select display attribute'} buttonClasses="text-xs font-semibold"
+                                selectedOption={(option: string) => setSelectedAttribute(option)} />
+                        </div>
+                        <Tooltip content={selectedAttribute == null ? TOOLTIPS_DICT.LABELING_FUNCTION.SELECT_ATTRIBUTE : TOOLTIPS_DICT.LABELING_FUNCTION.RUN_ON_10} color="invert" placement="left">
+                            <button disabled={selectedAttribute == null} onClick={getLabelingFunctionOn10Records}
+                                className="bg-white text-gray-700 text-xs font-semibold px-4 py-2 rounded-md border border-gray-300 hover:bg-gray-50 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed">
+                                Run on 10
+                            </button>
+                        </Tooltip>
                         <HeuristicRunButtons />
                     </div>
                 </div>
+                {sampleRecords && sampleRecords.records.length > 0 && !sampleRecords.codeHasErrors && <SampleRecords sampleRecords={sampleRecords} selectedAttribute={selectedAttribute} />}
 
                 <ContainerLogs logs={lastTaskLogs} type="heuristic" />
 

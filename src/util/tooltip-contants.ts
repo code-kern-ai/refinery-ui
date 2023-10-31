@@ -135,6 +135,8 @@ export const TOOLTIPS_DICT = {
         'CLICK_TO_COPY': 'Click to copy',
         'CLICK_TO_COPY_ERROR': 'Click to copy - embedding failed',
         'CLICK_TO_COPY_RUNNING': 'Click to copy - embedding not finished yet',
-        'INSTALLED_LIBRARIES': 'See available libraries for this labeling function'
+        'INSTALLED_LIBRARIES': 'See available libraries for this labeling function',
+        'SELECT_ATTRIBUTE': 'Select an attribute',
+        'RUN_ON_10': 'Run on 10 records',
     }
 }

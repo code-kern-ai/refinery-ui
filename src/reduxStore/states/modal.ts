@@ -140,6 +140,9 @@ const initialState: Modals = {
     [ModalEnum.LAST_WEAK_SUPERVISION_RUN]: {
         open: false
     },
+    [ModalEnum.SAMPLE_RECORDS_LABELING_FUNCTION]: {
+        open: false
+    },
 };
 
 const modalSlice = createSlice({
