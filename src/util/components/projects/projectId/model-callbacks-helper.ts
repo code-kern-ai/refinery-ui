@@ -1,5 +1,5 @@
 import { LabelSource } from "@/submodules/javascript-functions/enums/enums";
-import { mapInformationSourceStatsGlobal } from "./heuristics/heuristics-helper";
+import { mapInformationSourceStatsGlobal } from "./heuristics/shared-helper";
 
 export const ACTIONS_DROPDOWN_OPTIONS = ['Select all', 'Deselect all', 'Delete selected'];
 
