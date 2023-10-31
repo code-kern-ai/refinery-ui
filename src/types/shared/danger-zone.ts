@@ -8,4 +8,6 @@ export type DangerZoneProps = {
 export enum DangerZoneEnum {
     ATTRIBUTE = "attribute",
     LOOKUP_LIST = "lookup list",
+    ACTIVE_LEARNING = "active learning",
+    LABELING_FUNCTION = "labeling function",
 }

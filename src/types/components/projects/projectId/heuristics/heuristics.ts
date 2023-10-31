@@ -41,7 +41,7 @@ export type StatData = {
 }
 
 export type Stat = {
-    color: string | Color;
+    color: any;
     label: string;
     labelId: string;
     values: {

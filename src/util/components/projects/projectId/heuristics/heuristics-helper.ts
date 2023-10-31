@@ -6,7 +6,7 @@ import { InformationSourceCodeLookup, InformationSourceExamples } from "@/src/ut
 import { LabelingTaskTaskType } from "@/src/types/components/projects/projectId/settings/labeling-tasks";
 import { UNKNOWN_USER } from "@/src/util/constants";
 import { parseUTC } from "@/submodules/javascript-functions/date-parser";
-import { mapInformationSourceStatsGlobal } from "./shared-helper";
+import { getColorStruct, mapInformationSourceStatsGlobal } from "./shared-helper";
 
 export const ACTIONS_DROPDOWN_OPTIONS = ['Select all', 'Deselect all', 'Run selected', 'Delete selected'];
 export const NEW_HEURISTICS = ['Labeling function', 'Active learning', 'Zero-shot', 'Crowd labeler'];
@@ -22,16 +22,6 @@ export function postProcessHeuristics(heuristics: string, projectId: string): He
         source.routerLink = getRouterLinkHeuristic(source.informationSourceType, projectId, source.id);
         return source;
     });
-}
-
-function getColorStruct(color: any): Color {
-    return {
-        name: color,
-        backgroundColor: 'bg-' + color + '-100',
-        textColor: 'text-' + color + '-700',
-        borderColor: 'border-' + color + '-400',
-        hoverColor: 'hover:bg-' + color + '-200',
-    }
 }
 
 export function getFunctionName(heuristicType: InformationSourceType) {

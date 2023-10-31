@@ -1,7 +1,7 @@
 import { Heuristic } from "@/src/types/components/projects/projectId/heuristics/heuristics";
 import { InformationSourceType, LabelSource } from "@/submodules/javascript-functions/enums/enums";
 import { jsonCopy } from "@/submodules/javascript-functions/general";
-import { mapInformationSourceStats } from "../shared-helper";
+import { getColorStruct, mapInformationSourceStats } from "../shared-helper";
 import { dateAsUTCDate, timeDiffCalc } from "@/submodules/javascript-functions/date-parser";
 import { LabelingTask, LabelingTaskTaskType } from "@/src/types/components/projects/projectId/settings/labeling-tasks";
 import { getPythonClassRegExMatch, getPythonFunctionRegExMatch } from "@/submodules/javascript-functions/python-functions-parser";
@@ -13,6 +13,9 @@ export function postProcessCurrentHeuristic(heuristic: Heuristic, labelingTasks:
     prepareHeuristic.informationSourceType = InformationSourceType[heuristic['type']];
     prepareHeuristic.selected = heuristic['isSelected'];
     prepareHeuristic.stats = mapInformationSourceStats(heuristic['sourceStatistics']['edges']);
+    prepareHeuristic.stats.forEach((stat) => {
+        stat.color = getColorStruct(stat.color);
+    });
     prepareHeuristic.lastTask = heuristic['lastPayload'];
     const labelingTask = labelingTasks.find(a => a.id == heuristic.labelingTaskId);
     prepareHeuristic.labelingTaskName = labelingTask.name;

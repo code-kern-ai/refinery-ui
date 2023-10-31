@@ -2,7 +2,7 @@ import { DangerZoneEnum, DangerZoneProps } from "@/src/types/shared/danger-zone"
 import { Tooltip } from "@nextui-org/react";
 import Modal from "../modal/Modal";
 import { ModalButton, ModalEnum } from "@/src/types/shared/modal";
-import { useCallback, useEffect, useState } from "react";
+import { use, useCallback, useEffect, useState } from "react";
 import { selectModal, setModalStates } from "@/src/reduxStore/states/modal";
 import { useDispatch, useSelector } from "react-redux";
 import { useMutation } from "@apollo/client";
@@ -13,6 +13,7 @@ import LoadingIcon from "../loading/LoadingIcon";
 import { selectProject } from "@/src/reduxStore/states/project";
 import { DELETE_LOOKUP_LIST } from "@/src/services/gql/mutations/lookup-lists";
 import { removeFromAllLookupListById } from "@/src/reduxStore/states/pages/lookup-lists";
+import { DELETE_HEURISTIC } from "@/src/services/gql/mutations/heuristics";
 
 const ABORT_BUTTON = { buttonCaption: 'Delete', disabled: false, useButton: true };
 
@@ -27,6 +28,7 @@ export default function DangerZone(props: DangerZoneProps) {
 
     const [deleteAttributeMut] = useMutation(DELETE_USER_ATTRIBUTE)
     const [deleteLookupListMut] = useMutation(DELETE_LOOKUP_LIST);
+    const [deleteHeuristicMut] = useMutation(DELETE_HEURISTIC);
 
     const deleteElement = useCallback(() => {
         setIsDeleting(true);
@@ -42,6 +44,12 @@ export default function DangerZone(props: DangerZoneProps) {
                     setIsDeleting(false);
                     dispatch(removeFromAllLookupListById(props.id));
                     router.push(`/projects/${project.id}/lookup-lists`);
+                });
+            case DangerZoneEnum.LABELING_FUNCTION:
+            case DangerZoneEnum.ACTIVE_LEARNING:
+                deleteHeuristicMut({ variables: { projectId: project.id, informationSourceId: props.id } }).then(() => {
+                    setIsDeleting(false);
+                    router.push(`/projects/${project.id}/heuristics`);
                 });
         }
 

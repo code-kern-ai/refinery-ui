@@ -22,6 +22,9 @@ import { copyToClipboard } from "@/submodules/javascript-functions/general";
 import HeuristicsEditor from "../shared/HeuristicsEditor";
 import HeuristicRunButtons from "../shared/HeuristicRunButtons";
 import ContainerLogs from "@/src/components/shared/logs/ContainerLogs";
+import HeuristicStatistics from "../shared/HeuristicStatistics";
+import DangerZone from "@/src/components/shared/danger-zone/DangerZone";
+import { DangerZoneEnum } from "@/src/types/shared/danger-zone";
 
 export default function ActiveLearning() {
     const dispatch = useDispatch();
@@ -107,64 +110,69 @@ export default function ActiveLearning() {
 
     return (
         <HeuristicsLayout updateSourceCode={(code) => updateSourceCodeToDisplay(code)}>
-            {currentHeuristic && <div className="relative flex-shrink-0 min-h-16 flex justify-between pb-2">
-                <div className="flex items-center flex-wrap mt-3">
-                    <div className="text-sm leading-5 font-medium text-gray-700 inline-block mr-2">Editor</div>
-                    <Tooltip content={TOOLTIPS_DICT.LABELING_FUNCTION.LABELING_TASK} color="invert" placement="top">
-                        <Dropdown options={labelingTasks.map(a => a.name)} buttonName={currentHeuristic?.labelingTaskName} selectedOption={(option: string) => saveHeuristic(option)} />
-                    </Tooltip>
-                    {currentHeuristic.labels?.length == 0 ? (<div className="text-sm font-normal text-gray-500 ml-3">No labels for target task</div>) : <>
-                        {currentHeuristic.labels?.map((label: any, index: number) => (
-                            <Tooltip content={TOOLTIPS_DICT.HEURISTICS.CLICK_TO_COPY} color="invert" placement="top" key={label.name}>
-                                <span className={`inline-flex border items-center px-2 py-0.5 rounded text-xs font-medium cursor-pointer ml-3 ${label.color.backgroundColor} ${label.color.hoverColor} ${label.color.textColor} ${label.color.borderColor}`}>
-                                    {label.name}
-                                </span>
-                            </Tooltip>
-                        ))}
-                    </>}
-                </div>
-            </div>}
-            <div className="flex flex-row items-center mb-3">
-                <div className="flex items-center">
-                    {embeddings.length > 0 ? (<>
-                        {embeddingsFiltered.length > 0 ? (<>
-                            {embeddingsFiltered.map((embedding: Embedding, index: number) => <Fragment key={embedding.id}>
-                                <div className="text-sm leading-5 font-medium text-gray-700 inline-block mr-2">Embeddings</div>
-                                {embedding.state == Status.FINISHED && <Tooltip content={TOOLTIPS_DICT.LABELING_FUNCTION.CLICK_TO_COPY} color="invert" placement="top">
-                                    <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-purple-100 text-purple-700 cursor-pointer" onClick={() => copyToClipboard(embedding.name)}>
-                                        {embedding.name}
+            {currentHeuristic && <div>
+                <div className="relative flex-shrink-0 min-h-16 flex justify-between pb-2">
+                    <div className="flex items-center flex-wrap mt-3">
+                        <div className="text-sm leading-5 font-medium text-gray-700 inline-block mr-2">Editor</div>
+                        <Tooltip content={TOOLTIPS_DICT.LABELING_FUNCTION.LABELING_TASK} color="invert" placement="top">
+                            <Dropdown options={labelingTasks.map(a => a.name)} buttonName={currentHeuristic?.labelingTaskName} selectedOption={(option: string) => saveHeuristic(option)} />
+                        </Tooltip>
+                        {currentHeuristic.labels?.length == 0 ? (<div className="text-sm font-normal text-gray-500 ml-3">No labels for target task</div>) : <>
+                            {currentHeuristic.labels?.map((label: any, index: number) => (
+                                <Tooltip content={TOOLTIPS_DICT.HEURISTICS.CLICK_TO_COPY} color="invert" placement="top" key={label.name}>
+                                    <span className={`inline-flex border items-center px-2 py-0.5 rounded text-xs font-medium cursor-pointer ml-3 ${label.color.backgroundColor} ${label.color.hoverColor} ${label.color.textColor} ${label.color.borderColor}`}>
+                                        {label.name}
                                     </span>
-                                </Tooltip>}
-                                {embedding.state == Status.FAILED && <Tooltip content={TOOLTIPS_DICT.LABELING_FUNCTION.CLICK_TO_COPY_ERROR} color="invert" placement="top">
-                                    <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-red-100 text-red-700 cursor-pointer" onClick={() => copyToClipboard(embedding.name)}>
-                                        {embedding.name}
-                                    </span>
-                                </Tooltip>}
-                                {(embedding.state != Status.FINISHED && embedding.state != Status.FAILED) && <Tooltip content={TOOLTIPS_DICT.LABELING_FUNCTION.CLICK_TO_COPY_ERROR} color="invert" placement="top">
-                                    <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-700 cursor-pointer" onClick={() => copyToClipboard(embedding.name)}>
-                                        {embedding.name}
-                                    </span>
-                                </Tooltip>}
-                            </Fragment>)}
-                        </>) : (<div className="text-sm font-normal text-gray-500">No matching embeddings found</div>)}
-                    </>) : (<div className="text-sm font-normal text-gray-500">No embeddings for project</div>
-                    )}
+                                </Tooltip>
+                            ))}
+                        </>}
+                    </div>
                 </div>
-                <div className="flex flex-row flex-nowrap items-center ml-auto">
-                    {/* TODO: Add bricks integrator */}
+                <div className="flex flex-row items-center mb-3">
+                    <div className="flex items-center">
+                        {embeddings.length > 0 ? (<>
+                            {embeddingsFiltered.length > 0 ? (<>
+                                {embeddingsFiltered.map((embedding: Embedding, index: number) => <Fragment key={embedding.id}>
+                                    <div className="text-sm leading-5 font-medium text-gray-700 inline-block mr-2">Embeddings</div>
+                                    {embedding.state == Status.FINISHED && <Tooltip content={TOOLTIPS_DICT.LABELING_FUNCTION.CLICK_TO_COPY} color="invert" placement="top">
+                                        <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-purple-100 text-purple-700 cursor-pointer" onClick={() => copyToClipboard(embedding.name)}>
+                                            {embedding.name}
+                                        </span>
+                                    </Tooltip>}
+                                    {embedding.state == Status.FAILED && <Tooltip content={TOOLTIPS_DICT.LABELING_FUNCTION.CLICK_TO_COPY_ERROR} color="invert" placement="top">
+                                        <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-red-100 text-red-700 cursor-pointer" onClick={() => copyToClipboard(embedding.name)}>
+                                            {embedding.name}
+                                        </span>
+                                    </Tooltip>}
+                                    {(embedding.state != Status.FINISHED && embedding.state != Status.FAILED) && <Tooltip content={TOOLTIPS_DICT.LABELING_FUNCTION.CLICK_TO_COPY_ERROR} color="invert" placement="top">
+                                        <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-700 cursor-pointer" onClick={() => copyToClipboard(embedding.name)}>
+                                            {embedding.name}
+                                        </span>
+                                    </Tooltip>}
+                                </Fragment>)}
+                            </>) : (<div className="text-sm font-normal text-gray-500">No matching embeddings found</div>)}
+                        </>) : (<div className="text-sm font-normal text-gray-500">No embeddings for project</div>
+                        )}
+                    </div>
+                    <div className="flex flex-row flex-nowrap items-center ml-auto">
+                        {/* TODO: Add bricks integrator */}
+                    </div>
                 </div>
+                <HeuristicsEditor />
+
+                <div className="mt-2 flex flex-grow justify-between items-center float-right">
+                    <div className="flex items-center">
+                        <HeuristicRunButtons />
+                    </div>
+                </div>
+
+                <ContainerLogs logs={lastTaskLogs} type="heuristic" />
+
+                <HeuristicStatistics />
+
+                <DangerZone elementType={DangerZoneEnum.ACTIVE_LEARNING} id={currentHeuristic.id} name={currentHeuristic.name} />
             </div>
-            <HeuristicsEditor />
-
-            <div className="mt-2 flex flex-grow justify-between items-center float-right">
-                <div className="flex items-center">
-                    <HeuristicRunButtons />
-                </div>
-            </div>
-
-            <ContainerLogs logs={lastTaskLogs} type="heuristic" />
-
-
+            }
         </HeuristicsLayout >
     )
 }

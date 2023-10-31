@@ -1,3 +1,4 @@
+import { Color } from "@/src/types/components/projects/projectId/heuristics/heuristics";
 import { percentRoundString } from "@/submodules/javascript-functions/general";
 
 export function mapInformationSourceStatsGlobal(data) {
@@ -48,8 +49,8 @@ function convertStatData(data = null) {
             'TruePositives': !data ? '-' : data['truePositives'],
             'FalsePositives': !data ? '-' : data['falsePositives'],
             'FalseNegatives': !data ? '-' : data['falseNegatives'],
-            'Precision': !data ? '-' : getPrecision(data['truePositives'], data['falsePositives']),
-            'Recall': !data ? '-' : getRecall(data['truePositives'], data['falseNegatives']),
+            'Precision': !data ? '-' : percentRoundString(getPrecision(data['truePositives'], data['falsePositives'])),
+            'Recall': !data ? '-' : percentRoundString(getRecall(data['truePositives'], data['falseNegatives'])),
             Coverage: !data ? '-' : data['recordCoverage'],
             TotalHits: !data ? '-' : data['totalHits'],
             Conflicts: !data ? '-' : data['sourceConflicts'],
@@ -71,5 +72,15 @@ export function getRecall(tp: number, fn: number): number {
         return 0;
     } else {
         return tp / (tp + fn);
+    }
+}
+
+export function getColorStruct(color: any): Color {
+    return {
+        name: color,
+        backgroundColor: 'bg-' + color + '-100',
+        textColor: 'text-' + color + '-700',
+        borderColor: 'border-' + color + '-400',
+        hoverColor: 'hover:bg-' + color + '-200',
     }
 }
