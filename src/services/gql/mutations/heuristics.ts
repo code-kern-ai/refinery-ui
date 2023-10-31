@@ -76,3 +76,21 @@ mutation ($projectId: ID!, $informationSourceId: ID!) {
 }
 
 `;
+
+export const UPDATE_INFORMATION_SOURCE = gql`
+mutation ($projectId: ID!, $informationSourceId: ID!, $labelingTaskId: ID!, $code: String, $description: String, $name: String) {
+  updateInformationSource(projectId: $projectId, informationSourceId: $informationSourceId, labelingTaskId: $labelingTaskId, code: $code, description: $description, name: $name) {
+    ok
+  }
+}
+`;
+
+export const RUN_HEURISTIC_THEN_TRIGGER_WEAK_SUPERVISION = gql`
+mutation ($projectId: ID!, $informationSourceId: ID!, $labelingTaskId: ID!) {
+  runHeuristicThenTriggerWeakSupervision(
+    projectId: $projectId, informationSourceId: $informationSourceId, labelingTaskId: $labelingTaskId
+  ) {
+    ok
+  }
+}
+`;

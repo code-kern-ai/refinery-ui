@@ -30,7 +30,7 @@ export default function LookupListsOverview() {
     const checkedLookupLists = useSelector(selectCheckedLookupLists);
     const modalDelete = useSelector(selectModal(ModalEnum.DELETE_LOOKUP_LIST));
 
-    const [getLookupLists] = useLazyQuery(LOOKUP_LISTS_BY_PROJECT_ID);
+    const [refetchLookupLists] = useLazyQuery(LOOKUP_LISTS_BY_PROJECT_ID);
     const [createLookupListMut] = useMutation(CREATE_LOOKUP_LIST);
     const [deleteLookupListMut] = useMutation(DELETE_LOOKUP_LIST);
 
@@ -62,7 +62,7 @@ export default function LookupListsOverview() {
 
     useEffect(() => {
         if (!project) return;
-        getLookupLists({ variables: { projectId: project.id } }).then((res) => {
+        refetchLookupLists({ variables: { projectId: project.id } }).then((res) => {
             dispatch(setAllLookupLists(postProcessLookupLists(res.data["knowledgeBasesByProjectId"])));
         });
         WebSocketsService.subscribeToNotification(CurrentPage.LOOKUP_LISTS_OVERVIEW, {
@@ -116,7 +116,7 @@ export default function LookupListsOverview() {
 
     function handleWebsocketNotification(msgParts: string[]) {
         if (['knowledge_base_updated', 'knowledge_base_deleted', 'knowledge_base_created'].includes(msgParts[1])) {
-            getLookupLists({ variables: { projectId: project.id } }).then((res) => {
+            refetchLookupLists({ variables: { projectId: project.id } }).then((res) => {
                 dispatch(setAllLookupLists(postProcessLookupLists(res.data["knowledgeBasesByProjectId"])));
             });
         }

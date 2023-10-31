@@ -25,9 +25,9 @@ export default function ContainerLogs(props: ContainerLogsProps) {
         <div className="mt-8 text-sm leading-5 w-full flex items-center">
             <div className="font-medium text-gray-700">Container Logs</div>
 
-            {props.currentAttribute.logs ? (
+            {props.logs ? (
                 <Tooltip content="Click to copy" color="invert" placement="top">
-                    <button onClick={() => copyToClipboardLogs(props.currentAttribute.logs.join('\n'), 0)}>
+                    <button onClick={() => copyToClipboardLogs(props.logs.join('\n'), 0)}>
                         {copyClicked != 0 ? (<IconClipboard className="transition-all duration-500 ease-in-out" />) : (<IconCheck className="transition-all duration-500 ease-in-out" />)}
                     </button>
                 </Tooltip>
@@ -37,9 +37,9 @@ export default function ContainerLogs(props: ContainerLogsProps) {
                 </Tooltip>)}
 
 
-            <div className="font-normal text-gray-500 pt-0.5">Please send this log to the support if you face problems with your attribute</div>
+            <div className="font-normal text-gray-500 pt-0.5">Please send this log to the support if you face problems with your {props.type}</div>
         </div>
 
-        <Logs logs={props.currentAttribute.logs} />
+        <Logs logs={props.logs} />
     </div>)
 }

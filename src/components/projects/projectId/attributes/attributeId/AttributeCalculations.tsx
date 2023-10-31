@@ -332,7 +332,7 @@ export default function AttributeCalculation() {
                         else setCurrentAttribute(postProcessCurrentAttribute(attribute));
                     });
                 }} />
-                <ContainerLogs currentAttribute={currentAttribute} />
+                <ContainerLogs logs={currentAttribute.logs} type="attribute" />
 
                 <div className="mt-8">
                     <div className="text-sm leading-5 font-medium text-gray-700 inline-block">Calculation progress</div>

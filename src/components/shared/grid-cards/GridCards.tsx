@@ -1,5 +1,5 @@
 import { selectProject } from "@/src/reduxStore/states/project";
-import { Heuristic } from "@/src/types/components/projects/projectId/heuristics";
+import { Heuristic } from "@/src/types/components/projects/projectId/heuristics/heuristics";
 import { GridCardsProps } from "@/src/types/shared/grid-cards";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-contants";
 import { InformationSourceType } from "@/submodules/javascript-functions/enums/enums";

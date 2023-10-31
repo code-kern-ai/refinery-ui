@@ -9,7 +9,7 @@ import { LabelingTask } from "@/src/types/components/projects/projectId/settings
 import { GET_LABELING_TASKS_BY_PROJECT_ID } from "@/src/services/gql/queries/project-setting";
 import { useLazyQuery } from "@apollo/client";
 import { postProcessLabelingTasks, postProcessLabelingTasksSchema } from "@/src/util/components/projects/projectId/settings/labeling-tasks-helper";
-import { postProcessHeuristics } from "@/src/util/components/projects/projectId/heuristics-helper";
+import { postProcessHeuristics } from "@/src/util/components/projects/projectId/heuristics/heuristics-helper";
 import { GET_HEURISTICS_OVERVIEW_DATA } from "@/src/services/gql/queries/heuristics";
 import { selectHeuristicsAll, setAllHeuristics } from "@/src/reduxStore/states/pages/heuristics";
 import GridCards from "@/src/components/shared/grid-cards/GridCards";

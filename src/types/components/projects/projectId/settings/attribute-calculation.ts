@@ -13,7 +13,8 @@ export type SampleRecord = {
 };
 
 export type ContainerLogsProps = {
-    currentAttribute: Attribute;
+    logs: any;
+    type: string;
 }
 
 export type Record = {

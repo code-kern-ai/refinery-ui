@@ -20,6 +20,7 @@ export type Embedding = {
     type?: string;
     dimension?: number;
     count?: number;
+    attributeId?: string;
 };
 
 export enum EmbeddingType {

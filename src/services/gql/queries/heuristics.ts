@@ -26,3 +26,61 @@ query ($projectId: ID!) {
   }
 }
 `;
+
+export const GET_HEURISTICS_BY_ID = gql`
+query ($projectId: ID!, $informationSourceId: ID!) {
+  informationSourceBySourceId(projectId: $projectId, informationSourceId: $informationSourceId) {
+    id
+    name
+    type
+    description
+    sourceCode
+    isSelected
+    labelingTaskId
+    returnType
+    lastPayload {
+      id
+      createdAt
+      finishedAt
+      state
+      iteration
+      progress
+      __typename
+    }
+    sourceStatistics {
+      edges {
+        node {
+          labelingTaskLabel {
+            name
+            color
+            __typename
+          }
+          truePositives
+          falsePositives
+          falseNegatives
+          recordCoverage
+          totalHits
+          sourceConflicts
+          sourceOverlaps
+          active
+        }
+      }
+    }
+  }
+}
+`;
+
+export const GET_TASK_BY_TASK_ID = gql`
+query ($projectId: ID!, $payloadId: ID!) {
+  payloadByPayloadId(projectId: $projectId, payloadId: $payloadId) {
+    id
+    createdAt
+    state
+    logs
+    iteration
+    informationSource {
+      type
+    }
+  }
+}
+`;

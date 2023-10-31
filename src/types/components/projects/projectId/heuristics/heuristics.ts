@@ -1,5 +1,5 @@
 import { InformationSourceType } from "@/submodules/javascript-functions/enums/enums";
-import { LabelingTask } from "./settings/labeling-tasks";
+import { LabelingTask } from "../settings/labeling-tasks";
 
 export type Heuristic = {
     id: string;
@@ -17,6 +17,12 @@ export type Heuristic = {
     stats: Stat[];
     routerLink: string;
     description: string;
+    sourceCode: string;
+    sourceCodeToDisplay: string;
+    lastTask: any;
+    durationText: string;
+    labelingTaskName: string;
+    labels: any;
 };
 
 export type StatData = {

@@ -1,4 +1,4 @@
-import { Heuristic } from '@/src/types/components/projects/projectId/heuristics';
+import { Heuristic } from '@/src/types/components/projects/projectId/heuristics/heuristics';
 import { InformationSourceType } from '@/submodules/javascript-functions/enums/enums';
 import { createSlice } from '@reduxjs/toolkit'
 import type { PayloadAction } from '@reduxjs/toolkit'

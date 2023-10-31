@@ -10,12 +10,12 @@ import { WebSocketsService } from '@/src/services/base/web-sockets/WebSocketsSer
 import { CREATE_INFORMATION_SOURCE_PAYLOAD, DELETE_HEURISTIC, RUN_ZERO_SHOT_PROJECT, SET_ALL_HEURISTICS, START_WEAK_SUPERVISIONS } from '@/src/services/gql/mutations/heuristics';
 import { GET_CURRENT_WEAK_SUPERVISION_RUN } from '@/src/services/gql/queries/heuristics';
 import style from '@/src/styles/components/projects/projectId/heuristics.module.css';
-import { Heuristic, HeuristicsHeaderProps } from '@/src/types/components/projects/projectId/heuristics';
+import { Heuristic, HeuristicsHeaderProps } from '@/src/types/components/projects/projectId/heuristics/heuristics';
 import { LabelingTask } from '@/src/types/components/projects/projectId/settings/labeling-tasks';
 import { CurrentPage } from '@/src/types/shared/general';
 import { ModalButton, ModalEnum } from '@/src/types/shared/modal';
 import { Status } from '@/src/types/shared/statuses';
-import { ACTIONS_DROPDOWN_OPTIONS, NEW_HEURISTICS, checkSelectedHeuristics, postProcessCurrentWeakSupervisionRun } from '@/src/util/components/projects/projectId/heuristics-helper';
+import { ACTIONS_DROPDOWN_OPTIONS, NEW_HEURISTICS, checkSelectedHeuristics, postProcessCurrentWeakSupervisionRun } from '@/src/util/components/projects/projectId/heuristics/heuristics-helper';
 import { TOOLTIPS_DICT } from '@/src/util/tooltip-contants';
 import { InformationSourceType } from '@/submodules/javascript-functions/enums/enums';
 import Dropdown from '@/submodules/react-components/components/Dropdown';

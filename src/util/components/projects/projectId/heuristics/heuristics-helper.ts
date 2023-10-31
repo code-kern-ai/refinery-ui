@@ -1,11 +1,12 @@
-import { CurrentWeakSupervision, Heuristic } from "@/src/types/components/projects/projectId/heuristics";
+import { CurrentWeakSupervision, Heuristic } from "@/src/types/components/projects/projectId/heuristics/heuristics";
 import { InformationSourceType, LabelSource } from "@/submodules/javascript-functions/enums/enums";
-import { Color } from "@/src/types/components/projects/projectId/heuristics";
-import { jsonCopy, percentRoundString } from "@/submodules/javascript-functions/general";
+import { Color } from "@/src/types/components/projects/projectId/heuristics/heuristics";
+import { jsonCopy } from "@/submodules/javascript-functions/general";
 import { InformationSourceCodeLookup, InformationSourceExamples } from "@/src/util/classes/heuristics";
 import { LabelingTaskTaskType } from "@/src/types/components/projects/projectId/settings/labeling-tasks";
 import { UNKNOWN_USER } from "@/src/util/constants";
 import { parseUTC } from "@/submodules/javascript-functions/date-parser";
+import { mapInformationSourceStatsGlobal } from "./shared-helper";
 
 export const ACTIONS_DROPDOWN_OPTIONS = ['Select all', 'Deselect all', 'Run selected', 'Delete selected'];
 export const NEW_HEURISTICS = ['Labeling function', 'Active learning', 'Zero-shot', 'Crowd labeler'];
@@ -21,50 +22,6 @@ export function postProcessHeuristics(heuristics: string, projectId: string): He
         source.routerLink = getRouterLinkHeuristic(source.informationSourceType, projectId, source.id);
         return source;
     });
-}
-
-export function mapInformationSourceStatsGlobal(data) {
-    if (data?.length) {
-        return data.map((wrapper) => {
-            return convertStatDataGlobal(wrapper)
-        })
-    } else {
-        return [convertStatDataGlobal()];
-    }
-}
-function convertStatDataGlobal(data = null) {
-    return {
-        label: !data ? '-' : data.label,
-        color: !data ? '-' : data.color,
-        labelId: !data ? '-' : data.labelId,
-        values: {
-            'TruePositives': !data ? '-' : data.true_positives,
-            'FalsePositives': !data ? '-' : data.false_positives,
-            'FalseNegatives': !data ? '-' : data.false_negatives,
-            'Precision': !data ? '-' : percentRoundString(getPrecision(data.true_positives, data.false_positives)),
-            'Recall': !data ? '-' : getRecall(data.true_positives, data.false_negatives),
-            Coverage: !data ? '-' : data.record_coverage,
-            TotalHits: !data ? '-' : data.total_hits,
-            Conflicts: !data ? '-' : data.source_conflicts,
-            Overlaps: !data ? '-' : data.source_overlaps,
-        },
-    }
-}
-
-function getPrecision(tp: number, fp: number): number {
-    if (tp + fp == 0) {
-        return 0;
-    } else {
-        return tp / (tp + fp);
-    }
-}
-
-function getRecall(tp: number, fn: number): number {
-    if (tp + fn == 0) {
-        return 0;
-    } else {
-        return tp / (tp + fn);
-    }
 }
 
 function getColorStruct(color: any): Color {

@@ -121,6 +121,20 @@ export const TOOLTIPS_DICT = {
         'SELECT_AT_LEAST_ONE_HEURISTIC': 'Please select at least one heuristic',
         'SELECT_AT_LEAST_ONE_VALID_HEURISTIC': 'At least one invalid heuristic is selected',
         'WEAK_SUPERVISION': 'Calculation of denoised labels can take up to a few minutes!',
-        'LAST_WEAK_SUPERVISION_INFO': 'Last weak supervision run information'
+        'LAST_WEAK_SUPERVISION_INFO': 'Last weak supervision run information',
+        'EXECUTION_TIME': 'Execution time',
+        'EDIT_NAME': 'Edit name',
+        'EDIT_DESCRIPTION': 'Edit description',
+        'CLICK_TO_COPY': 'Click to copy',
+        'IMPORT_STATEMENT': 'Click to copy import statement',
+        'RUN': 'Creates a task to run the function',
+        'RUN_WS': 'Run weak supervision on current labeling task'
+    },
+    [CurrentPage.LABELING_FUNCTION]: {
+        'LABELING_TASK': 'Pick the labeling task',
+        'CLICK_TO_COPY': 'Click to copy',
+        'CLICK_TO_COPY_ERROR': 'Click to copy - embedding failed',
+        'CLICK_TO_COPY_RUNNING': 'Click to copy - embedding not finished yet',
+        'INSTALLED_LIBRARIES': 'See available libraries for this labeling function'
     }
 }

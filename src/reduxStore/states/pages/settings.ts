@@ -15,6 +15,7 @@ type SettingsState = {
     },
     embeddings: {
         all: Embedding[];
+        filtered: Embedding[];
     },
     recommendedEncodersDict: { [embeddingId: string]: RecommendedEncoder };
     recommendedEncodersAll: RecommendedEncoder[];
@@ -32,7 +33,8 @@ function getInitState(): SettingsState {
             usableAttributes: []
         },
         embeddings: {
-            all: []
+            all: [],
+            filtered: []
         },
         recommendedEncodersDict: {},
         recommendedEncodersAll: [],
@@ -78,6 +80,10 @@ const settingsSlice = createSlice({
             if (action.payload) state.embeddings.all = action.payload;
             else state.embeddings.all = [];
         },
+        setFilteredEmbeddings(state, action: PayloadAction<Embedding[]>) {
+            if (action.payload) state.embeddings.filtered = action.payload;
+            else state.embeddings.filtered = [];
+        },
         removeFromAllEmbeddingsById(state, action: PayloadAction<string>) {
             if (action.payload) state.embeddings.all = state.embeddings.all.filter((embedding) => embedding.id !== action.payload);
         },
@@ -122,6 +128,7 @@ export const selectUsableNonTextAttributes = (state) => state.settings.attribute
 export const selectUsableAttributes = (state) => state.settings.attributes.usableAttributes;
 
 export const selectEmbeddings = (state) => state.settings.embeddings.all;
+export const selectEmbeddingsFiltered = (state) => state.settings.embeddings.filtered;
 export const selectRecommendedEncodersAll = selectRecommendedEncodersFunc(true);
 export const selectRecommendedEncodersDict = (state) => state.settings.recommendedEncodersDict;
 
@@ -143,5 +150,5 @@ export function selectRecommendedEncodersFunc(asArray: boolean = false) {
     else return (state) => arrayToDict(state.settings.recommendedEncodersAll, 'id');
 }
 
-export const { setAllAttributes, extendAllAttributes, removeFromAllAttributesById, updateAttributeById, setAllEmbeddings, removeFromAllEmbeddingsById, setAllRecommendedEncodersDict, setRecommendedEncodersAll, setLabelingTasksAll, removeFromAllLabelingTasksById, removeLabelFromLabelingTask } = settingsSlice.actions;
+export const { setAllAttributes, extendAllAttributes, removeFromAllAttributesById, updateAttributeById, setAllEmbeddings, setFilteredEmbeddings, removeFromAllEmbeddingsById, setAllRecommendedEncodersDict, setRecommendedEncodersAll, setLabelingTasksAll, removeFromAllLabelingTasksById, removeLabelFromLabelingTask } = settingsSlice.actions;
 export const settingsReducer = settingsSlice.reducer;
