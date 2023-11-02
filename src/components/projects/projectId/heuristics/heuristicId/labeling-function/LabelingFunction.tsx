@@ -2,7 +2,7 @@ import { useRouter } from "next/router";
 import HeuristicsLayout from "../shared/HeuristicsLayout";
 import { useDispatch, useSelector } from "react-redux";
 import { selectProject } from "@/src/reduxStore/states/project";
-import { use, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useLazyQuery, useMutation } from "@apollo/client";
 import { GET_HEURISTICS_BY_ID, GET_LABELING_FUNCTION_ON_10_RECORDS, GET_TASK_BY_TASK_ID } from "@/src/services/gql/queries/heuristics";
 import { selectHeuristic, setActiveHeuristics, updateHeuristicsState } from "@/src/reduxStore/states/pages/heuristics";
@@ -27,6 +27,9 @@ import { SampleRecord } from "@/src/types/components/projects/projectId/heuristi
 import { getPythonFunctionRegExMatch } from "@/submodules/javascript-functions/python-functions-parser";
 import CalculationProgress from "./CalculationProgress";
 import { copyToClipboard } from "@/submodules/javascript-functions/general";
+import { WebSocketsService } from "@/src/services/base/web-sockets/WebSocketsService";
+import { CurrentPage } from "@/src/types/shared/general";
+import { timer } from "rxjs";
 
 export default function LabelingFunction() {
     const dispatch = useDispatch();
@@ -41,6 +44,7 @@ export default function LabelingFunction() {
     const [selectedAttribute, setSelectedAttribute] = useState<string>(null);
     const [sampleRecords, setSampleRecords] = useState<SampleRecord>(null);
     const [displayLogWarning, setDisplayLogWarning] = useState<boolean>(false);
+    const [updatedThroughWebsocket, setUpdatedThroughWebsocket] = useState<boolean>(false);
 
     const [refetchCurrentHeuristic] = useLazyQuery(GET_HEURISTICS_BY_ID);
     const [refetchLabelingTasksByProjectId] = useLazyQuery(GET_LABELING_TASKS_BY_PROJECT_ID, { fetchPolicy: "network-only" });
@@ -63,6 +67,11 @@ export default function LabelingFunction() {
     useEffect(() => {
         if (!currentHeuristic) return;
         refetchTaskByTaskIdAndProcess();
+        WebSocketsService.subscribeToNotification(CurrentPage.LABELING_FUNCTION, {
+            projectId: project.id,
+            whitelist: ['labeling_task_updated', 'labeling_task_created', 'label_created', 'label_deleted', 'labeling_task_deleted', 'information_source_deleted', 'information_source_updated', 'model_callback_update_statistics', 'payload_progress', 'payload_finished', 'payload_failed', 'payload_created'],
+            func: handleWebsocketNotification
+        });
     }, [currentHeuristic]);
 
     function refetchCurrentHeuristicAndProcess() {
@@ -79,6 +88,7 @@ export default function LabelingFunction() {
     }
 
     function saveHeuristic(labelingTaskName: string) {
+        if (updatedThroughWebsocket) return;
         const labelingTask = labelingTasks.find(a => a.name == labelingTaskName);
         updateHeuristicMut({ variables: { projectId: project.id, informationSourceId: currentHeuristic.id, labelingTaskId: labelingTask.id } }).then((res) => {
             dispatch(updateHeuristicsState(currentHeuristic.id, { labelingTaskId: labelingTask.id, labelingTaskName: labelingTask.name, labels: labelingTask.labels }))
@@ -96,7 +106,7 @@ export default function LabelingFunction() {
             setLastTaskLogs(["Task is queued for execution"]);
             return;
         }
-        refetchTaskByTaskId({ variables: { projectId: project.id, payloadId: currentHeuristic.lastTask.id } }).then((res) => {
+        refetchTaskByTaskId({ variables: { projectId: project.id, payloadId: currentHeuristic.lastPayload.id } }).then((res) => {
             setLastTaskLogs(postProcessLastTaskLogs((res['data']['payloadByPayloadId'])));
         });
     }
@@ -115,6 +125,32 @@ export default function LabelingFunction() {
         updateHeuristicMut({ variables: { projectId: project.id, informationSourceId: currentHeuristic.id, labelingTaskId: currentHeuristic.labelingTaskId, code: finalSourceCode } }).then((res) => {
             dispatch(updateHeuristicsState(currentHeuristic.id, { sourceCode: finalSourceCode }))
         });
+    }
+
+    function handleWebsocketNotification(msgParts: string[]) {
+        if (['labeling_task_updated', 'labeling_task_created', 'label_created', 'label_deleted'].includes(msgParts[1])) {
+            refetchLabelingTasksAndProcess();
+        } else if ('labeling_task_deleted' == msgParts[1]) {
+            alert('Parent labeling task was deleted!');
+            router.push(`/projects/${project.id}/heuristics`);
+        } else if ('information_source_deleted' == msgParts[1]) {
+            alert('Information source was deleted!');
+            router.push(`/projects/${project.id}/heuristics`);
+        } else if (['information_source_updated', 'model_callback_update_statistics'].includes(msgParts[1])) {
+            if (currentHeuristic.id == msgParts[2]) {
+                setUpdatedThroughWebsocket(true);
+                refetchCurrentHeuristicAndProcess();
+            }
+        } else if (msgParts[1] == 'payload_progress') {
+            if (msgParts[2] != currentHeuristic.id) return;
+            dispatch(updateHeuristicsState(currentHeuristic.id, { lastTask: { progress: Number(msgParts[4]), state: Status.CREATED } }))
+        } else {
+            if (msgParts[2] != currentHeuristic.id) return;
+            if (msgParts[1] == 'payload_finished' || msgParts[1] == 'payload_failed' || msgParts[1] == 'payload_created') {
+                refetchCurrentHeuristicAndProcess();
+                refetchTaskByTaskIdAndProcess();
+            }
+        }
     }
 
     return (
@@ -170,9 +206,7 @@ export default function LabelingFunction() {
                 {sampleRecords && sampleRecords.records.length > 0 && !sampleRecords.codeHasErrors && <>
                     <SampleRecords sampleRecords={sampleRecords} selectedAttribute={selectedAttribute} />
                     {displayLogWarning && <div className="text-sm inline-block font-normal text-gray-500 italic">
-                        This is a temporary log from your last "Run on 10" execution. It will vanish once you leave/reload the
-                        page or
-                        "Run" the heuristic.
+                        This is a temporary log from your last &quot;Run on 10&quot; execution. It will vanish once you leave/reload the page or &quot;Run&quot; the heuristic.
                     </div>}
                 </>}
 

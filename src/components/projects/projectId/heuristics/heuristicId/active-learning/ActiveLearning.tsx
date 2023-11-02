@@ -26,6 +26,8 @@ import HeuristicStatistics from "../shared/HeuristicStatistics";
 import DangerZone from "@/src/components/shared/danger-zone/DangerZone";
 import { DangerZoneEnum } from "@/src/types/shared/danger-zone";
 import { getPythonClassRegExMatch } from "@/submodules/javascript-functions/python-functions-parser";
+import { WebSocketsService } from "@/src/services/base/web-sockets/WebSocketsService";
+import { CurrentPage } from "@/src/types/shared/general";
 
 export default function ActiveLearning() {
     const dispatch = useDispatch();
@@ -51,6 +53,7 @@ export default function ActiveLearning() {
         if (!router.query.heuristicId) return;
         refetchLabelingTasksAndProcess();
         refetchEmbeddingsAndPostProcess();
+        refetchWS();
     }, [project, router.query.heuristicId]);
 
     useEffect(() => {
@@ -115,6 +118,32 @@ export default function ActiveLearning() {
         const finalSourceCode = value.replace(regMatch[0], getClassLine(null, labelingTasks, currentHeuristic.labelingTaskId));
         updateHeuristicMut({ variables: { projectId: project.id, informationSourceId: currentHeuristic.id, labelingTaskId: currentHeuristic.labelingTaskId, code: finalSourceCode } }).then((res) => {
             dispatch(updateHeuristicsState(currentHeuristic.id, { sourceCode: finalSourceCode }))
+        });
+    }
+
+    function handleWebsocketNotification(msgParts: string[]) {
+        if (['labeling_task_updated', 'labeling_task_created', 'label_created', 'label_deleted'].includes(msgParts[1])) {
+            refetchLabelingTasksAndProcess();
+        } else if ('labeling_task_deleted' == msgParts[1]) {
+            alert('Parent labeling task was deleted!');
+            router.push(`/projects/${project.id}/heuristics`);
+        } else if ('information_source_deleted' == msgParts[1]) {
+            alert('Information source was deleted!');
+            router.push(`/projects/${project.id}/heuristics`);
+        } else if (['information_source_updated', 'model_callback_update_statistics'].includes(msgParts[1])) {
+            if (currentHeuristic.id == msgParts[2]) {
+                refetchCurrentHeuristicAndProcess();
+            }
+        } else if (msgParts[1] == 'embedding_deleted' || (msgParts[1] == 'embedding' && msgParts[3] == 'state')) {
+            refetchEmbeddingsAndPostProcess();
+        }
+    }
+
+    function refetchWS() {
+        WebSocketsService.subscribeToNotification(CurrentPage.ACTIVE_LEARNING, {
+            projectId: project.id,
+            whitelist: ['labeling_task_updated', 'labeling_task_created', 'label_created', 'label_deleted', 'labeling_task_deleted', 'information_source_deleted', 'information_source_updated', 'model_callback_update_statistics', 'embedding_deleted', 'embedding'],
+            func: handleWebsocketNotification
         });
     }
 

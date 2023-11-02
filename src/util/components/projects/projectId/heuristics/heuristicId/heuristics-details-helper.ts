@@ -40,7 +40,6 @@ export function postProcessCurrentHeuristic(heuristic: Heuristic, labelingTasks:
             prepareHeuristic.sourceCodeToDisplay = prepareHeuristic.sourceCode.replace(getClassLine(null, labelingTasks, heuristic.labelingTaskId), getClassLine(prepareHeuristic.name, labelingTasks, heuristic.labelingTaskId));
         }
     }
-
     return prepareHeuristic;
 }
 
