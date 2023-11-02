@@ -44,12 +44,11 @@ export default function LabelingFunction() {
     const [selectedAttribute, setSelectedAttribute] = useState<string>(null);
     const [sampleRecords, setSampleRecords] = useState<SampleRecord>(null);
     const [displayLogWarning, setDisplayLogWarning] = useState<boolean>(false);
-    const [updatedThroughWebsocket, setUpdatedThroughWebsocket] = useState<boolean>(false);
 
-    const [refetchCurrentHeuristic] = useLazyQuery(GET_HEURISTICS_BY_ID);
+    const [refetchCurrentHeuristic] = useLazyQuery(GET_HEURISTICS_BY_ID, { fetchPolicy: "network-only" });
     const [refetchLabelingTasksByProjectId] = useLazyQuery(GET_LABELING_TASKS_BY_PROJECT_ID, { fetchPolicy: "network-only" });
     const [updateHeuristicMut] = useMutation(UPDATE_INFORMATION_SOURCE);
-    const [refetchTaskByTaskId] = useLazyQuery(GET_TASK_BY_TASK_ID, { fetchPolicy: "no-cache" });
+    const [refetchTaskByTaskId] = useLazyQuery(GET_TASK_BY_TASK_ID, { fetchPolicy: "network-only" });
     const [refetchRunOn10] = useLazyQuery(GET_LABELING_FUNCTION_ON_10_RECORDS, { fetchPolicy: "no-cache" })
 
     useEffect(() => {
@@ -88,7 +87,6 @@ export default function LabelingFunction() {
     }
 
     function saveHeuristic(labelingTaskName: string) {
-        if (updatedThroughWebsocket) return;
         const labelingTask = labelingTasks.find(a => a.name == labelingTaskName);
         updateHeuristicMut({ variables: { projectId: project.id, informationSourceId: currentHeuristic.id, labelingTaskId: labelingTask.id } }).then((res) => {
             dispatch(updateHeuristicsState(currentHeuristic.id, { labelingTaskId: labelingTask.id, labelingTaskName: labelingTask.name, labels: labelingTask.labels }))
@@ -138,7 +136,6 @@ export default function LabelingFunction() {
             router.push(`/projects/${project.id}/heuristics`);
         } else if (['information_source_updated', 'model_callback_update_statistics'].includes(msgParts[1])) {
             if (currentHeuristic.id == msgParts[2]) {
-                setUpdatedThroughWebsocket(true);
                 refetchCurrentHeuristicAndProcess();
             }
         } else if (msgParts[1] == 'payload_progress') {
@@ -146,8 +143,8 @@ export default function LabelingFunction() {
             dispatch(updateHeuristicsState(currentHeuristic.id, { lastTask: { progress: Number(msgParts[4]), state: Status.CREATED } }))
         } else {
             if (msgParts[2] != currentHeuristic.id) return;
+            refetchCurrentHeuristicAndProcess();
             if (msgParts[1] == 'payload_finished' || msgParts[1] == 'payload_failed' || msgParts[1] == 'payload_created') {
-                refetchCurrentHeuristicAndProcess();
                 refetchTaskByTaskIdAndProcess();
             }
         }

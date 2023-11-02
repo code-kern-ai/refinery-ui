@@ -6,6 +6,7 @@ import { HeuristicRunButtonsProps } from "@/src/types/components/projects/projec
 import { Status } from "@/src/types/shared/statuses";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
 import { dateAsUTCDate } from "@/submodules/javascript-functions/date-parser";
+import { InformationSourceType } from "@/submodules/javascript-functions/enums/enums";
 import { useMutation } from "@apollo/client";
 import { Tooltip } from "@nextui-org/react";
 import { useEffect, useState } from "react";
@@ -29,14 +30,18 @@ export default function HeuristicRunButtons(props: HeuristicRunButtonsProps) {
         setJustClickedRun(true);
         createTaskMut({ variables: { projectId: project.id, informationSourceId: currentHeuristic.id } }).then((res) => {
             setJustClickedRun(false);
-            props.updateDisplayLogWarning(false);
+            if (currentHeuristic.informationSourceType === InformationSourceType.LABELING_FUNCTION) {
+                props.updateDisplayLogWarning(false);
+            }
         });
     }
 
     function runHeuristicAndWeaklySupervise() {
         runHeuristicAndWeaklySuperviseMut({ variables: { projectId: project.id, informationSourceId: currentHeuristic.id, labelingTaskId: currentHeuristic.labelingTaskId } }).then((res) => {
             setJustClickedRun(false);
-            props.updateDisplayLogWarning(false);
+            if (currentHeuristic.informationSourceType === InformationSourceType.LABELING_FUNCTION) {
+                props.updateDisplayLogWarning(false);
+            }
         });
     }
 

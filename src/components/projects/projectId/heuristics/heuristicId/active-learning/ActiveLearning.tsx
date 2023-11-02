@@ -42,10 +42,10 @@ export default function ActiveLearning() {
 
     const [lastTaskLogs, setLastTaskLogs] = useState<string[]>([]);
 
-    const [refetchCurrentHeuristic] = useLazyQuery(GET_HEURISTICS_BY_ID);
+    const [refetchCurrentHeuristic] = useLazyQuery(GET_HEURISTICS_BY_ID, { fetchPolicy: "network-only" });
     const [refetchLabelingTasksByProjectId] = useLazyQuery(GET_LABELING_TASKS_BY_PROJECT_ID, { fetchPolicy: "network-only" });
     const [updateHeuristicMut] = useMutation(UPDATE_INFORMATION_SOURCE);
-    const [refetchEmbeddings] = useLazyQuery(GET_EMBEDDING_SCHEMA_BY_PROJECT_ID, { fetchPolicy: "no-cache" });
+    const [refetchEmbeddings] = useLazyQuery(GET_EMBEDDING_SCHEMA_BY_PROJECT_ID, { fetchPolicy: "network-only" });
     const [refetchTaskByTaskId] = useLazyQuery(GET_TASK_BY_TASK_ID, { fetchPolicy: "no-cache" });
 
     useEffect(() => {
@@ -53,7 +53,6 @@ export default function ActiveLearning() {
         if (!router.query.heuristicId) return;
         refetchLabelingTasksAndProcess();
         refetchEmbeddingsAndPostProcess();
-        refetchWS();
     }, [project, router.query.heuristicId]);
 
     useEffect(() => {
@@ -67,6 +66,11 @@ export default function ActiveLearning() {
         if (!embeddings) return;
         dispatch(setFilteredEmbeddings(embeddings.filter(e => embeddingRelevant(e, attributes, labelingTasks, currentHeuristic.labelingTaskId))));
         refetchTaskByTaskIdAndProcess();
+        WebSocketsService.subscribeToNotification(CurrentPage.ACTIVE_LEARNING, {
+            projectId: project.id,
+            whitelist: ['labeling_task_updated', 'labeling_task_created', 'label_created', 'label_deleted', 'labeling_task_deleted', 'information_source_deleted', 'information_source_updated', 'model_callback_update_statistics', 'embedding_deleted', 'embedding', 'payload_finished', 'payload_failed', 'payload_created'],
+            func: handleWebsocketNotification
+        });
     }, [currentHeuristic]);
 
     function refetchTaskByTaskIdAndProcess() {
@@ -136,15 +140,13 @@ export default function ActiveLearning() {
             }
         } else if (msgParts[1] == 'embedding_deleted' || (msgParts[1] == 'embedding' && msgParts[3] == 'state')) {
             refetchEmbeddingsAndPostProcess();
+        } else {
+            if (msgParts[2] != currentHeuristic.id) return;
+            refetchCurrentHeuristicAndProcess();
+            if (msgParts[1] == 'payload_finished' || msgParts[1] == 'payload_failed' || msgParts[1] == 'payload_created') {
+                refetchTaskByTaskIdAndProcess();
+            }
         }
-    }
-
-    function refetchWS() {
-        WebSocketsService.subscribeToNotification(CurrentPage.ACTIVE_LEARNING, {
-            projectId: project.id,
-            whitelist: ['labeling_task_updated', 'labeling_task_created', 'label_created', 'label_deleted', 'labeling_task_deleted', 'information_source_deleted', 'information_source_updated', 'model_callback_update_statistics', 'embedding_deleted', 'embedding'],
-            func: handleWebsocketNotification
-        });
     }
 
     return (
