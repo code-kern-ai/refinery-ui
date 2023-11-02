@@ -4,6 +4,7 @@ import { LabelingTask, LabelingTaskTaskType } from "@/src/types/components/proje
 import { InformationSourceType } from "@/submodules/javascript-functions/enums/enums";
 import { jsonCopy } from "@/submodules/javascript-functions/general";
 import { parseContainerLogsData } from "@/submodules/javascript-functions/logs-parser";
+import { getColorStruct } from "../shared-helper";
 
 export function embeddingRelevant(embedding: Embedding, attributes: Attribute[], labelingTasks: LabelingTask[], currentLabelingTaskId: string): boolean {
     if (!embedding) return false;
@@ -80,5 +81,6 @@ function getLabelFromExtractionResult(str: string) {
 
 function getColorForLabel(label: string, labelingTasks: LabelingTask[], currentLabelingTaskId: string) {
     const labelingTaskLabels = labelingTasks.find(lt => lt.id == currentLabelingTaskId).labels;
-    return label != '-' ? labelingTaskLabels.find(el => el.name == label)?.color : 'gray';
+    const labelColor = labelingTaskLabels.find(el => el.name == label)?.color;
+    return label != '-' && labelColor != undefined ? labelColor : getColorStruct('gray');
 }

@@ -141,7 +141,8 @@ const initialState: Modals = {
         open: false
     },
     [ModalEnum.SAMPLE_RECORDS_LABELING_FUNCTION]: {
-        open: false
+        open: false,
+        currentRecordIdx: -1,
     },
 };
 

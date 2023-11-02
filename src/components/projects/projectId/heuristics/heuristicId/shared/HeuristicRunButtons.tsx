@@ -2,15 +2,16 @@ import LoadingIcon from "@/src/components/shared/loading/LoadingIcon";
 import { selectHeuristic } from "@/src/reduxStore/states/pages/heuristics";
 import { selectProject } from "@/src/reduxStore/states/project";
 import { CREATE_INFORMATION_SOURCE_PAYLOAD, RUN_HEURISTIC_THEN_TRIGGER_WEAK_SUPERVISION } from "@/src/services/gql/mutations/heuristics";
+import { HeuristicRunButtonsProps } from "@/src/types/components/projects/projectId/heuristics/heuristicId/heuristics-details";
 import { Status } from "@/src/types/shared/statuses";
-import { TOOLTIPS_DICT } from "@/src/util/tooltip-contants";
+import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
 import { dateAsUTCDate } from "@/submodules/javascript-functions/date-parser";
 import { useMutation } from "@apollo/client";
 import { Tooltip } from "@nextui-org/react";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 
-export default function HeuristicRunButtons() {
+export default function HeuristicRunButtons(props: HeuristicRunButtonsProps) {
     const project = useSelector(selectProject);
     const currentHeuristic = useSelector(selectHeuristic);
 
@@ -28,12 +29,14 @@ export default function HeuristicRunButtons() {
         setJustClickedRun(true);
         createTaskMut({ variables: { projectId: project.id, informationSourceId: currentHeuristic.id } }).then((res) => {
             setJustClickedRun(false);
+            props.updateDisplayLogWarning(false);
         });
     }
 
     function runHeuristicAndWeaklySupervise() {
         runHeuristicAndWeaklySuperviseMut({ variables: { projectId: project.id, informationSourceId: currentHeuristic.id, labelingTaskId: currentHeuristic.labelingTaskId } }).then((res) => {
             setJustClickedRun(false);
+            props.updateDisplayLogWarning(false);
         });
     }
 

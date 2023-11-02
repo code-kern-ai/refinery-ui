@@ -3,3 +3,11 @@ export enum HeuristicsProperty {
     NAME = 'name',
     DESCRIPTION = 'description',
 }
+
+export type HeuristicsEditorProps = {
+    updatedSourceCode: (code: string) => void;
+}
+
+export type HeuristicRunButtonsProps = {
+    updateDisplayLogWarning?: (val: boolean) => void;
+}

@@ -6,7 +6,7 @@ import { CREATE_LABELING_TASK, DELETE_LABELING_TASK } from "@/src/services/gql/m
 import { LabelingTaskTaskType, LabelingTasksProps } from "@/src/types/components/projects/projectId/settings/labeling-tasks";
 import { ModalButton, ModalEnum } from "@/src/types/shared/modal";
 import { isTaskNameUnique } from "@/src/util/components/projects/projectId/settings/labeling-tasks-helper";
-import { TOOLTIPS_DICT } from "@/src/util/tooltip-contants";
+import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
 import Dropdown from "@/submodules/react-components/components/Dropdown";
 import { useMutation } from "@apollo/client";
 import { Tooltip } from "@nextui-org/react";

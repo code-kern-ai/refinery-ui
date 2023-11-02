@@ -1,6 +1,6 @@
 import { selectProject } from "@/src/reduxStore/states/project";
 import { useDispatch, useSelector } from "react-redux";
-import style from '@/src/styles/components/projects/projectId/heuristics.module.css';
+import style from '@/src/styles/components/projects/projectId/heuristics/heuristics.module.css';
 import { useEffect, useState } from "react";
 import { setLabelingTasksAll } from "@/src/reduxStore/states/pages/settings";
 import { CurrentPage } from "@/src/types/shared/general";

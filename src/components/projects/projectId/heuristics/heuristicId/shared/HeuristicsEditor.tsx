@@ -1,16 +1,15 @@
 import { selectHeuristic } from "@/src/reduxStore/states/pages/heuristics";
-import { getPythonFunctionRegExMatch } from "@/submodules/javascript-functions/python-functions-parser";
+import { HeuristicsEditorProps } from "@/src/types/components/projects/projectId/heuristics/heuristicId/heuristics-details";
 import { Editor } from "@monaco-editor/react";
 import { useState } from "react";
 import { useSelector } from "react-redux";
 
 const EDITOR_OPTIONS = { theme: 'vs-light', language: 'python', readOnly: false };
 
-export default function HeuristicsEditor() {
+export default function HeuristicsEditor(props: HeuristicsEditorProps) {
     const currentHeuristic = useSelector(selectHeuristic);
 
     const [isInitial, setIsInitial] = useState(null);  //null as add state to differentiate between initial, not and unchecked
-    const [editorOptions, setEditorOptions] = useState(EDITOR_OPTIONS);
 
     function openBricksIntegrator() {
         // TODO: open bricks integrator
@@ -35,12 +34,9 @@ export default function HeuristicsEditor() {
                 height="400px"
                 defaultLanguage={'python'}
                 value={currentHeuristic.sourceCodeToDisplay}
-                options={editorOptions}
+                options={EDITOR_OPTIONS}
                 onChange={(value) => {
-                    const regMatch: any = getPythonFunctionRegExMatch(value);
-                    // changeAttributeName(regMatch ? regMatch[2] : '');
-                    // setCurrentAttribute({ ...currentAttribute, sourceCode: value });
-                    // updateSourceCode(value);
+                    props.updatedSourceCode(value);
                 }}
             />
         </div>)

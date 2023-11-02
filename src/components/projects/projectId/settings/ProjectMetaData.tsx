@@ -1,7 +1,7 @@
 import { removeFromAllProjectsById, selectProject, setActiveProject } from "@/src/reduxStore/states/project";
 import { UPDATE_PROJECT_NAME_AND_DESCRIPTION } from "@/src/services/gql/mutations/project-settings";
 import { DELETE_PROJECT } from "@/src/services/gql/mutations/projects";
-import { TOOLTIPS_DICT } from "@/src/util/tooltip-contants";
+import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
 import { jsonCopy } from "@/submodules/javascript-functions/general";
 import { useMutation } from "@apollo/client";
 import { Tooltip } from "@nextui-org/react";

@@ -11,7 +11,7 @@ import { NOT_AVAILABLE, UNKNOWN_USER } from "@/src/util/constants";
 import { IconArrowRight, IconX } from "@tabler/icons-react";
 import { useMutation } from "@apollo/client";
 import { DELETE_PROJECT } from "@/src/services/gql/mutations/projects";
-import { TOOLTIPS_DICT } from "@/src/util/tooltip-contants";
+import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
 
 export default function ProjectCard(props: ProjectCardProps) {
     const router = useRouter();

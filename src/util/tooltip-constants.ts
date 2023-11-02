@@ -138,5 +138,9 @@ export const TOOLTIPS_DICT = {
         'INSTALLED_LIBRARIES': 'See available libraries for this labeling function',
         'SELECT_ATTRIBUTE': 'Select an attribute',
         'RUN_ON_10': 'Run on 10 records',
+        'CURRENTLY_RUNNING': 'Currently being executed',
+        'FINISHED': 'Successfully executed',
+        'ERROR': 'Execution ran into errors',
+        'EXECUTION_TIME': 'Execution time',
     }
 }

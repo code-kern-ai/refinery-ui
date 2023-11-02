@@ -17,7 +17,7 @@ import { useRouter } from "next/router";
 import { ACTIONS_DROPDOWN_OPTIONS, postProcessLookupLists } from "@/src/util/components/projects/projectId/lookup-lists-helper";
 import { WebSocketsService } from "@/src/services/base/web-sockets/WebSocketsService";
 import { CurrentPage } from "@/src/types/shared/general";
-import { TOOLTIPS_DICT } from "@/src/util/tooltip-contants";
+import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
 
 const ABORT_BUTTON = { buttonCaption: "Delete", useButton: true, disabled: false };
 

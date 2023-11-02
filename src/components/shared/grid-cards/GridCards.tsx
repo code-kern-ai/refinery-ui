@@ -1,12 +1,12 @@
 import { selectProject } from "@/src/reduxStore/states/project";
 import { Heuristic } from "@/src/types/components/projects/projectId/heuristics/heuristics";
 import { GridCardsProps } from "@/src/types/shared/grid-cards";
-import { TOOLTIPS_DICT } from "@/src/util/tooltip-contants";
+import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
 import { InformationSourceType } from "@/submodules/javascript-functions/enums/enums";
 import { Tooltip } from "@nextui-org/react";
 import { IconArrowRight, IconCode, IconPointerStar, IconSparkles, IconUsers } from "@tabler/icons-react";
 import { useSelector } from "react-redux";
-import style from '@/src/styles/components/projects/projectId/heuristics.module.css';
+import style from '@/src/styles/components/projects/projectId/heuristics/heuristics.module.css';
 import { useMutation } from "@apollo/client";
 import { TOGGLE_HEURISTICS_SELECTED } from "@/src/services/gql/mutations/heuristics";
 import { useRouter } from "next/router";

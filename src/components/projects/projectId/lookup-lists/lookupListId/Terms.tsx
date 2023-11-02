@@ -2,7 +2,7 @@ import { selectProject } from "@/src/reduxStore/states/project";
 import { ADD_TERM_TO_LOOKUP_LIST, BLACKLIST_TERM, REMOVE_TERM, UPDATE_TERM } from "@/src/services/gql/mutations/lookup-lists";
 import { Term, TermsProps } from "@/src/types/components/projects/projectId/lookup-lists";
 import { BLACKLISTED_TERMS_DROPDOWN_OPTIONS, TERMS_DROPDOWN_OPTIONS, isTermUnique } from "@/src/util/components/projects/projectId/lookup-lists-helper";
-import { TOOLTIPS_DICT } from "@/src/util/tooltip-contants";
+import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
 import { jsonCopy } from "@/submodules/javascript-functions/general";
 import Dropdown from "@/submodules/react-components/components/Dropdown";
 import { useMutation } from "@apollo/client";

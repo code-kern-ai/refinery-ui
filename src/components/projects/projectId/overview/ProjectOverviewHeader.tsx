@@ -1,5 +1,5 @@
 import { getDisplayGraphValueArray } from "@/src/util/components/projects/projectId/project-overview-helper";
-import { TOOLTIPS_DICT } from "@/src/util/tooltip-contants";
+import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
 import Dropdown from "@/submodules/react-components/components/Dropdown";
 import { Tooltip } from "@nextui-org/react";
 import { useState } from "react";

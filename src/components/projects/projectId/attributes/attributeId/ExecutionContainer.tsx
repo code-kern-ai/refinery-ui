@@ -15,7 +15,7 @@ import { useDispatch, useSelector } from "react-redux";
 import style from '@/src/styles/components/projects/projectId/attribute-calculation.module.css';
 import { DataTypeEnum } from "@/src/types/shared/general";
 import { CALCULATE_USER_ATTRIBUTE_ALL_RECORDS } from "@/src/services/gql/mutations/project-settings";
-import { TOOLTIPS_DICT } from "@/src/util/tooltip-contants";
+import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
 
 
 const ACCEPT_BUTTON = { buttonCaption: 'Accept', useButton: true };

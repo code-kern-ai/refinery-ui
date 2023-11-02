@@ -21,7 +21,7 @@ import LabelingTasksModals from "./LabelingTasksModals";
 import LabelsModals from "./LabelsModals";
 import RenameLabelModal from "./RenameLabelModal";
 import { UPDATE_LABELING_TASK } from "@/src/services/gql/mutations/project-settings";
-import { TOOLTIPS_DICT } from "@/src/util/tooltip-contants";
+import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
 
 export default function LabelingTasks() {
     const router = useRouter();

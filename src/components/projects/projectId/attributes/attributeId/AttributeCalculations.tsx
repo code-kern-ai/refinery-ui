@@ -28,7 +28,7 @@ import LoadingIcon from "@/src/components/shared/loading/LoadingIcon";
 import { WebSocketsService } from "@/src/services/base/web-sockets/WebSocketsService";
 import { timer } from "rxjs";
 import { unsubscribeWSOnDestroy } from "@/src/services/base/web-sockets/web-sockets-helper";
-import { TOOLTIPS_DICT } from "@/src/util/tooltip-contants";
+import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
 
 const EDITOR_OPTIONS = { theme: 'vs-light', language: 'python', readOnly: false };
 

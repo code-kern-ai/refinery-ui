@@ -23,7 +23,7 @@ import { jsonCopy } from "@/submodules/javascript-functions/general";
 import { dateAsUTCDate } from "@/submodules/javascript-functions/date-parser";
 import { timer } from "rxjs";
 import { unsubscribeWSOnDestroy } from "@/src/services/base/web-sockets/web-sockets-helper";
-import { TOOLTIPS_DICT } from "@/src/util/tooltip-contants";
+import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
 
 const ABORT_BUTTON = { buttonCaption: 'Delete', useButton: true, disabled: false };
 const ACCEPT_BUTTON = { buttonCaption: 'Accept', useButton: true };

@@ -5,7 +5,7 @@ import { GET_LABELING_TASKS_BY_PROJECT_ID } from "@/src/services/gql/queries/pro
 import { LabelingTask } from "@/src/types/components/projects/projectId/settings/labeling-tasks";
 import { ACTIONS_DROPDOWN_OPTIONS, postProcessModelCallbacks } from "@/src/util/components/projects/projectId/model-callbacks-helper";
 import { postProcessLabelingTasks, postProcessLabelingTasksSchema } from "@/src/util/components/projects/projectId/settings/labeling-tasks-helper";
-import { TOOLTIPS_DICT } from "@/src/util/tooltip-contants";
+import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
 import Dropdown from "@/submodules/react-components/components/Dropdown";
 import { useLazyQuery } from "@apollo/client";
 import { Tooltip } from "@nextui-org/react";

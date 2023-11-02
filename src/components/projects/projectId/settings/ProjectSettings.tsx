@@ -32,7 +32,7 @@ import { RecommendedEncoder } from "@/src/types/components/projects/projectId/se
 import LabelingTasks from "./labeling-tasks/LabelingTasks";
 import { jsonCopy } from "@/submodules/javascript-functions/general";
 import { unsubscribeWSOnDestroy } from "@/src/services/base/web-sockets/web-sockets-helper";
-import { TOOLTIPS_DICT } from "@/src/util/tooltip-contants";
+import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
 
 const ACCEPT_BUTTON = { buttonCaption: "Accept", useButton: true, disabled: true }
 

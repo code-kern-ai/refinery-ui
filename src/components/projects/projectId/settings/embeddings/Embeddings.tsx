@@ -20,7 +20,7 @@ import { useDispatch, useSelector } from "react-redux";
 import AddNewEmbedding from "./AddNewEmbedding";
 import Dropdown from "@/submodules/react-components/components/Dropdown";
 import { unsubscribeWSOnDestroy } from "@/src/services/base/web-sockets/web-sockets-helper";
-import { TOOLTIPS_DICT } from "@/src/util/tooltip-contants";
+import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
 
 const ABORT_BUTTON = { useButton: true, disabled: false };
 const EDIT_BUTTON = { buttonCaption: 'Edit', useButton: true, disabled: false, closeAfterClick: false };

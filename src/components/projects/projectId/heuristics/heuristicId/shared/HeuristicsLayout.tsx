@@ -10,7 +10,7 @@ import { HeuristicsProperty } from "@/src/types/components/projects/projectId/he
 import { Attribute } from "@/src/types/components/projects/projectId/settings/data-schema";
 import { postProcessLookupLists } from "@/src/util/components/projects/projectId/lookup-lists-helper";
 import { postProcessingAttributes } from "@/src/util/components/projects/projectId/settings/data-schema-helper";
-import { TOOLTIPS_DICT } from "@/src/util/tooltip-contants";
+import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
 import { copyToClipboard } from "@/submodules/javascript-functions/general";
 import { useLazyQuery, useMutation } from "@apollo/client";
 import { Tooltip } from "@nextui-org/react";

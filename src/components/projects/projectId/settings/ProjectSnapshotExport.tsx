@@ -10,7 +10,7 @@ import { DownloadState, ProjectSize } from "@/src/types/components/projects/proj
 import { CurrentPage } from "@/src/types/shared/general";
 import { ModalEnum } from "@/src/types/shared/modal";
 import { postProcessingFormGroups } from "@/src/util/components/projects/projectId/settings/project-export-helper";
-import { TOOLTIPS_DICT } from "@/src/util/tooltip-contants";
+import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
 import { downloadByteData } from "@/submodules/javascript-functions/export";
 import { formatBytes } from "@/submodules/javascript-functions/general";
 import { useLazyQuery } from "@apollo/client";

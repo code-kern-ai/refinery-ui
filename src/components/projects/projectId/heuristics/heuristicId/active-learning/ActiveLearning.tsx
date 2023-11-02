@@ -7,7 +7,7 @@ import { GET_HEURISTICS_BY_ID, GET_TASK_BY_TASK_ID } from "@/src/services/gql/qu
 import { Fragment, useEffect, useState } from "react";
 import { selectHeuristic, setActiveHeuristics, updateHeuristicsState } from "@/src/reduxStore/states/pages/heuristics";
 import { getClassLine, postProcessCurrentHeuristic, postProcessLastTaskLogs } from "@/src/util/components/projects/projectId/heuristics/heuristicId/heuristics-details-helper";
-import { TOOLTIPS_DICT } from "@/src/util/tooltip-contants";
+import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
 import { Tooltip } from "@nextui-org/react";
 import Dropdown from "@/submodules/react-components/components/Dropdown";
 import { selectAttributes, selectEmbeddings, selectEmbeddingsFiltered, selectLabelingTasksAll, setAllEmbeddings, setFilteredEmbeddings, setLabelingTasksAll } from "@/src/reduxStore/states/pages/settings";
@@ -25,6 +25,7 @@ import ContainerLogs from "@/src/components/shared/logs/ContainerLogs";
 import HeuristicStatistics from "../shared/HeuristicStatistics";
 import DangerZone from "@/src/components/shared/danger-zone/DangerZone";
 import { DangerZoneEnum } from "@/src/types/shared/danger-zone";
+import { getPythonClassRegExMatch } from "@/submodules/javascript-functions/python-functions-parser";
 
 export default function ActiveLearning() {
     const dispatch = useDispatch();
@@ -108,6 +109,15 @@ export default function ActiveLearning() {
         dispatch(updateHeuristicsState(currentHeuristic.id, { sourceCodeToDisplay: finalSourceCode }))
     }
 
+    function updateSourceCode(value: string) {
+        var regMatch: any = getPythonClassRegExMatch(value);
+        if (!regMatch) return value;
+        const finalSourceCode = value.replace(regMatch[0], getClassLine(null, labelingTasks, currentHeuristic.labelingTaskId));
+        updateHeuristicMut({ variables: { projectId: project.id, informationSourceId: currentHeuristic.id, labelingTaskId: currentHeuristic.labelingTaskId, code: finalSourceCode } }).then((res) => {
+            dispatch(updateHeuristicsState(currentHeuristic.id, { sourceCode: finalSourceCode }))
+        });
+    }
+
     return (
         <HeuristicsLayout updateSourceCode={(code) => updateSourceCodeToDisplay(code)}>
             {currentHeuristic && <div>
@@ -158,7 +168,7 @@ export default function ActiveLearning() {
                         {/* TODO: Add bricks integrator */}
                     </div>
                 </div>
-                <HeuristicsEditor />
+                <HeuristicsEditor updatedSourceCode={(code: string) => updateSourceCode(code)} />
 
                 <div className="mt-2 flex flex-grow justify-between items-center float-right">
                     <div className="flex items-center">

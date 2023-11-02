@@ -10,7 +10,7 @@ import { LookupListOperationsProps } from "@/src/types/components/projects/proje
 import { DownloadState } from "@/src/types/components/projects/projectId/settings/project-export";
 import { ModalButton, ModalEnum } from "@/src/types/shared/modal";
 import { UploadFileType } from "@/src/types/shared/upload";
-import { TOOLTIPS_DICT } from "@/src/util/tooltip-contants";
+import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
 import { downloadByteData } from "@/submodules/javascript-functions/export";
 import { useLazyQuery, useMutation } from "@apollo/client";
 import { Tooltip } from "@nextui-org/react";
