@@ -147,6 +147,13 @@ const initialState: Modals = {
     [ModalEnum.WHY_SO_LONG]: {
         open: false
     },
+    [ModalEnum.SAMPLE_RECORDS_ZERO_SHOT]: {
+        open: false,
+        currentRecordIdx: -1,
+    },
+    [ModalEnum.CANCEL_EXECUTION]: {
+        open: false
+    }
 };
 
 const modalSlice = createSlice({

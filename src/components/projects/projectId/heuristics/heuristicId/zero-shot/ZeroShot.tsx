@@ -23,6 +23,10 @@ import LoadingIcon from "@/src/components/shared/loading/LoadingIcon";
 import { selectIsManaged } from "@/src/reduxStore/states/general";
 import { IconArrowAutofitDown } from "@tabler/icons-react";
 import Playground from "./Playground";
+import HeuristicStatistics from "../shared/HeuristicStatistics";
+import DangerZone from "@/src/components/shared/danger-zone/DangerZone";
+import { DangerZoneEnum } from "@/src/types/shared/danger-zone";
+import CalculationProgress from "./CalculationProgress";
 
 export default function ZeroShot() {
     const dispatch = useDispatch();
@@ -168,6 +172,13 @@ export default function ZeroShot() {
                 </div>
 
                 <Playground />
+
+                <CalculationProgress />
+
+                <HeuristicStatistics />
+
+                <DangerZone elementType={DangerZoneEnum.ZERO_SHOT} id={currentHeuristic.id} name={currentHeuristic.name} />
+
             </div>}
         </div>}
     </HeuristicsLayout >)

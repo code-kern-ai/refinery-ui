@@ -78,5 +78,19 @@ export function postProcessZeroShotText(zeroShotText: any, labels: any[]) {
         label.color = labelColor;
     });
     return zeroShotTextCopy;
+}
 
+export function postProcessZeroShot10Records(zeroShotResults: any, labels: any[]) {
+    const prepareZeroShotResults = jsonCopy(zeroShotResults);
+    prepareZeroShotResults.durationText = "~" + Math.round(prepareZeroShotResults.duration * 100) / 100 + " sec";
+    prepareZeroShotResults.records.forEach(record => {
+        record.shortView = true;
+        record.fullRecordData = JSON.parse(record.fullRecordData);
+        record.labels.forEach(e => {
+            e.confidenceText = (e.confidence * 100).toFixed(2) + "%";
+            const labelColor = labels.find((l) => l.name == e.labelName)?.color;
+            e.color = labelColor;
+        });
+    });
+    return prepareZeroShotResults
 }

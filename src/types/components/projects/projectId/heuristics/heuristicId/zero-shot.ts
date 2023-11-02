@@ -8,3 +8,7 @@ export type ZeroShotSettings = {
     runIndividually: boolean;
     attributeName: string;
 };
+
+export type ZeroShotExecutionProps = {
+    customLabels: string;
+};

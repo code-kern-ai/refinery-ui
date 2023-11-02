@@ -152,6 +152,9 @@ export const TOOLTIPS_DICT = {
         'CONFIDENCE': 'Minimum confidence required to store predictions',
         'WHY_SO_LONG': 'Why is this taking so long?',
         'COMPUTE_TEXT': 'Computes the prediction for your given example text',
-        'CONFIDENCE_TOO_LOW': '< minConfidence -> would be ignored'
+        'CONFIDENCE_TOO_LOW': '< minConfidence -> would be ignored',
+        'EXECUTE_10_RECORDS': 'Execute the zero-shot model on 10 records',
+        'EXECUTE_ALL_RECORDS': 'Execute the zero-shot model on all records',
+        'CANCEL_EXECUTION': 'Cancel the execution',
     }
 }

@@ -111,3 +111,20 @@ query ($projectId: ID!, $informationSourceId: ID!, $config: String!, $text: Stri
   }
 }  
 `;
+
+export const GET_ZERO_SHOT_10_RANDOM_RECORDS = gql`
+query ($projectId: ID!, $informationSourceId: ID!, $labels: JSONString) {
+  zeroShot10Records(projectId: $projectId, informationSourceId: $informationSourceId, labelNames: $labels) {
+    duration
+    records {
+      recordId
+      checkedText
+      fullRecordData
+      labels {
+        labelName
+        confidence
+      }
+    }
+  }
+}
+`;
