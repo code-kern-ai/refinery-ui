@@ -29,7 +29,6 @@ import CalculationProgress from "./CalculationProgress";
 import { copyToClipboard } from "@/submodules/javascript-functions/general";
 import { WebSocketsService } from "@/src/services/base/web-sockets/WebSocketsService";
 import { CurrentPage } from "@/src/types/shared/general";
-import { timer } from "rxjs";
 
 export default function LabelingFunction() {
     const dispatch = useDispatch();

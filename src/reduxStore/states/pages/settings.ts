@@ -12,6 +12,7 @@ type SettingsState = {
         useableEmbedableAttributes: Attribute[];
         useableNonTextAttributes: Attribute[];
         usableAttributes: any[];
+        usableTextAttributes: any[];
     },
     embeddings: {
         all: Embedding[];
@@ -30,7 +31,8 @@ function getInitState(): SettingsState {
             all: [],
             useableEmbedableAttributes: [],
             useableNonTextAttributes: [],
-            usableAttributes: []
+            usableAttributes: [],
+            usableTextAttributes: []
         },
         embeddings: {
             all: [],
@@ -63,6 +65,7 @@ const settingsSlice = createSlice({
             }
             const filterFromAll = state.attributes.all.filter((attribute) => (attribute.state === AttributeState.UPLOADED || attribute.state === AttributeState.AUTOMATICALLY_CREATED || attribute.state === AttributeState.USABLE));
             state.attributes.usableAttributes = [fullRecordEl, ...filterFromAll];
+            state.attributes.usableTextAttributes = state.attributes.useableEmbedableAttributes.filter((attribute) => attribute.dataType === DataTypeEnum.TEXT);
         },
         extendAllAttributes(state, action: PayloadAction<Attribute>) {
             if (action.payload) state.attributes.all.push(action.payload);
@@ -126,6 +129,7 @@ export const selectAttributesDict = selectAttributesFunc(false);
 export const selectUseableEmbedableAttributes = (state) => state.settings.attributes.useableEmbedableAttributes;
 export const selectUsableNonTextAttributes = (state) => state.settings.attributes.useableNonTextAttributes;
 export const selectUsableAttributes = (state) => state.settings.attributes.usableAttributes;
+export const selectTextAttributes = (state) => state.settings.attributes.usableTextAttributes;
 
 export const selectEmbeddings = (state) => state.settings.embeddings.all;
 export const selectEmbeddingsFiltered = (state) => state.settings.embeddings.filtered;

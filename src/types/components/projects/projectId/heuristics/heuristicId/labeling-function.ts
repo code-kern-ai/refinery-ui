@@ -1,5 +1,3 @@
-import { Attribute } from "../../settings/data-schema";
-
 export type SampleRecordProps = {
     sampleRecords: SampleRecord;
     selectedAttribute: string;

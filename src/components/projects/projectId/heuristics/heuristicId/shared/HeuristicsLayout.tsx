@@ -1,7 +1,7 @@
 import Statuses from "@/src/components/shared/statuses/Statuses";
 import { selectHeuristic, updateHeuristicsState } from "@/src/reduxStore/states/pages/heuristics";
-import { selectAllLookupLists, selectLookupList, setAllLookupLists } from "@/src/reduxStore/states/pages/lookup-lists";
-import { selectAttributes, selectUsableAttributes, setAllAttributes } from "@/src/reduxStore/states/pages/settings";
+import { selectAllLookupLists, setAllLookupLists } from "@/src/reduxStore/states/pages/lookup-lists";
+import { selectUsableAttributes, setAllAttributes } from "@/src/reduxStore/states/pages/settings";
 import { selectProject } from "@/src/reduxStore/states/project"
 import { UPDATE_INFORMATION_SOURCE } from "@/src/services/gql/mutations/heuristics";
 import { LOOKUP_LISTS_BY_PROJECT_ID } from "@/src/services/gql/queries/lookup-lists";
@@ -11,6 +11,7 @@ import { Attribute } from "@/src/types/components/projects/projectId/settings/da
 import { postProcessLookupLists } from "@/src/util/components/projects/projectId/lookup-lists-helper";
 import { postProcessingAttributes } from "@/src/util/components/projects/projectId/settings/data-schema-helper";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
+import { InformationSourceType } from "@/submodules/javascript-functions/enums/enums";
 import { copyToClipboard } from "@/submodules/javascript-functions/general";
 import { useLazyQuery, useMutation } from "@apollo/client";
 import { Tooltip } from "@nextui-org/react";
@@ -66,7 +67,9 @@ export default function HeuristicsLayout(props: any) {
     function saveHeuristic() {
         updateHeuristicMut({ variables: { projectId: project.id, informationSourceId: currentHeuristic.id, labelingTaskId: currentHeuristic.labelingTaskId, name: currentHeuristic.name, description: currentHeuristic.description } }).then((res) => {
             dispatch(updateHeuristicsState(currentHeuristic.id, { name: currentHeuristic.name, description: currentHeuristic.description }));
-            props.updateSourceCode(currentHeuristic.sourceCode);
+            if (currentHeuristic.informationSourceType == InformationSourceType.LABELING_FUNCTION || currentHeuristic.informationSourceType == InformationSourceType.ACTIVE_LEARNING) {
+                props.updateSourceCode(currentHeuristic.sourceCode);
+            }
         });
     }
 
@@ -137,7 +140,7 @@ export default function HeuristicsLayout(props: any) {
                         </div>
                     </div>}
                 </div>
-                <div className="grid grid-cols-2 gap-2 items-center mt-8" style={{ gridTemplateColumns: 'max-content auto' }}>
+                {(currentHeuristic.informationSourceType == InformationSourceType.LABELING_FUNCTION || currentHeuristic.informationSourceType == InformationSourceType.ACTIVE_LEARNING) && <div className="grid grid-cols-2 gap-2 items-center mt-8" style={{ gridTemplateColumns: 'max-content auto' }}>
                     <div className="text-sm leading-5 font-medium text-gray-700 inline-block">Attributes</div>
                     <div className="flex flex-row items-center">
                         {usableAttributes.length == 0 && <div className="text-sm font-normal text-gray-500">No usable attributes.</div>}
@@ -165,7 +168,7 @@ export default function HeuristicsLayout(props: any) {
                             </Tooltip>
                         ))}
                     </div>
-                </div>
+                </div>}
                 {props.children}
             </div>
         </div>}

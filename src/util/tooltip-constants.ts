@@ -142,5 +142,16 @@ export const TOOLTIPS_DICT = {
         'FINISHED': 'Successfully executed',
         'ERROR': 'Execution ran into errors',
         'EXECUTION_TIME': 'Execution time',
+    },
+    [CurrentPage.ZERO_SHOT]: {
+        'LABELING_TASK': 'Select the labeling task',
+        'HOSTED_VERSION': 'Check out our hosted version to use this function',
+        'NAVIGATE_MODELS_DOWNLOADED': 'See which models are downloaded',
+        'INPUT_ATTRIBUTE': 'Select an input attribute',
+        'MODEL': 'Select a model',
+        'CONFIDENCE': 'Minimum confidence required to store predictions',
+        'WHY_SO_LONG': 'Why is this taking so long?',
+        'COMPUTE_TEXT': 'Computes the prediction for your given example text',
+        'CONFIDENCE_TOO_LOW': '< minConfidence -> would be ignored'
     }
 }

@@ -121,7 +121,7 @@ export default function HeuristicsCreationModals() {
             });
         }
         if (models.length == 0) {
-            refetchZeroShotRecommendations().then((res) => {
+            refetchZeroShotRecommendations({ variables: { projectId: project.id } }).then((res) => {
                 setModels(JSON.parse(res.data['zeroShotRecommendations']));
             });
         }

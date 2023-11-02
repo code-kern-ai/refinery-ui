@@ -16,6 +16,7 @@ export enum CurrentPage {
     MODEL_CALLBACKS = "MODEL_CALLBACKS",
     LABELING_FUNCTION = "LABELING_FUNCTION",
     ACTIVE_LEARNING = "ACTIVE_LEARNING",
+    ZERO_SHOT = "ZERO_SHOT",
 }
 
 export type User = {

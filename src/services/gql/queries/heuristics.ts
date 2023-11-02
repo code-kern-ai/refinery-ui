@@ -98,3 +98,16 @@ query ($projectId: ID!, $informationSourceId: ID!) {
   }
 }
 `;
+
+export const GET_ZERO_SHOT_TEXT = gql`
+query ($projectId: ID!, $informationSourceId: ID!, $config: String!, $text: String!, $runIndividually:Boolean!, $labels: JSONString!) {
+  zeroShotText(projectId: $projectId, informationSourceId: $informationSourceId, config: $config, text: $text, runIndividually: $runIndividually, labelNames: $labels) {
+    config
+    text
+    labels {
+      labelName
+      confidence
+    }
+  }
+}  
+`;

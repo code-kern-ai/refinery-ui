@@ -1,0 +1,174 @@
+import { selectHeuristic, setActiveHeuristics, updateHeuristicsState } from "@/src/reduxStore/states/pages/heuristics"
+import { useDispatch, useSelector } from "react-redux"
+import HeuristicsLayout from "../shared/HeuristicsLayout";
+import { selectProject } from "@/src/reduxStore/states/project";
+import { useLazyQuery, useMutation } from "@apollo/client";
+import { GET_HEURISTICS_BY_ID } from "@/src/services/gql/queries/heuristics";
+import { useEffect, useState } from "react";
+import { useRouter } from "next/router";
+import { GET_LABELING_TASKS_BY_PROJECT_ID, GET_ZERO_SHOT_RECOMMENDATIONS } from "@/src/services/gql/queries/project-setting";
+import { postProcessLabelingTasks, postProcessLabelingTasksSchema } from "@/src/util/components/projects/projectId/settings/labeling-tasks-helper";
+import { selectLabelingTasksAll, selectTextAttributes, selectUsableAttributes, setLabelingTasksAll } from "@/src/reduxStore/states/pages/settings";
+import { CurrentPage } from "@/src/types/shared/general";
+import { WebSocketsService } from "@/src/services/base/web-sockets/WebSocketsService";
+import { CONFIDENCE_INTERVALS, parseToSettingsJson, postProcessZeroShot } from "@/src/util/components/projects/projectId/heuristics/heuristicId/zero-shot-helper";
+import { UPDATE_INFORMATION_SOURCE } from "@/src/services/gql/mutations/heuristics";
+import { LabelingTaskTarget } from "@/src/types/components/projects/projectId/settings/labeling-tasks";
+import { Tooltip } from "@nextui-org/react";
+import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
+import Dropdown from "@/submodules/react-components/components/Dropdown";
+import { jsonCopy } from "@/submodules/javascript-functions/general";
+import { ZeroShotSettings } from "@/src/types/components/projects/projectId/heuristics/heuristicId/zero-shot";
+import LoadingIcon from "@/src/components/shared/loading/LoadingIcon";
+import { selectIsManaged } from "@/src/reduxStore/states/general";
+import { IconArrowAutofitDown } from "@tabler/icons-react";
+import Playground from "./Playground";
+
+export default function ZeroShot() {
+    const dispatch = useDispatch();
+    const router = useRouter();
+
+    const project = useSelector(selectProject);
+    const currentHeuristic = useSelector(selectHeuristic);
+    const labelingTasks = useSelector(selectLabelingTasksAll);
+    const textAttributes = useSelector(selectTextAttributes);
+    const isManaged = useSelector(selectIsManaged);
+
+    const [isModelDownloading, setIsModelDownloading] = useState(false);
+    const [models, setModels] = useState([]);
+
+    const [refetchCurrentHeuristic] = useLazyQuery(GET_HEURISTICS_BY_ID, { fetchPolicy: "network-only" });
+    const [refetchLabelingTasksByProjectId] = useLazyQuery(GET_LABELING_TASKS_BY_PROJECT_ID, { fetchPolicy: "network-only" });
+    const [updateHeuristicMut] = useMutation(UPDATE_INFORMATION_SOURCE);
+    const [refetchZeroShotRecommendations] = useLazyQuery(GET_ZERO_SHOT_RECOMMENDATIONS, { fetchPolicy: 'network-only', nextFetchPolicy: 'cache-first' });
+
+    useEffect(() => {
+        if (!project) return;
+        if (!router.query.heuristicId) return;
+        refetchLabelingTasksAndProcess();
+        refetchZeroShotRecommendations({ variables: { projectId: project.id } }).then((res) => {
+            setModels(JSON.parse(res.data['zeroShotRecommendations']));
+        });
+    }, [project, router.query.heuristicId]);
+
+    useEffect(() => {
+        if (!project) return;
+        if (!labelingTasks) return;
+        refetchCurrentHeuristicAndProcess();
+    }, [labelingTasks]);
+
+    useEffect(() => {
+        if (!currentHeuristic) return;
+        WebSocketsService.subscribeToNotification(CurrentPage.ZERO_SHOT, {
+            projectId: project.id,
+            whitelist: ['labeling_task_updated', 'labeling_task_created', 'label_created', 'label_deleted', 'labeling_task_deleted', 'information_source_deleted', 'information_source_updated', 'payload_update_statistics', 'payload_finished', 'payload_failed', 'payload_created', 'zero-shot', 'zero_shot_download'],
+            func: handleWebsocketNotification
+        });
+    }, [currentHeuristic]);
+
+    function refetchCurrentHeuristicAndProcess() {
+        refetchCurrentHeuristic({ variables: { projectId: project.id, informationSourceId: router.query.heuristicId } }).then((res) => {
+            dispatch(setActiveHeuristics(postProcessZeroShot(res['data']['informationSourceBySourceId'], labelingTasks, textAttributes)));
+        });
+    }
+
+    function refetchLabelingTasksAndProcess() {
+        refetchLabelingTasksByProjectId({ variables: { projectId: project.id } }).then((res) => {
+            const labelingTasks = postProcessLabelingTasks(res['data']['projectByProjectId']['labelingTasks']['edges']);
+            dispatch(setLabelingTasksAll(postProcessLabelingTasksSchema(labelingTasks)));
+        });
+    }
+
+    function saveHeuristic(labelingTaskName?: string, zeroShotSettings?: ZeroShotSettings) {
+        const labelingTask = labelingTaskName ? labelingTasks.find(a => a.name == labelingTaskName) : labelingTasks.find(a => a.id == currentHeuristic.zeroShotSettings.taskId);
+        const code = parseToSettingsJson(zeroShotSettings ? zeroShotSettings : currentHeuristic.zeroShotSettings);
+        updateHeuristicMut({ variables: { projectId: project.id, informationSourceId: currentHeuristic.id, labelingTaskId: labelingTask.id, code: code } }).then((res) => {
+            dispatch(updateHeuristicsState(currentHeuristic.id, { zeroShotSettings: zeroShotSettings ? zeroShotSettings : currentHeuristic.zeroShotSettings, labelingTaskId: labelingTask.id, labelingTaskName: labelingTask.name, labels: labelingTask.labels }))
+        });
+    }
+
+    function changeZeroShotSettings(attributeName: string, newValue: any, saveToDb: boolean = true) {
+        const zeroShotSettingsCopy = jsonCopy(currentHeuristic.zeroShotSettings);
+        if (attributeName == "excludedLabels") {
+            if (currentHeuristic.zeroShotSettings.excludedLabels.includes(newValue)) {
+                zeroShotSettingsCopy.excludedLabels = zeroShotSettingsCopy.excludedLabels.filter(id => id != newValue);
+                dispatch(updateHeuristicsState(currentHeuristic.id, { zeroShotSettings: zeroShotSettingsCopy }));
+            } else {
+                zeroShotSettingsCopy.excludedLabels.push(newValue);
+                dispatch(updateHeuristicsState(currentHeuristic.id, { zeroShotSettings: zeroShotSettingsCopy }));
+            }
+        } else if (attributeName == "targetConfig") {
+            zeroShotSettingsCopy.targetConfig = newValue;
+        } else {
+            if (attributeName == 'minConfidence') zeroShotSettingsCopy.minConfidence = newValue / 100;
+            dispatch(updateHeuristicsState(currentHeuristic.id, { zeroShotSettings: { [attributeName]: newValue } }));
+            if (attributeName == 'taskId') {
+                const labelingTask = labelingTasks.find(a => a.id == currentHeuristic.zeroShotSettings.taskId);
+                dispatch(updateHeuristicsState(currentHeuristic.id, { zeroShotSettings: { attributeSelectDisabled: textAttributes.length == 1 || labelingTask.taskTarget === LabelingTaskTarget.ON_ATTRIBUTE } }));
+            }
+        }
+        if (saveToDb) saveHeuristic(null, zeroShotSettingsCopy);
+    }
+
+    function handleWebsocketNotification(msgParts: string[]) { }
+
+    return (<HeuristicsLayout>
+        {currentHeuristic && <div>
+            {currentHeuristic.zeroShotSettings && <div className="mt-8 text-sm text-gray-700 leading-5">
+                <div className="font-medium">Settings</div>
+                <div className="font-normal mt-2">Labeling task</div>
+                <div className="relative flex-shrink-0 min-h-16 flex justify-between pb-2">
+                    <div className="flex items-center flex-wrap mt-3">
+                        <Tooltip content={TOOLTIPS_DICT.ZERO_SHOT.LABELING_TASK} color="invert" placement="top">
+                            <Dropdown options={labelingTasks.map(a => a.name)} buttonName={currentHeuristic?.labelingTaskName} selectedOption={(option: string) => saveHeuristic(option)} />
+                        </Tooltip>
+                        {currentHeuristic.labels?.length == 0 ? (<div className="text-sm font-normal text-gray-500 ml-3">No labels for target task</div>) : <>
+                            {currentHeuristic.labels?.map((label: any, index: number) => (
+                                <span key={label.id} onClick={() => changeZeroShotSettings('excludedLabels', label.id)}
+                                    className={`inline-flex border items-center px-2 py-0.5 rounded text-xs font-medium cursor-pointer ml-3 ${label.color.backgroundColor} ${label.color.hoverColor} ${label.color.textColor} ${label.color.borderColor}`}>
+                                    <span className="font-medium mr-3">{label.name}</span>
+                                    <span className="pb-0.5">
+                                        <input className="cursor-pointer align-middle" type="checkbox" defaultChecked={currentHeuristic.zeroShotSettings.excludedLabels?.includes(label.id)} />
+                                    </span>
+                                </span>
+                            ))}
+                        </>}
+                    </div>
+                </div>
+
+                <div className="mt-3 grid gap-x-4 gap-y-2 items-center" style={{ gridTemplateColumns: 'max-content max-content max-content' }}>
+                    <div className="font-normal">Input attribute</div>
+                    {!isModelDownloading ? (<div className="font-normal flex items-center h-6">
+                        Model
+                        <Tooltip content={!isManaged ? TOOLTIPS_DICT.ZERO_SHOT.HOSTED_VERSION : TOOLTIPS_DICT.ZERO_SHOT.NAVIGATE_MODELS_DOWNLOADED} color="invert" placement="right">
+                            <button disabled={!isManaged} onClick={() => router.push('/models-download')}
+                                className="ml-1 inline-block items-center border border-gray-300 shadow-sm text-xs font-semibold rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed">
+                                <IconArrowAutofitDown className="h-5 w-5 inline-block mr-1" />
+                            </button>
+                        </Tooltip>
+                    </div>) : (<div className="font-normal inline-flex items-center">Model Downloading <LoadingIcon /></div>)}
+                    <div className="font-normal">Required model confidence</div>
+                    <Tooltip content={TOOLTIPS_DICT.ZERO_SHOT.INPUT_ATTRIBUTE} color="invert" placement="top">
+                        <Dropdown options={textAttributes} buttonName={currentHeuristic.zeroShotSettings.attributeName} disabled={currentHeuristic.zeroShotSettings.attributeSelectDisabled}
+                            selectedOption={(option: string) => {
+                                const attributeId = textAttributes.find(a => a.name == option).id;
+                                changeZeroShotSettings('attributeId', attributeId);
+                            }} />
+                    </Tooltip>
+                    <Tooltip content={TOOLTIPS_DICT.ZERO_SHOT.MODEL} color="invert" placement="top">
+                        <Dropdown options={models.map(m => m.configString)} buttonName={currentHeuristic.zeroShotSettings.targetConfig} selectedOption={(option: string) => {
+                            changeZeroShotSettings('targetConfig', option);
+                        }} />
+                    </Tooltip>
+                    <Tooltip content={TOOLTIPS_DICT.ZERO_SHOT.CONFIDENCE} color="invert" placement="top">
+                        <Dropdown options={CONFIDENCE_INTERVALS} buttonName={(currentHeuristic.zeroShotSettings.minConfidence * 100) + '%'} selectedOption={(option: string) => {
+                            changeZeroShotSettings('minConfidence', option);
+                        }} />
+                    </Tooltip>
+                </div>
+
+                <Playground />
+            </div>}
+        </div>}
+    </HeuristicsLayout >)
+}
