@@ -17,6 +17,7 @@ export enum CurrentPage {
     LABELING_FUNCTION = "LABELING_FUNCTION",
     ACTIVE_LEARNING = "ACTIVE_LEARNING",
     ZERO_SHOT = "ZERO_SHOT",
+    CROWD_LABELER = "CROWD_LABELER",
 }
 
 export type User = {

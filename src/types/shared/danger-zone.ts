@@ -11,4 +11,5 @@ export enum DangerZoneEnum {
     ACTIVE_LEARNING = "active learning",
     LABELING_FUNCTION = "labeling function",
     ZERO_SHOT = "zero shot",
+    CROWD_LABELER = "crowd labeler",
 }

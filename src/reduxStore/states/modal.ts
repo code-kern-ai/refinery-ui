@@ -149,7 +149,7 @@ const initialState: Modals = {
     },
     [ModalEnum.SAMPLE_RECORDS_ZERO_SHOT]: {
         open: false,
-        currentRecordIdx: -1,
+        record: null,
     },
     [ModalEnum.CANCEL_EXECUTION]: {
         open: false

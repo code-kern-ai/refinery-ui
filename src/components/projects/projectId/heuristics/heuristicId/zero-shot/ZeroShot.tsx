@@ -114,7 +114,21 @@ export default function ZeroShot() {
         if (saveToDb) saveHeuristic(null, zeroShotSettingsCopy);
     }
 
-    function handleWebsocketNotification(msgParts: string[]) { }
+    function handleWebsocketNotification(msgParts: string[]) {
+        if (['labeling_task_updated', 'labeling_task_created', 'label_created', 'label_deleted'].includes(msgParts[1])) {
+            refetchLabelingTasksAndProcess();
+        } else if ('labeling_task_deleted' == msgParts[1]) {
+            alert('Parent labeling task was deleted!');
+            router.push(`/projects/${project.id}/heuristics`);
+        } else if ('information_source_deleted' == msgParts[1]) {
+            alert('Information source was deleted!');
+            router.push(`/projects/${project.id}/heuristics`);
+        } else if ('information_source_updated' == msgParts[1]) {
+            if (currentHeuristic.id == msgParts[2]) {
+                refetchCurrentHeuristicAndProcess();
+            }
+        }
+    }
 
     return (<HeuristicsLayout>
         {currentHeuristic && <div>

@@ -1,7 +1,7 @@
 import Modal from "@/src/components/shared/modal/Modal";
-import { setModalStates } from "@/src/reduxStore/states/modal";
+import { selectModal, setModalStates } from "@/src/reduxStore/states/modal";
 import { selectHeuristic } from "@/src/reduxStore/states/pages/heuristics";
-import { selectLabelingTasksAll } from "@/src/reduxStore/states/pages/settings";
+import { selectLabelingTasksAll, selectUsableAttributes } from "@/src/reduxStore/states/pages/settings";
 import { selectProject } from "@/src/reduxStore/states/project";
 import { RUN_ZERO_SHOT_PROJECT } from "@/src/services/gql/mutations/heuristics";
 import { GET_ZERO_SHOT_10_RANDOM_RECORDS } from "@/src/services/gql/queries/heuristics";
@@ -13,8 +13,9 @@ import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants"
 import { useLazyQuery, useMutation } from "@apollo/client";
 import { Tooltip } from "@nextui-org/react"
 import { IconAlertTriangle } from "@tabler/icons-react";
-import { useEffect, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import style from '@/src/styles/components/projects/projectId/heuristics/heuristics-details.module.css';
 
 export default function ZeroShotExecution(props: ZeroShotExecutionProps) {
     const dispatch = useDispatch();
@@ -22,6 +23,8 @@ export default function ZeroShotExecution(props: ZeroShotExecutionProps) {
     const project = useSelector(selectProject);
     const currentHeuristic = useSelector(selectHeuristic);
     const labelingTasks = useSelector(selectLabelingTasksAll);
+    const modalRecord = useSelector(selectModal(ModalEnum.SAMPLE_RECORDS_ZERO_SHOT));
+    const usableAttributes = useSelector(selectUsableAttributes);
 
     const [canRunProject, setCanRunProject] = useState(false);
     const [randomRecordTesterResult, setRandomRecordTesterResult] = useState(null);
@@ -115,7 +118,7 @@ export default function ZeroShotExecution(props: ZeroShotExecutionProps) {
                                             </Tooltip> : <div className="w-10"></div>}
                                         </div>
                                         <div className="flex items-center justify-center mr-5">
-                                            <label onClick={() => dispatch(setModalStates(ModalEnum.SAMPLE_RECORDS_ZERO_SHOT, { currentRecordIdx: i, open: true }))}
+                                            <label onClick={() => dispatch(setModalStates(ModalEnum.SAMPLE_RECORDS_ZERO_SHOT, { record: record, open: true }))}
                                                 className=" bg-white text-gray-700 text-xs font-semibold px-4 py-1 rounded border border-gray-300 cursor-pointer hover:bg-gray-50 focus:outline-none inline-block">
                                                 View
                                             </label>
@@ -129,9 +132,39 @@ export default function ZeroShotExecution(props: ZeroShotExecutionProps) {
             </div>
 
             <Modal modalName={ModalEnum.SAMPLE_RECORDS_ZERO_SHOT}>
+                <h1 className="text-lg text-gray-900 mb-2 text-center">View details</h1>
+                <div className="text-sm text-gray-500 my-2">
+                    {usableAttributes.map((att, i) => (<div className="text-sm leading-5 text-left my-3">
+                        <div className="text-gray-900 font-bold">{att.name}</div>
+                        <div className="text-gray-500 font-normal">
+                            {modalRecord.record?.fullRecordData[att.name]}</div>
+                    </div>))}
+                </div>
 
-            </Modal>
-        </div>}
+                <div className="gap-x-2 items-center" style={{ gridTemplateColumns: 'max content 16.5rem max-content' }}>
+                    {modalRecord.record?.labels.map((result: any, index) => (<div key={index} className="flex items-center">
+                        {result.color ? (<div className={`border items-center px-2 py-0.5 rounded text-xs font-medium text-center mr-2 my-2 ${result.color.backgroundColor} ${result.color.textColor} ${result.color.borderColor} ${result.color.hoverColor}`}>
+                            {result.labelName}
+                        </div>) : (<div
+                            className="border items-center px-2 py-0.5 rounded text-xs font-medium text-center mr-2 my-2 bg-gray-100 text-gray-700 border-gray-400 hover:bg-gray-200">
+                            {result.labelName}
+                        </div>)}
+                        <div className="text-sm leading-5 font-normal text-gray-500">
+                            <div className="w-64 bg-gray-200 rounded-full h-2.5 dark:bg-gray-700">
+                                <div className="bg-green-400 h-2.5 rounded-full" style={{ 'width': result.confidenceText }}>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="flex flex-row items-center">
+                            <span className="text-sm select-none self-start ml-2">{result.confidenceText}</span>
+                            {(result.confidence * 100) < currentHeuristic.zeroShotSettings.minConfidence && <Tooltip content={TOOLTIPS_DICT.ZERO_SHOT.CONFIDENCE_TOO_LOW} color="invert" placement="top">
+                                <IconAlertTriangle className="text-yellow-500 h-5 w-5" />
+                            </Tooltip>}
+                        </div>
+                    </div>))}
+                </div>
+            </Modal >
+        </div >}
     </>
     )
 }
