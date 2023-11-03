@@ -134,7 +134,7 @@ export default function ZeroShotExecution(props: ZeroShotExecutionProps) {
             <Modal modalName={ModalEnum.SAMPLE_RECORDS_ZERO_SHOT}>
                 <h1 className="text-lg text-gray-900 mb-2 text-center">View details</h1>
                 <div className="text-sm text-gray-500 my-2">
-                    {usableAttributes.map((att, i) => (<div className="text-sm leading-5 text-left my-3">
+                    {usableAttributes.map((att, i) => (<div key={att.id} className="text-sm leading-5 text-left my-3">
                         <div className="text-gray-900 font-bold">{att.name}</div>
                         <div className="text-gray-500 font-normal">
                             {modalRecord.record?.fullRecordData[att.name]}</div>

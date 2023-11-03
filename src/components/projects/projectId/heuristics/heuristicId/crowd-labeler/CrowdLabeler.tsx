@@ -15,6 +15,9 @@ import HeuristicsLayout from "../shared/HeuristicsLayout";
 import { selectAnnotators } from "@/src/reduxStore/states/general";
 import DangerZone from "@/src/components/shared/danger-zone/DangerZone";
 import { DangerZoneEnum } from "@/src/types/shared/danger-zone";
+import HeuristicStatistics from "../shared/HeuristicStatistics";
+import CrowdLabelerSettings from "./CrowdLabelerSettings";
+import { postProcessCrowdLabeler } from "@/src/util/components/projects/projectId/heuristics/heuristicId/crowd-labeler-helper";
 
 export default function CrowdLabeler() {
     const dispatch = useDispatch();
@@ -51,7 +54,7 @@ export default function CrowdLabeler() {
 
     function refetchCurrentHeuristicAndProcess() {
         refetchCurrentHeuristic({ variables: { projectId: project.id, informationSourceId: router.query.heuristicId } }).then((res) => {
-            dispatch(setActiveHeuristics(postProcessCurrentHeuristic(res['data']['informationSourceBySourceId'], labelingTasks)));
+            dispatch(setActiveHeuristics(postProcessCrowdLabeler(res['data']['informationSourceBySourceId'], labelingTasks)));
         });
     }
 
@@ -115,7 +118,7 @@ export default function CrowdLabeler() {
                                         className="prose prose-indigo mt-5 text-gray-500 lg:col-start-1 lg:row-start-1 lg:max-w-none">
                                         <p>Annotators will receive an annotator/slice-specific URL, which shows them records
                                             of the respective data slice. They can label through this slice, but their
-                                            labels won't be set as your manual reference labels. Instead, their output will
+                                            labels won&apos;t be set as your manual reference labels. Instead, their output will
                                             be considered a heuristic just like a labeling function.</p>
                                         <p>To get started, please ensure the following:</p>
                                         <ul role="list">
@@ -133,7 +136,10 @@ export default function CrowdLabeler() {
                             </div>
                         </div>
                     </div></>
-            ) : (<></>)}
+            ) : (<>
+                <CrowdLabelerSettings />
+                <HeuristicStatistics />
+            </>)}
             <DangerZone elementType={DangerZoneEnum.CROWD_LABELER} id={currentHeuristic.id} name={currentHeuristic.name} />
         </div>}
     </HeuristicsLayout>)
