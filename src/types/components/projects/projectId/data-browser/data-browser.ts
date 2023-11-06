@@ -1,3 +1,5 @@
+import { SearchGroup } from "@/submodules/javascript-functions/enums/enums";
+
 export type DataSlice = {
     id: string;
     name: string;
@@ -13,4 +15,15 @@ export type DataSlice = {
     info: string; // is a JSONstring and gets parsed when applied
     color: any;
     displayName: string;
+};
+
+export type SearchGroupElement = {
+    group: SearchGroup;
+    key: string;
+    sortOrder: number;
+    isOpen: boolean;
+    inOpenTransition: boolean;
+    name: string;
+    nameAdd: string;
+    subText: string;
 };

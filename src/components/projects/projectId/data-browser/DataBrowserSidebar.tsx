@@ -5,9 +5,9 @@ import { removeFromAllDataSlicesById, selectActiveSlice, selectAdditionalData, s
 import { selectProject } from '@/src/reduxStore/states/project';
 import { DELETE_DATA_SLICE } from '@/src/services/gql/queries/data-slices';
 import style from '@/src/styles/components/projects/projectId/data-browser.module.css';
-import { DataSlice } from '@/src/types/components/projects/projectId/data-browser.ts/data-browser';
+import { DataSlice } from '@/src/types/components/projects/projectId/data-browser/data-browser';
 import { ModalButton, ModalEnum } from '@/src/types/shared/modal';
-import { updateSliceInfoHelper } from '@/src/util/components/projects/projectId/data-browser-helper';
+import { updateSliceInfoHelper } from '@/src/util/components/projects/projectId/data-browser/data-browser-helper';
 import { parseLinkFromText } from '@/src/util/shared/link-parser-helper';
 import { TOOLTIPS_DICT } from '@/src/util/tooltip-constants';
 import { Slice } from '@/submodules/javascript-functions/enums/enums';
@@ -19,6 +19,7 @@ import { useRouter } from 'next/router';
 import { Fragment, useCallback, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { timer } from 'rxjs';
+import SearchGroups from './SearchGroups';
 
 const ABORT_BUTTON = { buttonCaption: 'Delete', useButton: true, disabled: false };
 
@@ -140,8 +141,11 @@ export default function DataBrowserSidebar() {
                     </div>
                 </div>
                 <span className="text-sm text-gray-400">You can filter and order all your data in the browser according to your needs. Selected filter criteria can be saved and used later on.</span>
+
+                <SearchGroups />
             </div>}
-        </div >
+        </div>
+
         <Modal modalName={ModalEnum.DELETE_SLICE} abortButton={abortButton}>
             <h1 className="text-lg text-gray-900 mb-2 text-center">Warning</h1>
             <div className="text-sm text-gray-500 my-2 text-center">

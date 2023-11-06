@@ -1,4 +1,4 @@
-import { DataSlice } from "@/src/types/components/projects/projectId/data-browser.ts/data-browser";
+import { DataSlice } from "@/src/types/components/projects/projectId/data-browser/data-browser";
 import { Project } from "@/src/types/components/projects/projects-list";
 import { User } from "@/src/types/shared/general";
 import { buildFullLink } from "@/src/util/shared/link-parser-helper";

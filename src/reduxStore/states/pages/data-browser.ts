@@ -1,4 +1,4 @@
-import { DataSlice } from '@/src/types/components/projects/projectId/data-browser.ts/data-browser';
+import { DataSlice } from '@/src/types/components/projects/projectId/data-browser/data-browser';
 import { arrayToDict } from '@/submodules/javascript-functions/general';
 import { createSlice } from '@reduxjs/toolkit'
 import type { PayloadAction } from '@reduxjs/toolkit'
