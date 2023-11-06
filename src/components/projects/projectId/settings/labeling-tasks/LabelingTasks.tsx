@@ -91,7 +91,6 @@ export default function LabelingTasks() {
     }
 
     function labelingTasksDropdownValues() {
-        if (labelingTasksSchema.length != 0) return labelingTasksDropdownArray;
         const prepareNewArray: { name: string, value: string }[] = [];
         for (let t of Object.values(LabelingTaskTaskType)) {
             if (t == LabelingTaskTaskType.NOT_USEABLE) continue;

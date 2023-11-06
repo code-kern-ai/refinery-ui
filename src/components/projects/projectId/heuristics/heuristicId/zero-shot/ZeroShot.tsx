@@ -27,6 +27,7 @@ import HeuristicStatistics from "../shared/HeuristicStatistics";
 import DangerZone from "@/src/components/shared/danger-zone/DangerZone";
 import { DangerZoneEnum } from "@/src/types/shared/danger-zone";
 import CalculationProgress from "./CalculationProgress";
+import { Status } from "@/src/types/shared/statuses";
 
 export default function ZeroShot() {
     const dispatch = useDispatch();
@@ -127,6 +128,23 @@ export default function ZeroShot() {
             if (currentHeuristic.id == msgParts[2]) {
                 refetchCurrentHeuristicAndProcess();
             }
+        } else if ('zero_shot_download' == msgParts[1]) {
+            if (currentHeuristic.id == msgParts[3]) {
+                if ("started" == msgParts[2]) setIsModelDownloading(true);
+                if ("finished" == msgParts[2]) setIsModelDownloading(false);
+            }
+        } else if (msgParts[1] == 'zero-shot') {
+            if (msgParts[2] != currentHeuristic.lastTask.id) return;
+            if (msgParts[3] == 'progress') {
+                dispatch(updateHeuristicsState(currentHeuristic.id, { lastTask: { progress: Number(msgParts[4]), state: Status.CREATED, id: msgParts[2] } }))
+            } else if (msgParts[3] == 'state') {
+                if (msgParts[4] == Status.FINISHED) {
+                    refetchCurrentHeuristicAndProcess();
+                } else {
+                    dispatch(updateHeuristicsState(currentHeuristic.id, { lastTask: { state: msgParts[4] } }))
+                }
+            }
+
         }
     }
 

@@ -43,6 +43,7 @@ const initialState: Modals = {
         open: false,
         attributeName: '',
         duplicateNameExists: false,
+        attributeType: null,
     },
     [ModalEnum.PROJECT_SNAPSHOT]: {
         open: false,

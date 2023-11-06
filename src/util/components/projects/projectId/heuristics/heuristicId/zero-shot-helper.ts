@@ -21,6 +21,7 @@ export function postProcessZeroShot(heuristic: Heuristic, labelingTasks: Labelin
         stat.color = getColorStruct(stat.color);
     });
     prepareHeuristic.labels = labelingTask.labels;
+    prepareHeuristic.lastTask = heuristic['lastPayload'];
     if (prepareHeuristic.lastTask) {
         const task = jsonCopy(prepareHeuristic.lastTask);
         if (task.createdAt && task.finishedAt) {

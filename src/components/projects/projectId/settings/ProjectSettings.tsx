@@ -48,7 +48,6 @@ export default function ProjectSettings() {
 
     const [pKeyValid, setPKeyValid] = useState<boolean | null>(null);
     const [pKeyCheckTimer, setPKeyCheckTimer] = useState(null);
-    const [attributeType, setAttributeType] = useState("Text");
     const [isAcRunning, setIsAcRunning] = useState(false);
     const [tokenizationProgress, setTokenizationProgress] = useState(0);
     const [checkIfAcUploadedRecords, setCheckIfAcUploadedRecords] = useState(false);
@@ -86,7 +85,7 @@ export default function ProjectSettings() {
     }, [attributes]);
 
     const createUserAttribute = useCallback(() => {
-        const attributeTypeFinal = DATA_TYPES.find((type) => type.name === attributeType).value;
+        const attributeTypeFinal = DATA_TYPES.find((type) => type.name === modalCreateNewAtt.attributeType).value;
         createAttributeMut({ variables: { projectId: project.id, name: modalCreateNewAtt.attributeName, dataType: attributeTypeFinal } }).then((res) => {
             const id = res?.data?.createUserAttribute.attributeId;
             if (id) {
@@ -124,7 +123,7 @@ export default function ProjectSettings() {
     }
 
     useEffect(() => {
-        setAcceptButton({ ...acceptButton, emitFunction: createUserAttribute, disabled: modalCreateNewAtt.duplicateNameExists || modalCreateNewAtt.attributeName.trim() == "" });
+        setAcceptButton({ ...acceptButton, emitFunction: createUserAttribute, disabled: modalCreateNewAtt.duplicateNameExists || modalCreateNewAtt.attributeName.trim() == "" || modalCreateNewAtt.attributeType == null });
     }, [modalCreateNewAtt]);
 
     function requestPKeyCheck() {
@@ -315,10 +314,10 @@ export default function ProjectSettings() {
                     <Tooltip content={TOOLTIPS_DICT.PROJECT_SETTINGS.SELECT_ATTRIBUTE_TYPE} color="invert" placement="right">
                         <span className="cursor-help card-title mb-0 label-text font-normal"><span className="underline filtersUnderline">Attribute type</span></span>
                     </Tooltip>
-                    <Dropdown buttonName={attributeType} options={DATA_TYPES} selectedOption={(option: string) => setAttributeType(option)} />
+                    <Dropdown buttonName={modalCreateNewAtt.attributeType ?? 'Select type'} options={DATA_TYPES} selectedOption={(option: string) => dispatch(setModalStates(ModalEnum.CREATE_NEW_ATTRIBUTE, { attributeType: option }))} />
                 </div>
                 {modalCreateNewAtt.duplicateNameExists && <div className="text-red-700 text-xs mt-2">Attribute name exists</div>}
-                {attributeType == 'Embedding List' && <div className="border border-gray-300 text-xs text-gray-500 p-2.5 rounded-lg text-justify mt-2 max-w-2xl">
+                {modalCreateNewAtt.attributeType == 'Embedding List' && <div className="border border-gray-300 text-xs text-gray-500 p-2.5 rounded-lg text-justify mt-2 max-w-2xl">
                     <label className="text-gray-700">
                         Embedding lists are special. They can only be used for similarity search. If a list
                         entry is matched, the whole record is considered matched.

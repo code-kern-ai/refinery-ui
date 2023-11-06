@@ -2,6 +2,7 @@ import LoadingIcon from "@/src/components/shared/loading/LoadingIcon";
 import Modal from "@/src/components/shared/modal/Modal";
 import { openModal, selectModal } from "@/src/reduxStore/states/modal";
 import { selectHeuristic } from "@/src/reduxStore/states/pages/heuristics";
+import { selectProject } from "@/src/reduxStore/states/project";
 import { CANCEL_ZERO_SHOT_RUN } from "@/src/services/gql/mutations/heuristics";
 import { ModalButton, ModalEnum } from "@/src/types/shared/modal";
 import { Status } from "@/src/types/shared/statuses";
@@ -17,6 +18,7 @@ const ABORT_BUTTON = { buttonCaption: 'Cancel', useButton: true, disabled: false
 export default function CalculationProgress() {
     const dispatch = useDispatch();
 
+    const project = useSelector(selectProject);
     const currentHeuristic = useSelector(selectHeuristic);
     const modalCancel = useSelector(selectModal(ModalEnum.CANCEL_EXECUTION));
 
@@ -25,7 +27,7 @@ export default function CalculationProgress() {
     const [cancelExecutionMut] = useMutation(CANCEL_ZERO_SHOT_RUN);
 
     const cancelExecution = useCallback(() => {
-        cancelExecutionMut({ variables: { projectId: currentHeuristic.projectId, informationSourceId: currentHeuristic.id, payloadId: currentHeuristic.lastTask.id } }).then(() => { });
+        cancelExecutionMut({ variables: { projectId: project.id, informationSourceId: currentHeuristic.id, payloadId: currentHeuristic.lastTask.id } }).then(() => { });
     }, [modalCancel]);
 
     useEffect(() => {
@@ -80,7 +82,8 @@ export default function CalculationProgress() {
                 <div className="flex flex-col items-center">
                     <h1 className="text-lg text-gray-900 mb-2">Cancel Execution</h1>
                     <div className="text-sm text-gray-500 my-2">
-                        Are you sure you want to cancel?<br>This will stop the execution and remove already created labels.</br>
+                        Are you sure you want to cancel?
+                        <div>This will stop the execution and remove already created labels.</div>
                     </div>
                 </div>
 

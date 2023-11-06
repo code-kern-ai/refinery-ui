@@ -92,7 +92,7 @@ export default function CrowdLabeler() {
 
     return (<HeuristicsLayout>
         {currentHeuristic && <div>
-            {annotators.length == 0 ? (
+            {annotators.length == 0 || dataSlices.length == 0 ? (
                 <>
                     <div className="overflow-hidden bg-white">
                         <div className="relative py-8 pr-4">
