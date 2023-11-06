@@ -1,0 +1,19 @@
+.transitionAll {
+    transition: all 0.25s ease-in-out;
+}
+
+.sidebarWidth {
+    max-width: 56px;
+}
+
+.sidebarWidthOpen {
+    max-width: 400px;
+}
+
+.searchMenuWidth {
+    width: 400px;
+}
+
+.rotateTransform {
+    transform: rotate(180deg);
+}

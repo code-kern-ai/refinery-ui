@@ -149,7 +149,7 @@ export default function Sidebar() {
                                             className="flex items-center justify-center overflow-visible mt-10 2xl:mt-12">
                                             <Tooltip placement="right" trigger="hover" color="invert" content="Data Browser">
                                                 <div className={`relative z-50 ${project.numDataScaleUploaded == 0 ? 'opacity-50 cursor-not-allowed pointer-events-none' : 'opacity-100 cursor-pointer'}`}>
-                                                    <button onClick={() => router.push(`/projects/${project.id}/data`)}
+                                                    <button onClick={() => router.push(`/projects/${project.id}/data-browser`)}
                                                         className={`circle ${routeColor.data.active ? 'text-kernpurple' : 'text-white'}`}>
                                                         <IconTriangleSquareCircle className="w-6 h-6" />
                                                     </button>

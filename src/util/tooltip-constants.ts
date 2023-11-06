@@ -164,5 +164,10 @@ export const TOOLTIPS_DICT = {
         'LOCK_ACCESS': 'Lock access',
         'UNLOCK_ACCESS': 'Unlock access',
         'REMOVE_LINK': 'Remove link',
+    },
+    [CurrentPage.DATA_BROWSER]: {
+        'COPY_TO_CLIPBOARD': 'Copy to clipboard',
+        'ONLY_MANAGED': 'Only usable for the managed version',
+        'OUTDATED_SLICE': 'Outdated slice&#10;save to update'
     }
 }

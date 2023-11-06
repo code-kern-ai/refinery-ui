@@ -16,3 +16,11 @@ query($projectId:ID!,$sliceType:String){
   }
 }
 `;
+
+export const DELETE_DATA_SLICE = gql`
+mutation($projectId: ID!, $dataSliceId: ID!){
+  deleteDataSlice(projectId: $projectId, dataSliceId: $dataSliceId){
+    ok
+  }
+}
+`;

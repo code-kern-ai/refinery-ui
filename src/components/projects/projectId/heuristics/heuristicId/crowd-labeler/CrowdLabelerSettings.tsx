@@ -1,11 +1,12 @@
 import { selectAnnotators, selectAnnotatorsDict } from "@/src/reduxStore/states/general";
-import { selectDataSlicesAll, selectDataSlicesDict, setDataSlices } from "@/src/reduxStore/states/pages/data-browser";
+import { selectDataSlicesAll, selectDataSlicesDict } from "@/src/reduxStore/states/pages/data-browser";
 import { selectHeuristic, updateHeuristicsState } from "@/src/reduxStore/states/pages/heuristics";
 import { selectLabelingTasksAll } from "@/src/reduxStore/states/pages/settings";
 import { selectProject } from "@/src/reduxStore/states/project";
 import { CREATE_ACCESS_LINK, LOCK_ACCESS_LINK, REMOVE_ACCESS_LINK, UPDATE_INFORMATION_SOURCE } from "@/src/services/gql/mutations/heuristics";
 import { GET_ACCESS_LINK } from "@/src/services/gql/queries/heuristics";
-import { buildFullLink, parseLinkFromText, parseToSettingsJson } from "@/src/util/components/projects/projectId/heuristics/heuristicId/crowd-labeler-helper";
+import { parseToSettingsJson } from "@/src/util/components/projects/projectId/heuristics/heuristicId/crowd-labeler-helper";
+import { buildFullLink, parseLinkFromText } from "@/src/util/shared/link-parser-helper";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
 import { copyToClipboard, jsonCopy } from "@/submodules/javascript-functions/general";
 import Dropdown from "@/submodules/react-components/components/Dropdown";

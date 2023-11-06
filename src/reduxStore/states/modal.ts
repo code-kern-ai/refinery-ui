@@ -154,7 +154,15 @@ const initialState: Modals = {
     },
     [ModalEnum.CANCEL_EXECUTION]: {
         open: false
-    }
+    },
+    [ModalEnum.DATA_SLICE_INFO]: {
+        open: false,
+        sliceInfo: null,
+    },
+    [ModalEnum.DELETE_SLICE]: {
+        open: false,
+        sliceId: '',
+    },
 };
 
 const modalSlice = createSlice({
