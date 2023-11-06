@@ -159,5 +159,10 @@ export const TOOLTIPS_DICT = {
     },
     [CurrentPage.CROWD_LABELER]: {
         'SELECT_ANNOTATOR': 'Select an annotator',
+        'SELECT_DATA_SLICE': 'Select a data slice',
+        'COPY_TO_CLIPBOARD': 'Copy to clipboard',
+        'LOCK_ACCESS': 'Lock access',
+        'UNLOCK_ACCESS': 'Unlock access',
+        'REMOVE_LINK': 'Remove link',
     }
 }

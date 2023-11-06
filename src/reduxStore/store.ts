@@ -7,6 +7,7 @@ import { uploadReducer } from './states/upload';
 import { settingsReducer } from './states/pages/settings';
 import { modelsDownloadedSliceReducer } from './states/pages/models-downloaded';
 import { heuristicsReducer } from './states/pages/heuristics';
+import { dataBrowserReducer } from './states/pages/data-browser';
 
 const store = configureStore({
     reducer: {
@@ -17,7 +18,8 @@ const store = configureStore({
         upload: uploadReducer,
         settings: settingsReducer,
         modelsDownloaded: modelsDownloadedSliceReducer,
-        heuristics: heuristicsReducer
+        heuristics: heuristicsReducer,
+        dataBrowser: dataBrowserReducer,
     },
     devTools: process.env.IS_DEV == '1',
 });

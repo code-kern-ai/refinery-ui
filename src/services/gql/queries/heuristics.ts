@@ -128,3 +128,13 @@ query ($projectId: ID!, $informationSourceId: ID!, $labels: JSONString) {
   }
 }
 `;
+
+export const GET_ACCESS_LINK = gql`
+query ($projectId: ID!, $linkId: ID!) {
+  accessLink(projectId: $projectId, linkId: $linkId) {
+    id
+    link
+    isLocked
+  }
+}
+`;

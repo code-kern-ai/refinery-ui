@@ -102,3 +102,31 @@ mutation ($projectId: ID!, $informationSourceId: ID!, $payloadId: ID!) {
   }
 }
 `;
+
+export const CREATE_ACCESS_LINK = gql`
+mutation ($projectId: ID!, $id: ID!, $type: String!) {
+  generateAccessLink(projectId: $projectId, id: $id, type: $type) {
+    link {
+      id
+      link
+      isLocked
+    }
+  }
+}
+`;
+
+export const REMOVE_ACCESS_LINK = gql`
+mutation ($projectId: ID!, $linkId: ID!) {
+removeAccessLink(projectId: $projectId, linkId: $linkId) {
+  ok
+}
+}
+`;
+
+export const LOCK_ACCESS_LINK = gql`
+mutation ($projectId: ID!, $linkId: ID!, $lockState: Boolean) {
+  lockAccessLink(projectId: $projectId, linkId: $linkId, lockState: $lockState) {
+    ok
+  }
+}
+`;

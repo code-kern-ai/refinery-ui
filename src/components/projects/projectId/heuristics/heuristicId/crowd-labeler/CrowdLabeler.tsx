@@ -5,7 +5,6 @@ import { WebSocketsService } from "@/src/services/base/web-sockets/WebSocketsSer
 import { GET_HEURISTICS_BY_ID } from "@/src/services/gql/queries/heuristics";
 import { GET_LABELING_TASKS_BY_PROJECT_ID } from "@/src/services/gql/queries/project-setting";
 import { CurrentPage } from "@/src/types/shared/general";
-import { postProcessCurrentHeuristic } from "@/src/util/components/projects/projectId/heuristics/heuristicId/heuristics-details-helper";
 import { postProcessLabelingTasks, postProcessLabelingTasksSchema } from "@/src/util/components/projects/projectId/settings/labeling-tasks-helper";
 import { useLazyQuery } from "@apollo/client";
 import { useRouter } from "next/router";
@@ -18,6 +17,9 @@ import { DangerZoneEnum } from "@/src/types/shared/danger-zone";
 import HeuristicStatistics from "../shared/HeuristicStatistics";
 import CrowdLabelerSettings from "./CrowdLabelerSettings";
 import { postProcessCrowdLabeler } from "@/src/util/components/projects/projectId/heuristics/heuristicId/crowd-labeler-helper";
+import { selectDataSlicesAll, setDataSlices } from "@/src/reduxStore/states/pages/data-browser";
+import { DATA_SLICES } from "@/src/services/gql/queries/data-slices";
+
 
 export default function CrowdLabeler() {
     const dispatch = useDispatch();
@@ -27,14 +29,20 @@ export default function CrowdLabeler() {
     const currentHeuristic = useSelector(selectHeuristic);
     const labelingTasks = useSelector(selectLabelingTasksAll);
     const annotators = useSelector(selectAnnotators);
+    const dataSlices = useSelector(selectDataSlicesAll);
 
     const [refetchCurrentHeuristic] = useLazyQuery(GET_HEURISTICS_BY_ID, { fetchPolicy: "network-only" });
     const [refetchLabelingTasksByProjectId] = useLazyQuery(GET_LABELING_TASKS_BY_PROJECT_ID, { fetchPolicy: "network-only" });
+    const [refetchDataSlicesMut] = useLazyQuery(DATA_SLICES, { fetchPolicy: 'network-only' });
+
 
     useEffect(() => {
         if (!project) return;
         if (!router.query.heuristicId) return;
         refetchLabelingTasksAndProcess();
+        refetchDataSlicesMut({ variables: { projectId: project.id, sliceType: "STATIC_DEFAULT" } }).then((res) => {
+            dispatch(setDataSlices(res.data.dataSlices));
+        });
     }, [project, router.query.heuristicId]);
 
     useEffect(() => {
@@ -47,7 +55,7 @@ export default function CrowdLabeler() {
         if (!currentHeuristic) return;
         WebSocketsService.subscribeToNotification(CurrentPage.CROWD_LABELER, {
             projectId: project.id,
-            whitelist: ['labeling_task_updated', 'labeling_task_created', 'label_created', 'label_deleted', 'labeling_task_deleted', 'information_source_deleted', 'information_source_updated', 'model_callback_update_statistics', 'payload_progress', 'payload_finished', 'payload_failed', 'payload_created'],
+            whitelist: ['labeling_task_updated', 'labeling_task_created', 'label_created', 'label_deleted', 'labeling_task_deleted', 'information_source_deleted', 'information_source_updated', 'model_callback_update_statistics'],
             func: handleWebsocketNotification
         });
     }, [currentHeuristic]);
@@ -67,7 +75,19 @@ export default function CrowdLabeler() {
 
 
     function handleWebsocketNotification(msgParts: string[]) {
-
+        if (['labeling_task_updated', 'labeling_task_created', 'label_created', 'label_deleted'].includes(msgParts[1])) {
+            refetchLabelingTasksAndProcess();
+        } else if ('labeling_task_deleted' == msgParts[1]) {
+            alert('Parent labeling task was deleted!');
+            router.push(`/projects/${project.id}/heuristics`);
+        } else if ('information_source_deleted' == msgParts[1]) {
+            alert('Information source was deleted!');
+            router.push(`/projects/${project.id}/heuristics`);
+        } else if (['information_source_updated', 'model_callback_update_statistics'].includes(msgParts[1])) {
+            if (currentHeuristic.id == msgParts[2]) {
+                refetchCurrentHeuristicAndProcess();
+            }
+        }
     }
 
     return (<HeuristicsLayout>

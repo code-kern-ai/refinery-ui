@@ -48,6 +48,7 @@ export default function DangerZone(props: DangerZoneProps) {
             case DangerZoneEnum.LABELING_FUNCTION:
             case DangerZoneEnum.ACTIVE_LEARNING:
             case DangerZoneEnum.ZERO_SHOT:
+            case DangerZoneEnum.CROWD_LABELER:
                 deleteHeuristicMut({ variables: { projectId: project.id, informationSourceId: props.id } }).then(() => {
                     setIsDeleting(false);
                     router.push(`/projects/${project.id}/heuristics`);

@@ -104,6 +104,12 @@ export default function HeuristicsLayout(props: any) {
                         {currentHeuristic.lastTask && <Tooltip content={TOOLTIPS_DICT.HEURISTICS.EXECUTION_TIME} color="invert" placement="right">
                             <div className="text-sm leading-5 font-normal text-gray-500 ml-3 mt-1 inline-block">{currentHeuristic.lastTask.durationText}</div>
                         </Tooltip>}
+                        {(currentHeuristic.informationSourceType === InformationSourceType.CROWD_LABELER && currentHeuristic.lastTask) && <div className="text-sm leading-5 font-normal text-gray-500 w-36">
+                            <div className="w-36 bg-gray-200 rounded-full h-2.5 dark:bg-gray-700">
+                                <div className="bg-green-400 h-2.5 rounded-full" style={{ 'width': currentHeuristic.lastTask.progress + '%' }}>
+                                </div>
+                            </div>
+                        </div>}
                     </div>
                 </div>
             </div>
