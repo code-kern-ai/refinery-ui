@@ -1,14 +1,15 @@
 import { SearchGroupElement } from "@/src/types/components/projects/projectId/data-browser/data-browser";
 import { SearchGroupItem, SearchItemType } from "@/src/types/components/projects/projectId/data-browser/search-groups";
 import { SearchOperator } from "@/src/types/components/projects/projectId/data-browser/search-operators";
+import { LabelingTask, LabelingTaskTarget } from "@/src/types/components/projects/projectId/settings/labeling-tasks";
 import { nameForGroupKeyToString } from "@/submodules/javascript-functions/enums/enum-functions";
-import { SearchGroup } from "@/submodules/javascript-functions/enums/enums";
+import { InformationSourceType, SearchGroup } from "@/submodules/javascript-functions/enums/enums";
 
 export function getBasicSearchGroup(
     group: SearchGroup,
     sortOrder: number,
     nameAdd: string = '',
-    keyAdd: string = null,
+    keyAdd: string = null
 ): SearchGroupElement {
     return {
         group: group,
@@ -133,7 +134,7 @@ export function userCreateSearchGroup(item, globalSearchGroupCount, users) {
     }
 }
 
-export function buildUserArray(users) {
+function buildUserArray(users) {
     let array = [];
     for (const u of users) {
         if (u.countSum == 0) continue;
@@ -155,4 +156,80 @@ export function buildUserArray(users) {
         });
     }
     return array;
+}
+
+export function labelingTasksCreateSearchGroup(item, task: LabelingTask, globalSearchGroupCount: number) {
+    return {
+        id: globalSearchGroupCount,
+        group: item.group,
+        groupKey: item.groupKey,
+        type: item.type,
+        taskTarget: task.taskTarget == LabelingTaskTarget.ON_ATTRIBUTE ? task.attribute.name : 'Full Record',
+        taskId: task.id,
+        active: true,
+        manualLabels: labelingTaskLabelArray(task),
+        weakSupervisionLabels: labelingTaskLabelArray(task),
+        modelCallbackLabels: labelingTaskLabelArray(task),
+        sortByWeakSupervisionConfidence: null,
+        sortByModelCallbackConfidence: null,
+        weakSupervisionConfidence: getConfidenceFilter(),
+        modelCallbackConfidence: getConfidenceFilter(),
+        heuristics: labelingTaskHeuristicArray(task),
+        isWithDifferentResults: isWithDifferentResults(task),
+    }
+}
+
+function labelingTaskLabelArray(task: LabelingTask) {
+    let array = [];
+    let noLabelItemExists = false;
+    for (let l of task.labels) {
+        noLabelItemExists = (noLabelItemExists || l.id === 'NO_LABEL') ? true : false,
+            array.push({
+                id: l.id,
+                name: l.name,
+                active: l.active === undefined ? false : l.active,
+                negate: l.negate === undefined ? false : l.negate,
+            });
+    }
+    if (task.labels.length > 0 && !noLabelItemExists) {
+        array.push({
+            id: 'NO_LABEL',
+            name: 'Has no label', //filter not in labelid to ensure only the ones from task are used -- join part
+            active: false,
+        });
+    }
+    return array;
+}
+
+function getConfidenceFilter() {
+    return {
+        active: false,
+        negate: false,
+        lower: 0,
+        upper: 100
+    }
+}
+
+function labelingTaskHeuristicArray(task: LabelingTask) {
+    let array = []
+    for (let l of task.informationSources) {
+        if (l.type == InformationSourceType.LABELING_FUNCTION || l.type == InformationSourceType.ACTIVE_LEARNING
+            || l.type == InformationSourceType.ZERO_SHOT || l.type == InformationSourceType.CROWD_LABELER || l.type === undefined) {
+            array.push({
+                id: l.id,
+                name: l.name,
+                active: false,
+                negate: false,
+            });
+        }
+    }
+    return array;
+}
+
+function isWithDifferentResults(task: LabelingTask) {
+    return {
+        active: false,
+        taskId: task.id,
+        taskType: task.taskType
+    }
 }

@@ -1,9 +1,8 @@
 import { selectAttributes, selectLabelingTasksAll } from "@/src/reduxStore/states/pages/settings";
 import { selectProject } from "@/src/reduxStore/states/project";
-import { SearchGroupElement } from "@/src/types/components/projects/projectId/data-browser/data-browser";
-import { attributeCreateSearchGroup, getBasicGroupItems, getBasicSearchGroup, getBasicSearchItem, userCreateSearchGroup } from "@/src/util/components/projects/projectId/data-browser/search-groups-helper";
+import { attributeCreateSearchGroup, getBasicGroupItems, getBasicSearchGroup, getBasicSearchItem, labelingTasksCreateSearchGroup, userCreateSearchGroup } from "@/src/util/components/projects/projectId/data-browser/search-groups-helper";
 import { SearchGroup } from "@/submodules/javascript-functions/enums/enums";
-import { IconArrowBadgeDown, IconInfoCircle, IconPlus, IconTrash } from "@tabler/icons-react";
+import { IconArrowBadgeDown, IconDisabled, IconFilterOff, IconInfoCircle, IconPlus, IconPointerOff, IconTrash } from "@tabler/icons-react";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import style from '@/src/styles/components/projects/projectId/data-browser.module.css';
@@ -18,6 +17,8 @@ import { Tooltip } from "@nextui-org/react";
 import { setModalStates } from "@/src/reduxStore/states/modal";
 import { ModalEnum } from "@/src/types/shared/modal";
 import DataBrowserModals from "./DataBrowserModals";
+import { jsonCopy } from "@/submodules/javascript-functions/general";
+import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
 
 const GROUP_SORT_ORDER = 0;
 let GLOBAL_SEARCH_GROUP_COUNT = 0;
@@ -32,19 +33,23 @@ export default function SearchGroups() {
     const usersMap = useSelector(selectUsersCount);
 
     const [fullSearch, setFullSearch] = useState<any>({});
-    const [searchGroups, setSearchGroups] = useState<{ [key: string]: SearchGroupElement }>({});
+    const [searchGroups, setSearchGroups] = useState<{ [key: string]: any }>({});
     const [searchGroupsOrder, setSearchGroupsOrder] = useState<{ order: number; key: string }[]>([]);
     const [attributesSortOrder, setAttributeSortOrder] = useState([]);
     const [operatorsDropdown, setOperatorsDropdown] = useState([]);
     const [tooltipsArray, setTooltipArray] = useState([]);
     const [saveDropdownAttribute, setSaveDropdownAttribute] = useState(null);
     const [saveAttributeType, setSaveAttributeType] = useState(null);
+    const [manualLabels, setManualLabels] = useState([]);
+    const [weakSupervisionLabels, setWeakSupervisionLabels] = useState([]);
+    const [modelCallBacksLabels, setModelCallBacksLabels] = useState([]);
 
     useEffect(() => {
         if (!project) return;
         if (!users) return;
+        if (!labelingTasks) return;
         prepareSearchGroups();
-    }, [project, users]);
+    }, [project, users, labelingTasks]);
 
     useEffect(() => {
         if (!attributes) return;
@@ -88,6 +93,7 @@ export default function SearchGroups() {
         const fullSearchCopy = { ...fullSearch }
         const searchGroupsCopy = { ...searchGroups };
         const searchGroupsOrderCopy = [...searchGroupsOrder];
+
         // Drill down
         fullSearch["DRILL_DOWN"] = { value: false, groupElements: [] };
 
@@ -95,10 +101,7 @@ export default function SearchGroups() {
         const searchGroupAttributes = getBasicSearchGroup(SearchGroup.ATTRIBUTES, GROUP_SORT_ORDER + 100);
         fullSearchCopy[SearchGroup.ATTRIBUTES] = { value: searchGroupAttributes, groupElements: [] };
         searchGroupsCopy[SearchGroup.ATTRIBUTES] = searchGroupAttributes;
-        for (let baseItem of getBasicGroupItems(
-            searchGroupAttributes.group,
-            searchGroupAttributes.key
-        )) {
+        for (let baseItem of getBasicGroupItems(searchGroupAttributes.group, searchGroupAttributes.key)) {
             fullSearchCopy[SearchGroup.ATTRIBUTES].groupElements.push(attributeCreateSearchGroup(baseItem, ++GLOBAL_SEARCH_GROUP_COUNT));
         }
         for (let [key, value] of Object.entries(searchGroupsCopy)) {
@@ -112,13 +115,21 @@ export default function SearchGroups() {
         const searchGroupUserFilter = getBasicSearchGroup(SearchGroup.USER_FILTER, GROUP_SORT_ORDER + 200);
         fullSearchCopy[SearchGroup.USER_FILTER] = { value: searchGroupUserFilter, groupElements: [] };
         searchGroupsCopy[SearchGroup.USER_FILTER] = searchGroupUserFilter;
-        for (let baseItem of getBasicGroupItems(
-            searchGroupUserFilter.group,
-            searchGroupUserFilter.key
-        )) {
+        for (let baseItem of getBasicGroupItems(searchGroupUserFilter.group, searchGroupUserFilter.key)) {
             fullSearchCopy[SearchGroup.USER_FILTER].groupElements = userCreateSearchGroup(baseItem, ++GLOBAL_SEARCH_GROUP_COUNT, users);
         }
 
+        // Labeling Tasks
+        let count = 0;
+        for (let task of labelingTasks) {
+            const searchGroupLabelingTasks = getBasicSearchGroup(SearchGroup.LABELING_TASKS, GROUP_SORT_ORDER + 300 + count, task.name, task.id);
+            searchGroupsCopy[SearchGroup.LABELING_TASKS + '_' + task.id] = searchGroupLabelingTasks;
+            fullSearchCopy[SearchGroup.LABELING_TASKS + '_' + task.id] = { value: searchGroupLabelingTasks, groupElements: [] };
+            for (let baseItem of getBasicGroupItems(searchGroupLabelingTasks.group, searchGroupLabelingTasks.key)) {
+                fullSearchCopy[SearchGroup.LABELING_TASKS + '_' + task.id].groupElements = labelingTasksCreateSearchGroup(baseItem, task, ++GLOBAL_SEARCH_GROUP_COUNT);
+            }
+            count++;
+        }
         setSearchGroups(searchGroupsCopy);
         setFullSearch(fullSearchCopy);
 
@@ -137,7 +148,7 @@ export default function SearchGroups() {
         setSearchGroups(searchGroupsCopy)
     }
 
-    function setActiveNegateGroup(groupItem, index, group) {
+    function setActiveNegateGroup(groupItem, index, group, forceValue: boolean = null) {
         if (groupItem.disabled) return;
         const groupItemCopy = { ...groupItem };
         if (!groupItemCopy['active'])
@@ -150,11 +161,15 @@ export default function SearchGroups() {
         }
         groupItemCopy['color'] = getActiveNegateGroupColor(groupItemCopy);
         const fullSearchCopy = { ...fullSearch };
+        console.log("full search copy", group.key == SearchGroup.LABELING_TASKS + '_' + groupItem['id'], group.key, SearchGroup.LABELING_TASKS + '_' + groupItem['id'])
         if (group.key == SearchGroup.USER_FILTER) {
             fullSearchCopy[group.key].groupElements['users'][index] = groupItemCopy;
+        } else if (forceValue) { // for the labeling tasks because of the different structure
+            fullSearchCopy[group.key].groupElements['heuristics'][index] = groupItemCopy;
         } else {
             fullSearchCopy[group.key].groupElements[index] = groupItemCopy;
         }
+        console.log("full search copy", fullSearchCopy, group.key == SearchGroup.LABELING_TASKS)
         setFullSearch(fullSearchCopy);
     }
 
@@ -232,6 +247,51 @@ export default function SearchGroups() {
         const formControlsIdx = fullSearch[key].groupElements[i];
         const attributeType = getAttributeType(attributesSortOrder, formControlsIdx['name']);
         checkDecimalPatterns(attributeType, event, formControlsIdx['operator'], '-');
+    }
+
+    function updateLabelsFullSearch(labels: string[], groupKey: string, labelsKey: string) {
+        const fullSearchCopy = { ...fullSearch };
+        for (let label of labels) {
+            const labelsInTask = fullSearchCopy[groupKey].groupElements[labelsKey];
+            const findLabel = labelsInTask.find((el) => el.name == label);
+            findLabel.active = !findLabel.active;
+        }
+        setFullSearch(fullSearchCopy);
+    }
+
+    function changeConfidence(event: any, type: string, key: string, groupKey: string) {
+        const fullSearchCopy = { ...fullSearch };
+        const group = fullSearchCopy[key].groupElements[groupKey];
+        let lower = group['lower'];
+        let upper = group['upper'];
+        if (lower < 0) lower = 0;
+        if (upper > 100) upper = 100;
+        if (upper <= 1) upper = 1;
+        if (lower >= upper) lower = upper - 1;
+        if (upper <= lower) upper = lower + 1;
+
+        if (type == 'lower') {
+            group['lower'] = event.target.value == '' ? 0 : parseInt(event.target.value);
+        } else {
+            group['upper'] = event.target.value == '' ? 0 : parseInt(event.target.value);
+        }
+        group['active'] = !group['active'];
+        setFullSearch(fullSearchCopy);
+    }
+
+    function clearConfidence(group) {
+        const fullSearchCopy = { ...fullSearch };
+        group['lower'] = 0;
+        group['upper'] = 100;
+        group['active'] = false;
+        setFullSearch(fullSearchCopy);
+    }
+
+    function updateIsDifferent(groupKey: string, group: any) {
+        const fullSearchCopy = { ...fullSearch };
+        fullSearchCopy[groupKey].groupElements['isWithDifferentResults'].active = !fullSearchCopy[groupKey].groupElements['isWithDifferentResults'].active
+        fullSearchCopy[groupKey].groupElements['isWithDifferentResults'].color = getActiveNegateGroupColor(fullSearchCopy[groupKey].groupElements['isWithDifferentResults']);
+        setFullSearch(fullSearchCopy);
     }
 
     return (<>
@@ -322,10 +382,116 @@ export default function SearchGroups() {
                         </div>
                         <DataBrowserModals />
                     </div>}
-                    {(fullSearch[group.key].value.group != SearchGroup.ATTRIBUTES && fullSearch[group.key].value.group != SearchGroup.USER_FILTER) && <p>{'Default :('}</p>}
+                    {fullSearch[group.key].value.group == SearchGroup.LABELING_TASKS && <div className="flex flex-row items-center mt-4">
+                        <div className="flex-grow flex flex-col">
+
+                            <div>Manually labeled</div>
+                            {fullSearch[group.key].groupElements['manualLabels'].length == 0 ? (<ButtonLabelsDisabled />) : (
+                                <Dropdown options={fullSearch[group.key].groupElements['manualLabels']} buttonName={manualLabels.length == 0 ? 'None selected' : manualLabels.join(',')} hasCheckboxes={true}
+                                    selectedOption={(option: any) => {
+                                        const labels = [];
+                                        option.forEach((a: any) => {
+                                            if (a.checked) labels.push(a.name);
+                                        });
+                                        setManualLabels(labels);
+                                        updateLabelsFullSearch(labels, group.key, 'manualLabels');
+                                    }} />
+                            )}
+
+                            <div className="mt-2">Weakly supervised</div>
+                            {fullSearch[group.key].groupElements['weakSupervisionLabels'].length == 0 ? (<ButtonLabelsDisabled />) : (
+                                <Dropdown options={fullSearch[group.key].groupElements['weakSupervisionLabels']} buttonName={weakSupervisionLabels.length == 0 ? 'None selected' : weakSupervisionLabels.join(',')} hasCheckboxes={true}
+                                    selectedOption={(option: any) => {
+                                        const labels = [];
+                                        option.forEach((a: any) => {
+                                            if (a.checked) labels.push(a.name);
+                                        });
+                                        setWeakSupervisionLabels(labels);
+                                        updateLabelsFullSearch(labels, group.key, 'weakSupervisionLabels');
+                                    }} />
+                            )}
+                            <div className="flex-grow min-w-0 mt-1">
+                                <div className="flex flex-row items-center">
+                                    <span className="label-text mr-0.5 font-dmMono">CONFIDENCE BETWEEN</span>
+                                    <input
+                                        onChange={(e) => changeConfidence(e, 'lower', group.key, 'weakSupervisionConfidence')}
+                                        value={fullSearch[group.key].groupElements['weakSupervisionConfidence']['lower']}
+                                        className="h-8 w-11 border-gray-300 rounded-md placeholder-italic border text-gray-900 pl-4 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100" />
+                                    <span className="label-text mx-0.5 font-dmMono">% AND</span>
+                                    <input
+                                        onChange={(e) => changeConfidence(e, 'upper', group.key, 'weakSupervisionConfidence')}
+                                        value={fullSearch[group.key].groupElements['weakSupervisionConfidence']['upper']}
+                                        className="h-8 w-11 border-gray-300 rounded-md placeholder-italic border text-gray-900 pl-4 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100" />
+                                    {fullSearch[group.key].groupElements['weakSupervisionConfidence']['active'] && <Tooltip content={TOOLTIPS_DICT.DATA_BROWSER.CLEAR_WS_CONFIDENCE} color="invert">
+                                        <IconFilterOff className="text-red-700 cursor-pointer" onClick={() => clearConfidence(fullSearch[group.key].groupElements['weakSupervisionConfidence'])} />
+                                    </Tooltip>}
+                                </div>
+                            </div>
+
+                            <div className="mt-2">Model callback</div>
+                            {fullSearch[group.key].groupElements['modelCallbackLabels'].length == 0 ? (<ButtonLabelsDisabled />) : (
+                                <Dropdown options={fullSearch[group.key].groupElements['modelCallbackLabels']} buttonName={modelCallBacksLabels.length == 0 ? 'None selected' : modelCallBacksLabels.join(',')} hasCheckboxes={true}
+                                    selectedOption={(option: any) => {
+                                        const labels = [];
+                                        option.forEach((a: any) => {
+                                            if (a.checked) labels.push(a.name);
+                                        });
+                                        setModelCallBacksLabels(labels);
+                                        updateLabelsFullSearch(labels, group.key, 'modelCallbackLabels');
+                                    }} />
+                            )}
+                            <div className="flex-grow min-w-0 mt-1">
+                                <div className="flex flex-row items-center">
+                                    <span className="label-text mr-0.5 font-dmMono">CONFIDENCE BETWEEN</span>
+                                    <input
+                                        onChange={(e) => changeConfidence(e, 'lower', group.key, 'modelCallbackConfidence')}
+                                        value={fullSearch[group.key].groupElements['modelCallbackConfidence']['lower']}
+                                        className="h-8 w-11 border-gray-300 rounded-md placeholder-italic border text-gray-900 pl-4 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100" />
+                                    <span className="label-text mx-0.5 font-dmMono">% AND</span>
+                                    <input
+                                        onChange={(e) => changeConfidence(e, 'upper', group.key, 'modelCallbackConfidence')}
+                                        value={fullSearch[group.key].groupElements['modelCallbackConfidence']['upper']}
+                                        className="h-8 w-11 border-gray-300 rounded-md placeholder-italic border text-gray-900 pl-4 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100" />
+                                    {fullSearch[group.key].groupElements['modelCallbackConfidence']['active'] && <Tooltip content={TOOLTIPS_DICT.DATA_BROWSER.CLEAR_MC_CONFIDENCE} color="invert">
+                                        <IconFilterOff className="text-red-700 cursor-pointer" onClick={() => clearConfidence(fullSearch[group.key].groupElements['modelCallbackConfidence'])} />
+                                    </Tooltip>}
+                                </div>
+                            </div>
+
+                            <div className="mt-2 font-bold">Heuristics</div>
+                            {fullSearch[group.key].groupElements['heuristics'].length == 0 ? (<div className="text-sm text-gray-400">No heuristics associated with this task</div>) : (<div className="flex flex-col">
+                                <div className="flex items-center border-t border-t-gray-300 border-b border-b-gray-300">
+                                    <div onClick={() => updateIsDifferent(group.key, fullSearch[group.key].groupElements['isWithDifferentResults'])} style={{ backgroundColor: fullSearch[group.key].groupElements['isWithDifferentResults'].color, borderColor: fullSearch[group.key].groupElements['isWithDifferentResults'].color }}
+                                        className="ml-2 mr-2 h-4 w-4 border-gray-300 border rounded cursor-pointer hover:bg-gray-200">
+                                    </div>
+                                    <span className="label-text truncate w-full pl-2">Only with different results</span>
+                                </div>
+                                {fullSearch[group.key].groupElements['heuristics'].map((groupItem, index) => (<div key={groupItem.id} className="my-1">
+                                    <div className="flex flex-row items-center">
+                                        <div onClick={() => setActiveNegateGroup(groupItem, index, group, true)} style={{ backgroundColor: groupItem.color, borderColor: groupItem.color }}
+                                            className="ml-2 mr-2 h-4 w-4 border-gray-300 border rounded cursor-pointer hover:bg-gray-200">
+                                        </div>
+                                        <span className="label-text truncate w-full pl-2">{groupItem['name']}</span>
+                                    </div>
+                                </div>))}
+                            </div>)}
+                        </div>
+                    </div>}
+
+                    {(fullSearch[group.key].value.group != SearchGroup.ATTRIBUTES && fullSearch[group.key].value.group != SearchGroup.USER_FILTER && fullSearch[group.key].value.group != SearchGroup.LABELING_TASKS) && <p>{'Default :('}</p>}
                 </form>
             </div>
         </div >))
         }
     </>)
+}
+
+function ButtonLabelsDisabled() {
+    return (<button disabled={true} className="cursor-not-allowed inline-flex rounded-md border border-gray-300 w-80 shadow-sm px-4 py-1.5 items-center bg-white text-xs font-semibold text-gray-700 focus:ring-offset-2 focus:ring-offset-gray-400" >
+        <div className="truncate min-w-0 mr-4">
+            No labels associated with this task
+        </div>
+        <IconPointerOff className="h-5 w-5 text-gray-400" />
+
+    </button>)
 }

@@ -168,6 +168,8 @@ export const TOOLTIPS_DICT = {
     [CurrentPage.DATA_BROWSER]: {
         'COPY_TO_CLIPBOARD': 'Copy to clipboard',
         'ONLY_MANAGED': 'Only usable for the managed version',
-        'OUTDATED_SLICE': 'Outdated slice&#10;save to update'
+        'OUTDATED_SLICE': 'Outdated slice&#10;save to update',
+        'CLEAR_WS_CONFIDENCE': 'Clear filter for weakly supervised confidence',
+        'CLEAR_MC_CONFIDENCE': 'Clear filter for model callback confidence',
     }
 }
