@@ -3,7 +3,7 @@ import { Project } from "@/src/types/components/projects/projects-list";
 import { User } from "@/src/types/shared/general";
 import { buildFullLink } from "@/src/util/shared/link-parser-helper";
 import { parseUTC } from "@/submodules/javascript-functions/date-parser";
-import { sliceTypeToString } from "@/submodules/javascript-functions/enums/enum-functions";
+import { labelSourceToString, sliceTypeToString } from "@/submodules/javascript-functions/enums/enum-functions";
 import { Slice } from "@/submodules/javascript-functions/enums/enums";
 import { jsonCopy } from "@/submodules/javascript-functions/general";
 
@@ -59,4 +59,22 @@ export function updateSliceInfoHelper(slice: DataSlice, project: Project, users:
         sliceInfo["Link"] = buildFullLink("/projects/" + project.id + "/labeling/" + slice.id);
     }
     return sliceInfo;
+}
+
+export function postProcessUsersCount(usersCount: any, users: User[]) {
+    const usersMapCount = {}
+    const prepareUsersCount = jsonCopy(usersCount[0]);
+    prepareUsersCount.counts = JSON.parse(prepareUsersCount.counts);
+    users.forEach(user => {
+        let sum = 0;
+        const userCopy = jsonCopy(user);
+        if (prepareUsersCount.counts) prepareUsersCount.counts.forEach(e => {
+            sum += e.count;
+            e.source = labelSourceToString(e.source_type);
+        });
+        userCopy.countSum = sum;
+        userCopy.counts = prepareUsersCount.counts;
+        usersMapCount[userCopy.id] = userCopy;
+    });
+    return usersMapCount;
 }

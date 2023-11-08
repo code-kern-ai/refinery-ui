@@ -163,6 +163,10 @@ const initialState: Modals = {
         open: false,
         sliceId: '',
     },
+    [ModalEnum.USER_INFO]: {
+        open: false,
+        userInfo: null,
+    }
 };
 
 const modalSlice = createSlice({

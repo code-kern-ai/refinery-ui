@@ -42,3 +42,17 @@ query($userRole:String){
   }
 }
 `;
+
+export const GET_ORGANIZATION_USERS_WITH_COUNT = gql`
+query($projectId:ID!){
+  allUsersWithRecordCount(projectId:$projectId) {
+    user {
+      id
+      mail
+      firstName
+      lastName
+    }
+    counts
+  }
+}  
+`;

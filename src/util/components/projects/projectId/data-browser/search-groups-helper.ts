@@ -100,3 +100,59 @@ export function getBasicSearchItem(
             };
     }
 }
+
+export function attributeCreateSearchGroup(item, globalSearchGroupCount) {
+    return {
+        id: globalSearchGroupCount,
+        group: item.group,
+        groupKey: item.groupKey,
+        type: item.type,
+        name: item.defaultValue,
+        active: false,
+        negate: false,
+        addText: item.addText,
+        operator: item.operator,
+        searchValue: 'x',
+        searchValueBetween: '',
+        caseSensitive: false
+    }
+}
+
+export function userCreateSearchGroup(item, globalSearchGroupCount, users) {
+    return {
+        id: globalSearchGroupCount,
+        group: item.group,
+        groupKey: item.groupKey,
+        active: false,
+        negate: false,
+        type: item.type,
+        name: item.defaultValue,
+        addText: item.addText,
+        users: buildUserArray(users),
+        updateDummy: true
+    }
+}
+
+export function buildUserArray(users) {
+    let array = [];
+    for (const u of users) {
+        if (u.countSum == 0) continue;
+        const user = u.user ? u.user : u;
+        let name = "Unknown";
+        let shortName = "Unknown";
+        if (user.firstName) {
+            name = user.firstName + ' ' + user.lastName;
+            shortName = user.firstName[0] + '. ' + user.lastName;
+        }
+
+        array.push({
+            id: user.id,
+            active: false,
+            negate: false,
+            displayName: name,
+            name: shortName,
+            dataTip: user.mail ? user.mail : "Unknown user ID"
+        });
+    }
+    return array;
+}

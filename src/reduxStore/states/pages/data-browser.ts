@@ -2,6 +2,7 @@ import { DataSlice } from '@/src/types/components/projects/projectId/data-browse
 import { arrayToDict } from '@/submodules/javascript-functions/general';
 import { createSlice } from '@reduxjs/toolkit'
 import type { PayloadAction } from '@reduxjs/toolkit'
+import { User } from 'aws-sdk/clients/budgets';
 
 type DataBrowserState = {
     all: DataSlice[];
@@ -9,7 +10,8 @@ type DataBrowserState = {
     additionalData: {
         displayOutdatedWarning: boolean;
         staticDataSliceCurrentCount: number
-    }
+    },
+    usersMapCount: any;
 }
 
 function getInitState(): DataBrowserState {
@@ -19,7 +21,8 @@ function getInitState(): DataBrowserState {
         additionalData: {
             displayOutdatedWarning: false,
             staticDataSliceCurrentCount: 0
-        }
+        },
+        usersMapCount: {}
     };
 }
 
@@ -61,6 +64,10 @@ const dataBrowserSlice = createSlice({
                 };
             },
         },
+        setUsersMapCount(state, action: PayloadAction<any>) {
+            if (action.payload) state.usersMapCount = action.payload;
+            else state.usersMapCount = {};
+        }
     },
 })
 
@@ -70,6 +77,7 @@ export const selectActiveSlice = (state) => state.dataBrowser.active;
 export const selectDataSlicesAll = selectDataSlicesFunc(true);
 export const selectDataSlicesDict = selectDataSlicesFunc(false);
 export const selectAdditionalData = (state) => state.dataBrowser.additionalData;
+export const selectUsersCount = (state) => state.dataBrowser.usersMapCount;
 
 export function selectDataSlicesFunc(asArray: boolean = false) {
     if (asArray) return (state) => state.dataBrowser.all;
@@ -77,5 +85,5 @@ export function selectDataSlicesFunc(asArray: boolean = false) {
 }
 
 
-export const { setDataSlices, setActiveDataSlice, removeFromAllDataSlicesById, updateDataSlicesState } = dataBrowserSlice.actions;
+export const { setDataSlices, setActiveDataSlice, removeFromAllDataSlicesById, updateDataSlicesState, setUsersMapCount } = dataBrowserSlice.actions;
 export const dataBrowserReducer = dataBrowserSlice.reducer;

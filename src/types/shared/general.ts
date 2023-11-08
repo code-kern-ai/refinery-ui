@@ -27,6 +27,9 @@ export type User = {
     mail: string;
     role: string;
     avatarUri: string;
+    counts?: any[];
+    countSum?: number;
+    user?: User;
 }
 
 export enum DataTypeEnum {

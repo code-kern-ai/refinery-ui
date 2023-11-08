@@ -1,25 +1,35 @@
 import { selectAttributes, selectLabelingTasksAll } from "@/src/reduxStore/states/pages/settings";
 import { selectProject } from "@/src/reduxStore/states/project";
 import { SearchGroupElement } from "@/src/types/components/projects/projectId/data-browser/data-browser";
-import { getBasicGroupItems, getBasicSearchGroup, getBasicSearchItem } from "@/src/util/components/projects/projectId/data-browser/search-groups-helper";
+import { attributeCreateSearchGroup, getBasicGroupItems, getBasicSearchGroup, getBasicSearchItem, userCreateSearchGroup } from "@/src/util/components/projects/projectId/data-browser/search-groups-helper";
 import { SearchGroup } from "@/submodules/javascript-functions/enums/enums";
-import { IconArrowBadgeDown, IconPlus, IconTrash } from "@tabler/icons-react";
+import { IconArrowBadgeDown, IconInfoCircle, IconPlus, IconTrash } from "@tabler/icons-react";
 import { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import style from '@/src/styles/components/projects/projectId/data-browser.module.css';
 import { timer } from "rxjs";
 import Dropdown from "@/submodules/react-components/components/Dropdown";
 import { SearchOperator } from "@/src/types/components/projects/projectId/data-browser/search-operators";
 import { checkDecimalPatterns, getAttributeType, getSearchOperatorTooltip } from "@/src/util/components/projects/projectId/data-browser/search-operators-helper";
 import { DataTypeEnum } from "@/src/types/shared/general";
+import { selectAllUsers } from "@/src/reduxStore/states/general";
+import { selectUsersCount } from "@/src/reduxStore/states/pages/data-browser";
+import { Tooltip } from "@nextui-org/react";
+import { setModalStates } from "@/src/reduxStore/states/modal";
+import { ModalEnum } from "@/src/types/shared/modal";
+import DataBrowserModals from "./DataBrowserModals";
 
 const GROUP_SORT_ORDER = 0;
 let GLOBAL_SEARCH_GROUP_COUNT = 0;
 
 export default function SearchGroups() {
+    const dispatch = useDispatch();
+
     const project = useSelector(selectProject);
     const attributes = useSelector(selectAttributes);
     const labelingTasks = useSelector(selectLabelingTasksAll);
+    const users = useSelector(selectAllUsers);
+    const usersMap = useSelector(selectUsersCount);
 
     const [fullSearch, setFullSearch] = useState<any>({});
     const [searchGroups, setSearchGroups] = useState<{ [key: string]: SearchGroupElement }>({});
@@ -32,8 +42,9 @@ export default function SearchGroups() {
 
     useEffect(() => {
         if (!project) return;
+        if (!users) return;
         prepareSearchGroups();
-    }, [project]);
+    }, [project, users]);
 
     useEffect(() => {
         if (!attributes) return;
@@ -66,7 +77,7 @@ export default function SearchGroups() {
     }, [fullSearch]);
 
     function prepareSearchGroups() {
-        if (!attributes || !labelingTasks) {
+        if (!attributes || !labelingTasks || !users) {
             console.log('preparation before data collected --> should not happen');
             return;
         }
@@ -81,14 +92,14 @@ export default function SearchGroups() {
         fullSearch["DRILL_DOWN"] = { value: false, groupElements: [] };
 
         // Attributes
-        const searchGroupContainer = getBasicSearchGroup(SearchGroup.ATTRIBUTES, GROUP_SORT_ORDER + 100);
-        fullSearchCopy[SearchGroup.ATTRIBUTES] = { value: searchGroupContainer, groupElements: [] };
-        searchGroupsCopy[SearchGroup.ATTRIBUTES] = searchGroupContainer;
+        const searchGroupAttributes = getBasicSearchGroup(SearchGroup.ATTRIBUTES, GROUP_SORT_ORDER + 100);
+        fullSearchCopy[SearchGroup.ATTRIBUTES] = { value: searchGroupAttributes, groupElements: [] };
+        searchGroupsCopy[SearchGroup.ATTRIBUTES] = searchGroupAttributes;
         for (let baseItem of getBasicGroupItems(
-            searchGroupContainer.group,
-            searchGroupContainer.key
+            searchGroupAttributes.group,
+            searchGroupAttributes.key
         )) {
-            fullSearchCopy[SearchGroup.ATTRIBUTES].groupElements.push(attributeCreateSearchGroup(baseItem));
+            fullSearchCopy[SearchGroup.ATTRIBUTES].groupElements.push(attributeCreateSearchGroup(baseItem, ++GLOBAL_SEARCH_GROUP_COUNT));
         }
         for (let [key, value] of Object.entries(searchGroupsCopy)) {
             const findEl = searchGroupsOrderCopy.find(el => el.key == key);
@@ -96,6 +107,18 @@ export default function SearchGroups() {
                 searchGroupsOrderCopy.push({ order: value.sortOrder, key: key });
             }
         }
+
+        // User Filter
+        const searchGroupUserFilter = getBasicSearchGroup(SearchGroup.USER_FILTER, GROUP_SORT_ORDER + 200);
+        fullSearchCopy[SearchGroup.USER_FILTER] = { value: searchGroupUserFilter, groupElements: [] };
+        searchGroupsCopy[SearchGroup.USER_FILTER] = searchGroupUserFilter;
+        for (let baseItem of getBasicGroupItems(
+            searchGroupUserFilter.group,
+            searchGroupUserFilter.key
+        )) {
+            fullSearchCopy[SearchGroup.USER_FILTER].groupElements = userCreateSearchGroup(baseItem, ++GLOBAL_SEARCH_GROUP_COUNT, users);
+        }
+
         setSearchGroups(searchGroupsCopy);
         setFullSearch(fullSearchCopy);
 
@@ -114,23 +137,6 @@ export default function SearchGroups() {
         setSearchGroups(searchGroupsCopy)
     }
 
-    function attributeCreateSearchGroup(item) {
-        return {
-            id: ++GLOBAL_SEARCH_GROUP_COUNT,
-            group: item.group,
-            groupKey: item.groupKey,
-            type: item.type,
-            name: item.defaultValue,
-            active: false,
-            negate: false,
-            addText: item.addText,
-            operator: item.operator,
-            searchValue: 'x',
-            searchValueBetween: '',
-            caseSensitive: false
-        }
-    }
-
     function setActiveNegateGroup(groupItem, index, group) {
         if (groupItem.disabled) return;
         const groupItemCopy = { ...groupItem };
@@ -144,7 +150,11 @@ export default function SearchGroups() {
         }
         groupItemCopy['color'] = getActiveNegateGroupColor(groupItemCopy);
         const fullSearchCopy = { ...fullSearch };
-        fullSearchCopy[group.key].groupElements[index] = groupItemCopy;
+        if (group.key == SearchGroup.USER_FILTER) {
+            fullSearchCopy[group.key].groupElements['users'][index] = groupItemCopy;
+        } else {
+            fullSearchCopy[group.key].groupElements[index] = groupItemCopy;
+        }
         setFullSearch(fullSearchCopy);
     }
 
@@ -192,7 +202,7 @@ export default function SearchGroups() {
     function addSearchGroupItem(groupItem, groupKey) {
         const fullSearchCopy = { ...fullSearch };
         let item = getBasicSearchItem(groupItem['type'], groupItem['groupKey']);
-        fullSearchCopy[groupKey].groupElements.push(attributeCreateSearchGroup(item));
+        fullSearchCopy[groupKey].groupElements.push(attributeCreateSearchGroup(item, ++GLOBAL_SEARCH_GROUP_COUNT));
         setFullSearch(fullSearchCopy);
     }
 
@@ -202,7 +212,7 @@ export default function SearchGroups() {
         formControlsIdx[field] = value;
         if (field == 'name') {
             const attributeType = getAttributeType(attributesSortOrder, value);
-            //   this.saveDropdownAttribute = value;
+            setSaveDropdownAttribute(value);
             setSaveAttributeType(attributeType);
             if (attributeType == "BOOLEAN" && formControlsIdx['searchValue'] != "") {
                 formControlsIdx['searchValue'] = "";
@@ -239,7 +249,6 @@ export default function SearchGroups() {
                     <div className="text-xs text-gray-400 truncate" style={{ maxWidth: '21rem' }}>
                         {searchGroups[group.key].subText}
                         {searchGroups[group.key].nameAdd != '' && <label className="font-normal ml-1">{searchGroups[group.key].nameAdd}</label>}
-
                     </div>
                 </div>
             </div>
@@ -295,7 +304,25 @@ export default function SearchGroups() {
                             </div>
                         </div>))}
                     </div>}
-                    {fullSearch[group.key].value.group != SearchGroup.ATTRIBUTES && <p>{'Default :('}</p>}
+                    {fullSearch[group.key].value.group == SearchGroup.USER_FILTER && <div className="flex flex-row items-center mt-4">
+                        <div className="flex flex-grow">
+                            <div className="flex flex-col">
+                                {fullSearch[group.key].groupElements['users'].map((groupItem, index) => (<div key={groupItem.id} className="my-1">
+                                    <div className="form-control flex flex-row flex-nowrap items-center">
+                                        <div onClick={() => setActiveNegateGroup(groupItem, index, group)} style={{ backgroundColor: groupItem.color, borderColor: groupItem.color }}
+                                            className="ml-2 mr-2 h-4 w-4 border-gray-300 border rounded cursor-pointer hover:bg-gray-200">
+                                        </div>
+                                        <span className="label-text truncate">{groupItem['displayName']}</span>
+                                        {usersMap && usersMap[groupItem['id']] && <div><Tooltip content={groupItem['dataTip']} placement="left" color="invert">
+                                            <IconInfoCircle className="ml-1 text-gray-700 h-5 w-5" onClick={() => dispatch(setModalStates(ModalEnum.USER_INFO, { open: true, userInfo: usersMap[groupItem['id']] }))} />
+                                        </Tooltip></div>}
+                                    </div>
+                                </div>))}
+                            </div>
+                        </div>
+                        <DataBrowserModals />
+                    </div>}
+                    {(fullSearch[group.key].value.group != SearchGroup.ATTRIBUTES && fullSearch[group.key].value.group != SearchGroup.USER_FILTER) && <p>{'Default :('}</p>}
                 </form>
             </div>
         </div >))
