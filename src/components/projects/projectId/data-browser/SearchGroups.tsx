@@ -1,8 +1,8 @@
-import { selectAttributes, selectLabelingTasksAll } from "@/src/reduxStore/states/pages/settings";
+import { selectAttributes, selectAttributesDict, selectLabelingTasksAll } from "@/src/reduxStore/states/pages/settings";
 import { selectProject } from "@/src/reduxStore/states/project";
-import { attributeCreateSearchGroup, getBasicGroupItems, getBasicSearchGroup, getBasicSearchItem, labelingTasksCreateSearchGroup, userCreateSearchGroup } from "@/src/util/components/projects/projectId/data-browser/search-groups-helper";
-import { SearchGroup } from "@/submodules/javascript-functions/enums/enums";
-import { IconArrowBadgeDown, IconDisabled, IconFilterOff, IconInfoCircle, IconPlus, IconPointerOff, IconTrash } from "@tabler/icons-react";
+import { attributeCreateSearchGroup, generateRandomSeed, getBasicGroupItems, getBasicSearchGroup, getBasicSearchItem, labelingTasksCreateSearchGroup, orderByCreateSearchGroup, userCreateSearchGroup } from "@/src/util/components/projects/projectId/data-browser/search-groups-helper";
+import { SearchGroup, StaticOrderByKeys } from "@/submodules/javascript-functions/enums/enums";
+import { IconArrowBadgeDown, IconArrowUp, IconArrowsRandom, IconFilterOff, IconInfoCircle, IconPlus, IconPointerOff, IconTrash } from "@tabler/icons-react";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import style from '@/src/styles/components/projects/projectId/data-browser.module.css';
@@ -17,7 +17,6 @@ import { Tooltip } from "@nextui-org/react";
 import { setModalStates } from "@/src/reduxStore/states/modal";
 import { ModalEnum } from "@/src/types/shared/modal";
 import DataBrowserModals from "./DataBrowserModals";
-import { jsonCopy } from "@/submodules/javascript-functions/general";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
 
 const GROUP_SORT_ORDER = 0;
@@ -31,6 +30,7 @@ export default function SearchGroups() {
     const labelingTasks = useSelector(selectLabelingTasksAll);
     const users = useSelector(selectAllUsers);
     const usersMap = useSelector(selectUsersCount);
+    const attributesDict = useSelector(selectAttributesDict);
 
     const [fullSearch, setFullSearch] = useState<any>({});
     const [searchGroups, setSearchGroups] = useState<{ [key: string]: any }>({});
@@ -130,6 +130,15 @@ export default function SearchGroups() {
             }
             count++;
         }
+
+        // order by
+        const searchGroupOrder = getBasicSearchGroup(SearchGroup.ORDER_STATEMENTS, GROUP_SORT_ORDER + 400);
+        fullSearchCopy[SearchGroup.ORDER_STATEMENTS] = { value: searchGroupOrder, groupElements: [] };
+        searchGroupsCopy[SearchGroup.ORDER_STATEMENTS] = searchGroupOrder;
+        for (let baseItem of getBasicGroupItems(searchGroupUserFilter.group, searchGroupUserFilter.key)) {
+            fullSearchCopy[SearchGroup.ORDER_STATEMENTS].groupElements = orderByCreateSearchGroup(baseItem, ++GLOBAL_SEARCH_GROUP_COUNT, attributesSortOrder, attributesDict);
+        }
+
         setSearchGroups(searchGroupsCopy);
         setFullSearch(fullSearchCopy);
 
@@ -161,15 +170,15 @@ export default function SearchGroups() {
         }
         groupItemCopy['color'] = getActiveNegateGroupColor(groupItemCopy);
         const fullSearchCopy = { ...fullSearch };
-        console.log("full search copy", group.key == SearchGroup.LABELING_TASKS + '_' + groupItem['id'], group.key, SearchGroup.LABELING_TASKS + '_' + groupItem['id'])
         if (group.key == SearchGroup.USER_FILTER) {
             fullSearchCopy[group.key].groupElements['users'][index] = groupItemCopy;
         } else if (forceValue) { // for the labeling tasks because of the different structure
             fullSearchCopy[group.key].groupElements['heuristics'][index] = groupItemCopy;
+        } else if (group.key == SearchGroup.ORDER_STATEMENTS) {
+            fullSearchCopy[group.key].groupElements['orderBy'][index] = groupItemCopy;
         } else {
             fullSearchCopy[group.key].groupElements[index] = groupItemCopy;
         }
-        console.log("full search copy", fullSearchCopy, group.key == SearchGroup.LABELING_TASKS)
         setFullSearch(fullSearchCopy);
     }
 
@@ -291,6 +300,27 @@ export default function SearchGroups() {
         const fullSearchCopy = { ...fullSearch };
         fullSearchCopy[groupKey].groupElements['isWithDifferentResults'].active = !fullSearchCopy[groupKey].groupElements['isWithDifferentResults'].active
         fullSearchCopy[groupKey].groupElements['isWithDifferentResults'].color = getActiveNegateGroupColor(fullSearchCopy[groupKey].groupElements['isWithDifferentResults']);
+        setFullSearch(fullSearchCopy);
+    }
+
+    function setSortFormControl(index, group) {
+        const fullSearchCopy = { ...fullSearch };
+        const formControlsIdx = fullSearchCopy[group.key].groupElements['orderBy'][index];
+        if (formControlsIdx['active'] && formControlsIdx['direction'] == -1) {
+            formControlsIdx['direction'] = 1;
+        } else if (formControlsIdx['active'] && formControlsIdx['direction'] == 1) {
+            formControlsIdx['direction'] = -1;
+            formControlsIdx['active'] = false;
+        } else {
+            formControlsIdx['active'] = true;
+        }
+        setFullSearch(fullSearchCopy);
+    }
+
+    function setRandomSeedGroup(value?: string) {
+        const fullSearchCopy = { ...fullSearch };
+        const formControlsIdx = fullSearchCopy[SearchGroup.ORDER_STATEMENTS].groupElements['orderBy'].find((el) => el['orderByKey'] == StaticOrderByKeys.RANDOM);
+        formControlsIdx['seedString'] = value ?? generateRandomSeed();
         setFullSearch(fullSearchCopy);
     }
 
@@ -477,8 +507,38 @@ export default function SearchGroups() {
                             </div>)}
                         </div>
                     </div>}
+                    {fullSearch[group.key].value.group == SearchGroup.ORDER_STATEMENTS && <div className="mt-4">
+                        {fullSearch[group.key].groupElements['orderBy'].map((groupItem, index) => (<div key={groupItem.id}>
+                            <div className="form-control class mb-2">
+                                {groupItem['orderByKey'] != StaticOrderByKeys.RANDOM ? (<div className="mb-2 flex items-center">
+                                    <div onClick={() => setSortFormControl(index, group)} className={`p-0 cursor-pointer ${groupItem['direction'] == 1 ? style.rotateTransform : null}`}>
+                                        <div className="ml-2 mr-2 h-4 w-4 border-gray-300 border rounded cursor-pointer hover:bg-gray-200">
+                                            {groupItem['active'] != 0 && <IconArrowUp className="text-gray-500 h-3 w-3" />}
+                                        </div>
+                                    </div>
+                                    <span className="ml-2 label-text truncate w-full">{groupItem['displayName']}</span>
+                                </div>) : (<div className="flex flex-row items-center mr-2">
+                                    <div onClick={() => setActiveNegateGroup(groupItem, index, group)} style={{ backgroundColor: groupItem.color, borderColor: groupItem.color }}
+                                        className="ml-2 mr-2 h-4 w-4 border-gray-300 border rounded cursor-pointer hover:bg-gray-200">
+                                    </div>
+                                    <span className="label-text truncate pl-2">{groupItem['displayName']}</span>
+                                    <div className="flex rounded-md shadow-sm">
+                                        <span className="ml-2 inline-flex items-center px-2.5 text-sm rounded-l-md border border-r-0 border-gray-300 bg-gray-50 text-gray-500 sm:text-sm">
+                                            Seed
+                                            <div className="ml-2 cursor-pointer" onClick={() => setRandomSeedGroup()}>
+                                                <IconArrowsRandom />
+                                            </div>
+                                        </span>
+                                        <input placeholder={groupItem['seedString']}
+                                            onChange={(e) => setRandomSeedGroup(e.target.value)}
+                                            className="h-8 w-36 border-gray-300 rounded-r-md placeholder-italic border text-gray-900 pl-4 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100" />
+                                    </div>
+                                </div>)}
+                            </div>
+                        </div>))}
+                    </div>}
 
-                    {(fullSearch[group.key].value.group != SearchGroup.ATTRIBUTES && fullSearch[group.key].value.group != SearchGroup.USER_FILTER && fullSearch[group.key].value.group != SearchGroup.LABELING_TASKS) && <p>{'Default :('}</p>}
+                    {(fullSearch[group.key].value.group != SearchGroup.ATTRIBUTES && fullSearch[group.key].value.group != SearchGroup.USER_FILTER && fullSearch[group.key].value.group != SearchGroup.LABELING_TASKS && fullSearch[group.key].value.group != SearchGroup.ORDER_STATEMENTS) && <p>{'Default :('}</p>}
                 </form>
             </div>
         </div >))

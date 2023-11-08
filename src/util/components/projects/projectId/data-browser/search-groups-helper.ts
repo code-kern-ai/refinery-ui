@@ -2,8 +2,10 @@ import { SearchGroupElement } from "@/src/types/components/projects/projectId/da
 import { SearchGroupItem, SearchItemType } from "@/src/types/components/projects/projectId/data-browser/search-groups";
 import { SearchOperator } from "@/src/types/components/projects/projectId/data-browser/search-operators";
 import { LabelingTask, LabelingTaskTarget } from "@/src/types/components/projects/projectId/settings/labeling-tasks";
-import { nameForGroupKeyToString } from "@/submodules/javascript-functions/enums/enum-functions";
-import { InformationSourceType, SearchGroup } from "@/submodules/javascript-functions/enums/enums";
+import { getOrderByDisplayName, nameForGroupKeyToString } from "@/submodules/javascript-functions/enums/enum-functions";
+import { InformationSourceType, SearchGroup, StaticOrderByKeys } from "@/submodules/javascript-functions/enums/enums";
+
+export const SEED_CHARACTERS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
 
 export function getBasicSearchGroup(
     group: SearchGroup,
@@ -170,8 +172,8 @@ export function labelingTasksCreateSearchGroup(item, task: LabelingTask, globalS
         manualLabels: labelingTaskLabelArray(task),
         weakSupervisionLabels: labelingTaskLabelArray(task),
         modelCallbackLabels: labelingTaskLabelArray(task),
-        sortByWeakSupervisionConfidence: null,
-        sortByModelCallbackConfidence: null,
+        sortByWeakSupervisionConfidence: getOrderByGroup(StaticOrderByKeys.WEAK_SUPERVISION_CONFIDENCE, false, -1),
+        sortByModelCallbackConfidence: getOrderByGroup(StaticOrderByKeys.MODEL_CALLBACK_CONFIDENCE, false, -1),
         weakSupervisionConfidence: getConfidenceFilter(),
         modelCallbackConfidence: getConfidenceFilter(),
         heuristics: labelingTaskHeuristicArray(task),
@@ -232,4 +234,64 @@ function isWithDifferentResults(task: LabelingTask) {
         taskId: task.id,
         taskType: task.taskType
     }
+}
+
+export function orderByCreateSearchGroup(item, globalSearchGroupCount, attributesSortOrder, attributesDict) {
+    return {
+        id: globalSearchGroupCount,
+        group: item.group,
+        groupKey: item.groupKey,
+        type: item.type,
+        name: item.defaultValue,
+        addText: item.addText,
+        orderBy: orderByArray(attributesSortOrder, attributesDict),
+        updateDummy: true
+    }
+}
+
+function orderByArray(attributesSortOrder: any[] = [], attributesDict: any) {
+    let array = [];
+    for (let i = 1; i < attributesSortOrder.length; i++) {
+        array.push(getOrderByGroup(attributesDict[attributesSortOrder[i].key].name, true, -1)) //1, //-1 desc, 1 asc     
+    }
+    array.push(getOrderByGroup(StaticOrderByKeys.WEAK_SUPERVISION_CONFIDENCE, false, -1));
+    array.push(getOrderByGroup(StaticOrderByKeys.MODEL_CALLBACK_CONFIDENCE, false, -1));
+    array.push(getOrderByGroup(StaticOrderByKeys.RANDOM, false, -1));
+
+    return array;
+}
+
+function getOrderByGroup(orderByKey: string, isAttribute: boolean, direction) {
+    let group;
+    if (orderByKey == StaticOrderByKeys.RANDOM) {
+        group = {
+            id: orderByKey,
+            orderByKey: orderByKey,
+            active: false,
+            seedString: generateRandomSeed(),
+            displayName: getOrderByDisplayName(orderByKey),
+            isAttribute: isAttribute,
+        }
+    } else {
+        group = {
+            id: orderByKey,
+            orderByKey: orderByKey,
+            active: false,
+            direction: direction,
+            displayName: getOrderByDisplayName(orderByKey),
+            isAttribute: isAttribute,
+        }
+    }
+    return group;
+}
+
+export function generateRandomSeed() {
+    const length = 7;
+    let seed = '';
+    const charactersLength = SEED_CHARACTERS.length;
+    for (var i = 0; i < length; i++) {
+        seed += SEED_CHARACTERS.charAt(Math.floor(Math.random() *
+            charactersLength));
+    }
+    return seed;
 }
