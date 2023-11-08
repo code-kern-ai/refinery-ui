@@ -17,3 +17,7 @@
 .rotateTransform {
     transform: rotate(180deg);
 }
+
+.transitionTransform {
+    transition: transform 0.15s ease-in-out;
+}
