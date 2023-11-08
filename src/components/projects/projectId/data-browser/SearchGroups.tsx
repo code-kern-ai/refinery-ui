@@ -1,6 +1,6 @@
 import { selectAttributes, selectAttributesDict, selectLabelingTasksAll } from "@/src/reduxStore/states/pages/settings";
 import { selectProject } from "@/src/reduxStore/states/project";
-import { attributeCreateSearchGroup, generateRandomSeed, getBasicGroupItems, getBasicSearchGroup, getBasicSearchItem, labelingTasksCreateSearchGroup, orderByCreateSearchGroup, userCreateSearchGroup } from "@/src/util/components/projects/projectId/data-browser/search-groups-helper";
+import { attributeCreateSearchGroup, commentsCreateSearchGroup, generateRandomSeed, getBasicGroupItems, getBasicSearchGroup, getBasicSearchItem, labelingTasksCreateSearchGroup, orderByCreateSearchGroup, userCreateSearchGroup } from "@/src/util/components/projects/projectId/data-browser/search-groups-helper";
 import { SearchGroup, StaticOrderByKeys } from "@/submodules/javascript-functions/enums/enums";
 import { IconArrowBadgeDown, IconArrowUp, IconArrowsRandom, IconFilterOff, IconInfoCircle, IconPlus, IconPointerOff, IconTrash } from "@tabler/icons-react";
 import { useEffect, useState } from "react";
@@ -139,6 +139,14 @@ export default function SearchGroups() {
             fullSearchCopy[SearchGroup.ORDER_STATEMENTS].groupElements = orderByCreateSearchGroup(baseItem, ++GLOBAL_SEARCH_GROUP_COUNT, attributesSortOrder, attributesDict);
         }
 
+        // comments
+        const searchGroupComments = getBasicSearchGroup(SearchGroup.COMMENTS, GROUP_SORT_ORDER + 500);
+        fullSearchCopy[SearchGroup.COMMENTS] = { value: searchGroupComments, groupElements: [] };
+        searchGroupsCopy[SearchGroup.COMMENTS] = searchGroupComments;
+        for (let baseItem of getBasicGroupItems(searchGroupComments.group, searchGroupComments.key)) {
+            fullSearchCopy[SearchGroup.COMMENTS].groupElements = commentsCreateSearchGroup(baseItem, ++GLOBAL_SEARCH_GROUP_COUNT);
+        }
+
         setSearchGroups(searchGroupsCopy);
         setFullSearch(fullSearchCopy);
 
@@ -176,6 +184,8 @@ export default function SearchGroups() {
             fullSearchCopy[group.key].groupElements['heuristics'][index] = groupItemCopy;
         } else if (group.key == SearchGroup.ORDER_STATEMENTS) {
             fullSearchCopy[group.key].groupElements['orderBy'][index] = groupItemCopy;
+        } else if (group.key == SearchGroup.COMMENTS) {
+            fullSearchCopy[group.key].groupElements['hasComments'] = groupItemCopy;
         } else {
             fullSearchCopy[group.key].groupElements[index] = groupItemCopy;
         }
@@ -537,8 +547,22 @@ export default function SearchGroups() {
                             </div>
                         </div>))}
                     </div>}
+                    {fullSearch[group.key].value.group == SearchGroup.COMMENTS && <div className="flex flex-row items-center mt-4">
+                        <div className="flex-grow flex items-center">
+                            <div className="flex flex-col">
+                                <div className="my-1">
+                                    {fullSearch[group.key].groupElements['hasComments'] && <div className="form-control flex flex-row flex-nowrap">
+                                        <div onClick={() => setActiveNegateGroup(fullSearch[group.key].groupElements['hasComments'], null, group)} style={{ backgroundColor: fullSearch[group.key].groupElements['hasComments'].color, borderColor: fullSearch[group.key].groupElements['hasComments'].color }}
+                                            className="ml-2 mr-2 h-4 w-4 border-gray-300 border rounded cursor-pointer hover:bg-gray-200">
+                                        </div>
+                                        <span className="ml-2 label-text truncate">Record with comments</span>
+                                    </div>}
+                                </div>
+                            </div>
+                        </div>
+                    </div>}
 
-                    {(fullSearch[group.key].value.group != SearchGroup.ATTRIBUTES && fullSearch[group.key].value.group != SearchGroup.USER_FILTER && fullSearch[group.key].value.group != SearchGroup.LABELING_TASKS && fullSearch[group.key].value.group != SearchGroup.ORDER_STATEMENTS) && <p>{'Default :('}</p>}
+                    {(fullSearch[group.key].value.group != SearchGroup.ATTRIBUTES && fullSearch[group.key].value.group != SearchGroup.USER_FILTER && fullSearch[group.key].value.group != SearchGroup.LABELING_TASKS && fullSearch[group.key].value.group != SearchGroup.ORDER_STATEMENTS && fullSearch[group.key].value.group != SearchGroup.COMMENTS) && <p>{'Default :('}</p>}
                 </form>
             </div>
         </div >))

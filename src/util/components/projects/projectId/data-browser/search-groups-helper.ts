@@ -295,3 +295,20 @@ export function generateRandomSeed() {
     }
     return seed;
 }
+
+export function commentsCreateSearchGroup(item, globalSearchGroupCount) {
+    return {
+        id: globalSearchGroupCount,
+        group: item.group,
+        groupKey: item.groupKey,
+        active: false,
+        negate: false,
+        type: item.type,
+        name: item.defaultValue,
+        hasComments: {
+            active: false,
+            negate: false
+        },
+        updateDummy: true
+    }
+}
