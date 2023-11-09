@@ -171,5 +171,7 @@ export const TOOLTIPS_DICT = {
         'OUTDATED_SLICE': 'Outdated slice&#10;save to update',
         'CLEAR_WS_CONFIDENCE': 'Clear filter for weakly supervised confidence',
         'CLEAR_MC_CONFIDENCE': 'Clear filter for model callback confidence',
+        'CONNECT': 'Connection within atomic filters',
+        'SAVE_SLICE': 'Store filters to disk'
     }
 }

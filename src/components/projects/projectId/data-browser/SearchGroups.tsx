@@ -18,6 +18,7 @@ import { setModalStates } from "@/src/reduxStore/states/modal";
 import { ModalEnum } from "@/src/types/shared/modal";
 import DataBrowserModals from "./DataBrowserModals";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
+import { DataSliceOperations } from "./DataSliceOperations";
 
 const GROUP_SORT_ORDER = 0;
 let GLOBAL_SEARCH_GROUP_COUNT = 0;
@@ -95,7 +96,7 @@ export default function SearchGroups() {
         const searchGroupsOrderCopy = [...searchGroupsOrder];
 
         // Drill down
-        fullSearch["DRILL_DOWN"] = { value: false, groupElements: [] };
+        fullSearch[SearchGroup.DRILL_DOWN] = { value: false, groupElements: [] };
 
         // Attributes
         const searchGroupAttributes = getBasicSearchGroup(SearchGroup.ATTRIBUTES, GROUP_SORT_ORDER + 100);
@@ -334,6 +335,12 @@ export default function SearchGroups() {
         setFullSearch(fullSearchCopy);
     }
 
+    function handleDrillDown(value: boolean) {
+        const fullSearchCopy = { ...fullSearch };
+        fullSearchCopy[SearchGroup.DRILL_DOWN].value = value;
+        setFullSearch(fullSearchCopy);
+    }
+
     return (<>
         {searchGroups && searchGroupsOrder.map((group) => (<div key={group.key} className="mt-4">
             <div onClick={() => toggleGroupMenu(group.key)}
@@ -567,6 +574,32 @@ export default function SearchGroups() {
             </div>
         </div >))
         }
+        <div className="mt-4 grid items-center" style={{ gridTemplateColumns: 'max-content max-content max-content max-content max-content' }}>
+            {fullSearch[SearchGroup.DRILL_DOWN] && <div className="flex flex-row items-center">
+                <Tooltip content={TOOLTIPS_DICT.DATA_BROWSER.CONNECT} color="invert" placement="right">
+                    <div className="cursor-help mr-2 underline filtersUnderline">
+                        Connect by
+                    </div>
+                </Tooltip>
+                <div className="flex items-center">
+                    <input type="radio" name="drillDown" id="radio-drill-down-inactive"
+                        onChange={() => handleDrillDown(false)} checked={!fullSearch[SearchGroup.DRILL_DOWN].value}
+                        className="focus:ring-blue-500 h-4 w-4 text-blue-600 border-gray-200" />
+                    <label htmlFor="radio-drill-down-inactive" className="cursor-pointer label p-1 label-text pr-2 font-dmMono">
+                        OR
+                    </label>
+                </div>
+                <div className="flex items-center mr-3">
+                    <input id="radio-drill-down-active" type="radio"
+                        onChange={() => handleDrillDown(true)} checked={fullSearch[SearchGroup.DRILL_DOWN].value}
+                        className="focus:ring-blue-500 h-4 w-4 text-blue-600 border-gray-200" />
+                    <label htmlFor="radio-drill-down-active" className="cursor-pointer label p-1 label-text pr-2 font-dmMono">
+                        AND
+                    </label>
+                </div>
+            </div>}
+        </div >
+        <DataSliceOperations fullSearch={fullSearch} />
     </>)
 }
 
