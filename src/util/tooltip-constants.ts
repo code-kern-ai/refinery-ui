@@ -172,6 +172,10 @@ export const TOOLTIPS_DICT = {
         'CLEAR_WS_CONFIDENCE': 'Clear filter for weakly supervised confidence',
         'CLEAR_MC_CONFIDENCE': 'Clear filter for model callback confidence',
         'CONNECT': 'Connection within atomic filters',
-        'SAVE_SLICE': 'Store filters to disk'
+        'SAVE_SLICE': 'Store filters to disk',
+        'CONFIGURATION': 'Change the data browser configurations',
+        'INTERSECTION': 'intersection (AND)',
+        'EDIT_RECORD': 'Edit record',
+        'RECORD_COMMENTS': 'Record comments',
     }
 }

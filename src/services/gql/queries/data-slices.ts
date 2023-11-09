@@ -17,18 +17,17 @@ query($projectId:ID!,$sliceType:String){
 }
 `;
 
-export const DELETE_DATA_SLICE = gql`
-mutation($projectId: ID!, $dataSliceId: ID!){
-  deleteDataSlice(projectId: $projectId, dataSliceId: $dataSliceId){
-    ok
+export const SEARCH_RECORDS_EXTENDED = gql`
+query ($projectId: ID!, $filterData: [JSONString]!, $offset: Int, $limit: Int) {
+  searchRecordsExtended(projectId: $projectId, filterData: $filterData, offset: $offset, limit: $limit) {
+    queryLimit
+    queryOffset
+    fullCount
+    sessionId
+    recordList {
+      recordData
+    }
   }
 }
-`;
 
-export const CREATE_DATA_SLICE = gql`
-mutation($projectId: ID!, $name: String!, $static: Boolean!, $filterRaw: JSONString!, $filterData: [JSONString]!){
-  createDataSlice(projectId: $projectId, name: $name, static: $static, filterRaw: $filterRaw, filterData: $filterData){
-    id
-  }
-}
 `;

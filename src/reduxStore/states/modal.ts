@@ -170,7 +170,14 @@ const initialState: Modals = {
     [ModalEnum.SAVE_DATA_SLICE]: {
         open: false,
         sliceName: '',
-    }
+    },
+    [ModalEnum.CONFIGURATION]: {
+        open: false
+    },
+    [ModalEnum.RECORD_COMMENTS]: {
+        open: false,
+        commentsData: null,
+    },
 };
 
 const modalSlice = createSlice({

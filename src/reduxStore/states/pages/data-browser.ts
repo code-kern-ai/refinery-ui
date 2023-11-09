@@ -1,17 +1,26 @@
-import { DataSlice } from '@/src/types/components/projects/projectId/data-browser/data-browser';
+import { DataSlice, SearchRecordsExtended } from '@/src/types/components/projects/projectId/data-browser/data-browser';
 import { arrayToDict } from '@/submodules/javascript-functions/general';
 import { createSlice } from '@reduxjs/toolkit'
 import type { PayloadAction } from '@reduxjs/toolkit'
-import { User } from 'aws-sdk/clients/budgets';
 
 type DataBrowserState = {
     all: DataSlice[];
     active: DataSlice | null;
     additionalData: {
         displayOutdatedWarning: boolean;
-        staticDataSliceCurrentCount: number
+        staticDataSliceCurrentCount: number;
+        staticSliceOrderActive: boolean;
+        loading: boolean;
     },
     usersMapCount: any;
+    searchRecordsExtended: SearchRecordsExtended;
+    similaritySearch: {
+        recordsInDisplay: boolean
+    },
+    activeSearchParams: any[];
+    configuration: {
+        weakSupervisionRelated: boolean;
+    }
 }
 
 function getInitState(): DataBrowserState {
@@ -20,9 +29,25 @@ function getInitState(): DataBrowserState {
         active: null,
         additionalData: {
             displayOutdatedWarning: false,
-            staticDataSliceCurrentCount: 0
+            staticDataSliceCurrentCount: 0,
+            staticSliceOrderActive: false,
+            loading: false,
         },
-        usersMapCount: {}
+        usersMapCount: {},
+        searchRecordsExtended: {
+            fullCount: 0,
+            queryLimit: 0,
+            queryOffset: 0,
+            recordList: [],
+            sessionId: ""
+        },
+        similaritySearch: {
+            recordsInDisplay: false
+        },
+        activeSearchParams: [],
+        configuration: {
+            weakSupervisionRelated: false
+        }
     };
 }
 
@@ -67,6 +92,16 @@ const dataBrowserSlice = createSlice({
         setUsersMapCount(state, action: PayloadAction<any>) {
             if (action.payload) state.usersMapCount = action.payload;
             else state.usersMapCount = {};
+        },
+        setSearchRecordsExtended(state, action: PayloadAction<SearchRecordsExtended>) {
+            if (action.payload) state.searchRecordsExtended = action.payload;
+            else state.searchRecordsExtended = {
+                fullCount: 0,
+                queryLimit: 0,
+                queryOffset: 0,
+                recordList: [],
+                sessionId: ""
+            };
         }
     },
 })
@@ -78,6 +113,10 @@ export const selectDataSlicesAll = selectDataSlicesFunc(true);
 export const selectDataSlicesDict = selectDataSlicesFunc(false);
 export const selectAdditionalData = (state) => state.dataBrowser.additionalData;
 export const selectUsersCount = (state) => state.dataBrowser.usersMapCount;
+export const selectRecords = (state) => state.dataBrowser.searchRecordsExtended;
+export const selectSimilaritySearch = (state) => state.dataBrowser.similaritySearch;
+export const selectActiveSearchParams = (state) => state.dataBrowser.activeSearchParams;
+export const selectConfiguration = (state) => state.dataBrowser.configuration;
 
 export function selectDataSlicesFunc(asArray: boolean = false) {
     if (asArray) return (state) => state.dataBrowser.all;
@@ -85,5 +124,5 @@ export function selectDataSlicesFunc(asArray: boolean = false) {
 }
 
 
-export const { setDataSlices, setActiveDataSlice, removeFromAllDataSlicesById, updateDataSlicesState, setUsersMapCount } = dataBrowserSlice.actions;
+export const { setDataSlices, setActiveDataSlice, removeFromAllDataSlicesById, updateDataSlicesState, setUsersMapCount, setSearchRecordsExtended } = dataBrowserSlice.actions;
 export const dataBrowserReducer = dataBrowserSlice.reducer;

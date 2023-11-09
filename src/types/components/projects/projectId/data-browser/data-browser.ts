@@ -1,4 +1,5 @@
 import { SearchGroup } from "@/submodules/javascript-functions/enums/enums";
+import { type } from "os";
 
 export type DataSlice = {
     id: string;
@@ -26,4 +27,23 @@ export type SearchGroupElement = {
     name: string;
     nameAdd: string;
     subText: string;
+};
+
+export type SearchRecordsExtended = {
+    fullCount: number;
+    queryLimit: number;
+    queryOffset: number;
+    recordList: any[];
+    sessionId: string;
+};
+
+export type RecordListProps = {
+    editRecord: (index: number) => void;
+    recordComments: any;
+}
+
+export type ColumnData = {
+    field: string;
+    displayName: string;
+    order: number;
 };

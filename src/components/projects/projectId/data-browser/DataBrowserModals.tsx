@@ -3,7 +3,7 @@ import { selectIsManaged } from "@/src/reduxStore/states/general";
 import { selectModal } from "@/src/reduxStore/states/modal";
 import { removeFromAllDataSlicesById } from "@/src/reduxStore/states/pages/data-browser";
 import { selectProject } from "@/src/reduxStore/states/project";
-import { DELETE_DATA_SLICE } from "@/src/services/gql/queries/data-slices";
+import { DELETE_DATA_SLICE } from "@/src/services/gql/mutations/data-slices";
 import { ModalButton, ModalEnum } from "@/src/types/shared/modal";
 import { parseLinkFromText } from "@/src/util/shared/link-parser-helper";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
@@ -97,5 +97,9 @@ export default function DataBrowserModals() {
                 </div>
             </div>}
         </Modal>
+
+        <Modal modalName={ModalEnum.CONFIGURATION}></Modal>
+
+        <Modal modalName={ModalEnum.RECORD_COMMENTS}></Modal>
     </>)
 }
