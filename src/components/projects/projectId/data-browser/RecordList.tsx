@@ -28,7 +28,7 @@ export default function RecordList(props: RecordListProps) {
                     </Tooltip>
                 </div>}
 
-                <RecordDisplay />
+                <RecordDisplay record={record} />
                 {record.rla_aggregation && <div className="mt-2 flex flex-col">
                     {record.wsHint && configuration.weakSupervisionRelated && <div className="text-gray-800 text-sm font-semibold">{record.wsHint}</div>}
                     <RecordTable columnsData={DATA_BROWSER_TABLE_COLUMN_HEADERS} tableData={record.rla_aggregation} />

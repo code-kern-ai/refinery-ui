@@ -4,6 +4,7 @@ import { SampleRecordProps } from "@/src/types/components/projects/projectId/heu
 import { ModalEnum } from "@/src/types/shared/modal";
 import { useDispatch, useSelector } from "react-redux";
 import style from '@/src/styles/components/projects/projectId/heuristics/heuristics-details.module.css';
+import { RecordDisplay } from "@/src/components/shared/record-display/RecordDisplay";
 
 export default function SampleRecords(props: SampleRecordProps) {
     const dispatch = useDispatch();
@@ -48,9 +49,7 @@ export default function SampleRecords(props: SampleRecordProps) {
             <h1 className="text-lg text-gray-900 mb-2 text-center">View details</h1>
             {modalSampleRecord.currentRecordIdx != -1 && <div>
                 <div className={`text-sm text-gray-500 my-2 overflow-y-auto max-height-modal ${style.scrollableSize}`}>
-
-                    {/* TODO: record display component, added on data browser, attribute calculation */}
-
+                    <RecordDisplay record={props.sampleRecords.records[modalSampleRecord.currentRecordIdx]} />
                     <div className="text-sm leading-5 text-left text-gray-900 font-bold">
                         Label data
                         <div className="flex items-center justify-start">

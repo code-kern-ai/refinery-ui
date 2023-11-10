@@ -23,6 +23,7 @@ export type Attribute = {
     progress?: number;
     sourceCodeToDisplay?: string;
     saveSourceCode: boolean;
+    key?: string;
 }
 
 export type AttributeVisibilityStates = {

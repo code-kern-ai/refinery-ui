@@ -1,4 +1,4 @@
-import { DataSlice, SearchRecordsExtended } from '@/src/types/components/projects/projectId/data-browser/data-browser';
+import { DataSlice, LineBreaksType, SearchRecordsExtended } from '@/src/types/components/projects/projectId/data-browser/data-browser';
 import { arrayToDict } from '@/submodules/javascript-functions/general';
 import { createSlice } from '@reduxjs/toolkit'
 import type { PayloadAction } from '@reduxjs/toolkit'
@@ -20,6 +20,7 @@ type DataBrowserState = {
     activeSearchParams: any[];
     configuration: {
         weakSupervisionRelated: boolean;
+        lineBreaks: LineBreaksType;
     }
 }
 
@@ -46,7 +47,8 @@ function getInitState(): DataBrowserState {
         },
         activeSearchParams: [],
         configuration: {
-            weakSupervisionRelated: false
+            weakSupervisionRelated: false,
+            lineBreaks: LineBreaksType.NORMAL
         }
     };
 }

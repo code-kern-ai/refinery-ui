@@ -16,6 +16,7 @@ import style from '@/src/styles/components/projects/projectId/attribute-calculat
 import { DataTypeEnum } from "@/src/types/shared/general";
 import { CALCULATE_USER_ATTRIBUTE_ALL_RECORDS } from "@/src/services/gql/mutations/project-settings";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
+import { RecordDisplay } from "@/src/components/shared/record-display/RecordDisplay";
 
 
 const ACCEPT_BUTTON = { buttonCaption: 'Accept', useButton: true };
@@ -145,7 +146,7 @@ export default function ExecutionContainer(props: ExecutionContainerProps) {
             <h1 className="text-lg text-gray-900 mb-2 text-center">View details</h1>
             {modalViewRecordDetails.record ? (
                 <div className={`overflow-y-auto max-height-modal text-sm text-gray-500 my-2 ${style.scrollableSize}`}>
-                    {/* TODO: Add the attribute when the component RECORD-DISPLAY is implemented */}
+                    <RecordDisplay record={modalViewRecordDetails.record} />
                     <div className="text-sm leading-5 text-left text-gray-900 font-bold">Calculated value</div>
                     <div className="text-sm leading-5 text-left text-gray-500 font-normal">
                         {props.currentAttribute.dataType != DataTypeEnum.EMBEDDING_LIST ? <span>

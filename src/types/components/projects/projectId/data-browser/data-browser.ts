@@ -47,3 +47,9 @@ export type ColumnData = {
     displayName: string;
     order: number;
 };
+
+export enum LineBreaksType {
+    NORMAL = 'NORMAL',
+    IS_PRE_WRAP = 'IS_PRE_WRAP',
+    IS_PRE_LINE = 'IS_PRE_LINE',
+}
