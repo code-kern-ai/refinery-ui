@@ -18,7 +18,7 @@ import HeuristicStatistics from "../shared/HeuristicStatistics";
 import CrowdLabelerSettings from "./CrowdLabelerSettings";
 import { postProcessCrowdLabeler } from "@/src/util/components/projects/projectId/heuristics/heuristicId/crowd-labeler-helper";
 import { selectDataSlicesAll, setDataSlices } from "@/src/reduxStore/states/pages/data-browser";
-import { DATA_SLICES } from "@/src/services/gql/queries/data-slices";
+import { DATA_SLICES } from "@/src/services/gql/queries/data-browser";
 
 
 export default function CrowdLabeler() {

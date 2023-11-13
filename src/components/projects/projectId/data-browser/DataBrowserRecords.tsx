@@ -29,8 +29,11 @@ export default function DataBrowserRecords() {
     function clearFilters() { }
 
     function storePreliminaryRecordIds(index: number, forEdit: boolean = false) {
+        // TODO: Add the session and the data to the store
         if (forEdit) {
             router.push(`/projects/${project.id}/edit-record`);
+        } else {
+            router.push(`/projects/${project.id}/labeling`);
         }
     }
 
@@ -99,7 +102,8 @@ export default function DataBrowserRecords() {
                 {extendedRecords.fullCount == 0 && <div>Your search criteria didn&apos;t match any record.</div>}
                 <RecordList
                     recordComments={{}}
-                    editRecord={(index) => storePreliminaryRecordIds(index, true)} />
+                    editRecord={(index) => storePreliminaryRecordIds(index, true)}
+                    recordClicked={(index) => storePreliminaryRecordIds(index)} />
             </div>}
         </div>
         <DataBrowserModals />

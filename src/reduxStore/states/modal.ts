@@ -178,6 +178,10 @@ const initialState: Modals = {
         open: false,
         commentsData: null,
     },
+    [ModalEnum.SIMILARITY_SEARCH]: {
+        open: false,
+        recordId: '',
+    }
 };
 
 const modalSlice = createSlice({

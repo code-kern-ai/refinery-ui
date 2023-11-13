@@ -16,7 +16,7 @@ export default function Modal(props: any) {
 
     useEffect(() => {
         fillButtons();
-    }, [props.acceptButton, props.abortButton, props.backButton]);
+    }, [props.acceptButton, props.abortButton, props.backButton, props.secondAcceptButton]);
 
     useEffect(() => {
         if (props.hasOwnButtons != undefined) setHasOwnButtons(props.hasOwnButtons);
@@ -68,6 +68,18 @@ export default function Modal(props: any) {
             if (typeof props.backButton == "string") props.backButton = { useButton: isStringTrue(props.backButton as string) };
             else if (typeof props.backButton == "boolean") props.backButton = { useButton: props.backButton };
             if (props.backButton) initButton(props.backButton, ModalButtonType.BACK);
+        }
+        if (props.secondAcceptButton == undefined) {
+            const newProps = {
+                ...props,
+                secondAcceptButton: { useButton: false }
+            };
+            props = newProps;
+        }
+        else {
+            if (typeof props.secondAcceptButton == "string") props.secondAcceptButton = { useButton: isStringTrue(props.secondAcceptButton as string) };
+            else if (typeof props.secondAcceptButton == "boolean") props.secondAcceptButton = { useButton: props.secondAcceptButton };
+            if (props.secondAcceptButton) initButton(props.secondAcceptButton, ModalButtonType.ACCEPT);
         }
 
     }
@@ -124,6 +136,9 @@ export default function Modal(props: any) {
                                     {props.acceptButton?.useButton ?
                                         <button className={`ml-2 bg-green-100 border border-green-400 text-green-700 text-xs font-semibold px-4 py-2 rounded-md ${props.acceptButton.disabled ? 'cursor-not-allowed opacity-50' : 'cursor-pointer opacity-100'} hover:bg-green-200 focus:outline-none`}
                                             onClick={() => clickButton(props.acceptButton)}>{props.acceptButton.buttonCaption}</button> : null}
+                                    {props.secondAcceptButton?.useButton ?
+                                        <button className={`ml-2 bg-green-100 border border-green-400 text-green-700 text-xs font-semibold px-4 py-2 rounded-md ${props.secondAcceptButton.disabled ? 'cursor-not-allowed opacity-50' : 'cursor-pointer opacity-100'} hover:bg-green-200 focus:outline-none`}
+                                            onClick={() => clickButton(props.secondAcceptButton)}>{props.secondAcceptButton.buttonCaption}</button> : null}
                                     {props.abortButton?.useButton ?
                                         <button className={`ml-2 bg-red-100 border border-red-400 text-red-700 text-xs font-semibold px-4 py-2 rounded-md ${props.abortButton.disabled ? 'cursor-not-allowed opacity-50' : 'cursor-pointer opacity-100'} hover:bg-red-200 focus:outline-none`}
                                             onClick={() => clickButton(props.abortButton)}>{props.abortButton.buttonCaption}</button> : null}

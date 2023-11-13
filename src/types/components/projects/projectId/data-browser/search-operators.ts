@@ -11,3 +11,9 @@ export enum SearchOperator {
     LESS = 'LESS',
     LESS_EQUAL = 'LESS_EQUAL',
 }
+
+export enum FilterIntegrationOperator {
+    EQUAL = 'EQUAL',
+    BETWEEN = 'BETWEEN',
+    IN = 'IN'
+}

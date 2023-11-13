@@ -2,17 +2,18 @@ import { selectProject } from "@/src/reduxStore/states/project"
 import { useDispatch, useSelector } from "react-redux"
 import DataBrowserSidebar from "./DataBrowserSidebar";
 import { useLazyQuery } from "@apollo/client";
-import { DATA_SLICES, SEARCH_RECORDS_EXTENDED } from "@/src/services/gql/queries/data-slices";
+import { DATA_SLICES, SEARCH_RECORDS_EXTENDED } from "@/src/services/gql/queries/data-browser";
 import { useEffect, useState } from "react";
 import { setDataSlices, setSearchRecordsExtended, setUsersMapCount } from "@/src/reduxStore/states/pages/data-browser";
 import { postProcessDataSlices, postProcessRecordsExtended, postProcessUsersCount } from "@/src/util/components/projects/projectId/data-browser/data-browser-helper";
-import { GET_ATTRIBUTES_BY_PROJECT_ID, GET_LABELING_TASKS_BY_PROJECT_ID } from "@/src/services/gql/queries/project-setting";
-import { selectLabelingTasksAll, setAllAttributes, setLabelingTasksAll } from "@/src/reduxStore/states/pages/settings";
+import { GET_ATTRIBUTES_BY_PROJECT_ID, GET_EMBEDDING_SCHEMA_BY_PROJECT_ID, GET_LABELING_TASKS_BY_PROJECT_ID } from "@/src/services/gql/queries/project-setting";
+import { selectLabelingTasksAll, setAllAttributes, setAllEmbeddings, setLabelingTasksAll } from "@/src/reduxStore/states/pages/settings";
 import { postProcessingAttributes } from "@/src/util/components/projects/projectId/settings/data-schema-helper";
 import { postProcessLabelingTasks, postProcessLabelingTasksSchema } from "@/src/util/components/projects/projectId/settings/labeling-tasks-helper";
 import { GET_ORGANIZATION_USERS_WITH_COUNT } from "@/src/services/gql/queries/organizations";
 import { selectAllUsers } from "@/src/reduxStore/states/general";
 import DataBrowserRecords from "./DataBrowserRecords";
+import { postProcessingEmbeddings } from "@/src/util/components/projects/projectId/settings/embeddings-helper";
 
 const SEARCH_REQUEST = { offset: 0, limit: 20 };
 
@@ -29,6 +30,7 @@ export default function DataBrowser() {
     const [refetchLabelingTasksByProjectId] = useLazyQuery(GET_LABELING_TASKS_BY_PROJECT_ID, { fetchPolicy: "network-only" });
     const [refetchUsersCount] = useLazyQuery(GET_ORGANIZATION_USERS_WITH_COUNT, { fetchPolicy: "no-cache" });
     const [refetchExtendedRecord] = useLazyQuery(SEARCH_RECORDS_EXTENDED, { fetchPolicy: "no-cache" });
+    const [refetchEmbeddings] = useLazyQuery(GET_EMBEDDING_SCHEMA_BY_PROJECT_ID, { fetchPolicy: "network-only" });
 
     useEffect(() => {
         if (!project) return;
@@ -39,6 +41,7 @@ export default function DataBrowser() {
         refetchAttributesAndProcess();
         refetchLabelingTasksAndProcess();
         refetchUsersCountAndProcess();
+        refetchEmbeddingsAndPostProcess();
     }, [project, users]);
 
     useEffect(() => {
@@ -69,6 +72,13 @@ export default function DataBrowser() {
     function refetchExtendedSearchAndProcess() {
         refetchExtendedRecord({ variables: { projectId: project.id, filterData: JSON.stringify({}), offset: searchRequest.offset, limit: searchRequest.limit } }).then((res) => {
             dispatch(setSearchRecordsExtended(postProcessRecordsExtended(res.data['searchRecordsExtended'], labelingTasks)));
+        });
+    }
+
+    function refetchEmbeddingsAndPostProcess() {
+        refetchEmbeddings({ variables: { projectId: project.id } }).then((res) => {
+            const embeddings = postProcessingEmbeddings(res.data['projectByProjectId']['embeddings']['edges'].map((e) => e['node']), []);
+            dispatch(setAllEmbeddings(embeddings));
         });
     }
 

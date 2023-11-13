@@ -31,3 +31,17 @@ query ($projectId: ID!, $filterData: [JSONString]!, $offset: Int, $limit: Int) {
 }
 
 `;
+
+export const SEARCH_SIMILAR_RECORDS = gql`
+query ($projectId: ID!, $embeddingId: ID!, $recordId: ID!, $attFilter: JSONString, $recordSubKey:Int) {
+  searchRecordsBySimilarity(projectId: $projectId, embeddingId: $embeddingId, recordId: $recordId, attFilter: $attFilter,recordSubKey:$recordSubKey) {
+    queryLimit
+    queryOffset
+    fullCount
+    sessionId
+    recordList {
+      recordData
+    }
+  }
+}
+`;

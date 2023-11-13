@@ -2,7 +2,7 @@ import Modal from "@/src/components/shared/modal/Modal";
 import { openModal, selectModal, setModalStates } from "@/src/reduxStore/states/modal";
 import { selectDataSlicesAll } from "@/src/reduxStore/states/pages/data-browser";
 import { selectProject } from "@/src/reduxStore/states/project";
-import { CREATE_DATA_SLICE } from "@/src/services/gql/mutations/data-slices";
+import { CREATE_DATA_SLICE } from "@/src/services/gql/mutations/data-browser";
 import { ModalButton, ModalEnum } from "@/src/types/shared/modal";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
 import { useMutation } from "@apollo/client";

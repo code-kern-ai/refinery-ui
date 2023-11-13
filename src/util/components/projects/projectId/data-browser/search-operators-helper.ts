@@ -1,4 +1,4 @@
-import { SearchOperator } from "@/src/types/components/projects/projectId/data-browser/search-operators";
+import { FilterIntegrationOperator, SearchOperator } from "@/src/types/components/projects/projectId/data-browser/search-operators";
 
 export function getAttributeType(attributes: any[], attributeName: string) {
     return attributes.find(att => att.name == attributeName)?.type;
@@ -60,4 +60,16 @@ export function checkDecimalPatterns(attributeType: string, event: any, operator
             return;
         }
     }
+}
+
+export function getFilterIntegrationOperatorTooltip(operator: FilterIntegrationOperator): string {
+    switch (operator) {
+        case FilterIntegrationOperator.EQUAL:
+            return '= {value}';
+        case FilterIntegrationOperator.BETWEEN:
+            return '>= {a} and <= {b}';
+        case FilterIntegrationOperator.IN:
+            return 'Included in separated list of values';
+    }
+    return 'UNKNOWN';
 }
