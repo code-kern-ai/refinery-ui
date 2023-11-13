@@ -178,6 +178,8 @@ export const TOOLTIPS_DICT = {
         'EDIT_RECORD': 'Edit record',
         'RECORD_COMMENTS': 'Record comments',
         'ADD_EMBEDDING': 'Add an embedding in the project settings',
-        'UPDATE_SLICE': 'Update your current data slice'
+        'UPDATE_SLICE': 'Update your current data slice',
+        'CREATE_EMBEDDINGS': 'Create embedding to find outliers',
+        'STATIC_DATA_SLICE': 'Creates a static data slice'
     }
 }

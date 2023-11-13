@@ -2,9 +2,9 @@ import Modal from "@/src/components/shared/modal/Modal";
 import { selectUser } from "@/src/reduxStore/states/general";
 import { openModal, selectModal, setModalStates } from "@/src/reduxStore/states/modal";
 import { extendAllDataSlices, selectActiveSearchParams, selectActiveSlice, selectAdditionalData, selectConfiguration, selectDataSlicesAll, setActiveDataSlice } from "@/src/reduxStore/states/pages/data-browser";
-import { selectAttributes, selectLabelingTasksAll } from "@/src/reduxStore/states/pages/settings";
+import { selectAttributes, selectEmbeddings, selectLabelingTasksAll } from "@/src/reduxStore/states/pages/settings";
 import { selectProject } from "@/src/reduxStore/states/project";
-import { CREATE_DATA_SLICE, UPDATE_DATA_SLICE } from "@/src/services/gql/mutations/data-browser";
+import { CREATE_DATA_SLICE, CREATE_OUTLIER_SLICE, UPDATE_DATA_SLICE } from "@/src/services/gql/mutations/data-browser";
 import { DataSlice } from "@/src/types/components/projects/projectId/data-browser/data-browser";
 import { ModalButton, ModalEnum } from "@/src/types/shared/modal";
 import { getRawFilterForSave, parseFilterToExtended } from "@/src/util/components/projects/projectId/data-browser/filter-parser-helper";
@@ -13,7 +13,7 @@ import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
 import { Slice } from "@/submodules/javascript-functions/enums/enums";
 import { useMutation } from "@apollo/client";
 import { Tooltip } from "@nextui-org/react";
-import { IconFilter, IconRotate } from "@tabler/icons-react";
+import { IconChartBubble, IconFilter, IconRotate } from "@tabler/icons-react";
 import { useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
@@ -24,6 +24,7 @@ export function DataSliceOperations(props: { fullSearch: {} }) {
 
     const project = useSelector(selectProject);
     const modalSaveDataSlice = useSelector(selectModal(ModalEnum.SAVE_DATA_SLICE));
+    const modalOutlierSlice = useSelector(selectModal(ModalEnum.CREATE_OUTLIER_SLICE));
     const dataSlices = useSelector(selectDataSlicesAll);
     const configuration = useSelector(selectConfiguration);
     const user = useSelector(selectUser);
@@ -32,11 +33,13 @@ export function DataSliceOperations(props: { fullSearch: {} }) {
     const activeSearchParams = useSelector(selectActiveSearchParams);
     const activeSlice = useSelector(selectActiveSlice);
     const additionalData = useSelector(selectAdditionalData);
+    const embeddings = useSelector(selectEmbeddings);
 
     const [isStatic, setIsStatic] = useState<boolean>(false);
 
     const [createDataSliceMut] = useMutation(CREATE_DATA_SLICE);
     const [updateDataSliceMut] = useMutation(UPDATE_DATA_SLICE);
+    const [createOutlierSliceMut] = useMutation(CREATE_OUTLIER_SLICE);
 
     const saveDataSlice = useCallback(() => {
         createDataSliceMut({
@@ -75,7 +78,7 @@ export function DataSliceOperations(props: { fullSearch: {} }) {
             buttonCaption: modalSaveDataSlice.sliceNameExists ? 'Update' : 'Save',
             disabled: modalSaveDataSlice.sliceName == ''
         })
-    }, [modalSaveDataSlice])
+    }, [modalSaveDataSlice]);
 
     const [acceptButton, setAcceptButton] = useState<ModalButton>(ACCEPT_BUTTON);
 
@@ -86,7 +89,6 @@ export function DataSliceOperations(props: { fullSearch: {} }) {
 
     function updateSlice(isStatic = null) {
         isStatic = isStatic == null ? activeSlice.static : isStatic;
-
         updateDataSliceMut({
             variables: {
                 projectId: project.id,
@@ -96,6 +98,15 @@ export function DataSliceOperations(props: { fullSearch: {} }) {
                 filterData: parseFilterToExtended(activeSearchParams, attributes, configuration, labelingTasks, user)
             }
         }).then((res) => { });
+    }
+
+    function requestOutlierSlice() {
+        if (embeddings.length == 0) return;
+        let embeddingId = embeddings.length == 1 ? embeddings[0].id : modalOutlierSlice.embeddingId;
+
+        createOutlierSliceMut({ variables: { projectId: project.id, embeddingId } }).then((res) => {
+
+        });
     }
 
     return (<div>
@@ -115,11 +126,19 @@ export function DataSliceOperations(props: { fullSearch: {} }) {
                 </button>
             </Tooltip>
         </div>
+        <div className="mt-1">
+            <Tooltip content={embeddings.length == 0 ? TOOLTIPS_DICT.DATA_BROWSER.CREATE_EMBEDDINGS : TOOLTIPS_DICT.DATA_BROWSER.STATIC_DATA_SLICE} color="invert" placement="right">
+                <button onClick={() => embeddings.length == 1 ? requestOutlierSlice() : dispatch(openModal(ModalEnum.CREATE_OUTLIER_SLICE))}
+                    disabled={embeddings.length == 0}
+                    className="mr-1 f inline-flex items-center w-36 px-2.5 py-1.5 border border-gray-200 shadow-sm text-xs font-medium rounded text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 cursor-pointer disabled:cursor-not-allowed disabled:opacity-50">
+                    <IconChartBubble className="w-6 h-6 mr-1 text-green-700 fill-green-100" />
+                    Find outliers
+                </button>
+            </Tooltip>
+        </div>
         <Modal modalName={ModalEnum.SAVE_DATA_SLICE} acceptButton={acceptButton}>
-            <div className="flex flex-grow justify-center text-lg leading-6 text-gray-900 font-medium">
-                Data slice creation</div>
-            <div className="mb-2 flex flex-grow justify-center text-sm">
-                Save or update the current filter settings as a data slice</div>
+            <div className="flex flex-grow justify-center text-lg leading-6 text-gray-900 font-medium">Data slice creation</div>
+            <div className="mb-2 flex flex-grow justify-center text-sm">Save or update the current filter settings as a data slice</div>
             <p className="pt-4 text-left">You have two choices.
                 <label className="block font-bold mt-2">Dynamic:</label>
                 Stores the current filter critera and is reapplied whenever the data slice is selected.
@@ -157,6 +176,10 @@ export function DataSliceOperations(props: { fullSearch: {} }) {
                         }} className="h-9 w-full border-gray-300 rounded-md placeholder-italic border text-gray-900 pl-4 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100" placeholder="Enter name..." />
                 </div>
             </div>
+        </Modal>
+
+        <Modal modalName={ModalEnum.CREATE_OUTLIER_SLICE}>
+
         </Modal>
     </div>)
 }

@@ -23,3 +23,11 @@ mutation($projectId: ID!, $dataSliceId: ID!, $static: Boolean!, $filterRaw: JSON
   }
 }
 `;
+
+export const CREATE_OUTLIER_SLICE = gql`
+mutation($projectId: ID!, $embeddingId: ID!){
+  createOutlierSlice(projectId: $projectId, embeddingId: $embeddingId) {
+    ok
+  } 
+}
+`;

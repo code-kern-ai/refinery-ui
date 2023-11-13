@@ -181,6 +181,10 @@ const initialState: Modals = {
     [ModalEnum.SIMILARITY_SEARCH]: {
         open: false,
         recordId: '',
+    },
+    [ModalEnum.CREATE_OUTLIER_SLICE]: {
+        open: false,
+        embeddingId: '',
     }
 };
 

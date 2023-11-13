@@ -32,7 +32,6 @@ export default function DataBrowserSidebar() {
     const [dataSliceFilter, setDataSliceFilter] = useState('');
     const [filteredSlices, setFilteredSlices] = useState([]);
 
-
     useEffect(() => {
         if (!dataSlices) return;
         setFilteredSlices(dataSlices);

@@ -128,6 +128,18 @@ const dataBrowserSlice = createSlice({
                 };
             },
         },
+        updateAdditionalDataState: {
+            reducer(state, action: PayloadAction<any[]>) {
+                if (action.payload.length !== 2) throw new Error("updateAdditionalDataState must be called with exactly 2 arguments");
+                const [additionalDataField, changes] = action.payload;
+                state.additionalData[additionalDataField] = changes;
+            },
+            prepare(additionalDataField: string, changes: any) {
+                return {
+                    payload: [additionalDataField, changes]
+                };
+            },
+        },
     },
 })
 
@@ -149,5 +161,5 @@ export function selectDataSlicesFunc(asArray: boolean = false) {
 }
 
 
-export const { setDataSlices, setActiveDataSlice, removeFromAllDataSlicesById, updateDataSlicesState, setUsersMapCount, setSearchRecordsExtended, setActiveSearchParams, extendAllDataSlices, updateConfigurationState } = dataBrowserSlice.actions;
+export const { setDataSlices, setActiveDataSlice, removeFromAllDataSlicesById, updateDataSlicesState, setUsersMapCount, setSearchRecordsExtended, setActiveSearchParams, extendAllDataSlices, updateConfigurationState, updateAdditionalDataState } = dataBrowserSlice.actions;
 export const dataBrowserReducer = dataBrowserSlice.reducer;
