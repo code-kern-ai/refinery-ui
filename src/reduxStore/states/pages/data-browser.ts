@@ -21,6 +21,8 @@ type DataBrowserState = {
     configuration: {
         weakSupervisionRelated: boolean;
         lineBreaks: LineBreaksType;
+        highlightText: boolean;
+        separator: string;
     }
 }
 
@@ -48,7 +50,9 @@ function getInitState(): DataBrowserState {
         activeSearchParams: [],
         configuration: {
             weakSupervisionRelated: false,
-            lineBreaks: LineBreaksType.NORMAL
+            lineBreaks: LineBreaksType.NORMAL,
+            highlightText: false,
+            separator: ","
         }
     };
 }
@@ -112,6 +116,18 @@ const dataBrowserSlice = createSlice({
         extendAllDataSlices(state, action: PayloadAction<any>) {
             if (action.payload) state.all.push(action.payload);
         },
+        updateConfigurationState: {
+            reducer(state, action: PayloadAction<any[]>) {
+                if (action.payload.length !== 2) throw new Error("updateConfigurationState must be called with exactly 2 arguments");
+                const [confField, changes] = action.payload;
+                state.configuration[confField] = changes;
+            },
+            prepare(confField: string, changes: any) {
+                return {
+                    payload: [confField, changes]
+                };
+            },
+        },
     },
 })
 
@@ -133,5 +149,5 @@ export function selectDataSlicesFunc(asArray: boolean = false) {
 }
 
 
-export const { setDataSlices, setActiveDataSlice, removeFromAllDataSlicesById, updateDataSlicesState, setUsersMapCount, setSearchRecordsExtended, setActiveSearchParams, extendAllDataSlices } = dataBrowserSlice.actions;
+export const { setDataSlices, setActiveDataSlice, removeFromAllDataSlicesById, updateDataSlicesState, setUsersMapCount, setSearchRecordsExtended, setActiveSearchParams, extendAllDataSlices, updateConfigurationState } = dataBrowserSlice.actions;
 export const dataBrowserReducer = dataBrowserSlice.reducer;
