@@ -115,7 +115,7 @@ export function attributeCreateSearchGroup(item, globalSearchGroupCount) {
         negate: false,
         addText: item.addText,
         operator: item.operator,
-        searchValue: 'x',
+        searchValue: '',
         searchValueBetween: '',
         caseSensitive: false
     }

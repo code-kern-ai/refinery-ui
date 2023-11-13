@@ -11,14 +11,20 @@ import Dropdown from "@/submodules/react-components/components/Dropdown";
 import { SearchOperator } from "@/src/types/components/projects/projectId/data-browser/search-operators";
 import { checkDecimalPatterns, getAttributeType, getSearchOperatorTooltip } from "@/src/util/components/projects/projectId/data-browser/search-operators-helper";
 import { DataTypeEnum } from "@/src/types/shared/general";
-import { selectAllUsers } from "@/src/reduxStore/states/general";
-import { selectUsersCount } from "@/src/reduxStore/states/pages/data-browser";
+import { selectAllUsers, selectUser } from "@/src/reduxStore/states/general";
+import { selectActiveSearchParams, selectConfiguration, selectRecords, selectUsersCount, setActiveSearchParams, setSearchRecordsExtended } from "@/src/reduxStore/states/pages/data-browser";
 import { Tooltip } from "@nextui-org/react";
 import { setModalStates } from "@/src/reduxStore/states/modal";
 import { ModalEnum } from "@/src/types/shared/modal";
 import DataBrowserModals from "./DataBrowserModals";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
 import { DataSliceOperations } from "./DataSliceOperations";
+import { useLazyQuery } from "@apollo/client";
+import { SEARCH_RECORDS_EXTENDED } from "@/src/services/gql/queries/data-browser";
+import { postProcessRecordsExtended } from "@/src/util/components/projects/projectId/data-browser/data-browser-helper";
+import { parseFilterToExtended } from "@/src/util/components/projects/projectId/data-browser/filter-parser-helper";
+import { updateSearchParameters } from "@/src/util/components/projects/projectId/data-browser/search-parameters";
+import { jsonCopy } from "@/submodules/javascript-functions/general";
 
 const GROUP_SORT_ORDER = 0;
 let GLOBAL_SEARCH_GROUP_COUNT = 0;
@@ -32,6 +38,10 @@ export default function SearchGroups() {
     const users = useSelector(selectAllUsers);
     const usersMap = useSelector(selectUsersCount);
     const attributesDict = useSelector(selectAttributesDict);
+    const extendedRecords = useSelector(selectRecords);
+    const activeSearchParams = useSelector(selectActiveSearchParams);
+    const configuration = useSelector(selectConfiguration);
+    const user = useSelector(selectUser);
 
     const [fullSearch, setFullSearch] = useState<any>({});
     const [searchGroups, setSearchGroups] = useState<{ [key: string]: any }>({});
@@ -44,6 +54,8 @@ export default function SearchGroups() {
     const [manualLabels, setManualLabels] = useState([]);
     const [weakSupervisionLabels, setWeakSupervisionLabels] = useState([]);
     const [modelCallBacksLabels, setModelCallBacksLabels] = useState([]);
+
+    const [refetchExtendedRecord] = useLazyQuery(SEARCH_RECORDS_EXTENDED, { fetchPolicy: "no-cache" });
 
     useEffect(() => {
         if (!project) return;
@@ -79,8 +91,18 @@ export default function SearchGroups() {
     }, [searchGroups, attributesSortOrder]);
 
     useEffect(() => {
-        console.log("full search", fullSearch);
-    }, [fullSearch]);
+        if (!user) return;
+        if (!activeSearchParams) return;
+        refetchExtendedRecord({
+            variables: {
+                projectId: project.id,
+                filterData: parseFilterToExtended(activeSearchParams, attributes, configuration, labelingTasks, user.id),
+                offset: 0, limit: 20
+            }
+        }).then((res) => {
+            dispatch(setSearchRecordsExtended(postProcessRecordsExtended(res.data['searchRecordsExtended'], labelingTasks)));
+        });
+    }, [activeSearchParams]);
 
     function prepareSearchGroups() {
         if (!attributes || !labelingTasks || !users) {
@@ -191,6 +213,7 @@ export default function SearchGroups() {
             fullSearchCopy[group.key].groupElements[index] = groupItemCopy;
         }
         setFullSearch(fullSearchCopy);
+        updateSearchParams(fullSearchCopy);
     }
 
     function getActiveNegateGroupColor(group) {
@@ -242,7 +265,7 @@ export default function SearchGroups() {
     }
 
     function selectValueDropdown(value: string, i: number, field: string, key: any) {
-        const fullSearchCopy = { ...fullSearch };
+        const fullSearchCopy = jsonCopy(fullSearch);
         const formControlsIdx = fullSearchCopy[key].groupElements[i];
         formControlsIdx[field] = value;
         if (field == 'name') {
@@ -261,6 +284,7 @@ export default function SearchGroups() {
         }
         setFullSearch(fullSearchCopy);
         getOperatorDropdownValues(i, value);
+        updateSearchParams(fullSearchCopy);
     }
 
     function checkIfDecimals(event: any, i: number, key: string) {
@@ -339,6 +363,11 @@ export default function SearchGroups() {
         const fullSearchCopy = { ...fullSearch };
         fullSearchCopy[SearchGroup.DRILL_DOWN].value = value;
         setFullSearch(fullSearchCopy);
+    }
+
+    function updateSearchParams(fullSearchCopy) {
+        const activeParams = updateSearchParameters(Object.values(fullSearchCopy), attributes, configuration.separator, fullSearchCopy);
+        dispatch(setActiveSearchParams(activeParams));
     }
 
     return (<>

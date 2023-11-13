@@ -104,7 +104,14 @@ const dataBrowserSlice = createSlice({
                 recordList: [],
                 sessionId: ""
             };
-        }
+        },
+        setActiveSearchParams(state, action: PayloadAction<any[]>) {
+            if (action.payload) state.activeSearchParams = action.payload;
+            else state.activeSearchParams = [];
+        },
+        extendAllDataSlices(state, action: PayloadAction<any>) {
+            if (action.payload) state.all.push(action.payload);
+        },
     },
 })
 
@@ -126,5 +133,5 @@ export function selectDataSlicesFunc(asArray: boolean = false) {
 }
 
 
-export const { setDataSlices, setActiveDataSlice, removeFromAllDataSlicesById, updateDataSlicesState, setUsersMapCount, setSearchRecordsExtended } = dataBrowserSlice.actions;
+export const { setDataSlices, setActiveDataSlice, removeFromAllDataSlicesById, updateDataSlicesState, setUsersMapCount, setSearchRecordsExtended, setActiveSearchParams, extendAllDataSlices } = dataBrowserSlice.actions;
 export const dataBrowserReducer = dataBrowserSlice.reducer;

@@ -1,9 +1,14 @@
 import Modal from "@/src/components/shared/modal/Modal";
+import { selectUser } from "@/src/reduxStore/states/general";
 import { openModal, selectModal, setModalStates } from "@/src/reduxStore/states/modal";
-import { selectDataSlicesAll } from "@/src/reduxStore/states/pages/data-browser";
+import { extendAllDataSlices, selectActiveSearchParams, selectConfiguration, selectDataSlicesAll } from "@/src/reduxStore/states/pages/data-browser";
+import { selectAttributes, selectLabelingTasksAll } from "@/src/reduxStore/states/pages/settings";
 import { selectProject } from "@/src/reduxStore/states/project";
 import { CREATE_DATA_SLICE } from "@/src/services/gql/mutations/data-browser";
+import { DataSlice } from "@/src/types/components/projects/projectId/data-browser/data-browser";
 import { ModalButton, ModalEnum } from "@/src/types/shared/modal";
+import { getRawFilterForSave, parseFilterToExtended } from "@/src/util/components/projects/projectId/data-browser/filter-parser-helper";
+import { getColorStruct } from "@/src/util/components/projects/projectId/heuristics/shared-helper";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
 import { useMutation } from "@apollo/client";
 import { Tooltip } from "@nextui-org/react";
@@ -19,6 +24,11 @@ export function DataSliceOperations(props: { fullSearch: {} }) {
     const project = useSelector(selectProject);
     const modalSaveDataSlice = useSelector(selectModal(ModalEnum.SAVE_DATA_SLICE));
     const dataSlices = useSelector(selectDataSlicesAll);
+    const configuration = useSelector(selectConfiguration);
+    const user = useSelector(selectUser);
+    const attributes = useSelector(selectAttributes);
+    const labelingTasks = useSelector(selectLabelingTasksAll);
+    const activeSearchParams = useSelector(selectActiveSearchParams);
 
     const [isStatic, setIsStatic] = useState<boolean>(false);
 
@@ -30,9 +40,17 @@ export function DataSliceOperations(props: { fullSearch: {} }) {
                 projectId: project.id,
                 name: modalSaveDataSlice.sliceName,
                 static: isStatic,
-                filterRaw: getRawFilterForSave(),
-                filterData: []
+                filterRaw: getRawFilterForSave(props.fullSearch),
+                filterData: parseFilterToExtended(activeSearchParams, attributes, configuration, labelingTasks, user)
             }
+        }).then((res) => {
+            const id = res["data"]["createDataSlice"]["id"];
+            const slice = {
+                id: id, name: modalSaveDataSlice.sliceName, static: isStatic, filterRaw: getRawFilterForSave(props.fullSearch),
+                filterData: parseFilterToExtended(activeSearchParams, attributes, configuration, labelingTasks, user), color: getColorStruct(isStatic),
+                displayName: modalSaveDataSlice.sliceName
+            }
+            dispatch(extendAllDataSlices(slice))
         })
     }, [modalSaveDataSlice]);
 
@@ -52,15 +70,6 @@ export function DataSliceOperations(props: { fullSearch: {} }) {
     function checkIfNameExists(name: string) {
         const exists = dataSlices.find(slice => slice.name == name);
         dispatch(setModalStates(ModalEnum.SAVE_DATA_SLICE, { sliceNameExists: exists }));
-    }
-
-    function getRawFilterForSave(): string {
-        const selectedFilters = {};
-        for (let [key, value] of Object.entries(props.fullSearch)) {
-            selectedFilters[key] = value
-        }
-        console.log(selectedFilters);
-        return JSON.stringify(selectedFilters);
     }
 
     return (<div>

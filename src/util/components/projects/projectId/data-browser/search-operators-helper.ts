@@ -73,3 +73,67 @@ export function getFilterIntegrationOperatorTooltip(operator: FilterIntegrationO
     }
     return 'UNKNOWN';
 }
+
+export function prepareFilterElements(searchElement: any, name: string, separator: string, attributeType: string) {
+    let values = [];
+    if (searchElement.values.operator == SearchOperator.BETWEEN) {
+        values = [name, searchElement.values.searchValue, searchElement.values.searchValueBetween];
+    } else if (searchElement.values.operator == SearchOperator.IN || searchElement.values.operator == SearchOperator.IN_WC) {
+        const split = searchElement.values.searchValue.split(separator).filter(i => i);
+        values = [name, ...split];
+    } else if (searchElement.values.operator == '') {
+        searchElement.values.operator = SearchOperator.EQUAL;
+        values = [name, searchElement.values.negate ? searchElement.values.negate : !searchElement.values.negate];
+    } else {
+        values = [name, attributeType != "BOOLEAN" ? searchElement.values.searchValue : !searchElement.values.negate];
+    }
+    values = parseFilterElements(searchElement, values, attributeType);
+    return values;
+}
+export function parseFilterElements(searchElement: any, values: any, attributeType: string): any[] {
+    if (attributeType == "INTEGER" && searchElement.values.operator != SearchOperator.IN_WC) {
+        for (let i = 1; i < values.length; i++) {
+            const isNum = /^\d+$/.test(values[i].trim());
+            if (!isNum) return null;
+            else values[i] = parseInt(values[i].trim());
+        }
+    } else if (attributeType == "FLOAT" && searchElement.values.operator != SearchOperator.IN_WC) {
+        for (let i = 1; i < values.length; i++) {
+            const isNum = /^(\d+|(\d+\.\d*))$/.test(values[i].trim())
+            if (!isNum) return null;
+            else values[i] = parseInt(values[i].trim());
+        }
+    } else {
+        values.slice(1, values.length).forEach((value, index) => {
+            values[index + 1] = value;
+        });
+    }
+    return values;
+}
+
+export function prepareOperator(searchElement: any, attributeType: string): string {
+    if (searchElement.values.caseSensitive) {
+        let operator = searchElement.values.operator;
+        switch (operator) {
+            case SearchOperator.BEGINS_WITH:
+                operator = "BEGINS_WITH_CS";
+                break;
+            case SearchOperator.ENDS_WITH:
+                operator = "ENDS_WITH_CS";
+                break;
+            case SearchOperator.CONTAINS:
+                operator = "CONTAINS_CS";
+                break;
+            case SearchOperator.IN_WC:
+                operator = "IN_WC_CS";
+                break;
+        }
+        return operator;
+    }
+
+    if (attributeType == "BOOLEAN") {
+        return SearchOperator.EQUAL;
+    } else {
+        return searchElement.values.operator;
+    }
+}
