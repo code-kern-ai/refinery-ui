@@ -58,7 +58,7 @@ export default function DataBrowserSidebar() {
     }
 
     function toggleSlice(slice) {
-        // dispatch(setActiveDataSlice(slice));
+        dispatch(setActiveDataSlice(slice));
     }
 
     function updateSliceInfo(slice: DataSlice) {

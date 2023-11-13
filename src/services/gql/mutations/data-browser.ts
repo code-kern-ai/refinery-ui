@@ -15,3 +15,11 @@ mutation($projectId: ID!, $name: String!, $static: Boolean!, $filterRaw: JSONStr
   }
 }
 `;
+
+export const UPDATE_DATA_SLICE = gql`
+mutation($projectId: ID!, $dataSliceId: ID!, $static: Boolean!, $filterRaw: JSONString!, $filterData: [JSONString]){
+  updateDataSlice(projectId: $projectId, dataSliceId: $dataSliceId, static: $static, filterRaw: $filterRaw, filterData: $filterData){
+    ok
+  }
+}
+`;

@@ -3,7 +3,7 @@ import { selectProject } from "@/src/reduxStore/states/project";
 import { attributeCreateSearchGroup, commentsCreateSearchGroup, generateRandomSeed, getBasicGroupItems, getBasicSearchGroup, getBasicSearchItem, labelingTasksCreateSearchGroup, orderByCreateSearchGroup, userCreateSearchGroup } from "@/src/util/components/projects/projectId/data-browser/search-groups-helper";
 import { SearchGroup, StaticOrderByKeys } from "@/submodules/javascript-functions/enums/enums";
 import { IconArrowBadgeDown, IconArrowUp, IconArrowsRandom, IconFilterOff, IconInfoCircle, IconPlus, IconPointerOff, IconTrash } from "@tabler/icons-react";
-import { useEffect, useState } from "react";
+import { use, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import style from '@/src/styles/components/projects/projectId/data-browser.module.css';
 import { timer } from "rxjs";
@@ -12,7 +12,7 @@ import { SearchOperator } from "@/src/types/components/projects/projectId/data-b
 import { checkDecimalPatterns, getAttributeType, getSearchOperatorTooltip } from "@/src/util/components/projects/projectId/data-browser/search-operators-helper";
 import { DataTypeEnum } from "@/src/types/shared/general";
 import { selectAllUsers, selectUser } from "@/src/reduxStore/states/general";
-import { selectActiveSearchParams, selectConfiguration, selectRecords, selectUsersCount, setActiveSearchParams, setSearchRecordsExtended } from "@/src/reduxStore/states/pages/data-browser";
+import { selectActiveSearchParams, selectActiveSlice, selectConfiguration, selectRecords, selectUsersCount, setActiveSearchParams, setSearchRecordsExtended } from "@/src/reduxStore/states/pages/data-browser";
 import { Tooltip } from "@nextui-org/react";
 import { setModalStates } from "@/src/reduxStore/states/modal";
 import { ModalEnum } from "@/src/types/shared/modal";
@@ -38,10 +38,10 @@ export default function SearchGroups() {
     const users = useSelector(selectAllUsers);
     const usersMap = useSelector(selectUsersCount);
     const attributesDict = useSelector(selectAttributesDict);
-    const extendedRecords = useSelector(selectRecords);
     const activeSearchParams = useSelector(selectActiveSearchParams);
     const configuration = useSelector(selectConfiguration);
     const user = useSelector(selectUser);
+    const activeSlice = useSelector(selectActiveSlice);
 
     const [fullSearch, setFullSearch] = useState<any>({});
     const [searchGroups, setSearchGroups] = useState<{ [key: string]: any }>({});
@@ -103,6 +103,12 @@ export default function SearchGroups() {
             dispatch(setSearchRecordsExtended(postProcessRecordsExtended(res.data['searchRecordsExtended'], labelingTasks)));
         });
     }, [activeSearchParams]);
+
+    useEffect(() => {
+        if (!activeSlice) return;
+        const activeParams = updateSearchParameters(Object.values(JSON.parse(activeSlice.filterRaw)), attributes, configuration.separator, fullSearch);
+        dispatch(setActiveSearchParams(activeParams));
+    }, [activeSlice]);
 
     function prepareSearchGroups() {
         if (!attributes || !labelingTasks || !users) {

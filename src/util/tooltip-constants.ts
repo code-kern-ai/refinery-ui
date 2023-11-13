@@ -177,6 +177,7 @@ export const TOOLTIPS_DICT = {
         'INTERSECTION': 'intersection (AND)',
         'EDIT_RECORD': 'Edit record',
         'RECORD_COMMENTS': 'Record comments',
-        'ADD_EMBEDDING': 'Add an embedding in the project settings'
+        'ADD_EMBEDDING': 'Add an embedding in the project settings',
+        'UPDATE_SLICE': 'Update your current data slice'
     }
 }

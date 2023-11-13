@@ -1,18 +1,19 @@
 import Modal from "@/src/components/shared/modal/Modal";
 import { selectUser } from "@/src/reduxStore/states/general";
 import { openModal, selectModal, setModalStates } from "@/src/reduxStore/states/modal";
-import { extendAllDataSlices, selectActiveSearchParams, selectConfiguration, selectDataSlicesAll } from "@/src/reduxStore/states/pages/data-browser";
+import { extendAllDataSlices, selectActiveSearchParams, selectActiveSlice, selectAdditionalData, selectConfiguration, selectDataSlicesAll, setActiveDataSlice } from "@/src/reduxStore/states/pages/data-browser";
 import { selectAttributes, selectLabelingTasksAll } from "@/src/reduxStore/states/pages/settings";
 import { selectProject } from "@/src/reduxStore/states/project";
-import { CREATE_DATA_SLICE } from "@/src/services/gql/mutations/data-browser";
+import { CREATE_DATA_SLICE, UPDATE_DATA_SLICE } from "@/src/services/gql/mutations/data-browser";
 import { DataSlice } from "@/src/types/components/projects/projectId/data-browser/data-browser";
 import { ModalButton, ModalEnum } from "@/src/types/shared/modal";
 import { getRawFilterForSave, parseFilterToExtended } from "@/src/util/components/projects/projectId/data-browser/filter-parser-helper";
 import { getColorStruct } from "@/src/util/components/projects/projectId/heuristics/shared-helper";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
+import { Slice } from "@/submodules/javascript-functions/enums/enums";
 import { useMutation } from "@apollo/client";
 import { Tooltip } from "@nextui-org/react";
-import { IconFilter } from "@tabler/icons-react";
+import { IconFilter, IconRotate } from "@tabler/icons-react";
 import { useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
@@ -29,10 +30,13 @@ export function DataSliceOperations(props: { fullSearch: {} }) {
     const attributes = useSelector(selectAttributes);
     const labelingTasks = useSelector(selectLabelingTasksAll);
     const activeSearchParams = useSelector(selectActiveSearchParams);
+    const activeSlice = useSelector(selectActiveSlice);
+    const additionalData = useSelector(selectAdditionalData);
 
     const [isStatic, setIsStatic] = useState<boolean>(false);
 
     const [createDataSliceMut] = useMutation(CREATE_DATA_SLICE);
+    const [updateDataSliceMut] = useMutation(UPDATE_DATA_SLICE);
 
     const saveDataSlice = useCallback(() => {
         createDataSliceMut({
@@ -50,16 +54,24 @@ export function DataSliceOperations(props: { fullSearch: {} }) {
                 filterData: parseFilterToExtended(activeSearchParams, attributes, configuration, labelingTasks, user), color: getColorStruct(isStatic),
                 displayName: modalSaveDataSlice.sliceName
             }
-            dispatch(extendAllDataSlices(slice))
+            dispatch(extendAllDataSlices(slice));
         })
     }, [modalSaveDataSlice]);
 
-    const updateDataSlice = useCallback(() => { }, [modalSaveDataSlice]);
+    const updateDataSliceByName = useCallback(() => {
+        dataSlices.forEach((slice: DataSlice) => {
+            if (slice.name == modalSaveDataSlice.sliceName) {
+                setActiveDataSlice(slice);
+                updateSlice(isStatic);
+                return;
+            }
+        });
+    }, [modalSaveDataSlice]);
 
     useEffect(() => {
         setAcceptButton({
             ...ACCEPT_BUTTON,
-            emitFunction: modalSaveDataSlice.sliceNameExists ? updateDataSlice : saveDataSlice,
+            emitFunction: modalSaveDataSlice.sliceNameExists ? updateDataSliceByName : saveDataSlice,
             buttonCaption: modalSaveDataSlice.sliceNameExists ? 'Update' : 'Save',
             disabled: modalSaveDataSlice.sliceName == ''
         })
@@ -72,6 +84,20 @@ export function DataSliceOperations(props: { fullSearch: {} }) {
         dispatch(setModalStates(ModalEnum.SAVE_DATA_SLICE, { sliceNameExists: exists }));
     }
 
+    function updateSlice(isStatic = null) {
+        isStatic = isStatic == null ? activeSlice.static : isStatic;
+
+        updateDataSliceMut({
+            variables: {
+                projectId: project.id,
+                static: isStatic,
+                dataSliceId: activeSlice.id,
+                filterRaw: getRawFilterForSave(props.fullSearch),
+                filterData: parseFilterToExtended(activeSearchParams, attributes, configuration, labelingTasks, user)
+            }
+        }).then((res) => { });
+    }
+
     return (<div>
         <div className="flex items-center mt-4">
             <Tooltip content={TOOLTIPS_DICT.DATA_BROWSER.SAVE_SLICE} color="invert" placement="top">
@@ -79,6 +105,13 @@ export function DataSliceOperations(props: { fullSearch: {} }) {
                     className="mr-1 inline-flex items-center w-36 px-2.5 py-1.5 border border-gray-200 shadow-sm text-xs font-medium rounded text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 cursor-pointer">
                     <IconFilter className="w-6 h-6 mr-1" />
                     Save data slice
+                </button>
+            </Tooltip>
+            <Tooltip content={TOOLTIPS_DICT.DATA_BROWSER.SAVE_SLICE} color="invert" placement="top">
+                <button onClick={updateSlice} disabled={!activeSlice || activeSlice?.sliceType == Slice.STATIC_OUTLIER || (activeSlice?.static && activeSlice.count == additionalData.staticDataSliceCurrentCount && !additionalData.displayOutdatedWarning)}
+                    className="mr-1 f inline-flex items-center w-40 px-2.5 py-1.5 border border-gray-200 shadow-sm text-xs font-medium rounded text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 cursor-pointer disabled:cursor-not-allowed disabled:opacity-50">
+                    <IconRotate className="w-6 h-6 mr-1" />
+                    Update data slice
                 </button>
             </Tooltip>
         </div>
@@ -119,7 +152,7 @@ export function DataSliceOperations(props: { fullSearch: {} }) {
                         onKeyUp={(e: any) => checkIfNameExists(e.target.value)}
                         onKeyDown={(e: any) => {
                             if (e.key == 'Enter') {
-                                modalSaveDataSlice.sliceNameExists ? updateDataSlice() : saveDataSlice()
+                                modalSaveDataSlice.sliceNameExists ? updateDataSliceByName() : saveDataSlice()
                             }
                         }} className="h-9 w-full border-gray-300 rounded-md placeholder-italic border text-gray-900 pl-4 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100" placeholder="Enter name..." />
                 </div>
