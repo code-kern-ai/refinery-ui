@@ -22,12 +22,12 @@ export function parseFilterToExtended(activeSearchParams, attributes: Attribute[
             toReturn.push(appendBlackAndWhiteListUser(toReturn, searchElement));
         } else if (searchElement.values.group == SearchGroup.ORDER_STATEMENTS) {
             orderBy.ORDER_BY = appendActiveOrderBy(searchElement.values, orderBy);
+            if (orderBy.ORDER_BY.length > 0) {
+                toReturn.push(JSON.stringify(orderBy));
+            }
         } else if (searchElement.values.group == SearchGroup.COMMENTS) {
             toReturn.push(appendBlackAndWhiteListComments(toReturn, searchElement, user));
         }
-    }
-    if (orderBy.ORDER_BY.length > 0) {
-        toReturn.push(JSON.stringify(orderBy));
     }
     return toReturn;
 }
@@ -227,8 +227,8 @@ function appendBlackAndWhiteListLabelingTaskForConfidence(
 }
 
 function appendBlackAndWhiteListUser(appendTo, searchElement) {
-    const drillDown: boolean = true
-    appendBlackAndWhiteListUserForArray(appendTo, searchElement.values.users, drillDown);
+    const drillDown: boolean = false;
+    return appendBlackAndWhiteListUserForArray(appendTo, searchElement.users, drillDown);
 }
 
 function appendBlackAndWhiteListUserForArray(
@@ -274,9 +274,9 @@ function appendBlackAndWhiteListUserForArray(
     }
 
     if (whitelist.SUBQUERIES.length > 0)
-        appendTo.push(JSON.stringify(whitelist));
+        return JSON.stringify(whitelist);
     if (blacklist.SUBQUERIES.length > 0)
-        appendTo.push(JSON.stringify(blacklist));
+        return JSON.stringify(blacklist);
     return appendTo;
 }
 
@@ -301,7 +301,7 @@ function appendActiveOrderBy(values, orderBy) {
 }
 
 function appendBlackAndWhiteListComments(appendTo: string[], searchElement: any, user): any {
-    const hasCommentsObj = searchElement.values.hasComments[0];
+    const hasCommentsObj = searchElement.values.hasComments;
     let element = {
         SUBQUERY_TYPE: hasCommentsObj.negate ? 'BLACKLIST' : 'WHITELIST',
         SUBQUERIES: [{
@@ -309,7 +309,7 @@ function appendBlackAndWhiteListComments(appendTo: string[], searchElement: any,
             VALUES: [user.id],
         }],
     };
-    return hasCommentsObj.active ? appendTo.push(JSON.stringify(element)) : appendTo;
+    return hasCommentsObj.active ? JSON.stringify(element) : appendTo;
 }
 
 // TODO: add BE changes for this

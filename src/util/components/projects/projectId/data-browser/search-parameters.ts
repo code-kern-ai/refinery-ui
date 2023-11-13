@@ -17,14 +17,14 @@ export function updateSearchParameters(searchElement, attributes, separator, sea
         } else if (p.value.key == SearchGroup.COMMENTS) {
             if (!p.groupElements.hasComments.active) return;
             param = createSplittedText(updateSearchParamText(p, attributes, separator), searchGroup, p);
+            activeParams.push({ splittedText: param, values: p.groupElements });
+        } else if (p.value.key == SearchGroup.USER_FILTER) {
+            for (let i of p.groupElements.users) {
+                if (!i.active) return;
+                param = createSplittedText(updateSearchParamText(p, attributes, separator), searchGroup, p);
+                activeParams.push({ splittedText: param, values: { group: p.value.group }, users: p.groupElements.users });
+            }
         }
-        // } else {
-        //     if (!p.groupElements.active) return;
-        //     const searchText = updateSearchParamText(p, attributes, separator);
-        //     console.log("searchText", searchText)
-        //     param = createSplittedText(searchText, searchGroup);
-        //     activeParams.push(param)
-        // }
     });
     return activeParams.filter(i => i);
 }
@@ -103,8 +103,8 @@ function updateSearchParamText(searchElement, attributes, separator) {
             searchElement.searchText = searchElement.searchText.replaceAll("-", ",");
     } else if (searchElement.value.key == SearchItemType.LABELING_TASK) {
         searchElement.searchText = labelingTaskBuildSearchParamText(searchElement.values);
-    } else if (searchElement.value.key == SearchItemType.USER) {
-        searchElement.searchText = userBuildSearchParamText(searchElement.values);
+    } else if (searchElement.value.key == SearchGroup.USER_FILTER) {
+        searchElement.searchText = userBuildSearchParamText(searchElement.groupElements.users);
     } else if (searchElement.value.key == SearchItemType.ORDER_BY) {
         searchElement.searchText = orderByBuildSearchParamText(searchElement.values);
     } else if (searchElement.value.key == SearchItemType.COMMENTS) {
@@ -149,7 +149,7 @@ function labelingTaskBuildSearchParamText(values): string {
 }
 
 function labelingTaskBuildSearchParamTextPart(arr: any[], blockname: string): string {
-    const drillDown: boolean = true
+    const drillDown: boolean = false
     let text = '';
     let in_values = '';
     let not_in_values = '';
@@ -173,8 +173,7 @@ function labelingTaskBuildSearchParamTextPart(arr: any[], blockname: string): st
 }
 
 function userBuildSearchParamText(values) {
-    let text = labelingTaskBuildSearchParamTextPart(values.users, 'User');
-
+    let text = labelingTaskBuildSearchParamTextPart(values, 'User');
     if (values.negate) text = 'NOT (' + text + ')';
     return text;
 }

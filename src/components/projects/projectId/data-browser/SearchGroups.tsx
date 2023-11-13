@@ -96,7 +96,7 @@ export default function SearchGroups() {
         refetchExtendedRecord({
             variables: {
                 projectId: project.id,
-                filterData: parseFilterToExtended(activeSearchParams, attributes, configuration, labelingTasks, user.id),
+                filterData: parseFilterToExtended(activeSearchParams, attributes, configuration, labelingTasks, user),
                 offset: 0, limit: 20
             }
         }).then((res) => {
@@ -200,7 +200,7 @@ export default function SearchGroups() {
             groupItemCopy['active'] = false;
         }
         groupItemCopy['color'] = getActiveNegateGroupColor(groupItemCopy);
-        const fullSearchCopy = { ...fullSearch };
+        const fullSearchCopy = jsonCopy(fullSearch);
         if (group.key == SearchGroup.USER_FILTER) {
             fullSearchCopy[group.key].groupElements['users'][index] = groupItemCopy;
         } else if (forceValue) { // for the labeling tasks because of the different structure
