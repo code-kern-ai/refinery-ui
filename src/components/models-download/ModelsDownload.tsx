@@ -1,32 +1,24 @@
-import { removeModelDownloadByName, selectModelsDownloaded, setModelsDownloaded } from "@/src/reduxStore/states/pages/models-downloaded";
+import { selectModelsDownloaded, setModelsDownloaded } from "@/src/reduxStore/states/pages/models-downloaded";
 import { GET_MODEL_PROVIDER_INFO } from "@/src/services/gql/queries/projects";
 import { ModelsDownloaded, ModelsDownloadedStatus } from "@/src/types/components/models-downloaded/models-downloaded";
-import { postProcessingModelsDownload, postProcessingZeroShotEncoders } from "@/src/util/components/models-downloaded/models-downloaded-helper";
-import { useLazyQuery, useMutation } from "@apollo/client";
+import { postProcessingModelsDownload } from "@/src/util/components/models-downloaded/models-downloaded-helper";
+import { useLazyQuery } from "@apollo/client";
 import { Tooltip } from "@nextui-org/react";
 import { IconAlertTriangleFilled, IconArrowLeft, IconBan, IconCheckbox, IconCircleCheckFilled, IconExternalLink, IconLoader, IconPlus, IconTrash } from "@tabler/icons-react";
 import { useRouter } from "next/router";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import LoadingIcon from "../shared/loading/LoadingIcon";
-import { openModal, selectModal, setModalStates } from "@/src/reduxStore/states/modal";
-import { ModalButton, ModalEnum } from "@/src/types/shared/modal";
-import Modal from "../shared/modal/Modal";
-import { MODEL_PROVIDER_DELETE_MODEL, MODEL_PROVIDER_DOWNLOAD_MODEL } from "@/src/services/gql/mutations/projects";
+import { openModal, setModalStates } from "@/src/reduxStore/states/modal";
+import { ModalEnum } from "@/src/types/shared/modal";
 import { selectIsManaged } from "@/src/reduxStore/states/general";
-import Dropdown from "@/submodules/react-components/components/Dropdown";
-import { GET_RECOMMENDED_ENCODERS_FOR_EMBEDDINGS, GET_ZERO_SHOT_RECOMMENDATIONS } from "@/src/services/gql/queries/project-setting";
-import { selectRecommendedEncodersAll } from "@/src/reduxStore/states/pages/settings";
 import { WebSocketsService } from "@/src/services/base/web-sockets/WebSocketsService";
 import { CurrentPage } from "@/src/types/shared/general";
-import { jsonCopy } from "@/submodules/javascript-functions/general";
-import { dateAsUTCDate } from "@/submodules/javascript-functions/date-parser";
 import { timer } from "rxjs";
 import { unsubscribeWSOnDestroy } from "@/src/services/base/web-sockets/web-sockets-helper";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
-
-const ABORT_BUTTON = { buttonCaption: 'Delete', useButton: true, disabled: false };
-const ACCEPT_BUTTON = { buttonCaption: 'Accept', useButton: true };
+import AddModelDownload from "./AddModelDownload";
+import DeleteModelDownload from "./DeleteModelDownload";
 
 export default function ModelsDownload() {
     const router = useRouter();
@@ -34,65 +26,18 @@ export default function ModelsDownload() {
 
     const isManaged = useSelector(selectIsManaged);
     const modelsDownloaded = useSelector(selectModelsDownloaded);
-    const modalDeleteModel = useSelector(selectModal(ModalEnum.DELETE_MODEL_DOWNLOAD));
-    const modalAddModel = useSelector(selectModal(ModalEnum.ADD_MODEL_DOWNLOAD));
-    const encoders = useSelector(selectRecommendedEncodersAll);
-
-    const [modelsList, setModelsList] = useState<string[]>([]);
-    const [modelName, setModelName] = useState<string>('');
 
     const [refetchModelsDownload] = useLazyQuery(GET_MODEL_PROVIDER_INFO, { fetchPolicy: 'network-only', nextFetchPolicy: 'cache-first' });
-    const [deleteModelDownload] = useMutation(MODEL_PROVIDER_DELETE_MODEL);
-    const [refetchZeroShotRecommendations] = useLazyQuery(GET_ZERO_SHOT_RECOMMENDATIONS, { fetchPolicy: 'network-only', nextFetchPolicy: 'cache-first' });
-    const [refetchRecommendedEncoders] = useLazyQuery(GET_RECOMMENDED_ENCODERS_FOR_EMBEDDINGS, { fetchPolicy: 'network-only', nextFetchPolicy: 'cache-first' });
-    const [downloadModelMut] = useMutation(MODEL_PROVIDER_DOWNLOAD_MODEL);
 
     useEffect(unsubscribeWSOnDestroy(router, [CurrentPage.MODELS_DOWNLOAD]), []);
 
     useEffect(() => {
         refetchModels();
-        refetchZeroShotRecommendations().then((resZeroShot) => {
-            if (encoders.length > 0) {
-                setModelsList(postProcessingZeroShotEncoders(JSON.parse(resZeroShot.data['zeroShotRecommendations']), encoders));
-            } else {
-                refetchRecommendedEncoders().then((resEncoders) => {
-                    setModelsList(postProcessingZeroShotEncoders(JSON.parse(resZeroShot.data['zeroShotRecommendations']), resEncoders.data['recommendedEncoders']));
-                });
-            }
-        });
         WebSocketsService.subscribeToNotification(CurrentPage.MODELS_DOWNLOAD, {
             whitelist: ['model_provider_download'],
             func: handleWebsocketNotification
         })
     }, []);
-
-    const deleteModel = useCallback(() => {
-        deleteModelDownload({ variables: { modelName: modalDeleteModel.modelName } }).then(() => {
-            dispatch(removeModelDownloadByName(modalDeleteModel.modelName));
-        });
-    }, [modalDeleteModel]);
-
-    const addModel = useCallback(() => {
-        downloadModelMut({ variables: { modelName: modalAddModel.modelName } }).then((res) => {
-            const downloadedModelsCopy = jsonCopy(modelsDownloaded);
-            downloadedModelsCopy.push({
-                "name": modalAddModel.modelName,
-                "date": dateAsUTCDate(new Date()).toLocaleString(),
-                "status": "initializing"
-            });
-            dispatch(setModelsDownloaded(downloadedModelsCopy));
-        });
-    }, [modalAddModel]);
-
-    useEffect(() => {
-        const checkIfModelExists = modelsDownloaded.find((model: ModelsDownloaded) => model.name === modelName);
-        setAbortButton({ ...abortButton, emitFunction: deleteModel });
-        setAcceptButton({ ...acceptButton, emitFunction: addModel, disabled: modelName === '' || checkIfModelExists !== undefined });
-    }, [modalDeleteModel, modalAddModel]);
-
-    const [abortButton, setAbortButton] = useState<ModalButton>(ABORT_BUTTON);
-    const [acceptButton, setAcceptButton] = useState<ModalButton>(ACCEPT_BUTTON);
-
 
     function refetchModels() {
         refetchModelsDownload().then((res) => {
@@ -185,16 +130,16 @@ export default function ModelsDownload() {
                                         {model.status === ModelsDownloadedStatus.FINISHED ? model.sizeFormatted : '-'}
                                     </td>
                                     <td className="whitespace-nowrap text-center px-3 py-2 text-sm text-gray-500 justify-center flex">
-                                        {model.status === ModelsDownloadedStatus.FINISHED && <Tooltip content={TOOLTIPS_DICT.MODELS_DOWNLOAD.SUCCESS} color="invert" placement="top">
+                                        {model.status === ModelsDownloadedStatus.FINISHED && <Tooltip content={TOOLTIPS_DICT.GENERAL.SUCCESSFULLY_CREATED} color="invert" placement="top">
                                             <IconCircleCheckFilled className="h-6 w-6 text-green-500" />
                                         </Tooltip>}
-                                        {model.status === ModelsDownloadedStatus.FAILED && <Tooltip content={TOOLTIPS_DICT.MODELS_DOWNLOAD.ERROR} color="invert" placement="top">
+                                        {model.status === ModelsDownloadedStatus.FAILED && <Tooltip content={TOOLTIPS_DICT.GENERAL.ERROR} color="invert" placement="top">
                                             <IconAlertTriangleFilled className="h-6 w-6 text-red-500" />
                                         </Tooltip>}
-                                        {model.status === ModelsDownloadedStatus.DOWNLOADING && <Tooltip content={TOOLTIPS_DICT.MODELS_DOWNLOAD.DOWNLOADING} color="invert" placement="top">
+                                        {model.status === ModelsDownloadedStatus.DOWNLOADING && <Tooltip content={TOOLTIPS_DICT.GENERAL.DOWNLOADING} color="invert" placement="top">
                                             <LoadingIcon />
                                         </Tooltip>}
-                                        {model.status === ModelsDownloadedStatus.INITIALIZING && <Tooltip content={TOOLTIPS_DICT.MODELS_DOWNLOAD.INITIALIZING} color="invert" placement="top">
+                                        {model.status === ModelsDownloadedStatus.INITIALIZING && <Tooltip content={TOOLTIPS_DICT.GENERAL.INITIALIZING} color="invert" placement="top">
                                             <IconLoader className="h-6 w-6 text-gray-500" />
                                         </Tooltip>}
                                     </td>
@@ -218,28 +163,7 @@ export default function ModelsDownload() {
                 </div>
             </div>
         </div>
-
-        <Modal modalName={ModalEnum.DELETE_MODEL_DOWNLOAD} abortButton={abortButton}>
-            <div className="flex flex-grow justify-center text-lg leading-6 text-gray-900 font-medium">
-                Warning </div>
-            <p className="mt-2 text-gray-500 text-sm">Are you sure you want to delete this embedding?</p>
-            <p className="text-gray-500 text-sm">This will delete all data associated with it!</p>
-        </Modal>
-
-        <Modal modalName={ModalEnum.ADD_MODEL_DOWNLOAD} acceptButton={acceptButton}>
-            <div className="flex flex-grow justify-center text-lg leading-6 text-gray-900 font-medium">
-                Add new model</div>
-            <form className="mt-3">
-                <div className="grid grid-cols-2 gap-2 items-center" style={{ gridTemplateColumns: 'max-content auto' }}>
-                    <Tooltip content={TOOLTIPS_DICT.MODELS_DOWNLOAD.MODEL} placement="right" color="invert">
-                        <span className="card-title mb-0 label-text flex"><span className="cursor-help underline filtersUnderline">Name</span></span>
-                    </Tooltip>
-                    <Dropdown options={modelsList.map((model: any) => model.configString)} hasSearchBar={true} selectedOption={(option: string) => {
-                        dispatch(setModalStates(ModalEnum.ADD_MODEL_DOWNLOAD, { modelName: option, open: true }));
-                        setModelName(option);
-                    }} />
-                </div>
-            </form>
-        </Modal>
+        <AddModelDownload />
+        <DeleteModelDownload />
     </div>);
 }

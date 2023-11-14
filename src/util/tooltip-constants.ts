@@ -1,6 +1,16 @@
 import { CurrentPage } from "../types/shared/general";
 
 export const TOOLTIPS_DICT = {
+    ['GENERAL']: {
+        'SUCCESSFULLY_CREATED': 'Successfully created',
+        'ERROR': 'Execution ran into errors',
+        'DOWNLOADING': 'Model is downloading',
+        'INITIALIZING': 'Model is initializing',
+        'IMPORT_STATEMENT': 'Copy import statement to clipboard',
+        'SUBMIT': 'Submit',
+        'CANCEL': 'Cancel',
+        'CLICK_TO_COPY': 'Click to copy',
+    },
     [CurrentPage.PROJECT_SETTINGS]: {
         'ADD_NEW_ATTRIBUTE': 'Add a new attribute',
         'PROJECT_SNAPSHOT': 'Creates a snapshot compressed file of your current project',
@@ -19,8 +29,6 @@ export const TOOLTIPS_DICT = {
             'MODEL': 'Choose your model',
             'HAS_FILTER_ATTRIBUTES': 'Has filter attributes',
             'NO_FILTER_ATTRIBUTES': 'No filter attributes',
-            'SUCCESSFULLY_CREATED': 'Successfully created',
-            'ERROR': 'Embedding creation ran into errors',
             'GENERATE_EMBEDDING': 'Vectorize your attributes. Integration to Hugging Face available',
             'HOSTED_VERSION': 'Check out our hosted version to use this function',
             'NAVIGATE_MODELS_DOWNLOADED': 'See which models are downloaded'
@@ -43,10 +51,6 @@ export const TOOLTIPS_DICT = {
     [CurrentPage.MODELS_DOWNLOAD]: {
         'USED_ZS': 'Can be used for zero-shot',
         'NOT_USED_ZS': 'Cannot be used for zero-shot',
-        'SUCCESS': 'Successfully downloaded',
-        'ERROR': 'Model ran into errors',
-        'DOWNLOADING': 'Model is downloading',
-        'INITIALIZING': 'Model is initializing',
         'MODEL': 'Name of your Hugging Face model'
     },
     [CurrentPage.PROJECTS]: {
@@ -56,13 +60,10 @@ export const TOOLTIPS_DICT = {
         'EDIT_NAME': 'Edit your lookup list name',
         'EDIT_DESCRIPTION': 'Edit your lookup list description',
         'PYTHON_VARIABLE': 'The variable name can be used inside a labeling function',
-        'IMPORT': 'Copy import statement to clipboard',
         'UPLOAD_LOOKUP_LIST': 'Please ensure that the column is called "value"',
         'DOWNLOAD_LOOKUP_LIST': 'Download your lookup list to your local machine',
         'PASTE_LOOKUP_LIST': 'Paste your lookup list here',
         'DELETE_LOOKUP_LIST': 'Delete your lookup list',
-        'SUBMIT': 'Submit',
-        'CANCEL': 'Cancel',
     },
     [CurrentPage.MODEL_CALLBACKS]: {
         'ADD_LABELING_TASK': 'Add new labeling task',
@@ -75,15 +76,10 @@ export const TOOLTIPS_DICT = {
         'EDIT_NAME': 'Edit your attribute\'s name',
         'CANNOT_EDIT_DATATYPE': 'Cannot edit data type',
         'EDIT_DATATYPE': 'Edit your data type',
-        'CLICK_TO_COPY': 'Click to copy',
-        'IMPORT_STATEMENT': 'Click to copy import statement',
         'AVAILABLE_LIBRARIES': 'See available libraries for this attribute calculation',
         'BEING_EXECUTED': 'Currently being executed',
-        'SUCCESS': 'Successfully executed',
-        'ERROR': 'Execution ran into errors',
         'DELETE': 'Delete this attribute calculation',
         'EXECUTE_10_RECORDS': 'Execute the attribute on 10 records',
-
     },
     [CurrentPage.LOOKUP_LISTS_OVERVIEW]: {
         'ENABLE_ACTIONS': 'At least one lookup list is needed to enable actions',
@@ -97,7 +93,6 @@ export const TOOLTIPS_DICT = {
         'TARGET_TYPE': 'Choose the target type',
         'LABELING_TASK': 'Choose the labeling task',
         'STATIC_DATA_SLICE': 'Choose a static data slice',
-
     },
     [CurrentPage.HEURISTICS]: {
         'ADD_LABELING_TASK': 'Add new labeling task',
@@ -125,22 +120,17 @@ export const TOOLTIPS_DICT = {
         'EXECUTION_TIME': 'Execution time',
         'EDIT_NAME': 'Edit name',
         'EDIT_DESCRIPTION': 'Edit description',
-        'CLICK_TO_COPY': 'Click to copy',
-        'IMPORT_STATEMENT': 'Click to copy import statement',
         'RUN': 'Creates a task to run the function',
         'RUN_WS': 'Run weak supervision on current labeling task'
     },
     [CurrentPage.LABELING_FUNCTION]: {
         'LABELING_TASK': 'Pick the labeling task',
-        'CLICK_TO_COPY': 'Click to copy',
         'CLICK_TO_COPY_ERROR': 'Click to copy - embedding failed',
         'CLICK_TO_COPY_RUNNING': 'Click to copy - embedding not finished yet',
         'INSTALLED_LIBRARIES': 'See available libraries for this labeling function',
         'SELECT_ATTRIBUTE': 'Select an attribute',
         'RUN_ON_10': 'Run on 10 records',
         'CURRENTLY_RUNNING': 'Currently being executed',
-        'FINISHED': 'Successfully executed',
-        'ERROR': 'Execution ran into errors',
         'EXECUTION_TIME': 'Execution time',
     },
     [CurrentPage.ZERO_SHOT]: {
@@ -166,7 +156,6 @@ export const TOOLTIPS_DICT = {
         'REMOVE_LINK': 'Remove link',
     },
     [CurrentPage.DATA_BROWSER]: {
-        'COPY_TO_CLIPBOARD': 'Copy to clipboard',
         'ONLY_MANAGED': 'Only usable for the managed version',
         'OUTDATED_SLICE': 'Outdated slice&#10;save to update',
         'CLEAR_WS_CONFIDENCE': 'Clear filter for weakly supervised confidence',

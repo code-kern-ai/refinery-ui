@@ -8,6 +8,7 @@ import { settingsReducer } from './states/pages/settings';
 import { modelsDownloadedSliceReducer } from './states/pages/models-downloaded';
 import { heuristicsReducer } from './states/pages/heuristics';
 import { dataBrowserReducer } from './states/pages/data-browser';
+import { cacheReducer } from './states/cachedValues';
 
 const store = configureStore({
     reducer: {
@@ -20,6 +21,7 @@ const store = configureStore({
         modelsDownloaded: modelsDownloadedSliceReducer,
         heuristics: heuristicsReducer,
         dataBrowser: dataBrowserReducer,
+        cache: cacheReducer,
     },
     devTools: process.env.IS_DEV == '1',
 });

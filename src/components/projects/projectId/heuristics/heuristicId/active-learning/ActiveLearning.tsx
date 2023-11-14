@@ -160,7 +160,7 @@ export default function ActiveLearning() {
                         </Tooltip>
                         {currentHeuristic.labels?.length == 0 ? (<div className="text-sm font-normal text-gray-500 ml-3">No labels for target task</div>) : <>
                             {currentHeuristic.labels?.map((label: any, index: number) => (
-                                <Tooltip content={TOOLTIPS_DICT.HEURISTICS.CLICK_TO_COPY} color="invert" placement="top" key={label.name}>
+                                <Tooltip content={TOOLTIPS_DICT.GENERAL.CLICK_TO_COPY} color="invert" placement="top" key={label.name}>
                                     <span className={`inline-flex border items-center px-2 py-0.5 rounded text-xs font-medium cursor-pointer ml-3 ${label.color.backgroundColor} ${label.color.hoverColor} ${label.color.textColor} ${label.color.borderColor}`}>
                                         {label.name}
                                     </span>
@@ -175,7 +175,7 @@ export default function ActiveLearning() {
                             {embeddingsFiltered.length > 0 ? (<>
                                 {embeddingsFiltered.map((embedding: Embedding, index: number) => <Fragment key={embedding.id}>
                                     <div className="text-sm leading-5 font-medium text-gray-700 inline-block mr-2">Embeddings</div>
-                                    {embedding.state == Status.FINISHED && <Tooltip content={TOOLTIPS_DICT.LABELING_FUNCTION.CLICK_TO_COPY} color="invert" placement="top">
+                                    {embedding.state == Status.FINISHED && <Tooltip content={TOOLTIPS_DICT.GENERAL.CLICK_TO_COPY} color="invert" placement="top">
                                         <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-purple-100 text-purple-700 cursor-pointer" onClick={() => copyToClipboard(embedding.name)}>
                                             {embedding.name}
                                         </span>

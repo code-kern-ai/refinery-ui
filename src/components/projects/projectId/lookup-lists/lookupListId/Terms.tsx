@@ -131,12 +131,12 @@ export default function Terms(props: TermsProps) {
                                     className="h-8 w-full border-gray-300 rounded-md placeholder-italic border text-gray-900 pl-4 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100" />
                             </div>
                             <div className="mt-2 flex">
-                                <Tooltip content={TOOLTIPS_DICT.LOOKUP_LISTS_DETAILS.SUBMIT} placement="top" color="invert">
+                                <Tooltip content={TOOLTIPS_DICT.GENERAL.SUBMIT} placement="top" color="invert">
                                     <button className="mx-2" onClick={() => openTermEditor(false, term.id, term.value, term.comment)}>
                                         <IconCircleCheckFilled />
                                     </button>
                                 </Tooltip>
-                                <Tooltip content={TOOLTIPS_DICT.LOOKUP_LISTS_DETAILS.CANCEL} placement="top" color="invert">
+                                <Tooltip content={TOOLTIPS_DICT.GENERAL.CANCEL} placement="top" color="invert">
                                     <button onClick={cancelTermEditor}>
                                         <IconCircleMinus />
                                     </button>

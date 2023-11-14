@@ -7,7 +7,7 @@ type ModelsDownloadedState = {
 
 function getInitState(): ModelsDownloadedState {
     return {
-        modelsDownloaded: [],
+        modelsDownloaded: null
     };
 }
 
@@ -23,12 +23,15 @@ const modelsDownloadedSlice = createSlice({
         },
         removeModelDownloadByName(state, action: PayloadAction<string>) {
             if (action.payload) state.modelsDownloaded = state.modelsDownloaded.filter((model) => model.name !== action.payload);
+        },
+        extentModelsDownloaded(state, action: PayloadAction<ModelsDownloaded>) {
+            if (action.payload) state.modelsDownloaded.push(action.payload);
         }
     },
 });
 
 export const selectModelsDownloaded = (state) => state.modelsDownloaded.modelsDownloaded;
 
-export const { setModelsDownloaded, removeModelDownloadByName } = modelsDownloadedSlice.actions;
+export const { setModelsDownloaded, removeModelDownloadByName, extentModelsDownloaded } = modelsDownloadedSlice.actions;
 
 export const modelsDownloadedSliceReducer = modelsDownloadedSlice.reducer;

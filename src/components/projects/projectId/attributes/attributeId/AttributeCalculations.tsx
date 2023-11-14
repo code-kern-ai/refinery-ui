@@ -259,7 +259,7 @@ export default function AttributeCalculation() {
                     <div className="flex flex-row items-center">
                         {usableAttributes.length == 0 && <div className="text-sm font-normal text-gray-500">No usable attributes.</div>}
                         {usableAttributes.map((attribute: Attribute) => (
-                            <Tooltip key={attribute.id} content={attribute.dataTypeName + ' - ' + TOOLTIPS_DICT.ATTRIBUTE_CALCULATION.CLICK_TO_COPY} color="invert" placement="top">
+                            <Tooltip key={attribute.id} content={attribute.dataTypeName + ' - ' + TOOLTIPS_DICT.GENERAL.CLICK_TO_COPY} color="invert" placement="top">
                                 <span onClick={() => copyToClipboard(attribute.name)}>
                                     <div className={`cursor-pointer border items-center px-2 py-0.5 rounded text-xs font-medium text-center mr-2 ${'bg-' + attribute.color + '-100'} ${'text-' + attribute.color + '-700'} ${'border-' + attribute.color + '-400'} ${'hover:bg-' + attribute.color + '-200'}`}>
                                         {attribute.name}
@@ -273,7 +273,7 @@ export default function AttributeCalculation() {
                         {lookupLists.length == 0 ? 'No lookup lists in project' : 'Lookup lists'}</div>
                     <div className="flex flex-row items-center">
                         {lookupLists.map((lookupList) => (
-                            <Tooltip key={lookupList.id} content={TOOLTIPS_DICT.ATTRIBUTE_CALCULATION.IMPORT_STATEMENT} color="invert" placement="top">
+                            <Tooltip key={lookupList.id} content={TOOLTIPS_DICT.GENERAL.IMPORT_STATEMENT} color="invert" placement="top">
                                 <span onClick={() => copyToClipboard("from knowledge import " + lookupList.pythonVariable)}>
                                     <div className="cursor-pointer border items-center px-2 py-0.5 rounded text-xs font-medium text-center mr-2">
                                         {lookupList.pythonVariable} - {lookupList.termCount}
@@ -354,10 +354,10 @@ export default function AttributeCalculation() {
                             </div>
                         </div>}
                     {currentAttribute.state !== AttributeState.RUNNING && currentAttribute.state !== AttributeState.INITIAL && <div className="flex flex-row items-center">
-                        {currentAttribute.state == AttributeState.USABLE && <Tooltip content={TOOLTIPS_DICT.ATTRIBUTE_CALCULATION.SUCCESS} color="invert">
+                        {currentAttribute.state == AttributeState.USABLE && <Tooltip content={TOOLTIPS_DICT.GENERAL.SUCCESSFULLY_CREATED} color="invert">
                             <IconCircleCheckFilled className="h-6 w-6 text-green-500" />
                         </Tooltip>}
-                        {currentAttribute.state == AttributeState.FAILED && <Tooltip content={TOOLTIPS_DICT.ATTRIBUTE_CALCULATION.ERROR} color="invert">
+                        {currentAttribute.state == AttributeState.FAILED && <Tooltip content={TOOLTIPS_DICT.GENERAL.ERROR} color="invert">
                             <IconAlertTriangleFilled className="h-6 w-6 text-red-500" />
                         </Tooltip>}
                         <div className="py-6 text-sm leading-5 font-normal text-gray-500">

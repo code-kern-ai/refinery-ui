@@ -13,6 +13,9 @@ import { WebSocketsService } from "../services/base/web-sockets/WebSocketsServic
 import { timer } from "rxjs";
 import { RouteManager } from "../services/base/route-manager";
 import { postProcessUsersList } from "../util/components/users/users-list-helper";
+import { GET_RECOMMENDED_ENCODERS_FOR_EMBEDDINGS, GET_ZERO_SHOT_RECOMMENDATIONS } from "../services/gql/queries/project-setting";
+import { CacheEnum, setCache } from "./states/cachedValues";
+import { postProcessingZeroShotEncoders } from "../util/components/models-downloaded/models-downloaded-helper";
 
 export function GlobalStoreDataComponent(props: React.PropsWithChildren) {
     const router = useRouter();
@@ -29,6 +32,8 @@ export function GlobalStoreDataComponent(props: React.PropsWithChildren) {
     const [refetchProjectByProjectId] = useLazyQuery(GET_PROJECT_BY_ID);
     const [refetchOrganization] = useLazyQuery(GET_ORGANIZATION);
     const [refetchOrganizationUsers] = useLazyQuery(GET_ORGANIZATION_USERS);
+    const [refetchZeroShotRecommendations] = useLazyQuery(GET_ZERO_SHOT_RECOMMENDATIONS, { fetchPolicy: 'cache-first' });
+    const [refetchRecommendedEncoders] = useLazyQuery(GET_RECOMMENDED_ENCODERS_FOR_EMBEDDINGS, { fetchPolicy: 'cache-first' });
 
     useEffect(() => {
         getIsManaged((data) => {
@@ -59,6 +64,13 @@ export function GlobalStoreDataComponent(props: React.PropsWithChildren) {
         });
         refetchOrganizationUsers().then((res) => {
             dispatch(setAllUsers(postProcessUsersList(res.data["allUsers"])));
+        });
+
+        // Set cache
+        refetchZeroShotRecommendations().then((resZeroShot) => {
+            refetchRecommendedEncoders().then((resEncoders) => {
+                dispatch(setCache(CacheEnum.MODELS_LIST, postProcessingZeroShotEncoders(JSON.parse(resZeroShot.data['zeroShotRecommendations']), resEncoders.data['recommendedEncoders'])))
+            });
         });
     }, []);
 

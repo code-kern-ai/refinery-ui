@@ -204,10 +204,10 @@ export default function Embeddings(props: EmbeddingProps) {
                                                 </div>
                                                 <p className="text-xs italic">{embedding.state}</p>
                                             </div>}
-                                            {embedding.state == EmbeddingState.FINISHED && <Tooltip content={TOOLTIPS_DICT.PROJECT_SETTINGS.EMBEDDINGS.SUCCESSFULLY_CREATED} color="invert">
+                                            {embedding.state == EmbeddingState.FINISHED && <Tooltip content={TOOLTIPS_DICT.GENERAL.SUCCESSFULLY_CREATED} color="invert">
                                                 <IconCircleCheckFilled className="h-6 w-6 text-green-500" />
                                             </Tooltip>}
-                                            {embedding.state == EmbeddingState.FAILED && <Tooltip content={TOOLTIPS_DICT.PROJECT_SETTINGS.EMBEDDINGS.ERROR} color="invert">
+                                            {embedding.state == EmbeddingState.FAILED && <Tooltip content={TOOLTIPS_DICT.GENERAL.ERROR} color="invert">
                                                 <IconAlertTriangleFilled className="h-6 w-6 text-red-500" />
                                             </Tooltip>}
                                         </td>

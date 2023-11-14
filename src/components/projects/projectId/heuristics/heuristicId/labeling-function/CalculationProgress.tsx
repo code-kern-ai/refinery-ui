@@ -19,10 +19,10 @@ export default function CalculationProgress() {
                             {currentHeuristic.lastTask.state === Status.CREATED && <Tooltip content={TOOLTIPS_DICT.LABELING_FUNCTION.CURRENTLY_RUNNING} color="invert" placement="right">
                                 <LoadingIcon />
                             </Tooltip>}
-                            {currentHeuristic.lastTask.state == Status.FINISHED && <Tooltip content={TOOLTIPS_DICT.LABELING_FUNCTION.FINISHED} color="invert">
+                            {currentHeuristic.lastTask.state == Status.FINISHED && <Tooltip content={TOOLTIPS_DICT.GENERAL.SUCCESSFULLY_CREATED} color="invert">
                                 <IconCircleCheckFilled className="h-6 w-6 text-green-500" />
                             </Tooltip>}
-                            {currentHeuristic.lastTask.state == Status.FAILED && <Tooltip content={TOOLTIPS_DICT.LABELING_FUNCTION.ERROR} color="invert">
+                            {currentHeuristic.lastTask.state == Status.FAILED && <Tooltip content={TOOLTIPS_DICT.GENERAL.ERROR} color="invert">
                                 <IconAlertTriangleFilled className="h-6 w-6 text-red-500" />
                             </Tooltip>}
                             {currentHeuristic.lastTask.state === Status.CREATED ? (<>

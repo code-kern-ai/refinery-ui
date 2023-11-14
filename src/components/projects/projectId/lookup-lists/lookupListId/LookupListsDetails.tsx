@@ -159,7 +159,7 @@ export default function LookupListsDetails() {
                         Python variable
                     </span>
                 </Tooltip>
-                <Tooltip content={TOOLTIPS_DICT.LOOKUP_LISTS_DETAILS.IMPORT} color="invert" placement="top">
+                <Tooltip content={TOOLTIPS_DICT.GENERAL.IMPORT_STATEMENT} color="invert" placement="top">
                     <span onClick={() => copyToClipboard("from knowledge import " + lookupList.pythonVariable)}
                         className="font-dmMono px-4 py-2 rounded-none rounded-r-md border border-gray-300 text-gray-500 sm:text-sm bg-gray-100 cursor-pointer">
                         {lookupList.pythonVariable}</span>

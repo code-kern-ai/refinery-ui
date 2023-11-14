@@ -151,7 +151,7 @@ export default function HeuristicsLayout(props: any) {
                     <div className="flex flex-row items-center">
                         {usableAttributes.length == 0 && <div className="text-sm font-normal text-gray-500">No usable attributes.</div>}
                         {usableAttributes.map((attribute: Attribute) => (
-                            <Tooltip key={attribute.id} content={attribute.dataTypeName + ' - ' + TOOLTIPS_DICT.HEURISTICS.CLICK_TO_COPY} color="invert" placement="top">
+                            <Tooltip key={attribute.id} content={attribute.dataTypeName + ' - ' + TOOLTIPS_DICT.GENERAL.CLICK_TO_COPY} color="invert" placement="top">
                                 <span onClick={() => copyToClipboard(attribute.name)}>
                                     <div className={`cursor-pointer border items-center px-2 py-0.5 rounded text-xs font-medium text-center mr-2 ${'bg-' + attribute.color + '-100'} ${'text-' + attribute.color + '-700'} ${'border-' + attribute.color + '-400'} ${'hover:bg-' + attribute.color + '-200'}`}>
                                         {attribute.name}
@@ -165,7 +165,7 @@ export default function HeuristicsLayout(props: any) {
                         {lookupLists.length == 0 ? 'No lookup lists' : 'Lookup lists'}</div>
                     <div className="flex flex-row items-center">
                         {lookupLists.map((lookupList) => (
-                            <Tooltip key={lookupList.id} content={TOOLTIPS_DICT.HEURISTICS.IMPORT_STATEMENT} color="invert" placement="top">
+                            <Tooltip key={lookupList.id} content={TOOLTIPS_DICT.GENERAL.IMPORT_STATEMENT} color="invert" placement="top">
                                 <span onClick={() => copyToClipboard("from knowledge import " + lookupList.pythonVariable)}>
                                     <div className="cursor-pointer border items-center px-2 py-0.5 rounded text-xs font-medium text-center mr-2">
                                         {lookupList.pythonVariable} - {lookupList.termCount}

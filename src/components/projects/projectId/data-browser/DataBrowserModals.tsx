@@ -91,7 +91,7 @@ export default function DataBrowserModals() {
                     {key == "Link" ? (<div>
                         <div className="mt-3 flex rounded-md">
                             <span className="inline-flex items-center rounded-l-md border border-r-0 border-gray-300 bg-gray-50 px-3 text-gray-500 sm:text-sm">{value.startsWith("https") ? 'https://' : 'http://'}</span>
-                            <Tooltip content={TOOLTIPS_DICT.DATA_BROWSER.COPY_TO_CLIPBOARD} color="invert" placement="top">
+                            <Tooltip content={TOOLTIPS_DICT.GENERAL.CLICK_TO_COPY} color="invert" placement="top">
                                 <span onClick={() => copyToClipboard(value + '?pos=1&type=DATA_SLICE')}
                                     className="cursor-pointer tooltip border rounded-none rounded-r-md border-gray-300 px-3 py-2 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
                                     {value.substring(value.startsWith("https") ? 8 : 7)}</span>
