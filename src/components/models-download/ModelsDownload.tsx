@@ -100,14 +100,18 @@ export default function ModelsDownload() {
         });
     }
 
-    function handleWebsocketNotification(msgParts: string[]) {
+    const handleWebsocketNotification = useCallback((msgParts: string[]) => {
         if (msgParts[1] === 'model_provider_download' && msgParts[2] === 'started') {
             timer(2500).subscribe(() => refetchModels());
 
         } else if (msgParts[1] === 'model_provider_download' && msgParts[2] === 'finished') {
-            timer(2500).subscribe(() => refetchModels())
+            timer(2500).subscribe(() => refetchModels());
         }
-    }
+    }, []);
+
+    useEffect(() => {
+        WebSocketsService.updateFunctionPointer(null, CurrentPage.MODELS_DOWNLOAD, handleWebsocketNotification)
+    }, [handleWebsocketNotification]);
 
     // TODO: add the hover box and the colors after the dropdown review is done
     return (<div className="p-4 bg-gray-100 h-screen overflow-y-auto flex-1 flex flex-col">

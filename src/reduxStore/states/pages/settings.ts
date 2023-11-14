@@ -41,7 +41,7 @@ function getInitState(): SettingsState {
         recommendedEncodersDict: {},
         recommendedEncodersAll: [],
         labelingTasks: {
-            all: []
+            all: null
         }
     };
 }
