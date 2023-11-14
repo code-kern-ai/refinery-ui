@@ -17,6 +17,7 @@ import { useDispatch, useSelector } from "react-redux";
 const ABORT_BUTTON = { buttonCaption: 'Delete', useButton: true, disabled: false };
 
 export default function DataBrowserModals() {
+    // i think we need to split this into multiple files since a change in modal a would trigger a rerender of all modals
     const dispatch = useDispatch();
     const router = useRouter();
 
@@ -29,6 +30,7 @@ export default function DataBrowserModals() {
     const [deleteDataSliceMut] = useMutation(DELETE_DATA_SLICE);
 
     const deleteDataSlice = useCallback(() => {
+        // since this only needs the sliceId and projectId i would assume this to be function outside the component with parameters to ensure a stable function pointer (so no need for useCallback)
         deleteDataSliceMut({ variables: { projectId: project.id, dataSliceId: modalDeleteSlice.sliceId } }).then((res) => {
             dispatch(removeFromAllDataSlicesById(modalDeleteSlice.sliceId));
         });

@@ -58,6 +58,8 @@ export default function DataBrowser() {
 
     function refetchLabelingTasksAndProcess() {
         refetchLabelingTasksByProjectId({ variables: { projectId: project.id } }).then((res) => {
+
+            // if this is something we need to do every time before we set the redux store why doesn't the redux store handle it on it's own? (goes for pretty much all setter if i see it right)
             const labelingTasks = postProcessLabelingTasks(res['data']['projectByProjectId']['labelingTasks']['edges']);
             dispatch(setLabelingTasksAll(postProcessLabelingTasksSchema(labelingTasks)));
         });
@@ -70,6 +72,7 @@ export default function DataBrowser() {
     }
 
     function refetchExtendedSearchAndProcess() {
+        // JSON.striginfy({}) could be either a default/const that is calculated once or a string
         refetchExtendedRecord({ variables: { projectId: project.id, filterData: JSON.stringify({}), offset: searchRequest.offset, limit: searchRequest.limit } }).then((res) => {
             dispatch(setSearchRecordsExtended(postProcessRecordsExtended(res.data['searchRecordsExtended'], labelingTasks)));
         });

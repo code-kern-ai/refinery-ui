@@ -15,8 +15,10 @@ export default function NewProject() {
 
     const [tokenizerValues, setTokenizerValues] = useState([]);
 
+    //also maybe an option for caching in redux store
     const [refetchTokenizerValues] = useLazyQuery(GET_ALL_TOKENIZER_OPTIONS, { fetchPolicy: 'cache-first' });
 
+    //this is created on every render so probably false
     const uploadOptions: UploadOptions = {
         deleteProjectOnFail: true,
         tokenizerValues: tokenizerValues,
@@ -33,6 +35,7 @@ export default function NewProject() {
         uploadOptions.tokenizerValues = tokenizerValues;
     }, [tokenizerValues]);
 
+    // maybe outside? isManaged can be passed as argument and the rest seems pretty static
     function checkWhitelistTokenizer(tokenizer) {
         tokenizer = Array.from(tokenizer);
         const allowedConfigs = ConfigManager.getConfigValue("spacy_downloads");

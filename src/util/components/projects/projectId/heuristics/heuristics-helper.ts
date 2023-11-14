@@ -42,7 +42,7 @@ export const DEFAULT_DESCRIPTION = 'provide some description for documentation';
 export function getInformationSourceTemplate(matching: any, type: InformationSourceType, embedding: string): any {
     if (matching.length != 1) return null;
     const firstLabelingTaskType = matching[0].taskType;
-    let tmplateKey: InformationSourceExamples;
+    let tmplateKey: InformationSourceExamples; //probably template not tmplate
     let replaceEmbedding = false;
     if (type == InformationSourceType.LABELING_FUNCTION) {
         tmplateKey = firstLabelingTaskType == LabelingTaskTaskType.INFORMATION_EXTRACTION ? InformationSourceExamples.LF_EMPTY_EXTRACTION : InformationSourceExamples.LF_EMPTY_CLASSIFICATION;
@@ -87,7 +87,7 @@ export function checkSelectedHeuristics(heuristics: Heuristic[], onlyValid: bool
 }
 
 export function postProcessCurrentWeakSupervisionRun(currentWeakSupervision: CurrentWeakSupervision): CurrentWeakSupervision {
-    const prepareWeakSupervision = jsonCopy(currentWeakSupervision);
+    const prepareWeakSupervision = jsonCopy(currentWeakSupervision); //why do we need a jsonCopy here?
     if (currentWeakSupervision.user.firstName) {
         prepareWeakSupervision.displayName = currentWeakSupervision.user.firstName[0] + '. ' + currentWeakSupervision.user.lastName;
     } else {

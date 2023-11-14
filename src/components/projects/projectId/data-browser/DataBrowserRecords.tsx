@@ -81,6 +81,7 @@ export default function DataBrowserRecords() {
         {!(activeSlice?.static) && <div className="flex flex-row flex-wrap mt-4">
         </div>}
         {activeSearchParams.map((searchParam, i) => (<div key={i}>
+            {/* keys shouldn't be indexes. if we have issues with findings a unique key we can use the id generator from the javascript-functions submodule (best applied during setting in the redux store)*/}
             {searchParam.splittedText.map((searchText, j) => (<div key={j} className="flex flex-row items-center gap-y-1" style={{ maxWidth: '95%' }}>
                 <div className="whitespace-pre-line break-all rounded-full items-center py-0.5 px-2.5 text-sm font-medium border border-green-700 bg-green-100 text-green-700 grid grid-cols-2 mr-2"
                     style={{ gridTemplateColumns: 'auto max-content' }}>

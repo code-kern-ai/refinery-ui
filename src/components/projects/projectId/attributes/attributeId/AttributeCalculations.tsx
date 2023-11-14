@@ -38,6 +38,8 @@ export default function AttributeCalculation() {
 
     const project = useSelector(selectProject);
     const attributes = useSelector(selectAttributes);
+    // is this correct? (new object on every render)
+    // why don't we create a selector for this (and ensure that we cache the result to prevent object problems -- lets talk about this :)
     const usableAttributes = useSelector(selectUsableAttributes).filter((attribute) => attribute.id != '@@NO_ATTRIBUTE@@');
     const lookupLists = useSelector(selectAllLookupLists);
 
@@ -60,7 +62,7 @@ export default function AttributeCalculation() {
 
     useEffect(() => {
         if (!project) return;
-        if (!currentAttribute || attributes.length == 0) {
+        if (!currentAttribute || attributes.length == 0) { //why is current attribute not part of the dependency array?
             refetchAttributes({ variables: { projectId: project.id, stateFilter: ['ALL'] } }).then((res) => {
                 dispatch(setAllAttributes(postProcessingAttributes(res.data['attributesByProjectId'])));
                 setCurrentAttribute(postProcessCurrentAttribute(attributes.find((attribute) => attribute.id === router.query.attributeId)));
@@ -75,14 +77,14 @@ export default function AttributeCalculation() {
         WebSocketsService.subscribeToNotification(CurrentPage.ATTRIBUTE_CALCULATION, {
             projectId: project.id,
             whitelist: ['attributes_updated', 'calculate_attribute', 'tokenization', 'knowledge_base_updated', 'knowledge_base_deleted', 'knowledge_base_created'],
-            func: handleWebsocketNotification
+            func: handleWebsocketNotification //will run into issues since depending on currentAttribute
         });
     }, [project, attributes]);
 
     useEffect(() => {
         if (!attributes) return;
         const tooltipsPreps = [];
-        ATTRIBUTES_VISIBILITY_STATES.forEach((state) => {
+        ATTRIBUTES_VISIBILITY_STATES.forEach((state) => { // foreach + push = map?
             tooltipsPreps.push(getTooltipVisibilityState(state.value));
         });
         setTooltipsArray(tooltipsPreps);
@@ -111,7 +113,7 @@ export default function AttributeCalculation() {
             setDuplicateNameExists(true);
             return;
         }
-        const attributeNew = jsonCopy(currentAttribute);
+        const attributeNew = jsonCopy(currentAttribute); // why a json copy?
         attributeNew.name = name;
         attributeNew.saveSourceCode = false;
         updateAttributeMut({ variables: { projectId: project.id, attributeId: currentAttribute.id, name: attributeNew.name } }).then(() => {
@@ -148,6 +150,8 @@ export default function AttributeCalculation() {
 
     function openBricksIntegrator() {
         // TODO: add it when the bricks integrator is ready
+
+        //personal preference but i'd put a console.log here so ui this can also be seen as "still open"
     }
 
     function onScrollEvent(event: any) {
@@ -211,6 +215,7 @@ export default function AttributeCalculation() {
 
     return (project && <div className="bg-white p-4 pb-16 overflow-y-auto h-screen" onScroll={(e: any) => onScrollEvent(e)}>
         {currentAttribute && <div>
+            {/* I think a header component might be reasonable here since similar logic is used between attribute calculation, heuristics and lookup lists (i think :D ) */}
             <div className={`sticky z-40 h-12 ${isHeaderNormal ? 'top-1' : '-top-5'}`}>
                 <div className={`bg-white flex-grow ${isHeaderNormal ? '' : 'shadow'}`}>
                     <div className={`flex-row justify-start items-center inline-block ${isHeaderNormal ? 'p-0' : 'flex py-2'}`} style={{ transition: 'all .25s ease-in-out' }}>

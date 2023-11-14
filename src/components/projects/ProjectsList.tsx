@@ -110,7 +110,7 @@ export default function ProjectsList() {
     function handleWebsocketNotification(msgParts: string[]) {
         if (['project_created', 'project_deleted', 'project_update'].includes(msgParts[1])) {
             refetchProjects();
-            refetchStats();
+            refetchStats(); //why dont we need to parse the data like with the one above?
         }
         // TODO: add logic for bad password
     }

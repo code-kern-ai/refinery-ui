@@ -34,25 +34,41 @@ export default function ModelsDownload() {
 
     const isManaged = useSelector(selectIsManaged);
     const modelsDownloaded = useSelector(selectModelsDownloaded);
+
+    // i think we should create own files for the models (even with the wrapper component) so it's more clear what is needed for what
+    // also i think we need a "isRendering" state for some selectors since we don't actually care about the changes in data as long as 
+    // the modal is closed (basically to prevent expensive useEffects without any benefit) -> lets maybe talk about this since i'm not sure myself :D 
     const modalDeleteModel = useSelector(selectModal(ModalEnum.DELETE_MODEL_DOWNLOAD));
     const modalAddModel = useSelector(selectModal(ModalEnum.ADD_MODEL_DOWNLOAD));
     const encoders = useSelector(selectRecommendedEncodersAll);
 
+    // do we have a rule for when to use the generic type (<T>) notation vs "[] as string[]"
+    // i think both have merits, though i don't think we have a rule yet
     const [modelsList, setModelsList] = useState<string[]>([]);
     const [modelName, setModelName] = useState<string>('');
 
     const [refetchModelsDownload] = useLazyQuery(GET_MODEL_PROVIDER_INFO, { fetchPolicy: 'network-only', nextFetchPolicy: 'cache-first' });
     const [deleteModelDownload] = useMutation(MODEL_PROVIDER_DELETE_MODEL);
+
+    //not sure if we need a lazy query if the values are collected via network only for the first version
     const [refetchZeroShotRecommendations] = useLazyQuery(GET_ZERO_SHOT_RECOMMENDATIONS, { fetchPolicy: 'network-only', nextFetchPolicy: 'cache-first' });
     const [refetchRecommendedEncoders] = useLazyQuery(GET_RECOMMENDED_ENCODERS_FOR_EMBEDDINGS, { fetchPolicy: 'network-only', nextFetchPolicy: 'cache-first' });
     const [downloadModelMut] = useMutation(MODEL_PROVIDER_DOWNLOAD_MODEL);
 
+
+    // since this should look pretty much always the same for subscription & unsubscribe (not including the function changes from below) i think we could also create a useWebsocket hook
+    // something like setupWebsocket(router, [CurrentPage.MODELS_DOWNLOAD], ['model_provider_download']) that has the useEffect etc. included (let's talk about this further)
+
     useEffect(unsubscribeWSOnDestroy(router, [CurrentPage.MODELS_DOWNLOAD]), []);
+
 
     useEffect(() => {
         refetchModels();
         refetchZeroShotRecommendations().then((resZeroShot) => {
             if (encoders.length > 0) {
+
+                // probably to much for now but we could cache the recommendations (e.g. in a redux store) and only refetch the downloaded parts then match them together
+                // the caching in a redux store would be e.g. in the StoreManagerComponent. (build caching like this for cognition )
                 setModelsList(postProcessingZeroShotEncoders(JSON.parse(resZeroShot.data['zeroShotRecommendations']), encoders));
             } else {
                 refetchRecommendedEncoders().then((resEncoders) => {
@@ -62,33 +78,52 @@ export default function ModelsDownload() {
         });
         WebSocketsService.subscribeToNotification(CurrentPage.MODELS_DOWNLOAD, {
             whitelist: ['model_provider_download'],
-            func: handleWebsocketNotification
+            func: handleWebsocketNotification // quite dangerous! We are setting a function pointer here that is not the same with the next render. 
+            // Since we currently only access stateless parts of the component this should work fine but would be an easy copy paste error.
+            // to prevent this we have a few options:
+            // 1. create a function outside the component to have the same pointer. However not easy since we would need to pass everything we need which doesn't match with the definition
+            // 2. set the function pointer whenever the function pointer changes (e.g. in a useEffect). However this would be a bit more expensive since we would need to check the pointer every render
+            // 3. combine 2. with useCallback to prevent unnecessary calls & add an option to set the function pointer <- i think this is the way to go (let's talk about this :)
         })
+
+
+        // don't we need to unsubscribe here? --> saw unsubscribeWSOnDestroy so this is obsolete i think
     }, []);
 
     const deleteModel = useCallback(() => {
         deleteModelDownload({ variables: { modelName: modalDeleteModel.modelName } }).then(() => {
             dispatch(removeModelDownloadByName(modalDeleteModel.modelName));
         });
-    }, [modalDeleteModel]);
+    }, [modalDeleteModel]); //this reads as "whenever modalDeleteModel changes" but we only need it if the modelName changes
 
     const addModel = useCallback(() => {
         downloadModelMut({ variables: { modelName: modalAddModel.modelName } }).then((res) => {
-            const downloadedModelsCopy = jsonCopy(modelsDownloaded);
+
+            const downloadedModelsCopy = jsonCopy(modelsDownloaded); //why json copy?
             downloadedModelsCopy.push({
                 "name": modalAddModel.modelName,
                 "date": dateAsUTCDate(new Date()).toLocaleString(),
                 "status": "initializing"
             });
-            dispatch(setModelsDownloaded(downloadedModelsCopy));
+
+            // why not the common spread operator? this should perform slightly better since the size of the array is clear at creation time
+            // [...modelsDownloaded,{
+            //     "name": modalAddModel.modelName,
+            //     "date": dateAsUTCDate(new Date()).toLocaleString(),
+            //     "status": "initializing"
+            // }]
+
+            dispatch(setModelsDownloaded(downloadedModelsCopy)); //why not add a redux store method to append an item?
         });
     }, [modalAddModel]);
 
     useEffect(() => {
         const checkIfModelExists = modelsDownloaded.find((model: ModelsDownloaded) => model.name === modelName);
-        setAbortButton({ ...abortButton, emitFunction: deleteModel });
+        setAbortButton({ ...abortButton, emitFunction: deleteModel }); // this creates a new button object with every change in the modal which results in a rerender of the whole modal since it's a parameter.
+        // I think i proposed the solution with changing the function point on demand but i think in it's current state it has more overhead.
         setAcceptButton({ ...acceptButton, emitFunction: addModel, disabled: modelName === '' || checkIfModelExists !== undefined });
     }, [modalDeleteModel, modalAddModel]);
+
 
     const [abortButton, setAbortButton] = useState<ModalButton>(ABORT_BUTTON);
     const [acceptButton, setAcceptButton] = useState<ModalButton>(ACCEPT_BUTTON);
@@ -181,6 +216,7 @@ export default function ModelsDownload() {
                                         {model.status === ModelsDownloadedStatus.FINISHED ? model.sizeFormatted : '-'}
                                     </td>
                                     <td className="whitespace-nowrap text-center px-3 py-2 text-sm text-gray-500 justify-center flex">
+                                        {/* might be interesting as a small component for the state (though i'm unsure how often wie actually use this) */}
                                         {model.status === ModelsDownloadedStatus.FINISHED && <Tooltip content={TOOLTIPS_DICT.MODELS_DOWNLOAD.SUCCESS} color="invert" placement="top">
                                             <IconCircleCheckFilled className="h-6 w-6 text-green-500" />
                                         </Tooltip>}

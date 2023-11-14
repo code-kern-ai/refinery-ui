@@ -22,7 +22,7 @@ import { RecordDisplay } from "@/src/components/shared/record-display/RecordDisp
 const ACCEPT_BUTTON = { buttonCaption: 'Accept', useButton: true };
 
 export default function ExecutionContainer(props: ExecutionContainerProps) {
-    const project = useSelector(selectProject);
+    const project = useSelector(selectProject); //why not project id?
     const dispatch = useDispatch();
 
     const modalExecuteAll = useSelector(selectModal(ModalEnum.EXECUTE_ATTRIBUTE_CALCULATION));
