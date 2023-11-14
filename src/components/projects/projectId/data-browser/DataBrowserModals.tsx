@@ -34,11 +34,11 @@ export default function DataBrowserModals() {
         deleteDataSliceMut({ variables: { projectId: project.id, dataSliceId: modalDeleteSlice.sliceId } }).then((res) => {
             dispatch(removeFromAllDataSlicesById(modalDeleteSlice.sliceId));
         });
-    }, [modalDeleteSlice]);
+    }, [modalDeleteSlice.sliceId]);
 
     useEffect(() => {
         setAbortButton({ ...abortButton, emitFunction: deleteDataSlice });
-    }, [modalDeleteSlice]);
+    }, [deleteDataSlice]);
 
     const [abortButton, setAbortButton] = useState<ModalButton>(ABORT_BUTTON);
 

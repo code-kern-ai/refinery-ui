@@ -52,11 +52,13 @@ export default function Upload(props: UploadProps) {
     useEffect(unsubscribeWSOnDestroy(router, [CurrentPage.PROJECTS, CurrentPage.NEW_PROJECT]), []);
 
     useEffect(() => {
-        const tokenizerValuesDisplay = [];
-        props.uploadOptions.tokenizerValues?.forEach((tokenizer: any, index: number) => {
+        if (!props.uploadOptions.tokenizerValues) return;
+        const tokenizerValuesDisplay = [...props.uploadOptions.tokenizerValues];
+        tokenizerValuesDisplay.forEach((tokenizer: any, index: number) => {
             const tokenizerNameContainsBrackets = tokenizer.name.includes('(') && tokenizer.name.includes(')');
-            tokenizer.name = tokenizer.name + (tokenizer.configString != undefined && !tokenizerNameContainsBrackets ? ` (${tokenizer.configString})` : '');
-            tokenizerValuesDisplay[index] = tokenizer;
+            const tokenizerCopy = { ...tokenizer };
+            tokenizerCopy.name = tokenizer.name + (tokenizer.configString != undefined && !tokenizerNameContainsBrackets ? ` (${tokenizer.configString})` : '');
+            tokenizerValuesDisplay[index] = tokenizerCopy;
         });
         setPrepareTokenizedValues(tokenizerValuesDisplay);
     }, [props.uploadOptions.tokenizerValues]);
@@ -303,8 +305,8 @@ export default function Upload(props: UploadProps) {
                                 className="underline cursor-pointer">documentation</span></a> for further
                         details.
                     </label>
-                    <Dropdown buttonName={tokenizer} options={prepareTokenizedValues} disabledOptions={props.uploadOptions.tokenizerValues.map((tokenizer: any) => tokenizer.disabled)}
-                        selectedOption={(option) => setTokenizer(option)} />
+                    <Dropdown buttonName={tokenizer} options={prepareTokenizedValues} disabledOptions={prepareTokenizedValues.map((tokenizer: any) => tokenizer.disabled)}
+                        selectedOption={(option) => setTokenizer(option)} dropdownItemsClasses="max-h-80 overflow-y-auto" />
                 </div>
                 <UploadWrapper uploadStarted={uploadStarted} doingSomething={doingSomething} progressState={progressState} submitted={submitted} isFileCleared={selectedFile == null}
                     isModal={props.uploadOptions.isModal} submitUpload={submitUpload} sendSelectedFile={(file) => {

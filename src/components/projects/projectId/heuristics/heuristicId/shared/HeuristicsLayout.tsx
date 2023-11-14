@@ -47,7 +47,7 @@ export default function HeuristicsLayout(props: any) {
         }
     }, [project]);
 
-    function onScrollEvent(event: any) {
+    function onScrollEvent(event: React.UIEvent<HTMLDivElement>) {
         if (!(event.target instanceof HTMLElement)) return;
         if ((event.target as HTMLElement).scrollTop > 0) {
             setIsHeaderNormal(false);
@@ -89,7 +89,7 @@ export default function HeuristicsLayout(props: any) {
         });
     }
 
-    return (project && <div className="bg-white p-4 pb-16 overflow-y-auto h-screen" onScroll={(e: any) => onScrollEvent(e)}>
+    return (project && <div className="bg-white p-4 pb-16 overflow-y-auto h-screen" onScroll={onScrollEvent}>
         {currentHeuristic && <div>
             <div className={`sticky z-40 h-12 ${isHeaderNormal ? 'top-1' : '-top-5'}`}>
                 <div className={`bg-white flex-grow ${isHeaderNormal ? '' : 'shadow'}`}>

@@ -82,12 +82,24 @@ export default function ProjectsList() {
     }, [modal]);
 
     function initData() {
+        refetchProjectsAndPostProcess();
+        refetchStatsAndPostProcess();
+
+        WebSocketsService.subscribeToNotification(CurrentPage.PROJECTS, {
+            whitelist: ['project_created', 'project_deleted', 'project_update', 'file_upload', 'bad_password'],
+            func: handleWebsocketNotification
+        });
+    }
+
+    function refetchProjectsAndPostProcess() {
         refetchProjects().then((res) => {
             const projects = res.data["allProjects"].edges.map((edge: any) => edge.node);
             dispatch(setAllProjects(postProcessProjectsList(projects)));
             setDataLoaded(true);
         });
+    }
 
+    function refetchStatsAndPostProcess() {
         refetchStats().then((res) => {
             const stats = JSON.parse(res.data["overviewStats"]);
             const statsDict = {};
@@ -100,17 +112,12 @@ export default function ProjectsList() {
             });
             setProjectStatisticsById(statsDict);
         });
-
-        WebSocketsService.subscribeToNotification(CurrentPage.PROJECTS, {
-            whitelist: ['project_created', 'project_deleted', 'project_update', 'file_upload', 'bad_password'],
-            func: handleWebsocketNotification
-        });
     }
 
     function handleWebsocketNotification(msgParts: string[]) {
         if (['project_created', 'project_deleted', 'project_update'].includes(msgParts[1])) {
-            refetchProjects();
-            refetchStats();
+            refetchProjectsAndPostProcess();
+            refetchStatsAndPostProcess();
         }
         // TODO: add logic for bad password
     }

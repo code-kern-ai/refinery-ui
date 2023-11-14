@@ -16,4 +16,8 @@ export class ConfigManager {
         return ConfigManager.config[key][subKey]
     }
 
+    public static isInit(): boolean {
+        return ConfigManager.config;
+    }
+
 }

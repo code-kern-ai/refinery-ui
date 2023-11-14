@@ -41,7 +41,7 @@ export default function AddModelDownload() {
         if (!modelsDownloaded) return;
         const checkIfModelExists = modelsDownloaded.find((model: ModelsDownloaded) => model.name === modelName);
         setAcceptButton({ ...acceptButton, emitFunction: addModel, disabled: modelName === '' || checkIfModelExists !== undefined });
-    }, [modalAddModel, modelsDownloaded, addModel]);
+    }, [modelsDownloaded, addModel]);
 
     const [acceptButton, setAcceptButton] = useState<ModalButton>(ACCEPT_BUTTON);
 

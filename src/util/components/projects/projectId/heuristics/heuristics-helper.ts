@@ -42,16 +42,16 @@ export const DEFAULT_DESCRIPTION = 'provide some description for documentation';
 export function getInformationSourceTemplate(matching: any, type: InformationSourceType, embedding: string): any {
     if (matching.length != 1) return null;
     const firstLabelingTaskType = matching[0].taskType;
-    let tmplateKey: InformationSourceExamples;
+    let templateKey: InformationSourceExamples;
     let replaceEmbedding = false;
     if (type == InformationSourceType.LABELING_FUNCTION) {
-        tmplateKey = firstLabelingTaskType == LabelingTaskTaskType.INFORMATION_EXTRACTION ? InformationSourceExamples.LF_EMPTY_EXTRACTION : InformationSourceExamples.LF_EMPTY_CLASSIFICATION;
+        templateKey = firstLabelingTaskType == LabelingTaskTaskType.INFORMATION_EXTRACTION ? InformationSourceExamples.LF_EMPTY_EXTRACTION : InformationSourceExamples.LF_EMPTY_CLASSIFICATION;
     }
     else {
-        tmplateKey = firstLabelingTaskType == LabelingTaskTaskType.INFORMATION_EXTRACTION ? InformationSourceExamples.AL_EMPTY_EXTRACTION : InformationSourceExamples.AL_EMPTY_CLASSIFICATION;
+        templateKey = firstLabelingTaskType == LabelingTaskTaskType.INFORMATION_EXTRACTION ? InformationSourceExamples.AL_EMPTY_EXTRACTION : InformationSourceExamples.AL_EMPTY_CLASSIFICATION;
         replaceEmbedding = true;
     }
-    const code = InformationSourceCodeLookup.getInformationSourceTemplate(tmplateKey);
+    const code = InformationSourceCodeLookup.getInformationSourceTemplate(templateKey);
     if (replaceEmbedding) {
         code.code = code.code.replace("@@EMBEDDING@@", embedding)
     }

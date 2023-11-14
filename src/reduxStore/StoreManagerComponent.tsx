@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { selectIsAdmin, selectIsDemo, selectIsManaged, setAllUsers, setIsAdmin, setIsDemo, setIsManaged, setOrganization, setUser } from "./states/general";
 import { getUserAvatarUri, jsonCopy } from "@/submodules/javascript-functions/general";
 import { setActiveProject } from "./states/project";
-import { GET_PROJECT_BY_ID } from "../services/gql/queries/projects";
+import { GET_ALL_TOKENIZER_OPTIONS, GET_PROJECT_BY_ID } from "../services/gql/queries/projects";
 import { useLazyQuery } from "@apollo/client";
 import { GET_ORGANIZATION, GET_ORGANIZATION_USERS, GET_USER_INFO } from "../services/gql/queries/organizations";
 import { GET_IS_ADMIN } from "../services/gql/queries/config";
@@ -16,6 +16,8 @@ import { postProcessUsersList } from "../util/components/users/users-list-helper
 import { GET_RECOMMENDED_ENCODERS_FOR_EMBEDDINGS, GET_ZERO_SHOT_RECOMMENDATIONS } from "../services/gql/queries/project-setting";
 import { CacheEnum, setCache } from "./states/cachedValues";
 import { postProcessingZeroShotEncoders } from "../util/components/models-downloaded/models-downloaded-helper";
+import { checkWhitelistTokenizer } from "../util/components/projects/new-project/new-project-helper";
+import { ConfigManager } from "../services/base/config";
 
 export function GlobalStoreDataComponent(props: React.PropsWithChildren) {
     const router = useRouter();
@@ -34,6 +36,7 @@ export function GlobalStoreDataComponent(props: React.PropsWithChildren) {
     const [refetchOrganizationUsers] = useLazyQuery(GET_ORGANIZATION_USERS);
     const [refetchZeroShotRecommendations] = useLazyQuery(GET_ZERO_SHOT_RECOMMENDATIONS, { fetchPolicy: 'cache-first' });
     const [refetchRecommendedEncoders] = useLazyQuery(GET_RECOMMENDED_ENCODERS_FOR_EMBEDDINGS, { fetchPolicy: 'cache-first' });
+    const [refetchTokenizerValues] = useLazyQuery(GET_ALL_TOKENIZER_OPTIONS, { fetchPolicy: 'cache-first' });
 
     useEffect(() => {
         getIsManaged((data) => {
@@ -103,5 +106,14 @@ export function GlobalStoreDataComponent(props: React.PropsWithChildren) {
 
     }, [router.query.projectId]);
 
+    useEffect(() => {
+        if (!isManaged) return;
+        if (!ConfigManager.isInit()) return;
+        refetchTokenizerValues().then((res) => {
+            dispatch(setCache(CacheEnum.TOKENIZER_VALUES, checkWhitelistTokenizer(res.data['languageModels'], isManaged)));
+        });
+    }, [ConfigManager.isInit(), isManaged]);
+
+    if (!dataLoaded) return <></>;
     return <div>{props.children}</div>;
 }

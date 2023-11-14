@@ -140,7 +140,7 @@ export default function LabelingTasks() {
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-200">
-                            {labelingTasksSchema.map((task: LabelingTask, index: number) => (
+                            {labelingTasksSchema && labelingTasksSchema.map((task: LabelingTask, index: number) => (
                                 <tr key={task.id} className={`${index % 2 != 0 ? 'bg-gray-50' : 'bg-white'}`}>
                                     <td className="whitespace-nowrap text-center px-3 py-2 text-sm text-gray-500">{task.targetName}</td>
                                     <td className="whitespace-nowrap text-center px-3 py-2 text-sm text-gray-500">

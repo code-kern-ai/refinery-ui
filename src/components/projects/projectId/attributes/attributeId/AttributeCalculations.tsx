@@ -77,15 +77,11 @@ export default function AttributeCalculation() {
             whitelist: ['attributes_updated', 'calculate_attribute', 'tokenization', 'knowledge_base_updated', 'knowledge_base_deleted', 'knowledge_base_created'],
             func: handleWebsocketNotification
         });
-    }, [project, attributes]);
+    }, [project, attributes, currentAttribute]);
 
     useEffect(() => {
         if (!attributes) return;
-        const tooltipsPreps = [];
-        ATTRIBUTES_VISIBILITY_STATES.forEach((state) => {
-            tooltipsPreps.push(getTooltipVisibilityState(state.value));
-        });
-        setTooltipsArray(tooltipsPreps);
+        setTooltipsArray(ATTRIBUTES_VISIBILITY_STATES.map((state) => getTooltipVisibilityState(state.value)));
     }, [attributes]);
 
     useEffect(() => {
@@ -111,7 +107,7 @@ export default function AttributeCalculation() {
             setDuplicateNameExists(true);
             return;
         }
-        const attributeNew = jsonCopy(currentAttribute);
+        const attributeNew = { ...currentAttribute };
         attributeNew.name = name;
         attributeNew.saveSourceCode = false;
         updateAttributeMut({ variables: { projectId: project.id, attributeId: currentAttribute.id, name: attributeNew.name } }).then(() => {
@@ -123,7 +119,7 @@ export default function AttributeCalculation() {
 
     function updateVisibility(option: string) {
         const visibility = ATTRIBUTES_VISIBILITY_STATES.find((state) => state.name === option).value;
-        const attributeNew = jsonCopy(currentAttribute);
+        const attributeNew = { ...currentAttribute };
         attributeNew.visibility = visibility;
         attributeNew.visibilityIndex = ATTRIBUTES_VISIBILITY_STATES.findIndex((state) => state.name === option);
         attributeNew.visibilityName = option;
@@ -136,7 +132,7 @@ export default function AttributeCalculation() {
 
     function updateDataType(option: string) {
         const dataType = DATA_TYPES.find((state) => state.name === option).value;
-        const attributeNew = jsonCopy(currentAttribute);
+        const attributeNew = { ...currentAttribute };
         attributeNew.dataType = dataType;
         attributeNew.dataTypeName = option;
         attributeNew.saveSourceCode = false;
@@ -148,6 +144,7 @@ export default function AttributeCalculation() {
 
     function openBricksIntegrator() {
         // TODO: add it when the bricks integrator is ready
+        console.log("TODO: add it when the bricks integrator is ready")
     }
 
     function onScrollEvent(event: any) {
@@ -175,7 +172,7 @@ export default function AttributeCalculation() {
         if (!currentAttribute) return;
         if (msgParts[1] == 'calculate_attribute') {
             if (msgParts[2] == 'progress' && msgParts[3] == currentAttribute.id) {
-                const currentAttributeCopy = jsonCopy(currentAttribute);
+                const currentAttributeCopy = { ...currentAttribute };
                 currentAttributeCopy.progress = Number(msgParts[4]);
                 currentAttributeCopy.state = AttributeState.RUNNING;
                 setCurrentAttribute(currentAttributeCopy);

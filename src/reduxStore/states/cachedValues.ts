@@ -1,7 +1,10 @@
+import { checkWhitelistTokenizer } from "@/src/util/components/projects/new-project/new-project-helper";
+import { extendArrayElementsByUniqueId } from "@/submodules/javascript-functions/id-prep";
 import { PayloadAction, createSlice } from "@reduxjs/toolkit";
 
 export enum CacheEnum {
     MODELS_LIST = 'MODELS_LIST',
+    TOKENIZER_VALUES = 'TOKENIZER_VALUES'
 }
 
 export type CachedVales = {
@@ -10,6 +13,7 @@ export type CachedVales = {
 
 const initialState: CachedVales = {
     [CacheEnum.MODELS_LIST]: null,
+    [CacheEnum.TOKENIZER_VALUES]: null,
 };
 
 const cacheSlice = createSlice({

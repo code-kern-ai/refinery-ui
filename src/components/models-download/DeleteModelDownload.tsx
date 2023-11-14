@@ -26,7 +26,7 @@ export default function DeleteModelDownload() {
 
     useEffect(() => {
         setAbortButton({ ...abortButton, emitFunction: deleteModel });
-    }, [modalDeleteModel, deleteModel]);
+    }, [deleteModel]);
 
     return (<Modal modalName={ModalEnum.DELETE_MODEL_DOWNLOAD} abortButton={abortButton}>
         <div className="flex flex-grow justify-center text-lg leading-6 text-gray-900 font-medium">
