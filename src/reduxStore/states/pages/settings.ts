@@ -3,7 +3,7 @@ import { Embedding, RecommendedEncoder } from '@/src/types/components/projects/p
 import { LabelingTask } from '@/src/types/components/projects/projectId/settings/labeling-tasks';
 import { DataTypeEnum } from '@/src/types/shared/general';
 import { arrayToDict } from '@/submodules/javascript-functions/general';
-import { createSlice } from '@reduxjs/toolkit'
+import { createSelector, createSlice } from '@reduxjs/toolkit'
 import type { PayloadAction } from '@reduxjs/toolkit'
 
 type SettingsState = {
@@ -124,8 +124,7 @@ const settingsSlice = createSlice({
 });
 
 //selectors
-export const selectAttributes = selectAttributesFunc(true);
-export const selectAttributesDict = selectAttributesFunc(false);
+export const selectAttributes = (state) => state.settings.attributes.all;
 export const selectUseableEmbedableAttributes = (state) => state.settings.attributes.useableEmbedableAttributes;
 export const selectUsableNonTextAttributes = (state) => state.settings.attributes.useableNonTextAttributes;
 export const selectUsableAttributes = (state) => state.settings.attributes.usableAttributes;
@@ -133,26 +132,13 @@ export const selectTextAttributes = (state) => state.settings.attributes.usableT
 
 export const selectEmbeddings = (state) => state.settings.embeddings.all;
 export const selectEmbeddingsFiltered = (state) => state.settings.embeddings.filtered;
-export const selectRecommendedEncodersAll = selectRecommendedEncodersFunc(true);
+export const selectRecommendedEncodersAll = (state) => state.settings.recommendedEncodersAll;
 export const selectRecommendedEncodersDict = (state) => state.settings.recommendedEncodersDict;
 
-export const selectLabelingTasksAll = selectLabelingTasksFunc(true);
-export const selectLabelingTasksDict = selectLabelingTasksFunc(false);
-
-export function selectAttributesFunc(asArray: boolean = false) {
-    if (asArray) return (state) => state.settings.attributes.all;
-    else return (state) => arrayToDict(state.settings.attributes.all, 'id');
-}
-
-export function selectLabelingTasksFunc(asArray: boolean = false) {
-    if (asArray) return (state) => state.settings.labelingTasks.all;
-    else return (state) => arrayToDict(state.settings.labelingTasks.all, 'id');
-}
-
-export function selectRecommendedEncodersFunc(asArray: boolean = false) {
-    if (asArray) return (state) => state.settings.recommendedEncodersAll;
-    else return (state) => arrayToDict(state.settings.recommendedEncodersAll, 'id');
-}
+export const selectLabelingTasksAll = (state) => state.settings.labelingTasks.all;
+export const selectAttributesDict = createSelector([selectAttributes], (a): any => a ? arrayToDict(a, 'id') : null);
+export const selectLabelingTasksDict = createSelector([selectLabelingTasksAll], (a): any => a ? arrayToDict(a, 'id') : null);
+export const selectUsableAttributesFiltered = createSelector([selectUsableAttributes], (a): any => a ? a.filter((attribute) => attribute.id != '@@NO_ATTRIBUTE@@') : null);
 
 export const { setAllAttributes, extendAllAttributes, removeFromAllAttributesById, updateAttributeById, setAllEmbeddings, setFilteredEmbeddings, removeFromAllEmbeddingsById, setAllRecommendedEncodersDict, setRecommendedEncodersAll, setLabelingTasksAll, removeFromAllLabelingTasksById, removeLabelFromLabelingTask } = settingsSlice.actions;
 export const settingsReducer = settingsSlice.reducer;

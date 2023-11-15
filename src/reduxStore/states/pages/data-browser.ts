@@ -1,6 +1,6 @@
 import { DataSlice, LineBreaksType, SearchRecordsExtended } from '@/src/types/components/projects/projectId/data-browser/data-browser';
 import { arrayToDict } from '@/submodules/javascript-functions/general';
-import { createSlice } from '@reduxjs/toolkit'
+import { createSelector, createSlice } from '@reduxjs/toolkit'
 import type { PayloadAction } from '@reduxjs/toolkit'
 
 type DataBrowserState = {
@@ -146,8 +146,7 @@ const dataBrowserSlice = createSlice({
 
 //selectors
 export const selectActiveSlice = (state) => state.dataBrowser.active;
-export const selectDataSlicesAll = selectDataSlicesFunc(true);
-export const selectDataSlicesDict = selectDataSlicesFunc(false);
+export const selectDataSlicesAll = (state) => state.dataBrowser.all;
 export const selectAdditionalData = (state) => state.dataBrowser.additionalData;
 export const selectUsersCount = (state) => state.dataBrowser.usersMapCount;
 export const selectRecords = (state) => state.dataBrowser.searchRecordsExtended;
@@ -155,11 +154,7 @@ export const selectSimilaritySearch = (state) => state.dataBrowser.similaritySea
 export const selectActiveSearchParams = (state) => state.dataBrowser.activeSearchParams;
 export const selectConfiguration = (state) => state.dataBrowser.configuration;
 
-export function selectDataSlicesFunc(asArray: boolean = false) {
-    if (asArray) return (state) => state.dataBrowser.all;
-    else return (state) => arrayToDict(state.dataBrowser.all, 'id');
-}
-
+export const selectDataSlicesDict = createSelector([selectDataSlicesAll], (a): any => a ? arrayToDict(a, 'id') : null);
 
 export const { setDataSlices, setActiveDataSlice, removeFromAllDataSlicesById, updateDataSlicesState, setUsersMapCount, setSearchRecordsExtended, setActiveSearchParams, extendAllDataSlices, updateConfigurationState, updateAdditionalDataState } = dataBrowserSlice.actions;
 export const dataBrowserReducer = dataBrowserSlice.reducer;

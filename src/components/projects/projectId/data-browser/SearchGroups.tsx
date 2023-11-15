@@ -100,6 +100,7 @@ export default function SearchGroups() {
     useEffect(() => {
         if (!user) return;
         if (!activeSearchParams) return;
+        if (!labelingTasks) return;
         refetchExtendedRecord({
             variables: {
                 projectId: project.id,
@@ -109,7 +110,7 @@ export default function SearchGroups() {
         }).then((res) => {
             dispatch(setSearchRecordsExtended(postProcessRecordsExtended(res.data['searchRecordsExtended'], labelingTasks)));
         });
-    }, [activeSearchParams]);
+    }, [activeSearchParams, user, project, attributes, labelingTasks, configuration, activeSlice]);
 
     useEffect(() => {
         if (!activeSlice) return;
@@ -139,12 +140,6 @@ export default function SearchGroups() {
         searchGroupsCopy[SearchGroup.ATTRIBUTES] = searchGroupAttributes;
         for (let baseItem of getBasicGroupItems(searchGroupAttributes.group, searchGroupAttributes.key)) {
             fullSearchCopy[SearchGroup.ATTRIBUTES].groupElements.push(attributeCreateSearchGroup(baseItem, ++GLOBAL_SEARCH_GROUP_COUNT));
-        }
-        for (let [key, value] of Object.entries(searchGroupsCopy)) {
-            const findEl = searchGroupsOrderCopy.find(el => el.key == key);
-            if (findEl == undefined) {
-                searchGroupsOrderCopy.push({ order: value.sortOrder, key: key });
-            }
         }
 
         // User Filter
@@ -186,6 +181,12 @@ export default function SearchGroups() {
         setSearchGroups(searchGroupsCopy);
         setFullSearch(fullSearchCopy);
 
+        for (let [key, value] of Object.entries(searchGroupsCopy)) {
+            const findEl = searchGroupsOrderCopy.find(el => el.key == key);
+            if (findEl == undefined) {
+                searchGroupsOrderCopy.push({ order: value.sortOrder, key: key });
+            }
+        }
         searchGroupsOrderCopy.sort((a, b) => a.order - b.order);
         setSearchGroupsOrder(searchGroupsOrderCopy);
     }
@@ -401,7 +402,7 @@ export default function SearchGroups() {
                     </div>
                 </div>
             </div>
-            <div className={`${style.transitionAll} ml-4`} style={{ maxHeight: searchGroups[group.key].isOpen ? '300px' : '0px', display: searchGroups[group.key].isOpen ? 'block' : 'none' }}>
+            <div className={`${style.transitionAll} ml-4`} style={{ maxHeight: searchGroups[group.key].isOpen ? '500px' : '0px', display: searchGroups[group.key].isOpen ? 'block' : 'none' }}>
                 <form>
                     {fullSearch[group.key].value.group == SearchGroup.ATTRIBUTES && <div className="contents mx-2">
                         {fullSearch[group.key].groupElements.map((groupItem, index) => (<div key={index}>

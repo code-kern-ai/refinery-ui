@@ -1,7 +1,7 @@
 import { User } from "@/src/types/shared/general";
 import { UserRole } from "@/src/types/shared/sidebar";
 import { arrayToDict } from "@/submodules/javascript-functions/general";
-import { PayloadAction, createSlice } from "@reduxjs/toolkit";
+import { PayloadAction, createSelector, createSlice } from "@reduxjs/toolkit";
 
 export type Organization = {
     gdprCompliant: boolean;
@@ -88,14 +88,10 @@ export const selectOrganization = (state) => state.general.organization;
 export const selectInactiveOrganization = (state) => state.general.organizationInactive;
 export const selectAllUsers = (state) => state.general.users.all;
 export const selectEngineers = (state) => state.general.users.engineers;
-export const selectAnnotators = selectAnnotatorsFunc(true);
-export const selectAnnotatorsDict = selectAnnotatorsFunc(false);
+export const selectAnnotators = (state) => state.general.users.annotators;
 export const selectExperts = (state) => state.general.users.experts;
 
-export function selectAnnotatorsFunc(asArray: boolean = false) {
-    if (asArray) return (state) => state.general.users.annotators;
-    else return (state) => arrayToDict(state.general.users.annotators, 'id');
-}
+export const selectAnnotatorsDict = createSelector([selectAnnotators], (a): any => a ? arrayToDict(a, 'id') : null);
 
 export const { setUser, setCurrentPage, setIsManaged, setIsDemo, setIsAdmin, setOrganization, setAllUsers } = generalSlice.actions;
 export const generalReducer = generalSlice.reducer;

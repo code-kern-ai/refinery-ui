@@ -8,7 +8,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { GET_LABELING_TASKS_BY_PROJECT_ID, GET_ZERO_SHOT_RECOMMENDATIONS } from "@/src/services/gql/queries/project-setting";
 import { postProcessLabelingTasks, postProcessLabelingTasksSchema } from "@/src/util/components/projects/projectId/settings/labeling-tasks-helper";
-import { selectLabelingTasksAll, selectTextAttributes, selectUsableAttributes, setLabelingTasksAll } from "@/src/reduxStore/states/pages/settings";
+import { selectLabelingTasksAll, selectTextAttributes, setLabelingTasksAll } from "@/src/reduxStore/states/pages/settings";
 import { CurrentPage } from "@/src/types/shared/general";
 import { WebSocketsService } from "@/src/services/base/web-sockets/WebSocketsService";
 import { CONFIDENCE_INTERVALS, parseToSettingsJson, postProcessZeroShot } from "@/src/util/components/projects/projectId/heuristics/heuristicId/zero-shot-helper";
