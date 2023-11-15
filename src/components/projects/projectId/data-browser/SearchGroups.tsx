@@ -25,6 +25,7 @@ import { parseFilterToExtended } from "@/src/util/components/projects/projectId/
 import { updateSearchParameters } from "@/src/util/components/projects/projectId/data-browser/search-parameters";
 import { jsonCopy } from "@/submodules/javascript-functions/general";
 import UserInfoModal from "./modals/UserInfoModal";
+import { getColorForDataType } from "@/src/util/components/projects/projectId/settings/data-schema-helper";
 
 const GROUP_SORT_ORDER = 0;
 let GLOBAL_SEARCH_GROUP_COUNT = 0;
@@ -54,6 +55,7 @@ export default function SearchGroups() {
     const [manualLabels, setManualLabels] = useState([]);
     const [weakSupervisionLabels, setWeakSupervisionLabels] = useState([]);
     const [modelCallBacksLabels, setModelCallBacksLabels] = useState([]);
+    const [backgroundColors, setBackgroundColors] = useState<string[]>([]);
 
     const [refetchExtendedRecord] = useLazyQuery(SEARCH_RECORDS_EXTENDED, { fetchPolicy: "no-cache" });
 
@@ -67,12 +69,15 @@ export default function SearchGroups() {
     useEffect(() => {
         if (!attributes) return;
         const attributesSort = [];
+        const colors = [];
         attributesSort.push({
+
             name: 'Any Attribute',
             key: null,
             order: 0,
             type: 'TEXT'
         });
+        colors.push('gray');
         attributes.forEach((att) => {
             attributesSort.push({
                 name: att.name,
@@ -80,7 +85,9 @@ export default function SearchGroups() {
                 order: att.relativePosition,
                 type: att.dataType,
             });
+            colors.push(getColorForDataType(att.dataType));
         });
+        setBackgroundColors(colors);
         setAttributeSortOrder(attributesSort);
     }, [attributes]);
 
@@ -412,7 +419,7 @@ export default function SearchGroups() {
                                 <div className="flex-grow mr-2.5 flex flex-col  mt-2 ">
                                     <div className="flex-grow flex flex-row flex-wrap gap-1">
                                         <div style={{ width: groupItem.operator != '' ? '49%' : '100%' }}>
-                                            <Dropdown options={attributesSortOrder} buttonName={groupItem.name}
+                                            <Dropdown options={attributesSortOrder} buttonName={groupItem.name} backgroundColors={backgroundColors}
                                                 selectedOption={(option: string) => selectValueDropdown(option, index, 'name', group.key)} />
                                         </div>
                                         <div style={{ width: '49%' }}>

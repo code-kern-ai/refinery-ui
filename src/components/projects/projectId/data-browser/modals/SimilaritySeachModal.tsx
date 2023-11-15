@@ -89,24 +89,26 @@ export default function SimilaritySearchModal() {
         if (!filterAttributesSS) return;
         let operators = [];
         let tooltips = [];
-        setColorAttributes([]);
+        let colors = [];
+        let operatorsCopy = { ...operatorsDict };
+        let tooltipsCopy = { ...tooltipsDict };
         for (let t of Object.values(FilterIntegrationOperator)) {
             operators.push(t.split("_").join(" "));
             tooltips.push(getFilterIntegrationOperatorTooltip(t));
         }
         filterAttributesSS.forEach((attribute: string) => {
-            const attributeType = getAttributeType(attributes, attribute);
+            const attributeType = attributes.find(att => att.name == attribute)?.dataType
             if (attributeType !== DataTypeEnum.INTEGER) {
                 operators = operators.filter(operator => operator !== FilterIntegrationOperator.BETWEEN);
                 tooltips = tooltips.filter(tooltip => tooltip !== getFilterIntegrationOperatorTooltip(FilterIntegrationOperator.BETWEEN));
             }
-            const operatorsCopy = { ...operatorsDict };
-            const tooltipsCopy = { ...tooltipsDict };
             operatorsCopy[attribute] = operators;
             tooltipsCopy[attribute] = tooltips;
-            setOperatorsDict(operatorsCopy);
-            setTooltipsDict(tooltipsCopy);
+            colors.push(getColorForDataType(attributeType));
         });
+        setOperatorsDict(operatorsCopy);
+        setTooltipsDict(tooltipsCopy);
+        setColorAttributes(colors);
     }
 
     function initFilterForm() {
@@ -175,7 +177,7 @@ export default function SimilaritySearchModal() {
                     <div className="flex-grow mr-2.5 flex flex-col  mt-2 ">
                         <div className="flex-grow flex flex-row flex-wrap gap-1">
                             <div style={{ width: '50%' }}>
-                                <Dropdown options={filterAttributesSS} buttonName={form.name}
+                                <Dropdown options={filterAttributesSS} buttonName={form.name} backgroundColors={colorsAttributes}
                                     selectedOption={(option: string) => setFilterDropdownVal(option, index, 'name')} />
                             </div>
                             <div style={{ width: '49%' }}>
