@@ -33,6 +33,7 @@ export default function ModelsDownload() {
 
     useEffect(() => {
         refetchModels();
+
         WebSocketsService.subscribeToNotification(CurrentPage.MODELS_DOWNLOAD, {
             whitelist: ['model_provider_download'],
             func: handleWebsocketNotification

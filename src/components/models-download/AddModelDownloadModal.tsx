@@ -23,6 +23,16 @@ export default function AddModelDownloadModal() {
     const modelsList = useSelector(selectCachedValue(CacheEnum.MODELS_LIST));
 
     const [modelName, setModelName] = useState('');
+    const [colorDownloadedModels, setColorDownloadedModels] = useState<boolean[]>([]);
+
+    useEffect(() => {
+        if (!modelsDownloaded || !modelsList) return;
+        const colorDownloadedModels = modelsList.map((model: any) => {
+            const checkIfModelExists = modelsDownloaded.find((modelDownloaded: ModelsDownloaded) => modelDownloaded.name === model.configString);
+            return checkIfModelExists !== undefined;
+        });
+        setColorDownloadedModels(colorDownloadedModels);
+    }, [modelsDownloaded, modelsList]);
 
     const [downloadModelMut] = useMutation(MODEL_PROVIDER_DOWNLOAD_MODEL);
 
@@ -53,10 +63,12 @@ export default function AddModelDownloadModal() {
                 <Tooltip content={TOOLTIPS_DICT.MODELS_DOWNLOAD.MODEL} placement="right" color="invert">
                     <span className="card-title mb-0 label-text flex"><span className="cursor-help underline filtersUnderline">Name</span></span>
                 </Tooltip>
-                <Dropdown options={modelsList && modelsList.map((model: any) => model.configString)} hasSearchBar={true} selectedOption={(option: string) => {
-                    dispatch(setModalStates(ModalEnum.ADD_MODEL_DOWNLOAD, { modelName: option, open: true }));
-                    setModelName(option);
-                }} />
+                <Dropdown options={modelsList && modelsList.map((model: any) => model.configString)} useDifferentTextColor={colorDownloadedModels} differentTextColor="green"
+                    hasSearchBar={true} dropdownItemsClasses="max-h-80 overflow-y-auto"
+                    selectedOption={(option: string) => {
+                        dispatch(setModalStates(ModalEnum.ADD_MODEL_DOWNLOAD, { modelName: option, open: true }));
+                        setModelName(option);
+                    }} />
             </div>
         </form>
     </Modal>)

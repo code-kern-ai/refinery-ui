@@ -476,7 +476,7 @@ export default function SearchGroups() {
 
                             <div>Manually labeled</div>
                             {fullSearch[group.key].groupElements['manualLabels'].length == 0 ? (<ButtonLabelsDisabled />) : (
-                                <Dropdown options={fullSearch[group.key].groupElements['manualLabels']} buttonName={manualLabels.length == 0 ? 'None selected' : manualLabels.join(',')} hasCheckboxes={true}
+                                <Dropdown options={fullSearch[group.key].groupElements['manualLabels']} buttonName={manualLabels.length == 0 ? 'None selected' : manualLabels.join(',')} hasCheckboxes={true} keepDrownOpen={true}
                                     selectedOption={(option: any) => {
                                         const labels = [];
                                         option.forEach((a: any) => {

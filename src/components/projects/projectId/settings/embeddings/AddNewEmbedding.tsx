@@ -1,14 +1,18 @@
 import Modal from "@/src/components/shared/modal/Modal";
 import { selectOrganization } from "@/src/reduxStore/states/general";
 import { selectModal } from "@/src/reduxStore/states/modal";
+import { setModelsDownloaded } from "@/src/reduxStore/states/pages/models-downloaded";
 import { selectEmbeddings, selectRecommendedEncodersAll, selectRecommendedEncodersDict, selectUsableNonTextAttributes, selectUseableEmbedableAttributes, setAllRecommendedEncodersDict } from "@/src/reduxStore/states/pages/settings";
 import { selectProject } from "@/src/reduxStore/states/project";
 import { CREATE_EMBEDDING } from "@/src/services/gql/mutations/project-settings";
 import { GET_EMBEDDING_PLATFORMS } from "@/src/services/gql/queries/project-setting";
+import { GET_MODEL_PROVIDER_INFO } from "@/src/services/gql/queries/projects";
+import { ModelsDownloaded } from "@/src/types/components/models-downloaded/models-downloaded";
 import { Attribute } from "@/src/types/components/projects/projectId/settings/data-schema";
 import { EmbeddingPlatform, EmbeddingProps, EmbeddingType, PlatformType, SuggestionsProps } from "@/src/types/components/projects/projectId/settings/embeddings";
 import { DataTypeEnum } from "@/src/types/shared/general";
 import { ModalButton, ModalEnum } from "@/src/types/shared/modal";
+import { postProcessingModelsDownload } from "@/src/util/components/models-downloaded/models-downloaded-helper";
 import { DEFAULT_AZURE_TYPE, GRANULARITY_TYPES_ARRAY, checkIfCreateEmbeddingIsDisabled, platformNamesDict, postProcessingEmbeddingPlatforms } from "@/src/util/components/projects/projectId/settings/embeddings-helper";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
 import { jsonCopy } from "@/submodules/javascript-functions/general";
@@ -16,7 +20,7 @@ import Dropdown from "@/submodules/react-components/components/Dropdown";
 import { useLazyQuery, useMutation } from "@apollo/client";
 import { Tooltip } from "@nextui-org/react";
 import { IconExternalLink } from "@tabler/icons-react";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { use, useCallback, useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
 const ACCEPT_BUTTON = { buttonCaption: 'Add embedding', disabled: false, useButton: true };
@@ -331,10 +335,30 @@ export default function AddNewEmbedding(props: EmbeddingProps) {
 }
 
 function SuggestionsModel(props: SuggestionsProps) {
+    const dispatch = useDispatch();
+
+    const [colorDownloadedModels, setColorDownloadedModels] = useState<boolean[]>([]);
+
+    const [refetchModelsDownload] = useLazyQuery(GET_MODEL_PROVIDER_INFO, { fetchPolicy: 'network-only', nextFetchPolicy: 'cache-first' });
+
+    useEffect(() => {
+        if (!props.options) return;
+        refetchModelsDownload().then((res) => {
+            const modelsDownloaded = postProcessingModelsDownload(res.data['modelProviderInfo']);
+            dispatch(setModelsDownloaded(modelsDownloaded));
+            const colorDownloadedModels = props.options.map((model: any) => {
+                const checkIfModelExists = modelsDownloaded.find((modelDownloaded: ModelsDownloaded) => modelDownloaded.name === model.configString);
+                return checkIfModelExists !== undefined;
+            });
+            setColorDownloadedModels(colorDownloadedModels);
+        });
+    }, [props.options]);
+
     return <><Tooltip content={TOOLTIPS_DICT.PROJECT_SETTINGS.EMBEDDINGS.MODEL} placement="right" color="invert">
         <span className="card-title mb-0 label-text flex"><span className="cursor-help underline filtersUnderline">Model</span></span>
     </Tooltip>
-        <Dropdown options={props.options.map((option: any) => option.configString)} hasSearchBar={true} selectedOption={(option: string) => props.selectedOption(option)} />
+        <Dropdown options={props.options.map((option: any) => option.configString)} hasSearchBar={true} differentTextColor="green" useDifferentTextColor={colorDownloadedModels}
+            selectedOption={(option: string) => props.selectedOption(option)} />
     </>
 }
 
