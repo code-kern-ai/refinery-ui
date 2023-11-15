@@ -104,8 +104,7 @@
   "include": [
     "next-env.d.ts",
     "**/*.ts",
-    "**/*.tsx",
-    "src/types/components/projects/projectId/data-browser",
+    "**/*.tsx"
   ],
   "exclude": [
     "node_modules"

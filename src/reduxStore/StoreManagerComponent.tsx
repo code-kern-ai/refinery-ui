@@ -71,6 +71,7 @@ export function GlobalStoreDataComponent(props: React.PropsWithChildren) {
 
         // Set cache
         refetchZeroShotRecommendations().then((resZeroShot) => {
+            dispatch(setCache(CacheEnum.ZERO_SHOT_RECOMMENDATIONS, JSON.parse(resZeroShot.data['zeroShotRecommendations'])))
             refetchRecommendedEncoders().then((resEncoders) => {
                 dispatch(setCache(CacheEnum.MODELS_LIST, postProcessingZeroShotEncoders(JSON.parse(resZeroShot.data['zeroShotRecommendations']), resEncoders.data['recommendedEncoders'])))
             });

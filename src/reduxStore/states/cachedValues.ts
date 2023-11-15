@@ -4,7 +4,8 @@ import { PayloadAction, createSlice } from "@reduxjs/toolkit";
 
 export enum CacheEnum {
     MODELS_LIST = 'MODELS_LIST',
-    TOKENIZER_VALUES = 'TOKENIZER_VALUES'
+    TOKENIZER_VALUES = 'TOKENIZER_VALUES',
+    ZERO_SHOT_RECOMMENDATIONS = 'ZERO_SHOT_RECOMMENDATIONS',
 }
 
 export type CachedVales = {
@@ -14,6 +15,7 @@ export type CachedVales = {
 const initialState: CachedVales = {
     [CacheEnum.MODELS_LIST]: null,
     [CacheEnum.TOKENIZER_VALUES]: null,
+    [CacheEnum.ZERO_SHOT_RECOMMENDATIONS]: null,
 };
 
 const cacheSlice = createSlice({

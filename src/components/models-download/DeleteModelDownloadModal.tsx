@@ -9,7 +9,7 @@ import { selectModal } from "@/src/reduxStore/states/modal";
 
 const ABORT_BUTTON = { buttonCaption: 'Delete', useButton: true, disabled: false };
 
-export default function DeleteModelDownload() {
+export default function DeleteModelDownloadModal() {
     const dispatch = useDispatch();
 
     const modalDeleteModel = useSelector(selectModal(ModalEnum.DELETE_MODEL_DOWNLOAD));

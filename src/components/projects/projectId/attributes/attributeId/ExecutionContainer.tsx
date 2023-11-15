@@ -1,32 +1,24 @@
 import LoadingIcon from "@/src/components/shared/loading/LoadingIcon";
-import Modal from "@/src/components/shared/modal/Modal";
-import { openModal, selectModal, setModalStates } from "@/src/reduxStore/states/modal";
+import { setModalStates } from "@/src/reduxStore/states/modal";
 import { selectProject } from "@/src/reduxStore/states/project";
 import { CALCULATE_USER_ATTRIBUTE_SAMPLE_RECORDS, GET_RECORD_BY_RECORD_ID } from "@/src/services/gql/queries/project-setting";
 import { ExecutionContainerProps, SampleRecord } from "@/src/types/components/projects/projectId/settings/attribute-calculation";
 import { AttributeState } from "@/src/types/components/projects/projectId/settings/data-schema";
-import { ModalButton, ModalEnum } from "@/src/types/shared/modal";
+import { ModalEnum } from "@/src/types/shared/modal";
 import { postProcessRecordByRecordId } from "@/src/util/components/projects/projectId/settings/attribute-calculation-helper";
 import { jsonCopy } from "@/submodules/javascript-functions/general";
-import { useLazyQuery, useMutation } from "@apollo/client";
+import { useLazyQuery } from "@apollo/client";
 import { Tooltip } from "@nextui-org/react";
-import { useCallback, useEffect, useState } from "react";
+import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import style from '@/src/styles/components/projects/projectId/attribute-calculation.module.css';
-import { DataTypeEnum } from "@/src/types/shared/general";
-import { CALCULATE_USER_ATTRIBUTE_ALL_RECORDS } from "@/src/services/gql/mutations/project-settings";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
-import { RecordDisplay } from "@/src/components/shared/record-display/RecordDisplay";
-
-
-const ACCEPT_BUTTON = { buttonCaption: 'Accept', useButton: true };
+import ConfirmExecutionModal from "./ConfirmExecutionModal";
+import ViewRecordDetailsModal from "./ViewRecordDetailsModal";
 
 export default function ExecutionContainer(props: ExecutionContainerProps) {
     const project = useSelector(selectProject);
     const dispatch = useDispatch();
 
-    const modalExecuteAll = useSelector(selectModal(ModalEnum.EXECUTE_ATTRIBUTE_CALCULATION));
-    const modalViewRecordDetails = useSelector(selectModal(ModalEnum.VIEW_RECORD_DETAILS));
 
     const [requestedSomething, setRequestedSomething] = useState(false);
     const [runOn10HasError, setRunOn10HasError] = useState(false);
@@ -36,18 +28,6 @@ export default function ExecutionContainer(props: ExecutionContainerProps) {
 
     const [refetchSampleRecords] = useLazyQuery(CALCULATE_USER_ATTRIBUTE_SAMPLE_RECORDS, { fetchPolicy: 'no-cache' });
     const [refetchRecordByRecordId] = useLazyQuery(GET_RECORD_BY_RECORD_ID);
-    const [executeAttributeCalculation] = useMutation(CALCULATE_USER_ATTRIBUTE_ALL_RECORDS);
-
-    const calculateUserAttributeAllRecords = useCallback(() => {
-        executeAttributeCalculation({ variables: { projectId: project.id, attributeId: props.currentAttribute.id } }).then((res) => {
-        });
-    }, [modalExecuteAll]);
-
-    useEffect(() => {
-        setAcceptButton({ ...ACCEPT_BUTTON, emitFunction: calculateUserAttributeAllRecords, disabled: requestedSomething });
-    }, [modalExecuteAll]);
-
-    const [acceptButton, setAcceptButton] = useState<ModalButton>(ACCEPT_BUTTON);
 
     function calculateUserAttributeSampleRecords() {
         if (requestedSomething) return;
@@ -95,7 +75,7 @@ export default function ExecutionContainer(props: ExecutionContainerProps) {
                 </Tooltip>
 
                 <Tooltip color="invert" placement="left" content={props.currentAttribute.state == AttributeState.USABLE || props.currentAttribute.state == AttributeState.RUNNING ? 'Attribute is already in use' : requestedSomething ? 'Test is running' : checkIfAtLeastRunning ? 'Another attribute is running' : checkIfAtLeastQueued ? 'Another attribute is queued for execution' : props.tokenizationProgress < 1 ? 'Tokenization is in progress' : runOn10HasError ? 'Run on 10 records has an error' : 'Execute the attribute on all records'}>
-                    <button onClick={() => dispatch(openModal(ModalEnum.EXECUTE_ATTRIBUTE_CALCULATION))}
+                    <button onClick={() => dispatch(setModalStates(ModalEnum.EXECUTE_ATTRIBUTE_CALCULATION, { open: true, requestedSomething: requestedSomething }))}
                         disabled={props.currentAttribute.state == AttributeState.USABLE || props.currentAttribute.state == AttributeState.RUNNING || requestedSomething || checkIfAtLeastRunning || checkIfAtLeastQueued || props.tokenizationProgress < 1 || runOn10HasError}
                         className={`bg-indigo-700 text-white text-xs leading-4 font-semibold px-4 py-2 rounded-md cursor-pointer ml-3 hover:bg-indigo-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 ${props.currentAttribute.state == AttributeState.USABLE || props.currentAttribute.state == AttributeState.RUNNING || requestedSomething || checkIfAtLeastRunning || checkIfAtLeastQueued || props.tokenizationProgress < 1 || runOn10HasError ? 'opacity-50 cursor-not-allowed' : 'opacity-100 cursor-pointer'}`}>
                         Run
@@ -132,34 +112,7 @@ export default function ExecutionContainer(props: ExecutionContainerProps) {
             </div>
         </div >}
 
-        <Modal modalName={ModalEnum.EXECUTE_ATTRIBUTE_CALCULATION} acceptButton={acceptButton}>
-            <h1 className="text-lg text-gray-900 mb-2 text-center">Attribute calculation</h1>
-            <div className="text-sm text-gray-500 my-2">
-                This action calculates the attribute for all records.
-                Be aware that calculated attributes are immutable.
-                If you want to change the attribute calculation afterwards, you need to create a new
-                attribute.
-            </div>
-        </Modal>
-
-        <Modal modalName={ModalEnum.VIEW_RECORD_DETAILS}>
-            <h1 className="text-lg text-gray-900 mb-2 text-center">View details</h1>
-            {modalViewRecordDetails.record ? (
-                <div className={`overflow-y-auto max-height-modal text-sm text-gray-500 my-2 ${style.scrollableSize}`}>
-                    <RecordDisplay record={modalViewRecordDetails.record} />
-                    <div className="text-sm leading-5 text-left text-gray-900 font-bold">Calculated value</div>
-                    <div className="text-sm leading-5 text-left text-gray-500 font-normal">
-                        {props.currentAttribute.dataType != DataTypeEnum.EMBEDDING_LIST ? <span>
-                            {sampleRecords.calculatedAttributes[modalViewRecordDetails.recordIdx]}
-                        </span> : <div className="flex flex-col gap-y-2 divide-y">
-                            {sampleRecords.calculatedAttributesList[modalViewRecordDetails.recordIdx].map((item: string, index: number) => <span key={index} className="mt-1">
-                                {sampleRecords.calculatedAttributesList[modalViewRecordDetails.recordIdx]}
-                            </span>)}
-                        </div>}
-                    </div>
-                </div>
-            ) : (<LoadingIcon />)}
-        </Modal>
-
+        <ViewRecordDetailsModal currentAttribute={props.currentAttribute} sampleRecords={sampleRecords} />
+        <ConfirmExecutionModal currentAttributeId={props.currentAttribute.id} />
     </div >)
 }

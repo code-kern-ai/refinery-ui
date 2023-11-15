@@ -11,7 +11,7 @@ import { removeFromAllProjectsById } from "@/src/reduxStore/states/project";
 const ACCEPT_BUTTON = { buttonCaption: "Delete and never show again", useButton: true };
 const ABORT_BUTTON = { buttonCaption: "Delete", useButton: true };
 
-export default function AdminDeleteProject() {
+export default function AdminDeleteProjectModal() {
     const dispatch = useDispatch();
 
     const isAdmin = useSelector(selectIsAdmin);
@@ -41,14 +41,14 @@ export default function AdminDeleteProject() {
         setAcceptButton({ ...ACCEPT_BUTTON, emitFunction: adminStoreInstantAndDelete });
         setAbortButton({ ...ABORT_BUTTON, emitFunction: adminDeleteProject });
     }, [adminDeleteProject, adminStoreInstantAndDelete]);
-    return (
-        <Modal modalName={ModalEnum.ADMIN_DELETE_PROJECT} acceptButton={acceptButton} abortButton={abortButton}>
-            <div className="flex flex-row items-center justify-center">
-                <span className="text-lg leading-6 text-gray-900 font-medium">
-                    Admin Function - Quick delete
-                </span>
-            </div>
-            Are you sure?<div>This will delete the project and all its data.</div>
-        </Modal>
+
+    return (<Modal modalName={ModalEnum.ADMIN_DELETE_PROJECT} acceptButton={acceptButton} abortButton={abortButton}>
+        <div className="flex flex-row items-center justify-center">
+            <span className="text-lg leading-6 text-gray-900 font-medium">
+                Admin Function - Quick delete
+            </span>
+        </div>
+        Are you sure?<div>This will delete the project and all its data.</div>
+    </Modal>
     )
 }

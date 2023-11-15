@@ -23,3 +23,12 @@ export type Record = {
     category: string;
     projectId: string;
 }
+
+export type ViewRecordDetailsModalProps = {
+    currentAttribute: Attribute;
+    sampleRecords: SampleRecord;
+}
+
+export type ConfirmExecutionModalProps = {
+    currentAttributeId: string;
+}

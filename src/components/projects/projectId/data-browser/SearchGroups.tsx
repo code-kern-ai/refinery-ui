@@ -16,7 +16,6 @@ import { selectActiveSearchParams, selectActiveSlice, selectConfiguration, selec
 import { Tooltip } from "@nextui-org/react";
 import { setModalStates } from "@/src/reduxStore/states/modal";
 import { ModalEnum } from "@/src/types/shared/modal";
-import DataBrowserModals from "./DataBrowserModals";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
 import { DataSliceOperations } from "./DataSliceOperations";
 import { useLazyQuery } from "@apollo/client";
@@ -25,6 +24,7 @@ import { postProcessRecordsExtended } from "@/src/util/components/projects/proje
 import { parseFilterToExtended } from "@/src/util/components/projects/projectId/data-browser/filter-parser-helper";
 import { updateSearchParameters } from "@/src/util/components/projects/projectId/data-browser/search-parameters";
 import { jsonCopy } from "@/submodules/javascript-functions/general";
+import UserInfoModal from "./modals/UserInfoModal";
 
 const GROUP_SORT_ORDER = 0;
 let GLOBAL_SEARCH_GROUP_COUNT = 0;
@@ -462,7 +462,7 @@ export default function SearchGroups() {
                                 </div>))}
                             </div>
                         </div>
-                        <DataBrowserModals />
+                        <UserInfoModal />
                     </div>}
                     {fullSearch[group.key].value.group == SearchGroup.LABELING_TASKS && <div className="flex flex-row items-center mt-4">
                         <div className="flex-grow flex flex-col">

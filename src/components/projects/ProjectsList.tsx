@@ -17,7 +17,7 @@ import style from "@/src/styles/components/projects/projects-list.module.css";
 import { useRouter } from "next/router";
 import { unsubscribeWSOnDestroy } from "@/src/services/base/web-sockets/web-sockets-helper";
 import { postProcessProjectsList } from "@/src/util/components/projects/projects-list-helper";
-import AdminDeleteProject from "./AdminDeleteProject";
+import AdminDeleteProjectModal from "./AdminDeleteProjectModal";
 
 export default function ProjectsList() {
     const router = useRouter();
@@ -221,7 +221,7 @@ export default function ProjectsList() {
                                         <ProjectCard project={project} projectStatisticsById={projectStatisticsById} key={index}></ProjectCard>
                                     ))}
                                 </div>
-                                <AdminDeleteProject />
+                                <AdminDeleteProjectModal />
                             </div>
                         </div>)}
                     </>) : (<></>)}

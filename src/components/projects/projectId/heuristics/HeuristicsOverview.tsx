@@ -2,41 +2,58 @@ import { selectProject } from "@/src/reduxStore/states/project";
 import { useDispatch, useSelector } from "react-redux";
 import style from '@/src/styles/components/projects/projectId/heuristics/heuristics.module.css';
 import { useEffect, useState } from "react";
-import { setLabelingTasksAll } from "@/src/reduxStore/states/pages/settings";
+import { selectEmbeddings, selectUsableNonTextAttributes, setAllAttributes, setAllEmbeddings, setLabelingTasksAll } from "@/src/reduxStore/states/pages/settings";
 import { CurrentPage } from "@/src/types/shared/general";
 import { WebSocketsService } from "@/src/services/base/web-sockets/WebSocketsService";
 import { LabelingTask } from "@/src/types/components/projects/projectId/settings/labeling-tasks";
-import { GET_LABELING_TASKS_BY_PROJECT_ID } from "@/src/services/gql/queries/project-setting";
+import { GET_ATTRIBUTES_BY_PROJECT_ID, GET_EMBEDDING_SCHEMA_BY_PROJECT_ID, GET_LABELING_TASKS_BY_PROJECT_ID } from "@/src/services/gql/queries/project-setting";
 import { useLazyQuery } from "@apollo/client";
 import { postProcessLabelingTasks, postProcessLabelingTasksSchema } from "@/src/util/components/projects/projectId/settings/labeling-tasks-helper";
 import { postProcessHeuristics } from "@/src/util/components/projects/projectId/heuristics/heuristics-helper";
 import { GET_HEURISTICS_OVERVIEW_DATA } from "@/src/services/gql/queries/heuristics";
 import { selectHeuristicsAll, setAllHeuristics } from "@/src/reduxStore/states/pages/heuristics";
 import GridCards from "@/src/components/shared/grid-cards/GridCards";
-import HeuristicsCreationModals from "./HeuristicsCreationModals";
 import HeuristicsHeader from "./HeuristicsHeader";
+import { postProcessingAttributes } from "@/src/util/components/projects/projectId/settings/data-schema-helper";
+import AddLabelingFunctionModal from "./AddLabelingFunctionModal";
+import AddActiveLeanerModal from "./AddActiveLearnerModal";
+import AddZeroShotModal from "./AddZeroShotModal";
+import AddCrowdLabelerModal from "./AddCrowdLabelerModal";
+import { postProcessingEmbeddings } from "@/src/util/components/projects/projectId/settings/embeddings-helper";
 
 export function HeuristicsOverview() {
     const dispatch = useDispatch();
 
     const project = useSelector(selectProject);
     const heuristics = useSelector(selectHeuristicsAll);
+    const embeddings = useSelector(selectEmbeddings);
+    const attributes = useSelector(selectUsableNonTextAttributes);
 
     const [filteredList, setFilteredList] = useState([]);
 
     const [refetchLabelingTasksByProjectId] = useLazyQuery(GET_LABELING_TASKS_BY_PROJECT_ID, { fetchPolicy: "network-only" });
     const [refetchHeuristics] = useLazyQuery(GET_HEURISTICS_OVERVIEW_DATA, { fetchPolicy: "network-only" });
+    const [refetchEmbeddings] = useLazyQuery(GET_EMBEDDING_SCHEMA_BY_PROJECT_ID, { fetchPolicy: "no-cache" });
+    const [refetchAttributes] = useLazyQuery(GET_ATTRIBUTES_BY_PROJECT_ID, { fetchPolicy: "network-only" });
 
     useEffect(() => {
         if (!project) return;
         refetchLabelingTasksAndProcess();
         refetchHeuristicsAndProcess();
+        if (embeddings.length == 0) {
+            refetchEmbeddingsAndProcess();
+        }
+        if (attributes.length == 0) {
+            refetchAttributes({ variables: { projectId: project.id, stateFilter: ['ALL'] } }).then((res) => {
+                dispatch(setAllAttributes(postProcessingAttributes(res.data['attributesByProjectId'])));
+            });
+        }
         WebSocketsService.subscribeToNotification(CurrentPage.HEURISTICS, {
             projectId: project.id,
-            whitelist: ['labeling_task_updated', 'labeling_task_created', 'labeling_task_deleted', 'information_source_created', 'information_source_updated', 'information_source_deleted', 'payload_finished', 'payload_failed', 'payload_created', 'payload_update_statistics'],
+            whitelist: ['labeling_task_updated', 'labeling_task_created', 'labeling_task_deleted', 'information_source_created', 'information_source_updated', 'information_source_deleted', 'payload_finished', 'payload_failed', 'payload_created', 'payload_update_statistics', 'embedding_deleted'],
             func: handleWebsocketNotification
         });
-    }, [project]);
+    }, [project, embeddings, attributes]);
 
     function refetchLabelingTasksAndProcess() {
         refetchLabelingTasksByProjectId({ variables: { projectId: project.id } }).then((res) => {
@@ -53,16 +70,23 @@ export function HeuristicsOverview() {
         });
     }
 
+    function refetchEmbeddingsAndProcess() {
+        refetchEmbeddings({ variables: { projectId: project.id } }).then((res) => {
+            const embeddingsFinal = postProcessingEmbeddings(res.data['projectByProjectId']['embeddings']['edges'].map((e) => e['node']), []);
+            dispatch(setAllEmbeddings(embeddingsFinal));
+        });
+    }
+
     function handleWebsocketNotification(msgParts: string[]) {
         if (['labeling_task_updated', 'labeling_task_created'].includes(msgParts[1])) {
             refetchLabelingTasksAndProcess();
-        }
-        if ('labeling_task_deleted' == msgParts[1]) {
+        } else if ('labeling_task_deleted' == msgParts[1]) {
             refetchLabelingTasksAndProcess();
             refetchHeuristicsAndProcess();
-        }
-        if (['information_source_created', 'information_source_updated', 'information_source_deleted', 'payload_finished', 'payload_failed', 'payload_created', 'payload_update_statistics', 'weak_supervision_started', 'weak_supervision_finished']) {
+        } else if (['information_source_created', 'information_source_updated', 'information_source_deleted', 'payload_finished', 'payload_failed', 'payload_created', 'payload_update_statistics', 'weak_supervision_started', 'weak_supervision_finished']) {
             refetchHeuristicsAndProcess();
+        } else if (msgParts[1] == 'embedding_deleted' || (msgParts[1] == 'embedding' && msgParts[3] == 'state')) {
+            refetchEmbeddingsAndProcess();
         }
     }
 
@@ -141,7 +165,10 @@ export function HeuristicsOverview() {
                 </div>
             </>)}
 
-            <HeuristicsCreationModals />
+            <AddLabelingFunctionModal />
+            <AddActiveLeanerModal />
+            <AddZeroShotModal />
+            <AddCrowdLabelerModal />
         </div >
     </div >)
 }

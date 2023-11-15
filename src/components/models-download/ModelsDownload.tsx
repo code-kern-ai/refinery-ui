@@ -17,8 +17,8 @@ import { CurrentPage } from "@/src/types/shared/general";
 import { timer } from "rxjs";
 import { unsubscribeWSOnDestroy } from "@/src/services/base/web-sockets/web-sockets-helper";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
-import AddModelDownload from "./AddModelDownload";
-import DeleteModelDownload from "./DeleteModelDownload";
+import AddModelDownloadModal from "./AddModelDownloadModal";
+import DeleteModelDownloadModal from "./DeleteModelDownloadModal";
 
 export default function ModelsDownload() {
     const router = useRouter();
@@ -163,7 +163,7 @@ export default function ModelsDownload() {
                 </div>
             </div>
         </div>
-        <AddModelDownload />
-        <DeleteModelDownload />
+        <AddModelDownloadModal />
+        <DeleteModelDownloadModal />
     </div>);
 }

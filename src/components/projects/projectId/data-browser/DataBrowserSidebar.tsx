@@ -14,7 +14,8 @@ import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { timer } from 'rxjs';
 import SearchGroups from './SearchGroups';
-import DataBrowserModals from './DataBrowserModals';
+import DeleteSliceModal from './modals/DeleteSliceModal';
+import DataSliceInfoModal from './modals/DataSliceInfoModal';
 
 export default function DataBrowserSidebar() {
     const dispatch = useDispatch();
@@ -115,6 +116,7 @@ export default function DataBrowserSidebar() {
                 <SearchGroups />
             </div>}
         </div>
-        <DataBrowserModals />
+        <DeleteSliceModal />
+        <DataSliceInfoModal />
     </div >)
 }

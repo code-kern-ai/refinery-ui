@@ -103,7 +103,8 @@ const initialState: Modals = {
         taskId: '',
     },
     [ModalEnum.EXECUTE_ATTRIBUTE_CALCULATION]: {
-        open: false
+        open: false,
+        requestedSomething: false,
     },
     [ModalEnum.DELETE_ELEMENT]: {
         open: false,

@@ -15,7 +15,7 @@ import { CacheEnum, selectCachedValue } from "@/src/reduxStore/states/cachedValu
 
 const ACCEPT_BUTTON = { buttonCaption: 'Accept', useButton: true };
 
-export default function AddModelDownload() {
+export default function AddModelDownloadModal() {
     const dispatch = useDispatch();
 
     const modalAddModel = useSelector(selectModal(ModalEnum.ADD_MODEL_DOWNLOAD));

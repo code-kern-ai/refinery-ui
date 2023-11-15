@@ -151,63 +151,62 @@ export default function SimilaritySearchModal() {
         setFilterAttributesForm(form);
     }
 
-    return (
-        <Modal modalName={ModalEnum.SIMILARITY_SEARCH} acceptButton={acceptButton} secondAcceptButton={secondAcceptButton}>
-            <div className="flex flex-grow justify-center text-lg leading-6 text-gray-900 font-medium">Select embedding for similarity search </div>
-            {activeSearchParams.length > 0 || similaritySearch.recordsInDisplay && <div className="text-red-500 mb-2 flex flex-grow justify-center text-sm">Warning: your current filter selection will be removed!</div>}
+    return (<Modal modalName={ModalEnum.SIMILARITY_SEARCH} acceptButton={acceptButton} secondAcceptButton={secondAcceptButton}>
+        <div className="flex flex-grow justify-center text-lg leading-6 text-gray-900 font-medium">Select embedding for similarity search </div>
+        {activeSearchParams.length > 0 || similaritySearch.recordsInDisplay && <div className="text-red-500 mb-2 flex flex-grow justify-center text-sm">Warning: your current filter selection will be removed!</div>}
 
-            <Dropdown options={embeddings} buttonName={selectedEmbedding ?? 'Select embedding'} selectedOption={(value) => setSelectedEmbedding(value)} dropdownClasses="my-2" />
-            {filterAttributesSS && filterAttributesSS.length > 0 && <div className="flex flex-col justify-start mt-4">
-                <div className="pr-2 bg-white text-md font-medium text-gray-900">Filter attributes</div>
-                <div className="text-sm text-gray-400">You can filter similarity search based on the attributes selected when
-                    creating the embedding</div>
-            </div>}
+        <Dropdown options={embeddings} buttonName={selectedEmbedding ?? 'Select embedding'} selectedOption={(value) => setSelectedEmbedding(value)} dropdownClasses="my-2" />
+        {filterAttributesSS && filterAttributesSS.length > 0 && <div className="flex flex-col justify-start mt-4">
+            <div className="pr-2 bg-white text-md font-medium text-gray-900">Filter attributes</div>
+            <div className="text-sm text-gray-400">You can filter similarity search based on the attributes selected when
+                creating the embedding</div>
+        </div>}
 
-            <div className="contents mx-2">
-                {filterAttributesForm && filterAttributesForm.map((form, index) => (<div key={index} className="contents mx-2">
-                    <div className="flex flex-row items-center rounded-md hover:bg-gray-50 my-2">
-                        <div className="flex flex-col">
-                            {filterAttributesForm.length > 1 &&
-                                <div onClick={() => removeFilterAttributesSS(index)}
-                                    className="mt-2 cursor-pointer flex justify-center hover:border-transparent hover:bg-transparent border-transparent bg-transparent px-0">
-                                    <IconTrash className="text-gray-900 cursor-pointer h-4 w-4" />
-                                </div>}
-                        </div>
-                        <div className="flex-grow mr-2.5 flex flex-col  mt-2 ">
-                            <div className="flex-grow flex flex-row flex-wrap gap-1">
-                                <div style={{ width: '50%' }}>
-                                    <Dropdown options={filterAttributesSS} buttonName={form.name}
-                                        selectedOption={(option: string) => setFilterDropdownVal(option, index, 'name')} />
-                                </div>
-                                <div style={{ width: '49%' }}>
-                                    <Dropdown options={operatorsDict[form.name]} buttonName={form.operator} tooltipsArray={tooltipsDict[form.operator]} tooltipArrayPlacement="left"
-                                        selectedOption={(option: string) => setFilterDropdownVal(option, index, 'operator')} />
-                                </div>
+        <div className="contents mx-2">
+            {filterAttributesForm && filterAttributesForm.map((form, index) => (<div key={index} className="contents mx-2">
+                <div className="flex flex-row items-center rounded-md hover:bg-gray-50 my-2">
+                    <div className="flex flex-col">
+                        {filterAttributesForm.length > 1 &&
+                            <div onClick={() => removeFilterAttributesSS(index)}
+                                className="mt-2 cursor-pointer flex justify-center hover:border-transparent hover:bg-transparent border-transparent bg-transparent px-0">
+                                <IconTrash className="text-gray-900 cursor-pointer h-4 w-4" />
+                            </div>}
+                    </div>
+                    <div className="flex-grow mr-2.5 flex flex-col  mt-2 ">
+                        <div className="flex-grow flex flex-row flex-wrap gap-1">
+                            <div style={{ width: '50%' }}>
+                                <Dropdown options={filterAttributesSS} buttonName={form.name}
+                                    selectedOption={(option: string) => setFilterDropdownVal(option, index, 'name')} />
                             </div>
-                            {/* TODO: Add check for unique values */}
-                            <div className="my-2 flex-grow flex flex-row items-center">
-                                {form.operator != '' && <input placeholder={form.addText}
-                                    onChange={(e) => setFilterDropdownVal(e.target.value, index, 'searchValue')}
-                                    onKeyDown={(e) => checkIfDecimals(e, index, form)}
-                                    className="h-8 w-full border-gray-300 rounded-md placeholder-italic border text-gray-900 pl-4 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100" />}
-                                {form.operator == SearchOperator.BETWEEN && <span className="text-sm text-gray-500 mx-1">AND</span>}
-                                {form.operator == SearchOperator.BETWEEN && <input placeholder={form.addText}
-                                    onChange={(e) => setFilterDropdownVal(e.target.value, index, 'searchValueBetween')}
-                                    onKeyDown={(e) => checkIfDecimals(e, index, form)}
-                                    className="h-8 w-full border-gray-300 rounded-md placeholder-italic border text-gray-900 pl-4 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100" />}
+                            <div style={{ width: '49%' }}>
+                                <Dropdown options={operatorsDict[form.name]} buttonName={form.operator} tooltipsArray={tooltipsDict[form.operator]} tooltipArrayPlacement="left"
+                                    selectedOption={(option: string) => setFilterDropdownVal(option, index, 'operator')} />
                             </div>
                         </div>
+                        {/* TODO: Add check for unique values */}
+                        <div className="my-2 flex-grow flex flex-row items-center">
+                            {form.operator != '' && <input placeholder={form.addText}
+                                onChange={(e) => setFilterDropdownVal(e.target.value, index, 'searchValue')}
+                                onKeyDown={(e) => checkIfDecimals(e, index, form)}
+                                className="h-8 w-full border-gray-300 rounded-md placeholder-italic border text-gray-900 pl-4 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100" />}
+                            {form.operator == SearchOperator.BETWEEN && <span className="text-sm text-gray-500 mx-1">AND</span>}
+                            {form.operator == SearchOperator.BETWEEN && <input placeholder={form.addText}
+                                onChange={(e) => setFilterDropdownVal(e.target.value, index, 'searchValueBetween')}
+                                onKeyDown={(e) => checkIfDecimals(e, index, form)}
+                                className="h-8 w-full border-gray-300 rounded-md placeholder-italic border text-gray-900 pl-4 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100" />}
+                        </div>
                     </div>
-                    <div className="w-full flex justify-center">
-                        {index == filterAttributesForm.length - 1 &&
-                            <span onClick={() => addFilterAttributesSS()}
-                                className="bg-gray-100 text-gray-800 cursor-pointer p-1 rounded-md hover:bg-gray-300">
-                                <IconPlus className="cursor-pointer" />
-                            </span>}
-                    </div>
-                </div>))}
-            </div>
+                </div>
+                <div className="w-full flex justify-center">
+                    {index == filterAttributesForm.length - 1 &&
+                        <span onClick={() => addFilterAttributesSS()}
+                            className="bg-gray-100 text-gray-800 cursor-pointer p-1 rounded-md hover:bg-gray-300">
+                            <IconPlus className="cursor-pointer" />
+                        </span>}
+                </div>
+            </div>))}
+        </div>
 
-        </Modal>
+    </Modal>
     )
 }

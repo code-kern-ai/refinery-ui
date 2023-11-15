@@ -12,7 +12,8 @@ import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
 import { Tooltip } from "@nextui-org/react";
 import { IconAngle, IconArrowRight, IconEdit, IconNotes } from "@tabler/icons-react";
 import { useDispatch, useSelector } from "react-redux";
-import SimilaritySearchModal from "./SimilaritySeachModal";
+import SimilaritySearchModal from "./modals/SimilaritySeachModal";
+import RecordCommentsModal from "./modals/RecordCommentsModal";
 
 export default function RecordList(props: RecordListProps) {
     const dispatch = useDispatch();
@@ -66,5 +67,6 @@ export default function RecordList(props: RecordListProps) {
         </div >))
         }
         <SimilaritySearchModal />
+        <RecordCommentsModal />
     </>);
 }

@@ -7,12 +7,12 @@ import { Slice } from '@/submodules/javascript-functions/enums/enums';
 import { Tooltip } from '@nextui-org/react';
 import { IconAdjustments, IconChartCircles, IconFilter, IconFilterOff, IconTriangleFilled } from '@tabler/icons-react';
 import { useDispatch, useSelector } from 'react-redux';
-import DataBrowserModals from './DataBrowserModals';
 import LoadingIcon from '@/src/components/shared/loading/LoadingIcon';
 import { selectAttributes } from '@/src/reduxStore/states/pages/settings';
 import RecordList from './RecordList';
 import { useRouter } from 'next/router';
 import { selectProject } from '@/src/reduxStore/states/project';
+import ConfigurationModal from './modals/ConfigurationModal';
 
 export default function DataBrowserRecords() {
     const dispatch = useDispatch();
@@ -106,6 +106,6 @@ export default function DataBrowserRecords() {
                     recordClicked={(index) => storePreliminaryRecordIds(index)} />
             </div>}
         </div>
-        <DataBrowserModals />
+        <ConfigurationModal />
     </div >)
 }
