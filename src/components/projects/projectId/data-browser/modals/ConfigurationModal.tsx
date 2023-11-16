@@ -39,6 +39,18 @@ export default function ConfigurationModal() {
         }
     }
 
+    function toggleSeparator() {
+        if (configuration.separator === ',') {
+            dispatch(updateConfigurationState('separator', '-'));
+            dispatch(setModalStates(ModalEnum.CONFIGURATION, { open: true }));
+
+        } else {
+            dispatch(updateConfigurationState('separator', ','));
+            dispatch(setModalStates(ModalEnum.CONFIGURATION, { open: true }));
+
+        }
+    }
+
     return (<Modal modalName={ModalEnum.CONFIGURATION}>
         <div className="flex flex-grow justify-center text-lg leading-6 text-gray-900 font-medium">View configuration </div>
         <div className="mb-2 flex flex-grow justify-center text-sm">Change the content that is displayed in the browser.</div>
@@ -95,6 +107,17 @@ export default function ConfigurationModal() {
                     </div>
                 </div>}
             </fieldset>
+            <div className="mt-3 text-sm text-gray-900 text-left">Select which separator you want to use for the IN operator</div>
+            <div className="flex flex-row items-start mt-2 text-left">
+                <input type="radio" checked={configuration.separator == ','} onChange={toggleSeparator} name="comma" id="comma"
+                    className="focus:ring-blue-500 h-6 w-4 text-blue-600 border-gray-200 cursor-pointer" />
+                <label htmlFor="comma" className="ml-1 block text-sm font-medium text-gray-700 cursor-pointer">Comma(,)</label>
+            </div>
+            <div className="flex flex-row items-start mt-2 text-left">
+                <input type="radio" checked={configuration.separator == '-'} onChange={toggleSeparator} name="dash" id="dash"
+                    className="focus:ring-blue-500 h-6 w-4 text-blue-600 border-gray-200 cursor-pointer" />
+                <label htmlFor="dash" className="ml-1 block text-sm font-medium text-gray-700 cursor-pointer">Dash(-)</label>
+            </div>
         </div >
     </Modal >
     )

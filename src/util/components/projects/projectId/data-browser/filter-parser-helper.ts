@@ -17,11 +17,11 @@ export function parseFilterToExtended(activeSearchParams, attributes: Attribute[
             attributeFilter = buildFilterElementAttribute(first, searchElement, attributes, configuration);
             if (attributeFilter) toReturn.push(JSON.stringify(attributeFilter));
         } else if (searchElement.values.group == SearchGroup.LABELING_TASKS) {
-            toReturn.push(appendBlackAndWhiteListLabelingTask(toReturn, searchElement, labelingTasks));
+            appendBlackAndWhiteListLabelingTask(toReturn, searchElement.values, labelingTasks)
         } else if (searchElement.values.group == SearchGroup.USER_FILTER) {
             toReturn.push(appendBlackAndWhiteListUser(toReturn, searchElement));
         } else if (searchElement.values.group == SearchGroup.ORDER_STATEMENTS) {
-            orderBy.ORDER_BY = appendActiveOrderBy(searchElement.values, orderBy);
+            orderBy.ORDER_BY = appendActiveOrderBy(searchElement.values.orderBy, orderBy);
             if (orderBy.ORDER_BY.length > 0) {
                 toReturn.push(JSON.stringify(orderBy));
             }
@@ -96,12 +96,12 @@ function buildFilterElementAttribute(first: boolean, searchElement: any, attribu
 }
 
 function appendBlackAndWhiteListLabelingTask(appendTo, searchElement, labelingTasks: LabelingTask[]) {
-    const drillDown: boolean = true;
+    const drillDown: boolean = false;
     const labelingTask = labelingTasks.find(l => l.id == searchElement.values.taskId);
-    appendBlackAndWhiteListLabelingTaskForArray(appendTo, searchElement.values.manualLabels, LabelSource.MANUAL, drillDown);
+    appendTo.push(appendBlackAndWhiteListLabelingTaskForArray(appendTo, searchElement.values.manualLabels, LabelSource.MANUAL, drillDown));
     appendBlackAndWhiteListLabelingTaskForArray(appendTo, searchElement.values.weakSupervisionLabels, LabelSource.WEAK_SUPERVISION, drillDown);
     appendBlackAndWhiteListLabelingTaskForArray(appendTo, searchElement.values.modelCallbackLabels, LabelSource.MODEL_CALLBACK, drillDown);
-    appendBlackAndWhiteListLabelingTaskForArray(appendTo, searchElement.values.informationSources, LabelSource.INFORMATION_SOURCE, drillDown);
+    appendBlackAndWhiteListLabelingTaskForArray(appendTo, searchElement.values.heuristics, LabelSource.INFORMATION_SOURCE, drillDown);
     appendBlackAndWhiteListLabelingTaskForConfidence(appendTo, searchElement.values.weakSupervisionConfidence, labelingTask.labels.map(l => l.id), true);
     appendBlackAndWhiteListLabelingTaskForConfidence(appendTo, searchElement.values.modelCallbackConfidence, labelingTask.labels.map(l => l.id), false);
 
@@ -114,7 +114,7 @@ function appendBlackAndWhiteListLabelingTask(appendTo, searchElement, labelingTa
                 VALUES: [isMixed.taskId],
             }],
         };
-        appendTo.push(JSON.stringify(whitelist));
+        return JSON.stringify(whitelist);
     }
     return appendTo;
 }
@@ -158,7 +158,6 @@ function appendBlackAndWhiteListLabelingTaskForArray(
             }
         }
     }
-
     if (inValues.length != 0) {
         whitelist.SUBQUERIES.push({
             QUERY_TEMPLATE: forLabel
@@ -186,10 +185,11 @@ function appendBlackAndWhiteListLabelingTaskForArray(
             VALUES: values,
         });
     }
+
     if (whitelist.SUBQUERIES.length > 0)
-        appendTo.push(JSON.stringify(whitelist));
+        return JSON.stringify(whitelist);
     if (blacklist.SUBQUERIES.length > 0)
-        appendTo.push(JSON.stringify(blacklist));
+        return JSON.stringify(blacklist);
     return appendTo;
 }
 
@@ -222,8 +222,7 @@ function appendBlackAndWhiteListLabelingTaskForConfidence(
         VALUES: [confidence.lower * 0.01, confidence.upper * 0.01],
     });
 
-    appendTo.push(JSON.stringify(list));
-    return appendTo;
+    return JSON.stringify(list);
 }
 
 function appendBlackAndWhiteListUser(appendTo, searchElement) {
@@ -272,7 +271,6 @@ function appendBlackAndWhiteListUserForArray(
             VALUES: notInValues,
         });
     }
-
     if (whitelist.SUBQUERIES.length > 0)
         return JSON.stringify(whitelist);
     if (blacklist.SUBQUERIES.length > 0)
@@ -297,7 +295,7 @@ function appendActiveOrderBy(values, orderBy) {
 
         }
     }
-    return orderBy;
+    return orderBy.ORDER_BY;
 }
 
 function appendBlackAndWhiteListComments(appendTo: string[], searchElement: any, user): any {

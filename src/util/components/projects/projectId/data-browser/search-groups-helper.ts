@@ -168,7 +168,7 @@ export function labelingTasksCreateSearchGroup(item, task: LabelingTask, globalS
         type: item.type,
         taskTarget: task.taskTarget == LabelingTaskTarget.ON_ATTRIBUTE ? task.attribute.name : 'Full Record',
         taskId: task.id,
-        active: true,
+        active: false,
         manualLabels: labelingTaskLabelArray(task),
         weakSupervisionLabels: labelingTaskLabelArray(task),
         modelCallbackLabels: labelingTaskLabelArray(task),

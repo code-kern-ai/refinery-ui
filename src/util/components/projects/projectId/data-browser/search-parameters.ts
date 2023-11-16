@@ -5,29 +5,40 @@ import { SearchGroup, StaticOrderByKeys } from "@/submodules/javascript-function
 import { getOrderByDisplayName } from "@/submodules/javascript-functions/enums/enum-functions";
 import { HighlightSearch } from "@/src/types/shared/highlight";
 
-export function updateSearchParameters(searchElement, attributes, separator, searchGroup) {
+export function updateSearchParameters(searchElement, attributes, separator, fullSearch) {
     const activeParams = [];
     searchElement.forEach(p => {
         let param = null;
-        if (p.value.key == SearchGroup.ATTRIBUTES) {
+        if (p.value.group == SearchGroup.ATTRIBUTES) {
             for (let i of p.groupElements) {
                 if (!i.active) return;
-                param = createSplittedText(updateSearchParamText(i, attributes, separator), searchGroup, p);
+                param = createSplittedText(updateSearchParamText(i, attributes, separator), fullSearch, p);
                 activeParams.push({ splittedText: param, values: i })
             }
-        } else if (p.value.key == SearchGroup.COMMENTS) {
+        } else if (p.value.group == SearchGroup.COMMENTS) {
             if (!p.groupElements.hasComments.active) return;
-            param = createSplittedText(updateSearchParamText(p, attributes, separator), searchGroup, p);
+            param = createSplittedText(updateSearchParamText(p, attributes, separator), fullSearch, p);
             activeParams.push({ splittedText: param, values: p.groupElements });
         } else if (p.value.key == SearchGroup.USER_FILTER) {
             for (let i of p.groupElements.users) {
                 if (!i.active) return;
-                param = createSplittedText(updateSearchParamText(p, attributes, separator), searchGroup, p);
+                param = createSplittedText(updateSearchParamText(p, attributes, separator), fullSearch, p);
                 activeParams.push({ splittedText: param, values: { group: p.value.group }, users: p.groupElements.users });
             }
+        } else if (p.value.group == SearchGroup.ORDER_STATEMENTS) {
+            for (let i of p.groupElements.orderBy) {
+                if (!i.active) continue;
+                param = createSplittedText(updateSearchParamText(p, attributes, separator), fullSearch, p);
+                activeParams.push({ splittedText: param, values: { group: p.value.group, orderBy: p.groupElements } });
+            }
+        }
+        else if (p.value.group == SearchGroup.LABELING_TASKS) {
+            if (!p.groupElements.active) return;
+            param = createSplittedText(updateSearchParamText(p, attributes, separator, fullSearch[p.value.key].nameAdd), fullSearch, p);
+            activeParams.push({ splittedText: param, values: { group: p.value.group, values: p.groupElements } });
         }
     });
-    return activeParams.filter(i => i);
+    return activeParams;
 }
 
 function createSplittedText(i, searchGroup, p) {
@@ -43,7 +54,7 @@ function createSplittedText(i, searchGroup, p) {
 }
 
 
-function updateSearchParamText(searchElement, attributes, separator) {
+function updateSearchParamText(searchElement, attributes, separator, nameAdd?) {
     if (searchElement.type == SearchItemType.ATTRIBUTE) {
         const attributeType = getAttributeType(attributes, searchElement.name);
         if (searchElement.operator == SearchOperator.BETWEEN) {
@@ -102,13 +113,13 @@ function updateSearchParamText(searchElement, attributes, separator) {
             searchElement.searchText = 'NOT (' + searchElement.searchText + ')';
         if (separator == "-")
             searchElement.searchText = searchElement.searchText.replaceAll("-", ",");
-    } else if (searchElement.value.key == SearchItemType.LABELING_TASK) {
-        searchElement.searchText = labelingTaskBuildSearchParamText(searchElement.values);
-    } else if (searchElement.value.key == SearchGroup.USER_FILTER) {
+    } else if (searchElement.value.group == SearchGroup.LABELING_TASKS) {
+        searchElement.searchText = nameAdd + labelingTaskBuildSearchParamText(searchElement.groupElements);
+    } else if (searchElement.value.group == SearchGroup.USER_FILTER) {
         searchElement.searchText = userBuildSearchParamText(searchElement.groupElements.users);
-    } else if (searchElement.value.key == SearchItemType.ORDER_BY) {
-        searchElement.searchText = orderByBuildSearchParamText(searchElement.values);
-    } else if (searchElement.value.key == SearchItemType.COMMENTS) {
+    } else if (searchElement.value.group == SearchGroup.ORDER_STATEMENTS) {
+        searchElement.searchText = orderByBuildSearchParamText(searchElement.groupElements);
+    } else if (searchElement.value.group == SearchGroup.COMMENTS) {
         searchElement.searchText = commentsBuildSearchParamText(searchElement.groupElements);
     }
     return searchElement;
@@ -126,7 +137,7 @@ function labelingTaskBuildSearchParamText(values): string {
     tmp = labelingTaskBuildSearchParamTextPart(values.modelCallbackLabels, 'MC-label');
     if (tmp) text += (text ? '\nAND ' : '') + ' (' + tmp + ')';
 
-    tmp = labelingTaskBuildSearchParamTextPart(values.informationSources, 'IS');
+    tmp = labelingTaskBuildSearchParamTextPart(values.heuristics, 'IS');
     if (tmp) text += (text ? '\nAND ' : '') + ' (' + tmp + ')';
 
     if (values.isWithDifferentResults.active) {
@@ -146,7 +157,6 @@ function labelingTaskBuildSearchParamText(values): string {
     if (values.negate) text = '\nNOT (' + text + ')';
     else text = '\n' + text;
     return text;
-    // return this.searchGroups.get(values.groupKey).nameAdd + ':' + text;
 }
 
 function labelingTaskBuildSearchParamTextPart(arr: any[], blockname: string): string {

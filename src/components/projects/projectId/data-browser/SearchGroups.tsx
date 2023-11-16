@@ -281,6 +281,7 @@ export default function SearchGroups(props: DataBrowserSideBarProps) {
         const fullSearchCopy = { ...fullSearch };
         fullSearchCopy[groupKey].groupElements.splice(index, 1);
         setFullSearch(fullSearchCopy);
+        updateSearchParams(fullSearchCopy);
     }
 
     function addSearchGroupItem(groupItem, groupKey) {
@@ -288,6 +289,7 @@ export default function SearchGroups(props: DataBrowserSideBarProps) {
         let item = getBasicSearchItem(groupItem['type'], groupItem['groupKey']);
         fullSearchCopy[groupKey].groupElements.push(attributeCreateSearchGroup(item, ++GLOBAL_SEARCH_GROUP_COUNT));
         setFullSearch(fullSearchCopy);
+        updateSearchParams(fullSearchCopy);
     }
 
     function selectValueDropdown(value: string, i: number, field: string, key: any) {
@@ -320,17 +322,20 @@ export default function SearchGroups(props: DataBrowserSideBarProps) {
     }
 
     function updateLabelsFullSearch(labels: string[], groupKey: string, labelsKey: string) {
-        const fullSearchCopy = { ...fullSearch };
+        const fullSearchCopy = jsonCopy(fullSearch);
         for (let label of labels) {
             const labelsInTask = fullSearchCopy[groupKey].groupElements[labelsKey];
             const findLabel = labelsInTask.find((el) => el.name == label);
             findLabel.active = !findLabel.active;
         }
+        fullSearchCopy[groupKey].groupElements.active = true;
+        fullSearchCopy[groupKey].nameAdd = labelingTasks.find((el) => el.id == groupKey.split('_')[2]).name;
         setFullSearch(fullSearchCopy);
+        updateSearchParams(fullSearchCopy);
     }
 
     function changeConfidence(event: any, type: string, key: string, groupKey: string) {
-        const fullSearchCopy = { ...fullSearch };
+        const fullSearchCopy = jsonCopy(fullSearch);
         const group = fullSearchCopy[key].groupElements[groupKey];
         let lower = group['lower'];
         let upper = group['upper'];
@@ -347,25 +352,28 @@ export default function SearchGroups(props: DataBrowserSideBarProps) {
         }
         group['active'] = !group['active'];
         setFullSearch(fullSearchCopy);
+        updateSearchParams(fullSearchCopy);
     }
 
     function clearConfidence(group) {
-        const fullSearchCopy = { ...fullSearch };
+        const fullSearchCopy = jsonCopy(fullSearch);
         group['lower'] = 0;
         group['upper'] = 100;
         group['active'] = false;
         setFullSearch(fullSearchCopy);
+        updateSearchParams(fullSearchCopy);
     }
 
     function updateIsDifferent(groupKey: string, group: any) {
-        const fullSearchCopy = { ...fullSearch };
+        const fullSearchCopy = jsonCopy(fullSearch);
         fullSearchCopy[groupKey].groupElements['isWithDifferentResults'].active = !fullSearchCopy[groupKey].groupElements['isWithDifferentResults'].active
         fullSearchCopy[groupKey].groupElements['isWithDifferentResults'].color = getActiveNegateGroupColor(fullSearchCopy[groupKey].groupElements['isWithDifferentResults']);
         setFullSearch(fullSearchCopy);
+        updateSearchParams(fullSearchCopy);
     }
 
     function setSortFormControl(index, group) {
-        const fullSearchCopy = { ...fullSearch };
+        const fullSearchCopy = jsonCopy(fullSearch);
         const formControlsIdx = fullSearchCopy[group.key].groupElements['orderBy'][index];
         if (formControlsIdx['active'] && formControlsIdx['direction'] == -1) {
             formControlsIdx['direction'] = 1;
@@ -376,19 +384,22 @@ export default function SearchGroups(props: DataBrowserSideBarProps) {
             formControlsIdx['active'] = true;
         }
         setFullSearch(fullSearchCopy);
+        updateSearchParams(fullSearchCopy);
     }
 
     function setRandomSeedGroup(value?: string) {
-        const fullSearchCopy = { ...fullSearch };
+        const fullSearchCopy = jsonCopy(fullSearch);
         const formControlsIdx = fullSearchCopy[SearchGroup.ORDER_STATEMENTS].groupElements['orderBy'].find((el) => el['orderByKey'] == StaticOrderByKeys.RANDOM);
         formControlsIdx['seedString'] = value ?? generateRandomSeed();
         setFullSearch(fullSearchCopy);
+        updateSearchParams(fullSearchCopy);
     }
 
     function handleDrillDown(value: boolean) {
-        const fullSearchCopy = { ...fullSearch };
+        const fullSearchCopy = jsonCopy(fullSearch);
         fullSearchCopy[SearchGroup.DRILL_DOWN].value = value;
         setFullSearch(fullSearchCopy);
+        updateSearchParams(fullSearchCopy);
     }
 
     function updateSearchParams(fullSearchCopy) {
