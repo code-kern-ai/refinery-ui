@@ -85,10 +85,10 @@ export default function DataSchema(props: DataSchemaProps) {
                                         <span>Primary Key</span>
                                         <div className="inline-block w-4 h-3.5">
                                             {props.pKeyValid != null && <>
-                                                {props.pKeyValid ? <Tooltip content={TOOLTIPS_DICT.PROJECT_SETTINGS.DATA_SCHEMA.UNIQUE_COMBINATION} color="invert" placement="bottom">
+                                                {props.pKeyValid ? <Tooltip content={TOOLTIPS_DICT.PROJECT_SETTINGS.DATA_SCHEMA.UNIQUE_COMBINATION} color="invert" placement="bottom" className="cursor-auto">
                                                     <IconCheck className="h-5 w-5 -mt-1" />
                                                 </Tooltip> :
-                                                    <Tooltip content={TOOLTIPS_DICT.PROJECT_SETTINGS.DATA_SCHEMA.NOT_UNIQUE_COMBINATION} color="invert" placement="bottom">
+                                                    <Tooltip content={TOOLTIPS_DICT.PROJECT_SETTINGS.DATA_SCHEMA.NOT_UNIQUE_COMBINATION} color="invert" placement="bottom" className="cursor-auto">
                                                         <IconX className="h-5 w-5 -mt-1" />
                                                     </Tooltip>}
                                             </>}

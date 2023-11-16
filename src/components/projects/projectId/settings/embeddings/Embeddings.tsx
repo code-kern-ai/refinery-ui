@@ -2,7 +2,7 @@ import LoadingIcon from "@/src/components/shared/loading/LoadingIcon";
 import Modal from "@/src/components/shared/modal/Modal";
 import { selectIsManaged } from "@/src/reduxStore/states/general";
 import { openModal, selectModal, setModalStates } from "@/src/reduxStore/states/modal";
-import { removeFromAllEmbeddingsById, selectAttributes, selectEmbeddings } from "@/src/reduxStore/states/pages/settings";
+import { removeFromAllEmbeddingsById, selectAttributes, selectEmbeddings, selectUsableNonTextAttributes } from "@/src/reduxStore/states/pages/settings";
 import { selectProject } from "@/src/reduxStore/states/project";
 import { WebSocketsService } from "@/src/services/base/web-sockets/WebSocketsService";
 import { DELETE_EMBEDDING, DELETE_FROM_TASK_QUEUE, UPDATE_EMBEDDING_PAYLOAD } from "@/src/services/gql/mutations/project-settings";
@@ -33,6 +33,7 @@ export default function Embeddings(props: EmbeddingProps) {
     const modalDeleteEmbedding = useSelector(selectModal(ModalEnum.DELETE_EMBEDDING));
     const modalFilteredAttributes = useSelector(selectModal(ModalEnum.FILTERED_ATTRIBUTES));
     const attributes = useSelector(selectAttributes);
+    const usableAttributes = useSelector(selectUsableNonTextAttributes);
     const isManaged = useSelector(selectIsManaged);
     const embeddings = useSelector(selectEmbeddings);
     const project = useSelector(selectProject);
@@ -41,6 +42,7 @@ export default function Embeddings(props: EmbeddingProps) {
     const [loadingEmbeddingsDict, setLoadingEmbeddingsDict] = useState<{ [key: string]: boolean }>({});
     const [showEditOption, setShowEditOption] = useState(false);
     const [filterAttributesUpdate, setFilterAttributesUpdate] = useState([]);
+    const [checkedAttributes, setCheckedAttributes] = useState([]);
 
     const [refetchDeleteEmbedding] = useMutation(DELETE_EMBEDDING);
     const [refetchDeleteTaskQueue] = useMutation(DELETE_FROM_TASK_QUEUE);
@@ -80,11 +82,8 @@ export default function Embeddings(props: EmbeddingProps) {
     const saveFilteredAttributes = useCallback(() => {
         setShowEditOption(false);
         dispatch(setModalStates(ModalEnum.FILTERED_ATTRIBUTES, { showEditOption: false }));
-        const updatedAttributes = modalFilteredAttributes.attributeNames.filter((a) => a.checked).map((a) => a.name);
-        updateEmbeddingPayloadMut({ variables: { projectId: project.id, embeddingId: modalFilteredAttributes.embeddingId, filterAttributes: JSON.stringify(updatedAttributes) } }).then((res) => {
-
-        });
-    }, [modalFilteredAttributes]);
+        updateEmbeddingPayloadMut({ variables: { projectId: project.id, embeddingId: modalFilteredAttributes.embeddingId, filterAttributes: JSON.stringify(filterAttributesUpdate) } }).then((res) => { });
+    }, [filterAttributesUpdate]);
 
     const editFilteredAttributes = useCallback(() => {
         setShowEditOption(true);
@@ -111,6 +110,17 @@ export default function Embeddings(props: EmbeddingProps) {
     const [editButton, setEditButton] = useState<ModalButton>(EDIT_BUTTON);
     const [acceptButton, setAcceptButton] = useState<ModalButton>(ACCEPT_BUTTON);
 
+
+    useEffect(() => {
+        if (!usableAttributes) return;
+        if (!modalFilteredAttributes.attributeNames) return;
+        const updated = usableAttributes.map((attribute) => {
+            const attributeCopy = jsonCopy(attribute);
+            attributeCopy.checked = modalFilteredAttributes.attributeNames.find((a) => a.name == attribute.name) != undefined;
+            return attributeCopy;
+        });
+        setCheckedAttributes(updated);
+    }, [usableAttributes, modalFilteredAttributes]);
 
     function handleWebsocketNotification(msgParts: string[]) {
         if (msgParts[1] == 'embedding_updated') {
@@ -252,8 +262,7 @@ export default function Embeddings(props: EmbeddingProps) {
             </div>
         </div>
         <Modal modalName={ModalEnum.FILTERED_ATTRIBUTES} acceptButton={acceptButton} backButton={editButton}>
-            <div className="flex flex-grow justify-center text-lg leading-6 text-gray-900 font-medium">
-                Edit embedding with filter attributes</div>
+            <div className="flex flex-grow justify-center text-lg leading-6 text-gray-900 font-medium">Edit embedding with filter attributes</div>
             <div className="my-2 flex flex-grow justify-center text-sm text-gray-500 text-center">
                 List of filter attributes selected when creating an embedding</div>
             {modalFilteredAttributes.attributeNames && modalFilteredAttributes.attributeNames.length == 0 ? <div className="text-xs text-gray-500 text-center italic">No filter attributes selected</div> : <div className="flex justify-center items-center">
@@ -265,18 +274,11 @@ export default function Embeddings(props: EmbeddingProps) {
             </div>}
             {modalFilteredAttributes.showEditOption && <div className="mt-3">
                 <div className="text-xs text-gray-500 text-center italic">Add or remove filter attributes</div>
-                <Dropdown options={modalFilteredAttributes.attributeNames.map(a => a.name)} buttonName={filterAttributesUpdate.length == 0 ? 'None selected' : filterAttributesUpdate.join(',')} hasCheckboxes={true}
-                    selectedCheckboxes={modalFilteredAttributes.attributeNames.map(a => a.checked)} hasSelectAll={true}
+                <Dropdown options={usableAttributes.map(a => a.name)} buttonName={filterAttributesUpdate.length == 0 ? 'None selected' : filterAttributesUpdate.join(',')} hasCheckboxes={true}
+                    selectedCheckboxes={checkedAttributes.map(a => a.checked)} hasSelectAll={true}
                     selectedOption={(option: any) => {
-                        setFilterAttributesUpdate(option.filter((o: any) => o.checked).map((o: any) => o.name));
-                        const updated = [];
-                        option.forEach((att: any) => {
-                            const attribute = attributes.find((a: any) => a.name == att.name);
-                            const attributeCopy = jsonCopy(attribute);
-                            attributeCopy.checked = att.checked;
-                            updated.push(attributeCopy);
-                        });
-                        dispatch(setModalStates(ModalEnum.FILTERED_ATTRIBUTES, { attributeNames: updated }));
+                        const attributes = option.filter((o: any) => o.checked).map((o: any) => o.name);
+                        setFilterAttributesUpdate(attributes);
                     }} />
             </div>}
         </Modal>
