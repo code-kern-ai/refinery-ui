@@ -2,7 +2,7 @@ import { RecordDisplay } from "@/src/components/shared/record-display/RecordDisp
 import RecordTable from "@/src/components/shared/record-table/RecordTable";
 import { selectUser } from "@/src/reduxStore/states/general";
 import { setModalStates } from "@/src/reduxStore/states/modal";
-import { selectConfiguration, selectRecords } from "@/src/reduxStore/states/pages/data-browser";
+import { selectConfiguration, selectRecordComments, selectRecords } from "@/src/reduxStore/states/pages/data-browser";
 import { selectEmbeddings } from "@/src/reduxStore/states/pages/settings";
 import { RecordListProps } from "@/src/types/components/projects/projectId/data-browser/data-browser";
 import { ModalEnum } from "@/src/types/shared/modal";
@@ -22,11 +22,13 @@ export default function RecordList(props: RecordListProps) {
     const user = useSelector(selectUser);
     const configuration = useSelector(selectConfiguration);
     const embeddings = useSelector(selectEmbeddings);
+    const recordComments = useSelector(selectRecordComments);
 
     return (<>
         {recordList && recordList.map((record, index) => (<div key={index} className="bg-white overflow-hidden shadow rounded-lg border mb-4 pb-4 relative">
             <div className="px-4 py-5 sm:p-6">
-                {props.recordComments[record.id] && <div className="cursor-pointer absolute top-6 right-5" onClick={() => dispatch(setModalStates(ModalEnum.RECORD_COMMENTS, { commentsData: props.recordComments[record.id], open: true }))}>
+                {recordComments[record.id] && <div className="cursor-pointer absolute top-6 right-5"
+                    onClick={() => dispatch(setModalStates(ModalEnum.RECORD_COMMENTS, { commentsData: recordComments[record.id], open: true }))}>
                     <Tooltip content={TOOLTIPS_DICT.DATA_BROWSER.RECORD_COMMENTS} color="invert" placement="left">
                         <IconNotes className="h-4 w-4" />
                     </Tooltip>

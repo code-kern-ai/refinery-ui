@@ -45,3 +45,9 @@ query ($projectId: ID!, $embeddingId: ID!, $recordId: ID!, $attFilter: JSONStrin
   }
 }
 `;
+
+export const GET_RECORD_COMMENTS = gql`
+query ($projectId: ID!, $recordIds: [ID]!) {
+  recordComments(projectId: $projectId, recordIds: $recordIds)
+}
+`;

@@ -67,7 +67,7 @@ export default function DataBrowserSidebar() {
     }
 
     return (<div className={`bg-white flex-auto h-screen w-full overflow-hidden border-r border-r-gray-100 ${style.transitionAll} ${isSearchMenuOpen ? style.sidebarWidthOpen : style.sidebarWidth}`}>
-        <div className={`flex flex-col select-none p-4 overflow-y-auto h-full ${style.sidebarWidthOpen} ${isSearchMenuVisible ? style.searchMenuWidth : null}`}>
+        <div className={`flex flex-col select-none pt-4 px-4 pb-20 overflow-y-auto h-full ${style.sidebarWidthOpen} ${isSearchMenuVisible ? style.searchMenuWidth : null}`}>
             <div className="flex flex-row items-center">
                 {isSearchMenuOpen && <div className="bg-white text-lg font-medium text-gray-900 pr-3">Existing data slices</div>}
                 <IconLayoutSidebar onClick={openSearchMenu} className={`w-6 h-6 text-gray-900 cursor-pointer ${isSearchMenuOpen ? style.rotateTransform : null}`} />

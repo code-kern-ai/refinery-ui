@@ -26,6 +26,7 @@ type DataBrowserState = {
     },
     textHighlight: string[];
     isTextHighlightNeeded: { [key: string]: boolean };
+    recordComments: any;
 }
 
 function getInitState(): DataBrowserState {
@@ -57,7 +58,8 @@ function getInitState(): DataBrowserState {
             separator: ","
         },
         textHighlight: [],
-        isTextHighlightNeeded: {}
+        isTextHighlightNeeded: {},
+        recordComments: {}
     };
 }
 
@@ -151,6 +153,10 @@ const dataBrowserSlice = createSlice({
         setIsTextHighlightNeeded(state, action: PayloadAction<{ [key: string]: boolean }>) {
             if (action.payload) state.isTextHighlightNeeded = action.payload;
             else state.isTextHighlightNeeded = {};
+        },
+        setRecordComments(state, action: PayloadAction<any>) {
+            if (action.payload) state.recordComments = action.payload;
+            else state.recordComments = {};
         }
     },
 })
@@ -167,8 +173,9 @@ export const selectActiveSearchParams = (state) => state.dataBrowser.activeSearc
 export const selectConfiguration = (state) => state.dataBrowser.configuration;
 export const selectTextHighlight = (state) => state.dataBrowser.textHighlight;
 export const selectIsTextHighlightNeeded = (state) => state.dataBrowser.isTextHighlightNeeded;
+export const selectRecordComments = (state) => state.dataBrowser.recordComments;
 
 export const selectDataSlicesDict = createSelector([selectDataSlicesAll], (a): any => a ? arrayToDict(a, 'id') : null);
 
-export const { setDataSlices, setActiveDataSlice, removeFromAllDataSlicesById, updateDataSlicesState, setUsersMapCount, setSearchRecordsExtended, setActiveSearchParams, extendAllDataSlices, updateConfigurationState, updateAdditionalDataState, setTextHighlight, setIsTextHighlightNeeded } = dataBrowserSlice.actions;
+export const { setDataSlices, setActiveDataSlice, removeFromAllDataSlicesById, updateDataSlicesState, setUsersMapCount, setSearchRecordsExtended, setActiveSearchParams, extendAllDataSlices, updateConfigurationState, updateAdditionalDataState, setTextHighlight, setIsTextHighlightNeeded, setRecordComments } = dataBrowserSlice.actions;
 export const dataBrowserReducer = dataBrowserSlice.reducer;

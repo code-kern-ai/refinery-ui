@@ -101,7 +101,6 @@ export default function DataBrowserRecords() {
             {extendedRecords && attributes && !additionalData.loading && <div className="mr-2">
                 {extendedRecords.fullCount == 0 && <div>Your search criteria didn&apos;t match any record.</div>}
                 <RecordList
-                    recordComments={{}}
                     editRecord={(index) => storePreliminaryRecordIds(index, true)}
                     recordClicked={(index) => storePreliminaryRecordIds(index)} />
             </div>}

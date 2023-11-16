@@ -6,7 +6,7 @@ import { buildFullLink } from "@/src/util/shared/link-parser-helper";
 import { parseUTC } from "@/submodules/javascript-functions/date-parser";
 import { informationSourceTypeToString, labelSourceToString, sliceTypeToString } from "@/submodules/javascript-functions/enums/enum-functions";
 import { LabelSource, Slice } from "@/submodules/javascript-functions/enums/enums";
-import { jsonCopy } from "@/submodules/javascript-functions/general";
+import { jsonCopy, tryParseJSON } from "@/submodules/javascript-functions/general";
 
 export function postProcessDataSlices(dataSlices: DataSlice[]) {
     const prepareDataSlices = jsonCopy(dataSlices);
@@ -169,4 +169,16 @@ export function getInformationSourceTextById(sourceId: string, labelingTasks: La
         }
     }
     return "UNKNOWN";
+}
+
+export function postProcessRecordComments(comments: any) {
+    if (!comments) return;
+    const commentsParsed = tryParseJSON(comments);
+    if (!commentsParsed) return;
+    const recordComments = { ...comments };
+    commentsParsed.forEach(e => {
+        if (!recordComments[e.record_id]) recordComments[e.record_id] = [];
+        recordComments[e.record_id].push(e);
+    });
+    return recordComments;
 }

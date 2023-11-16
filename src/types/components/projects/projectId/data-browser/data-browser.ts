@@ -40,7 +40,6 @@ export type SearchRecordsExtended = {
 export type RecordListProps = {
     editRecord: (index: number) => void;
     recordClicked: (index: number) => void;
-    recordComments: any;
 }
 
 export type ColumnData = {

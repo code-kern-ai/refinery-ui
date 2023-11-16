@@ -32,7 +32,6 @@ export function DataSliceOperations(props: { fullSearch: {} }) {
     const [updateDataSliceMut] = useMutation(UPDATE_DATA_SLICE);
     const [createOutlierSliceMut] = useMutation(CREATE_OUTLIER_SLICE);
 
-
     function updateSlice(isStatic = null) {
         isStatic = isStatic == null ? activeSlice.static : isStatic;
         updateDataSliceMut({
@@ -50,9 +49,7 @@ export function DataSliceOperations(props: { fullSearch: {} }) {
         if (embeddings.length == 0) return;
         let embeddingId = embeddings.length == 1 ? embeddings[0].id : modalOutlierSlice.embeddingId;
 
-        createOutlierSliceMut({ variables: { projectId: project.id, embeddingId } }).then((res) => {
-
-        });
+        createOutlierSliceMut({ variables: { projectId: project.id, embeddingId } }).then((res) => { });
     }
 
     return (<div>

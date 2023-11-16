@@ -647,7 +647,7 @@ export default function SearchGroups() {
                         <div className="flex-grow flex items-center">
                             <div className="flex flex-col">
                                 <div className="my-1">
-                                    {fullSearch[group.key].groupElements['hasComments'] && <div className="form-control flex flex-row flex-nowrap">
+                                    {fullSearch[group.key].groupElements['hasComments'] && <div className="form-control flex flex-row flex-nowrap items-center">
                                         <div onClick={() => setActiveNegateGroup(fullSearch[group.key].groupElements['hasComments'], null, group)} style={{ backgroundColor: fullSearch[group.key].groupElements['hasComments'].color, borderColor: fullSearch[group.key].groupElements['hasComments'].color }}
                                             className="ml-2 mr-2 h-4 w-4 border-gray-300 border rounded cursor-pointer hover:bg-gray-200">
                                         </div>
