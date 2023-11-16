@@ -1,11 +1,11 @@
 export type HighlightProps = {
     text: string;
-    regex: RegExp[] | RegExp;
-    searchFor: string[] | string;
-    matchCase: boolean | string;
-    searchForExtended: HighlightSearch[];
-    highlightClass: string;
-    additionalClasses: string[];
+    regex?: RegExp[] | RegExp;
+    searchFor?: string[] | string;
+    matchCase?: boolean | string;
+    searchForExtended?: HighlightSearch[];
+    highlightClass?: string;
+    additionalClasses?: string[];
 };
 
 export type RegexDisplay = {

@@ -23,7 +23,9 @@ type DataBrowserState = {
         lineBreaks: LineBreaksType;
         highlightText: boolean;
         separator: string;
-    }
+    },
+    textHighlight: string[];
+    isTextHighlightNeeded: { [key: string]: boolean };
 }
 
 function getInitState(): DataBrowserState {
@@ -51,9 +53,11 @@ function getInitState(): DataBrowserState {
         configuration: {
             weakSupervisionRelated: false,
             lineBreaks: LineBreaksType.NORMAL,
-            highlightText: false,
+            highlightText: true,
             separator: ","
-        }
+        },
+        textHighlight: [],
+        isTextHighlightNeeded: {}
     };
 }
 
@@ -140,6 +144,14 @@ const dataBrowserSlice = createSlice({
                 };
             },
         },
+        setTextHighlight(state, action: PayloadAction<string[]>) {
+            if (action.payload) state.textHighlight = action.payload;
+            else state.textHighlight = [];
+        },
+        setIsTextHighlightNeeded(state, action: PayloadAction<{ [key: string]: boolean }>) {
+            if (action.payload) state.isTextHighlightNeeded = action.payload;
+            else state.isTextHighlightNeeded = {};
+        }
     },
 })
 
@@ -153,8 +165,10 @@ export const selectRecords = (state) => state.dataBrowser.searchRecordsExtended;
 export const selectSimilaritySearch = (state) => state.dataBrowser.similaritySearch;
 export const selectActiveSearchParams = (state) => state.dataBrowser.activeSearchParams;
 export const selectConfiguration = (state) => state.dataBrowser.configuration;
+export const selectTextHighlight = (state) => state.dataBrowser.textHighlight;
+export const selectIsTextHighlightNeeded = (state) => state.dataBrowser.isTextHighlightNeeded;
 
 export const selectDataSlicesDict = createSelector([selectDataSlicesAll], (a): any => a ? arrayToDict(a, 'id') : null);
 
-export const { setDataSlices, setActiveDataSlice, removeFromAllDataSlicesById, updateDataSlicesState, setUsersMapCount, setSearchRecordsExtended, setActiveSearchParams, extendAllDataSlices, updateConfigurationState, updateAdditionalDataState } = dataBrowserSlice.actions;
+export const { setDataSlices, setActiveDataSlice, removeFromAllDataSlicesById, updateDataSlicesState, setUsersMapCount, setSearchRecordsExtended, setActiveSearchParams, extendAllDataSlices, updateConfigurationState, updateAdditionalDataState, setTextHighlight, setIsTextHighlightNeeded } = dataBrowserSlice.actions;
 export const dataBrowserReducer = dataBrowserSlice.reducer;

@@ -12,7 +12,7 @@ import { SearchOperator } from "@/src/types/components/projects/projectId/data-b
 import { checkDecimalPatterns, getAttributeType, getSearchOperatorTooltip } from "@/src/util/components/projects/projectId/data-browser/search-operators-helper";
 import { DataTypeEnum } from "@/src/types/shared/general";
 import { selectAllUsers, selectUser } from "@/src/reduxStore/states/general";
-import { selectActiveSearchParams, selectActiveSlice, selectConfiguration, selectRecords, selectUsersCount, setActiveSearchParams, setSearchRecordsExtended } from "@/src/reduxStore/states/pages/data-browser";
+import { selectActiveSearchParams, selectActiveSlice, selectConfiguration, selectIsTextHighlightNeeded, selectRecords, selectTextHighlight, selectUsersCount, setActiveSearchParams, setIsTextHighlightNeeded, setSearchRecordsExtended, setTextHighlight } from "@/src/reduxStore/states/pages/data-browser";
 import { Tooltip } from "@nextui-org/react";
 import { setModalStates } from "@/src/reduxStore/states/modal";
 import { ModalEnum } from "@/src/types/shared/modal";
@@ -22,7 +22,7 @@ import { useLazyQuery } from "@apollo/client";
 import { SEARCH_RECORDS_EXTENDED } from "@/src/services/gql/queries/data-browser";
 import { postProcessRecordsExtended } from "@/src/util/components/projects/projectId/data-browser/data-browser-helper";
 import { parseFilterToExtended } from "@/src/util/components/projects/projectId/data-browser/filter-parser-helper";
-import { updateSearchParameters } from "@/src/util/components/projects/projectId/data-browser/search-parameters";
+import { getRegexFromFilter, updateSearchParameters } from "@/src/util/components/projects/projectId/data-browser/search-parameters";
 import { jsonCopy } from "@/submodules/javascript-functions/general";
 import UserInfoModal from "./modals/UserInfoModal";
 import { getColorForDataType } from "@/src/util/components/projects/projectId/settings/data-schema-helper";
@@ -43,6 +43,8 @@ export default function SearchGroups() {
     const configuration = useSelector(selectConfiguration);
     const user = useSelector(selectUser);
     const activeSlice = useSelector(selectActiveSlice);
+    const textHighlight = useSelector(selectTextHighlight);
+    const isTextHighlightNeeded = useSelector(selectIsTextHighlightNeeded);
 
     const [fullSearch, setFullSearch] = useState<any>({});
     const [searchGroups, setSearchGroups] = useState<{ [key: string]: any }>({});
@@ -101,6 +103,8 @@ export default function SearchGroups() {
         if (!user) return;
         if (!activeSearchParams) return;
         if (!labelingTasks) return;
+        refreshTextHighlightNeeded();
+        setHighlightingToRecords();
         refetchExtendedRecord({
             variables: {
                 projectId: project.id,
@@ -382,6 +386,48 @@ export default function SearchGroups() {
     function updateSearchParams(fullSearchCopy) {
         const activeParams = updateSearchParameters(Object.values(fullSearchCopy), attributes, configuration.separator, fullSearchCopy);
         dispatch(setActiveSearchParams(activeParams));
+    }
+
+    function setHighlightingToRecords() {
+        let toSet = [];
+        let filter;
+        let textHighlightCopy = { ...textHighlight };
+        for (let i = 1; i < attributesSortOrder.length; i++) {
+            for (let searchElement of activeSearchParams) {
+                if (searchElement.values.group == SearchGroup.ATTRIBUTES) {
+                    if (
+                        searchElement.values.name == 'Any Attribute' ||
+                        searchElement.values.name == attributesDict[attributesSortOrder[i].key].name
+                    ) {
+                        if (typeof searchElement.values.searchValue != 'string') {
+                            searchElement.values.searchValue = searchElement.values.searchValue.toString();
+                        }
+                        filter = getRegexFromFilter(searchElement);
+                        if (filter) toSet.push(filter);
+                    }
+                }
+            }
+            textHighlightCopy[attributesSortOrder[i].key] = toSet;
+        }
+        dispatch(setTextHighlight(textHighlightCopy));
+    }
+
+    function refreshTextHighlightNeeded() {
+        const isTextHighlightNeededCopy = { ...isTextHighlightNeeded };
+        for (let i = 1; i < attributesSortOrder.length; i++) {
+            const attributeKey = attributesSortOrder[i].key;
+            for (let searchElement of activeSearchParams) {
+                if (searchElement.values.group == SearchGroup.ATTRIBUTES) {
+                    if (searchElement.values.name == 'Any Attribute' || searchElement.values.name == attributesDict[attributeKey].name) {
+                        if (searchElement.values.negate) isTextHighlightNeededCopy[attributeKey] = false;
+                        else isTextHighlightNeededCopy[attributeKey] = true;
+                    }
+                } else {
+                    isTextHighlightNeededCopy[attributeKey] = false;
+                }
+            }
+        }
+        dispatch(setIsTextHighlightNeeded(isTextHighlightNeededCopy));
     }
 
     return (<>

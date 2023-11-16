@@ -3,13 +3,24 @@ import { buildRegex, buildRegexps, rebuildText } from "@/src/util/shared/highlig
 import { isStringTrue } from "@/submodules/javascript-functions/general";
 import { useEffect, useState } from "react";
 
-export default function Highlight(props: HighlightProps) {
+export default function Highlight(props: any) {
     const [parts, setParts] = useState<RegexDisplay[]>([]);
     const [finalRegEx, setFinalRegEx] = useState<RegExp[]>([]);
 
+    const [highlightClass, setHighlightClass] = useState('');
+    const [addClassString, setAddClassString] = useState('')
+
     useEffect(() => {
         buildEverything();
-    }, []);
+        if (!props.highlightClass) {
+            setHighlightClass('bg-yellow-300');
+        } else {
+            setHighlightClass(props.highlightClass);
+        }
+        if (props.additionalClasses) {
+            setAddClassString(props.additionalClasses.join(' '));
+        }
+    }, [props.highlightClass, props.additionalClasses, props.matchCase, props.regex, props.searchFor, props.searchForExtended, props.text]);
 
     function buildEverything() {
         let matchCase = props.matchCase;
@@ -29,5 +40,9 @@ export default function Highlight(props: HighlightProps) {
         setParts(rebuildText(props.text, finalRegEx));
     }
 
-    return (<></>)
+    return (<span>
+        {parts && parts.map((part, index) => (<span key={index} className={`${part.isMatch ? highlightClass : null} ${addClassString}`}>
+            {part.text}
+        </span>))}
+    </span>)
 }

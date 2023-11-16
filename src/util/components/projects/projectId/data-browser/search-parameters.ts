@@ -3,6 +3,7 @@ import { getAttributeType } from "./search-operators-helper";
 import { SearchOperator } from "@/src/types/components/projects/projectId/data-browser/search-operators";
 import { SearchGroup, StaticOrderByKeys } from "@/submodules/javascript-functions/enums/enums";
 import { getOrderByDisplayName } from "@/submodules/javascript-functions/enums/enum-functions";
+import { HighlightSearch } from "@/src/types/shared/highlight";
 
 export function updateSearchParameters(searchElement, attributes, separator, searchGroup) {
     const activeParams = [];
@@ -197,4 +198,21 @@ function orderByBuildSearchParamText(values): string {
 
 function commentsBuildSearchParamText(values): string {
     return values.hasComments.negate ? 'NO COMMENTS' : 'HAS COMMENTS';
+}
+
+export function getRegexFromFilter(searchElement): HighlightSearch {
+    if (searchElement.values.negate) return null; //would highlight everything
+    let searchValue = searchElement.values.searchValue;
+    searchValue = searchValue.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&');
+    switch (searchElement.values.operator) {
+        case SearchOperator.EQUAL:
+            return { searchFor: '^' + searchValue + '$', matchCase: searchElement.values.caseSensitive };
+        case SearchOperator.BEGINS_WITH:
+            return { searchFor: '^' + searchValue, matchCase: searchElement.values.caseSensitive }
+        case SearchOperator.ENDS_WITH:
+            return { searchFor: searchValue + '$', matchCase: searchElement.values.caseSensitive };
+        case SearchOperator.CONTAINS:
+            return { searchFor: searchValue, matchCase: searchElement.values.caseSensitive };
+    }
+    return null;
 }
