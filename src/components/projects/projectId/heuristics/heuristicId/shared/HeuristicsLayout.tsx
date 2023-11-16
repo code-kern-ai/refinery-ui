@@ -1,5 +1,5 @@
 import Statuses from "@/src/components/shared/statuses/Statuses";
-import { selectHeuristic, updateHeuristicsState } from "@/src/reduxStore/states/pages/heuristics";
+import { selectHeuristic, setActiveHeuristics, updateHeuristicsState } from "@/src/reduxStore/states/pages/heuristics";
 import { selectAllLookupLists, setAllLookupLists } from "@/src/reduxStore/states/pages/lookup-lists";
 import { selectUsableAttributesFiltered, setAllAttributes } from "@/src/reduxStore/states/pages/settings";
 import { selectProject } from "@/src/reduxStore/states/project"
@@ -94,7 +94,10 @@ export default function HeuristicsLayout(props: any) {
             <div className={`sticky z-40 h-12 ${isHeaderNormal ? 'top-1' : '-top-5'}`}>
                 <div className={`bg-white flex-grow ${isHeaderNormal ? '' : 'shadow'}`}>
                     <div className={`flex-row justify-start items-center inline-block ${isHeaderNormal ? 'p-0' : 'flex py-2'}`} style={{ transition: 'all .25s ease-in-out' }}>
-                        <button onClick={() => router.push(`/projects/${project.id}/heuristics`)}
+                        <button onClick={() => {
+                            router.push(`/projects/${project.id}/heuristics`);
+                            dispatch(setActiveHeuristics(null));
+                        }}
                             className="text-green-800 text-sm font-medium">
                             <IconArrowLeft className="h-5 w-5 inline-block text-green-800" />
                             <span className="leading-5">Go back</span>
