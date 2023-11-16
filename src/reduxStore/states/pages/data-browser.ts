@@ -157,6 +157,10 @@ const dataBrowserSlice = createSlice({
         setRecordComments(state, action: PayloadAction<any>) {
             if (action.payload) state.recordComments = action.payload;
             else state.recordComments = {};
+        },
+        setRecordsInDisplay(state, action: PayloadAction<boolean>) {
+            if (action.payload) state.similaritySearch.recordsInDisplay = action.payload;
+            else state.similaritySearch.recordsInDisplay = false;
         }
     },
 })
@@ -177,5 +181,5 @@ export const selectRecordComments = (state) => state.dataBrowser.recordComments;
 
 export const selectDataSlicesDict = createSelector([selectDataSlicesAll], (a): any => a ? arrayToDict(a, 'id') : null);
 
-export const { setDataSlices, setActiveDataSlice, removeFromAllDataSlicesById, updateDataSlicesState, setUsersMapCount, setSearchRecordsExtended, setActiveSearchParams, extendAllDataSlices, updateConfigurationState, updateAdditionalDataState, setTextHighlight, setIsTextHighlightNeeded, setRecordComments } = dataBrowserSlice.actions;
+export const { setDataSlices, setActiveDataSlice, removeFromAllDataSlicesById, updateDataSlicesState, setUsersMapCount, setSearchRecordsExtended, setActiveSearchParams, extendAllDataSlices, updateConfigurationState, updateAdditionalDataState, setTextHighlight, setIsTextHighlightNeeded, setRecordComments, setRecordsInDisplay } = dataBrowserSlice.actions;
 export const dataBrowserReducer = dataBrowserSlice.reducer;

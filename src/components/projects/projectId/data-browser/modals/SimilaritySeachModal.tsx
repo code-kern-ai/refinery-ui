@@ -1,6 +1,6 @@
 import Modal from "@/src/components/shared/modal/Modal";
 import { selectModal } from "@/src/reduxStore/states/modal";
-import { selectActiveSearchParams, selectSimilaritySearch, setSearchRecordsExtended } from "@/src/reduxStore/states/pages/data-browser";
+import { selectActiveSearchParams, selectSimilaritySearch, setRecordsInDisplay, setSearchRecordsExtended } from "@/src/reduxStore/states/pages/data-browser";
 import { selectEmbeddings, selectLabelingTasksAll, selectUsableAttributes } from "@/src/reduxStore/states/pages/settings";
 import { selectProject } from "@/src/reduxStore/states/project";
 import { SEARCH_SIMILAR_RECORDS } from "@/src/services/gql/queries/data-browser";
@@ -51,6 +51,7 @@ export default function SimilaritySearchModal() {
             }
         }).then((res) => {
             dispatch(setSearchRecordsExtended(postProcessRecordsExtended(res.data['searchRecordsBySimilarity'], labelingTasks)));
+            dispatch(setRecordsInDisplay(true));
         });
     }
 
@@ -155,7 +156,7 @@ export default function SimilaritySearchModal() {
 
     return (<Modal modalName={ModalEnum.SIMILARITY_SEARCH} acceptButton={acceptButton} secondAcceptButton={secondAcceptButton}>
         <div className="flex flex-grow justify-center text-lg leading-6 text-gray-900 font-medium">Select embedding for similarity search </div>
-        {activeSearchParams.length > 0 || similaritySearch.recordsInDisplay && <div className="text-red-500 mb-2 flex flex-grow justify-center text-sm">Warning: your current filter selection will be removed!</div>}
+        {(activeSearchParams.length > 0 || similaritySearch.recordsInDisplay) && <div className="text-red-500 mb-2 flex flex-grow justify-center text-sm">Warning: your current filter selection will be removed!</div>}
 
         <Dropdown options={embeddings} buttonName={selectedEmbedding ?? 'Select embedding'} selectedOption={(value) => setSelectedEmbedding(value)} dropdownClasses="my-2" />
         {filterAttributesSS && filterAttributesSS.length > 0 && <div className="flex flex-col justify-start mt-4">

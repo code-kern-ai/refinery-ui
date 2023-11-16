@@ -1,5 +1,5 @@
 import { openModal } from '@/src/reduxStore/states/modal';
-import { selectActiveSearchParams, selectActiveSlice, selectAdditionalData, selectRecords, selectSimilaritySearch } from '@/src/reduxStore/states/pages/data-browser';
+import { selectActiveSearchParams, selectActiveSlice, selectAdditionalData, selectRecords, selectSimilaritySearch, setActiveDataSlice, setActiveSearchParams, setIsTextHighlightNeeded, setRecordsInDisplay, setTextHighlight } from '@/src/reduxStore/states/pages/data-browser';
 import style from '@/src/styles/components/projects/projectId/data-browser.module.css';
 import { ModalEnum } from '@/src/types/shared/modal';
 import { TOOLTIPS_DICT } from '@/src/util/tooltip-constants';
@@ -13,8 +13,9 @@ import RecordList from './RecordList';
 import { useRouter } from 'next/router';
 import { selectProject } from '@/src/reduxStore/states/project';
 import ConfigurationModal from './modals/ConfigurationModal';
+import { DataBrowserRecordsProps } from '@/src/types/components/projects/projectId/data-browser/data-browser';
 
-export default function DataBrowserRecords() {
+export default function DataBrowserRecords(props: DataBrowserRecordsProps) {
     const dispatch = useDispatch();
     const router = useRouter();
 
@@ -26,7 +27,12 @@ export default function DataBrowserRecords() {
     const activeSearchParams = useSelector(selectActiveSearchParams);
     const attributes = useSelector(selectAttributes);
 
-    function clearFilters() { }
+    function clearFilters() {
+        dispatch(setActiveSearchParams([]));
+        dispatch(setRecordsInDisplay(false));
+        dispatch(setActiveDataSlice(null));
+        dispatch(setTextHighlight([]));
+    }
 
     function storePreliminaryRecordIds(index: number, forEdit: boolean = false) {
         // TODO: Add the session and the data to the store
@@ -64,7 +70,10 @@ export default function DataBrowserRecords() {
                         </div>
                     </div>
                 </div>}
-                {activeSlice != null || activeSearchParams.length > 0 || similaritySearch.recordsInDisplay && <button onClick={clearFilters}
+                {(activeSlice != null || activeSearchParams.length > 0 || similaritySearch.recordsInDisplay) && <button onClick={() => {
+                    props.clearFullSearch(true);
+                    clearFilters();
+                }}
                     className="mr-1 inline-flex items-center px-2.5 py-2 border border-gray-300 shadow-sm text-xs font-semibold rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none cursor-pointer">
                     <IconFilterOff className="h-4 w-4 mr-1" />Clear filters
                 </button>}

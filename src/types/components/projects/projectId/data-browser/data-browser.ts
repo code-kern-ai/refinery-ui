@@ -53,3 +53,11 @@ export enum LineBreaksType {
     IS_PRE_WRAP = 'IS_PRE_WRAP',
     IS_PRE_LINE = 'IS_PRE_LINE',
 }
+
+export type DataBrowserRecordsProps = {
+    clearFullSearch: (val: boolean) => void;
+};
+
+export type DataBrowserSideBarProps = {
+    clearFullSearch: boolean;
+}

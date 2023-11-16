@@ -24,6 +24,7 @@ export default function DataBrowser() {
     const labelingTasks = useSelector(selectLabelingTasksAll);
 
     const [searchRequest, setSearchRequest] = useState(SEARCH_REQUEST);
+    const [clearFullSearch, setClearFullSearch] = useState(false);
 
     const [refetchDataSlices] = useLazyQuery(DATA_SLICES, { fetchPolicy: 'network-only' });
     const [refetchAttributes] = useLazyQuery(GET_ATTRIBUTES_BY_PROJECT_ID, { fetchPolicy: "network-only" });
@@ -95,8 +96,8 @@ export default function DataBrowser() {
 
     return (<>
         {project && <div className="flex flex-row h-full">
-            <DataBrowserSidebar />
-            <DataBrowserRecords />
+            <DataBrowserSidebar clearFullSearch={clearFullSearch} />
+            <DataBrowserRecords clearFullSearch={(val) => setClearFullSearch(val)} />
         </div>}
     </>)
 }

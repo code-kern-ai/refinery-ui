@@ -12,7 +12,7 @@ import { SearchOperator } from "@/src/types/components/projects/projectId/data-b
 import { checkDecimalPatterns, getAttributeType, getSearchOperatorTooltip } from "@/src/util/components/projects/projectId/data-browser/search-operators-helper";
 import { DataTypeEnum } from "@/src/types/shared/general";
 import { selectAllUsers, selectUser } from "@/src/reduxStore/states/general";
-import { selectActiveSearchParams, selectActiveSlice, selectConfiguration, selectIsTextHighlightNeeded, selectRecords, selectTextHighlight, selectUsersCount, setActiveSearchParams, setIsTextHighlightNeeded, setSearchRecordsExtended, setTextHighlight } from "@/src/reduxStore/states/pages/data-browser";
+import { selectActiveSearchParams, selectActiveSlice, selectConfiguration, selectIsTextHighlightNeeded, selectRecords, selectTextHighlight, selectUsersCount, setActiveSearchParams, setIsTextHighlightNeeded, setRecordsInDisplay, setSearchRecordsExtended, setTextHighlight } from "@/src/reduxStore/states/pages/data-browser";
 import { Tooltip } from "@nextui-org/react";
 import { setModalStates } from "@/src/reduxStore/states/modal";
 import { ModalEnum } from "@/src/types/shared/modal";
@@ -26,11 +26,12 @@ import { getRegexFromFilter, updateSearchParameters } from "@/src/util/component
 import { jsonCopy } from "@/submodules/javascript-functions/general";
 import UserInfoModal from "./modals/UserInfoModal";
 import { getColorForDataType } from "@/src/util/components/projects/projectId/settings/data-schema-helper";
+import { DataBrowserSideBarProps } from "@/src/types/components/projects/projectId/data-browser/data-browser";
 
 const GROUP_SORT_ORDER = 0;
 let GLOBAL_SEARCH_GROUP_COUNT = 0;
 
-export default function SearchGroups() {
+export default function SearchGroups(props: DataBrowserSideBarProps) {
     const dispatch = useDispatch();
 
     const project = useSelector(selectProject);
@@ -121,6 +122,13 @@ export default function SearchGroups() {
         const activeParams = updateSearchParameters(Object.values(JSON.parse(activeSlice.filterRaw)), attributes, configuration.separator, fullSearch);
         dispatch(setActiveSearchParams(activeParams));
     }, [activeSlice]);
+
+    useEffect(() => {
+        if (!props.clearFullSearch) return;
+        setFullSearch({});
+        setSearchGroups({});
+        prepareSearchGroups();
+    }, [props.clearFullSearch]);
 
     function prepareSearchGroups() {
         if (!attributes || !labelingTasks || !users) {

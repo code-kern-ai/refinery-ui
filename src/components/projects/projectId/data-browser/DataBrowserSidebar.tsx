@@ -3,7 +3,7 @@ import { setModalStates } from '@/src/reduxStore/states/modal';
 import { selectActiveSlice, selectAdditionalData, selectDataSlicesAll, setActiveDataSlice } from '@/src/reduxStore/states/pages/data-browser';
 import { selectProject } from '@/src/reduxStore/states/project';
 import style from '@/src/styles/components/projects/projectId/data-browser.module.css';
-import { DataSlice } from '@/src/types/components/projects/projectId/data-browser/data-browser';
+import { DataBrowserSideBarProps, DataSlice } from '@/src/types/components/projects/projectId/data-browser/data-browser';
 import { ModalEnum } from '@/src/types/shared/modal';
 import { updateSliceInfoHelper } from '@/src/util/components/projects/projectId/data-browser/data-browser-helper';
 import { TOOLTIPS_DICT } from '@/src/util/tooltip-constants';
@@ -17,7 +17,7 @@ import SearchGroups from './SearchGroups';
 import DeleteSliceModal from './modals/DeleteSliceModal';
 import DataSliceInfoModal from './modals/DataSliceInfoModal';
 
-export default function DataBrowserSidebar() {
+export default function DataBrowserSidebar(props: DataBrowserSideBarProps) {
     const dispatch = useDispatch();
 
     const project = useSelector(selectProject);
@@ -113,7 +113,7 @@ export default function DataBrowserSidebar() {
                 </div>
                 <span className="text-sm text-gray-400">You can filter and order all your data in the browser according to your needs. Selected filter criteria can be saved and used later on.</span>
 
-                <SearchGroups />
+                <SearchGroups clearFullSearch={props.clearFullSearch} />
             </div>}
         </div>
         <DeleteSliceModal />
