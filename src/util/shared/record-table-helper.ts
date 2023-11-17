@@ -1,5 +1,7 @@
 import { jsonCopy } from "@/submodules/javascript-functions/general";
 
+export const WEAK_SUPERVISION = 'Weak Supervision';
+
 export function prepareColumnsData(columnsData: any[] | {}): any[] {
     if (!columnsData ||
         (!Array.isArray(columnsData) && Object.keys(columnsData).length == 0) ||

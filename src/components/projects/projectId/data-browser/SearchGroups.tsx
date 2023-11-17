@@ -3,7 +3,7 @@ import { selectProject } from "@/src/reduxStore/states/project";
 import { attributeCreateSearchGroup, commentsCreateSearchGroup, generateRandomSeed, getBasicGroupItems, getBasicSearchGroup, getBasicSearchItem, labelingTasksCreateSearchGroup, orderByCreateSearchGroup, userCreateSearchGroup } from "@/src/util/components/projects/projectId/data-browser/search-groups-helper";
 import { SearchGroup, StaticOrderByKeys } from "@/submodules/javascript-functions/enums/enums";
 import { IconArrowBadgeDown, IconArrowUp, IconArrowsRandom, IconFilterOff, IconInfoCircle, IconPlus, IconPointerOff, IconTrash } from "@tabler/icons-react";
-import { use, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import style from '@/src/styles/components/projects/projectId/data-browser.module.css';
 import { timer } from "rxjs";
@@ -27,6 +27,9 @@ import { jsonCopy } from "@/submodules/javascript-functions/general";
 import UserInfoModal from "./modals/UserInfoModal";
 import { getColorForDataType } from "@/src/util/components/projects/projectId/settings/data-schema-helper";
 import { DataBrowserSideBarProps } from "@/src/types/components/projects/projectId/data-browser/data-browser";
+import { GET_CURRENT_WEAK_SUPERVISION_RUN } from "@/src/services/gql/queries/heuristics";
+import { Status } from "@/src/types/shared/statuses";
+import { postProcessCurrentWeakSupervisionRun } from "@/src/util/components/projects/projectId/heuristics/heuristics-helper";
 
 const GROUP_SORT_ORDER = 0;
 let GLOBAL_SEARCH_GROUP_COUNT = 0;
@@ -59,8 +62,11 @@ export default function SearchGroups(props: DataBrowserSideBarProps) {
     const [weakSupervisionLabels, setWeakSupervisionLabels] = useState([]);
     const [modelCallBacksLabels, setModelCallBacksLabels] = useState([]);
     const [backgroundColors, setBackgroundColors] = useState<string[]>([]);
+    const [currentWeakSupervisionRun, setCurrentWeakSupervisionRun] = useState(null);
+    const [selectedHeuristicsWS, setSelectedHeuristicsWS] = useState<string[]>([]);
 
     const [refetchExtendedRecord] = useLazyQuery(SEARCH_RECORDS_EXTENDED, { fetchPolicy: "no-cache" });
+    const [refetchCurrentWeakSupervision] = useLazyQuery(GET_CURRENT_WEAK_SUPERVISION_RUN, { fetchPolicy: "network-only" });
 
     useEffect(() => {
         if (!project) return;
@@ -106,6 +112,7 @@ export default function SearchGroups(props: DataBrowserSideBarProps) {
         if (!labelingTasks) return;
         refreshTextHighlightNeeded();
         setHighlightingToRecords();
+        refetchCurrentWeakSupervisionAndProcess();
         refetchExtendedRecord({
             variables: {
                 projectId: project.id,
@@ -129,6 +136,12 @@ export default function SearchGroups(props: DataBrowserSideBarProps) {
         setSearchGroups({});
         prepareSearchGroups();
     }, [props.clearFullSearch]);
+
+    useEffect(() => {
+        if (!currentWeakSupervisionRun) return;
+        if (currentWeakSupervisionRun.state == Status.NOT_YET_RUN) return;
+        setSelectedHeuristicsWS(currentWeakSupervisionRun.selectedInformationSources.split(','));
+    }, [currentWeakSupervisionRun]);
 
     function prepareSearchGroups() {
         if (!attributes || !labelingTasks || !users) {
@@ -449,6 +462,16 @@ export default function SearchGroups(props: DataBrowserSideBarProps) {
         dispatch(setIsTextHighlightNeeded(isTextHighlightNeededCopy));
     }
 
+    function refetchCurrentWeakSupervisionAndProcess() {
+        refetchCurrentWeakSupervision({ variables: { projectId: project.id } }).then((res) => {
+            if (res == null) {
+                setCurrentWeakSupervisionRun({ state: Status.NOT_YET_RUN });
+            } else {
+                setCurrentWeakSupervisionRun(postProcessCurrentWeakSupervisionRun(res['data']['currentWeakSupervisionRun']));
+            }
+        });
+    }
+
     return (<>
         {searchGroups && searchGroupsOrder.map((group) => (<div key={group.key} className="mt-4">
             <div onClick={() => toggleGroupMenu(group.key)}
@@ -621,7 +644,7 @@ export default function SearchGroups(props: DataBrowserSideBarProps) {
                                     </div>
                                     <span className="label-text truncate w-full pl-2">Only with different results</span>
                                 </div>
-                                {fullSearch[group.key].groupElements['heuristics'].map((groupItem, index) => (<div key={groupItem.id} className="my-1">
+                                {fullSearch[group.key].groupElements['heuristics'].map((groupItem, index) => (<div key={groupItem.id} className={`my-1 ${selectedHeuristicsWS.includes(groupItem['name']) && configuration.weakSupervisionRelated ? '' : 'hidden'}`} >
                                     <div className="flex flex-row items-center">
                                         <div onClick={() => setActiveNegateGroup(groupItem, index, group, true)} style={{ backgroundColor: groupItem.color, borderColor: groupItem.color }}
                                             className="ml-2 mr-2 h-4 w-4 border-gray-300 border rounded cursor-pointer hover:bg-gray-200">
