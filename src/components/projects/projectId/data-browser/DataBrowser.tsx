@@ -4,7 +4,7 @@ import DataBrowserSidebar from "./DataBrowserSidebar";
 import { useLazyQuery } from "@apollo/client";
 import { DATA_SLICES, GET_RECORD_COMMENTS, SEARCH_RECORDS_EXTENDED } from "@/src/services/gql/queries/data-browser";
 import { useEffect, useState } from "react";
-import { setDataSlices, setRecordComments, setSearchRecordsExtended, setUsersMapCount, updateAdditionalDataState } from "@/src/reduxStore/states/pages/data-browser";
+import { expandRecordList, setDataSlices, setRecordComments, setSearchRecordsExtended, setUsersMapCount, updateAdditionalDataState } from "@/src/reduxStore/states/pages/data-browser";
 import { postProcessDataSlices, postProcessRecordComments, postProcessRecordsExtended, postProcessUsersCount } from "@/src/util/components/projects/projectId/data-browser/data-browser-helper";
 import { GET_ATTRIBUTES_BY_PROJECT_ID, GET_EMBEDDING_SCHEMA_BY_PROJECT_ID, GET_LABELING_TASKS_BY_PROJECT_ID } from "@/src/services/gql/queries/project-setting";
 import { selectLabelingTasksAll, setAllAttributes, setAllEmbeddings, setLabelingTasksAll } from "@/src/reduxStore/states/pages/settings";
@@ -52,6 +52,17 @@ export default function DataBrowser() {
         refetchExtendedSearchAndProcess();
     }, [project, labelingTasks]);
 
+    useEffect(() => {
+        if (!project) return;
+        if (!searchRequest) return;
+        if (searchRequest.offset == 0) return;
+        refetchExtendedRecord({ variables: { projectId: project.id, filterData: JSON.stringify({}), offset: searchRequest.offset, limit: searchRequest.limit } }).then((res) => {
+            const parsedRecordData = postProcessRecordsExtended(res.data['searchRecordsExtended'], labelingTasks);
+            dispatch(expandRecordList(parsedRecordData));
+            refetchRecordCommentsAndProcess(parsedRecordData.recordList);
+        });
+    }, [searchRequest]);
+
     function refetchAttributesAndProcess() {
         refetchAttributes({ variables: { projectId: project.id, stateFilter: ['ALL'] } }).then((res) => {
             dispatch(setAllAttributes(postProcessingAttributes(res.data['attributesByProjectId'])));
@@ -94,10 +105,14 @@ export default function DataBrowser() {
         });
     }
 
+    function getNextRecords() {
+        setSearchRequest({ offset: searchRequest.offset + searchRequest.limit, limit: searchRequest.limit });
+    }
+
     return (<>
         {project && <div className="flex flex-row h-full">
             <DataBrowserSidebar clearFullSearch={clearFullSearch} />
-            <DataBrowserRecords clearFullSearch={(val) => setClearFullSearch(val)} />
+            <DataBrowserRecords clearFullSearch={(val) => setClearFullSearch(val)} refetchNextRecords={getNextRecords} />
         </div>}
     </>)
 }

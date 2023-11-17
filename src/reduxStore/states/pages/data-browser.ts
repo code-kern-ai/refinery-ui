@@ -161,6 +161,15 @@ const dataBrowserSlice = createSlice({
         setRecordsInDisplay(state, action: PayloadAction<boolean>) {
             if (action.payload) state.similaritySearch.recordsInDisplay = action.payload;
             else state.similaritySearch.recordsInDisplay = false;
+        },
+        expandRecordList(state, action: PayloadAction<any>) {
+            if (action.payload) {
+                state.searchRecordsExtended.fullCount = action.payload.fullCount;
+                state.searchRecordsExtended.queryLimit = action.payload.queryLimit;
+                state.searchRecordsExtended.queryOffset = action.payload.queryOffset;
+                state.searchRecordsExtended.recordList = [...state.searchRecordsExtended.recordList, ...action.payload.recordList];
+                state.searchRecordsExtended.sessionId = action.payload.sessionId;
+            }
         }
     },
 })
@@ -181,5 +190,5 @@ export const selectRecordComments = (state) => state.dataBrowser.recordComments;
 
 export const selectDataSlicesDict = createSelector([selectDataSlicesAll], (a): any => a ? arrayToDict(a, 'id') : null);
 
-export const { setDataSlices, setActiveDataSlice, removeFromAllDataSlicesById, updateDataSlicesState, setUsersMapCount, setSearchRecordsExtended, setActiveSearchParams, extendAllDataSlices, updateConfigurationState, updateAdditionalDataState, setTextHighlight, setIsTextHighlightNeeded, setRecordComments, setRecordsInDisplay } = dataBrowserSlice.actions;
+export const { setDataSlices, setActiveDataSlice, removeFromAllDataSlicesById, updateDataSlicesState, setUsersMapCount, setSearchRecordsExtended, setActiveSearchParams, extendAllDataSlices, updateConfigurationState, updateAdditionalDataState, setTextHighlight, setIsTextHighlightNeeded, setRecordComments, setRecordsInDisplay, expandRecordList } = dataBrowserSlice.actions;
 export const dataBrowserReducer = dataBrowserSlice.reducer;

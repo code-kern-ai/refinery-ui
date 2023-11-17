@@ -56,6 +56,7 @@ export enum LineBreaksType {
 
 export type DataBrowserRecordsProps = {
     clearFullSearch: (val: boolean) => void;
+    refetchNextRecords: () => void;
 };
 
 export type DataBrowserSideBarProps = {

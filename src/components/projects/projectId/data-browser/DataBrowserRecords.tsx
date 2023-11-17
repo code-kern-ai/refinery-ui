@@ -43,6 +43,12 @@ export default function DataBrowserRecords(props: DataBrowserRecordsProps) {
         }
     }
 
+    function refetchMoreRecords(e: any) {
+        if (e.target.offsetHeight + e.target.scrollTop >= e.target.scrollHeight) {
+            props.refetchNextRecords();
+        }
+    }
+
     return (<div className={`pt-4 bg-gray-100 flex-auto flex flex-col px-2 h-full ${style.transitionAll} `}>
         {extendedRecords && <div className='flex items-center justify-between'>
             <div className="text-sm select-none flex flex-row flex-nowrap whitespace-nowrap mr-2">
@@ -105,7 +111,7 @@ export default function DataBrowserRecords(props: DataBrowserRecordsProps) {
 
         </div>))}
 
-        <div className="mb-3 mt-4 grow overflow-y-auto" style={{ maxHeight: 'calc(100vh - 160px)' }}>
+        <div className="mb-3 mt-4 grow overflow-y-auto" style={{ maxHeight: 'calc(100vh - 160px)' }} onScroll={(e: any) => refetchMoreRecords(e)}>
             {additionalData.loading && <LoadingIcon size='md' />}
             {extendedRecords && attributes && !additionalData.loading && <div className="mr-2">
                 {extendedRecords.fullCount == 0 && <div>Your search criteria didn&apos;t match any record.</div>}
