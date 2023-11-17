@@ -1,5 +1,5 @@
 import { selectLabelingTasksAll, setLabelingTasksAll } from "@/src/reduxStore/states/pages/settings";
-import { selectProject } from "@/src/reduxStore/states/project"
+import { selectProjectId } from "@/src/reduxStore/states/project"
 import { GET_MODEL_CALLBACKS_OVERVIEW_DATA } from "@/src/services/gql/queries/model-callbacks";
 import { GET_LABELING_TASKS_BY_PROJECT_ID } from "@/src/services/gql/queries/project-setting";
 import { LabelingTask } from "@/src/types/components/projects/projectId/settings/labeling-tasks";
@@ -27,7 +27,7 @@ export default function ModelCallbacks() {
     const dispatch = useDispatch();
     const router = useRouter();
 
-    const project = useSelector(selectProject);
+    const projectId = useSelector(selectProjectId);
     const labelingTasks = useSelector(selectLabelingTasksAll);
     const modalDelete = useSelector(selectModal(ModalEnum.DELETE_MODEL_CALLBACKS));
 
@@ -53,15 +53,15 @@ export default function ModelCallbacks() {
     const [abortButton, setAbortButton] = useState<ModalButton>(ABORT_BUTTON);
 
     useEffect(() => {
-        if (!project) return;
+        if (!projectId) return;
         refetchLabelingTasksAndProcess();
         refetchModelCallbacksAndProcess();
         WebSocketsService.subscribeToNotification(CurrentPage.MODEL_CALLBACKS, {
-            projectId: project.id,
+            projectId: projectId,
             whitelist: ['information_source_created', 'information_source_updated', 'information_source_deleted', 'labeling_task_deleted', 'labeling_task_updated', 'labeling_task_created', 'model_callback_update_statistics'],
             func: handleWebsocketNotification
         });
-    }, [project]);
+    }, [projectId]);
 
     function toggleTabs(index: number, labelingTask: LabelingTask | null) {
         setOpenTab(index);
@@ -69,14 +69,14 @@ export default function ModelCallbacks() {
     }
 
     function refetchLabelingTasksAndProcess() {
-        refetchLabelingTasksByProjectId({ variables: { projectId: project.id } }).then((res) => {
+        refetchLabelingTasksByProjectId({ variables: { projectId: projectId } }).then((res) => {
             const labelingTasks = postProcessLabelingTasks(res['data']['projectByProjectId']['labelingTasks']['edges']);
             dispatch(setLabelingTasksAll(postProcessLabelingTasksSchema(labelingTasks)))
         });
     }
 
     function refetchModelCallbacksAndProcess() {
-        refetchModelCallbacks({ variables: { projectId: project.id } }).then((res) => {
+        refetchModelCallbacks({ variables: { projectId: projectId } }).then((res) => {
             const modelCallbacks = postProcessModelCallbacks(res['data']['modelCallbacksOverviewData']);
             setModelCallbacks(modelCallbacks);
             setFilteredList(modelCallbacks);
@@ -129,7 +129,7 @@ export default function ModelCallbacks() {
         }
     }
 
-    return (project && <div className="p-4 bg-gray-100 h-full flex-1 flex flex-col">
+    return (projectId && <div className="p-4 bg-gray-100 h-full flex-1 flex flex-col">
         <div className="w-full h-full">
             <div className="flex-shrink-0 block xl:flex justify-between items-center">
                 <div className={`flex ${style.widthLine} border-b-2 border-b-gray-200 max-w-full overflow-x-auto`}>
@@ -138,7 +138,7 @@ export default function ModelCallbacks() {
                         <div className={`cursor-pointer text-sm leading-5 font-medium mr-10 py-5 ${openTab == index ? 'text-indigo-700 ' + style.borderBottom : 'text-gray-500'}`} onClick={() => toggleTabs(index, labelingTask)}>{labelingTask.name}</div>
                     </div>)}
                     <Tooltip color="invert" placement="right" content={TOOLTIPS_DICT.MODEL_CALLBACKS.ADD_LABELING_TASK} >
-                        <button onClick={() => router.push(`/projects/${project.id}/settings`)}>
+                        <button onClick={() => router.push(`/projects/${projectId}/settings`)}>
                             <IconPlus size={20} strokeWidth={1.5} className="text-gray-500 cursor-pointer" />
                         </button>
                     </Tooltip>
@@ -166,7 +166,7 @@ export default function ModelCallbacks() {
                     <div className="flex justify-center overflow-visible">
                         <Tooltip placement="left" content={TOOLTIPS_DICT.MODEL_CALLBACKS.NAVIGATE_HEURISTICS} color="invert">
                             <button onClick={() => {
-                                router.push(`/projects/${project.id}/heuristics`)
+                                router.push(`/projects/${projectId}/heuristics`)
                             }} className="bg-white text-gray-700 text-xs font-medium mr-3 px-4 py-2 rounded-md border border-gray-300 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
                                 Heuristics
                             </button>
@@ -176,7 +176,7 @@ export default function ModelCallbacks() {
                     <div className="flex justify-center overflow-visible">
                         <Tooltip placement="left" content={TOOLTIPS_DICT.MODEL_CALLBACKS.NAVIGATE_LOOKUP_LISTS} color="invert">
                             <button onClick={() => {
-                                router.push(`/projects/${project.id}/lookup-lists`)
+                                router.push(`/projects/${projectId}/lookup-lists`)
                             }} className=" bg-white text-gray-700 text-xs font-medium mr-3 px-4 py-2 rounded-md border border-gray-300 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
                                 Lookup lists
                             </button>

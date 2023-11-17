@@ -3,7 +3,7 @@ import Modal from "@/src/components/shared/modal/Modal";
 import { openModal } from "@/src/reduxStore/states/modal";
 import { selectHeuristic } from "@/src/reduxStore/states/pages/heuristics";
 import { selectLabelingTasksAll } from "@/src/reduxStore/states/pages/settings";
-import { selectProject } from "@/src/reduxStore/states/project";
+import { selectProjectId } from "@/src/reduxStore/states/project";
 import { GET_ZERO_SHOT_TEXT } from "@/src/services/gql/queries/heuristics";
 import { ModalEnum } from "@/src/types/shared/modal";
 import { postProcessZeroShotText } from "@/src/util/components/projects/projectId/heuristics/heuristicId/zero-shot-helper";
@@ -18,7 +18,7 @@ import ZeroShotExecution from "./ZeroShotExecution";
 export default function Playground() {
     const dispatch = useDispatch();
 
-    const project = useSelector(selectProject);
+    const projectId = useSelector(selectProjectId);
     const currentHeuristic = useSelector(selectHeuristic);
     const labelingTasks = useSelector(selectLabelingTasksAll);
 
@@ -45,7 +45,7 @@ export default function Playground() {
         setSingleLineTesterResult([]);
         refetchZeroShotText({
             variables: {
-                projectId: project.id, informationSourceId: currentHeuristic.id, config: currentHeuristic.zeroShotSettings.targetConfig, text: testInput, runIndividually: currentHeuristic.zeroShotSettings.runIndividually, labels: JSON.stringify(labels)
+                projectId: projectId, informationSourceId: currentHeuristic.id, config: currentHeuristic.zeroShotSettings.targetConfig, text: testInput, runIndividually: currentHeuristic.zeroShotSettings.runIndividually, labels: JSON.stringify(labels)
             }
         }).then(res => {
             const labels = labelingTasks.find(task => task.id == currentHeuristic.labelingTaskId).labels

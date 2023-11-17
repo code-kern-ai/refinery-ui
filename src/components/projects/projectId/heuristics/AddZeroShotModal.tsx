@@ -3,7 +3,7 @@ import { CacheEnum, selectCachedValue } from "@/src/reduxStore/states/cachedValu
 import { selectModal } from "@/src/reduxStore/states/modal";
 import { selectHeuristicType } from "@/src/reduxStore/states/pages/heuristics";
 import { selectLabelingTasksAll, selectUsableNonTextAttributes } from "@/src/reduxStore/states/pages/settings";
-import { selectProject } from "@/src/reduxStore/states/project";
+import { selectProjectId } from "@/src/reduxStore/states/project";
 import { CREATE_ZERO_SHOT_INFORMATION_SOURCE } from "@/src/services/gql/mutations/heuristics";
 import { LabelingTaskTaskType } from "@/src/types/components/projects/projectId/settings/labeling-tasks";
 import { ModalButton, ModalEnum } from "@/src/types/shared/modal";
@@ -22,7 +22,7 @@ const ACCEPT_BUTTON = { buttonCaption: 'Create', useButton: true, disabled: true
 export default function AddZeroShotModal() {
     const router = useRouter();
 
-    const project = useSelector(selectProject);
+    const projectId = useSelector(selectProjectId);
     const labelingTasks = useSelector(selectLabelingTasksAll);
     const attributes = useSelector(selectUsableNonTextAttributes);
     const modalZs = useSelector(selectModal(ModalEnum.ADD_ZERO_SHOT));
@@ -41,10 +41,10 @@ export default function AddZeroShotModal() {
     const createZeroShot = useCallback(() => {
         const labelingTaskId = labelingTasks.find(lt => lt.name == labelingTask)?.id;
         const attributeId = attributes.find(a => a.name == attribute) ? attributes.find(a => a.name == attribute).id : '';
-        createZeroShotMut({ variables: { projectId: project.id, targetConfig: model, labelingTaskId: labelingTaskId, attributeId: attributeId } }).then((res) => {
+        createZeroShotMut({ variables: { projectId: projectId, targetConfig: model, labelingTaskId: labelingTaskId, attributeId: attributeId } }).then((res) => {
             let id = res['data']?.['createZeroShotInformationSource']['id'];
             if (id) {
-                router.push(getRouterLinkHeuristic(heuristicType, project.id, id))
+                router.push(getRouterLinkHeuristic(heuristicType, projectId, id))
             } else {
                 console.log("can't find newly created id for " + heuristicType + " --> can't open");
             }

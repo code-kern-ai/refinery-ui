@@ -2,7 +2,7 @@ import { selectAnnotators, selectAnnotatorsDict } from "@/src/reduxStore/states/
 import { selectDataSlicesAll, selectDataSlicesDict } from "@/src/reduxStore/states/pages/data-browser";
 import { selectHeuristic, updateHeuristicsState } from "@/src/reduxStore/states/pages/heuristics";
 import { selectLabelingTasksAll } from "@/src/reduxStore/states/pages/settings";
-import { selectProject } from "@/src/reduxStore/states/project";
+import { selectProjectId } from "@/src/reduxStore/states/project";
 import { CREATE_ACCESS_LINK, LOCK_ACCESS_LINK, REMOVE_ACCESS_LINK, UPDATE_INFORMATION_SOURCE } from "@/src/services/gql/mutations/heuristics";
 import { GET_ACCESS_LINK } from "@/src/services/gql/queries/heuristics";
 import { parseToSettingsJson } from "@/src/util/components/projects/projectId/heuristics/heuristicId/crowd-labeler-helper";
@@ -21,7 +21,7 @@ export default function CrowdLabelerSettings() {
     const dispatch = useDispatch();
     const router = useRouter();
 
-    const project = useSelector(selectProject);
+    const projectId = useSelector(selectProjectId);
     const currentHeuristic = useSelector(selectHeuristic);
     const labelingTasks = useSelector(selectLabelingTasksAll);
     const annotators = useSelector(selectAnnotators);
@@ -36,17 +36,17 @@ export default function CrowdLabelerSettings() {
     const [changeAccessLinkMut] = useMutation(LOCK_ACCESS_LINK);
 
     useEffect(() => {
-        if (!project) return;
-        refetchAccessLink({ variables: { projectId: project.id, linkId: currentHeuristic.crowdLabelerSettings.accessLinkId } }).then((res) => {
+        if (!projectId) return;
+        refetchAccessLink({ variables: { projectId: projectId, linkId: currentHeuristic.crowdLabelerSettings.accessLinkId } }).then((res) => {
             if (!res?.data?.accessLink?.id) return;
             fillLinkData(res.data.accessLink);
         });
-    }, [project]);
+    }, [projectId]);
 
     function saveHeuristic(labelingTaskName: string, crowdLabelerSettings: any = null) {
         const labelingTask = labelingTaskName ? labelingTasks.find(a => a.name == labelingTaskName) : labelingTasks.find(a => a.id == currentHeuristic.labelingTaskId);
         const code = parseToSettingsJson(crowdLabelerSettings ? crowdLabelerSettings : currentHeuristic.crowdLabelerSettings);
-        updateHeuristicMut({ variables: { projectId: project.id, informationSourceId: currentHeuristic.id, labelingTaskId: labelingTask.id, code: code } }).then((res) => {
+        updateHeuristicMut({ variables: { projectId: projectId, informationSourceId: currentHeuristic.id, labelingTaskId: labelingTask.id, code: code } }).then((res) => {
             dispatch(updateHeuristicsState(currentHeuristic.id, { labelingTaskId: labelingTask.id, labelingTaskName: labelingTask.name, labels: labelingTask.labels }));
         });
     }
@@ -60,7 +60,7 @@ export default function CrowdLabelerSettings() {
 
     function generateAccessLink() {
         if (currentHeuristic.crowdLabelerSettings.accessLinkId) return;
-        createAccessLinkMut({ variables: { projectId: project.id, type: "HEURISTIC", id: currentHeuristic.id } }).then((res) => {
+        createAccessLinkMut({ variables: { projectId: projectId, type: "HEURISTIC", id: currentHeuristic.id } }).then((res) => {
             if (!res?.data?.generateAccessLink?.link?.id) return;
             const link = res.data.generateAccessLink.link;
             fillLinkData(link);
@@ -70,7 +70,7 @@ export default function CrowdLabelerSettings() {
     }
 
     function removeAccessLink() {
-        removeAccessLinkMut({ variables: { projectId: project.id, linkId: currentHeuristic.crowdLabelerSettings.accessLink } }).then((res) => {
+        removeAccessLinkMut({ variables: { projectId: projectId, linkId: currentHeuristic.crowdLabelerSettings.accessLink } }).then((res) => {
             if (!res?.data?.removeAccessLink?.link?.id) return;
             dispatch(updateHeuristicsState(currentHeuristic.id, { crowdLabelerSettings: { ...currentHeuristic.crowdLabelerSettings, accessLink: null } }));
             saveHeuristic(null, { ...currentHeuristic.crowdLabelerSettings, accessLink: null });
@@ -89,7 +89,7 @@ export default function CrowdLabelerSettings() {
 
     function changeAccessLinkLock() {
         if (!currentHeuristic.crowdLabelerSettings.accessLinkId) return;
-        changeAccessLinkMut({ variables: { projectId: project.id, linkId: currentHeuristic.crowdLabelerSettings.accessLinkId, lockState: !currentHeuristic.crowdLabelerSettings.accessLinkLocked } }).then((res) => {
+        changeAccessLinkMut({ variables: { projectId: projectId, linkId: currentHeuristic.crowdLabelerSettings.accessLinkId, lockState: !currentHeuristic.crowdLabelerSettings.accessLinkLocked } }).then((res) => {
             if (!res?.data?.lockAccessLink?.link?.id) return;
             dispatch(updateHeuristicsState(currentHeuristic.id, { crowdLabelerSettings: { ...currentHeuristic.crowdLabelerSettings, accessLinkLocked: res.data.lockAccessLink.link.isLocked } }));
             saveHeuristic(null, { ...currentHeuristic.crowdLabelerSettings, accessLinkLocked: res.data.lockAccessLink.link.isLocked });

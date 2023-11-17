@@ -1,6 +1,6 @@
 import Modal from "@/src/components/shared/modal/Modal";
 import { selectModal } from "@/src/reduxStore/states/modal";
-import { selectProject } from "@/src/reduxStore/states/project";
+import { selectProjectId } from "@/src/reduxStore/states/project";
 import { CALCULATE_USER_ATTRIBUTE_ALL_RECORDS } from "@/src/services/gql/mutations/project-settings";
 import { ConfirmExecutionModalProps } from "@/src/types/components/projects/projectId/settings/attribute-calculation";
 import { ModalButton, ModalEnum } from "@/src/types/shared/modal";
@@ -12,13 +12,13 @@ const ACCEPT_BUTTON = { buttonCaption: 'Accept', useButton: true };
 
 
 export default function ConfirmExecutionModal(props: ConfirmExecutionModalProps) {
-    const project = useSelector(selectProject);
+    const projectId = useSelector(selectProjectId);
     const modalExecuteAll = useSelector(selectModal(ModalEnum.EXECUTE_ATTRIBUTE_CALCULATION));
 
     const [executeAttributeCalculation] = useMutation(CALCULATE_USER_ATTRIBUTE_ALL_RECORDS);
 
     const calculateUserAttributeAllRecords = useCallback(() => {
-        executeAttributeCalculation({ variables: { projectId: project.id, attributeId: props.currentAttributeId } }).then((res) => {
+        executeAttributeCalculation({ variables: { projectId: projectId, attributeId: props.currentAttributeId } }).then((res) => {
         });
     }, [modalExecuteAll]);
 

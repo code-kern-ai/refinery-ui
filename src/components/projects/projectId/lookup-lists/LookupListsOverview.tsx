@@ -1,4 +1,4 @@
-import { selectProject } from "@/src/reduxStore/states/project";
+import { selectProjectId } from "@/src/reduxStore/states/project";
 import React, { useCallback, useEffect, useState } from "react"
 import { useDispatch, useSelector } from "react-redux";
 import { extendAllLookupLists, removeFromAllLookupListById, selectAllLookupLists, selectCheckedLookupLists, setAllLookupLists, setCheckedLookupLists } from "@/src/reduxStore/states/pages/lookup-lists";
@@ -25,7 +25,7 @@ export default function LookupListsOverview() {
     const router = useRouter();
     const dispatch = useDispatch();
 
-    const project = useSelector(selectProject);
+    const projectId = useSelector(selectProjectId);
     const lookupLists = useSelector(selectAllLookupLists);
     const checkedLookupLists = useSelector(selectCheckedLookupLists);
     const modalDelete = useSelector(selectModal(ModalEnum.DELETE_LOOKUP_LIST));
@@ -43,7 +43,7 @@ export default function LookupListsOverview() {
                 const lookupList = lookupLists[index];
                 deleteLookupListMut({
                     variables: {
-                        projectId: project?.id,
+                        projectId: projectId,
                         knowledgeBaseId: lookupList.id
                     }
                 }).then((res) => {
@@ -61,22 +61,22 @@ export default function LookupListsOverview() {
     const [abortButton, setAbortButton] = useState<ModalButton>(ABORT_BUTTON);
 
     useEffect(() => {
-        if (!project) return;
-        refetchLookupLists({ variables: { projectId: project.id } }).then((res) => {
+        if (!projectId) return;
+        refetchLookupLists({ variables: { projectId: projectId } }).then((res) => {
             dispatch(setAllLookupLists(postProcessLookupLists(res.data["knowledgeBasesByProjectId"])));
         });
         WebSocketsService.subscribeToNotification(CurrentPage.LOOKUP_LISTS_OVERVIEW, {
-            projectId: project.id,
+            projectId: projectId,
             whitelist: ['knowledge_base_updated', 'knowledge_base_deleted', 'knowledge_base_created'],
             func: handleWebsocketNotification
         });
-    }, [project]);
+    }, [projectId]);
 
     function createLookupList() {
-        createLookupListMut({ variables: { projectId: project.id } }).then((res) => {
+        createLookupListMut({ variables: { projectId: projectId } }).then((res) => {
             const lookupList = res.data?.createKnowledgeBase["knowledgeBase"];
             dispatch(extendAllLookupLists(lookupList));
-            router.push(`/projects/${project.id}/lookup-lists/${lookupList.id}`);
+            router.push(`/projects/${projectId}/lookup-lists/${lookupList.id}`);
         });
     }
 
@@ -116,14 +116,14 @@ export default function LookupListsOverview() {
 
     function handleWebsocketNotification(msgParts: string[]) {
         if (['knowledge_base_updated', 'knowledge_base_deleted', 'knowledge_base_created'].includes(msgParts[1])) {
-            refetchLookupLists({ variables: { projectId: project.id } }).then((res) => {
+            refetchLookupLists({ variables: { projectId: projectId } }).then((res) => {
                 dispatch(setAllLookupLists(postProcessLookupLists(res.data["knowledgeBasesByProjectId"])));
             });
         }
     }
 
     return (
-        project?.id ? (
+        projectId ? (
             <div className="p-4 h-screen bg-gray-100 flex-1 flex flex-col">
                 <div className="w-full ">
                     <div className="flex-shrink-0 block sm:flex justify-between items-center">
@@ -163,7 +163,7 @@ export default function LookupListsOverview() {
                             <div className="flex justify-center overflow-visible">
                                 <Tooltip placement="left" content={TOOLTIPS_DICT.LOOKUP_LISTS_OVERVIEW.NAVIGATE_HEURISTICS} color="invert">
                                     <button onClick={() => {
-                                        router.push(`/projects/${project.id}/heuristics`)
+                                        router.push(`/projects/${projectId}/heuristics`)
                                     }} className="bg-white text-gray-700 text-xs font-medium mr-3 px-4 py-2 rounded-md border border-gray-300 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
                                         Heuristics
                                     </button>
@@ -173,7 +173,7 @@ export default function LookupListsOverview() {
                             <div className="flex justify-center overflow-visible">
                                 <Tooltip placement="left" content={TOOLTIPS_DICT.LOOKUP_LISTS_OVERVIEW.NAVIGATE_MODEL_CALLBACKS} color="invert">
                                     <button onClick={() => {
-                                        router.push(`/projects/${project.id}/model-callbacks`)
+                                        router.push(`/projects/${projectId}/model-callbacks`)
                                     }} className=" bg-white text-gray-700 text-xs font-medium mr-3 px-4 py-2 rounded-md border border-gray-300 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
                                         Model callbacks
                                     </button>

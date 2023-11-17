@@ -1,4 +1,4 @@
-import { selectProject } from '@/src/reduxStore/states/project';
+import { selectProjectId } from '@/src/reduxStore/states/project';
 import { WebSocketsService } from '@/src/services/base/web-sockets/WebSocketsService';
 import { CurrentPage } from '@/src/types/shared/general';
 import { useLazyQuery } from '@apollo/client';
@@ -18,7 +18,7 @@ const PROJECT_STATS_INITIAL_STATE: ProjectStats = getEmptyProjectStats();
 
 export default function ProjectOverview() {
     const router = useRouter();
-    const project = useSelector(selectProject);
+    const projectId = useSelector(selectProjectId);
 
     const [projectStats, setProjectStats] = useState<ProjectStats>(PROJECT_STATS_INITIAL_STATE);
     const [graphsHaveValues, setGraphsHaveValues] = useState<boolean>(false);
@@ -33,7 +33,7 @@ export default function ProjectOverview() {
             whitelist: ['label_created', 'label_deleted', 'labeling_task_deleted', 'labeling_task_updated', 'labeling_task_created', 'weak_supervision_finished', 'data_slice_created', 'data_slice_updated', 'data_slice_deleted'],
             func: handleWebsocketNotification
         });
-    }, [project]);
+    }, [projectId]);
 
     function handleWebsocketNotification(msgParts: string[]) {
 
@@ -41,18 +41,18 @@ export default function ProjectOverview() {
 
     // TODO: Add labeling task id and data slice id to the query
     function getProjectStats() {
-        if (!project) return;
+        if (!projectId) return;
         const projectStatsCopy = jsonCopy(projectStats);
         projectStatsCopy.generalLoading = true;
         projectStatsCopy.interAnnotatorLoading = true;
         setProjectStats(projectStatsCopy);
-        refetchProjectStats({ variables: { projectId: project.id, labelingTaskId: "9ba4096a-96b8-433d-a3bf-0704c6bf3202", sliceId: null } }).then((res) => {
+        refetchProjectStats({ variables: { projectId: projectId, labelingTaskId: "9ba4096a-96b8-433d-a3bf-0704c6bf3202", sliceId: null } }).then((res) => {
             setProjectStats(postProcessingStats(JSON.parse(res['data']['generalProjectStats'])));
         });
     }
 
     return (<div>
-        {project != null && <div className="p-4 bg-gray-100 flex-1 flex flex-col min-h-full">
+        {projectId != null && <div className="p-4 bg-gray-100 flex-1 flex flex-col min-h-full">
             <ProjectOverviewHeader />
             <ProjectOverviewCards projectStats={projectStats} />
             {graphsHaveValues ? (<div>

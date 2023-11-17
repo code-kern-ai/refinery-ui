@@ -1,4 +1,4 @@
-import { selectProject } from "@/src/reduxStore/states/project";
+import { selectProjectId } from "@/src/reduxStore/states/project";
 import { Heuristic } from "@/src/types/components/projects/projectId/heuristics/heuristics";
 import { GridCardsProps } from "@/src/types/shared/grid-cards";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
@@ -15,7 +15,7 @@ import Statuses from "../statuses/Statuses";
 export default function GridCards(props: GridCardsProps) {
     const router = useRouter();
 
-    const project = useSelector(selectProject);
+    const projectId = useSelector(selectProjectId);
 
     const [toggleHeuristicsMut] = useMutation(TOGGLE_HEURISTICS_SELECTED);
 
@@ -30,7 +30,7 @@ export default function GridCards(props: GridCardsProps) {
             <div className={`relative flex space-x-3 items-center rounded-lg border border-gray-300 bg-white px-6 py-5 shadow-sm hover:border-gray-400 ${props.filteredList.length > 2 ? style.item : ''}`}>
                 <div className="h-full flex flex-col gap-2 items-center self-start">
                     <label htmlFor="heuristic-name" className="cursor-pointer flex justify-center">
-                        <input type="checkbox" className="cursor-pointer" name="heuristic-name" checked={heuristic.selected} onChange={() => toggleHeuristic(project.id, heuristic.id)} />
+                        <input type="checkbox" className="cursor-pointer" name="heuristic-name" checked={heuristic.selected} onChange={() => toggleHeuristic(projectId, heuristic.id)} />
                     </label>
                     {heuristic.informationSourceType === InformationSourceType.LABELING_FUNCTION && <Tooltip content={TOOLTIPS_DICT.HEURISTICS.LABELING_FUNCTION} color="invert" placement="right">
                         <IconCode size={20} strokeWidth={1.5} />

@@ -1,6 +1,6 @@
 import { openModal, setModalStates } from "@/src/reduxStore/states/modal";
 import { selectLabelingTasksAll, setLabelingTasksAll } from "@/src/reduxStore/states/pages/settings";
-import { selectProject } from "@/src/reduxStore/states/project";
+import { selectProjectId } from "@/src/reduxStore/states/project";
 import { WebSocketsService } from "@/src/services/base/web-sockets/WebSocketsService";
 import { unsubscribeWSOnDestroy } from "@/src/services/base/web-sockets/web-sockets-helper";
 import { GET_LABELING_TASKS_BY_PROJECT_ID } from "@/src/services/gql/queries/project-setting";
@@ -27,7 +27,7 @@ export default function LabelingTasks() {
     const router = useRouter();
     const dispatch = useDispatch();
 
-    const project = useSelector(selectProject);
+    const projectId = useSelector(selectProjectId);
     const labelingTasksSchema = useSelector(selectLabelingTasksAll);
 
     const [labelingTasksDropdownArray, setLabelingTasksDropdownArray] = useState<{ name: string, value: string }[]>([]);
@@ -39,14 +39,14 @@ export default function LabelingTasks() {
         LabelHelper.setLabelColorOptions();
         refetchLabelingTasksAndProcess();
         refetchWS();
-    }, [project]);
+    }, [projectId]);
 
     useEffect(() => {
         setLabelingTasksDropdownArray(labelingTasksDropdownValues());
     }, [labelingTasksSchema]);
 
     function refetchLabelingTasksAndProcess() {
-        refetchLabelingTasksByProjectId({ variables: { projectId: project.id } }).then((res) => {
+        refetchLabelingTasksByProjectId({ variables: { projectId: projectId } }).then((res) => {
             const labelingTasks = postProcessLabelingTasks(res['data']['projectByProjectId']['labelingTasks']['edges']);
             dispatch(setLabelingTasksAll(postProcessLabelingTasksSchema(labelingTasks)))
         });
@@ -56,7 +56,7 @@ export default function LabelingTasks() {
 
     function refetchWS() {
         WebSocketsService.subscribeToNotification(CurrentPage.PROJECT_SETTINGS, {
-            projectId: project.id,
+            projectId: projectId,
             whitelist: ['label_created', 'label_deleted', 'labeling_task_deleted', 'labeling_task_updated', 'labeling_task_created'],
             func: handleWebsocketNotification
         });
@@ -74,7 +74,7 @@ export default function LabelingTasks() {
         dispatch(setLabelingTasksAll(labelingTasksSchemaCopy));
         if (value == '') return;
         if (!isTaskNameUnique(labelingTasksSchema, value)) return;
-        updateLabelingTaskMut({ variables: { projectId: project.id, labelingTaskId: task.id, labelingTaskName: value, labelingTaskType: task.taskType, labelingTaskTargetId: task.targetId == "" ? null : task.targetId } }).then((res) => {
+        updateLabelingTaskMut({ variables: { projectId: projectId, labelingTaskId: task.id, labelingTaskName: value, labelingTaskType: task.taskType, labelingTaskTargetId: task.targetId == "" ? null : task.targetId } }).then((res) => {
             const labelingTasksSchemaCopy = jsonCopy(labelingTasksSchema);
             labelingTasksSchemaCopy[index].name = value;
             labelingTasksSchemaCopy[index].nameOpen = false;
@@ -83,7 +83,7 @@ export default function LabelingTasks() {
     }
 
     function updateLabelingTaskType(task: LabelingTask, index: number, value: string) {
-        updateLabelingTaskMut({ variables: { projectId: project.id, labelingTaskId: task.id, labelingTaskName: task.name, labelingTaskType: value, labelingTaskTargetId: task.targetId == "" ? null : task.targetId } }).then((res) => {
+        updateLabelingTaskMut({ variables: { projectId: projectId, labelingTaskId: task.id, labelingTaskName: task.name, labelingTaskType: value, labelingTaskTargetId: task.targetId == "" ? null : task.targetId } }).then((res) => {
             const labelingTasksSchemaCopy = jsonCopy(labelingTasksSchema);
             labelingTasksSchemaCopy[index].taskType = value;
             dispatch(setLabelingTasksAll(labelingTasksSchemaCopy));

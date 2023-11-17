@@ -3,7 +3,7 @@ import Modal from "@/src/components/shared/modal/Modal";
 import { selectIsManaged } from "@/src/reduxStore/states/general";
 import { openModal, selectModal, setModalStates } from "@/src/reduxStore/states/modal";
 import { removeFromAllEmbeddingsById, selectAttributes, selectEmbeddings, selectUsableNonTextAttributes } from "@/src/reduxStore/states/pages/settings";
-import { selectProject } from "@/src/reduxStore/states/project";
+import { selectProjectId } from "@/src/reduxStore/states/project";
 import { WebSocketsService } from "@/src/services/base/web-sockets/WebSocketsService";
 import { DELETE_EMBEDDING, DELETE_FROM_TASK_QUEUE, UPDATE_EMBEDDING_PAYLOAD } from "@/src/services/gql/mutations/project-settings";
 import { Embedding, EmbeddingProps, EmbeddingState } from "@/src/types/components/projects/projectId/settings/embeddings";
@@ -36,7 +36,7 @@ export default function Embeddings(props: EmbeddingProps) {
     const usableAttributes = useSelector(selectUsableNonTextAttributes);
     const isManaged = useSelector(selectIsManaged);
     const embeddings = useSelector(selectEmbeddings);
-    const project = useSelector(selectProject);
+    const projectId = useSelector(selectProjectId);
 
     const [somethingLoading, setSomethingLoading] = useState(false);
     const [loadingEmbeddingsDict, setLoadingEmbeddingsDict] = useState<{ [key: string]: boolean }>({});
@@ -62,11 +62,11 @@ export default function Embeddings(props: EmbeddingProps) {
         const embeddingId = modalDeleteEmbedding.embeddingId;
         if (!embeddingId) return;
         if (modalDeleteEmbedding.isQueuedElement) {
-            refetchDeleteTaskQueue({ variables: { projectId: project.id, taskId: embeddingId } }).then((res) => {
+            refetchDeleteTaskQueue({ variables: { projectId: projectId, taskId: embeddingId } }).then((res) => {
                 dispatch(removeFromAllEmbeddingsById(embeddingId));
             });
         } else {
-            refetchDeleteEmbedding({ variables: { projectId: project.id, embeddingId: embeddingId } }).then((res) => {
+            refetchDeleteEmbedding({ variables: { projectId: projectId, embeddingId: embeddingId } }).then((res) => {
                 dispatch(removeFromAllEmbeddingsById(embeddingId));
             });
         }
@@ -82,7 +82,7 @@ export default function Embeddings(props: EmbeddingProps) {
     const saveFilteredAttributes = useCallback(() => {
         setShowEditOption(false);
         dispatch(setModalStates(ModalEnum.FILTERED_ATTRIBUTES, { showEditOption: false }));
-        updateEmbeddingPayloadMut({ variables: { projectId: project.id, embeddingId: modalFilteredAttributes.embeddingId, filterAttributes: JSON.stringify(filterAttributesUpdate) } }).then((res) => { });
+        updateEmbeddingPayloadMut({ variables: { projectId: projectId, embeddingId: modalFilteredAttributes.embeddingId, filterAttributes: JSON.stringify(filterAttributesUpdate) } }).then((res) => { });
     }, [filterAttributesUpdate]);
 
     const editFilteredAttributes = useCallback(() => {

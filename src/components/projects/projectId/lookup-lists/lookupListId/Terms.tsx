@@ -1,4 +1,4 @@
-import { selectProject } from "@/src/reduxStore/states/project";
+import { selectProjectId } from "@/src/reduxStore/states/project";
 import { ADD_TERM_TO_LOOKUP_LIST, BLACKLIST_TERM, REMOVE_TERM, UPDATE_TERM } from "@/src/services/gql/mutations/lookup-lists";
 import { Term, TermsProps } from "@/src/types/components/projects/projectId/lookup-lists";
 import { BLACKLISTED_TERMS_DROPDOWN_OPTIONS, TERMS_DROPDOWN_OPTIONS, isTermUnique } from "@/src/util/components/projects/projectId/lookup-lists-helper";
@@ -15,7 +15,7 @@ import { useSelector } from "react-redux";
 export default function Terms(props: TermsProps) {
     const router = useRouter();
     const terms = props.terms;
-    const project = useSelector(selectProject);
+    const projectId = useSelector(selectProjectId);
 
     const [name, setName] = useState("");
     const [description, setDescription] = useState("");
@@ -29,7 +29,7 @@ export default function Terms(props: TermsProps) {
 
     function addTermToKnowledgeBase() {
         if (name == '' || !isTermUnique(name, terms)) return;
-        addTermsMut({ variables: { projectId: project.id, value: name, comment: description, knowledgeBaseId: router.query.lookupListId } }).then((res) => {
+        addTermsMut({ variables: { projectId: projectId, value: name, comment: description, knowledgeBaseId: router.query.lookupListId } }).then((res) => {
             setName("");
             setDescription("");
             props.refetchTerms();
@@ -52,13 +52,13 @@ export default function Terms(props: TermsProps) {
     }
 
     function removeTerm(term: Term) {
-        removeTermMut({ variables: { projectId: project.id, termId: term.id } }).then((res) => {
+        removeTermMut({ variables: { projectId: projectId, termId: term.id } }).then((res) => {
             props.refetchTerms();
         });
     }
 
     function blacklistTerm(term: Term) {
-        blacklistTermMut({ variables: { projectId: project.id, termId: term.id } }).then((res) => {
+        blacklistTermMut({ variables: { projectId: projectId, termId: term.id } }).then((res) => {
             props.refetchTerms();
         });
     }
@@ -68,7 +68,7 @@ export default function Terms(props: TermsProps) {
         if (open) {
             setEditableTerm(termId);
         } else {
-            updateTermMut({ variables: { projectId: project.id, termId: termId, value: value, comment: comment ?? '' } }).then((res) => {
+            updateTermMut({ variables: { projectId: projectId, termId: termId, value: value, comment: comment ?? '' } }).then((res) => {
                 props.refetchTerms();
             });
         }

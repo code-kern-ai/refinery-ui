@@ -11,7 +11,7 @@ import LoadingIcon from '@/src/components/shared/loading/LoadingIcon';
 import { selectAttributes } from '@/src/reduxStore/states/pages/settings';
 import RecordList from './RecordList';
 import { useRouter } from 'next/router';
-import { selectProject } from '@/src/reduxStore/states/project';
+import { selectProjectId } from '@/src/reduxStore/states/project';
 import ConfigurationModal from './modals/ConfigurationModal';
 import { DataBrowserRecordsProps } from '@/src/types/components/projects/projectId/data-browser/data-browser';
 
@@ -19,7 +19,7 @@ export default function DataBrowserRecords(props: DataBrowserRecordsProps) {
     const dispatch = useDispatch();
     const router = useRouter();
 
-    const project = useSelector(selectProject);
+    const projectId = useSelector(selectProjectId);
     const extendedRecords = useSelector(selectRecords);
     const activeSlice = useSelector(selectActiveSlice);
     const similaritySearch = useSelector(selectSimilaritySearch);
@@ -37,9 +37,9 @@ export default function DataBrowserRecords(props: DataBrowserRecordsProps) {
     function storePreliminaryRecordIds(index: number, forEdit: boolean = false) {
         // TODO: Add the session and the data to the store
         if (forEdit) {
-            router.push(`/projects/${project.id}/edit-record`);
+            router.push(`/projects/${projectId}/edit-record`);
         } else {
-            router.push(`/projects/${project.id}/labeling`);
+            router.push(`/projects/${projectId}/labeling`);
         }
     }
 

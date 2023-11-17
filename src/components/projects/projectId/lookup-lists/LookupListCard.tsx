@@ -1,5 +1,5 @@
 import { selectAllLookupLists, selectCheckedLookupLists, setCheckedLookupLists } from "@/src/reduxStore/states/pages/lookup-lists";
-import { selectProject } from "@/src/reduxStore/states/project";
+import { selectProjectId } from "@/src/reduxStore/states/project";
 import { LookupListCardProps } from "@/src/types/components/projects/projectId/lookup-lists";
 import { IconArrowRight } from "@tabler/icons-react";
 import { useRouter } from "next/router";
@@ -10,7 +10,7 @@ export function LookupListCard(props: LookupListCardProps) {
     const dispatch = useDispatch();
     const router = useRouter();
 
-    const project = useSelector(selectProject);
+    const projectId = useSelector(selectProjectId);
     const lookupLists = useSelector(selectAllLookupLists);
     const checkedLookupLists = useSelector(selectCheckedLookupLists);
 
@@ -36,7 +36,7 @@ export function LookupListCard(props: LookupListCardProps) {
                     {props.lookupList.name}
                 </div>
                 <div onClick={() => {
-                    router.push(`/projects/${project.id}/lookup-lists/${props.lookupList.id}`);
+                    router.push(`/projects/${projectId}/lookup-lists/${props.lookupList.id}`);
                 }} className="text-green-800 float-right cursor-pointer">
                     Details
                     <IconArrowRight className="h-5 w-5 inline-block text-green-800" />

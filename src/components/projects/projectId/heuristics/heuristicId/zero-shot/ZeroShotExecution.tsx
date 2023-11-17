@@ -2,7 +2,7 @@ import Modal from "@/src/components/shared/modal/Modal";
 import { selectModal, setModalStates } from "@/src/reduxStore/states/modal";
 import { selectHeuristic } from "@/src/reduxStore/states/pages/heuristics";
 import { selectLabelingTasksAll, selectUsableAttributes } from "@/src/reduxStore/states/pages/settings";
-import { selectProject } from "@/src/reduxStore/states/project";
+import { selectProjectId } from "@/src/reduxStore/states/project";
 import { RUN_ZERO_SHOT_PROJECT } from "@/src/services/gql/mutations/heuristics";
 import { GET_ZERO_SHOT_10_RANDOM_RECORDS } from "@/src/services/gql/queries/heuristics";
 import { ZeroShotExecutionProps } from "@/src/types/components/projects/projectId/heuristics/heuristicId/zero-shot";
@@ -13,14 +13,13 @@ import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants"
 import { useLazyQuery, useMutation } from "@apollo/client";
 import { Tooltip } from "@nextui-org/react"
 import { IconAlertTriangle } from "@tabler/icons-react";
-import { Fragment, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import style from '@/src/styles/components/projects/projectId/heuristics/heuristics-details.module.css';
 
 export default function ZeroShotExecution(props: ZeroShotExecutionProps) {
     const dispatch = useDispatch();
 
-    const project = useSelector(selectProject);
+    const projectId = useSelector(selectProjectId);
     const currentHeuristic = useSelector(selectHeuristic);
     const labelingTasks = useSelector(selectLabelingTasksAll);
     const modalRecord = useSelector(selectModal(ModalEnum.SAMPLE_RECORDS_ZERO_SHOT));
@@ -50,7 +49,7 @@ export default function ZeroShotExecution(props: ZeroShotExecutionProps) {
         if (!labels.length) return;
         setTesterRequestedSomething(true);
         setRandomRecordTesterResult(null);
-        refetchZeroShot10Records({ variables: { projectId: project.id, informationSourceId: currentHeuristic.id, labels: JSON.stringify(labels) } }).then((res) => {
+        refetchZeroShot10Records({ variables: { projectId: projectId, informationSourceId: currentHeuristic.id, labels: JSON.stringify(labels) } }).then((res) => {
             const labels = labelingTasks.find(task => task.id == currentHeuristic.labelingTaskId).labels
             setRandomRecordTesterResult(postProcessZeroShot10Records(res.data['zeroShot10Records'], labels));
             setTesterRequestedSomething(false);
@@ -60,7 +59,7 @@ export default function ZeroShotExecution(props: ZeroShotExecutionProps) {
     function runZeroShotProject() {
         if (!canRunProject) return;
         setTesterRequestedSomething(true);
-        runZeroShotMut({ variables: { projectId: project.id, informationSourceId: currentHeuristic.id } }).then((res) => {
+        runZeroShotMut({ variables: { projectId: projectId, informationSourceId: currentHeuristic.id } }).then((res) => {
             setTesterRequestedSomething(false);
         });
     }

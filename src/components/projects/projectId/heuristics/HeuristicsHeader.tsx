@@ -5,7 +5,7 @@ import { selectIsManaged } from '@/src/reduxStore/states/general';
 import { openModal, selectModal } from '@/src/reduxStore/states/modal';
 import { selectHeuristicsAll, setHeuristicType } from '@/src/reduxStore/states/pages/heuristics';
 import { selectLabelingTasksAll } from '@/src/reduxStore/states/pages/settings';
-import { selectProject } from '@/src/reduxStore/states/project';
+import { selectProjectId } from '@/src/reduxStore/states/project';
 import { WebSocketsService } from '@/src/services/base/web-sockets/WebSocketsService';
 import { CREATE_INFORMATION_SOURCE_PAYLOAD, DELETE_HEURISTIC, RUN_ZERO_SHOT_PROJECT, SET_ALL_HEURISTICS, START_WEAK_SUPERVISIONS } from '@/src/services/gql/mutations/heuristics';
 import { GET_CURRENT_WEAK_SUPERVISION_RUN } from '@/src/services/gql/queries/heuristics';
@@ -33,7 +33,7 @@ export default function HeuristicsHeader(props: HeuristicsHeaderProps) {
     const router = useRouter();
 
     const isManaged = useSelector(selectIsManaged);
-    const project = useSelector(selectProject);
+    const projectId = useSelector(selectProjectId);
     const heuristics = useSelector(selectHeuristicsAll);
     const labelingTasks = useSelector(selectLabelingTasksAll);
     const modalDelete = useSelector(selectModal(ModalEnum.DELETE_HEURISTICS));
@@ -53,18 +53,18 @@ export default function HeuristicsHeader(props: HeuristicsHeaderProps) {
     const [runZeroShotMut] = useMutation(RUN_ZERO_SHOT_PROJECT);
 
     useEffect(() => {
-        if (!project) return;
+        if (!projectId) return;
         WebSocketsService.subscribeToNotification(CurrentPage.HEURISTICS, {
-            projectId: project.id,
+            projectId: projectId,
             whitelist: ['weak_supervision_started', 'weak_supervision_finished'],
             func: handleWebsocketNotification
         });
-    }, [project]);
+    }, [projectId]);
 
     const deleteHeuristics = useCallback(() => {
         heuristics.forEach((heuristic) => {
             if (heuristic.selected) {
-                deleteHeuristicMut({ variables: { projectId: project.id, informationSourceId: heuristic.id } }).then(() => props.refetch());
+                deleteHeuristicMut({ variables: { projectId: projectId, informationSourceId: heuristic.id } }).then(() => props.refetch());
             }
         });
     }, [modalDelete]);
@@ -84,7 +84,7 @@ export default function HeuristicsHeader(props: HeuristicsHeaderProps) {
     const [abortButton, setAbortButton] = useState<ModalButton>(ABORT_BUTTON);
 
     function refetchCurrentWeakSupervisionAndProcess() {
-        refetchCurrentWeakSupervision({ variables: { projectId: project.id } }).then((res) => {
+        refetchCurrentWeakSupervision({ variables: { projectId: projectId } }).then((res) => {
             if (res == null) {
                 setCurrentWeakSupervisionRun({ state: Status.NOT_YET_RUN });
             } else {
@@ -142,15 +142,15 @@ export default function HeuristicsHeader(props: HeuristicsHeaderProps) {
 
     function runHeuristic(type: InformationSourceType, id: string) {
         if (type == InformationSourceType.ZERO_SHOT) {
-            runZeroShotMut({ variables: { projectId: project.id, informationSourceId: id } }).then(() => { });
+            runZeroShotMut({ variables: { projectId: projectId, informationSourceId: id } }).then(() => { });
         } else if (type == InformationSourceType.CROWD_LABELER) {
         } else {
-            createTaskMut({ variables: { projectId: project.id, informationSourceId: id } }).then(() => { });
+            createTaskMut({ variables: { projectId: projectId, informationSourceId: id } }).then(() => { });
         }
     }
 
     function selectHeuristics(checked: boolean) {
-        setHeuristicsMut({ variables: { projectId: project.id, value: checked } }).then(() => { props.refetch() });
+        setHeuristicsMut({ variables: { projectId: projectId, value: checked } }).then(() => { props.refetch() });
     }
 
     function prepareSelectionList() {
@@ -168,7 +168,7 @@ export default function HeuristicsHeader(props: HeuristicsHeaderProps) {
     }
 
     function startWeakSupervision() {
-        startWeakSupervisionMut({ variables: { projectId: project.id } }).then(() => { });
+        startWeakSupervisionMut({ variables: { projectId: projectId } }).then(() => { });
     }
 
     function handleWebsocketNotification(msgParts: string[]) {
@@ -186,7 +186,7 @@ export default function HeuristicsHeader(props: HeuristicsHeaderProps) {
                     <div className={`cursor-pointer text-sm leading-5 font-medium mr-10 py-5 ${openTab == index ? 'text-indigo-700 ' + style.borderBottom : 'text-gray-500'}`} onClick={() => toggleTabs(index, labelingTask)}>{labelingTask.name}</div>
                 </div>)}
                 <Tooltip color="invert" placement="right" content={TOOLTIPS_DICT.HEURISTICS.ADD_LABELING_TASK} >
-                    <button onClick={() => router.push(`/projects/${project.id}/settings`)}>
+                    <button onClick={() => router.push(`/projects/${projectId}/settings`)}>
                         <IconPlus size={20} strokeWidth={1.5} className="text-gray-500 cursor-pointer" />
                     </button>
                 </Tooltip>
@@ -267,7 +267,7 @@ export default function HeuristicsHeader(props: HeuristicsHeaderProps) {
                 <div className="flex justify-center overflow-visible">
                     <Tooltip placement="left" content={TOOLTIPS_DICT.HEURISTICS.NAVIGATE_MODEL_CALLBACKS} color="invert">
                         <button onClick={() => {
-                            router.push(`/projects/${project.id}/model-callbacks`)
+                            router.push(`/projects/${projectId}/model-callbacks`)
                         }} className="bg-white text-gray-700 text-xs font-medium mr-3 px-4 py-2 rounded-md border border-gray-300 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
                             Model callbacks
                         </button>
@@ -277,7 +277,7 @@ export default function HeuristicsHeader(props: HeuristicsHeaderProps) {
                 <div className="flex justify-center overflow-visible">
                     <Tooltip placement="left" content={TOOLTIPS_DICT.HEURISTICS.NAVIGATE_LOOKUP_LISTS} color="invert">
                         <button onClick={() => {
-                            router.push(`/projects/${project.id}/lookup-lists`)
+                            router.push(`/projects/${projectId}/lookup-lists`)
                         }} className=" bg-white text-gray-700 text-xs font-medium mr-3 px-4 py-2 rounded-md border border-gray-300 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
                             Lookup lists
                         </button>

@@ -3,7 +3,7 @@ import { selectOrganization } from "@/src/reduxStore/states/general";
 import { selectModal } from "@/src/reduxStore/states/modal";
 import { setModelsDownloaded } from "@/src/reduxStore/states/pages/models-downloaded";
 import { selectEmbeddings, selectRecommendedEncodersAll, selectRecommendedEncodersDict, selectUsableNonTextAttributes, selectUseableEmbedableAttributes, setAllRecommendedEncodersDict } from "@/src/reduxStore/states/pages/settings";
-import { selectProject } from "@/src/reduxStore/states/project";
+import { selectProjectId } from "@/src/reduxStore/states/project";
 import { CREATE_EMBEDDING } from "@/src/services/gql/mutations/project-settings";
 import { GET_EMBEDDING_PLATFORMS } from "@/src/services/gql/queries/project-setting";
 import { GET_MODEL_PROVIDER_INFO } from "@/src/services/gql/queries/projects";
@@ -20,7 +20,7 @@ import Dropdown from "@/submodules/react-components/components/Dropdown";
 import { useLazyQuery, useMutation } from "@apollo/client";
 import { Tooltip } from "@nextui-org/react";
 import { IconExternalLink } from "@tabler/icons-react";
-import { use, useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
 const ACCEPT_BUTTON = { buttonCaption: 'Add embedding', disabled: false, useButton: true };
@@ -32,7 +32,7 @@ export default function AddNewEmbedding(props: EmbeddingProps) {
     const embeddingHandles = useSelector(selectRecommendedEncodersDict);
     const embeddingHandlesAll = useSelector(selectRecommendedEncodersAll);
     const organization = useSelector(selectOrganization);
-    const project = useSelector(selectProject);
+    const projectId = useSelector(selectProjectId);
     const useableNonTextAttributes = useSelector(selectUsableNonTextAttributes);
     const modalEmbedding = useSelector(selectModal(ModalEnum.ADD_EMBEDDING));
     const embeddings = useSelector(selectEmbeddings);
@@ -194,7 +194,7 @@ export default function AddNewEmbedding(props: EmbeddingProps) {
         }
 
         const attributeId = useableEmbedableAttributes.find((a) => a.name == targetAttribute).id;
-        createEmbeddingMut({ variables: { projectId: project.id, attributeId: attributeId, config: JSON.stringify(config) } }).then((res) => {
+        createEmbeddingMut({ variables: { projectId: projectId, attributeId: attributeId, config: JSON.stringify(config) } }).then((res) => {
             // TODO: return embedding on the BE, so we can add it to the store, because that is used in the websocket
         });
 

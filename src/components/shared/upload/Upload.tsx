@@ -14,7 +14,7 @@ import { CurrentPage } from "@/src/types/shared/general";
 import { WebSocketsService } from "@/src/services/base/web-sockets/WebSocketsService";
 import { jsonCopy } from "@/submodules/javascript-functions/general";
 import { useRouter } from "next/router";
-import { extendAllProjects, removeFromAllProjectsById, selectAllProjects, selectProject } from "@/src/reduxStore/states/project";
+import { extendAllProjects, removeFromAllProjectsById, selectAllProjects, selectProjectId } from "@/src/reduxStore/states/project";
 import CryptedField from "../crypted-field/CryptedField";
 import { unsubscribeWSOnDestroy } from "@/src/services/base/web-sockets/web-sockets-helper";
 import { GET_UPLOAD_CREDENTIALS_AND_ID, GET_UPLOAD_TASK_BY_TASK_ID } from "@/src/services/gql/queries/projects";
@@ -28,7 +28,7 @@ export default function Upload(props: UploadProps) {
     const uploadFileType = useSelector(selectUploadData).uploadFileType;
     const importOptions = useSelector(selectUploadData).importOptions;
     const projects = useSelector(selectAllProjects);
-    const project = useSelector(selectProject);
+    const projectId = useSelector(selectProjectId);
 
     const [selectedFile, setSelectedFile] = useState(null as File);
     const [projectTitle, setProjectTitle] = useState<string>("");
@@ -152,10 +152,10 @@ export default function Upload(props: UploadProps) {
                 executeUploadFile();
             });
         } else if (uploadFileType == UploadFileType.RECORDS_ADD) {
-            UploadHelper.setProjectId(project.id);
+            UploadHelper.setProjectId(projectId);
             executeUploadFile();
         } else if (uploadFileType == UploadFileType.KNOWLEDGE_BASE) {
-            UploadHelper.setProjectId(project.id);
+            UploadHelper.setProjectId(projectId);
             executeUploadFile();
         }
     }

@@ -1,7 +1,7 @@
 import Modal from "@/src/components/shared/modal/Modal";
 import { selectModal, setModalStates } from "@/src/reduxStore/states/modal";
 import { removeLabelFromLabelingTask, selectLabelingTasksAll, setLabelingTasksAll } from "@/src/reduxStore/states/pages/settings";
-import { selectProject } from "@/src/reduxStore/states/project";
+import { selectProjectId } from "@/src/reduxStore/states/project";
 import { CREATE_LABEL, DELETE_LABEL, UPDATE_LABEL_COLOR, UPDATE_LABEL_HOTKEY } from "@/src/services/gql/mutations/project-settings";
 import { LabelColors, LabelType, LabelingTask, LabelingTasksProps } from "@/src/types/components/projects/projectId/settings/labeling-tasks";
 import { ModalButton, ModalEnum } from "@/src/types/shared/modal";
@@ -21,7 +21,7 @@ const ACCEPT_BUTTON = { buttonCaption: 'Add label', useButton: true, closeAfterC
 export default function LabelsModals(props: LabelingTasksProps) {
     const dispatch = useDispatch();
 
-    const project = useSelector(selectProject);
+    const projectId = useSelector(selectProjectId);
     const labelingTasksSchema = useSelector(selectLabelingTasksAll);
     const modalDeleteLabel = useSelector(selectModal(ModalEnum.DELETE_LABEL));
     const modalAddLabel = useSelector(selectModal(ModalEnum.ADD_LABEL));
@@ -35,7 +35,7 @@ export default function LabelsModals(props: LabelingTasksProps) {
 
     const deleteLabel = useCallback(() => {
         LabelHelper.removeLabel(modalDeleteLabel.taskId, modalDeleteLabel.label.color.name);
-        deleteLabelMut({ variables: { projectId: project.id, labelId: modalDeleteLabel.label.id } }).then(() => {
+        deleteLabelMut({ variables: { projectId: projectId, labelId: modalDeleteLabel.label.id } }).then(() => {
             dispatch(removeLabelFromLabelingTask(modalDeleteLabel.taskId, modalDeleteLabel.label.id));
         });
     }, [modalDeleteLabel]);
@@ -43,7 +43,7 @@ export default function LabelsModals(props: LabelingTasksProps) {
     const addLabel = useCallback(() => {
         const labelColor = LabelHelper.addLabel(modalAddLabel.taskId, modalAddLabel.labelName);
         dispatch(setModalStates(ModalEnum.ADD_LABEL, { ...modalAddLabel, labelName: '', open: true }));
-        createLabelMut({ variables: { projectId: project.id, labelingTaskId: modalAddLabel.taskId, labelName: modalAddLabel.labelName, labelColor: labelColor } }).then((res) => {
+        createLabelMut({ variables: { projectId: projectId, labelingTaskId: modalAddLabel.taskId, labelName: modalAddLabel.labelName, labelColor: labelColor } }).then((res) => {
             // TODO: Currently fixed with websockets and refetching but another option would be to return from BE and add to redux
         })
     }, [modalAddLabel]);
@@ -64,7 +64,7 @@ export default function LabelsModals(props: LabelingTasksProps) {
         if (!modalChangeColor.open) return;
         const changedLabel = LabelHelper.checkAndSetLabelHotkey(event, modalChangeColor.label);
         if (!LabelHelper.labelHotkeyError) {
-            updateLabelHotKeyMut({ variables: { projectId: project.id, labelingTaskLabelId: changedLabel.id, labelHotkey: changedLabel.hotkey } }).then((res) => {
+            updateLabelHotKeyMut({ variables: { projectId: projectId, labelingTaskLabelId: changedLabel.id, labelHotkey: changedLabel.hotkey } }).then((res) => {
                 const labelingTasksSchemaCopy = jsonCopy(labelingTasksSchema);
                 const labelingTask = labelingTasksSchemaCopy.find((task: LabelingTask) => task.id == modalChangeColor.taskId);
                 const label = labelingTask.labels.find((label: LabelType) => label.id == modalChangeColor.label.id);
@@ -85,7 +85,7 @@ export default function LabelsModals(props: LabelingTasksProps) {
 
     function updateLabelColor(newColor: string) {
         LabelHelper.updateLabelColor(modalChangeColor.taskId, modalChangeColor.label.color.name, newColor);
-        updateLabelColorMut({ variables: { projectId: project.id, labelingTaskLabelId: modalChangeColor.label.id, labelColor: newColor } }).then((res) => {
+        updateLabelColorMut({ variables: { projectId: projectId, labelingTaskLabelId: modalChangeColor.label.id, labelColor: newColor } }).then((res) => {
             const labelingTasksSchemaCopy = jsonCopy(labelingTasksSchema);
             const labelingTask = labelingTasksSchemaCopy.find((task: LabelingTask) => task.id == modalChangeColor.taskId);
             const label = labelingTask.labels.find((label: LabelType) => label.id == modalChangeColor.label.id);

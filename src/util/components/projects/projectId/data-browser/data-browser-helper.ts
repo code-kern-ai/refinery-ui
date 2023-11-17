@@ -37,7 +37,7 @@ function getColorForSliceType(sliceType: Slice) {
     }
 }
 
-export function updateSliceInfoHelper(slice: DataSlice, project: Project, users: User[]) {
+export function updateSliceInfoHelper(slice: DataSlice, projectId: string, users: User[]) {
     let sliceInfo = {};
     if (slice.sliceType == Slice.STATIC_OUTLIER) {
         sliceInfo["Name"] = parseUTC(slice.createdAt);
@@ -56,8 +56,8 @@ export function updateSliceInfoHelper(slice: DataSlice, project: Project, users:
         sliceInfo[key] = info[key];
     }
     if (slice.sliceType == Slice.STATIC_DEFAULT) {
-        sliceInfo["Link"] = "/projects/" + project.id + "/labeling/" + slice.id;
-        sliceInfo["Link"] = buildFullLink("/projects/" + project.id + "/labeling/" + slice.id);
+        sliceInfo["Link"] = "/projects/" + projectId + "/labeling/" + slice.id;
+        sliceInfo["Link"] = buildFullLink("/projects/" + projectId + "/labeling/" + slice.id);
     }
     return sliceInfo;
 }

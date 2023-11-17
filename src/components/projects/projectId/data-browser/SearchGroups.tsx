@@ -1,5 +1,5 @@
 import { selectAttributes, selectAttributesDict, selectLabelingTasksAll } from "@/src/reduxStore/states/pages/settings";
-import { selectProject } from "@/src/reduxStore/states/project";
+import { selectProjectId } from "@/src/reduxStore/states/project";
 import { attributeCreateSearchGroup, commentsCreateSearchGroup, generateRandomSeed, getBasicGroupItems, getBasicSearchGroup, getBasicSearchItem, labelingTasksCreateSearchGroup, orderByCreateSearchGroup, userCreateSearchGroup } from "@/src/util/components/projects/projectId/data-browser/search-groups-helper";
 import { SearchGroup, StaticOrderByKeys } from "@/submodules/javascript-functions/enums/enums";
 import { IconArrowBadgeDown, IconArrowUp, IconArrowsRandom, IconFilterOff, IconInfoCircle, IconPlus, IconPointerOff, IconTrash } from "@tabler/icons-react";
@@ -37,7 +37,7 @@ let GLOBAL_SEARCH_GROUP_COUNT = 0;
 export default function SearchGroups(props: DataBrowserSideBarProps) {
     const dispatch = useDispatch();
 
-    const project = useSelector(selectProject);
+    const projectId = useSelector(selectProjectId);
     const attributes = useSelector(selectAttributes);
     const labelingTasks = useSelector(selectLabelingTasksAll);
     const users = useSelector(selectAllUsers);
@@ -69,11 +69,11 @@ export default function SearchGroups(props: DataBrowserSideBarProps) {
     const [refetchCurrentWeakSupervision] = useLazyQuery(GET_CURRENT_WEAK_SUPERVISION_RUN, { fetchPolicy: "network-only" });
 
     useEffect(() => {
-        if (!project) return;
+        if (!projectId) return;
         if (!users) return;
         if (!labelingTasks) return;
         prepareSearchGroups();
-    }, [project, users, labelingTasks]);
+    }, [projectId, users, labelingTasks]);
 
     useEffect(() => {
         if (!attributes) return;
@@ -115,14 +115,14 @@ export default function SearchGroups(props: DataBrowserSideBarProps) {
         refetchCurrentWeakSupervisionAndProcess();
         refetchExtendedRecord({
             variables: {
-                projectId: project.id,
+                projectId: projectId,
                 filterData: parseFilterToExtended(activeSearchParams, attributes, configuration, labelingTasks, user),
                 offset: 0, limit: 20
             }
         }).then((res) => {
             dispatch(setSearchRecordsExtended(postProcessRecordsExtended(res.data['searchRecordsExtended'], labelingTasks)));
         });
-    }, [activeSearchParams, user, project, attributes, labelingTasks, configuration, activeSlice]);
+    }, [activeSearchParams, user, projectId, attributes, labelingTasks, configuration, activeSlice]);
 
     useEffect(() => {
         if (!activeSlice) return;
@@ -463,7 +463,7 @@ export default function SearchGroups(props: DataBrowserSideBarProps) {
     }
 
     function refetchCurrentWeakSupervisionAndProcess() {
-        refetchCurrentWeakSupervision({ variables: { projectId: project.id } }).then((res) => {
+        refetchCurrentWeakSupervision({ variables: { projectId: projectId } }).then((res) => {
             if (res == null) {
                 setCurrentWeakSupervisionRun({ state: Status.NOT_YET_RUN });
             } else {

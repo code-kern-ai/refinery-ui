@@ -3,7 +3,7 @@ import { selectUser } from "@/src/reduxStore/states/general";
 import { selectModal, setModalStates } from "@/src/reduxStore/states/modal";
 import { extendAllDataSlices, selectActiveSearchParams, selectActiveSlice, selectAdditionalData, selectConfiguration, selectDataSlicesAll, setActiveDataSlice } from "@/src/reduxStore/states/pages/data-browser";
 import { selectAttributes, selectLabelingTasksAll } from "@/src/reduxStore/states/pages/settings";
-import { selectProject } from "@/src/reduxStore/states/project";
+import { selectProjectId } from "@/src/reduxStore/states/project";
 import { CREATE_DATA_SLICE, UPDATE_DATA_SLICE } from "@/src/services/gql/mutations/data-browser";
 import { DataSlice } from "@/src/types/components/projects/projectId/data-browser/data-browser";
 import { ModalButton, ModalEnum } from "@/src/types/shared/modal"
@@ -18,7 +18,7 @@ const ACCEPT_BUTTON = { buttonCaption: 'Save', disabled: true, useButton: true }
 export default function SaveDataSliceModal(props: { fullSearch: {} }) {
     const dispatch = useDispatch();
 
-    const project = useSelector(selectProject);
+    const projectId = useSelector(selectProjectId);
     const modalSaveDataSlice = useSelector(selectModal(ModalEnum.SAVE_DATA_SLICE));
     const attributes = useSelector(selectAttributes);
     const labelingTasks = useSelector(selectLabelingTasksAll);
@@ -36,7 +36,7 @@ export default function SaveDataSliceModal(props: { fullSearch: {} }) {
     const saveDataSlice = useCallback(() => {
         createDataSliceMut({
             variables: {
-                projectId: project.id,
+                projectId: projectId,
                 name: modalSaveDataSlice.sliceName,
                 static: isStatic,
                 filterRaw: getRawFilterForSave(props.fullSearch),
@@ -83,7 +83,7 @@ export default function SaveDataSliceModal(props: { fullSearch: {} }) {
         isStatic = isStatic == null ? activeSlice.static : isStatic;
         updateDataSliceMut({
             variables: {
-                projectId: project.id,
+                projectId: projectId,
                 static: isStatic,
                 dataSliceId: activeSlice.id,
                 filterRaw: getRawFilterForSave(props.fullSearch),

@@ -10,7 +10,7 @@ import { DELETE_USER_ATTRIBUTE } from "@/src/services/gql/mutations/projects";
 import { removeFromAllAttributesById } from "@/src/reduxStore/states/pages/settings";
 import { useRouter } from "next/router";
 import LoadingIcon from "../loading/LoadingIcon";
-import { selectProject } from "@/src/reduxStore/states/project";
+import { selectProjectId } from "@/src/reduxStore/states/project";
 import { DELETE_LOOKUP_LIST } from "@/src/services/gql/mutations/lookup-lists";
 import { removeFromAllLookupListById } from "@/src/reduxStore/states/pages/lookup-lists";
 import { DELETE_HEURISTIC } from "@/src/services/gql/mutations/heuristics";
@@ -21,7 +21,7 @@ export default function DangerZone(props: DangerZoneProps) {
     const dispatch = useDispatch();
     const router = useRouter();
 
-    const project = useSelector(selectProject);
+    const projectId = useSelector(selectProjectId);
     const modalDelete = useSelector(selectModal(ModalEnum.DELETE_ELEMENT));
 
     const [isDeleting, setIsDeleting] = useState(false);
@@ -34,24 +34,24 @@ export default function DangerZone(props: DangerZoneProps) {
         setIsDeleting(true);
         switch (props.elementType) {
             case DangerZoneEnum.ATTRIBUTE:
-                deleteAttributeMut({ variables: { projectId: project.id, attributeId: props.id } }).then(() => {
+                deleteAttributeMut({ variables: { projectId: projectId, attributeId: props.id } }).then(() => {
                     setIsDeleting(false);
                     dispatch(removeFromAllAttributesById(props.id));
-                    router.push(`/projects/${project.id}/settings`);
+                    router.push(`/projects/${projectId}/settings`);
                 });
             case DangerZoneEnum.LOOKUP_LIST:
-                deleteLookupListMut({ variables: { projectId: project.id, knowledgeBaseId: props.id } }).then(() => {
+                deleteLookupListMut({ variables: { projectId: projectId, knowledgeBaseId: props.id } }).then(() => {
                     setIsDeleting(false);
                     dispatch(removeFromAllLookupListById(props.id));
-                    router.push(`/projects/${project.id}/lookup-lists`);
+                    router.push(`/projects/${projectId}/lookup-lists`);
                 });
             case DangerZoneEnum.LABELING_FUNCTION:
             case DangerZoneEnum.ACTIVE_LEARNING:
             case DangerZoneEnum.ZERO_SHOT:
             case DangerZoneEnum.CROWD_LABELER:
-                deleteHeuristicMut({ variables: { projectId: project.id, informationSourceId: props.id } }).then(() => {
+                deleteHeuristicMut({ variables: { projectId: projectId, informationSourceId: props.id } }).then(() => {
                     setIsDeleting(false);
-                    router.push(`/projects/${project.id}/heuristics`);
+                    router.push(`/projects/${projectId}/heuristics`);
                 });
         }
 

@@ -1,7 +1,7 @@
 import { selectAllUsers } from '@/src/reduxStore/states/general';
 import { setModalStates } from '@/src/reduxStore/states/modal';
 import { selectActiveSlice, selectAdditionalData, selectDataSlicesAll, setActiveDataSlice } from '@/src/reduxStore/states/pages/data-browser';
-import { selectProject } from '@/src/reduxStore/states/project';
+import { selectProjectId } from '@/src/reduxStore/states/project';
 import style from '@/src/styles/components/projects/projectId/data-browser.module.css';
 import { DataBrowserSideBarProps, DataSlice } from '@/src/types/components/projects/projectId/data-browser/data-browser';
 import { ModalEnum } from '@/src/types/shared/modal';
@@ -20,7 +20,7 @@ import DataSliceInfoModal from './modals/DataSliceInfoModal';
 export default function DataBrowserSidebar(props: DataBrowserSideBarProps) {
     const dispatch = useDispatch();
 
-    const project = useSelector(selectProject);
+    const projectId = useSelector(selectProjectId);
     const users = useSelector(selectAllUsers);
     const activeSlice = useSelector(selectActiveSlice);
     const dataSlices = useSelector(selectDataSlicesAll);
@@ -62,7 +62,7 @@ export default function DataBrowserSidebar(props: DataBrowserSideBarProps) {
     }
 
     function updateSliceInfo(slice: DataSlice) {
-        const sliceInfo = updateSliceInfoHelper(slice, project, users);
+        const sliceInfo = updateSliceInfoHelper(slice, projectId, users);
         dispatch(setModalStates(ModalEnum.DATA_SLICE_INFO, { sliceInfo: sliceInfo, open: true }));
     }
 

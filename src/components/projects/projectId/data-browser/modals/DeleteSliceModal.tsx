@@ -1,7 +1,7 @@
 import Modal from "@/src/components/shared/modal/Modal";
 import { selectModal } from "@/src/reduxStore/states/modal";
 import { removeFromAllDataSlicesById } from "@/src/reduxStore/states/pages/data-browser";
-import { selectProject } from "@/src/reduxStore/states/project";
+import { selectProjectId } from "@/src/reduxStore/states/project";
 import { DELETE_DATA_SLICE } from "@/src/services/gql/mutations/data-browser";
 import { ModalButton, ModalEnum } from "@/src/types/shared/modal";
 import { useMutation } from "@apollo/client";
@@ -13,14 +13,14 @@ const ABORT_BUTTON = { buttonCaption: 'Delete', useButton: true, disabled: false
 export default function DeleteSliceModal() {
     const dispatch = useDispatch();
 
-    const project = useSelector(selectProject);
+    const projectId = useSelector(selectProjectId);
 
     const modalDeleteSlice = useSelector(selectModal(ModalEnum.DELETE_SLICE));
 
     const [deleteDataSliceMut] = useMutation(DELETE_DATA_SLICE);
 
     const deleteDataSlice = useCallback(() => {
-        deleteDataSliceMut({ variables: { projectId: project.id, dataSliceId: modalDeleteSlice.sliceId } }).then((res) => {
+        deleteDataSliceMut({ variables: { projectId: projectId, dataSliceId: modalDeleteSlice.sliceId } }).then((res) => {
             dispatch(removeFromAllDataSlicesById(modalDeleteSlice.sliceId));
         });
     }, [modalDeleteSlice.sliceId]);

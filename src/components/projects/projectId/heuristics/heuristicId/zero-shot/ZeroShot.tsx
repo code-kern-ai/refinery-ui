@@ -1,7 +1,7 @@
 import { selectHeuristic, setActiveHeuristics, updateHeuristicsState } from "@/src/reduxStore/states/pages/heuristics"
 import { useDispatch, useSelector } from "react-redux"
 import HeuristicsLayout from "../shared/HeuristicsLayout";
-import { selectProject } from "@/src/reduxStore/states/project";
+import { selectProjectId } from "@/src/reduxStore/states/project";
 import { useLazyQuery, useMutation } from "@apollo/client";
 import { GET_HEURISTICS_BY_ID } from "@/src/services/gql/queries/heuristics";
 import { useEffect, useState } from "react";
@@ -33,7 +33,7 @@ export default function ZeroShot() {
     const dispatch = useDispatch();
     const router = useRouter();
 
-    const project = useSelector(selectProject);
+    const projectId = useSelector(selectProjectId);
     const currentHeuristic = useSelector(selectHeuristic);
     const labelingTasks = useSelector(selectLabelingTasksAll);
     const textAttributes = useSelector(selectTextAttributes);
@@ -48,16 +48,16 @@ export default function ZeroShot() {
     const [refetchZeroShotRecommendations] = useLazyQuery(GET_ZERO_SHOT_RECOMMENDATIONS, { fetchPolicy: 'network-only', nextFetchPolicy: 'cache-first' });
 
     useEffect(() => {
-        if (!project) return;
+        if (!projectId) return;
         if (!router.query.heuristicId) return;
         refetchLabelingTasksAndProcess();
-        refetchZeroShotRecommendations({ variables: { projectId: project.id } }).then((res) => {
+        refetchZeroShotRecommendations({ variables: { projectId: projectId } }).then((res) => {
             setModels(JSON.parse(res.data['zeroShotRecommendations']));
         });
-    }, [project, router.query.heuristicId]);
+    }, [projectId, router.query.heuristicId]);
 
     useEffect(() => {
-        if (!project) return;
+        if (!projectId) return;
         if (!labelingTasks) return;
         refetchCurrentHeuristicAndProcess();
     }, [labelingTasks]);
@@ -65,20 +65,20 @@ export default function ZeroShot() {
     useEffect(() => {
         if (!currentHeuristic) return;
         WebSocketsService.subscribeToNotification(CurrentPage.ZERO_SHOT, {
-            projectId: project.id,
+            projectId: projectId,
             whitelist: ['labeling_task_updated', 'labeling_task_created', 'label_created', 'label_deleted', 'labeling_task_deleted', 'information_source_deleted', 'information_source_updated', 'payload_update_statistics', 'payload_finished', 'payload_failed', 'payload_created', 'zero-shot', 'zero_shot_download'],
             func: handleWebsocketNotification
         });
     }, [currentHeuristic]);
 
     function refetchCurrentHeuristicAndProcess() {
-        refetchCurrentHeuristic({ variables: { projectId: project.id, informationSourceId: router.query.heuristicId } }).then((res) => {
+        refetchCurrentHeuristic({ variables: { projectId: projectId, informationSourceId: router.query.heuristicId } }).then((res) => {
             dispatch(setActiveHeuristics(postProcessZeroShot(res['data']['informationSourceBySourceId'], labelingTasks, textAttributes)));
         });
     }
 
     function refetchLabelingTasksAndProcess() {
-        refetchLabelingTasksByProjectId({ variables: { projectId: project.id } }).then((res) => {
+        refetchLabelingTasksByProjectId({ variables: { projectId: projectId } }).then((res) => {
             const labelingTasks = postProcessLabelingTasks(res['data']['projectByProjectId']['labelingTasks']['edges']);
             dispatch(setLabelingTasksAll(postProcessLabelingTasksSchema(labelingTasks)));
         });
@@ -87,7 +87,7 @@ export default function ZeroShot() {
     function saveHeuristic(labelingTaskName?: string, zeroShotSettings?: ZeroShotSettings) {
         const labelingTask = labelingTaskName ? labelingTasks.find(a => a.name == labelingTaskName) : labelingTasks.find(a => a.id == currentHeuristic.zeroShotSettings.taskId);
         const code = parseToSettingsJson(zeroShotSettings ? zeroShotSettings : currentHeuristic.zeroShotSettings);
-        updateHeuristicMut({ variables: { projectId: project.id, informationSourceId: currentHeuristic.id, labelingTaskId: labelingTask.id, code: code } }).then((res) => {
+        updateHeuristicMut({ variables: { projectId: projectId, informationSourceId: currentHeuristic.id, labelingTaskId: labelingTask.id, code: code } }).then((res) => {
             dispatch(updateHeuristicsState(currentHeuristic.id, { zeroShotSettings: zeroShotSettings ? zeroShotSettings : currentHeuristic.zeroShotSettings, labelingTaskId: labelingTask.id, labelingTaskName: labelingTask.name, labels: labelingTask.labels }))
         });
     }
@@ -120,10 +120,10 @@ export default function ZeroShot() {
             refetchLabelingTasksAndProcess();
         } else if ('labeling_task_deleted' == msgParts[1]) {
             alert('Parent labeling task was deleted!');
-            router.push(`/projects/${project.id}/heuristics`);
+            router.push(`/projects/${projectId}/heuristics`);
         } else if ('information_source_deleted' == msgParts[1]) {
             alert('Information source was deleted!');
-            router.push(`/projects/${project.id}/heuristics`);
+            router.push(`/projects/${projectId}/heuristics`);
         } else if ('information_source_updated' == msgParts[1]) {
             if (currentHeuristic.id == msgParts[2]) {
                 refetchCurrentHeuristicAndProcess();

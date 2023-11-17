@@ -2,7 +2,7 @@ import LoadingIcon from "@/src/components/shared/loading/LoadingIcon";
 import Modal from "@/src/components/shared/modal/Modal";
 import ModalUpload from "@/src/components/shared/upload/ModalUpload";
 import { openModal } from "@/src/reduxStore/states/modal";
-import { selectProject } from "@/src/reduxStore/states/project";
+import { selectProjectId } from "@/src/reduxStore/states/project";
 import { setUploadFileType } from "@/src/reduxStore/states/upload";
 import { PASTE_TERM } from "@/src/services/gql/mutations/lookup-lists";
 import { EXPORT_LIST } from "@/src/services/gql/queries/lookup-lists";
@@ -28,7 +28,7 @@ export default function LookupListOperations(props: LookupListOperationsProps) {
     const router = useRouter();
     const dispatch = useDispatch();
 
-    const project = useSelector(selectProject);
+    const projectId = useSelector(selectProjectId);
 
     const [downloadMessage, setDownloadMessage] = useState<DownloadState>(DownloadState.NONE);
     const [uploadOptions, setUploadOptions] = useState(BASE_OPTIONS);
@@ -39,13 +39,13 @@ export default function LookupListOperations(props: LookupListOperationsProps) {
     const [pasteLookupListMut] = useMutation(PASTE_TERM);
 
     const pasteLookupList = useCallback(() => {
-        pasteLookupListMut({ variables: { projectId: project.id, knowledgeBaseId: router.query.lookupListId, values: inputArea, split: inputSplit, delete: false } }).then((res) => {
+        pasteLookupListMut({ variables: { projectId: projectId, knowledgeBaseId: router.query.lookupListId, values: inputArea, split: inputSplit, delete: false } }).then((res) => {
             setInputArea("");
         });
     }, [inputArea, inputSplit]);
 
     const removeLookupList = useCallback(() => {
-        pasteLookupListMut({ variables: { projectId: project.id, knowledgeBaseId: router.query.lookupListId, values: inputArea, split: inputSplit, delete: true } }).then((res) => {
+        pasteLookupListMut({ variables: { projectId: projectId, knowledgeBaseId: router.query.lookupListId, values: inputArea, split: inputSplit, delete: true } }).then((res) => {
             setInputArea("");
         });
     }, [inputArea, inputSplit]);
@@ -68,7 +68,7 @@ export default function LookupListOperations(props: LookupListOperationsProps) {
 
     function requestFileExport(): void {
         setDownloadMessage(DownloadState.PREPARATION);
-        refetchExportList({ variables: { projectId: project.id, listId: router.query.lookupListId } }).then((res) => {
+        refetchExportList({ variables: { projectId: projectId, listId: router.query.lookupListId } }).then((res) => {
             setDownloadMessage(DownloadState.DOWNLOAD);
             const downloadContent = JSON.parse(res.data['exportKnowledgeBase']);
             downloadByteData(downloadContent, 'lookup_list.json');

@@ -2,7 +2,7 @@ import LoadingIcon from "@/src/components/shared/loading/LoadingIcon";
 import Modal from "@/src/components/shared/modal/Modal";
 import { openModal, selectModal } from "@/src/reduxStore/states/modal";
 import { selectHeuristic } from "@/src/reduxStore/states/pages/heuristics";
-import { selectProject } from "@/src/reduxStore/states/project";
+import { selectProjectId } from "@/src/reduxStore/states/project";
 import { CANCEL_ZERO_SHOT_RUN } from "@/src/services/gql/mutations/heuristics";
 import { ModalButton, ModalEnum } from "@/src/types/shared/modal";
 import { Status } from "@/src/types/shared/statuses";
@@ -18,7 +18,7 @@ const ABORT_BUTTON = { buttonCaption: 'Cancel', useButton: true, disabled: false
 export default function CalculationProgress() {
     const dispatch = useDispatch();
 
-    const project = useSelector(selectProject);
+    const projectId = useSelector(selectProjectId);
     const currentHeuristic = useSelector(selectHeuristic);
     const modalCancel = useSelector(selectModal(ModalEnum.CANCEL_EXECUTION));
 
@@ -27,7 +27,7 @@ export default function CalculationProgress() {
     const [cancelExecutionMut] = useMutation(CANCEL_ZERO_SHOT_RUN);
 
     const cancelExecution = useCallback(() => {
-        cancelExecutionMut({ variables: { projectId: project.id, informationSourceId: currentHeuristic.id, payloadId: currentHeuristic.lastTask.id } }).then(() => { });
+        cancelExecutionMut({ variables: { projectId: projectId, informationSourceId: currentHeuristic.id, payloadId: currentHeuristic.lastTask.id } }).then(() => { });
     }, [modalCancel]);
 
     useEffect(() => {

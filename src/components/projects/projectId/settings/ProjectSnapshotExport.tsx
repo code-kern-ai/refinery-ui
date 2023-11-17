@@ -1,7 +1,7 @@
 import LoadingIcon from "@/src/components/shared/loading/LoadingIcon";
 import Modal from "@/src/components/shared/modal/Modal";
 import { closeModal, selectModal } from "@/src/reduxStore/states/modal";
-import { selectProject } from "@/src/reduxStore/states/project";
+import { selectProjectId } from "@/src/reduxStore/states/project";
 import { downloadFile } from "@/src/services/base/s3-service";
 import { WebSocketsService } from "@/src/services/base/web-sockets/WebSocketsService";
 import { unsubscribeWSOnDestroy } from "@/src/services/base/web-sockets/web-sockets-helper";
@@ -24,7 +24,7 @@ import { timer } from "rxjs";
 export default function ProjectSnapshotExport() {
     const router = useRouter();
     const dispatch = useDispatch();
-    const project = useSelector(selectProject);
+    const projectId = useSelector(selectProjectId);
     const modal = useSelector(selectModal(ModalEnum.PROJECT_SNAPSHOT))
 
     const [projectSize, setProjectSize] = useState(null);
@@ -44,7 +44,7 @@ export default function ProjectSnapshotExport() {
         requestProjectSize();
         requestProjectExportCredentials();
         WebSocketsService.subscribeToNotification(CurrentPage.PROJECT_SETTINGS, {
-            projectId: project.id,
+            projectId: projectId,
             whitelist: ['project_export'],
             func: handleWebsocketNotification
         });
@@ -60,14 +60,14 @@ export default function ProjectSnapshotExport() {
     }, [projectExportArray]);
 
     function requestProjectSize() {
-        refetchProjectSize({ variables: { projectId: project.id } }).then((res) => {
+        refetchProjectSize({ variables: { projectId: projectId } }).then((res) => {
             setProjectSize(res.data['projectSize']);
             setProjectExportArray(postProcessingFormGroups(res.data['projectSize']));
         });
     }
 
     function requestProjectExportCredentials() {
-        refetchLastProjectExportCredentials({ variables: { projectId: project.id } }).then((res) => {
+        refetchLastProjectExportCredentials({ variables: { projectId: projectId } }).then((res) => {
             const projectExportCredentials = res.data['lastProjectExportCredentials'];
             if (!projectExportCredentials) setProjectExportCredentials(null);
             else {
@@ -84,7 +84,7 @@ export default function ProjectSnapshotExport() {
         setDownloadPrepareMessage(DownloadState.PREPARATION);
         const exportOptions = buildJsonExportOptions();
         // TODO: Add logic for sending encryption key
-        refetchProjectExport({ variables: { projectId: project.id, exportOptions: exportOptions, key: null } }).then((res) => {
+        refetchProjectExport({ variables: { projectId: projectId, exportOptions: exportOptions, key: null } }).then((res) => {
             setProjectExportCredentials(null);
         });
     }

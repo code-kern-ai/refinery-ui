@@ -1,7 +1,7 @@
 import Modal from "@/src/components/shared/modal/Modal";
 import Statuses from "@/src/components/shared/statuses/Statuses"
 import { openModal } from "@/src/reduxStore/states/modal";
-import { selectProject } from "@/src/reduxStore/states/project";
+import { selectProjectId } from "@/src/reduxStore/states/project";
 import { WebSocketsService } from "@/src/services/base/web-sockets/WebSocketsService";
 import { unsubscribeWSOnDestroy } from "@/src/services/base/web-sockets/web-sockets-helper";
 import { UPDATE_PROJECT_FOR_GATES } from "@/src/services/gql/mutations/project-settings";
@@ -21,7 +21,7 @@ export default function GatesIntegration() {
     const router = useRouter();
     const dispatch = useDispatch();
 
-    const project = useSelector(selectProject);
+    const projectId = useSelector(selectProjectId);
 
     const [gatesIntegrationData, setGatesIntegrationData] = useState(null);
     const [gatesLink, setGatesLink] = useState(null);
@@ -32,17 +32,17 @@ export default function GatesIntegration() {
     useEffect(unsubscribeWSOnDestroy(router, [CurrentPage.PROJECT_SETTINGS]), []);
 
     useEffect(() => {
-        setGatesLink(window.location.origin + '/gates/project/' + project.id + "/prediction");
+        setGatesLink(window.location.origin + '/gates/project/' + projectId + "/prediction");
         refetchAndSetGatesIntegrationData();
     }, []);
 
     const updateProjectForGates = useCallback(() => {
-        updateProjectsGatesMut({ variables: { projectId: project.id } }).then(() => { });
+        updateProjectsGatesMut({ variables: { projectId: projectId } }).then(() => { });
     }, []);
 
     useEffect(() => {
         WebSocketsService.subscribeToNotification(CurrentPage.PROJECT_SETTINGS, {
-            projectId: project.id,
+            projectId: projectId,
             whitelist: ['gates_integration', 'information_source_deleted', 'information_source_updated', 'tokenization', 'embedding', 'embedding_deleted'],
             func: handleWebsocketNotification
         })
@@ -55,7 +55,7 @@ export default function GatesIntegration() {
     const [acceptButton, setAcceptButton] = useState<ModalButton>(ACCEPT_BUTTON);
 
     function refetchAndSetGatesIntegrationData() {
-        refetchGatesIntegrationData({ variables: { projectId: project.id } }).then((res) => {
+        refetchGatesIntegrationData({ variables: { projectId: projectId } }).then((res) => {
             setGatesIntegrationData(res.data['getGatesIntegrationData']);
         });
     }

@@ -1,7 +1,7 @@
 import Modal from "@/src/components/shared/modal/Modal";
 import { selectActiveSearchParams, selectSimilaritySearch } from "@/src/reduxStore/states/pages/data-browser";
 import { selectEmbeddings } from "@/src/reduxStore/states/pages/settings";
-import { selectProject } from "@/src/reduxStore/states/project";
+import { selectProjectId } from "@/src/reduxStore/states/project";
 import { CREATE_OUTLIER_SLICE } from "@/src/services/gql/mutations/data-browser";
 import { ModalButton, ModalEnum } from "@/src/types/shared/modal";
 import Dropdown from "@/submodules/react-components/components/Dropdown";
@@ -12,7 +12,7 @@ import { useSelector } from "react-redux";
 const ACCEPT_BUTTON = { buttonCaption: 'Search', disabled: true, useButton: true }
 
 export default function CreateOutlierSliceModal() {
-    const project = useSelector(selectProject);
+    const projectId = useSelector(selectProjectId);
 
     const activeSearchParams = useSelector(selectActiveSearchParams);
     const similaritySearch = useSelector(selectSimilaritySearch);
@@ -25,7 +25,7 @@ export default function CreateOutlierSliceModal() {
 
     const requestOutlierSlice = useCallback(() => {
         const embeddingId = embeddings.find((embedding) => embedding.name == selectedEmbedding).id;
-        createOutlierSliceMut({ variables: { projectId: project.id, embeddingId: embeddingId } }).then((res) => { });
+        createOutlierSliceMut({ variables: { projectId: projectId, embeddingId: embeddingId } }).then((res) => { });
     }, [selectedEmbedding]);
 
     useEffect(() => {

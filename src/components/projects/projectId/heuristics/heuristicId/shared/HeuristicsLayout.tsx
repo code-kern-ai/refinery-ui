@@ -2,7 +2,7 @@ import Statuses from "@/src/components/shared/statuses/Statuses";
 import { selectHeuristic, setActiveHeuristics, updateHeuristicsState } from "@/src/reduxStore/states/pages/heuristics";
 import { selectAllLookupLists, setAllLookupLists } from "@/src/reduxStore/states/pages/lookup-lists";
 import { selectUsableAttributesFiltered, setAllAttributes } from "@/src/reduxStore/states/pages/settings";
-import { selectProject } from "@/src/reduxStore/states/project"
+import { selectProjectId } from "@/src/reduxStore/states/project"
 import { UPDATE_INFORMATION_SOURCE } from "@/src/services/gql/mutations/heuristics";
 import { LOOKUP_LISTS_BY_PROJECT_ID } from "@/src/services/gql/queries/lookup-lists";
 import { GET_ATTRIBUTES_BY_PROJECT_ID } from "@/src/services/gql/queries/project-setting";
@@ -24,7 +24,7 @@ export default function HeuristicsLayout(props: any) {
     const dispatch = useDispatch();
     const router = useRouter();
 
-    const project = useSelector(selectProject);
+    const projectId = useSelector(selectProjectId);
     const currentHeuristic = useSelector(selectHeuristic);
     const usableAttributes = useSelector(selectUsableAttributesFiltered);
     const lookupLists = useSelector(selectAllLookupLists);
@@ -38,14 +38,14 @@ export default function HeuristicsLayout(props: any) {
     const [updateHeuristicMut] = useMutation(UPDATE_INFORMATION_SOURCE);
 
     useEffect(() => {
-        if (!project) return;
+        if (!projectId) return;
         if (usableAttributes.length == 0) {
             refetchAttributesAndProcess();
         }
         if (lookupLists.length == 0) {
             refetchLookupListsAndProcess();
         }
-    }, [project]);
+    }, [projectId]);
 
     function onScrollEvent(event: React.UIEvent<HTMLDivElement>) {
         if (!(event.target instanceof HTMLElement)) return;
@@ -65,7 +65,7 @@ export default function HeuristicsLayout(props: any) {
     }
 
     function saveHeuristic() {
-        updateHeuristicMut({ variables: { projectId: project.id, informationSourceId: currentHeuristic.id, labelingTaskId: currentHeuristic.labelingTaskId, name: currentHeuristic.name, description: currentHeuristic.description } }).then((res) => {
+        updateHeuristicMut({ variables: { projectId: projectId, informationSourceId: currentHeuristic.id, labelingTaskId: currentHeuristic.labelingTaskId, name: currentHeuristic.name, description: currentHeuristic.description } }).then((res) => {
             dispatch(updateHeuristicsState(currentHeuristic.id, { name: currentHeuristic.name, description: currentHeuristic.description }));
             if (currentHeuristic.informationSourceType == InformationSourceType.LABELING_FUNCTION || currentHeuristic.informationSourceType == InformationSourceType.ACTIVE_LEARNING) {
                 props.updateSourceCode(currentHeuristic.sourceCode);
@@ -78,24 +78,24 @@ export default function HeuristicsLayout(props: any) {
     }
 
     function refetchAttributesAndProcess() {
-        refetchAttributes({ variables: { projectId: project.id, stateFilter: ['ALL'] } }).then((res) => {
+        refetchAttributes({ variables: { projectId: projectId, stateFilter: ['ALL'] } }).then((res) => {
             dispatch(setAllAttributes(postProcessingAttributes(res.data['attributesByProjectId'])));
         });
     }
 
     function refetchLookupListsAndProcess() {
-        refetchLookupLists({ variables: { projectId: project.id } }).then((res) => {
+        refetchLookupLists({ variables: { projectId: projectId } }).then((res) => {
             dispatch(setAllLookupLists(postProcessLookupLists(res.data["knowledgeBasesByProjectId"])));
         });
     }
 
-    return (project && <div className="bg-white p-4 pb-16 overflow-y-auto h-screen" onScroll={onScrollEvent}>
+    return (projectId && <div className="bg-white p-4 pb-16 overflow-y-auto h-screen" onScroll={onScrollEvent}>
         {currentHeuristic && <div>
             <div className={`sticky z-40 h-12 ${isHeaderNormal ? 'top-1' : '-top-5'}`}>
                 <div className={`bg-white flex-grow ${isHeaderNormal ? '' : 'shadow'}`}>
                     <div className={`flex-row justify-start items-center inline-block ${isHeaderNormal ? 'p-0' : 'flex py-2'}`} style={{ transition: 'all .25s ease-in-out' }}>
                         <button onClick={() => {
-                            router.push(`/projects/${project.id}/heuristics`);
+                            router.push(`/projects/${projectId}/heuristics`);
                             dispatch(setActiveHeuristics(null));
                         }}
                             className="text-green-800 text-sm font-medium">

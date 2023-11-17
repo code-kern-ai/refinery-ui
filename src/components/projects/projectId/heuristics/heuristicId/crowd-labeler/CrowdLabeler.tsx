@@ -1,6 +1,6 @@
 import { selectHeuristic, setActiveHeuristics } from "@/src/reduxStore/states/pages/heuristics";
 import { selectLabelingTasksAll, setLabelingTasksAll } from "@/src/reduxStore/states/pages/settings";
-import { selectProject } from "@/src/reduxStore/states/project";
+import { selectProjectId } from "@/src/reduxStore/states/project";
 import { WebSocketsService } from "@/src/services/base/web-sockets/WebSocketsService";
 import { GET_HEURISTICS_BY_ID } from "@/src/services/gql/queries/heuristics";
 import { GET_LABELING_TASKS_BY_PROJECT_ID } from "@/src/services/gql/queries/project-setting";
@@ -25,7 +25,7 @@ export default function CrowdLabeler() {
     const dispatch = useDispatch();
     const router = useRouter();
 
-    const project = useSelector(selectProject);
+    const projectId = useSelector(selectProjectId);
     const currentHeuristic = useSelector(selectHeuristic);
     const labelingTasks = useSelector(selectLabelingTasksAll);
     const annotators = useSelector(selectAnnotators);
@@ -37,16 +37,16 @@ export default function CrowdLabeler() {
 
 
     useEffect(() => {
-        if (!project) return;
+        if (!projectId) return;
         if (!router.query.heuristicId) return;
         refetchLabelingTasksAndProcess();
-        refetchDataSlicesMut({ variables: { projectId: project.id, sliceType: "STATIC_DEFAULT" } }).then((res) => {
+        refetchDataSlicesMut({ variables: { projectId: projectId, sliceType: "STATIC_DEFAULT" } }).then((res) => {
             dispatch(setDataSlices(res.data.dataSlices));
         });
-    }, [project, router.query.heuristicId]);
+    }, [projectId, router.query.heuristicId]);
 
     useEffect(() => {
-        if (!project) return;
+        if (!projectId) return;
         if (!labelingTasks) return;
         refetchCurrentHeuristicAndProcess();
     }, [labelingTasks]);
@@ -54,20 +54,20 @@ export default function CrowdLabeler() {
     useEffect(() => {
         if (!currentHeuristic) return;
         WebSocketsService.subscribeToNotification(CurrentPage.CROWD_LABELER, {
-            projectId: project.id,
+            projectId: projectId,
             whitelist: ['labeling_task_updated', 'labeling_task_created', 'label_created', 'label_deleted', 'labeling_task_deleted', 'information_source_deleted', 'information_source_updated', 'model_callback_update_statistics'],
             func: handleWebsocketNotification
         });
     }, [currentHeuristic]);
 
     function refetchCurrentHeuristicAndProcess() {
-        refetchCurrentHeuristic({ variables: { projectId: project.id, informationSourceId: router.query.heuristicId } }).then((res) => {
+        refetchCurrentHeuristic({ variables: { projectId: projectId, informationSourceId: router.query.heuristicId } }).then((res) => {
             dispatch(setActiveHeuristics(postProcessCrowdLabeler(res['data']['informationSourceBySourceId'], labelingTasks)));
         });
     }
 
     function refetchLabelingTasksAndProcess() {
-        refetchLabelingTasksByProjectId({ variables: { projectId: project.id } }).then((res) => {
+        refetchLabelingTasksByProjectId({ variables: { projectId: projectId } }).then((res) => {
             const labelingTasks = postProcessLabelingTasks(res['data']['projectByProjectId']['labelingTasks']['edges']);
             dispatch(setLabelingTasksAll(postProcessLabelingTasksSchema(labelingTasks)));
         });
@@ -79,10 +79,10 @@ export default function CrowdLabeler() {
             refetchLabelingTasksAndProcess();
         } else if ('labeling_task_deleted' == msgParts[1]) {
             alert('Parent labeling task was deleted!');
-            router.push(`/projects/${project.id}/heuristics`);
+            router.push(`/projects/${projectId}/heuristics`);
         } else if ('information_source_deleted' == msgParts[1]) {
             alert('Information source was deleted!');
-            router.push(`/projects/${project.id}/heuristics`);
+            router.push(`/projects/${projectId}/heuristics`);
         } else if (['information_source_updated', 'model_callback_update_statistics'].includes(msgParts[1])) {
             if (currentHeuristic.id == msgParts[2]) {
                 refetchCurrentHeuristicAndProcess();

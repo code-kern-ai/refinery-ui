@@ -2,7 +2,7 @@ import { selectUser } from "@/src/reduxStore/states/general";
 import { openModal, selectModal } from "@/src/reduxStore/states/modal";
 import { selectActiveSearchParams, selectActiveSlice, selectAdditionalData, selectConfiguration, selectDataSlicesAll, setActiveDataSlice } from "@/src/reduxStore/states/pages/data-browser";
 import { selectAttributes, selectEmbeddings, selectLabelingTasksAll } from "@/src/reduxStore/states/pages/settings";
-import { selectProject } from "@/src/reduxStore/states/project";
+import { selectProjectId } from "@/src/reduxStore/states/project";
 import { CREATE_OUTLIER_SLICE, UPDATE_DATA_SLICE } from "@/src/services/gql/mutations/data-browser";
 import { ModalEnum } from "@/src/types/shared/modal";
 import { getRawFilterForSave, parseFilterToExtended } from "@/src/util/components/projects/projectId/data-browser/filter-parser-helper";
@@ -18,7 +18,7 @@ import SaveDataSliceModal from "./modals/SaveDataSliceModal";
 export function DataSliceOperations(props: { fullSearch: {} }) {
     const dispatch = useDispatch();
 
-    const project = useSelector(selectProject);
+    const projectId = useSelector(selectProjectId);
     const modalOutlierSlice = useSelector(selectModal(ModalEnum.CREATE_OUTLIER_SLICE));
     const configuration = useSelector(selectConfiguration);
     const user = useSelector(selectUser);
@@ -36,7 +36,7 @@ export function DataSliceOperations(props: { fullSearch: {} }) {
         isStatic = isStatic == null ? activeSlice.static : isStatic;
         updateDataSliceMut({
             variables: {
-                projectId: project.id,
+                projectId: projectId,
                 static: isStatic,
                 dataSliceId: activeSlice.id,
                 filterRaw: getRawFilterForSave(props.fullSearch),
@@ -49,7 +49,7 @@ export function DataSliceOperations(props: { fullSearch: {} }) {
         if (embeddings.length == 0) return;
         let embeddingId = embeddings.length == 1 ? embeddings[0].id : modalOutlierSlice.embeddingId;
 
-        createOutlierSliceMut({ variables: { projectId: project.id, embeddingId } }).then((res) => { });
+        createOutlierSliceMut({ variables: { projectId: projectId, embeddingId } }).then((res) => { });
     }
 
     return (<div>

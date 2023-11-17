@@ -1,7 +1,7 @@
 import Modal from "@/src/components/shared/modal/Modal";
 import { selectHeuristicType } from "@/src/reduxStore/states/pages/heuristics";
 import { selectLabelingTasksAll } from "@/src/reduxStore/states/pages/settings";
-import { selectProject } from "@/src/reduxStore/states/project";
+import { selectProjectId } from "@/src/reduxStore/states/project";
 import { CREATE_HEURISTIC } from "@/src/services/gql/mutations/heuristics";
 import { ModalButton, ModalEnum } from "@/src/types/shared/modal";
 import { DEFAULT_DESCRIPTION, getFunctionName, getInformationSourceTemplate, getRouterLinkHeuristic } from "@/src/util/components/projects/projectId/heuristics/heuristics-helper";
@@ -18,7 +18,7 @@ const ACCEPT_BUTTON = { buttonCaption: 'Create', useButton: true, disabled: true
 export default function AddLabelingFunctionModal() {
     const router = useRouter();
 
-    const project = useSelector(selectProject);
+    const projectId = useSelector(selectProjectId);
     const labelingTasks = useSelector(selectLabelingTasksAll);
     const heuristicType = useSelector(selectHeuristicType);
 
@@ -35,7 +35,7 @@ export default function AddLabelingFunctionModal() {
         if (!codeData) return;
         createHeuristicMut({
             variables: {
-                projectId: project.id,
+                projectId: projectId,
                 labelingTaskId: labelingTaskId,
                 sourceCode: codeData.code,
                 name: name,
@@ -45,7 +45,7 @@ export default function AddLabelingFunctionModal() {
         }).then((res) => {
             let id = res['data']?.['createInformationSource']?.['informationSource']?.['id'];
             if (id) {
-                router.push(getRouterLinkHeuristic(heuristicType, project.id, id))
+                router.push(getRouterLinkHeuristic(heuristicType, projectId, id))
             } else {
                 console.log("can't find newly created id for " + heuristicType + " --> can't open");
             }

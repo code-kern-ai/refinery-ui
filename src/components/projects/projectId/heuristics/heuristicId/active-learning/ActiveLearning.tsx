@@ -1,7 +1,7 @@
 import { useDispatch, useSelector } from "react-redux";
 import HeuristicsLayout from "../shared/HeuristicsLayout";
 import { useRouter } from "next/router";
-import { selectProject } from "@/src/reduxStore/states/project";
+import { selectProjectId } from "@/src/reduxStore/states/project";
 import { useLazyQuery, useMutation } from "@apollo/client";
 import { GET_HEURISTICS_BY_ID, GET_TASK_BY_TASK_ID } from "@/src/services/gql/queries/heuristics";
 import { Fragment, useEffect, useState } from "react";
@@ -33,7 +33,7 @@ export default function ActiveLearning() {
     const dispatch = useDispatch();
     const router = useRouter();
 
-    const project = useSelector(selectProject);
+    const projectId = useSelector(selectProjectId);
     const currentHeuristic = useSelector(selectHeuristic);
     const labelingTasks = useSelector(selectLabelingTasksAll);
     const embeddings = useSelector(selectEmbeddings);
@@ -49,14 +49,14 @@ export default function ActiveLearning() {
     const [refetchTaskByTaskId] = useLazyQuery(GET_TASK_BY_TASK_ID, { fetchPolicy: "no-cache" });
 
     useEffect(() => {
-        if (!project) return;
+        if (!projectId) return;
         if (!router.query.heuristicId) return;
         refetchLabelingTasksAndProcess();
         refetchEmbeddingsAndPostProcess();
-    }, [project, router.query.heuristicId]);
+    }, [projectId, router.query.heuristicId]);
 
     useEffect(() => {
-        if (!project) return;
+        if (!projectId) return;
         if (!labelingTasks) return;
         refetchCurrentHeuristicAndProcess();
     }, [labelingTasks]);
@@ -67,7 +67,7 @@ export default function ActiveLearning() {
         dispatch(setFilteredEmbeddings(embeddings.filter(e => embeddingRelevant(e, attributes, labelingTasks, currentHeuristic.labelingTaskId))));
         refetchTaskByTaskIdAndProcess();
         WebSocketsService.subscribeToNotification(CurrentPage.ACTIVE_LEARNING, {
-            projectId: project.id,
+            projectId: projectId,
             whitelist: ['labeling_task_updated', 'labeling_task_created', 'label_created', 'label_deleted', 'labeling_task_deleted', 'information_source_deleted', 'information_source_updated', 'model_callback_update_statistics', 'embedding_deleted', 'embedding', 'payload_finished', 'payload_failed', 'payload_created'],
             func: handleWebsocketNotification
         });
@@ -79,33 +79,33 @@ export default function ActiveLearning() {
             setLastTaskLogs(["Task is queued for execution"]);
             return;
         }
-        refetchTaskByTaskId({ variables: { projectId: project.id, payloadId: currentHeuristic.lastTask.id } }).then((res) => {
+        refetchTaskByTaskId({ variables: { projectId: projectId, payloadId: currentHeuristic.lastTask.id } }).then((res) => {
             setLastTaskLogs(postProcessLastTaskLogs((res['data']['payloadByPayloadId'])));
         });
     }
 
     function refetchCurrentHeuristicAndProcess() {
-        refetchCurrentHeuristic({ variables: { projectId: project.id, informationSourceId: router.query.heuristicId } }).then((res) => {
+        refetchCurrentHeuristic({ variables: { projectId: projectId, informationSourceId: router.query.heuristicId } }).then((res) => {
             dispatch(setActiveHeuristics(postProcessCurrentHeuristic(res['data']['informationSourceBySourceId'], labelingTasks)));
         });
     }
 
     function saveHeuristic(labelingTaskName: string) {
         const labelingTask = labelingTasks.find(a => a.name == labelingTaskName);
-        updateHeuristicMut({ variables: { projectId: project.id, informationSourceId: currentHeuristic.id, labelingTaskId: labelingTask.id } }).then((res) => {
+        updateHeuristicMut({ variables: { projectId: projectId, informationSourceId: currentHeuristic.id, labelingTaskId: labelingTask.id } }).then((res) => {
             dispatch(updateHeuristicsState(currentHeuristic.id, { labelingTaskId: labelingTask.id, labelingTaskName: labelingTask.name, labels: labelingTask.labels }))
         });
     }
 
     function refetchLabelingTasksAndProcess() {
-        refetchLabelingTasksByProjectId({ variables: { projectId: project.id } }).then((res) => {
+        refetchLabelingTasksByProjectId({ variables: { projectId: projectId } }).then((res) => {
             const labelingTasks = postProcessLabelingTasks(res['data']['projectByProjectId']['labelingTasks']['edges']);
             dispatch(setLabelingTasksAll(postProcessLabelingTasksSchema(labelingTasks)));
         });
     }
 
     function refetchEmbeddingsAndPostProcess() {
-        refetchEmbeddings({ variables: { projectId: project.id } }).then((res) => {
+        refetchEmbeddings({ variables: { projectId: projectId } }).then((res) => {
             const embeddings = postProcessingEmbeddings(res.data['projectByProjectId']['embeddings']['edges'].map((e) => e['node']), []);
             dispatch(setAllEmbeddings(embeddings));
         });
@@ -120,7 +120,7 @@ export default function ActiveLearning() {
         var regMatch: any = getPythonClassRegExMatch(value);
         if (!regMatch) return value;
         const finalSourceCode = value.replace(regMatch[0], getClassLine(null, labelingTasks, currentHeuristic.labelingTaskId));
-        updateHeuristicMut({ variables: { projectId: project.id, informationSourceId: currentHeuristic.id, labelingTaskId: currentHeuristic.labelingTaskId, code: finalSourceCode } }).then((res) => {
+        updateHeuristicMut({ variables: { projectId: projectId, informationSourceId: currentHeuristic.id, labelingTaskId: currentHeuristic.labelingTaskId, code: finalSourceCode } }).then((res) => {
             dispatch(updateHeuristicsState(currentHeuristic.id, { sourceCode: finalSourceCode }))
         });
     }
@@ -130,10 +130,10 @@ export default function ActiveLearning() {
             refetchLabelingTasksAndProcess();
         } else if ('labeling_task_deleted' == msgParts[1]) {
             alert('Parent labeling task was deleted!');
-            router.push(`/projects/${project.id}/heuristics`);
+            router.push(`/projects/${projectId}/heuristics`);
         } else if ('information_source_deleted' == msgParts[1]) {
             alert('Information source was deleted!');
-            router.push(`/projects/${project.id}/heuristics`);
+            router.push(`/projects/${projectId}/heuristics`);
         } else if (['information_source_updated', 'model_callback_update_statistics'].includes(msgParts[1])) {
             if (currentHeuristic.id == msgParts[2]) {
                 refetchCurrentHeuristicAndProcess();

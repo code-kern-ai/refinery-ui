@@ -2,7 +2,7 @@ import LoadingIcon from "@/src/components/shared/loading/LoadingIcon";
 import Statuses from "@/src/components/shared/statuses/Statuses";
 import { setCurrentPage } from "@/src/reduxStore/states/general";
 import { selectAttributes, updateAttributeById } from "@/src/reduxStore/states/pages/settings";
-import { selectProject } from "@/src/reduxStore/states/project";
+import { selectProjectId } from "@/src/reduxStore/states/project";
 import { UPDATE_ATTRIBUTE } from "@/src/services/gql/mutations/project-settings";
 import { Attribute, DataSchemaProps } from "@/src/types/components/projects/projectId/settings/data-schema";
 import { CurrentPage } from "@/src/types/shared/general";
@@ -21,7 +21,7 @@ export default function DataSchema(props: DataSchemaProps) {
     const router = useRouter();
     const dispatch = useDispatch();
 
-    const project = useSelector(selectProject)
+    const projectId = useSelector(selectProjectId)
     const attributes = useSelector(selectAttributes);
 
     const [somethingLoading, setSomethingLoading] = useState(false);
@@ -43,7 +43,7 @@ export default function DataSchema(props: DataSchemaProps) {
     function updatePrimaryKey(attribute: Attribute) {
         const attributeNew = jsonCopy(attribute);
         attributeNew.isPrimaryKey = !attributeNew.isPrimaryKey;
-        updateAttributeMut({ variables: { projectId: project.id, attributeId: attributeNew.id, isPrimaryKey: attributeNew.isPrimaryKey } }).then(() => {
+        updateAttributeMut({ variables: { projectId: projectId, attributeId: attributeNew.id, isPrimaryKey: attributeNew.isPrimaryKey } }).then(() => {
             dispatch(updateAttributeById(attributeNew));
         });
     }
@@ -53,7 +53,7 @@ export default function DataSchema(props: DataSchemaProps) {
         const attributeNew = jsonCopy(attribute);
         attributeNew.visibility = visibility;
         attributeNew.visibilityIndex = ATTRIBUTES_VISIBILITY_STATES.findIndex((state) => state.name === option);
-        updateAttributeMut({ variables: { projectId: project.id, attributeId: attribute.id, visibility: attributeNew.visibility } }).then(() => {
+        updateAttributeMut({ variables: { projectId: projectId, attributeId: attribute.id, visibility: attributeNew.visibility } }).then(() => {
             dispatch(updateAttributeById(attributeNew));
         });
     }
@@ -135,7 +135,7 @@ export default function DataSchema(props: DataSchemaProps) {
                                             {attribute.userCreated ? <button type="button" className="text-green-800 text-sm font-medium"
                                                 onClick={() => {
                                                     dispatch(setCurrentPage(CurrentPage.ATTRIBUTE_CALCULATION));
-                                                    router.push(`/projects/${project.id}/attributes/${attribute.id}`);
+                                                    router.push(`/projects/${projectId}/attributes/${attribute.id}`);
                                                 }}>
                                                 <span className="leading-5">Details</span>
                                                 <IconArrowRight className="h-5 w-5 inline-block text-green-800" />

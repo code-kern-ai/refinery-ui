@@ -2,7 +2,7 @@ import Modal from "@/src/components/shared/modal/Modal";
 import { selectModal } from "@/src/reduxStore/states/modal";
 import { selectActiveSearchParams, selectSimilaritySearch, setRecordsInDisplay, setSearchRecordsExtended } from "@/src/reduxStore/states/pages/data-browser";
 import { selectEmbeddings, selectLabelingTasksAll, selectUsableAttributes } from "@/src/reduxStore/states/pages/settings";
-import { selectProject } from "@/src/reduxStore/states/project";
+import { selectProjectId } from "@/src/reduxStore/states/project";
 import { SEARCH_SIMILAR_RECORDS } from "@/src/services/gql/queries/data-browser";
 import { FilterIntegrationOperator, SearchOperator } from "@/src/types/components/projects/projectId/data-browser/search-operators";
 import { DataTypeEnum } from "@/src/types/shared/general";
@@ -28,7 +28,7 @@ export default function SimilaritySearchModal() {
     const similaritySearch = useSelector(selectSimilaritySearch);
     const embeddings = useSelector(selectEmbeddings);
     const attributes = useSelector(selectUsableAttributes);
-    const project = useSelector(selectProject);
+    const projectId = useSelector(selectProjectId);
     const labelingTasks = useSelector(selectLabelingTasksAll);
 
     const [filterAttributesSS, setFilterAttributesSS] = useState<any>(null);
@@ -43,7 +43,7 @@ export default function SimilaritySearchModal() {
     function getSimilarRecords(hasFilter: boolean = false) {
         refetchSimilarRecords({
             variables: {
-                projectId: project.id,
+                projectId: projectId,
                 embeddingId: embeddings.find((embedding: any) => embedding.name === selectedEmbedding).id,
                 recordId: modalSS.recordId,
                 attFilter: hasFilter ? prepareAttFilter(filterAttributesForm, attributes) : null,

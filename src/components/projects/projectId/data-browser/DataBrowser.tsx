@@ -1,4 +1,4 @@
-import { selectProject } from "@/src/reduxStore/states/project"
+import { selectProjectId } from "@/src/reduxStore/states/project"
 import { useDispatch, useSelector } from "react-redux"
 import DataBrowserSidebar from "./DataBrowserSidebar";
 import { useLazyQuery } from "@apollo/client";
@@ -19,7 +19,7 @@ const SEARCH_REQUEST = { offset: 0, limit: 20 };
 
 export default function DataBrowser() {
     const dispatch = useDispatch();
-    const project = useSelector(selectProject);
+    const projectId = useSelector(selectProjectId);
     const users = useSelector(selectAllUsers);
     const labelingTasks = useSelector(selectLabelingTasksAll);
 
@@ -35,28 +35,28 @@ export default function DataBrowser() {
     const [refetchRecordComments] = useLazyQuery(GET_RECORD_COMMENTS, { fetchPolicy: "no-cache" });
 
     useEffect(() => {
-        if (!project) return;
+        if (!projectId) return;
         if (!users) return;
-        refetchDataSlices({ variables: { projectId: project.id } }).then((res) => {
+        refetchDataSlices({ variables: { projectId: projectId } }).then((res) => {
             dispatch(setDataSlices(postProcessDataSlices(res.data.dataSlices)));
         });
         refetchAttributesAndProcess();
         refetchLabelingTasksAndProcess();
         refetchUsersCountAndProcess();
         refetchEmbeddingsAndPostProcess();
-    }, [project, users]);
+    }, [projectId, users]);
 
     useEffect(() => {
-        if (!project) return;
+        if (!projectId) return;
         if (!labelingTasks) return;
         refetchExtendedSearchAndProcess();
-    }, [project, labelingTasks]);
+    }, [projectId, labelingTasks]);
 
     useEffect(() => {
-        if (!project) return;
+        if (!projectId) return;
         if (!searchRequest) return;
         if (searchRequest.offset == 0) return;
-        refetchExtendedRecord({ variables: { projectId: project.id, filterData: JSON.stringify({}), offset: searchRequest.offset, limit: searchRequest.limit } }).then((res) => {
+        refetchExtendedRecord({ variables: { projectId: projectId, filterData: JSON.stringify({}), offset: searchRequest.offset, limit: searchRequest.limit } }).then((res) => {
             const parsedRecordData = postProcessRecordsExtended(res.data['searchRecordsExtended'], labelingTasks);
             dispatch(expandRecordList(parsedRecordData));
             refetchRecordCommentsAndProcess(parsedRecordData.recordList);
@@ -64,26 +64,26 @@ export default function DataBrowser() {
     }, [searchRequest]);
 
     function refetchAttributesAndProcess() {
-        refetchAttributes({ variables: { projectId: project.id, stateFilter: ['ALL'] } }).then((res) => {
+        refetchAttributes({ variables: { projectId: projectId, stateFilter: ['ALL'] } }).then((res) => {
             dispatch(setAllAttributes(postProcessingAttributes(res.data['attributesByProjectId'])));
         });
     }
 
     function refetchLabelingTasksAndProcess() {
-        refetchLabelingTasksByProjectId({ variables: { projectId: project.id } }).then((res) => {
+        refetchLabelingTasksByProjectId({ variables: { projectId: projectId } }).then((res) => {
             const labelingTasks = postProcessLabelingTasks(res['data']['projectByProjectId']['labelingTasks']['edges']);
             dispatch(setLabelingTasksAll(postProcessLabelingTasksSchema(labelingTasks)));
         });
     }
 
     function refetchUsersCountAndProcess() {
-        refetchUsersCount({ variables: { projectId: project.id } }).then((res) => {
+        refetchUsersCount({ variables: { projectId: projectId } }).then((res) => {
             dispatch(setUsersMapCount(postProcessUsersCount(res.data['allUsersWithRecordCount'], users)));
         });
     }
 
     function refetchExtendedSearchAndProcess() {
-        refetchExtendedRecord({ variables: { projectId: project.id, filterData: JSON.stringify({}), offset: searchRequest.offset, limit: searchRequest.limit } }).then((res) => {
+        refetchExtendedRecord({ variables: { projectId: projectId, filterData: JSON.stringify({}), offset: searchRequest.offset, limit: searchRequest.limit } }).then((res) => {
             const parsedRecordData = postProcessRecordsExtended(res.data['searchRecordsExtended'], labelingTasks);
             dispatch(setSearchRecordsExtended(parsedRecordData));
             refetchRecordCommentsAndProcess(parsedRecordData.recordList);
@@ -91,7 +91,7 @@ export default function DataBrowser() {
     }
 
     function refetchEmbeddingsAndPostProcess() {
-        refetchEmbeddings({ variables: { projectId: project.id } }).then((res) => {
+        refetchEmbeddings({ variables: { projectId: projectId } }).then((res) => {
             const embeddings = postProcessingEmbeddings(res.data['projectByProjectId']['embeddings']['edges'].map((e) => e['node']), []);
             dispatch(setAllEmbeddings(embeddings));
         });
@@ -100,7 +100,7 @@ export default function DataBrowser() {
     function refetchRecordCommentsAndProcess(parsedRecordData: any) {
         const currentRecordIds = parsedRecordData?.map((record) => record.id);
         if (!currentRecordIds || currentRecordIds.length == 0) return;
-        refetchRecordComments({ variables: { projectId: project.id, recordIds: currentRecordIds } }).then((res) => {
+        refetchRecordComments({ variables: { projectId: projectId, recordIds: currentRecordIds } }).then((res) => {
             dispatch(setRecordComments(postProcessRecordComments(res.data['recordComments'])));
         });
     }
@@ -110,7 +110,7 @@ export default function DataBrowser() {
     }
 
     return (<>
-        {project && <div className="flex flex-row h-full">
+        {projectId && <div className="flex flex-row h-full">
             <DataBrowserSidebar clearFullSearch={clearFullSearch} />
             <DataBrowserRecords clearFullSearch={(val) => setClearFullSearch(val)} refetchNextRecords={getNextRecords} />
         </div>}

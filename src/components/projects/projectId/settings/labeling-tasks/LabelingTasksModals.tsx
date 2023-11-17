@@ -1,7 +1,7 @@
 import Modal from "@/src/components/shared/modal/Modal";
 import { selectModal, setModalStates } from "@/src/reduxStore/states/modal";
 import { removeFromAllLabelingTasksById, selectLabelingTasksAll, selectUsableAttributes } from "@/src/reduxStore/states/pages/settings";
-import { selectProject } from "@/src/reduxStore/states/project";
+import { selectProjectId } from "@/src/reduxStore/states/project";
 import { CREATE_LABELING_TASK, DELETE_LABELING_TASK } from "@/src/services/gql/mutations/project-settings";
 import { LabelingTaskTaskType, LabelingTasksProps } from "@/src/types/components/projects/projectId/settings/labeling-tasks";
 import { ModalButton, ModalEnum } from "@/src/types/shared/modal";
@@ -19,7 +19,7 @@ const ACCEPT_BUTTON = { buttonCaption: 'Add labeling task', useButton: true };
 export default function LabelingTasksModals(props: LabelingTasksProps) {
     const dispatch = useDispatch();
 
-    const project = useSelector(selectProject);
+    const projectId = useSelector(selectProjectId);
     const usableAttributes = useSelector(selectUsableAttributes);
     const labelingTasksSchema = useSelector(selectLabelingTasksAll);
     const modalDeleteLabelingTask = useSelector(selectModal(ModalEnum.DELETE_LABELING_TASK));
@@ -29,7 +29,7 @@ export default function LabelingTasksModals(props: LabelingTasksProps) {
     const [createLabelingTaskMut] = useMutation(CREATE_LABELING_TASK);
 
     const deleteLabelingTask = useCallback(() => {
-        deleteLabelingTaskMut({ variables: { projectId: project.id, labelingTaskId: modalDeleteLabelingTask.taskId } }).then((res) => {
+        deleteLabelingTaskMut({ variables: { projectId: projectId, labelingTaskId: modalDeleteLabelingTask.taskId } }).then((res) => {
             dispatch(removeFromAllLabelingTasksById(modalDeleteLabelingTask.taskId));
         });
     }, [modalDeleteLabelingTask]);
@@ -41,7 +41,7 @@ export default function LabelingTasksModals(props: LabelingTasksProps) {
         }
         createLabelingTaskMut({
             variables: {
-                projectId: project.id, labelingTaskName: modalAddLabelingTask.taskName, labelingTaskType: LabelingTaskTaskType.MULTICLASS_CLASSIFICATION, labelingTaskTargetId: taskTarget
+                projectId: projectId, labelingTaskName: modalAddLabelingTask.taskName, labelingTaskType: LabelingTaskTaskType.MULTICLASS_CLASSIFICATION, labelingTaskTargetId: taskTarget
             }
         }).then((res) => {
             // TODO: Currently fixed with websockets and refetching but another option would be to return from BE and add to redux

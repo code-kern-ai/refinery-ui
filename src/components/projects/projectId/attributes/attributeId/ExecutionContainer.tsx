@@ -1,6 +1,6 @@
 import LoadingIcon from "@/src/components/shared/loading/LoadingIcon";
 import { setModalStates } from "@/src/reduxStore/states/modal";
-import { selectProject } from "@/src/reduxStore/states/project";
+import { selectProjectId } from "@/src/reduxStore/states/project";
 import { CALCULATE_USER_ATTRIBUTE_SAMPLE_RECORDS, GET_RECORD_BY_RECORD_ID } from "@/src/services/gql/queries/project-setting";
 import { ExecutionContainerProps, SampleRecord } from "@/src/types/components/projects/projectId/settings/attribute-calculation";
 import { AttributeState } from "@/src/types/components/projects/projectId/settings/data-schema";
@@ -16,7 +16,7 @@ import ConfirmExecutionModal from "./ConfirmExecutionModal";
 import ViewRecordDetailsModal from "./ViewRecordDetailsModal";
 
 export default function ExecutionContainer(props: ExecutionContainerProps) {
-    const project = useSelector(selectProject);
+    const projectId = useSelector(selectProjectId);
     const dispatch = useDispatch();
 
 
@@ -32,7 +32,7 @@ export default function ExecutionContainer(props: ExecutionContainerProps) {
     function calculateUserAttributeSampleRecords() {
         if (requestedSomething) return;
         setRequestedSomething(true);
-        refetchSampleRecords({ variables: { projectId: project.id, attributeId: props.currentAttribute.id } }).then((res) => {
+        refetchSampleRecords({ variables: { projectId: projectId, attributeId: props.currentAttribute.id } }).then((res) => {
             const sampleRecordsFinal = jsonCopy(res.data['calculateUserAttributeSampleRecords']);
             setRequestedSomething(false);
             setRunOn10HasError(sampleRecordsFinal.calculatedAttributes.length > 0 ? false : true);
@@ -47,7 +47,7 @@ export default function ExecutionContainer(props: ExecutionContainerProps) {
     }
 
     function recordByRecordId(recordId: string) {
-        refetchRecordByRecordId({ variables: { projectId: project.id, recordId: recordId } }).then((res) => {
+        refetchRecordByRecordId({ variables: { projectId: projectId, recordId: recordId } }).then((res) => {
             dispatch(setModalStates(ModalEnum.VIEW_RECORD_DETAILS, { record: postProcessRecordByRecordId(res.data['recordByRecordId']) }));
         });
     }

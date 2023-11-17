@@ -1,5 +1,5 @@
 import { updateLookupListState } from "@/src/reduxStore/states/pages/lookup-lists";
-import { selectProject } from "@/src/reduxStore/states/project"
+import { selectProjectId } from "@/src/reduxStore/states/project"
 import { UPDATE_KNOWLEDGE_BASE } from "@/src/services/gql/mutations/lookup-lists";
 import { LOOKUP_LIST_BY_LOOKUP_LIST_ID, TERMS_BY_KNOWLEDGE_BASE_ID } from "@/src/services/gql/queries/lookup-lists";
 import { LookupList, LookupListProperty, Term } from "@/src/types/components/projects/projectId/lookup-lists";
@@ -23,7 +23,7 @@ export default function LookupListsDetails() {
     const router = useRouter();
     const dispatch = useDispatch();
 
-    const project = useSelector(selectProject);
+    const projectId = useSelector(selectProjectId);
 
     const [lookupList, setLookupList] = useState<LookupList | null>(null);
     const [terms, setTerms] = useState<Term[]>([]);
@@ -37,24 +37,24 @@ export default function LookupListsDetails() {
     const [updateLookupListMut] = useMutation(UPDATE_KNOWLEDGE_BASE);
 
     useEffect(() => {
-        if (!project) return;
-        refetchCurrentLookupList({ variables: { projectId: project.id, knowledgeBaseId: router.query.lookupListId } }).then((res) => {
+        if (!projectId) return;
+        refetchCurrentLookupList({ variables: { projectId: projectId, knowledgeBaseId: router.query.lookupListId } }).then((res) => {
             setLookupList(postProcessLookupList(res.data['knowledgeBaseByKnowledgeBaseId']));
         });
         refetchTerms();
         refetchWS();
-    }, [project, router.query.lookupListId]);
+    }, [projectId, router.query.lookupListId]);
 
     function refetchWS() {
         WebSocketsService.subscribeToNotification(CurrentPage.LOOKUP_LISTS_DETAILS, {
-            projectId: project.id,
+            projectId: projectId,
             whitelist: ['knowledge_base_updated', 'knowledge_base_deleted', 'knowledge_base_term_updated'],
             func: handleWebsocketNotification
         });
     }
 
     function refetchTerms() {
-        refetchTermsLookupList({ variables: { projectId: project.id, knowledgeBaseId: router.query.lookupListId } }).then((res) => {
+        refetchTermsLookupList({ variables: { projectId: projectId, knowledgeBaseId: router.query.lookupListId } }).then((res) => {
             setFinalSize(res.data['termsByKnowledgeBaseId'].length);
             setTerms(postProcessTerms(res.data['termsByKnowledgeBaseId']));
         });
@@ -71,7 +71,7 @@ export default function LookupListsDetails() {
 
     function saveLookupList() {
         updateLookupListMut({
-            variables: { projectId: project.id, knowledgeBaseId: lookupList.id, name: lookupList.name, description: lookupList.description }
+            variables: { projectId: projectId, knowledgeBaseId: lookupList.id, name: lookupList.name, description: lookupList.description }
         }).then((res) => {
             dispatch(updateLookupListState(lookupList.id, { name: lookupList.name, description: lookupList.description }))
         });
@@ -94,24 +94,24 @@ export default function LookupListsDetails() {
     function handleWebsocketNotification(msgParts: string[]) {
         if (msgParts[2] == router.query.lookupListId) {
             if (msgParts[1] == 'knowledge_base_updated') {
-                refetchCurrentLookupList({ variables: { projectId: project.id, knowledgeBaseId: router.query.lookupListId } }).then((res) => {
+                refetchCurrentLookupList({ variables: { projectId: projectId, knowledgeBaseId: router.query.lookupListId } }).then((res) => {
                     setLookupList(postProcessLookupList(res.data['knowledgeBaseByKnowledgeBaseId']));
                 });
             } else if (msgParts[1] == 'knowledge_base_deleted') {
                 alert('Lookup list was deleted');
-                router.push(`/projects/${project.id}/lookup-lists`);
+                router.push(`/projects/${projectId}/lookup-lists`);
             } else if (msgParts[1] == 'knowledge_base_term_updated') {
                 refetchTerms();
             }
         }
     }
 
-    return (project && <div className="bg-white p-4 pb-16 overflow-y-auto h-screen" onScroll={(e: any) => onScrollEvent(e)}>
+    return (projectId && <div className="bg-white p-4 pb-16 overflow-y-auto h-screen" onScroll={(e: any) => onScrollEvent(e)}>
         {lookupList && <div>
             <div className={`sticky z-40 h-12 ${isHeaderNormal ? 'top-1' : '-top-5'}`}>
                 <div className={`bg-white flex-grow ${isHeaderNormal ? '' : 'shadow'}`}>
                     <div className={`flex-row justify-start items-center inline-block ${isHeaderNormal ? 'p-0' : 'flex py-2'}`} style={{ transition: 'all .25s ease-in-out' }}>
-                        <button onClick={() => router.push(`/projects/${project.id}/lookup-lists`)}
+                        <button onClick={() => router.push(`/projects/${projectId}/lookup-lists`)}
                             className="text-green-800 text-sm font-medium">
                             <IconArrowLeft className="h-5 w-5 inline-block text-green-800" />
                             <span className="leading-5">Go back</span>

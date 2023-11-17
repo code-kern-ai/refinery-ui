@@ -1,4 +1,4 @@
-import { selectProject } from "@/src/reduxStore/states/project";
+import { selectProjectId } from "@/src/reduxStore/states/project";
 import { useDispatch, useSelector } from "react-redux";
 import style from '@/src/styles/components/projects/projectId/heuristics/heuristics.module.css';
 import { useEffect, useState } from "react";
@@ -24,7 +24,7 @@ import { postProcessingEmbeddings } from "@/src/util/components/projects/project
 export function HeuristicsOverview() {
     const dispatch = useDispatch();
 
-    const project = useSelector(selectProject);
+    const projectId = useSelector(selectProjectId);
     const heuristics = useSelector(selectHeuristicsAll);
     const embeddings = useSelector(selectEmbeddings);
     const attributes = useSelector(selectUsableNonTextAttributes);
@@ -37,41 +37,41 @@ export function HeuristicsOverview() {
     const [refetchAttributes] = useLazyQuery(GET_ATTRIBUTES_BY_PROJECT_ID, { fetchPolicy: "network-only" });
 
     useEffect(() => {
-        if (!project) return;
+        if (!projectId) return;
         refetchLabelingTasksAndProcess();
         refetchHeuristicsAndProcess();
         if (embeddings.length == 0) {
             refetchEmbeddingsAndProcess();
         }
         if (attributes.length == 0) {
-            refetchAttributes({ variables: { projectId: project.id, stateFilter: ['ALL'] } }).then((res) => {
+            refetchAttributes({ variables: { projectId: projectId, stateFilter: ['ALL'] } }).then((res) => {
                 dispatch(setAllAttributes(postProcessingAttributes(res.data['attributesByProjectId'])));
             });
         }
         WebSocketsService.subscribeToNotification(CurrentPage.HEURISTICS, {
-            projectId: project.id,
+            projectId: projectId,
             whitelist: ['labeling_task_updated', 'labeling_task_created', 'labeling_task_deleted', 'information_source_created', 'information_source_updated', 'information_source_deleted', 'payload_finished', 'payload_failed', 'payload_created', 'payload_update_statistics', 'embedding_deleted'],
             func: handleWebsocketNotification
         });
-    }, [project, embeddings, attributes]);
+    }, [projectId, embeddings, attributes]);
 
     function refetchLabelingTasksAndProcess() {
-        refetchLabelingTasksByProjectId({ variables: { projectId: project.id } }).then((res) => {
+        refetchLabelingTasksByProjectId({ variables: { projectId: projectId } }).then((res) => {
             const labelingTasks = postProcessLabelingTasks(res['data']['projectByProjectId']['labelingTasks']['edges']);
             dispatch(setLabelingTasksAll(postProcessLabelingTasksSchema(labelingTasks)));
         });
     }
 
     function refetchHeuristicsAndProcess() {
-        refetchHeuristics({ variables: { projectId: project.id } }).then((res) => {
-            const heuristics = postProcessHeuristics(res['data']['informationSourcesOverviewData'], project.id);
+        refetchHeuristics({ variables: { projectId: projectId } }).then((res) => {
+            const heuristics = postProcessHeuristics(res['data']['informationSourcesOverviewData'], projectId);
             dispatch(setAllHeuristics(heuristics));
             setFilteredList(heuristics);
         });
     }
 
     function refetchEmbeddingsAndProcess() {
-        refetchEmbeddings({ variables: { projectId: project.id } }).then((res) => {
+        refetchEmbeddings({ variables: { projectId: projectId } }).then((res) => {
             const embeddingsFinal = postProcessingEmbeddings(res.data['projectByProjectId']['embeddings']['edges'].map((e) => e['node']), []);
             dispatch(setAllEmbeddings(embeddingsFinal));
         });
@@ -90,7 +90,7 @@ export function HeuristicsOverview() {
         }
     }
 
-    return (project && <div className="p-4 bg-gray-100 h-full flex-1 flex flex-col">
+    return (projectId && <div className="p-4 bg-gray-100 h-full flex-1 flex flex-col">
         <div className="w-full h-full -mr-4">
             <HeuristicsHeader refetch={refetchHeuristicsAndProcess}
                 filterList={(labelingTask: LabelingTask) => setFilteredList(labelingTask != null ? heuristics.filter((heuristic) => heuristic.labelingTaskId === labelingTask.id) : heuristics)} />

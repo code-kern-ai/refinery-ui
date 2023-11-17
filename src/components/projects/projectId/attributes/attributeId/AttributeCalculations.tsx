@@ -1,7 +1,7 @@
 import Statuses from "@/src/components/shared/statuses/Statuses";
 import { selectAllLookupLists, setAllLookupLists } from "@/src/reduxStore/states/pages/lookup-lists";
 import { selectAttributes, selectUsableAttributesFiltered, setAllAttributes, updateAttributeById } from "@/src/reduxStore/states/pages/settings";
-import { selectProject } from "@/src/reduxStore/states/project"
+import { selectProjectId } from "@/src/reduxStore/states/project"
 import { UPDATE_ATTRIBUTE } from "@/src/services/gql/mutations/project-settings";
 import { LOOKUP_LISTS_BY_PROJECT_ID } from "@/src/services/gql/queries/lookup-lists";
 import { GET_ATTRIBUTES_BY_PROJECT_ID, GET_ATTRIBUTE_BY_ATTRIBUTE_ID, GET_PROJECT_TOKENIZATION } from "@/src/services/gql/queries/project-setting";
@@ -10,7 +10,7 @@ import { CurrentPage, DataTypeEnum } from "@/src/types/shared/general";
 import { postProcessLookupLists } from "@/src/util/components/projects/projectId/lookup-lists-helper";
 import { postProcessCurrentAttribute } from "@/src/util/components/projects/projectId/settings/attribute-calculation-helper";
 import { ATTRIBUTES_VISIBILITY_STATES, DATA_TYPES, getTooltipVisibilityState, postProcessingAttributes } from "@/src/util/components/projects/projectId/settings/data-schema-helper";
-import { copyToClipboard, jsonCopy } from "@/submodules/javascript-functions/general";
+import { copyToClipboard } from "@/submodules/javascript-functions/general";
 import Dropdown from "@/submodules/react-components/components/Dropdown";
 import { useLazyQuery, useMutation } from "@apollo/client";
 import { Editor } from "@monaco-editor/react";
@@ -36,7 +36,7 @@ export default function AttributeCalculation() {
     const router = useRouter();
     const dispatch = useDispatch();
 
-    const project = useSelector(selectProject);
+    const projectId = useSelector(selectProjectId);
     const attributes = useSelector(selectAttributes);
     const usableAttributes = useSelector(selectUsableAttributesFiltered)
     const lookupLists = useSelector(selectAllLookupLists);
@@ -59,25 +59,25 @@ export default function AttributeCalculation() {
     useEffect(unsubscribeWSOnDestroy(router, [CurrentPage.ATTRIBUTE_CALCULATION]), []);
 
     useEffect(() => {
-        if (!project) return;
+        if (!projectId) return;
         if (!currentAttribute || attributes.length == 0) {
-            refetchAttributes({ variables: { projectId: project.id, stateFilter: ['ALL'] } }).then((res) => {
+            refetchAttributes({ variables: { projectId: projectId, stateFilter: ['ALL'] } }).then((res) => {
                 dispatch(setAllAttributes(postProcessingAttributes(res.data['attributesByProjectId'])));
                 setCurrentAttribute(postProcessCurrentAttribute(attributes.find((attribute) => attribute.id === router.query.attributeId)));
             });
         }
         if (lookupLists.length == 0) {
-            refetchLookupLists({ variables: { projectId: project.id } }).then((res) => {
+            refetchLookupLists({ variables: { projectId: projectId } }).then((res) => {
                 dispatch(setAllLookupLists(res.data['knowledgeBasesByProjectId']));
             });
         }
         checkProjectTokenization();
         WebSocketsService.subscribeToNotification(CurrentPage.ATTRIBUTE_CALCULATION, {
-            projectId: project.id,
+            projectId: projectId,
             whitelist: ['attributes_updated', 'calculate_attribute', 'tokenization', 'knowledge_base_updated', 'knowledge_base_deleted', 'knowledge_base_created'],
             func: handleWebsocketNotification
         });
-    }, [project, attributes, currentAttribute]);
+    }, [projectId, attributes, currentAttribute]);
 
     useEffect(() => {
         if (!attributes) return;
@@ -110,7 +110,7 @@ export default function AttributeCalculation() {
         const attributeNew = { ...currentAttribute };
         attributeNew.name = name;
         attributeNew.saveSourceCode = false;
-        updateAttributeMut({ variables: { projectId: project.id, attributeId: currentAttribute.id, name: attributeNew.name } }).then(() => {
+        updateAttributeMut({ variables: { projectId: projectId, attributeId: currentAttribute.id, name: attributeNew.name } }).then(() => {
             setCurrentAttribute(postProcessCurrentAttribute(attributeNew));
             dispatch(updateAttributeById(attributeNew));
             setDuplicateNameExists(false);
@@ -124,7 +124,7 @@ export default function AttributeCalculation() {
         attributeNew.visibilityIndex = ATTRIBUTES_VISIBILITY_STATES.findIndex((state) => state.name === option);
         attributeNew.visibilityName = option;
         attributeNew.saveSourceCode = false;
-        updateAttributeMut({ variables: { projectId: project.id, attributeId: currentAttribute.id, visibility: attributeNew.visibility } }).then(() => {
+        updateAttributeMut({ variables: { projectId: projectId, attributeId: currentAttribute.id, visibility: attributeNew.visibility } }).then(() => {
             setCurrentAttribute(postProcessCurrentAttribute(attributeNew));
             dispatch(updateAttributeById(attributeNew));
         });
@@ -136,7 +136,7 @@ export default function AttributeCalculation() {
         attributeNew.dataType = dataType;
         attributeNew.dataTypeName = option;
         attributeNew.saveSourceCode = false;
-        updateAttributeMut({ variables: { projectId: project.id, attributeId: currentAttribute.id, dataType: attributeNew.dataType } }).then(() => {
+        updateAttributeMut({ variables: { projectId: projectId, attributeId: currentAttribute.id, dataType: attributeNew.dataType } }).then(() => {
             setCurrentAttribute(postProcessCurrentAttribute(attributeNew));
             dispatch(updateAttributeById(attributeNew));
         });
@@ -159,11 +159,11 @@ export default function AttributeCalculation() {
     function updateSourceCode(value: string) {
         var regMatch: any = getPythonFunctionRegExMatch(value);
         const finalSourceCode = value.replace(regMatch[0], 'def ac(record)');
-        updateAttributeMut({ variables: { projectId: project.id, attributeId: currentAttribute.id, sourceCode: finalSourceCode } });
+        updateAttributeMut({ variables: { projectId: projectId, attributeId: currentAttribute.id, sourceCode: finalSourceCode } });
     }
 
     function checkProjectTokenization() {
-        refetchProjectTokenization({ variables: { projectId: project.id } }).then((res) => {
+        refetchProjectTokenization({ variables: { projectId: projectId } }).then((res) => {
             setTokenizationProgress(res.data['projectTokenization']?.progress);
         });
     }
@@ -177,10 +177,10 @@ export default function AttributeCalculation() {
                 currentAttributeCopy.state = AttributeState.RUNNING;
                 setCurrentAttribute(currentAttributeCopy);
             } else {
-                refetchAttributes({ variables: { projectId: project.id, stateFilter: ['ALL'] } }).then((res) => {
+                refetchAttributes({ variables: { projectId: projectId, stateFilter: ['ALL'] } }).then((res) => {
                     dispatch(setAllAttributes(postProcessingAttributes(res.data['attributesByProjectId'])));
                 });
-                refetchAttributeByAttributeId({ variables: { projectId: project.id, attributeId: currentAttribute?.id } }).then((res) => {
+                refetchAttributeByAttributeId({ variables: { projectId: projectId, attributeId: currentAttribute?.id } }).then((res) => {
                     const attribute = res.data['attributeByAttributeId'];
                     if (attribute == null) setCurrentAttribute(null);
                     else setCurrentAttribute(postProcessCurrentAttribute(attribute));
@@ -190,7 +190,7 @@ export default function AttributeCalculation() {
                 }
             }
         } else if (['knowledge_base_updated', 'knowledge_base_deleted', 'knowledge_base_created'].includes(msgParts[1])) {
-            refetchLookupLists({ variables: { projectId: project.id } }).then((res) => {
+            refetchLookupLists({ variables: { projectId: projectId } }).then((res) => {
                 dispatch(setAllLookupLists(postProcessLookupLists(res.data['knowledgeBasesByProjectId'])));
             });
         } else if (msgParts[1] == 'tokenization' && msgParts[2] == 'docbin') {
@@ -206,12 +206,12 @@ export default function AttributeCalculation() {
         }
     }
 
-    return (project && <div className="bg-white p-4 pb-16 overflow-y-auto h-screen" onScroll={(e: any) => onScrollEvent(e)}>
+    return (projectId && <div className="bg-white p-4 pb-16 overflow-y-auto h-screen" onScroll={(e: any) => onScrollEvent(e)}>
         {currentAttribute && <div>
             <div className={`sticky z-40 h-12 ${isHeaderNormal ? 'top-1' : '-top-5'}`}>
                 <div className={`bg-white flex-grow ${isHeaderNormal ? '' : 'shadow'}`}>
                     <div className={`flex-row justify-start items-center inline-block ${isHeaderNormal ? 'p-0' : 'flex py-2'}`} style={{ transition: 'all .25s ease-in-out' }}>
-                        <button onClick={() => router.push(`/projects/${project.id}/settings`)}
+                        <button onClick={() => router.push(`/projects/${projectId}/settings`)}
                             className="text-green-800 text-sm font-medium">
                             <IconArrowLeft className="h-5 w-5 inline-block text-green-800" />
                             <span className="leading-5">Go back</span>
@@ -323,7 +323,7 @@ export default function AttributeCalculation() {
                 </div>
 
                 <ExecutionContainer currentAttribute={currentAttribute} tokenizationProgress={tokenizationProgress} refetchCurrentAttribute={() => {
-                    refetchAttributeByAttributeId({ variables: { projectId: project.id, attributeId: currentAttribute?.id } }).then((res) => {
+                    refetchAttributeByAttributeId({ variables: { projectId: projectId, attributeId: currentAttribute?.id } }).then((res) => {
                         const attribute = res.data['attributeByAttributeId'];
                         if (attribute == null) setCurrentAttribute(null);
                         else setCurrentAttribute(postProcessCurrentAttribute(attribute));
