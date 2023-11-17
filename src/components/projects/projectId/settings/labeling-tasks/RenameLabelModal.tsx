@@ -1,5 +1,5 @@
 import Modal from "@/src/components/shared/modal/Modal";
-import { selectModal, setModalStates } from "@/src/reduxStore/states/modal";
+import { initModal, selectModal, setModalStates } from "@/src/reduxStore/states/modal";
 import { selectLabelingTasksAll, setLabelingTasksAll } from "@/src/reduxStore/states/pages/settings";
 import { selectProjectId } from "@/src/reduxStore/states/project";
 import { HANDLE_LABEL_RENAME_WARNING, UPDATE_LABEL_NAME } from "@/src/services/gql/mutations/project-settings";
@@ -36,6 +36,7 @@ export default function RenameLabelModal(props: LabelingTasksProps) {
             const label = labelingTask.labels.find((label: LabelType) => label.id == modalRenameLabel.label.id);
             label.name = newLabelName;
             dispatch(setLabelingTasksAll(labelingTasksSchemaCopy));
+            dispatch(initModal(ModalEnum.RENAME_LABEL));
         });
     }, [modalRenameLabel, newLabelName]);
 
@@ -44,7 +45,12 @@ export default function RenameLabelModal(props: LabelingTasksProps) {
     }, [renameLabel]);
 
     useEffect(() => {
+        if (!LabelHelper.renameLabelData) return;
         setAcceptButtonRename({ ...ACCEPT_BUTTON, emitFunction: renameLabel, disabled: LabelHelper.renameLabelData?.checkResults?.errors.length > 0 });
+        if (!modalRenameLabel.changedLabelName) {
+            dispatch(setModalStates(ModalEnum.RENAME_LABEL, { changedLabelName: modalRenameLabel.label.name }));
+            LabelHelper.renameLabelData.canCheck = false;
+        }
     }, [modalRenameLabel]);
 
     const [acceptButtonRename, setAcceptButtonRename] = useState<ModalButton>(ACCEPT_BUTTON);
@@ -58,7 +64,7 @@ export default function RenameLabelModal(props: LabelingTasksProps) {
                 e.newParsed = LabelHelper.prepareSourceCode(e.new, e.information_source_name);
             });
             LabelHelper.renameLabelData.checkResults = result;
-            dispatch(setModalStates(ModalEnum.RENAME_LABEL, { ...modalRenameLabel, checkResults: result, open: true }));
+            dispatch(setModalStates(ModalEnum.RENAME_LABEL, { checkResults: result, open: true, changedLabelName: newLabelName }));
         });
     }
 
@@ -70,7 +76,7 @@ export default function RenameLabelModal(props: LabelingTasksProps) {
     }
 
     return (
-        <Modal modalName={ModalEnum.RENAME_LABEL} acceptButton={acceptButtonRename}>
+        <Modal modalName={ModalEnum.RENAME_LABEL} acceptButton={acceptButtonRename} doNotFullyInit={true}>
             {LabelHelper.renameLabelData && modalRenameLabel.label && <div className="flex flex-col gap-y-2">
                 <div className="self-center flex flex-row flex-nowrap items-center justify-center">
                     <p className="mr-2 font-bold">Change label name:</p><span
@@ -78,11 +84,11 @@ export default function RenameLabelModal(props: LabelingTasksProps) {
                 </div>
                 <div className="flex flex-col gap-y-2" style={{ maxHeight: 'calc(80vh - 100px)' }}>
                     <div className="flex flex-row flex-nowrap items-center">
-                        <input defaultValue={modalRenameLabel.label.name} onChange={(event) => setNewLabelName(event.target.value)}
-                            onInput={(event: any) => LabelHelper.checkInputRenameLabel(event, modalRenameLabel)} onKeyDown={(event: any) => {
-                                if (event.key == 'Enter') checkRenameLabel();
-                            }}
-                            className="h-8 w-full border-gray-300 rounded-md placeholder-italic border text-gray-900 pl-4 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100" />
+                        <input defaultValue={modalRenameLabel.changedLabelName} onChange={(event) => {
+                            setNewLabelName(event.target.value);
+                        }} onInput={(event: any) => LabelHelper.checkInputRenameLabel(event, modalRenameLabel)} onKeyDown={(event: any) => {
+                            if (event.key == 'Enter') checkRenameLabel();
+                        }} className="h-8 w-full border-gray-300 rounded-md placeholder-italic border text-gray-900 pl-4 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100" />
                         <button onClick={checkRenameLabel} disabled={!LabelHelper.renameLabelData.canCheck}
                             className={`ml-2 flex-shrink-0 bg-green-100 text-green-700 border border-green-400 text-xs font-semibold px-4 py-2 rounded-md hover:bg-green-200 focus:outline-none ${LabelHelper.renameLabelData.canCheck ? 'opacity-100 cursor-pointer' : 'opacity-50 cursor-not-allowed'}`}>
                             Check Rename</button>
@@ -126,7 +132,7 @@ export default function RenameLabelModal(props: LabelingTasksProps) {
                                     warnings[index].open = !warnings[index].open;
                                     const checkResults = jsonCopy(modalRenameLabel.checkResults);
                                     checkResults.warnings = warnings;
-                                    dispatch(setModalStates(ModalEnum.RENAME_LABEL, { ...modalRenameLabel, checkResults: checkResults }));
+                                    dispatch(setModalStates(ModalEnum.RENAME_LABEL, { checkResults: checkResults, changedLabelName: newLabelName }));
                                 }}>
                                     <div className="mr-1">
                                         <IconTriangleInverted className={`h-3 w-3 ${warning.open ? 'transform rotate-180' : ''}`} />

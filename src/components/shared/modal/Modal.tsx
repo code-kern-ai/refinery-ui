@@ -3,7 +3,7 @@ import { Fragment } from 'react'
 import { Dialog, Transition } from '@headlessui/react'
 import { isStringTrue } from '@/submodules/javascript-functions/general';
 import { useDispatch, useSelector } from 'react-redux';
-import { Modal, initModal, openModal, selectModal } from '@/src/reduxStore/states/modal';
+import { Modal, closeModal, initModal, openModal, selectModal } from '@/src/reduxStore/states/modal';
 import { ModalButton, ModalButtonType } from '@/src/types/shared/modal';
 import { modalButtonCaption } from '@/src/util/shared/modal-helper';
 
@@ -29,7 +29,8 @@ export default function Modal(props: any) {
 
     function setOpen(value: boolean) {
         if (value) dispatch(openModal(props.modalName));
-        else fullInit(); // to ensure the modal is fully reset
+        else if (!props.doNotFullyInit) fullInit();  // to ensure the modal is fully reset
+        else dispatch(closeModal(props.modalName))
     }
 
     function fillButtons() {
