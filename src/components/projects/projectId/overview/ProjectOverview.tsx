@@ -28,8 +28,10 @@ export default function ProjectOverview() {
     useEffect(unsubscribeWSOnDestroy(router, [CurrentPage.PROJECT_OVERVIEW]), []);
 
     useEffect(() => {
+        if (!projectId) return;
         getProjectStats();
         WebSocketsService.subscribeToNotification(CurrentPage.PROJECT_OVERVIEW, {
+            projectId: projectId,
             whitelist: ['label_created', 'label_deleted', 'labeling_task_deleted', 'labeling_task_updated', 'labeling_task_created', 'weak_supervision_finished', 'data_slice_created', 'data_slice_updated', 'data_slice_deleted'],
             func: handleWebsocketNotification
         });
