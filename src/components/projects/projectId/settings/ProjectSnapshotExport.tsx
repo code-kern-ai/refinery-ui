@@ -17,7 +17,7 @@ import { useLazyQuery } from "@apollo/client";
 import { Tooltip } from "@nextui-org/react";
 import { IconDownload, IconInfoCircle } from "@tabler/icons-react";
 import { useRouter } from "next/router";
-import { Fragment, useEffect, useState } from "react";
+import { Fragment, useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { timer } from "rxjs";
 
@@ -41,6 +41,7 @@ export default function ProjectSnapshotExport() {
 
     useEffect(() => {
         if (!modal || !modal.open) return;
+        if (!projectId) return;
         requestProjectSize();
         requestProjectExportCredentials();
         WebSocketsService.subscribeToNotification(CurrentPage.PROJECT_SETTINGS, {
@@ -110,12 +111,18 @@ export default function ProjectSnapshotExport() {
         });
     }
 
-    function handleWebsocketNotification(msgParts: string[]) {
+    const handleWebsocketNotification = useCallback((msgParts: string[]) => {
         if (msgParts[1] == 'project_export') {
             setDownloadPrepareMessage(DownloadState.NONE);
             requestProjectExportCredentials();
         }
-    }
+    }, []);
+
+    useEffect(() => {
+        if (!projectId) return;
+        WebSocketsService.updateFunctionPointer(projectId, CurrentPage.PROJECT_SETTINGS, handleWebsocketNotification)
+    }, [handleWebsocketNotification, projectId]);
+
 
     return (<Modal modalName={ModalEnum.PROJECT_SNAPSHOT} hasOwnButtons={true}>
         <div className="text-lg leading-6 text-gray-900 font-medium text-center">

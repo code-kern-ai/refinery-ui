@@ -6,7 +6,7 @@ import { Project, ProjectStatistics } from "@/src/types/components/projects/proj
 import { CurrentPage } from "@/src/types/shared/general";
 import { jsonCopy, percentRoundString } from "@/submodules/javascript-functions/general";
 import { useLazyQuery, useMutation } from "@apollo/client";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import YoutubeIntroduction from "./YoutubeIntroduction";
 import ButtonsContainer from "./ButtonsContainer";
@@ -42,23 +42,21 @@ export default function ProjectsList() {
     useEffect(unsubscribeWSOnDestroy(router, [CurrentPage.PROJECTS]), []);
 
     useEffect(() => {
-        if (organizationInactive == null) return;
-        if (!organizationInactive) {
-            initData();
-        } else {
-            createDefaultOrg();
-        }
-    }, [organizationInactive]);
-
-    function initData() {
-        refetchProjectsAndPostProcess();
-        refetchStatsAndPostProcess();
-
         WebSocketsService.subscribeToNotification(CurrentPage.PROJECTS, {
             whitelist: ['project_created', 'project_deleted', 'project_update', 'file_upload', 'bad_password'],
             func: handleWebsocketNotification
         });
-    }
+    }, []);
+
+    useEffect(() => {
+        if (organizationInactive == null) return;
+        if (!organizationInactive) {
+            refetchProjectsAndPostProcess();
+            refetchStatsAndPostProcess();
+        } else {
+            createDefaultOrg();
+        }
+    }, [organizationInactive]);
 
     function refetchProjectsAndPostProcess() {
         refetchProjects().then((res) => {
@@ -83,14 +81,6 @@ export default function ProjectsList() {
         });
     }
 
-    function handleWebsocketNotification(msgParts: string[]) {
-        if (['project_created', 'project_deleted', 'project_update'].includes(msgParts[1])) {
-            refetchProjectsAndPostProcess();
-            refetchStatsAndPostProcess();
-        }
-        // TODO: add logic for bad password
-    }
-
     function createDefaultOrg() {
         if (isManaged || isDemo) {
             setDataLoaded(true);
@@ -108,6 +98,18 @@ export default function ProjectsList() {
             });
         });
     }
+
+    const handleWebsocketNotification = useCallback((msgParts: string[]) => {
+        if (['project_created', 'project_deleted', 'project_update'].includes(msgParts[1])) {
+            refetchProjectsAndPostProcess();
+            refetchStatsAndPostProcess();
+        }
+        // TODO: add logic for bad password
+    }, []);
+
+    useEffect(() => {
+        WebSocketsService.updateFunctionPointer(null, CurrentPage.PROJECTS, handleWebsocketNotification)
+    }, [handleWebsocketNotification]);
 
     return (
         <div>

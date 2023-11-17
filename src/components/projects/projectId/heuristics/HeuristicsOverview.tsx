@@ -1,7 +1,7 @@
 import { selectProjectId } from "@/src/reduxStore/states/project";
 import { useDispatch, useSelector } from "react-redux";
 import style from '@/src/styles/components/projects/projectId/heuristics/heuristics.module.css';
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { selectEmbeddings, selectUsableNonTextAttributes, setAllAttributes, setAllEmbeddings, setLabelingTasksAll } from "@/src/reduxStore/states/pages/settings";
 import { CurrentPage } from "@/src/types/shared/general";
 import { WebSocketsService } from "@/src/services/base/web-sockets/WebSocketsService";
@@ -20,9 +20,12 @@ import AddActiveLeanerModal from "./AddActiveLearnerModal";
 import AddZeroShotModal from "./AddZeroShotModal";
 import AddCrowdLabelerModal from "./AddCrowdLabelerModal";
 import { postProcessingEmbeddings } from "@/src/util/components/projects/projectId/settings/embeddings-helper";
+import { useRouter } from "next/router";
+import { unsubscribeWSOnDestroy } from "@/src/services/base/web-sockets/web-sockets-helper";
 
 export function HeuristicsOverview() {
     const dispatch = useDispatch();
+    const router = useRouter();
 
     const projectId = useSelector(selectProjectId);
     const heuristics = useSelector(selectHeuristicsAll);
@@ -35,6 +38,8 @@ export function HeuristicsOverview() {
     const [refetchHeuristics] = useLazyQuery(GET_HEURISTICS_OVERVIEW_DATA, { fetchPolicy: "network-only" });
     const [refetchEmbeddings] = useLazyQuery(GET_EMBEDDING_SCHEMA_BY_PROJECT_ID, { fetchPolicy: "no-cache" });
     const [refetchAttributes] = useLazyQuery(GET_ATTRIBUTES_BY_PROJECT_ID, { fetchPolicy: "network-only" });
+
+    useEffect(unsubscribeWSOnDestroy(router, [CurrentPage.HEURISTICS]), []);
 
     useEffect(() => {
         if (!projectId) return;
@@ -77,7 +82,7 @@ export function HeuristicsOverview() {
         });
     }
 
-    function handleWebsocketNotification(msgParts: string[]) {
+    const handleWebsocketNotification = useCallback((msgParts: string[]) => {
         if (['labeling_task_updated', 'labeling_task_created'].includes(msgParts[1])) {
             refetchLabelingTasksAndProcess();
         } else if ('labeling_task_deleted' == msgParts[1]) {
@@ -88,7 +93,12 @@ export function HeuristicsOverview() {
         } else if (msgParts[1] == 'embedding_deleted' || (msgParts[1] == 'embedding' && msgParts[3] == 'state')) {
             refetchEmbeddingsAndProcess();
         }
-    }
+    }, []);
+
+    useEffect(() => {
+        if (!projectId) return;
+        WebSocketsService.updateFunctionPointer(projectId, CurrentPage.HEURISTICS, handleWebsocketNotification)
+    }, [handleWebsocketNotification, projectId]);
 
     return (projectId && <div className="p-4 bg-gray-100 h-full flex-1 flex flex-col">
         <div className="w-full h-full -mr-4">

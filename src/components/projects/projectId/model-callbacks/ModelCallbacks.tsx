@@ -20,6 +20,7 @@ import Modal from "@/src/components/shared/modal/Modal";
 import { WebSocketsService } from "@/src/services/base/web-sockets/WebSocketsService";
 import { CurrentPage } from "@/src/types/shared/general";
 import GridCards from "@/src/components/shared/grid-cards/GridCards";
+import { unsubscribeWSOnDestroy } from "@/src/services/base/web-sockets/web-sockets-helper";
 
 const ABORT_BUTTON = { buttonCaption: "Delete", useButton: true, disabled: false };
 
@@ -51,6 +52,8 @@ export default function ModelCallbacks() {
     }, [modalDelete]);
 
     const [abortButton, setAbortButton] = useState<ModalButton>(ABORT_BUTTON);
+
+    useEffect(unsubscribeWSOnDestroy(router, [CurrentPage.MODEL_CALLBACKS]), []);
 
     useEffect(() => {
         if (!projectId) return;
@@ -117,7 +120,7 @@ export default function ModelCallbacks() {
         setSelectionList(selectionListFinal);
     }
 
-    function handleWebsocketNotification(msgParts: string[]) {
+    const handleWebsocketNotification = useCallback((msgParts: string[]) => {
         if (['labeling_task_updated', 'labeling_task_created'].includes(msgParts[1])) {
             refetchLabelingTasksAndProcess();
         }
@@ -127,7 +130,12 @@ export default function ModelCallbacks() {
         if (['information_source_created', 'information_source_updated', 'information_source_deleted', 'model_callback_update_statistics']) {
             refetchModelCallbacksAndProcess();
         }
-    }
+    }, []);
+
+    useEffect(() => {
+        if (!projectId) return;
+        WebSocketsService.updateFunctionPointer(projectId, CurrentPage.MODEL_CALLBACKS, handleWebsocketNotification)
+    }, [handleWebsocketNotification, projectId]);
 
     return (projectId && <div className="p-4 bg-gray-100 h-full flex-1 flex flex-col">
         <div className="w-full h-full">

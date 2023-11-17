@@ -8,7 +8,7 @@ import { CurrentPage } from "@/src/types/shared/general";
 import { postProcessLabelingTasks, postProcessLabelingTasksSchema } from "@/src/util/components/projects/projectId/settings/labeling-tasks-helper";
 import { useLazyQuery } from "@apollo/client";
 import { useRouter } from "next/router";
-import { useEffect } from "react";
+import { useCallback, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import HeuristicsLayout from "../shared/HeuristicsLayout";
 import { selectAnnotators } from "@/src/reduxStore/states/general";
@@ -19,6 +19,7 @@ import CrowdLabelerSettings from "./CrowdLabelerSettings";
 import { postProcessCrowdLabeler } from "@/src/util/components/projects/projectId/heuristics/heuristicId/crowd-labeler-helper";
 import { selectDataSlicesAll, setDataSlices } from "@/src/reduxStore/states/pages/data-browser";
 import { DATA_SLICES } from "@/src/services/gql/queries/data-browser";
+import { unsubscribeWSOnDestroy } from "@/src/services/base/web-sockets/web-sockets-helper";
 
 
 export default function CrowdLabeler() {
@@ -35,6 +36,7 @@ export default function CrowdLabeler() {
     const [refetchLabelingTasksByProjectId] = useLazyQuery(GET_LABELING_TASKS_BY_PROJECT_ID, { fetchPolicy: "network-only" });
     const [refetchDataSlicesMut] = useLazyQuery(DATA_SLICES, { fetchPolicy: 'network-only' });
 
+    useEffect(unsubscribeWSOnDestroy(router, [CurrentPage.CROWD_LABELER]), []);
 
     useEffect(() => {
         if (!projectId) return;
@@ -73,8 +75,8 @@ export default function CrowdLabeler() {
         });
     }
 
-
-    function handleWebsocketNotification(msgParts: string[]) {
+    const handleWebsocketNotification = useCallback((msgParts: string[]) => {
+        if (!currentHeuristic) return;
         if (['labeling_task_updated', 'labeling_task_created', 'label_created', 'label_deleted'].includes(msgParts[1])) {
             refetchLabelingTasksAndProcess();
         } else if ('labeling_task_deleted' == msgParts[1]) {
@@ -88,7 +90,12 @@ export default function CrowdLabeler() {
                 refetchCurrentHeuristicAndProcess();
             }
         }
-    }
+    }, [currentHeuristic]);
+
+    useEffect(() => {
+        if (!projectId) return;
+        WebSocketsService.updateFunctionPointer(projectId, CurrentPage.CROWD_LABELER, handleWebsocketNotification)
+    }, [handleWebsocketNotification, projectId]);
 
     return (<HeuristicsLayout>
         {currentHeuristic && <div>

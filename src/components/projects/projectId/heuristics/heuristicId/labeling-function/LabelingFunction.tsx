@@ -2,7 +2,7 @@ import { useRouter } from "next/router";
 import HeuristicsLayout from "../shared/HeuristicsLayout";
 import { useDispatch, useSelector } from "react-redux";
 import { selectProjectId } from "@/src/reduxStore/states/project";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useLazyQuery, useMutation } from "@apollo/client";
 import { GET_HEURISTICS_BY_ID, GET_LABELING_FUNCTION_ON_10_RECORDS, GET_TASK_BY_TASK_ID } from "@/src/services/gql/queries/heuristics";
 import { selectHeuristic, setActiveHeuristics, updateHeuristicsState } from "@/src/reduxStore/states/pages/heuristics";
@@ -29,6 +29,7 @@ import CalculationProgress from "./CalculationProgress";
 import { copyToClipboard } from "@/submodules/javascript-functions/general";
 import { WebSocketsService } from "@/src/services/base/web-sockets/WebSocketsService";
 import { CurrentPage } from "@/src/types/shared/general";
+import { unsubscribeWSOnDestroy } from "@/src/services/base/web-sockets/web-sockets-helper";
 
 export default function LabelingFunction() {
     const dispatch = useDispatch();
@@ -50,10 +51,17 @@ export default function LabelingFunction() {
     const [refetchTaskByTaskId] = useLazyQuery(GET_TASK_BY_TASK_ID, { fetchPolicy: "network-only" });
     const [refetchRunOn10] = useLazyQuery(GET_LABELING_FUNCTION_ON_10_RECORDS, { fetchPolicy: "no-cache" })
 
+    useEffect(unsubscribeWSOnDestroy(router, [CurrentPage.LABELING_FUNCTION]), []);
+
     useEffect(() => {
         if (!projectId) return;
         if (!router.query.heuristicId) return;
         refetchLabelingTasksAndProcess();
+        WebSocketsService.subscribeToNotification(CurrentPage.LABELING_FUNCTION, {
+            projectId: projectId,
+            whitelist: ['labeling_task_updated', 'labeling_task_created', 'label_created', 'label_deleted', 'labeling_task_deleted', 'information_source_deleted', 'information_source_updated', 'model_callback_update_statistics', 'payload_progress', 'payload_finished', 'payload_failed', 'payload_created'],
+            func: handleWebsocketNotification
+        });
     }, [projectId, router.query.heuristicId]);
 
     useEffect(() => {
@@ -65,11 +73,6 @@ export default function LabelingFunction() {
     useEffect(() => {
         if (!currentHeuristic) return;
         refetchTaskByTaskIdAndProcess();
-        WebSocketsService.subscribeToNotification(CurrentPage.LABELING_FUNCTION, {
-            projectId: projectId,
-            whitelist: ['labeling_task_updated', 'labeling_task_created', 'label_created', 'label_deleted', 'labeling_task_deleted', 'information_source_deleted', 'information_source_updated', 'model_callback_update_statistics', 'payload_progress', 'payload_finished', 'payload_failed', 'payload_created'],
-            func: handleWebsocketNotification
-        });
     }, [currentHeuristic]);
 
     function refetchCurrentHeuristicAndProcess() {
@@ -124,7 +127,8 @@ export default function LabelingFunction() {
         });
     }
 
-    function handleWebsocketNotification(msgParts: string[]) {
+    const handleWebsocketNotification = useCallback((msgParts: string[]) => {
+        if (!currentHeuristic) return;
         if (['labeling_task_updated', 'labeling_task_created', 'label_created', 'label_deleted'].includes(msgParts[1])) {
             refetchLabelingTasksAndProcess();
         } else if ('labeling_task_deleted' == msgParts[1]) {
@@ -147,7 +151,12 @@ export default function LabelingFunction() {
                 refetchTaskByTaskIdAndProcess();
             }
         }
-    }
+    }, [currentHeuristic]);
+
+    useEffect(() => {
+        if (!projectId) return;
+        WebSocketsService.updateFunctionPointer(projectId, CurrentPage.LABELING_FUNCTION, handleWebsocketNotification)
+    }, [handleWebsocketNotification, projectId]);
 
     return (
         <HeuristicsLayout updateSourceCode={(code: string) => updateSourceCodeToDisplay(code)}>

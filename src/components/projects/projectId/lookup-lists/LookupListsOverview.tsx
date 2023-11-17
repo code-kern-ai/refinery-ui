@@ -18,6 +18,7 @@ import { ACTIONS_DROPDOWN_OPTIONS, postProcessLookupLists } from "@/src/util/com
 import { WebSocketsService } from "@/src/services/base/web-sockets/WebSocketsService";
 import { CurrentPage } from "@/src/types/shared/general";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
+import { unsubscribeWSOnDestroy } from "@/src/services/base/web-sockets/web-sockets-helper";
 
 const ABORT_BUTTON = { buttonCaption: "Delete", useButton: true, disabled: false };
 
@@ -59,6 +60,8 @@ export default function LookupListsOverview() {
     }, [modalDelete]);
 
     const [abortButton, setAbortButton] = useState<ModalButton>(ABORT_BUTTON);
+
+    useEffect(unsubscribeWSOnDestroy(router, [CurrentPage.LOOKUP_LISTS_OVERVIEW]), []);
 
     useEffect(() => {
         if (!projectId) return;
@@ -114,13 +117,19 @@ export default function LookupListsOverview() {
         setSelectionList(selectionListFinal);
     }
 
-    function handleWebsocketNotification(msgParts: string[]) {
+    const handleWebsocketNotification = useCallback((msgParts: string[]) => {
         if (['knowledge_base_updated', 'knowledge_base_deleted', 'knowledge_base_created'].includes(msgParts[1])) {
             refetchLookupLists({ variables: { projectId: projectId } }).then((res) => {
                 dispatch(setAllLookupLists(postProcessLookupLists(res.data["knowledgeBasesByProjectId"])));
             });
         }
-    }
+    }, []);
+
+    useEffect(() => {
+        if (!projectId) return;
+        WebSocketsService.updateFunctionPointer(projectId, CurrentPage.LOOKUP_LISTS_OVERVIEW, handleWebsocketNotification)
+    }, [handleWebsocketNotification, projectId]);
+
 
     return (
         projectId ? (

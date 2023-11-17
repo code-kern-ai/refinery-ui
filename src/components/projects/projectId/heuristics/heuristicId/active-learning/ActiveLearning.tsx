@@ -4,7 +4,7 @@ import { useRouter } from "next/router";
 import { selectProjectId } from "@/src/reduxStore/states/project";
 import { useLazyQuery, useMutation } from "@apollo/client";
 import { GET_HEURISTICS_BY_ID, GET_TASK_BY_TASK_ID } from "@/src/services/gql/queries/heuristics";
-import { Fragment, useEffect, useState } from "react";
+import { Fragment, useCallback, useEffect, useState } from "react";
 import { selectHeuristic, setActiveHeuristics, updateHeuristicsState } from "@/src/reduxStore/states/pages/heuristics";
 import { getClassLine, postProcessCurrentHeuristic, postProcessLastTaskLogs } from "@/src/util/components/projects/projectId/heuristics/heuristicId/heuristics-details-helper";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
@@ -28,6 +28,7 @@ import { DangerZoneEnum } from "@/src/types/shared/danger-zone";
 import { getPythonClassRegExMatch } from "@/submodules/javascript-functions/python-functions-parser";
 import { WebSocketsService } from "@/src/services/base/web-sockets/WebSocketsService";
 import { CurrentPage } from "@/src/types/shared/general";
+import { unsubscribeWSOnDestroy } from "@/src/services/base/web-sockets/web-sockets-helper";
 
 export default function ActiveLearning() {
     const dispatch = useDispatch();
@@ -48,11 +49,19 @@ export default function ActiveLearning() {
     const [refetchEmbeddings] = useLazyQuery(GET_EMBEDDING_SCHEMA_BY_PROJECT_ID, { fetchPolicy: "network-only" });
     const [refetchTaskByTaskId] = useLazyQuery(GET_TASK_BY_TASK_ID, { fetchPolicy: "no-cache" });
 
+    useEffect(unsubscribeWSOnDestroy(router, [CurrentPage.ACTIVE_LEARNING]), []);
+
     useEffect(() => {
         if (!projectId) return;
         if (!router.query.heuristicId) return;
         refetchLabelingTasksAndProcess();
         refetchEmbeddingsAndPostProcess();
+
+        WebSocketsService.subscribeToNotification(CurrentPage.ACTIVE_LEARNING, {
+            projectId: projectId,
+            whitelist: ['labeling_task_updated', 'labeling_task_created', 'label_created', 'label_deleted', 'labeling_task_deleted', 'information_source_deleted', 'information_source_updated', 'model_callback_update_statistics', 'embedding_deleted', 'embedding', 'payload_finished', 'payload_failed', 'payload_created'],
+            func: handleWebsocketNotification
+        });
     }, [projectId, router.query.heuristicId]);
 
     useEffect(() => {
@@ -66,11 +75,6 @@ export default function ActiveLearning() {
         if (!embeddings) return;
         dispatch(setFilteredEmbeddings(embeddings.filter(e => embeddingRelevant(e, attributes, labelingTasks, currentHeuristic.labelingTaskId))));
         refetchTaskByTaskIdAndProcess();
-        WebSocketsService.subscribeToNotification(CurrentPage.ACTIVE_LEARNING, {
-            projectId: projectId,
-            whitelist: ['labeling_task_updated', 'labeling_task_created', 'label_created', 'label_deleted', 'labeling_task_deleted', 'information_source_deleted', 'information_source_updated', 'model_callback_update_statistics', 'embedding_deleted', 'embedding', 'payload_finished', 'payload_failed', 'payload_created'],
-            func: handleWebsocketNotification
-        });
     }, [currentHeuristic]);
 
     function refetchTaskByTaskIdAndProcess() {
@@ -125,7 +129,8 @@ export default function ActiveLearning() {
         });
     }
 
-    function handleWebsocketNotification(msgParts: string[]) {
+    const handleWebsocketNotification = useCallback((msgParts: string[]) => {
+        if (!currentHeuristic) return;
         if (['labeling_task_updated', 'labeling_task_created', 'label_created', 'label_deleted'].includes(msgParts[1])) {
             refetchLabelingTasksAndProcess();
         } else if ('labeling_task_deleted' == msgParts[1]) {
@@ -147,7 +152,12 @@ export default function ActiveLearning() {
                 refetchTaskByTaskIdAndProcess();
             }
         }
-    }
+    }, [currentHeuristic]);
+
+    useEffect(() => {
+        if (!projectId) return;
+        WebSocketsService.updateFunctionPointer(projectId, CurrentPage.ACTIVE_LEARNING, handleWebsocketNotification)
+    }, [handleWebsocketNotification, projectId]);
 
     return (
         <HeuristicsLayout updateSourceCode={(code) => updateSourceCodeToDisplay(code)}>

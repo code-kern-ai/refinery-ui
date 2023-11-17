@@ -17,7 +17,7 @@ import { Editor } from "@monaco-editor/react";
 import { Tooltip } from "@nextui-org/react";
 import { IconAlertTriangleFilled, IconArrowLeft, IconCircleCheckFilled } from "@tabler/icons-react";
 import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux"
 import ExecutionContainer from "./ExecutionContainer";
 import { getPythonFunctionRegExMatch } from "@/submodules/javascript-functions/python-functions-parser";
@@ -168,8 +168,9 @@ export default function AttributeCalculation() {
         });
     }
 
-    function handleWebsocketNotification(msgParts: string[]) {
+    const handleWebsocketNotification = useCallback((msgParts: string[]) => {
         if (!currentAttribute) return;
+        if (!projectId) return;
         if (msgParts[1] == 'calculate_attribute') {
             if (msgParts[2] == 'progress' && msgParts[3] == currentAttribute.id) {
                 const currentAttributeCopy = { ...currentAttribute };
@@ -202,9 +203,13 @@ export default function AttributeCalculation() {
                     timer(2000).subscribe(() => checkProjectTokenization());
                 }
             }
-
         }
-    }
+    }, [projectId, currentAttribute]);
+
+    useEffect(() => {
+        if (!projectId) return;
+        WebSocketsService.updateFunctionPointer(projectId, CurrentPage.ATTRIBUTE_CALCULATION, handleWebsocketNotification)
+    }, [handleWebsocketNotification, projectId]);
 
     return (projectId && <div className="bg-white p-4 pb-16 overflow-y-auto h-screen" onScroll={(e: any) => onScrollEvent(e)}>
         {currentAttribute && <div>

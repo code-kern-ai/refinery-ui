@@ -18,6 +18,7 @@ import { DangerZoneEnum } from "@/src/types/shared/danger-zone";
 import Terms from "./Terms";
 import { WebSocketsService } from "@/src/services/base/web-sockets/WebSocketsService";
 import { CurrentPage } from "@/src/types/shared/general";
+import { unsubscribeWSOnDestroy } from "@/src/services/base/web-sockets/web-sockets-helper";
 
 export default function LookupListsDetails() {
     const router = useRouter();
@@ -35,6 +36,8 @@ export default function LookupListsDetails() {
     const [refetchCurrentLookupList] = useLazyQuery(LOOKUP_LIST_BY_LOOKUP_LIST_ID, { fetchPolicy: 'network-only', nextFetchPolicy: 'cache-first' });
     const [refetchTermsLookupList] = useLazyQuery(TERMS_BY_KNOWLEDGE_BASE_ID, { fetchPolicy: 'cache-and-network' });
     const [updateLookupListMut] = useMutation(UPDATE_KNOWLEDGE_BASE);
+
+    useEffect(unsubscribeWSOnDestroy(router, [CurrentPage.LOOKUP_LISTS_DETAILS]), []);
 
     useEffect(() => {
         if (!projectId) return;

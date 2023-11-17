@@ -4,7 +4,7 @@ import HeuristicsLayout from "../shared/HeuristicsLayout";
 import { selectProjectId } from "@/src/reduxStore/states/project";
 import { useLazyQuery, useMutation } from "@apollo/client";
 import { GET_HEURISTICS_BY_ID } from "@/src/services/gql/queries/heuristics";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { GET_LABELING_TASKS_BY_PROJECT_ID, GET_ZERO_SHOT_RECOMMENDATIONS } from "@/src/services/gql/queries/project-setting";
 import { postProcessLabelingTasks, postProcessLabelingTasksSchema } from "@/src/util/components/projects/projectId/settings/labeling-tasks-helper";
@@ -28,6 +28,7 @@ import DangerZone from "@/src/components/shared/danger-zone/DangerZone";
 import { DangerZoneEnum } from "@/src/types/shared/danger-zone";
 import CalculationProgress from "./CalculationProgress";
 import { Status } from "@/src/types/shared/statuses";
+import { unsubscribeWSOnDestroy } from "@/src/services/base/web-sockets/web-sockets-helper";
 
 export default function ZeroShot() {
     const dispatch = useDispatch();
@@ -47,12 +48,19 @@ export default function ZeroShot() {
     const [updateHeuristicMut] = useMutation(UPDATE_INFORMATION_SOURCE);
     const [refetchZeroShotRecommendations] = useLazyQuery(GET_ZERO_SHOT_RECOMMENDATIONS, { fetchPolicy: 'network-only', nextFetchPolicy: 'cache-first' });
 
+    useEffect(unsubscribeWSOnDestroy(router, [CurrentPage.ZERO_SHOT]), []);
+
     useEffect(() => {
         if (!projectId) return;
         if (!router.query.heuristicId) return;
         refetchLabelingTasksAndProcess();
         refetchZeroShotRecommendations({ variables: { projectId: projectId } }).then((res) => {
             setModels(JSON.parse(res.data['zeroShotRecommendations']));
+        });
+        WebSocketsService.subscribeToNotification(CurrentPage.ZERO_SHOT, {
+            projectId: projectId,
+            whitelist: ['labeling_task_updated', 'labeling_task_created', 'label_created', 'label_deleted', 'labeling_task_deleted', 'information_source_deleted', 'information_source_updated', 'payload_update_statistics', 'payload_finished', 'payload_failed', 'payload_created', 'zero-shot', 'zero_shot_download'],
+            func: handleWebsocketNotification
         });
     }, [projectId, router.query.heuristicId]);
 
@@ -61,15 +69,6 @@ export default function ZeroShot() {
         if (!labelingTasks) return;
         refetchCurrentHeuristicAndProcess();
     }, [labelingTasks]);
-
-    useEffect(() => {
-        if (!currentHeuristic) return;
-        WebSocketsService.subscribeToNotification(CurrentPage.ZERO_SHOT, {
-            projectId: projectId,
-            whitelist: ['labeling_task_updated', 'labeling_task_created', 'label_created', 'label_deleted', 'labeling_task_deleted', 'information_source_deleted', 'information_source_updated', 'payload_update_statistics', 'payload_finished', 'payload_failed', 'payload_created', 'zero-shot', 'zero_shot_download'],
-            func: handleWebsocketNotification
-        });
-    }, [currentHeuristic]);
 
     function refetchCurrentHeuristicAndProcess() {
         refetchCurrentHeuristic({ variables: { projectId: projectId, informationSourceId: router.query.heuristicId } }).then((res) => {
@@ -115,7 +114,8 @@ export default function ZeroShot() {
         if (saveToDb) saveHeuristic(null, zeroShotSettingsCopy);
     }
 
-    function handleWebsocketNotification(msgParts: string[]) {
+    const handleWebsocketNotification = useCallback((msgParts: string[]) => {
+        if (!currentHeuristic) return;
         if (['labeling_task_updated', 'labeling_task_created', 'label_created', 'label_deleted'].includes(msgParts[1])) {
             refetchLabelingTasksAndProcess();
         } else if ('labeling_task_deleted' == msgParts[1]) {
@@ -144,9 +144,13 @@ export default function ZeroShot() {
                     dispatch(updateHeuristicsState(currentHeuristic.id, { lastTask: { state: msgParts[4] } }))
                 }
             }
-
         }
-    }
+    }, [currentHeuristic]);
+
+    useEffect(() => {
+        if (!projectId) return;
+        WebSocketsService.updateFunctionPointer(projectId, CurrentPage.ZERO_SHOT, handleWebsocketNotification)
+    }, [handleWebsocketNotification, projectId]);
 
     return (<HeuristicsLayout>
         {currentHeuristic && <div>

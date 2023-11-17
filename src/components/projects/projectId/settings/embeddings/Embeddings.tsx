@@ -51,8 +51,10 @@ export default function Embeddings(props: EmbeddingProps) {
     useEffect(unsubscribeWSOnDestroy(router, [CurrentPage.PROJECT_SETTINGS]), []);
 
     useEffect(() => {
+        if (!projectId) return;
         setSomethingLoading(false); // TODO add the condition
         WebSocketsService.subscribeToNotification(CurrentPage.PROJECT_SETTINGS, {
+            projectId: projectId,
             whitelist: ['embedding_updated', 'upload_embedding_payload'],
             func: handleWebsocketNotification
         });
@@ -122,20 +124,6 @@ export default function Embeddings(props: EmbeddingProps) {
         setCheckedAttributes(updated);
     }, [usableAttributes, modalFilteredAttributes]);
 
-    function handleWebsocketNotification(msgParts: string[]) {
-        if (msgParts[1] == 'embedding_updated') {
-            const loadingEmbeddingsDictCopy = jsonCopy(loadingEmbeddingsDict);
-            delete loadingEmbeddingsDictCopy[msgParts[2]];
-            setLoadingEmbeddingsDict(loadingEmbeddingsDictCopy);
-        } else if (msgParts[1] == 'upload_embedding_payload') {
-            if (loadingEmbeddingsDict[msgParts[2]] == undefined) {
-                const loadingEmbeddingsDictCopy = jsonCopy(loadingEmbeddingsDict);
-                loadingEmbeddingsDictCopy[msgParts[2]] = true;
-                setLoadingEmbeddingsDict(loadingEmbeddingsDictCopy);
-            }
-        }
-    }
-
     function prepareAttributeDataByNames(attributesNames: string[]) {
         if (!attributesNames) return [];
         const attributesNew = [];
@@ -150,6 +138,25 @@ export default function Embeddings(props: EmbeddingProps) {
         setFilterAttributesUpdate(attributesNames);
         return attributesNew;
     }
+
+    const handleWebsocketNotification = useCallback((msgParts: string[]) => {
+        if (msgParts[1] == 'embedding_updated') {
+            const loadingEmbeddingsDictCopy = jsonCopy(loadingEmbeddingsDict);
+            delete loadingEmbeddingsDictCopy[msgParts[2]];
+            setLoadingEmbeddingsDict(loadingEmbeddingsDictCopy);
+        } else if (msgParts[1] == 'upload_embedding_payload') {
+            if (loadingEmbeddingsDict[msgParts[2]] == undefined) {
+                const loadingEmbeddingsDictCopy = jsonCopy(loadingEmbeddingsDict);
+                loadingEmbeddingsDictCopy[msgParts[2]] = true;
+                setLoadingEmbeddingsDict(loadingEmbeddingsDictCopy);
+            }
+        }
+    }, []);
+
+    useEffect(() => {
+        if (!projectId) return;
+        WebSocketsService.updateFunctionPointer(projectId, CurrentPage.PROJECT_SETTINGS, handleWebsocketNotification)
+    }, [handleWebsocketNotification, projectId]);
 
     return (<div className="mt-8">
         <div className="text-lg leading-6 text-gray-900 font-medium inline-block w-full">

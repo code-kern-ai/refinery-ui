@@ -41,12 +41,13 @@ export default function GatesIntegration() {
     }, []);
 
     useEffect(() => {
+        if (!projectId) return;
         WebSocketsService.subscribeToNotification(CurrentPage.PROJECT_SETTINGS, {
             projectId: projectId,
             whitelist: ['gates_integration', 'information_source_deleted', 'information_source_updated', 'tokenization', 'embedding', 'embedding_deleted'],
             func: handleWebsocketNotification
         })
-    }, [updateProjectForGates]);
+    }, [projectId]);
 
     useEffect(() => {
         setAcceptButton({ ...ACCEPT_BUTTON, emitFunction: updateProjectForGates });
@@ -60,7 +61,7 @@ export default function GatesIntegration() {
         });
     }
 
-    function handleWebsocketNotification(msgParts: string[]) {
+    const handleWebsocketNotification = useCallback((msgParts: string[]) => {
         if (msgParts[1] == 'gates_integration') {
             refetchAndSetGatesIntegrationData();
         } else if (['information_source_deleted', 'information_source_updated'].includes(msgParts[1])) {
@@ -78,7 +79,12 @@ export default function GatesIntegration() {
                 refetchAndSetGatesIntegrationData();
             }
         }
-    }
+    }, [gatesIntegrationData]);
+
+    useEffect(() => {
+        if (!projectId) return;
+        WebSocketsService.updateFunctionPointer(projectId, CurrentPage.PROJECT_SETTINGS, handleWebsocketNotification)
+    }, [handleWebsocketNotification, projectId]);
 
     return (<div className="mt-8">
         <div className="text-lg leading-6 text-gray-900 font-medium inline-flex items-center">

@@ -2,7 +2,7 @@ import { selectProjectId } from '@/src/reduxStore/states/project';
 import { WebSocketsService } from '@/src/services/base/web-sockets/WebSocketsService';
 import { CurrentPage } from '@/src/types/shared/general';
 import { useLazyQuery } from '@apollo/client';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import ProjectOverviewHeader from './ProjectOverviewHeader';
 import { getEmptyProjectStats, postProcessingStats } from '@/src/util/components/projects/projectId/project-overview-helper';
@@ -35,10 +35,6 @@ export default function ProjectOverview() {
         });
     }, [projectId]);
 
-    function handleWebsocketNotification(msgParts: string[]) {
-
-    }
-
     // TODO: Add labeling task id and data slice id to the query
     function getProjectStats() {
         if (!projectId) return;
@@ -50,6 +46,15 @@ export default function ProjectOverview() {
             setProjectStats(postProcessingStats(JSON.parse(res['data']['generalProjectStats'])));
         });
     }
+
+    const handleWebsocketNotification = useCallback((msgParts: string[]) => {
+
+    }, []);
+
+    useEffect(() => {
+        if (!projectId) return;
+        WebSocketsService.updateFunctionPointer(projectId, CurrentPage.PROJECT_OVERVIEW, handleWebsocketNotification)
+    }, [handleWebsocketNotification, projectId]);
 
     return (<div>
         {projectId != null && <div className="p-4 bg-gray-100 flex-1 flex flex-col min-h-full">

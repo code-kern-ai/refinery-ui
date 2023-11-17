@@ -7,6 +7,7 @@ import { selectHeuristicsAll, setHeuristicType } from '@/src/reduxStore/states/p
 import { selectLabelingTasksAll } from '@/src/reduxStore/states/pages/settings';
 import { selectProjectId } from '@/src/reduxStore/states/project';
 import { WebSocketsService } from '@/src/services/base/web-sockets/WebSocketsService';
+import { unsubscribeWSOnDestroy } from '@/src/services/base/web-sockets/web-sockets-helper';
 import { CREATE_INFORMATION_SOURCE_PAYLOAD, DELETE_HEURISTIC, RUN_ZERO_SHOT_PROJECT, SET_ALL_HEURISTICS, START_WEAK_SUPERVISIONS } from '@/src/services/gql/mutations/heuristics';
 import { GET_CURRENT_WEAK_SUPERVISION_RUN } from '@/src/services/gql/queries/heuristics';
 import style from '@/src/styles/components/projects/projectId/heuristics/heuristics.module.css';
@@ -51,6 +52,8 @@ export default function HeuristicsHeader(props: HeuristicsHeaderProps) {
     const [refetchCurrentWeakSupervision] = useLazyQuery(GET_CURRENT_WEAK_SUPERVISION_RUN, { fetchPolicy: "network-only" });
     const [createTaskMut] = useMutation(CREATE_INFORMATION_SOURCE_PAYLOAD);
     const [runZeroShotMut] = useMutation(RUN_ZERO_SHOT_PROJECT);
+
+    useEffect(unsubscribeWSOnDestroy(router, [CurrentPage.HEURISTICS]), []);
 
     useEffect(() => {
         if (!projectId) return;
@@ -171,12 +174,17 @@ export default function HeuristicsHeader(props: HeuristicsHeaderProps) {
         startWeakSupervisionMut({ variables: { projectId: projectId } }).then(() => { });
     }
 
-    function handleWebsocketNotification(msgParts: string[]) {
+    const handleWebsocketNotification = useCallback((msgParts: string[]) => {
         if (['weak_supervision_started', 'weak_supervision_finished'].includes(msgParts[1])) {
             setCurrentWeakSupervisionRun(null);
             refetchCurrentWeakSupervisionAndProcess();
         }
-    }
+    }, []);
+
+    useEffect(() => {
+        if (!projectId) return;
+        WebSocketsService.updateFunctionPointer(projectId, CurrentPage.HEURISTICS, handleWebsocketNotification)
+    }, [handleWebsocketNotification, projectId]);
 
     return (
         <div className="flex-shrink-0 block xl:flex justify-between items-center">
