@@ -14,6 +14,7 @@ import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import style from "@/src/styles/components/projects/projectId/labeling.module.css";
 import NavigationBarTop from "./NavigationBarTop";
+import NavigationBarBottom from "./NavigationBarBottom";
 
 export default function LabelingMainComponent() {
     const router = useRouter();
@@ -24,7 +25,6 @@ export default function LabelingMainComponent() {
 
     const [refetchHuddleData] = useLazyQuery(REQUEST_HUDDLE_DATA, { fetchPolicy: 'no-cache' });
     const [refetchAvailableLinks] = useLazyQuery(AVAILABLE_LABELING_LINKS, { fetchPolicy: 'no-cache' });
-
 
     useEffect(() => {
         if (!projectId) return;
@@ -39,9 +39,34 @@ export default function LabelingMainComponent() {
         if (huddleId == DUMMY_HUDDLE_ID) requestHuddleData(huddleId);
         else {
             SessionManager.jumpToPosition(SessionManager.labelingLinkData.requestedPos);
-            router.push(`/projects/${projectId}/labeling/${SessionManager.labelingLinkData.huddleId}?pos=${SessionManager.labelingLinkData.requestedPos}&type=${SessionManager.huddleData.linkData.linkType}`);
+            router.push(`/projects/${projectId}/labeling/${SessionManager.labelingLinkData.huddleId}?pos=${SessionManager.huddleData.linkData.requestedPos}&type=${SessionManager.huddleData.linkData.linkType}`);
         }
     }, [projectId, router.query.sessionId]);
+
+    useEffect(() => {
+        const handleKeyUp = (event) => {
+            if (event.key == 'ArrowRight') {
+                nextRecord();
+            } else if (event.key == 'ArrowLeft') {
+                previousRecord();
+            }
+        };
+
+        document.addEventListener('keyup', handleKeyUp);
+        return () => {
+            document.removeEventListener('keyup', handleKeyUp);
+        };
+    }, []);
+
+    function previousRecord() {
+        SessionManager.previousRecord();
+        router.push(`/projects/${projectId}/labeling/${SessionManager.labelingLinkData.huddleId}?pos=${SessionManager.huddleData.linkData.requestedPos}&type=${SessionManager.huddleData.linkData.linkType}`);
+    }
+
+    function nextRecord() {
+        SessionManager.nextRecord();
+        router.push(`/projects/${projectId}/labeling/${SessionManager.labelingLinkData.huddleId}?pos=${SessionManager.huddleData.linkData.requestedPos}&type=${SessionManager.huddleData.linkData.linkType}`);
+    }
 
     function requestHuddleData(huddleId: string) {
         if (huddleId != SessionManager.labelingLinkData.huddleId) {
@@ -95,5 +120,8 @@ export default function LabelingMainComponent() {
             <span className="inline-flex items-center px-2 py-0.5 rounded font-medium bg-red-100 text-red-800">{LabelingSuiteManager.absoluteWarning}</span>
         </div>}
         <NavigationBarTop />
+        <div className="flex-grow overflow-y-auto" style={{ maxHeight: 'calc(80vh - 190px)' }}>
+        </div>
+        <NavigationBarBottom />
     </div>)
 }

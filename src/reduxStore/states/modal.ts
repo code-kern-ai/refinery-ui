@@ -187,7 +187,11 @@ const initialState: Modals = {
     [ModalEnum.CREATE_OUTLIER_SLICE]: {
         open: false,
         embeddingId: '',
-    }
+    },
+    [ModalEnum.DELETE_RECORD]: {
+        open: false,
+        recordId: '',
+    },
 };
 
 const modalSlice = createSlice({
