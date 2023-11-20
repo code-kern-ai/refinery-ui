@@ -5,10 +5,11 @@ import { lookupListsReducer } from './states/pages/lookup-lists';
 import { modalReducer } from './states/modal';
 import { uploadReducer } from './states/upload';
 import { settingsReducer } from './states/pages/settings';
-import { modelsDownloadedSliceReducer } from './states/pages/models-downloaded';
+import { modelsDownloadedReducer } from './states/pages/models-downloaded';
 import { heuristicsReducer } from './states/pages/heuristics';
 import { dataBrowserReducer } from './states/pages/data-browser';
 import { cacheReducer } from './states/cachedValues';
+import { labelingReducer } from './states/pages/labeling';
 
 const store = configureStore({
     reducer: {
@@ -18,10 +19,11 @@ const store = configureStore({
         lookupLists: lookupListsReducer,
         upload: uploadReducer,
         settings: settingsReducer,
-        modelsDownloaded: modelsDownloadedSliceReducer,
+        modelsDownloaded: modelsDownloadedReducer,
         heuristics: heuristicsReducer,
         dataBrowser: dataBrowserReducer,
         cache: cacheReducer,
+        labeling: labelingReducer
     },
     devTools: process.env.IS_DEV == '1',
 });

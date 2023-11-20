@@ -34,4 +34,4 @@ export const selectModelsDownloaded = (state) => state.modelsDownloaded.modelsDo
 
 export const { setModelsDownloaded, removeModelDownloadByName, extentModelsDownloaded } = modelsDownloadedSlice.actions;
 
-export const modelsDownloadedSliceReducer = modelsDownloadedSlice.reducer;
+export const modelsDownloadedReducer = modelsDownloadedSlice.reducer;
