@@ -100,4 +100,13 @@ export class SessionManager {
         this.prevDisabled = !this.huddleData || jumpIdx == 0;
         this.positionString = jumpPos + " / " + this.huddleData.recordIds.length + " records in";
     }
+
+    public static nextRecord() {
+        this.huddleData.linkData.requestedPos++;
+        this.jumpToPosition(this.huddleData.linkData.requestedPos);
+    }
+    public static previousRecord() {
+        this.huddleData.linkData.requestedPos--;
+        this.jumpToPosition(this.huddleData.linkData.requestedPos);
+    }
 }

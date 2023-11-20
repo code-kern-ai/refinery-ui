@@ -170,5 +170,13 @@ export const TOOLTIPS_DICT = {
         'UPDATE_SLICE': 'Update your current data slice',
         'CREATE_EMBEDDINGS': 'Create embedding to find outliers',
         'STATIC_DATA_SLICE': 'Creates a static data slice'
+    },
+    [CurrentPage.LABELING]: {
+        'NAVIGATE_TO_DATA_BROWSER': 'Go to the data browser',
+        'NAVIGATE_TO_RECORD_IDE': 'See the programmatic view for your current record',
+        'REACH_END': 'If you reached the end, you can select new filters in the browser',
+        'CHANGE_SLICES': 'Slices can be changed by the engineer in your team',
+        'ARROW_LEFT': 'Arrow left',
+        'ARROW_RIGHT': 'Arrow right',
     }
 }

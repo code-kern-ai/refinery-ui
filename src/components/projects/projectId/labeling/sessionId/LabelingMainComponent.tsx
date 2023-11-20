@@ -10,8 +10,10 @@ import { UserManager } from "@/src/util/classes/labeling/user-manager";
 import { DUMMY_HUDDLE_ID, parseLabelingLink } from "@/src/util/components/projects/projectId/labeling/labeling-general-helper";
 import { useLazyQuery } from "@apollo/client";
 import { useRouter } from "next/router";
-import { useEffect } from "react"
-import { useDispatch, useSelector } from "react-redux"
+import { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import style from "@/src/styles/components/projects/projectId/labeling.module.css";
+import NavigationBarTop from "./NavigationBarTop";
 
 export default function LabelingMainComponent() {
     const router = useRouter();
@@ -34,7 +36,11 @@ export default function LabelingMainComponent() {
             SessionManager.jumpToPosition(SessionManager.labelingLinkData.requestedPos);
             router.push(`/projects/${projectId}/labeling/${huddleId}?pos=${SessionManager.labelingLinkData.requestedPos}&type=${SessionManager.huddleData.linkData.linkType}`);
         }
-        requestHuddleData(huddleId);
+        if (huddleId == DUMMY_HUDDLE_ID) requestHuddleData(huddleId);
+        else {
+            SessionManager.jumpToPosition(SessionManager.labelingLinkData.requestedPos);
+            router.push(`/projects/${projectId}/labeling/${SessionManager.labelingLinkData.huddleId}?pos=${SessionManager.labelingLinkData.requestedPos}&type=${SessionManager.huddleData.linkData.linkType}`);
+        }
     }, [projectId, router.query.sessionId]);
 
     function requestHuddleData(huddleId: string) {
@@ -84,5 +90,10 @@ export default function LabelingMainComponent() {
         });
     }
 
-    return (<></>)
+    return (<div className={`h-full bg-white flex flex-col ${!LabelingSuiteManager.somethingLoading ? style.wait : ''}`}>
+        {LabelingSuiteManager.absoluteWarning && <div className="absolute left-0 right-0 flex items-center justify-center pointer-events-none top-4 z-100">
+            <span className="inline-flex items-center px-2 py-0.5 rounded font-medium bg-red-100 text-red-800">{LabelingSuiteManager.absoluteWarning}</span>
+        </div>}
+        <NavigationBarTop />
+    </div>)
 }

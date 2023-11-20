@@ -2,7 +2,7 @@ import { SessionManager } from "./session-manager";
 import { UserManager } from "./user-manager";
 
 export class LabelingSuiteManager {
-    public static somethingLoading: boolean = false;
+    public static somethingLoading: boolean = true;
     public static absoluteWarning: string;
 
     public static checkAbsoluteWarning() {
