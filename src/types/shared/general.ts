@@ -1,3 +1,5 @@
+import { UserType } from "../components/projects/projectId/labeling/labeling-general";
+
 export enum CurrentPage {
     PROJECTS = 'PROJECTS',
     LOOKUP_LISTS_OVERVIEW = 'LOOKUP_LISTS_OVERVIEW',
@@ -30,6 +32,7 @@ export type User = {
     counts?: any[];
     countSum?: number;
     user?: User;
+    userType?: UserType;
 }
 
 export enum DataTypeEnum {

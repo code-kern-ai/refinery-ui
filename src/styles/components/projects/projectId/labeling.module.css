@@ -2,3 +2,14 @@
 .wait * {
     cursor: wait;
 }
+
+.specialUserActive {
+    fill: #6DD87F;
+    stroke: none;
+
+}
+
+.specialUserInActive {
+    fill: none;
+    stroke: #6DD87F;
+}

@@ -30,7 +30,7 @@ export function postProcessCurrentAttribute(attribute: Attribute): Attribute {
 }
 
 export function postProcessRecordByRecordId(record: Record): Record {
-    const prepareRecord = jsonCopy(record);
+    const prepareRecord = { ...record };
     prepareRecord.data = JSON.parse(prepareRecord.data);
     return prepareRecord;
 }

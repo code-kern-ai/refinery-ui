@@ -1,7 +1,7 @@
-import { selectUser } from "@/src/reduxStore/states/general";
-import { setAvailableLinks, setSelectedLink } from "@/src/reduxStore/states/pages/labeling";
+import { selectAllUsers, selectUser } from "@/src/reduxStore/states/general";
+import { setAvailableLinks, updateRecordRequests, setSelectedLink, selectRecordRequestsRla, updateUsers } from "@/src/reduxStore/states/pages/labeling";
 import { selectProjectId } from "@/src/reduxStore/states/project"
-import { AVAILABLE_LABELING_LINKS, REQUEST_HUDDLE_DATA } from "@/src/services/gql/queries/labeling";
+import { AVAILABLE_LABELING_LINKS, GET_RECORD_LABEL_ASSOCIATIONS, GET_TOKENIZED_RECORD, REQUEST_HUDDLE_DATA } from "@/src/services/gql/queries/labeling";
 import { LabelingLinkType } from "@/src/types/components/projects/projectId/labeling/labeling-general";
 import { UserRole } from "@/src/types/shared/sidebar";
 import { LabelingSuiteManager } from "@/src/util/classes/labeling/manager";
@@ -15,6 +15,8 @@ import { useDispatch, useSelector } from "react-redux";
 import style from "@/src/styles/components/projects/projectId/labeling.module.css";
 import NavigationBarTop from "./NavigationBarTop";
 import NavigationBarBottom from "./NavigationBarBottom";
+import { GET_RECORD_BY_RECORD_ID } from "@/src/services/gql/queries/project-setting";
+import { combineLatest, switchMap } from "rxjs";
 
 export default function LabelingMainComponent() {
     const router = useRouter();
@@ -22,9 +24,14 @@ export default function LabelingMainComponent() {
 
     const projectId = useSelector(selectProjectId);
     const user = useSelector(selectUser);
+    const rlas = useSelector(selectRecordRequestsRla);
+    const users = useSelector(selectAllUsers);
 
     const [refetchHuddleData] = useLazyQuery(REQUEST_HUDDLE_DATA, { fetchPolicy: 'no-cache' });
     const [refetchAvailableLinks] = useLazyQuery(AVAILABLE_LABELING_LINKS, { fetchPolicy: 'no-cache' });
+    const [refetchTokenizedRecord] = useLazyQuery(GET_TOKENIZED_RECORD, { fetchPolicy: 'no-cache' });
+    const [refetchRecordByRecordId] = useLazyQuery(GET_RECORD_BY_RECORD_ID, { fetchPolicy: 'no-cache' });
+    const [refetchRla] = useLazyQuery(GET_RECORD_LABEL_ASSOCIATIONS, { fetchPolicy: 'network-only' });
 
     useEffect(() => {
         if (!projectId) return;
@@ -57,6 +64,27 @@ export default function LabelingMainComponent() {
             document.removeEventListener('keyup', handleKeyUp);
         };
     }, []);
+
+    useEffect(() => {
+        if (!SessionManager.currentRecordId) return;
+        // TODO: Fix in the BE needed, projectId is missing
+        combineLatest([
+            refetchTokenizedRecord({ variables: { recordId: SessionManager.currentRecordId } }),
+            refetchRecordByRecordId({ variables: { projectId, recordId: SessionManager.currentRecordId } }),
+            refetchRla({ variables: { projectId, recordId: SessionManager.currentRecordId } })
+        ]).subscribe(([tokenized, record, rla]) => {
+            dispatch(updateRecordRequests('token', tokenized.data.tokenizeRecord));
+            dispatch(updateRecordRequests('record', record.data.recordByRecordId));
+            dispatch(updateRecordRequests('rla', rla?.data?.recordByRecordId?.recordLabelAssociations));
+        });
+    }, [SessionManager.currentRecordId]);
+
+    useEffect(() => {
+        if (!rlas) return;
+        const [usersIcons, showUsersIcons] = UserManager.prepareUserIcons(rlas, user, users);
+        dispatch(updateUsers('userIcons', usersIcons));
+        dispatch(updateUsers('showUserIcons', showUsersIcons));
+    }, [rlas]);
 
     function previousRecord() {
         SessionManager.previousRecord();
@@ -106,8 +134,7 @@ export default function LabelingMainComponent() {
     function collectAvailableLinks() {
         if (user.role == UserRole.ENGINEER) return;
         const heuristicId = SessionManager.labelingLinkData.linkType == LabelingLinkType.HEURISTIC ? SessionManager.labelingLinkData.huddleId : null;
-        const assumedRole = UserManager.currentRole != UserManager.mainUser.data.role ? UserManager.currentRole : null;
-        refetchAvailableLinks({ variables: { projectId: projectId, assumedRole: assumedRole, assumedHeuristicId: heuristicId } }).then((result) => {
+        refetchAvailableLinks({ variables: { projectId: projectId, assumedRole: user.role, assumedHeuristicId: heuristicId } }).then((result) => {
             const availableLinks = result['data']['availableLinks'];
             dispatch(setAvailableLinks(availableLinks));
             const linkRoute = router.asPath.split("?")[0];
@@ -115,7 +142,7 @@ export default function LabelingMainComponent() {
         });
     }
 
-    return (<div className={`h-full bg-white flex flex-col ${!LabelingSuiteManager.somethingLoading ? style.wait : ''}`}>
+    return (<div className={`h-full bg-white flex flex-col ${LabelingSuiteManager.somethingLoading ? style.wait : ''}`}>
         {LabelingSuiteManager.absoluteWarning && <div className="absolute left-0 right-0 flex items-center justify-center pointer-events-none top-4 z-100">
             <span className="inline-flex items-center px-2 py-0.5 rounded font-medium bg-red-100 text-red-800">{LabelingSuiteManager.absoluteWarning}</span>
         </div>}

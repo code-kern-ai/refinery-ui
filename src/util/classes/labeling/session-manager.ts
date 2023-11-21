@@ -10,13 +10,13 @@ export class SessionManager {
     public static labelingLinkData: LabelingLinkData;
     public static huddleData: LabelingHuddle;
     public static absoluteWarning: string;
-    private static debounceTimer: any;
     public static nextDisabled: boolean = true;
     public static prevDisabled: boolean = true;
     public static positionString: string = "/ records in";
     public static availableLinks: any[];
     public static availableLinksLookup: {};
     public static selectedLink: any;
+    public static currentRecordId: string;
 
 
     public static readHuddleDataFromLocal() {
@@ -93,9 +93,8 @@ export class SessionManager {
         this.huddleData.linkData.requestedPos = jumpPos;
         localStorage.setItem('huddleData', JSON.stringify(this.huddleData));
 
-        if (this.debounceTimer) this.debounceTimer.unsubscribe();
         const jumpIdx = jumpPos - 1;
-        this.debounceTimer = timer(200).subscribe(() => RecordManager?.collectRecordData(this.huddleData.recordIds[jumpIdx]));
+        this.currentRecordId = this.huddleData.recordIds[jumpIdx];
         this.nextDisabled = !this.huddleData || jumpPos == this.huddleData.recordIds.length;
         this.prevDisabled = !this.huddleData || jumpIdx == 0;
         this.positionString = jumpPos + " / " + this.huddleData.recordIds.length + " records in";

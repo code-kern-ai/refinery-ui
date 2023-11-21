@@ -24,8 +24,8 @@ export enum LabelingLinkType {
     HEURISTIC = 'HEURISTIC',
 }
 
-export type UserData = {
-    data: any;
-    avatarUri: string;
-    isLoggedInUser: boolean;
+export enum UserType {
+    GOLD = 'GOLD',
+    ALL = 'ALL',
+    REGISTERED = 'REGISTERED',
 }
