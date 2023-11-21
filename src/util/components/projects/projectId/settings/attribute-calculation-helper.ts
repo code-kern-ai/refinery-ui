@@ -30,6 +30,7 @@ export function postProcessCurrentAttribute(attribute: Attribute): Attribute {
 }
 
 export function postProcessRecordByRecordId(record: Record): Record {
+    if (!record) return null;
     const prepareRecord = { ...record };
     prepareRecord.data = JSON.parse(prepareRecord.data);
     return prepareRecord;

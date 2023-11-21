@@ -178,6 +178,7 @@ export const TOOLTIPS_DICT = {
         'CHANGE_SLICES': 'Slices can be changed by the engineer in your team',
         'ARROW_LEFT': 'Arrow left',
         'ARROW_RIGHT': 'Arrow right',
-        'DELETE_CURRENT_RECORD': 'Delete current record'
+        'DELETE_CURRENT_RECORD': 'Delete current record',
+        'OPEN_SETTINGS': 'Open Labeling Suite settings'
     }
 }

@@ -190,8 +190,10 @@ const initialState: Modals = {
     },
     [ModalEnum.DELETE_RECORD]: {
         open: false,
-        recordId: '',
     },
+    [ModalEnum.LABELING_SETTINGS]: {
+        open: false,
+    }
 };
 
 const modalSlice = createSlice({

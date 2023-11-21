@@ -104,8 +104,13 @@ export class SessionManager {
         this.huddleData.linkData.requestedPos++;
         this.jumpToPosition(this.huddleData.linkData.requestedPos);
     }
+
     public static previousRecord() {
         this.huddleData.linkData.requestedPos--;
         this.jumpToPosition(this.huddleData.linkData.requestedPos);
+    }
+
+    public static setCurrentRecordDeleted() {
+        this.huddleData.recordIds[this.huddleData.linkData.requestedPos - 1] = "deleted";
     }
 }

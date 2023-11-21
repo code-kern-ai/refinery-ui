@@ -17,6 +17,7 @@ import NavigationBarTop from "./NavigationBarTop";
 import NavigationBarBottom from "./NavigationBarBottom";
 import { GET_RECORD_BY_RECORD_ID } from "@/src/services/gql/queries/project-setting";
 import { combineLatest, switchMap } from "rxjs";
+import { SettingManager } from "@/src/util/classes/labeling/settings-manager";
 
 export default function LabelingMainComponent() {
     const router = useRouter();
@@ -36,6 +37,7 @@ export default function LabelingMainComponent() {
     useEffect(() => {
         if (!projectId) return;
         if (!router.query.sessionId) return;
+        SettingManager.loadSettings(projectId);
         SessionManager.labelingLinkData = parseLabelingLink(router);
         SessionManager.readHuddleDataFromLocal();
         const huddleId = SessionManager.prepareLabelingSession(projectId);
@@ -51,6 +53,7 @@ export default function LabelingMainComponent() {
     }, [projectId, router.query.sessionId]);
 
     useEffect(() => {
+        if (!projectId) return;
         const handleKeyUp = (event) => {
             if (event.key == 'ArrowRight') {
                 nextRecord();
@@ -63,10 +66,11 @@ export default function LabelingMainComponent() {
         return () => {
             document.removeEventListener('keyup', handleKeyUp);
         };
-    }, []);
+    }, [projectId]);
 
     useEffect(() => {
         if (!SessionManager.currentRecordId) return;
+        if (SessionManager.currentRecordId == "deleted") return;
         // TODO: Fix in the BE needed, projectId is missing
         combineLatest([
             refetchTokenizedRecord({ variables: { recordId: SessionManager.currentRecordId } }),
