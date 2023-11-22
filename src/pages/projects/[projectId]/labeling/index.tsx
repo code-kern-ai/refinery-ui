@@ -1,4 +1,4 @@
-import LabelingMainComponent from "@/src/components/projects/projectId/labeling/sessionId/LabelingMainComponent";
+import LabelingMainComponent from "@/src/components/projects/projectId/labeling/sessionId/main-component/LabelingMainComponent";
 import { selectUser, setCurrentPage } from "@/src/reduxStore/states/general";
 import { selectProjectId } from "@/src/reduxStore/states/project";
 import { CurrentPage } from "@/src/types/shared/general";

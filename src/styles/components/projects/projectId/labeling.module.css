@@ -13,3 +13,7 @@
     fill: none;
     stroke: #6DD87F;
 }
+
+.rotateTransform {
+    transform: rotate(180deg);
+}

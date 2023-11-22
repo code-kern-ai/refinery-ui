@@ -16,8 +16,9 @@ import style from "@/src/styles/components/projects/projectId/labeling.module.cs
 import NavigationBarTop from "./NavigationBarTop";
 import NavigationBarBottom from "./NavigationBarBottom";
 import { GET_RECORD_BY_RECORD_ID } from "@/src/services/gql/queries/project-setting";
-import { combineLatest, switchMap } from "rxjs";
+import { combineLatest } from "rxjs";
 import { SettingManager } from "@/src/util/classes/labeling/settings-manager";
+import LabelingSuiteTaskHeader from "../sub-components/LabelingSuiteTaskHeader";
 
 export default function LabelingMainComponent() {
     const router = useRouter();
@@ -136,7 +137,7 @@ export default function LabelingMainComponent() {
     }
 
     function collectAvailableLinks() {
-        if (user.role == UserRole.ENGINEER) return;
+        if (user?.role == UserRole.ENGINEER) return;
         const heuristicId = SessionManager.labelingLinkData.linkType == LabelingLinkType.HEURISTIC ? SessionManager.labelingLinkData.huddleId : null;
         refetchAvailableLinks({ variables: { projectId: projectId, assumedRole: user.role, assumedHeuristicId: heuristicId } }).then((result) => {
             const availableLinks = result['data']['availableLinks'];
@@ -151,7 +152,8 @@ export default function LabelingMainComponent() {
             <span className="inline-flex items-center px-2 py-0.5 rounded font-medium bg-red-100 text-red-800">{LabelingSuiteManager.absoluteWarning}</span>
         </div>}
         <NavigationBarTop />
-        <div className="flex-grow overflow-y-auto" style={{ maxHeight: 'calc(80vh - 190px)' }}>
+        <div className="flex-grow overflow-y-auto" style={{ height: 'calc(100vh - 194px)' }}>
+            <LabelingSuiteTaskHeader />
         </div>
         <NavigationBarBottom />
     </div>)
