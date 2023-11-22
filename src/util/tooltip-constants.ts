@@ -185,6 +185,18 @@ export const TOOLTIPS_DICT = {
         'HOVER_BACKGROUND': 'Choose a color for the hover effects of the tables',
         'LINE_BREAKS': 'If checked, the attributes in the data-browser and labeling page will be shown with line breaks',
         'PRE_WRAP': 'Preserves whitespace and line breaks',
-        'PRE_LINE': 'Collapses multiple whitespaces and line breaks into a single space'
+        'PRE_LINE': 'Collapses multiple whitespaces and line breaks into a single space',
+        'SHOW_TASK_LEGEND': 'Completely hide/show the feature.&#10;&#10;Active settings are preserved',
+        'IS_COLLAPSED': 'Only show the quick selection buttons',
+        'QUICK_BUTTON': 'Hide/show quick buttons in expanded form',
+        'LABEL_OPTIONS': 'Amount of label buttons shown before hiding the rest under:&#10;\'other \<task\> options\'',
+        'CLOSE_LABEL_BOX': 'Close the label box after assigning a label',
+        'SHOW_TASK_NAMES': 'Display the corresponding task names next to the attribute names in the labeling grid',
+        'SHOW_HEURISTIC_CONFIDENCE': 'Display the heuristic label confidence.&#10;&#10;Please see in our docs for more information on confidence calculation.',
+        'LABEL_DISPLAY': 'Reduce the display size of classification labels by ordering them into less rows',
+        'SWIM_LANE': 'Groups display of labels in type, task, creator & label. Same group gets the same distance to the text.&#10;&#10;Might use a lot of space',
+        'OVERVIEW_TABLE': 'Completely hide/show the feature.&#10;&#10;Active settings are preserved',
+        'SHOW_HEURISTICS': 'Hide/Show heuristics in overview table to reduce bias',
+        'TASK_LEGEND_SETTINGS': 'If active the table will filter entries depending on task legend settings.&#10;&#10;Note that \'show heuristic\' disabled will overrule this'
     }
 }

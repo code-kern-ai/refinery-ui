@@ -69,25 +69,22 @@ export default function LabelingSettingsModal() {
         </div>
         {/* Page Main */}
         {activeTab == ComponentType.MAIN && <div className="flex flex-col gap-y-2 items-center my-4">
-            <div className="grid gap-y-2 gap-x-4 items-center" style={{ gridTemplateColumns: 'max-content 100px max-content' }}>
+            <div className="grid gap-y-2 gap-x-4 items-center text-left" style={{ gridTemplateColumns: 'max-content auto max-content' }}>
                 <span>Auto next record</span>
                 <span className="cursor-pointer flex items-center">
                     <input className="h-5 w-5 cursor-pointer" type="checkbox" checked={settingsConf?.main.autoNextRecord} onChange={() => changeSetting(ComponentType.MAIN, 'autoNextRecord')} /></span>
                 <Tooltip content={TOOLTIPS_DICT.LABELING.AUTO_NEXT_RECORD} color="invert" placement="top"><IconInfoCircle className="h-5 w-5" /></Tooltip>
-
                 <span>Hover background</span>
                 <Dropdown options={SettingManager.hoverColorOptions} buttonName={settingsConf?.main.hoverGroupBackgroundColor} backgroundColors={SettingManager.hoverColorClassArray}
                     dropdownItemsClasses="max-h-80 overflow-y-auto" buttonCaptionBgColor={settingsConf?.main.hoverGroupBackgroundColorClass}
                     selectedOption={(option: string) => changeSetting(ComponentType.MAIN, 'hoverGroupBackgroundColor', option)} />
                 <Tooltip content={TOOLTIPS_DICT.LABELING.HOVER_BACKGROUND} color="invert" placement="top"><IconInfoCircle className="h-5 w-5" /></Tooltip>
-
                 <span>Visible line breaks</span>
                 <div className="flex items-center h-5">
                     <input id="comments" type="checkbox" onChange={toggleLineBreaks} checked={settingsConf?.main.lineBreaks != LineBreaksType.NORMAL}
                         className="focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300 rounded cursor-pointer" />
                 </div>
                 <Tooltip content={TOOLTIPS_DICT.LABELING.LINE_BREAKS} color="invert" placement="top"><IconInfoCircle className="h-5 w-5" /></Tooltip>
-
                 {settingsConf?.main.lineBreaks != LineBreaksType.NORMAL && <Fragment>
                     <label htmlFor="preWrap" className="ml-3 block text-sm font-medium text-gray-700 cursor-pointer italic">Pre-wrap</label>
                     <input type="radio" checked={settingsConf?.main.lineBreaks == LineBreaksType.IS_PRE_WRAP} onChange={toggleLineBreaksPreWrap} name="lineBreaks" id="preWrap"
@@ -99,6 +96,70 @@ export default function LabelingSettingsModal() {
                         className="focus:ring-blue-500 h-6 w-4 text-blue-600 border-gray-200 cursor-pointer" />
                     <Tooltip content={TOOLTIPS_DICT.LABELING.PRE_LINE} color="invert" placement="top"><IconInfoCircle className="h-5 w-5" /></Tooltip>
                 </Fragment>}
+            </div>
+        </div>}
+        {/* Task Header */}
+        {activeTab == ComponentType.TASK_HEADER && <div className="flex flex-col gap-y-2 items-center my-4">
+            <p className="text-sm text-gray-600 text-center">These are general settings.<br />For label specific settings use the task list at the top</p>
+            <div className="grid gap-y-2 gap-x-4 items-center text-left" style={{ gridTemplateColumns: 'max-content auto max-content' }}>
+                <span>Show task legend</span>
+                <span className="cursor-pointer flex items-center">
+                    <input className="h-5 w-5 cursor-pointer" type="checkbox" checked={settingsConf?.task.show} onChange={() => changeSetting(ComponentType.TASK_HEADER, 'show')} /></span>
+                <Tooltip content={TOOLTIPS_DICT.LABELING.SHOW_TASK_LEGEND} color="invert" placement="top"><IconInfoCircle className="h-5 w-5" /></Tooltip>
+                <span>Collapse</span>
+                <span className="cursor-pointer flex items-center">
+                    <input className="h-5 w-5 cursor-pointer" type="checkbox" checked={settingsConf?.task.isCollapsed} onChange={() => changeSetting(ComponentType.TASK_HEADER, 'isCollapsed')} /></span>
+                <Tooltip content={TOOLTIPS_DICT.LABELING.IS_COLLAPSED} color="invert" placement="top"><IconInfoCircle className="h-5 w-5" /></Tooltip>
+                <span>Always show quick buttons</span>
+                <span className="cursor-pointer flex items-center">
+                    <input className="h-5 w-5 cursor-pointer" type="checkbox" checked={settingsConf?.task.alwaysShowQuickButtons} onChange={() => changeSetting(ComponentType.TASK_HEADER, 'alwaysShowQuickButtons')} /></span>
+                <Tooltip content={TOOLTIPS_DICT.LABELING.QUICK_BUTTON} color="invert" placement="top"><IconInfoCircle className="h-5 w-5" /></Tooltip>
+            </div>
+        </div>}
+        {/* Labeling */}
+        {activeTab == ComponentType.LABELING && <div className="flex flex-col gap-y-2 items-center my-4">
+            <div className="grid gap-y-2 gap-x-4 items-center text-left" style={{ gridTemplateColumns: 'max-content auto max-content' }}>
+                <span>Label options</span>
+                <input value={settingsConf?.labeling.showNLabelButton} type="number" onChange={(e) => changeSetting(ComponentType.LABELING, 'showNLabelButton', e.target.value)}
+                    className="h-9 w-12 border-gray-300 rounded-md placeholder-italic border text-gray-900 pl-4 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100" />
+                <Tooltip content={TOOLTIPS_DICT.LABELING.LABEL_OPTIONS} color="invert" placement="top"><IconInfoCircle className="h-5 w-5" /></Tooltip>
+                <span>Close label box</span>
+                <span className="cursor-pointer flex items-center">
+                    <input className="h-5 w-5 cursor-pointer" type="checkbox" checked={settingsConf?.labeling.closeLabelBoxAfterLabel} onChange={() => changeSetting(ComponentType.LABELING, 'closeLabelBoxAfterLabel')} /></span>
+                <Tooltip content={TOOLTIPS_DICT.LABELING.CLOSE_LABEL_BOX} color="invert" placement="top"><IconInfoCircle className="h-5 w-5" /></Tooltip>
+                <span>Show task names</span>
+                <span className="cursor-pointer flex items-center">
+                    <input className="h-5 w-5 cursor-pointer" type="checkbox" checked={settingsConf?.labeling.showTaskNames} onChange={() => changeSetting(ComponentType.LABELING, 'showTaskNames')} /></span>
+                <Tooltip content={TOOLTIPS_DICT.LABELING.SHOW_TASK_NAMES} color="invert" placement="top"><IconInfoCircle className="h-5 w-5" /></Tooltip>
+                <span>Show heuristic confidence</span>
+                <span className="cursor-pointer flex items-center">
+                    <input className="h-5 w-5 cursor-pointer" type="checkbox" checked={settingsConf?.labeling.showHeuristicConfidence} onChange={() => changeSetting(ComponentType.LABELING, 'showHeuristicConfidence')} /></span>
+                <Tooltip content={TOOLTIPS_DICT.LABELING.SHOW_HEURISTIC_CONFIDENCE} color="invert" placement="top"><IconInfoCircle className="h-5 w-5" /></Tooltip>
+                <span>Compact classification label display</span>
+                <span className="cursor-pointer flex items-center">
+                    <input className="h-5 w-5 cursor-pointer" type="checkbox" checked={settingsConf?.labeling.compactClassificationLabelDisplay} onChange={() => changeSetting(ComponentType.LABELING, 'compactClassificationLabelDisplay')} /></span>
+                <Tooltip content={TOOLTIPS_DICT.LABELING.LABEL_DISPLAY} color="invert" placement="top"><IconInfoCircle className="h-5 w-5" /></Tooltip>
+                <span>Swim lane extraction labels</span>
+                <span className="cursor-pointer flex items-center">
+                    <input className="h-5 w-5 cursor-pointer" type="checkbox" checked={settingsConf?.labeling.swimLaneExtractionDisplay} onChange={() => changeSetting(ComponentType.LABELING, 'swimLaneExtractionDisplay')} /></span>
+                <Tooltip content={TOOLTIPS_DICT.LABELING.SWIM_LANE} color="invert" placement="top"><IconInfoCircle className="h-5 w-5" /></Tooltip>
+            </div>
+        </div>}
+        {/* Overview table */}
+        {activeTab == ComponentType.OVERVIEW_TABLE && <div className="flex flex-col gap-y-2 items-center my-4">
+            <div className="grid gap-y-2 gap-x-4 items-center text-left" style={{ gridTemplateColumns: 'max-content auto max-content' }}>
+                <span>Show overview table</span>
+                <span className="cursor-pointer flex items-center">
+                    <input className="h-5 w-5 cursor-pointer" type="checkbox" checked={settingsConf?.overviewTable.show} onChange={() => changeSetting(ComponentType.OVERVIEW_TABLE, 'show')} /></span>
+                <Tooltip content={TOOLTIPS_DICT.LABELING.OVERVIEW_TABLE} color="invert" placement="top"><IconInfoCircle className="h-5 w-5" /></Tooltip>
+                <span>Show heuristics</span>
+                <span className="cursor-pointer flex items-center">
+                    <input className="h-5 w-5 cursor-pointer" type="checkbox" checked={settingsConf?.overviewTable.showHeuristics} onChange={() => changeSetting(ComponentType.OVERVIEW_TABLE, 'showHeuristics')} /></span>
+                <Tooltip content={TOOLTIPS_DICT.LABELING.SHOW_HEURISTICS} color="invert" placement="top"><IconInfoCircle className="h-5 w-5" /></Tooltip>
+                <span>Include task legend settings</span>
+                <span className="cursor-pointer flex items-center">
+                    <input className="h-5 w-5 cursor-pointer" type="checkbox" checked={settingsConf?.overviewTable.includeLabelDisplaySettings} onChange={() => changeSetting(ComponentType.OVERVIEW_TABLE, 'includeLabelDisplaySettings')} /></span>
+                <Tooltip content={TOOLTIPS_DICT.LABELING.TASK_LEGEND_SETTINGS} color="invert" placement="top"><IconInfoCircle className="h-5 w-5" /></Tooltip>
             </div>
         </div>}
     </Modal >)
