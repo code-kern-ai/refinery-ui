@@ -179,6 +179,12 @@ export const TOOLTIPS_DICT = {
         'ARROW_LEFT': 'Arrow left',
         'ARROW_RIGHT': 'Arrow right',
         'DELETE_CURRENT_RECORD': 'Delete current record',
-        'OPEN_SETTINGS': 'Open Labeling Suite settings'
+        'OPEN_SETTINGS': 'Open Labeling Suite settings',
+        'SETTINGS': 'Note that your browser stores these settings.&#10;&#10;Not your user or your organization!',
+        'AUTO_NEXT_RECORD': 'Jump to the next record after setting a manual classification label',
+        'HOVER_BACKGROUND': 'Choose a color for the hover effects of the tables',
+        'LINE_BREAKS': 'If checked, the attributes in the data-browser and labeling page will be shown with line breaks',
+        'PRE_WRAP': 'Preserves whitespace and line breaks',
+        'PRE_LINE': 'Collapses multiple whitespaces and line breaks into a single space'
     }
 }

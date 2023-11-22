@@ -1,14 +1,14 @@
 import { LineBreaksType } from "@/src/types/components/projects/projectId/data-browser/data-browser";
 import { ComponentType, LabelingSuiteSettings, LabelingSuiteTaskHeaderLabelSettings } from "@/src/types/components/projects/projectId/labeling/settings";
-import { LabelSource } from "@/submodules/javascript-functions/enums/enums";
-import { enumToArray, transferNestedDict } from "@/submodules/javascript-functions/general";
+import { transferNestedDict } from "@/submodules/javascript-functions/general";
+import { COLOR_OPTIONS } from "../../constants";
 
 export class SettingManager {
     static localStorageKey = "labelingSuiteSettings";
     public static settings: LabelingSuiteSettings;
 
-    public hoverColorOptions;
-    public hoverColorClassArray;
+    public static hoverColorOptions: string[];
+    public static hoverColorClassArray: string[];
 
     public static loadSettings(projectId: string) {
         this.settings = this.getDefaultLabelingSuiteSettings();
@@ -23,6 +23,11 @@ export class SettingManager {
         }
         if (!this.settings.task[projectId]) this.settings.task[projectId] = {};
         this.settings.main.lineBreaks = this.getLineBreakValue();
+    }
+
+    public static prepareColorOptions() {
+        this.hoverColorOptions = ['None', 'light gray', ...COLOR_OPTIONS];
+        this.hoverColorClassArray = [null, 'bg-gray-100', ...COLOR_OPTIONS.map(c => `bg-${c}-200`)];
     }
 
     private static getLineBreakValue(): LineBreaksType {
@@ -79,6 +84,15 @@ export class SettingManager {
             }
             settings[lastKey] = value;
         }
+
+        if (componentType == ComponentType.MAIN) {
+            const color = this.settings.main.hoverGroupBackgroundColor;
+            if (color == "None") this.settings.main.hoverGroupBackgroundColorClass = "";
+            else if (color == "light gray") this.settings.main.hoverGroupBackgroundColorClass = "bg-gray-100";
+            else if (color == "gray") this.settings.main.hoverGroupBackgroundColorClass = "bg-gray-200";
+            else this.settings.main.hoverGroupBackgroundColorClass = "bg-" + color + "-200";
+        }
+
         this.saveSettings();
     }
 
