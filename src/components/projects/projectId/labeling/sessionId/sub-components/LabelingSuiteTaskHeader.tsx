@@ -52,6 +52,7 @@ export default function LabelingSuiteTaskHeader() {
 
     function prepareDataForDisplay(data: any[]): any {
         if (!data) return null;
+        if (!settingsConf) return null;
         const finalData = Array(data.length);
         let i = 0;
         for (const task of data) {

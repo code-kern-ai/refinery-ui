@@ -40,7 +40,7 @@ export default function HeaderDisplay(props: HeaderDisplayProps) {
                                 setLabelSettingsLabelFunc(task.labels[labelId]);
                                 labelSettingsBoxPosition();
                             }} className="text-sm font-medium px-2 py-0.5 rounded-md border focus:outline-none cursor-pointer flex flex-row flex-no-wrap gap-x-1 items-center">
-                                {settingsConfTasks && settingsConfTasks[task.id][labelId] && <div className="grid grid-cols-2 gap-0.5">
+                                {settingsConfTasks && settingsConfTasks[task.id] && settingsConfTasks[task.id][labelId] && <div className="grid grid-cols-2 gap-0.5">
                                     <div className={`w-2.5 h-2.5 border rounded-full ${settingsConfTasks[task.id][labelId].showManual ? task.labels[labelId].color.backgroundColor : 'bg-white'} ${task.labels[labelId].color.borderColor}`}></div>
                                     <div className={`w-2.5 h-2.5 border rounded-full ${settingsConfTasks[task.id][labelId].showWeakSupervision ? task.labels[labelId].color.backgroundColor : 'bg-white'} ${task.labels[labelId].color.borderColor}`}></div>
                                     <div className={`w-2.5 h-2.5 border rounded-full ${settingsConfTasks[task.id][labelId].showModel ? task.labels[labelId].color.backgroundColor : 'bg-white'} ${task.labels[labelId].color.borderColor}`}></div>

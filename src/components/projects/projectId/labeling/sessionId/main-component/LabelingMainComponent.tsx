@@ -139,7 +139,7 @@ export default function LabelingMainComponent() {
     function collectAvailableLinks() {
         if (user?.role == UserRole.ENGINEER) return;
         const heuristicId = SessionManager.labelingLinkData.linkType == LabelingLinkType.HEURISTIC ? SessionManager.labelingLinkData.huddleId : null;
-        refetchAvailableLinks({ variables: { projectId: projectId, assumedRole: user.role, assumedHeuristicId: heuristicId } }).then((result) => {
+        refetchAvailableLinks({ variables: { projectId: projectId, assumedRole: user?.role, assumedHeuristicId: heuristicId } }).then((result) => {
             const availableLinks = result['data']['availableLinks'];
             dispatch(setAvailableLinks(availableLinks));
             const linkRoute = router.asPath.split("?")[0];
