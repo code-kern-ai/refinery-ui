@@ -20,6 +20,7 @@ import { combineLatest } from "rxjs";
 import LabelingSuiteTaskHeader from "../sub-components/LabelingSuiteTaskHeader";
 import { SettingManager } from "@/src/util/classes/labeling/settings-manager";
 import { jsonCopy, transferNestedDict } from "@/submodules/javascript-functions/general";
+import LabelingOverviewTable from "../sub-components/LabelingOverviewTable";
 
 export default function LabelingMainComponent() {
     const router = useRouter();
@@ -40,7 +41,8 @@ export default function LabelingMainComponent() {
     useEffect(() => {
         if (!projectId) return;
         let tmp = localStorage.getItem(SettingManager.localStorageKey);
-        const settingsCopy = jsonCopy(settings);
+        let settingsCopy = jsonCopy(settings);
+        settingsCopy = SettingManager.getDefaultLabelingSuiteSettings();
         if (tmp) {
             const tmpSettings = JSON.parse(tmp);
             // transfer only for this project
@@ -176,6 +178,7 @@ export default function LabelingMainComponent() {
         <NavigationBarTop />
         <div className="flex-grow overflow-y-auto" style={{ height: 'calc(100vh - 194px)' }}>
             <LabelingSuiteTaskHeader />
+            <LabelingOverviewTable />
         </div>
         <NavigationBarBottom />
     </div>)
