@@ -18,6 +18,7 @@ export function setLabelsForDisplay(task: any, settings: any) {
     const labels = {};
     const taskSettings = settings[task.id];
     for (const label of task.labels) {
+        if (!taskSettings) return;
         let labelSettings = taskSettings[label.id];
         if (!labelSettings) {
             labelSettings = SettingManager.getDefaultTaskOverviewLabelSettings();

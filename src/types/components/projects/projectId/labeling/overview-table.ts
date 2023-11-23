@@ -20,6 +20,7 @@ export type TableDisplayData = {
         borderColor: string,
     },
     rla: any
+    canBeDeleted: boolean,
 }
 
 export type HeaderHover = {
@@ -30,3 +31,7 @@ export type HeaderHover = {
     createdByCollection: string,
     rlaCollection: string,
 }
+
+export type LabelingInfoTableModalProps = {
+    dataToDisplay: TableDisplayData[],
+};

@@ -162,6 +162,13 @@ const labelingSlice = createSlice({
                     payload: [componentType, settingsPath, value]
                 };
             },
+        },
+        removeFromRlaById(state, action) {
+            const rlaId = action.payload;
+            if (rlaId) {
+                const index = state.recordRequests.rla.findIndex(rla => rla.id == rlaId);
+                if (index != -1) state.recordRequests.rla.splice(index, 1);
+            }
         }
     },
 });
@@ -177,7 +184,7 @@ export const selectRecordRequestsRla = (state: any) => state.labeling.recordRequ
 export const selectUserIconsData = (state: any) => state.labeling.userIconsData;
 export const selectSettings = (state: any) => state.labeling.settings;
 
-export const { setAvailableLinks, setSelectedLink, updateRecordRequests, updateUsers, setSettings, updateSettings } = labelingSlice.actions;
+export const { setAvailableLinks, setSelectedLink, updateRecordRequests, updateUsers, setSettings, updateSettings, removeFromRlaById } = labelingSlice.actions;
 
 export const labelingReducer = labelingSlice.reducer;
 

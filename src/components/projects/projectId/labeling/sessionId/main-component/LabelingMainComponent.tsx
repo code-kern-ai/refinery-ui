@@ -45,9 +45,6 @@ export default function LabelingMainComponent() {
         settingsCopy = SettingManager.getDefaultLabelingSuiteSettings();
         if (tmp) {
             const tmpSettings = JSON.parse(tmp);
-            // transfer only for this project
-            transferNestedDict(tmpSettings, settingsCopy, false);
-            //to ensure new setting values exist and old ones are loaded if matching name
             transferNestedDict(tmpSettings, settingsCopy);
             if (tmpSettings.task) {
                 transferNestedDict(tmpSettings.task, settingsCopy.task, false);

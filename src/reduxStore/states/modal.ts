@@ -193,6 +193,9 @@ const initialState: Modals = {
     },
     [ModalEnum.LABELING_SETTINGS]: {
         open: false,
+    },
+    [ModalEnum.LABELING_INFO_TABLE]: {
+        open: false,
     }
 };
 

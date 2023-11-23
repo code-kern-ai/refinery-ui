@@ -56,7 +56,7 @@ export default function LabelingSuiteTaskHeader() {
             let taskSettings = settings?.task[projectId][task.id];
             if (!taskSettings) {
                 taskSettings = {};
-                const settingsConfCopy = { ...settings };
+                const settingsConfCopy = jsonCopy(settings);
                 settingsConfCopy.task[projectId][task.id] = taskSettings;
                 dispatch(updateSettings(ComponentType.LABELING, 'task', settingsConfCopy.task))
             }
