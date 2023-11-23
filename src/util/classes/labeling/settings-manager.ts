@@ -97,13 +97,13 @@ export class SettingManager {
     }
 
 
-    private static getDefaultLabelingSuiteSettings(): LabelingSuiteSettings {
+    public static getDefaultLabelingSuiteSettings(): LabelingSuiteSettings {
         return {
             main: {
                 autoNextRecord: false,
                 hoverGroupBackgroundColor: "green",
                 hoverGroupBackgroundColorClass: "bg-green-100",
-                lineBreaks: this.getLineBreakValue()
+                lineBreaks: LineBreaksType.NORMAL
             },
             overviewTable: {
                 show: true,

@@ -60,3 +60,7 @@ export type QuickButtonProps = {
 export type QuickButtonsProps = {
     labelSettingsLabel?: any;
 }
+
+export type LabelSettingsBoxProps = {
+    labelSettingsLabel?: any;
+}

@@ -1,7 +1,7 @@
 import { selectLabelingTasksAll, setLabelingTasksAll } from "@/src/reduxStore/states/pages/settings";
 import { selectProjectId } from "@/src/reduxStore/states/project";
 import { GET_LABELING_TASKS_BY_PROJECT_ID } from "@/src/services/gql/queries/project-setting";
-import { ComponentType, LabelingSuiteSettings } from "@/src/types/components/projects/projectId/labeling/settings";
+import { ComponentType } from "@/src/types/components/projects/projectId/labeling/settings";
 import { LabelingSuiteTaskHeaderDisplayData } from "@/src/types/components/projects/projectId/labeling/task-header";
 import { LabelingTaskTaskType } from "@/src/types/components/projects/projectId/settings/labeling-tasks";
 import { SettingManager } from "@/src/util/classes/labeling/settings-manager";
@@ -15,15 +15,16 @@ import style from "@/src/styles/components/projects/projectId/labeling.module.cs
 import { IconLayoutNavbarCollapse } from "@tabler/icons-react";
 import QuickButtons from "./QuickButtons";
 import HeaderDisplay from "./HeaderDisplay";
+import { selectSettings, updateSettings } from "@/src/reduxStore/states/pages/labeling";
 
 export default function LabelingSuiteTaskHeader() {
     const dispatch = useDispatch();
 
     const projectId = useSelector(selectProjectId);
     const labelingTasks = useSelector(selectLabelingTasksAll);
+    const settings = useSelector(selectSettings);
 
     const [displayData, setDisplayData] = useState<LabelingSuiteTaskHeaderDisplayData[]>(null);
-    const [settingsConf, setSettingsConf] = useState<LabelingSuiteSettings>(null);
 
     const [refetchLabelingTasksByProjectId] = useLazyQuery(GET_LABELING_TASKS_BY_PROJECT_ID, { fetchPolicy: "network-only" });
 
@@ -38,11 +39,6 @@ export default function LabelingSuiteTaskHeader() {
         setDisplayData(prepareDataForDisplay(labelingTasks))
     }, [projectId, labelingTasks]);
 
-    useEffect(() => {
-        if (!SettingManager.settings) return;
-        setSettingsConf(SettingManager.settings);
-    }, [SettingManager.settings]);
-
     function refetchLabelingTasksAndProcess() {
         refetchLabelingTasksByProjectId({ variables: { projectId: projectId } }).then((res) => {
             const labelingTasks = postProcessLabelingTasks(res['data']['projectByProjectId']['labelingTasks']['edges']);
@@ -52,20 +48,20 @@ export default function LabelingSuiteTaskHeader() {
 
     function prepareDataForDisplay(data: any[]): any {
         if (!data) return null;
-        if (!settingsConf) return null;
+        if (!settings) return null;
         const finalData = Array(data.length);
         let i = 0;
         for (const task of data) {
             const taskCopy = jsonCopy(task);
-            let taskSettings = settingsConf?.task[projectId][task.id];
+            let taskSettings = settings?.task[projectId][task.id];
             if (!taskSettings) {
                 taskSettings = {};
-                const settingsConfCopy = { ...settingsConf };
+                const settingsConfCopy = { ...settings };
                 settingsConfCopy.task[projectId][task.id] = taskSettings;
-                setSettingsConf(settingsConfCopy);
+                dispatch(updateSettings(ComponentType.LABELING, 'task', settingsConfCopy.task))
             }
             taskCopy.labels.sort((a, b) => a.name.localeCompare(b.name));
-            const labels = setLabelsForDisplay(taskCopy, settingsConf.task[projectId]);
+            const labels = setLabelsForDisplay(taskCopy, settings.task[projectId]);
             let pos = taskCopy.taskType == LabelingTaskTaskType.INFORMATION_EXTRACTION ? 0 : 10000;
             pos += taskCopy.attribute ? taskCopy.attribute.relativePosition : 0;
             finalData[i++] = {
@@ -84,15 +80,15 @@ export default function LabelingSuiteTaskHeader() {
     }
 
     function toggleIsCollapsed() {
-        SettingManager.changeSetting(ComponentType.LABELING, 'isCollapsed');
+        dispatch(updateSettings(ComponentType.TASK_HEADER, 'isCollapsed'))
     }
 
     return (<div className="relative bg-white p-4">
         {displayData && displayData.length > 0 ? (<>
-            <div className={`absolute top-4 right-4 p-2 cursor-pointer ${SettingManager.settings.task.isCollapsed ? style.rotateTransform : null}`} onClick={toggleIsCollapsed}>
+            <div className={`absolute top-4 right-4 p-2 cursor-pointer ${settings.task.isCollapsed ? style.rotateTransform : null}`} onClick={toggleIsCollapsed}>
                 <IconLayoutNavbarCollapse size={24} stroke={2} />
             </div>
-            {SettingManager.settings.task.isCollapsed ? (<div className="flex flex-row flex-wrap gap-x-2">
+            {settings.task.isCollapsed ? (<div className="flex flex-row flex-wrap gap-x-2">
                 <QuickButtons />
             </div>) : (<HeaderDisplay displayData={displayData} />)}
         </>) : (<p className="text-gray-500">No labeling tasks in project</p>)}

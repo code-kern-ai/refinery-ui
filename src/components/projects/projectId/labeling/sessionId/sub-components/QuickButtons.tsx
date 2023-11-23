@@ -1,17 +1,23 @@
+import { selectSettings, setSettings } from "@/src/reduxStore/states/pages/labeling";
 import { selectProjectId } from "@/src/reduxStore/states/project";
 import { QuickButtonConfig, QuickButtonProps, QuickButtonsProps } from "@/src/types/components/projects/projectId/labeling/task-header";
 import { SettingManager } from "@/src/util/classes/labeling/settings-manager";
 import { getQuickButtonConfig } from "@/src/util/components/projects/projectId/labeling/task-header-helper";
+import { jsonCopy } from "@/submodules/javascript-functions/general";
 import { Tooltip } from "@nextui-org/react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 
 const QUICK_BUTTONS: QuickButtonConfig = getQuickButtonConfig();
 
 export default function QuickButtons(props: QuickButtonsProps) {
+    const dispatch = useDispatch();
+
     const projectId = useSelector(selectProjectId);
+    const settings = useSelector(selectSettings);
 
     function setAllLabelDisplaySetting(value: boolean, labelSettingsLabel?: any, attribute?: string, deactivateOthers?: boolean) {
-        const tasks = SettingManager.settings.task[projectId];
+        const settingsCopy = jsonCopy(settings);
+        const tasks = settingsCopy.task[projectId];
         if (deactivateOthers && !attribute) {
             console.error("deactivateOthers needs attribute");
             return;
@@ -53,15 +59,18 @@ export default function QuickButtons(props: QuickButtonsProps) {
                 }
             }
         }
+        dispatch(setSettings(settingsCopy));
     }
 
     function setAllLabelDisplaySettingDefault() {
-        const tasks = SettingManager.settings.task[projectId];
-        for (let taskId in SettingManager.settings.task[projectId]) {
-            for (let labelId in SettingManager.settings.task[projectId][taskId]) {
+        const settingsCopy = jsonCopy(settings);
+        const tasks = settingsCopy.task[projectId];
+        for (let taskId in tasks) {
+            for (let labelId in tasks) {
                 tasks[taskId][labelId] = SettingManager.getDefaultTaskOverviewLabelSettings();
             }
         }
+        dispatch(setSettings(settingsCopy));
     }
 
     return (<div className="flex flex-row flex-wrap gap-2 items-center">
@@ -103,7 +112,9 @@ export default function QuickButtons(props: QuickButtonsProps) {
 }
 
 function QuickButton(props: QuickButtonProps) {
-    return (<Tooltip content={'Activate ' + props.dataTipCaption + ' labels in labeling view'} color="invert" placement={SettingManager.settings.task.isCollapsed && props.caption == 'Manual' ? 'right' : 'bottom'}>
+    const settings = useSelector(selectSettings);
+
+    return (<Tooltip content={'Activate ' + props.dataTipCaption + ' labels in labeling view'} color="invert" placement={settings.task.isCollapsed && props.caption == 'Manual' ? 'right' : 'bottom'}>
         <button onClick={props.setAllLabelDisplaySetting}
             className="text-sm font-medium px-2 py-0.5 rounded-md border focus:outline-none cursor-pointer flex flex-row flex-no-wrap gap-x-1 items-center">
             {QUICK_BUTTONS[props.attributeName] && <div className="grid grid-cols-2 gap-0.5">

@@ -7,39 +7,24 @@ import { Tooltip } from "@nextui-org/react";
 import { IconSettings, IconTrash } from "@tabler/icons-react";
 import { useDispatch, useSelector } from "react-redux";
 import DeleteRecordModal from "./DeleteRecordModal";
-import { selectRecordRequestsRecord } from "@/src/reduxStore/states/pages/labeling";
-import { SettingManager } from "@/src/util/classes/labeling/settings-manager";
+import { selectRecordRequestsRecord, selectSettings, updateSettings } from "@/src/reduxStore/states/pages/labeling";
 import { ComponentType } from "@/src/types/components/projects/projectId/labeling/settings";
-import { ChangeEventHandler, useEffect, useState } from "react";
-import { selectProjectId } from "@/src/reduxStore/states/project";
 import LabelingSettingsModal from "./LabelingSettingsModal";
 
 export default function NavigationBarBottom() {
     const dispatch = useDispatch();
 
-    const projectId = useSelector(selectProjectId)
+    const settings = useSelector(selectSettings);
     const user = useSelector(selectUser);
     const record = useSelector(selectRecordRequestsRecord);
 
-    const [autoNextRecord, setAutoNextRecord] = useState(false);
-    const [showNLabelButton, setShowNLabelButton] = useState(0);
-
-    useEffect(() => {
-        if (!projectId) return;
-        if (!SettingManager.settings) return;
-        setAutoNextRecord(SettingManager.settings.main.autoNextRecord);
-        setShowNLabelButton(SettingManager.settings.labeling.showNLabelButton);
-    }, [SettingManager.settings, projectId])
-
     function toggleAutoNextRecord() {
-        SettingManager.changeSetting(ComponentType.MAIN, 'autoNextRecord');
-        setAutoNextRecord(SettingManager.settings.main.autoNextRecord)
+        dispatch(updateSettings(ComponentType.MAIN, 'autoNextRecord'))
     }
 
     function setShowNLabelButtonFunc(event: any) {
         const valueInt = event.target.value;
-        SettingManager.changeSetting(ComponentType.LABELING, 'showNLabelButton', valueInt);
-        setShowNLabelButton(SettingManager.settings.labeling.showNLabelButton);
+        dispatch(updateSettings(ComponentType.LABELING, 'showNLabelButton', valueInt))
     }
 
     return (<>
@@ -58,7 +43,7 @@ export default function NavigationBarBottom() {
                     <div className="flex justify-center overflow-visible items-center cursor-pointer">
                         {record && record.id != "deleted" && <> <label htmlFor="autoNextRecord"
                             className="flex-shrink-0 group relative inline-flex items-center justify-center cursor-pointer focus:outline-none" role="switch" aria-checked="false">
-                            <input name='autoNextRecord' className="h-5 w-5 cursor-pointer" type="checkbox" checked={autoNextRecord}
+                            <input name='autoNextRecord' className="h-5 w-5 cursor-pointer" type="checkbox" checked={settings.main.autoNextRecord}
                                 onChange={toggleAutoNextRecord} />
                         </label>
                             <span className="flex-grow flex flex-col ml-3 flex-shrink-0 mr-6">
@@ -69,7 +54,7 @@ export default function NavigationBarBottom() {
                     </div>
                     <div className="flex justify-center overflow-visible items-center cursor-pointer">
                         {record && record.id != "deleted" && <>
-                            <input value={showNLabelButton} type="number"
+                            <input value={settings.labeling.showNLabelButton} type="number"
                                 onChange={(event) => setShowNLabelButtonFunc(event)}
                                 onBlur={(event) => setShowNLabelButtonFunc(event)}
                                 onKeyDown={(event) => {

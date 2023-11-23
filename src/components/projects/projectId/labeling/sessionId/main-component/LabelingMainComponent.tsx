@@ -1,5 +1,5 @@
 import { selectAllUsers, selectUser } from "@/src/reduxStore/states/general";
-import { setAvailableLinks, updateRecordRequests, setSelectedLink, selectRecordRequestsRla, updateUsers } from "@/src/reduxStore/states/pages/labeling";
+import { setAvailableLinks, updateRecordRequests, setSelectedLink, selectRecordRequestsRla, updateUsers, setSettings, selectSettings } from "@/src/reduxStore/states/pages/labeling";
 import { selectProjectId } from "@/src/reduxStore/states/project"
 import { AVAILABLE_LABELING_LINKS, GET_RECORD_LABEL_ASSOCIATIONS, GET_TOKENIZED_RECORD, REQUEST_HUDDLE_DATA } from "@/src/services/gql/queries/labeling";
 import { LabelingLinkType } from "@/src/types/components/projects/projectId/labeling/labeling-general";
@@ -10,15 +10,16 @@ import { UserManager } from "@/src/util/classes/labeling/user-manager";
 import { DUMMY_HUDDLE_ID, parseLabelingLink } from "@/src/util/components/projects/projectId/labeling/labeling-general-helper";
 import { useLazyQuery } from "@apollo/client";
 import { useRouter } from "next/router";
-import { useEffect } from "react";
+import { use, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import style from "@/src/styles/components/projects/projectId/labeling.module.css";
 import NavigationBarTop from "./NavigationBarTop";
 import NavigationBarBottom from "./NavigationBarBottom";
 import { GET_RECORD_BY_RECORD_ID } from "@/src/services/gql/queries/project-setting";
 import { combineLatest } from "rxjs";
-import { SettingManager } from "@/src/util/classes/labeling/settings-manager";
 import LabelingSuiteTaskHeader from "../sub-components/LabelingSuiteTaskHeader";
+import { SettingManager } from "@/src/util/classes/labeling/settings-manager";
+import { jsonCopy, transferNestedDict } from "@/submodules/javascript-functions/general";
 
 export default function LabelingMainComponent() {
     const router = useRouter();
@@ -28,6 +29,7 @@ export default function LabelingMainComponent() {
     const user = useSelector(selectUser);
     const rlas = useSelector(selectRecordRequestsRla);
     const users = useSelector(selectAllUsers);
+    const settings = useSelector(selectSettings);
 
     const [refetchHuddleData] = useLazyQuery(REQUEST_HUDDLE_DATA, { fetchPolicy: 'no-cache' });
     const [refetchAvailableLinks] = useLazyQuery(AVAILABLE_LABELING_LINKS, { fetchPolicy: 'no-cache' });
@@ -37,8 +39,28 @@ export default function LabelingMainComponent() {
 
     useEffect(() => {
         if (!projectId) return;
+        let tmp = localStorage.getItem(SettingManager.localStorageKey);
+        const settingsCopy = jsonCopy(settings);
+        if (tmp) {
+            const tmpSettings = JSON.parse(tmp);
+            // transfer only for this project
+            transferNestedDict(tmpSettings, settingsCopy, false);
+            //to ensure new setting values exist and old ones are loaded if matching name
+            transferNestedDict(tmpSettings, settingsCopy);
+            if (tmpSettings.task) {
+                transferNestedDict(tmpSettings.task, settingsCopy.task, false);
+            }
+        }
+        if (!settingsCopy.task[projectId]) settingsCopy.task[projectId] = {};
+        for (let key in settingsCopy.task) {
+            if (key != projectId && key != 'show' && key != 'isCollapsed' && key != 'alwaysShowQuickButtons') delete settingsCopy.task[key];
+        }
+        dispatch(setSettings(settingsCopy));
+    }, [projectId]);
+
+    useEffect(() => {
+        if (!projectId) return;
         if (!router.query.sessionId) return;
-        SettingManager.loadSettings(projectId);
         SessionManager.labelingLinkData = parseLabelingLink(router);
         SessionManager.readHuddleDataFromLocal();
         const huddleId = SessionManager.prepareLabelingSession(projectId);
