@@ -14,7 +14,7 @@ import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import LabelingInfoTableModal from "./LabelingInfoTableModal";
 
-export default function LabelingOverviewTable() {
+export default function LabelingSuiteOverviewTable() {
     const dispatch = useDispatch();
 
     const rlas = useSelector(selectRecordRequestsRla);
@@ -124,7 +124,7 @@ export default function LabelingOverviewTable() {
                                             <IconSearch className="w-6 h-6 text-gray-700" />
                                         </td>
                                         <td className="w-icon">
-                                            {!ovItem.canBeDeleted && <div onClick={() => deleteLabelFromRecord(ovItem.rla.id)}>
+                                            {ovItem.canBeDeleted && <div onClick={() => deleteLabelFromRecord(ovItem.rla.id)}>
                                                 <IconTrash className="w-6 h-6 text-red-700" /></div>}
                                         </td>
                                     </tr>))}

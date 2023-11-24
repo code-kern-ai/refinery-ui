@@ -1,12 +1,11 @@
-import { postProcessRla, postProcessTokenizedRecords } from "@/src/util/components/projects/projectId/labeling/labeling-general-helper";
+import { getDefaultLabelingSuiteSettings, postProcessRla, postProcessTokenizedRecords } from "@/src/util/components/projects/projectId/labeling/labeling-general-helper";
 import { postProcessRecordByRecordId } from "@/src/util/components/projects/projectId/settings/attribute-calculation-helper";
-import { arrayToDict, transferNestedDict } from "@/submodules/javascript-functions/general";
+import { arrayToDict } from "@/submodules/javascript-functions/general";
 import { PayloadAction, createSelector, createSlice } from "@reduxjs/toolkit";
 import { Record } from "@/src/types/components/projects/projectId/settings/attribute-calculation";
 import { LabelingSuiteManager } from "@/src/util/classes/labeling/manager";
 import { RecordManager } from "@/src/util/classes/labeling/record-manager";
 import { ComponentType, LabelingSuiteSettings } from "@/src/types/components/projects/projectId/labeling/settings";
-import { SettingManager } from "@/src/util/classes/labeling/settings-manager";
 
 
 type LabelingSuiteState = {
@@ -41,7 +40,7 @@ function getInitState(): LabelingSuiteState {
             userIcons: [],
             showUserIcons: false,
         },
-        settings: SettingManager.getDefaultLabelingSuiteSettings(),
+        settings: getDefaultLabelingSuiteSettings(),
     };
 }
 

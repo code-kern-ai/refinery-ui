@@ -4,8 +4,7 @@ import { User } from "@/src/types/shared/general";
 import { UserRole } from "@/src/types/shared/sidebar";
 import { informationSourceTypeToString, labelSourceToString } from "@/submodules/javascript-functions/enums/enum-functions";
 import { InformationSourceType, LabelSource } from "@/submodules/javascript-functions/enums/enums";
-import { ALL_USERS_USER_ID, GOLD_STAR_USER_ID } from "./labeling-general-helper";
-import { SettingManager } from "@/src/util/classes/labeling/settings-manager";
+import { ALL_USERS_USER_ID, GOLD_STAR_USER_ID, getDefaultTaskOverviewLabelSettings } from "./labeling-general-helper";
 import { UserManager } from "@/src/util/classes/labeling/user-manager";
 import { LabelingSuiteTaskHeaderLabelSettings } from "@/src/types/components/projects/projectId/labeling/settings";
 
@@ -178,7 +177,7 @@ export function filterRlaLabelCondition(rla: any, settings, projectId): boolean 
     }
     let rlaSettings: LabelingSuiteTaskHeaderLabelSettings = taskSettings[rla.labelingTaskLabelId];
     if (!rlaSettings) {
-        rlaSettings = SettingManager.getDefaultTaskOverviewLabelSettings();
+        rlaSettings = getDefaultTaskOverviewLabelSettings();
         taskSettings[rla.labelingTaskLabelId] = rlaSettings;
     }
     switch (rla.sourceType) {

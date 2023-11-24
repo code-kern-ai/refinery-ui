@@ -1,7 +1,7 @@
 import { selectSettings, setSettings } from "@/src/reduxStore/states/pages/labeling";
 import { selectProjectId } from "@/src/reduxStore/states/project";
 import { QuickButtonConfig, QuickButtonProps, QuickButtonsProps } from "@/src/types/components/projects/projectId/labeling/task-header";
-import { SettingManager } from "@/src/util/classes/labeling/settings-manager";
+import { getDefaultTaskOverviewLabelSettings } from "@/src/util/components/projects/projectId/labeling/labeling-general-helper";
 import { getQuickButtonConfig } from "@/src/util/components/projects/projectId/labeling/task-header-helper";
 import { jsonCopy } from "@/submodules/javascript-functions/general";
 import { Tooltip } from "@nextui-org/react";
@@ -15,69 +15,27 @@ export default function QuickButtons(props: QuickButtonsProps) {
     const projectId = useSelector(selectProjectId);
     const settings = useSelector(selectSettings);
 
-    function setAllLabelDisplaySetting(value: boolean, labelSettingsLabel?: any, attribute?: string, deactivateOthers?: boolean) {
-        const settingsCopy = jsonCopy(settings);
-        const tasks = settingsCopy.task[projectId];
-        if (deactivateOthers && !attribute) {
-            console.error("deactivateOthers needs attribute");
-            return;
-        }
-        if (labelSettingsLabel) {
-            const labelId = props.labelSettingsLabel.id;
-            const taskId = props.labelSettingsLabel.taskId;
-            if (attribute && !deactivateOthers) tasks[taskId][labelId][attribute] = value;
-            else {
-                for (let key in tasks[taskId][labelId]) {
-                    if (deactivateOthers) {
-                        if (key == attribute) {
-                            tasks[taskId][labelId][key] = value;
-                        } else {
-                            tasks[taskId][labelId][key] = false;
-                        }
-                    } else {
-                        tasks[taskId][labelId][key] = value;
-                    }
-                }
-            }
-        } else {
-            for (let taskId in tasks) {
-                for (let labelId in tasks[taskId]) {
-                    if (attribute && !deactivateOthers) tasks[taskId][labelId][attribute] = value;
-                    else {
-                        for (let key in tasks[taskId][labelId]) {
-                            if (deactivateOthers) {
-                                if (key == attribute) {
-                                    tasks[taskId][labelId][key] = value;
-                                } else {
-                                    tasks[taskId][labelId][key] = false;
-                                }
-                            } else {
-                                tasks[taskId][labelId][key] = value;
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        dispatch(setSettings(settingsCopy));
-    }
 
     function setAllLabelDisplaySettingDefault() {
         const settingsCopy = jsonCopy(settings);
         const tasks = settingsCopy.task[projectId];
         for (let taskId in tasks) {
-            for (let labelId in tasks) {
-                tasks[taskId][labelId] = SettingManager.getDefaultTaskOverviewLabelSettings();
+            for (let labelId in tasks[taskId]) {
+                tasks[taskId][labelId] = getDefaultTaskOverviewLabelSettings();
             }
         }
         dispatch(setSettings(settingsCopy));
     }
 
+    function setAllLabelDisplaySetting(value: boolean, attribute?: string) {
+        props.setAllLabelDisplaySetting(value, attribute);
+    }
+
     return (<div className="flex flex-row flex-wrap gap-2 items-center">
-        <QuickButton attributeName="showManual" caption="Manual" dataTipCaption="manual" setAllLabelDisplaySetting={() => setAllLabelDisplaySetting(true, null, 'showManual')} />
-        <QuickButton attributeName="showWeakSupervision" caption="Weak Supervision" dataTipCaption="weak supervision" setAllLabelDisplaySetting={() => setAllLabelDisplaySetting(true, null, 'showWeakSupervision')} />
-        <QuickButton attributeName="showModel" caption="Model Callback" dataTipCaption="model callback" setAllLabelDisplaySetting={() => setAllLabelDisplaySetting(true, null, 'showModel')} />
-        <QuickButton attributeName="showHeuristics" caption="Heuristic" dataTipCaption="heuristic" setAllLabelDisplaySetting={() => setAllLabelDisplaySetting(true, null, 'showHeuristics')} />
+        <QuickButton attributeName="showManual" caption="Manual" dataTipCaption="manual" setAllLabelDisplaySetting={() => setAllLabelDisplaySetting(true, 'showManual')} />
+        <QuickButton attributeName="showWeakSupervision" caption="Weak Supervision" dataTipCaption="weak supervision" setAllLabelDisplaySetting={() => setAllLabelDisplaySetting(true, 'showWeakSupervision')} />
+        <QuickButton attributeName="showModel" caption="Model Callback" dataTipCaption="model callback" setAllLabelDisplaySetting={() => setAllLabelDisplaySetting(true, 'showModel')} />
+        <QuickButton attributeName="showHeuristics" caption="Heuristic" dataTipCaption="heuristic" setAllLabelDisplaySetting={() => setAllLabelDisplaySetting(true, 'showHeuristics')} />
         <button onClick={() => setAllLabelDisplaySetting(true)}
             className="text-sm font-medium px-2 py-0.5 rounded-md border focus:outline-none cursor-pointer flex flex-row flex-no-wrap gap-x-1 items-center">
             {QUICK_BUTTONS.all && <div className="grid grid-cols-2 gap-0.5">

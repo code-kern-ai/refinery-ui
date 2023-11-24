@@ -196,6 +196,10 @@ const initialState: Modals = {
     },
     [ModalEnum.LABELING_INFO_TABLE]: {
         open: false,
+    },
+    [ModalEnum.INFO_LABEL_BOX]: {
+        open: false,
+        labelSettingsLabel: null,
     }
 };
 

@@ -4,7 +4,6 @@ import { GET_LABELING_TASKS_BY_PROJECT_ID } from "@/src/services/gql/queries/pro
 import { ComponentType } from "@/src/types/components/projects/projectId/labeling/settings";
 import { LabelingSuiteTaskHeaderDisplayData } from "@/src/types/components/projects/projectId/labeling/task-header";
 import { LabelingTaskTaskType } from "@/src/types/components/projects/projectId/settings/labeling-tasks";
-import { SettingManager } from "@/src/util/classes/labeling/settings-manager";
 import { getHoverGroupsTaskOverview, setLabelsForDisplay } from "@/src/util/components/projects/projectId/labeling/task-header-helper";
 import { postProcessLabelingTasks, postProcessLabelingTasksSchema } from "@/src/util/components/projects/projectId/settings/labeling-tasks-helper";
 import { jsonCopy } from "@/submodules/javascript-functions/general";
@@ -83,7 +82,7 @@ export default function LabelingSuiteTaskHeader() {
         dispatch(updateSettings(ComponentType.TASK_HEADER, 'isCollapsed'))
     }
 
-    return (<div className="relative bg-white p-4">
+    return (<div id="base-dom-task-header" className="relative bg-white p-4">
         {displayData && displayData.length > 0 ? (<>
             <div className={`absolute top-4 right-4 p-2 cursor-pointer ${settings.task.isCollapsed ? style.rotateTransform : null}`} onClick={toggleIsCollapsed}>
                 <IconLayoutNavbarCollapse size={24} stroke={2} />

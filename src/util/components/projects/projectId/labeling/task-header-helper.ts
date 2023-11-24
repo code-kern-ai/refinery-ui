@@ -1,6 +1,5 @@
-import { LabelingSuiteSettings } from "@/src/types/components/projects/projectId/labeling/settings";
 import { HoverGroupTarget, LabelingSuiteTaskHeaderLabelDisplayData, QuickButtonConfig } from "@/src/types/components/projects/projectId/labeling/task-header";
-import { SettingManager } from "@/src/util/classes/labeling/settings-manager";
+import { getDefaultTaskOverviewLabelSettings } from "./labeling-general-helper";
 
 export function getQuickButtonConfig(): QuickButtonConfig {
     return {
@@ -21,7 +20,7 @@ export function setLabelsForDisplay(task: any, settings: any) {
         if (!taskSettings) return;
         let labelSettings = taskSettings[label.id];
         if (!labelSettings) {
-            labelSettings = SettingManager.getDefaultTaskOverviewLabelSettings();
+            labelSettings = getDefaultTaskOverviewLabelSettings();
             taskSettings[label.id] = labelSettings;
         }
         const data: LabelingSuiteTaskHeaderLabelDisplayData = {

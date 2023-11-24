@@ -59,8 +59,15 @@ export type QuickButtonProps = {
 
 export type QuickButtonsProps = {
     labelSettingsLabel?: any;
+    setAllLabelDisplaySetting: (val: boolean, attribute: string) => void;
 }
 
 export type LabelSettingsBoxProps = {
     labelSettingsLabel?: any;
+    position: any;
+    setAllLabelDisplaySetting: (val: boolean) => void;
+}
+
+export type InfoLabelBoxModalProps = {
+    toggleLabelDisplaySetting: (val: string) => void;
 }

@@ -7,10 +7,10 @@ import { UserRole } from "@/src/types/shared/sidebar";
 import { LabelingSuiteManager } from "@/src/util/classes/labeling/manager";
 import { SessionManager } from "@/src/util/classes/labeling/session-manager";
 import { UserManager } from "@/src/util/classes/labeling/user-manager";
-import { DUMMY_HUDDLE_ID, parseLabelingLink } from "@/src/util/components/projects/projectId/labeling/labeling-general-helper";
+import { DUMMY_HUDDLE_ID, getDefaultLabelingSuiteSettings, parseLabelingLink } from "@/src/util/components/projects/projectId/labeling/labeling-general-helper";
 import { useLazyQuery } from "@apollo/client";
 import { useRouter } from "next/router";
-import { use, useEffect } from "react";
+import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import style from "@/src/styles/components/projects/projectId/labeling.module.css";
 import NavigationBarTop from "./NavigationBarTop";
@@ -18,9 +18,11 @@ import NavigationBarBottom from "./NavigationBarBottom";
 import { GET_RECORD_BY_RECORD_ID } from "@/src/services/gql/queries/project-setting";
 import { combineLatest } from "rxjs";
 import LabelingSuiteTaskHeader from "../sub-components/LabelingSuiteTaskHeader";
-import { SettingManager } from "@/src/util/classes/labeling/settings-manager";
 import { jsonCopy, transferNestedDict } from "@/submodules/javascript-functions/general";
-import LabelingOverviewTable from "../sub-components/LabelingOverviewTable";
+import LabelingSuiteOverviewTable from "../sub-components/LabelingSuiteOverviewTable";
+import LabelingSuiteLabeling from "../sub-components/LabelingSuiteLabeling";
+
+const LOCAL_STORAGE_KEY = 'labelingSuiteSettings';
 
 export default function LabelingMainComponent() {
     const router = useRouter();
@@ -40,9 +42,9 @@ export default function LabelingMainComponent() {
 
     useEffect(() => {
         if (!projectId) return;
-        let tmp = localStorage.getItem(SettingManager.localStorageKey);
+        let tmp = localStorage.getItem(LOCAL_STORAGE_KEY);
         let settingsCopy = jsonCopy(settings);
-        settingsCopy = SettingManager.getDefaultLabelingSuiteSettings();
+        settingsCopy = getDefaultLabelingSuiteSettings();
         if (tmp) {
             const tmpSettings = JSON.parse(tmp);
             transferNestedDict(tmpSettings, settingsCopy);
@@ -175,7 +177,8 @@ export default function LabelingMainComponent() {
         <NavigationBarTop />
         <div className="flex-grow overflow-y-auto" style={{ height: 'calc(100vh - 194px)' }}>
             <LabelingSuiteTaskHeader />
-            <LabelingOverviewTable />
+            <LabelingSuiteLabeling />
+            <LabelingSuiteOverviewTable />
         </div>
         <NavigationBarBottom />
     </div>)

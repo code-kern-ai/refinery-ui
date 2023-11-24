@@ -197,6 +197,9 @@ export const TOOLTIPS_DICT = {
         'SWIM_LANE': 'Groups display of labels in type, task, creator & label. Same group gets the same distance to the text.&#10;&#10;Might use a lot of space',
         'OVERVIEW_TABLE': 'Completely hide/show the feature.&#10;&#10;Active settings are preserved',
         'SHOW_HEURISTICS': 'Hide/Show heuristics in overview table to reduce bias',
-        'TASK_LEGEND_SETTINGS': 'If active the table will filter entries depending on task legend settings.&#10;&#10;Note that \'show heuristic\' disabled will overrule this'
+        'TASK_LEGEND_SETTINGS': 'If active the table will filter entries depending on task legend settings.&#10;&#10;Note that \'show heuristic\' disabled will overrule this',
+        'INFO_LABEL_BOX': 'What can I do here?',
+        'ACTIVATE_ALL': 'Activate all',
+        'CLEAR_ALL': 'Clear all',
     }
 }

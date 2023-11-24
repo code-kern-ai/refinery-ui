@@ -1,4 +1,6 @@
+import { LineBreaksType } from "@/src/types/components/projects/projectId/data-browser/data-browser";
 import { LabelingLinkType } from "@/src/types/components/projects/projectId/labeling/labeling-general";
+import { LabelingSuiteSettings, LabelingSuiteTaskHeaderLabelSettings } from "@/src/types/components/projects/projectId/labeling/settings";
 import { UserRole } from "@/src/types/shared/sidebar";
 import { countOccurrences } from "@/submodules/javascript-functions/general";
 
@@ -99,4 +101,42 @@ function tokenMapper(token: any, lastIdx: number) {
 export function postProcessRla(rlas: any) {
     if (!rlas) return null;
     return rlas['edges'].map((edge) => edge['node']);
+}
+
+export function getDefaultLabelingSuiteSettings(): LabelingSuiteSettings {
+    return {
+        main: {
+            autoNextRecord: false,
+            hoverGroupBackgroundColor: "green",
+            hoverGroupBackgroundColorClass: "bg-green-100",
+            lineBreaks: LineBreaksType.NORMAL
+        },
+        overviewTable: {
+            show: true,
+            showHeuristics: true,
+            includeLabelDisplaySettings: true,
+        },
+        task: {
+            show: true,
+            isCollapsed: false,
+            alwaysShowQuickButtons: true,
+        },
+        labeling: {
+            showNLabelButton: 5,
+            showTaskNames: true,
+            showHeuristicConfidence: false,
+            compactClassificationLabelDisplay: true,
+            swimLaneExtractionDisplay: false,
+            closeLabelBoxAfterLabel: true,
+        }
+    }
+}
+
+export function getDefaultTaskOverviewLabelSettings(): LabelingSuiteTaskHeaderLabelSettings {
+    return {
+        showManual: true,
+        showWeakSupervision: true,
+        showModel: false,
+        showHeuristics: false,
+    }
 }

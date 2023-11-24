@@ -2,8 +2,6 @@ import { LabelingHuddle, LabelingLinkData } from "@/src/types/components/project
 import { DUMMY_HUDDLE_ID, ONE_DAY } from "../../components/projects/projectId/labeling/labeling-general-helper";
 import { LabelingSuiteManager } from "./manager";
 import { dateAsUTCDate } from "@/submodules/javascript-functions/date-parser";
-import { timer } from "rxjs";
-import { RecordManager } from "./record-manager";
 
 export class SessionManager {
 
