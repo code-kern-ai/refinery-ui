@@ -202,6 +202,7 @@ export const TOOLTIPS_DICT = {
         'ACTIVATE_ALL': 'Activate all',
         'CLEAR_ALL': 'Clear all',
         'REMOVE_LABELS_GOLD_STAR': 'Remove manual task labels from gold state',
-        'SET_LABELS_GOLD_STAR': 'Set manual task labels as gold labels'
+        'SET_LABELS_GOLD_STAR': 'Set manual task labels as gold labels',
+        'CHOOSE_LABELS': 'Choose from your labels'
     }
 }

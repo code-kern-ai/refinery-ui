@@ -18,3 +18,19 @@ mutation($projectId: ID!, $recordId: ID!, $associationIds: [ID]){
   }
 }
 `;
+
+export const ADD_CLASSIFICATION_LABELS_TO_RECORD = gql`
+mutation ($projectId: ID!, $recordId: ID!, $labelingTaskId: ID, $labelId: ID, $asGoldStar:Boolean, $sourceId: ID) {
+  addClassificationLabelsToRecord(projectId: $projectId, recordId: $recordId, labelingTaskId: $labelingTaskId, labelId: $labelId,asGoldStar:$asGoldStar, sourceId: $sourceId) {
+    ok
+  }
+}
+`;
+
+export const ADD_EXTRACTION_LABEL_TO_RECORD = gql`
+mutation ($projectId: ID!, $recordId: ID!, $labelingTaskId: ID!, $tokenStartIndex: Int!, $tokenEndIndex: Int!, $value: String!, $labelId: ID!, $asGoldStar:Boolean, $sourceId: ID) {
+  addExtractionLabelToRecord(projectId: $projectId, recordId: $recordId, labelingTaskId: $labelingTaskId, tokenStartIndex: $tokenStartIndex, tokenEndIndex: $tokenEndIndex, value: $value, labelId: $labelId,asGoldStar:$asGoldStar, sourceId: $sourceId) {
+    ok
+  }
+}
+`;

@@ -1,29 +1,40 @@
 import LoadingIcon from "@/src/components/shared/loading/LoadingIcon"
 import { selectUser } from "@/src/reduxStore/states/general"
-import { selectRecordRequests, selectSettings } from "@/src/reduxStore/states/pages/labeling"
+import { removeFromRlaById, selectRecordRequests, selectRecordRequestsRecord, selectSettings } from "@/src/reduxStore/states/pages/labeling"
 import { selectAttributes, selectLabelingTasksAll } from "@/src/reduxStore/states/pages/settings"
 import { selectProjectId } from "@/src/reduxStore/states/project"
 import { LabelingVars, TokenLookup } from "@/src/types/components/projects/projectId/labeling/labeling"
 import { LabelingTaskTaskType } from "@/src/types/components/projects/projectId/settings/labeling-tasks"
 import { UserRole } from "@/src/types/shared/sidebar"
-import { FULL_RECORD_ID, SWIM_LANE_SIZE_PX, buildLabelingRlaData, filterRlaDataForLabeling, findOrderPosItem, getDefaultLabelingVars, getFirstFitPos, getOrderLookupItem, getOrderLookupSort, getTaskTypeOrder } from "@/src/util/components/projects/projectId/labeling/labeling-helper"
+import { FULL_RECORD_ID, SWIM_LANE_SIZE_PX, buildLabelingRlaData, collectSelectionData, filterRlaDataForLabeling, findOrderPosItem, getDefaultLabelingVars, getFirstFitPos, getOrderLookupItem, getOrderLookupSort, getTaskTypeOrder, getTokenData } from "@/src/util/components/projects/projectId/labeling/labeling-helper"
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants"
 import { Tooltip } from "@nextui-org/react"
 import { IconAlertCircle, IconAssembly, IconBolt, IconCode, IconPointerStar, IconSparkles, IconStar, IconStarFilled, IconUsers } from "@tabler/icons-react"
 import { Fragment, useEffect, useState } from "react"
-import { useSelector } from "react-redux"
+import { useDispatch, useSelector } from "react-redux"
 import ExtractionDisplay from "./ExtractionDisplay"
 import { LineBreaksType } from "@/src/types/components/projects/projectId/data-browser/data-browser"
 import { jsonCopy } from "@/submodules/javascript-functions/general"
 import { InformationSourceType, LabelSource } from "@/submodules/javascript-functions/enums/enums"
+import { LabelingSuiteManager } from "@/src/util/classes/labeling/manager";
+import { useMutation } from "@apollo/client"
+import { ADD_CLASSIFICATION_LABELS_TO_RECORD, ADD_EXTRACTION_LABEL_TO_RECORD, DELETE_RECORD_LABEL_ASSOCIATION_BY_ID } from "@/src/services/gql/mutations/labeling"
+import { UserManager } from "@/src/util/classes/labeling/user-manager"
+import { SessionManager } from "@/src/util/classes/labeling/session-manager"
+import { GOLD_STAR_USER_ID } from "@/src/util/components/projects/projectId/labeling/labeling-main-component-helper"
+import { useRouter } from "next/router"
 
 export default function LabelingSuiteLabeling() {
+    const router = useRouter();
+    const dispatch = useDispatch();
+
     const projectId = useSelector(selectProjectId);
     const attributes = useSelector(selectAttributes);
     const labelingTasks = useSelector(selectLabelingTasksAll);
     const recordRequests = useSelector(selectRecordRequests);
     const settings = useSelector(selectSettings);
     const user = useSelector(selectUser);
+    const record = useSelector(selectRecordRequestsRecord);
 
     const [lVars, setLVars] = useState<LabelingVars>(getDefaultLabelingVars());
     const [tokenLookup, setTokenLookup] = useState<TokenLookup>({});
@@ -32,6 +43,11 @@ export default function LabelingSuiteLabeling() {
     const [canEditLabels, setCanEditLabels] = useState<boolean>(true);
     const [labelLookup, setLabelLookup] = useState<any>({});
     const [labelAddButtonDisabled, setLabelAddButtonDisabled] = useState<boolean>(true);
+    const [activeTasks, setActiveTasks] = useState<any[]>([]);
+
+    const [deleteRlaByIdMut] = useMutation(DELETE_RECORD_LABEL_ASSOCIATION_BY_ID);
+    const [addClassificationLabelToRecordMut] = useMutation(ADD_CLASSIFICATION_LABELS_TO_RECORD);
+    const [addExtractionLabelToRecordMut] = useMutation(ADD_EXTRACTION_LABEL_TO_RECORD);
 
     useEffect(() => {
         if (!projectId || !attributes || !recordRequests || !user) return;
@@ -40,9 +56,9 @@ export default function LabelingSuiteLabeling() {
     }, [projectId, attributes, recordRequests, user]);
 
     useEffect(() => {
-        if (!labelingTasks) return;
+        if (!labelingTasks || !lVars) return;
         rebuildLabelLookup();
-    }, [labelingTasks]);
+    }, [labelingTasks, lVars]);
 
     useEffect(() => {
         if (!fullRlaData) return;
@@ -88,12 +104,14 @@ export default function LabelingSuiteLabeling() {
         };
         for (const task of labelingTasks) {
             const attributeKey = task.attribute ? task.attribute.id : FULL_RECORD_ID;
+            const taskCopy = { ...task };
+            taskCopy.displayLabels = task.labels.slice(0, settings.labeling.showNLabelButton);
             lVarsCopy.taskLookup[attributeKey].lookup.push({
                 showText: false,
                 orderKey: getTaskTypeOrder(task.taskType),
-                task: task,
+                task: taskCopy,
                 showGridLabelPart: true,
-                tokenData: getTokenData(attributeKey),
+                tokenData: getTokenData(attributeKey, attributes, recordRequests),
             });
         }
         if (lVarsCopy.taskLookup[FULL_RECORD_ID].lookup.length == 0) {
@@ -122,21 +140,11 @@ export default function LabelingSuiteLabeling() {
                     lVarsCopy.taskLookup[key].lookup[0].showGridLabelPart = true;
                     lVarsCopy.taskLookup[key].lookup[0].gridRowSpan = "span " + extractionTasks.length;
                 }
-
             }
         }
         setLVars(lVarsCopy);
         // TODO: add rebuild for gold star
         // TODO: add active task
-    }
-
-    function getTokenData(attributeId: string): any {
-        if (!attributes) return null;
-        if (attributeId == FULL_RECORD_ID) return null;
-        for (const att of recordRequests.token.attributes) {
-            if (att.attributeId == attributeId) return att;
-        }
-        return null;
     }
 
     function toggleGoldStar() {
@@ -278,9 +286,62 @@ export default function LabelingSuiteLabeling() {
         }
     }
 
-    function addRla(task: any, labelId: string) { }
+    function addRla(task: any, labelId: string) {
+        if (!canEditLabels) return;
+        if (task.taskType == LabelingTaskTaskType.MULTICLASS_CLASSIFICATION) {
+            addLabelToTask(task.id, labelId);
+        } else {
+            addLabelToSelection(task.attribute.id, task.id, labelId);
+        }
+        if (settings.labeling.closeLabelBoxAfterLabel) {
+            setActiveTasks([]);
+            clearSelected();
+        }
+    }
 
-    function deleteRecordLabelAssociation(rlaLabel) { }
+    function deleteRecordLabelAssociation(rlaId: string) {
+        LabelingSuiteManager.somethingLoading = true;
+        deleteRlaByIdMut({ variables: { projectId: projectId, recordId: record.id, associationIds: [rlaId] } }).then(res => {
+            dispatch(removeFromRlaById(rlaId));
+        });
+    }
+
+    function addLabelToTask(labelingTaskId: string, labelId: string) {
+        if (!canEditLabels) return;
+        if (!fullRlaData) return;
+
+        const existingLabels = fullRlaData.filter(e =>
+            e.sourceTypeKey == LabelSource.MANUAL && e.createdBy == UserManager.displayUserId && e.labelId == labelId);
+
+        if (existingLabels.length == 1) return;
+        const sourceId = SessionManager.getSourceId();
+        const asGoldStar = UserManager.displayUserId == GOLD_STAR_USER_ID ? true : null;
+        addClassificationLabelToRecordMut({ variables: { projectId: projectId, recordId: record.id, labelingTaskId: labelingTaskId, labelId: labelId, asGoldStar: asGoldStar, sourceId: sourceId } }).then((res) => {
+            if (settings.main.autoNextRecord) {
+                SessionManager.nextRecord();
+                router.push(`/projects/${projectId}/labeling/${SessionManager.labelingLinkData.huddleId}?pos=${SessionManager.huddleData.linkData.requestedPos}&type=${SessionManager.huddleData.linkData.linkType}`);
+            }
+        });
+    }
+
+    function addLabelToSelection(attributeId: string, labelingTaskId: string, labelId: string) {
+        const selectionData = collectSelectionData(attributeId, tokenLookup, attributes, recordRequests);
+        if (!selectionData) return;
+        const sourceId = SessionManager.getSourceId();
+        addExtractionLabelToRecordMut({ variables: { projectId: projectId, recordId: record.id, labelingTaskId: labelingTaskId, labelId: labelId, startIdx: selectionData.startIdx, endIdx: selectionData.endIdx, value: selectionData.value, sourceId: sourceId } }).then((res) => {
+
+        });
+    }
+
+    function clearSelected() {
+        const tokenLookupCopy = { ...tokenLookup };
+        for (const attributeId in tokenLookupCopy) {
+            for (const token of tokenLookupCopy[attributeId].token) {
+                if ('selected' in token) delete token.selected;
+            }
+        }
+        setTokenLookup(tokenLookupCopy);
+    }
 
     return (<div className="bg-white relative p-4">
         {lVars.loading && <LoadingIcon size="lg" />}
@@ -305,21 +366,34 @@ export default function LabelingSuiteLabeling() {
                     {task.showGridLabelPart && <div className={`col-start-4 h-full py-1 ${i % 2 == 0 ? 'bg-white' : 'bg-gray-50'}`} style={{ gridRow: task.gridRowSpan }}>
                         <div className="flex flex-col gap-y-2">
                             {task.showText && <>
-                                {task.task.taskType == LabelingTaskTaskType.INFORMATION_EXTRACTION ? (<ExtractionDisplay attributeId={attribute.id} tokenLookup={tokenLookup} labelLookup={labelLookup} />) : (<>
-                                    {(recordRequests.record.data[lVars.taskLookup[attribute.id].attribute.name] != null && recordRequests.record.data[lVars.taskLookup[attribute.id].attribute.name] !== '') ?
-                                        (<p className={`break-words text-sm leading-5 font-normal text-gray-500 ${settings.main.lineBreaks != LineBreaksType.NORMAL ? (settings.main.lineBreaks == LineBreaksType.IS_PRE_WRAP ? 'whitespace-pre-wrap' : 'whitespace-pre-line') : ''}`}>
-                                            {recordRequests.record.data[lVars.taskLookup[attribute.id].attribute.name]}
-                                        </p>) : (<>
-                                            <IconAlertCircle className="text-yellow-700 inline-block h-5 w-5" />
-                                            <span className="text-gray-500 text-sm font-normal italic">Not present in the
-                                                record</span>
-                                        </>)}
-                                </>)}
+                                {task.task.taskType == LabelingTaskTaskType.INFORMATION_EXTRACTION ? (<ExtractionDisplay attributeId={attribute.id} tokenLookup={tokenLookup}
+                                    labelLookup={labelLookup} deleteRla={(rlaId) => deleteRecordLabelAssociation(rlaId)} />) : (<>
+                                        {(recordRequests.record.data[lVars.taskLookup[attribute.id].attribute.name] != null && recordRequests.record.data[lVars.taskLookup[attribute.id].attribute.name] !== '') ?
+                                            (<p className={`break-words text-sm leading-5 font-normal text-gray-500 ${settings.main.lineBreaks != LineBreaksType.NORMAL ? (settings.main.lineBreaks == LineBreaksType.IS_PRE_WRAP ? 'whitespace-pre-wrap' : 'whitespace-pre-line') : ''}`}>
+                                                {recordRequests.record.data[lVars.taskLookup[attribute.id].attribute.name]}
+                                            </p>) : (<>
+                                                <IconAlertCircle className="text-yellow-700 inline-block h-5 w-5" />
+                                                <span className="text-gray-500 text-sm font-normal italic">Not present in the
+                                                    record</span>
+                                            </>)}
+                                    </>)}
                             </>}
                             {task.task.taskType == LabelingTaskTaskType.MULTICLASS_CLASSIFICATION && <>
-                                {canEditLabels || user.role == UserRole.ANNOTATOR || user.role == UserRole.EXPERT && <div className="flex flex-row flex-wrap gap-2">
-                                    {/* TODO: add  */}
-                                </div>}
+                                {(canEditLabels || user.role == UserRole.ANNOTATOR || user.role == UserRole.EXPERT) && <div className="flex flex-row flex-wrap gap-2">
+                                    {task.task.displayLabels.map((label, index) => (<div key={label.id} className={`text-sm font-medium px-2 py-0.5 rounded-md border focus:outline-none cursor-pointer  ${labelLookup[label.id].color.backgroundColor} ${labelLookup[label.id].color.textColor} ${labelLookup[label.id].color.borderColor}`}>
+                                        <div className="truncate" style={{ maxWidth: '260px' }} onClick={() => addRla(task.task, label.id)}>{label.name}
+                                            {label.hotkey && <kbd className="ml-1 uppercase inline-flex items-center border bg-white border-gray-200 rounded px-2 text-sm font-sans font-medium text-gray-400">{label.hotkey}</kbd>}
+                                        </div>
+                                    </div>))}
+                                    <Tooltip content={TOOLTIPS_DICT.LABELING.CHOOSE_LABELS} color="invert" placement="top">
+                                        <button className="flex flex-row flex-nowrap bg-white text-gray-700 text-sm font-medium mr-3 px-2 py-0.5 rounded-md border border-gray-300 hover:bg-gray-50 focus:outline-none">
+                                            <span>other</span>
+                                            <span className="truncate mx-1" style={{ maxWidth: '9rem' }}>{task.task.name}</span>
+                                            <span>options</span>
+                                        </button>
+                                    </Tooltip>
+                                </div>
+                                }
                                 {rlaDataToDisplay[task.task.id] && <div>
                                     <div className={`flex gap-2 ${settings.labeling.compactClassificationLabelDisplay ? 'flex-row flex-wrap items-center' : 'flex-col'}`}>
                                         {rlaDataToDisplay[task.task.id].map((rlaLabel, index) => (<Tooltip key={index} content={rlaLabel.dataTip} color="invert" placement="top" className="w-max">
@@ -334,7 +408,7 @@ export default function LabelingSuiteLabeling() {
                                                     {rlaLabel.icon == LabelSource.WEAK_SUPERVISION && <IconAssembly size={20} strokeWidth={1.5} />}
                                                 </div>}
                                                 <div className="truncate" style={{ maxWidth: '260px' }}>{rlaLabel.labelDisplay}</div>
-                                                {rlaLabel.canBeDeleted && <div className="pl-1 cursor-pointer" onClick={() => deleteRecordLabelAssociation(rlaLabel)}>
+                                                {rlaLabel.canBeDeleted && <div className="pl-1 cursor-pointer" onClick={() => deleteRecordLabelAssociation(rlaLabel.rla.id)}>
                                                     <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 inline-block stroke-current relative" style={{ top: '-1px' }} viewBox="0 0 20 20" fill="currentColor">
                                                         <path fillRule="evenodd" d="M6.707 4.879A3 3 0 018.828 4H15a3 3 0 013 3v6a3 3 0 01-3 3H8.828a3 3 0 01-2.12-.879l-4.415-4.414a1 1 0 010-1.414l4.414-4.414zm4 2.414a1 1 0 00-1.414 1.414L10.586 10l-1.293 1.293a1 1 0 101.414 1.414L12 11.414l1.293 1.293a1 1 0 001.414-1.414L13.414 10l1.293-1.293a1 1 0 00-1.414-1.414L12 8.586l-1.293-1.293z" clipRule="evenodd" />
                                                     </svg>

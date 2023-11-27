@@ -26,6 +26,7 @@ export type ExtractionDisplayProps = {
     attributeId: string;
     tokenLookup: TokenLookup;
     labelLookup: any;
+    deleteRla: (rla: string) => void;
 }
 
 export type TokenLookup = {

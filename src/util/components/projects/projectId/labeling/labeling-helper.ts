@@ -1,10 +1,11 @@
-import { LabelingVars } from "@/src/types/components/projects/projectId/labeling/labeling";
+import { LabelingVars, TokenLookup } from "@/src/types/components/projects/projectId/labeling/labeling";
 import { LabelingTaskTaskType } from "@/src/types/components/projects/projectId/settings/labeling-tasks";
 import { GOLD_STAR_USER_ID } from "./labeling-main-component-helper";
 import { canDeleteRla, filterRlaLabelCondition, getCreatedByName, getHoverGroupsOverviewTable, getLabelSourceOrder } from "./overview-table-helper";
 import { LabelSource } from "@/submodules/javascript-functions/enums/enums";
 import { informationSourceTypeToString } from "@/submodules/javascript-functions/enums/enum-functions";
 import { User } from "@/src/types/shared/general";
+import { Attribute } from "@/src/types/components/projects/projectId/settings/data-schema";
 
 export const FULL_RECORD_ID = "FULL_RECORD";
 export const SWIM_LANE_SIZE_PX = 12;
@@ -134,4 +135,36 @@ export function findOrderPosItem(orderPosElement: any, compareItem: any): boolea
         if (orderPosElement[key] != compareItem[key]) return false;
     }
     return true;
+}
+
+export function collectSelectionData(attributeId: string, tokenLookup: TokenLookup, attributes: Attribute[], recordRequests: any): any {
+    let startIdx = -1;
+    let endIdx = -1;
+    for (const token of tokenLookup[attributeId].token) {
+        if (token.selected) {
+            if (startIdx == -1) startIdx = token.idx;
+        } else {
+            if (startIdx != -1) {
+                endIdx = token.idx - 1;
+                break;
+            }
+        }
+    }
+    if (endIdx == -1) endIdx = tokenLookup[attributeId].token.length - 1;
+    const tokenData = getTokenData(attributeId, attributes, recordRequests);
+    if (!tokenData) return null;
+    const value = tokenData.raw.substring(
+        tokenData.token[startIdx].posStart,
+        tokenData.token[endIdx].posEnd
+    )
+    return { startIdx: startIdx, endIdx: endIdx, value: value };
+}
+
+export function getTokenData(attributeId: string, attributes: Attribute[], recordRequests: any): any {
+    if (!attributes) return null;
+    if (attributeId == FULL_RECORD_ID) return null;
+    for (const att of recordRequests.token.attributes) {
+        if (att.attributeId == attributeId) return att;
+    }
+    return null;
 }

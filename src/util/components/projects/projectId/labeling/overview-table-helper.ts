@@ -138,7 +138,7 @@ export function getLabelData(e: any): any {
 
 export function canDeleteRla(rla, user): boolean {
     if (rla.sourceType != LabelSource.MANUAL) return false;
-    if (user.currentRole != UserRole.ENGINEER) return false;
+    if (user.role != UserRole.ENGINEER) return false;
     if (rla.isGoldStar) return true;
     return rla.createdBy == user.id;
 }
@@ -162,7 +162,7 @@ export function filterRlaDataForUser(rlaData: any[], user: User, rlaKey?: string
 
 export function filterRlaCondition(rla, user): boolean {
     const displayUserId = UserManager.displayUserId;
-    if (user.currentRole != UserRole.ENGINEER) return rla.sourceType == LabelSource.MANUAL && rla.createdBy == displayUserId;
+    if (user.role != UserRole.ENGINEER) return rla.sourceType == LabelSource.MANUAL && rla.createdBy == displayUserId;
     if (rla.sourceType != LabelSource.MANUAL) return true;
     if (displayUserId == ALL_USERS_USER_ID) return true;
     if (!!rla.isGoldStar) return displayUserId == GOLD_STAR_USER_ID;

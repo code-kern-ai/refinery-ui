@@ -1,4 +1,4 @@
-import { LabelingHuddle, LabelingLinkData } from "@/src/types/components/projects/projectId/labeling/labeling-main-component";
+import { LabelingHuddle, LabelingLinkData, LabelingLinkType } from "@/src/types/components/projects/projectId/labeling/labeling-main-component";
 import { DUMMY_HUDDLE_ID, ONE_DAY } from "../../components/projects/projectId/labeling/labeling-main-component-helper";
 import { LabelingSuiteManager } from "./manager";
 import { dateAsUTCDate } from "@/submodules/javascript-functions/date-parser";
@@ -111,4 +111,11 @@ export class SessionManager {
     public static setCurrentRecordDeleted() {
         this.huddleData.recordIds[this.huddleData.linkData.requestedPos - 1] = "deleted";
     }
+
+    public static getSourceId(): string {
+        if (!this.huddleData) return null;
+        if (this.huddleData.linkData.linkType != LabelingLinkType.HEURISTIC) return null;
+        return this.huddleData.linkData.huddleId;
+    }
+
 }
