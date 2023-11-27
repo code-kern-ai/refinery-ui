@@ -18,9 +18,9 @@ export default function ExtractionDisplay(props: ExtractionDisplayProps) {
                 style={{ marginBottom: props.tokenLookup[props.attributeId][token.idx]?.tokenMarginBottom }}>
                 {token.countLineBreaks == 0 ? (<>
                     {token.type ? (<Tooltip content={'spaCy type: ' + token.type} color="invert" placement="top"><TokenValue token={token} /></Tooltip>) : (<>
-                        <TokenValue token={token} /></>)}
+                        <TokenValue token={token} setSelected={(e) => props.setSelected(token.idx, token.idx, e)} /></>)}
                     {props.tokenLookup[props.attributeId][token.idx] && <>
-                        {props.tokenLookup[props.attributeId][token.idx].rlaArray.map((rlaItem, index) => (<div className={`absolute left-0 right-0 top-0 flex items-end z-n-2`} style={{ bottom: rlaItem.bottomPos }}>
+                        {props.tokenLookup[props.attributeId][token.idx].rlaArray.map((rlaItem, index) => (<div key={index} className={`absolute left-0 right-0 top-0 flex items-end z-n-2`} style={{ bottom: rlaItem.bottomPos }}>
                             <div className={`h-px flex items-end w-full relative ${props.labelLookup[rlaItem.labelId].color.backgroundColor} ${props.labelLookup[rlaItem.labelId].color.textColor} ${props.labelLookup[rlaItem.labelId].color.borderColor}`}
                                 style={{
                                     borderBottomWidth: '1px',
@@ -56,7 +56,7 @@ export default function ExtractionDisplay(props: ExtractionDisplayProps) {
 
 function TokenValue(props: any) {
     return (<>
-        {props.token && props.token.value != '\n' && <label
+        {props.token && props.token.value != '\n' && <label onClick={(e) => props.setSelected(e)}
             className={`rounded-lg hover:bg-gray-200 text-sm text-gray-500 leading-5 font-normal ${!props.token.nextCloser ? 'pr-1' : ''}`}
             style={{ backgroundColor: props.token.selected ? '#3399FF' : null, borderRadius: props.token.selected ? '0' : null, color: props.token.selected ? 'white' : null }}>
             {props.token.value}

@@ -23,6 +23,7 @@ import { UserManager } from "@/src/util/classes/labeling/user-manager"
 import { SessionManager } from "@/src/util/classes/labeling/session-manager"
 import { GOLD_STAR_USER_ID } from "@/src/util/components/projects/projectId/labeling/labeling-main-component-helper"
 import { useRouter } from "next/router"
+import LabelSelectionBox from "./LabelSelectionBox"
 
 export default function LabelingSuiteLabeling() {
     const router = useRouter();
@@ -43,7 +44,8 @@ export default function LabelingSuiteLabeling() {
     const [canEditLabels, setCanEditLabels] = useState<boolean>(true);
     const [labelLookup, setLabelLookup] = useState<any>({});
     const [labelAddButtonDisabled, setLabelAddButtonDisabled] = useState<boolean>(true);
-    const [activeTasks, setActiveTasks] = useState<any[]>([]);
+    const [activeTasks, setActiveTasks] = useState<any[]>(null);
+    const [position, setPosition] = useState({ top: 0, left: 0 });
 
     const [deleteRlaByIdMut] = useMutation(DELETE_RECORD_LABEL_ASSOCIATION_BY_ID);
     const [addClassificationLabelToRecordMut] = useMutation(ADD_CLASSIFICATION_LABELS_TO_RECORD);
@@ -144,7 +146,29 @@ export default function LabelingSuiteLabeling() {
         }
         setLVars(lVarsCopy);
         // TODO: add rebuild for gold star
-        // TODO: add active task
+        if (activeTasks) {
+            const activeTaskIds = activeTasks.map(x => x.task.id);
+            for (const key in lVars.taskLookup) {
+                const found = lVars.taskLookup[key].lookup.filter(t => activeTaskIds.includes(t.task.id));
+                if (found.length != 0) {
+                    setActiveTasksFunc(found);
+                    break;
+                }
+            }
+        }
+    }
+
+    function setActiveTasksFunc(tasks: any | any[]) {
+        if (!canEditLabels && user.role != UserRole.ANNOTATOR) {
+            if (activeTasks) setActiveTasks([]);
+            return;
+        }
+        if (Array.isArray(tasks)) {
+            setActiveTasks(tasks);
+        } else {
+            setActiveTasks([tasks]);
+        }
+        checkLabelVisibleInSearch(labelLookup);
     }
 
     function toggleGoldStar() {
@@ -294,7 +318,7 @@ export default function LabelingSuiteLabeling() {
             addLabelToSelection(task.attribute.id, task.id, labelId);
         }
         if (settings.labeling.closeLabelBoxAfterLabel) {
-            setActiveTasks([]);
+            setActiveTasksFunc([]);
             clearSelected();
         }
     }
@@ -343,6 +367,29 @@ export default function LabelingSuiteLabeling() {
         setTokenLookup(tokenLookupCopy);
     }
 
+    function setSelected(attributeId: string, tokenStart: number, tokenEnd: number, e?: any) {
+        if (!canEditLabels && user.role != UserRole.ANNOTATOR) return;
+        const tokenLookupCopy = jsonCopy(tokenLookup);
+        for (const token of tokenLookupCopy[attributeId].token) {
+            token.selected = token.idx >= tokenStart && token.idx <= tokenEnd;
+        }
+        setActiveTasksFunc(lVars.taskLookup[attributeId].lookup);
+        setTokenLookup(tokenLookupCopy);
+        labelBoxPosition(e);
+    }
+
+    function labelBoxPosition(e) {
+        const labelSelection = document.getElementById('label-selection-box');
+        if (!labelSelection) return;
+        const baseBom = document.getElementById('base-dom-task-header');
+        const baseBox = baseBom.getBoundingClientRect();
+        const { top, left, height } = e.target.getBoundingClientRect();
+        const heightLabelSelectionBox = 180;
+        const posTop = (top + height - baseBox.top - heightLabelSelectionBox)
+        const posLeft = (left - baseBox.left);
+        setPosition({ top: posTop, left: posLeft });
+    }
+
     return (<div className="bg-white relative p-4">
         {lVars.loading && <LoadingIcon size="lg" />}
         {!lVars.loading && recordRequests.record.deleted && <div className="flex items-center justify-center text-red-500">This Record has been deleted</div>}
@@ -366,8 +413,9 @@ export default function LabelingSuiteLabeling() {
                     {task.showGridLabelPart && <div className={`col-start-4 h-full py-1 ${i % 2 == 0 ? 'bg-white' : 'bg-gray-50'}`} style={{ gridRow: task.gridRowSpan }}>
                         <div className="flex flex-col gap-y-2">
                             {task.showText && <>
-                                {task.task.taskType == LabelingTaskTaskType.INFORMATION_EXTRACTION ? (<ExtractionDisplay attributeId={attribute.id} tokenLookup={tokenLookup}
-                                    labelLookup={labelLookup} deleteRla={(rlaId) => deleteRecordLabelAssociation(rlaId)} />) : (<>
+                                {task.task.taskType == LabelingTaskTaskType.INFORMATION_EXTRACTION ? (<ExtractionDisplay attributeId={attribute.id} tokenLookup={tokenLookup} labelLookup={labelLookup}
+                                    deleteRla={(rlaId) => deleteRecordLabelAssociation(rlaId)}
+                                    setSelected={(start, end, e) => setSelected(attribute.id, start, end, e)} />) : (<>
                                         {(recordRequests.record.data[lVars.taskLookup[attribute.id].attribute.name] != null && recordRequests.record.data[lVars.taskLookup[attribute.id].attribute.name] !== '') ?
                                             (<p className={`break-words text-sm leading-5 font-normal text-gray-500 ${settings.main.lineBreaks != LineBreaksType.NORMAL ? (settings.main.lineBreaks == LineBreaksType.IS_PRE_WRAP ? 'whitespace-pre-wrap' : 'whitespace-pre-line') : ''}`}>
                                                 {recordRequests.record.data[lVars.taskLookup[attribute.id].attribute.name]}
@@ -419,6 +467,7 @@ export default function LabelingSuiteLabeling() {
                                 </div>}
                             </>}
                         </div>
+                        <LabelSelectionBox activeTasks={activeTasks} position={position} labelLookup={labelLookup} />
                     </div>}
                 </Fragment>))}
             </Fragment>))}

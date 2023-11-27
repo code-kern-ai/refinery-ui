@@ -27,6 +27,7 @@ export type ExtractionDisplayProps = {
     tokenLookup: TokenLookup;
     labelLookup: any;
     deleteRla: (rla: string) => void;
+    setSelected: (start: number, end: number, e: any) => void;
 }
 
 export type TokenLookup = {
@@ -47,3 +48,12 @@ export type TokenLookup = {
         }
     }
 }
+
+export type LabelSelectionBoxProps = {
+    position: {
+        top: number;
+        left: number;
+    },
+    activeTasks: any,
+    labelLookup: any,
+};

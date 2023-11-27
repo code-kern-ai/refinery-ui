@@ -8,7 +8,6 @@ import { useDispatch, useSelector } from "react-redux";
 import InfoLabelBoxModal from "./InfoLabelBoxModal";
 import { jsonCopy } from "@/submodules/javascript-functions/general";
 import { selectSettings, setSettings } from "@/src/reduxStore/states/pages/labeling";
-import { useEffect } from "react";
 import { selectProjectId } from "@/src/reduxStore/states/project";
 
 export default function LabelSettingsBox(props: LabelSettingsBoxProps) {
