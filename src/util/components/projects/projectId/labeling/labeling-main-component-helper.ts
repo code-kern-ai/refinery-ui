@@ -1,5 +1,5 @@
 import { LineBreaksType } from "@/src/types/components/projects/projectId/data-browser/data-browser";
-import { LabelingLinkType } from "@/src/types/components/projects/projectId/labeling/labeling-general";
+import { LabelingLinkType } from "@/src/types/components/projects/projectId/labeling/labeling-main-component";
 import { LabelingSuiteSettings, LabelingSuiteTaskHeaderLabelSettings } from "@/src/types/components/projects/projectId/labeling/settings";
 import { UserRole } from "@/src/types/shared/sidebar";
 import { countOccurrences } from "@/submodules/javascript-functions/general";

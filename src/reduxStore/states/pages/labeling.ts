@@ -1,4 +1,4 @@
-import { getDefaultLabelingSuiteSettings, postProcessRla, postProcessTokenizedRecords } from "@/src/util/components/projects/projectId/labeling/labeling-general-helper";
+import { getDefaultLabelingSuiteSettings, postProcessRla, postProcessTokenizedRecords } from "@/src/util/components/projects/projectId/labeling/labeling-main-component-helper";
 import { postProcessRecordByRecordId } from "@/src/util/components/projects/projectId/settings/attribute-calculation-helper";
 import { arrayToDict } from "@/submodules/javascript-functions/general";
 import { PayloadAction, createSelector, createSlice } from "@reduxjs/toolkit";

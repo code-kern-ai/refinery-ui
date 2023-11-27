@@ -88,7 +88,7 @@ export default function HeaderDisplay(props: HeaderDisplayProps) {
     return (<div className="border md:rounded-lg">
         <table className="min-w-full">
             <tbody className="bg-white divide-y divide-gray-200">
-                {props.displayData.map((task, i) => (<tr key={task.id} className={`${i % 2 == 0 ? 'bg-white' : 'bg-gray-50'}`}>
+                {props.displayData && props.displayData.map((task, i) => (<tr key={task.id} className={`${i % 2 == 0 ? 'bg-white' : 'bg-gray-50'}`}>
                     <td className="font-bold py-2 pl-4 pr-3 text-sm text-gray-500 sm:pl-6 whitespace-nowrap">
                         {task.name}
                     </td>

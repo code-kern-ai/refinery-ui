@@ -23,7 +23,11 @@ export type LabelingSuiteTaskHeaderLabelDisplayData = {
         backgroundColor: string;
         textColor: string;
         borderColor: string;
-    }
+    },
+    showHeuristics: boolean;
+    showManual: boolean;
+    showModel: boolean;
+    showWeakSupervision: boolean;
 }
 
 export type QuickButtonConfig = {
@@ -59,7 +63,7 @@ export type QuickButtonProps = {
 
 export type QuickButtonsProps = {
     labelSettingsLabel?: any;
-    setAllLabelDisplaySetting: (val: boolean, attribute: string) => void;
+    setAllLabelDisplaySetting?: (val: boolean, attribute: string) => void;
 }
 
 export type LabelSettingsBoxProps = {

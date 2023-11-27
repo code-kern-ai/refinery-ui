@@ -2,12 +2,12 @@ import { selectAllUsers, selectUser } from "@/src/reduxStore/states/general";
 import { setAvailableLinks, updateRecordRequests, setSelectedLink, selectRecordRequestsRla, updateUsers, setSettings, selectSettings } from "@/src/reduxStore/states/pages/labeling";
 import { selectProjectId } from "@/src/reduxStore/states/project"
 import { AVAILABLE_LABELING_LINKS, GET_RECORD_LABEL_ASSOCIATIONS, GET_TOKENIZED_RECORD, REQUEST_HUDDLE_DATA } from "@/src/services/gql/queries/labeling";
-import { LabelingLinkType } from "@/src/types/components/projects/projectId/labeling/labeling-general";
+import { LabelingLinkType } from "@/src/types/components/projects/projectId/labeling/labeling-main-component";
 import { UserRole } from "@/src/types/shared/sidebar";
 import { LabelingSuiteManager } from "@/src/util/classes/labeling/manager";
 import { SessionManager } from "@/src/util/classes/labeling/session-manager";
 import { UserManager } from "@/src/util/classes/labeling/user-manager";
-import { DUMMY_HUDDLE_ID, getDefaultLabelingSuiteSettings, parseLabelingLink } from "@/src/util/components/projects/projectId/labeling/labeling-general-helper";
+import { DUMMY_HUDDLE_ID, getDefaultLabelingSuiteSettings, parseLabelingLink } from "@/src/util/components/projects/projectId/labeling/labeling-main-component-helper";
 import { useLazyQuery } from "@apollo/client";
 import { useRouter } from "next/router";
 import { useEffect } from "react";
@@ -42,11 +42,12 @@ export default function LabelingMainComponent() {
 
     useEffect(() => {
         if (!projectId) return;
-        let tmp = localStorage.getItem(LOCAL_STORAGE_KEY);
         let settingsCopy = jsonCopy(settings);
         settingsCopy = getDefaultLabelingSuiteSettings();
+        let tmp = localStorage.getItem(LOCAL_STORAGE_KEY);
         if (tmp) {
             const tmpSettings = JSON.parse(tmp);
+            //to ensure new setting values exist and old ones are loaded if matching name
             transferNestedDict(tmpSettings, settingsCopy);
             if (tmpSettings.task) {
                 transferNestedDict(tmpSettings.task, settingsCopy.task, false);

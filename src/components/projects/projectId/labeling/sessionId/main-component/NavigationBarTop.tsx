@@ -1,7 +1,7 @@
 import { selectUser } from "@/src/reduxStore/states/general";
 import { selectAvailableLinks, selectSelectedLink, selectUserIconsData, setSelectedLink } from "@/src/reduxStore/states/pages/labeling";
 import { selectProjectId } from "@/src/reduxStore/states/project";
-import { UserType } from "@/src/types/components/projects/projectId/labeling/labeling-general";
+import { UserType } from "@/src/types/components/projects/projectId/labeling/labeling-main-component";
 import { UserRole } from "@/src/types/shared/sidebar";
 import { SessionManager } from "@/src/util/classes/labeling/session-manager";
 import { UserManager } from "@/src/util/classes/labeling/user-manager";

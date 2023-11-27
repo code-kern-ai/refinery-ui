@@ -1,5 +1,6 @@
 import { HoverGroupTarget, LabelingSuiteTaskHeaderLabelDisplayData, QuickButtonConfig } from "@/src/types/components/projects/projectId/labeling/task-header";
-import { getDefaultTaskOverviewLabelSettings } from "./labeling-general-helper";
+import { getDefaultTaskOverviewLabelSettings } from "./labeling-main-component-helper";
+import { jsonCopy } from "@/submodules/javascript-functions/general";
 
 export function getQuickButtonConfig(): QuickButtonConfig {
     return {
@@ -15,13 +16,18 @@ export function getQuickButtonConfig(): QuickButtonConfig {
 
 export function setLabelsForDisplay(task: any, settings: any) {
     const labels = {};
-    const taskSettings = settings[task.id];
+    const settingsCopy = jsonCopy(settings);
     for (const label of task.labels) {
-        if (!taskSettings) return;
-        let labelSettings = taskSettings[label.id];
-        if (!labelSettings) {
-            labelSettings = getDefaultTaskOverviewLabelSettings();
-            taskSettings[label.id] = labelSettings;
+        let taskSettings = settingsCopy[task.id];
+        if (!taskSettings) {
+            const labelSettings = getDefaultTaskOverviewLabelSettings();
+            taskSettings = { ...taskSettings, [label.id]: labelSettings }
+        } else {
+            let labelSettings = taskSettings[label.id];
+            if (!labelSettings) {
+                labelSettings = getDefaultTaskOverviewLabelSettings();
+                taskSettings = { ...taskSettings, [label.id]: labelSettings }
+            }
         }
         const data: LabelingSuiteTaskHeaderLabelDisplayData = {
             id: label.id,
@@ -29,7 +35,11 @@ export function setLabelsForDisplay(task: any, settings: any) {
             name: label.name,
             hoverGroups: getHoverGroupsTaskOverview(task.name, label.id),
             hotkey: label.hotkey,
-            color: label.color
+            color: label.color,
+            showHeuristics: taskSettings[label.id].showHeuristics,
+            showManual: taskSettings[label.id].showManual,
+            showModel: taskSettings[label.id].showModel,
+            showWeakSupervision: taskSettings[label.id].showWeakSupervision,
         }
         labels[label.id] = data;
     }

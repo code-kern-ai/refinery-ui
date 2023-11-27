@@ -1,4 +1,4 @@
-import { UserType } from "../components/projects/projectId/labeling/labeling-general";
+import { UserType } from "../components/projects/projectId/labeling/labeling-main-component";
 
 export enum CurrentPage {
     PROJECTS = 'PROJECTS',

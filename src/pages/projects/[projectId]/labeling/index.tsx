@@ -3,7 +3,7 @@ import { selectUser, setCurrentPage } from "@/src/reduxStore/states/general";
 import { selectProjectId } from "@/src/reduxStore/states/project";
 import { CurrentPage } from "@/src/types/shared/general";
 import { SessionManager } from "@/src/util/classes/labeling/session-manager";
-import { DUMMY_HUDDLE_ID, guessLinkType } from "@/src/util/components/projects/projectId/labeling/labeling-general-helper";
+import { DUMMY_HUDDLE_ID, guessLinkType } from "@/src/util/components/projects/projectId/labeling/labeling-main-component-helper";
 import { useRouter } from "next/router";
 import { use, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";

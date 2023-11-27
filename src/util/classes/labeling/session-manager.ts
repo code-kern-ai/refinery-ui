@@ -1,5 +1,5 @@
-import { LabelingHuddle, LabelingLinkData } from "@/src/types/components/projects/projectId/labeling/labeling-general";
-import { DUMMY_HUDDLE_ID, ONE_DAY } from "../../components/projects/projectId/labeling/labeling-general-helper";
+import { LabelingHuddle, LabelingLinkData } from "@/src/types/components/projects/projectId/labeling/labeling-main-component";
+import { DUMMY_HUDDLE_ID, ONE_DAY } from "../../components/projects/projectId/labeling/labeling-main-component-helper";
 import { LabelingSuiteManager } from "./manager";
 import { dateAsUTCDate } from "@/submodules/javascript-functions/date-parser";
 

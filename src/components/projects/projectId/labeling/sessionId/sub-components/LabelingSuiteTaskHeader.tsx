@@ -14,7 +14,7 @@ import style from "@/src/styles/components/projects/projectId/labeling.module.cs
 import { IconLayoutNavbarCollapse } from "@tabler/icons-react";
 import QuickButtons from "./QuickButtons";
 import HeaderDisplay from "./HeaderDisplay";
-import { selectSettings, updateSettings } from "@/src/reduxStore/states/pages/labeling";
+import { selectSettings, setSettings, updateSettings } from "@/src/reduxStore/states/pages/labeling";
 
 export default function LabelingSuiteTaskHeader() {
     const dispatch = useDispatch();
@@ -50,29 +50,32 @@ export default function LabelingSuiteTaskHeader() {
         if (!settings) return null;
         const finalData = Array(data.length);
         let i = 0;
+        const settingsCopy = jsonCopy(settings);
         for (const task of data) {
             const taskCopy = jsonCopy(task);
-            let taskSettings = settings?.task[projectId][task.id];
+            let taskSettings = settingsCopy.task[projectId][taskCopy.id];
             if (!taskSettings) {
                 taskSettings = {};
-                const settingsConfCopy = jsonCopy(settings);
-                settingsConfCopy.task[projectId][task.id] = taskSettings;
-                dispatch(updateSettings(ComponentType.LABELING, 'task', settingsConfCopy.task))
+                settingsCopy.task[projectId][taskCopy.id] = taskSettings;
             }
             taskCopy.labels.sort((a, b) => a.name.localeCompare(b.name));
-            const labels = setLabelsForDisplay(taskCopy, settings.task[projectId]);
-            let pos = taskCopy.taskType == LabelingTaskTaskType.INFORMATION_EXTRACTION ? 0 : 10000;
-            pos += taskCopy.attribute ? taskCopy.attribute.relativePosition : 0;
+            const labels = setLabelsForDisplay(taskCopy, taskSettings);
+            let pos = task.taskType == LabelingTaskTaskType.INFORMATION_EXTRACTION ? 0 : 10000;
+            pos += task.attribute ? task.attribute.relativePosition : 0;
             finalData[i++] = {
-                id: taskCopy.id,
-                name: taskCopy.name,
-                hoverGroups: getHoverGroupsTaskOverview(taskCopy.name),
+                id: task.id,
+                name: task.name,
+                hoverGroups: getHoverGroupsTaskOverview(task.name),
                 orderPos: pos,
                 settings: taskSettings,
                 labels: labels,
                 labelOrder: task.labels.map(l => l.id),//labels are sorted by name before
             };
+            settingsCopy.task[projectId][taskCopy.id] = labels;
         }
+        const settingsCopy2 = jsonCopy(settings);
+        settingsCopy2.task[projectId] = settingsCopy.task[projectId];
+        dispatch(setSettings(settingsCopy2));
 
         finalData.sort((a, b) => a.orderPos - b.orderPos || a.name.localeCompare(b.name));
         return finalData;

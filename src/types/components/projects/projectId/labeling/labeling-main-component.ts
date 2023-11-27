@@ -29,3 +29,10 @@ export enum UserType {
     ALL = 'ALL',
     REGISTERED = 'REGISTERED',
 }
+
+export enum UpdateType {
+    RECORD = 'RECORD',
+    LABELING_TASKS = 'LABELING_TASKS',
+    ATTRIBUTES = 'ATTRIBUTES',
+    DISPLAY_USER = 'DISPLAY_USER',
+}

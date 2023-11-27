@@ -1,5 +1,5 @@
-import { UserType } from "@/src/types/components/projects/projectId/labeling/labeling-general";
-import { ALL_USERS_USER_ID, GOLD_STAR_USER_ID } from "../../components/projects/projectId/labeling/labeling-general-helper";
+import { UserType } from "@/src/types/components/projects/projectId/labeling/labeling-main-component";
+import { ALL_USERS_USER_ID, GOLD_STAR_USER_ID } from "../../components/projects/projectId/labeling/labeling-main-component-helper";
 import { LabelSource } from "@/submodules/javascript-functions/enums/enums";
 import { getUserAvatarUri } from "@/submodules/javascript-functions/general";
 import { User } from "@/src/types/shared/general";

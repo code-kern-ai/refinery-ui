@@ -4,9 +4,10 @@ import { User } from "@/src/types/shared/general";
 import { UserRole } from "@/src/types/shared/sidebar";
 import { informationSourceTypeToString, labelSourceToString } from "@/submodules/javascript-functions/enums/enum-functions";
 import { InformationSourceType, LabelSource } from "@/submodules/javascript-functions/enums/enums";
-import { ALL_USERS_USER_ID, GOLD_STAR_USER_ID, getDefaultTaskOverviewLabelSettings } from "./labeling-general-helper";
+import { ALL_USERS_USER_ID, GOLD_STAR_USER_ID, getDefaultTaskOverviewLabelSettings } from "./labeling-main-component-helper";
 import { UserManager } from "@/src/util/classes/labeling/user-manager";
 import { LabelingSuiteTaskHeaderLabelSettings } from "@/src/types/components/projects/projectId/labeling/settings";
+import { jsonCopy } from "@/submodules/javascript-functions/general";
 
 export function rlasHaveHeuristicData(rlas): boolean {
     if (!rlas) return false;
@@ -173,7 +174,8 @@ export function filterRlaLabelCondition(rla: any, settings, projectId): boolean 
     let taskSettings = settings.task[projectId][taskId];
     if (!taskSettings) {
         taskSettings = {};
-        settings.task[projectId][taskId] = taskSettings;
+        const settingsCopy = jsonCopy(settings);
+        settingsCopy.task[projectId][taskId] = taskSettings;
     }
     let rlaSettings: LabelingSuiteTaskHeaderLabelSettings = taskSettings[rla.labelingTaskLabelId];
     if (!rlaSettings) {
