@@ -21,3 +21,28 @@ type TaskLookup = {
     task: any;
     tokenData?: any;
 }
+
+export type ExtractionDisplayProps = {
+    attributeId: string;
+    tokenLookup: TokenLookup;
+    labelLookup: any;
+}
+
+export type TokenLookup = {
+    [attributeId: string]: {
+        token: any[],
+        [tokenIdx: number]: {
+            rlaArray: {
+                orderPos: number,// globalPosition used for absolute positioning
+                bottomPos: string,
+                isFirst: boolean,
+                isLast: boolean,
+                hoverGroups: any,
+                labelId: string,
+                canBeDeleted: boolean,
+                rla: any,
+            }[],
+            tokenMarginBottom: string,
+        }
+    }
+}

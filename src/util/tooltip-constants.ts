@@ -201,5 +201,7 @@ export const TOOLTIPS_DICT = {
         'INFO_LABEL_BOX': 'What can I do here?',
         'ACTIVATE_ALL': 'Activate all',
         'CLEAR_ALL': 'Clear all',
+        'REMOVE_LABELS_GOLD_STAR': 'Remove manual task labels from gold state',
+        'SET_LABELS_GOLD_STAR': 'Set manual task labels as gold labels'
     }
 }

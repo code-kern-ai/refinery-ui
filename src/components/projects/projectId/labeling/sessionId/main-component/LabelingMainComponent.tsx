@@ -15,12 +15,14 @@ import { useDispatch, useSelector } from "react-redux";
 import style from "@/src/styles/components/projects/projectId/labeling.module.css";
 import NavigationBarTop from "./NavigationBarTop";
 import NavigationBarBottom from "./NavigationBarBottom";
-import { GET_RECORD_BY_RECORD_ID } from "@/src/services/gql/queries/project-setting";
+import { GET_ATTRIBUTES_BY_PROJECT_ID, GET_RECORD_BY_RECORD_ID } from "@/src/services/gql/queries/project-setting";
 import { combineLatest } from "rxjs";
 import LabelingSuiteTaskHeader from "../sub-components/LabelingSuiteTaskHeader";
 import { jsonCopy, transferNestedDict } from "@/submodules/javascript-functions/general";
 import LabelingSuiteOverviewTable from "../sub-components/LabelingSuiteOverviewTable";
 import LabelingSuiteLabeling from "../sub-components/LabelingSuiteLabeling";
+import { setAllAttributes } from "@/src/reduxStore/states/pages/settings";
+import { postProcessingAttributes } from "@/src/util/components/projects/projectId/settings/data-schema-helper";
 
 const LOCAL_STORAGE_KEY = 'labelingSuiteSettings';
 
@@ -39,6 +41,7 @@ export default function LabelingMainComponent() {
     const [refetchTokenizedRecord] = useLazyQuery(GET_TOKENIZED_RECORD, { fetchPolicy: 'no-cache' });
     const [refetchRecordByRecordId] = useLazyQuery(GET_RECORD_BY_RECORD_ID, { fetchPolicy: 'no-cache' });
     const [refetchRla] = useLazyQuery(GET_RECORD_LABEL_ASSOCIATIONS, { fetchPolicy: 'network-only' });
+    const [refetchAttributes] = useLazyQuery(GET_ATTRIBUTES_BY_PROJECT_ID, { fetchPolicy: "network-only" });
 
     useEffect(() => {
         if (!projectId) return;
@@ -58,6 +61,7 @@ export default function LabelingMainComponent() {
             if (key != projectId && key != 'show' && key != 'isCollapsed' && key != 'alwaysShowQuickButtons') delete settingsCopy.task[key];
         }
         dispatch(setSettings(settingsCopy));
+        refetchAttributesAndProcess();
     }, [projectId]);
 
     useEffect(() => {
@@ -168,6 +172,12 @@ export default function LabelingMainComponent() {
             dispatch(setAvailableLinks(availableLinks));
             const linkRoute = router.asPath.split("?")[0];
             dispatch(setSelectedLink(availableLinks.find(link => link.link.split("?")[0] == linkRoute)));
+        });
+    }
+
+    function refetchAttributesAndProcess() {
+        refetchAttributes({ variables: { projectId: projectId, stateFilter: ['ALL'] } }).then((res) => {
+            dispatch(setAllAttributes(postProcessingAttributes(res.data['attributesByProjectId'])));
         });
     }
 
