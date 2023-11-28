@@ -81,6 +81,18 @@ export default function LabelingSuiteLabeling() {
         rebuildGoldInfo();
     }, [displayUserId, fullRlaData]);
 
+    useEffect(() => {
+        const handleMouseDown = (event) => {
+            if (!event.target.closest('.label-selection-box')) {
+                setActiveTasksFunc([]);
+            }
+        };
+        window.addEventListener('mousedown', handleMouseDown);
+        return () => {
+            window.removeEventListener('mousedown', handleMouseDown);
+        };
+    }, []);
+
     function attributesChanged() {
         if (!attributes) return;
         const lVarsCopy = { ...lVars };
@@ -387,9 +399,7 @@ export default function LabelingSuiteLabeling() {
         const selectionData = collectSelectionData(attributeId, tokenLookup, attributes, recordRequests);
         if (!selectionData) return;
         const sourceId = SessionManager.getSourceId();
-        addExtractionLabelToRecordMut({ variables: { projectId: projectId, recordId: record.id, labelingTaskId: labelingTaskId, labelId: labelId, tokenStartIndex: selectionData.startIdx, tokenEndIndex: selectionData.endIdx, value: selectionData.value, sourceId: sourceId } }).then((res) => {
-
-        });
+        addExtractionLabelToRecordMut({ variables: { projectId: projectId, recordId: record.id, labelingTaskId: labelingTaskId, labelId: labelId, tokenStartIndex: selectionData.startIdx, tokenEndIndex: selectionData.endIdx, value: selectionData.value, sourceId: sourceId } }).then((res) => { });
     }
 
     function clearSelected() {
@@ -469,13 +479,16 @@ export default function LabelingSuiteLabeling() {
                             </>}
                             {task.task.taskType == LabelingTaskTaskType.MULTICLASS_CLASSIFICATION && <>
                                 {(canEditLabels || user.role == UserRole.ANNOTATOR || user.role == UserRole.EXPERT) && <div className="flex flex-row flex-wrap gap-2">
-                                    {task.task.displayLabels.map((label, index) => (<div key={label.id} className={`text-sm font-medium px-2 py-0.5 rounded-md border focus:outline-none cursor-pointer  ${labelLookup[label.id].color.backgroundColor} ${labelLookup[label.id].color.textColor} ${labelLookup[label.id].color.borderColor}`}>
+                                    {task.task.displayLabels.map((label, index) => (<div key={label.id} className={`text-sm font-medium px-2 py-0.5 rounded-md border focus:outline-none cursor-pointer  ${labelLookup[label.id]?.color.backgroundColor} ${labelLookup[label.id]?.color.textColor} ${labelLookup[label.id]?.color.borderColor}`}>
                                         <div className="truncate" style={{ maxWidth: '260px' }} onClick={() => addRla(task.task, label.id)}>{label.name}
                                             {label.hotkey && <kbd className="ml-1 uppercase inline-flex items-center border bg-white border-gray-200 rounded px-2 text-sm font-sans font-medium text-gray-400">{label.hotkey}</kbd>}
                                         </div>
                                     </div>))}
                                     <Tooltip content={TOOLTIPS_DICT.LABELING.CHOOSE_LABELS} color="invert" placement="top">
-                                        <button className="flex flex-row flex-nowrap bg-white text-gray-700 text-sm font-medium mr-3 px-2 py-0.5 rounded-md border border-gray-300 hover:bg-gray-50 focus:outline-none">
+                                        <button onClick={() => {
+                                            setActiveTasksFunc(task);
+                                            labelBoxPosition(event);
+                                        }} className="flex flex-row flex-nowrap bg-white text-gray-700 text-sm font-medium mr-3 px-2 py-0.5 rounded-md border border-gray-300 hover:bg-gray-50 focus:outline-none">
                                             <span>other</span>
                                             <span className="truncate mx-1" style={{ maxWidth: '9rem' }}>{task.task.name}</span>
                                             <span>options</span>

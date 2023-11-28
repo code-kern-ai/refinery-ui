@@ -12,8 +12,14 @@ export default function LabelSelectionBox(props: LabelSelectionBoxProps) {
 
     const [newLabel, setNewLabel] = useState('');
 
+    function stopPropagation(e) {
+        e.preventDefault()
+        e.stopPropagation();
+    }
+
     return (<div id="label-selection-box" style={{ top: props.position.top, left: props.position.left, minWidth: '270px' }}
-        className={`flex flex-col rounded-lg bg-white shadow absolute z-10 border border-gray-300 ${props.activeTasks ? null : 'hidden'}`}>
+        onMouseDown={(e) => stopPropagation(e)} onMouseUp={(e) => stopPropagation(e)}
+        className={`flex flex-col rounded-lg bg-white shadow absolute z-10 border border-gray-300 ${props.activeTasks && props.activeTasks.length > 0 ? null : 'hidden'}`}>
         {props.activeTasks && <div className="max-h-80 overflow-y-auto">
             {props.activeTasks && props.activeTasks.map((task, index) => <Fragment key={index}>
                 <div className={`flex flex-grow flex-row justify-center p-2 ${index != 0 ? 'border-t borders-gray' : null}`}>

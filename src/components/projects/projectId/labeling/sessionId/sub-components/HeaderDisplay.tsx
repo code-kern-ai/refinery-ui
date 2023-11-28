@@ -1,6 +1,6 @@
 import { selectProjectId } from "@/src/reduxStore/states/project";
 import { HeaderDisplayProps, LabelingSuiteTaskHeaderLabelDisplayData } from "@/src/types/components/projects/projectId/labeling/task-header";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import QuickButtons from "./QuickButtons";
 import LabelSettingsBox from "./LabelSettingsBox";
@@ -15,6 +15,18 @@ export default function HeaderDisplay(props: HeaderDisplayProps) {
 
     const [labelSettingsLabel, setLabelSettingsLabel] = useState<LabelingSuiteTaskHeaderLabelDisplayData>(null);
     const [position, setPosition] = useState({ top: 0, left: 0 });
+
+    useEffect(() => {
+        const handleMouseDown = (event) => {
+            if (!event.target.closest('label-settings-box')) {
+                setLabelSettingsLabel(null);
+            }
+        };
+        window.addEventListener('mousedown', handleMouseDown);
+        return () => {
+            window.removeEventListener('mousedown', handleMouseDown);
+        };
+    }, []);
 
     function setLabelSettingsLabelFunc(label: LabelingSuiteTaskHeaderLabelDisplayData) {
         if (label == labelSettingsLabel) {

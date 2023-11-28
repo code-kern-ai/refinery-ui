@@ -25,7 +25,13 @@ export default function LabelSettingsBox(props: LabelSettingsBoxProps) {
         dispatch(setSettings(settingsCopy));
     }
 
+    function stopPropagation(e) {
+        e.preventDefault()
+        e.stopPropagation();
+    }
+
     return (<div id="label-settings-box" style={{ top: props.position.top, left: props.position.left }}
+        onMouseDown={(e) => stopPropagation(e)} onMouseUp={(e) => { stopPropagation(e) }}
         className={`flex flex-col rounded-lg bg-white shadow absolute z-10 border border-gray-300 ${props.labelSettingsLabel ? null : 'hidden'}`}>
         {props.labelSettingsLabel && <div className="pt-2">
             <div className="flex flex-row justify-center pb-2">
