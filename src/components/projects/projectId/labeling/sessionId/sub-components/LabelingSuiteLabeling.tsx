@@ -6,7 +6,7 @@ import { selectProjectId } from "@/src/reduxStore/states/project"
 import { LabelingVars, TokenLookup } from "@/src/types/components/projects/projectId/labeling/labeling"
 import { LabelingTaskTaskType } from "@/src/types/components/projects/projectId/settings/labeling-tasks"
 import { UserRole } from "@/src/types/shared/sidebar"
-import { DEFAULT_LABEL_COLOR, FULL_RECORD_ID, SWIM_LANE_SIZE_PX, buildLabelingRlaData, collectSelectionData, filterRlaDataForLabeling, findOrderPosItem, getDefaultLabelingVars, getFirstFitPos, getGoldInfoForTask, getOrderLookupItem, getOrderLookupSort, getTaskTypeOrder, getTokenData } from "@/src/util/components/projects/projectId/labeling/labeling-helper"
+import { DEFAULT_LABEL_COLOR, FULL_RECORD_ID, SWIM_LANE_SIZE_PX, buildLabelingRlaData, collectSelectionData, filterRlaDataForLabeling, findOrderPosItem, getDefaultLabelingVars, getFirstFitPos, getGoldInfoForTask, getOrderLookupItem, getOrderLookupSort, getTaskTypeOrder, getTokenData, parseSelectionData } from "@/src/util/components/projects/projectId/labeling/labeling-helper"
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants"
 import { Tooltip } from "@nextui-org/react"
 import { IconAlertCircle, IconAssembly, IconBolt, IconCode, IconPointerStar, IconSparkles, IconStar, IconStarFilled, IconUsers } from "@tabler/icons-react"
@@ -92,6 +92,22 @@ export default function LabelingSuiteLabeling() {
             window.removeEventListener('mousedown', handleMouseDown);
         };
     }, []);
+
+    useEffect(() => {
+        if (!tokenLookup) return;
+        const handleMouseUp = (e) => {
+            const [check, attributeIdStart, tokenStart, tokenEnd, startEl] = parseSelectionData();
+            if (!check) clearSelected();
+            else {
+                window.getSelection().empty();
+                setSelected(attributeIdStart, tokenStart, tokenEnd, startEl);
+            }
+        };
+        window.addEventListener('mouseup', handleMouseUp);
+        return () => {
+            window.removeEventListener('mouseup', handleMouseUp);
+        };
+    }, [tokenLookup]);
 
     function attributesChanged() {
         if (!attributes) return;
@@ -415,20 +431,25 @@ export default function LabelingSuiteLabeling() {
     function setSelected(attributeId: string, tokenStart: number, tokenEnd: number, e?: any) {
         if (!canEditLabels && user.role != UserRole.ANNOTATOR) return;
         const tokenLookupCopy = jsonCopy(tokenLookup);
-        for (const token of tokenLookupCopy[attributeId].token) {
+        if (!tokenLookupCopy[attributeId]) {
+            labelBoxPosition(e);
+            return;
+        }
+        for (const token of tokenLookupCopy[attributeId]?.token) {
             token.selected = token.idx >= tokenStart && token.idx <= tokenEnd;
         }
         setActiveTasksFunc(lVars.taskLookup[attributeId].lookup);
         setTokenLookup(tokenLookupCopy);
-        labelBoxPosition(e);
+        labelBoxPosition(e.target);
     }
 
     function labelBoxPosition(e) {
+        if (!e) return;
         const labelSelection = document.getElementById('label-selection-box');
         if (!labelSelection) return;
         const baseBom = document.getElementById('base-dom-task-header');
         const baseBox = baseBom.getBoundingClientRect();
-        const { top, left, height } = e.target.getBoundingClientRect();
+        const { top, left, height } = e.getBoundingClientRect();
         const heightLabelSelectionBox = 180;
         const posTop = (top + height - baseBox.top - heightLabelSelectionBox)
         const posLeft = (left - baseBox.left);
@@ -487,7 +508,7 @@ export default function LabelingSuiteLabeling() {
                                     <Tooltip content={TOOLTIPS_DICT.LABELING.CHOOSE_LABELS} color="invert" placement="top">
                                         <button onClick={() => {
                                             setActiveTasksFunc(task);
-                                            labelBoxPosition(event);
+                                            labelBoxPosition(event.target);
                                         }} className="flex flex-row flex-nowrap bg-white text-gray-700 text-sm font-medium mr-3 px-2 py-0.5 rounded-md border border-gray-300 hover:bg-gray-50 focus:outline-none">
                                             <span>other</span>
                                             <span className="truncate mx-1" style={{ maxWidth: '9rem' }}>{task.task.name}</span>

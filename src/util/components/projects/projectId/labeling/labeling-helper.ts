@@ -219,3 +219,39 @@ function rlaIsEqual(rlaA: any, rlaB: any): boolean {
 
     return true;
 }
+
+export function parseSelectionData(): any[] {
+    let selection = window.getSelection();
+    if (selection.type != 'Range') return [false];
+
+    const startElement = getSelectionElement(selection, true);
+    const endElement = getSelectionElement(selection, false);
+    if (!startElement || !endElement) return [false];
+    let attributeIdStart: any = startElement.getAttribute('data-attributeid');
+    let attributeIdEnd: any = endElement.getAttribute('data-attributeid');
+
+    if (attributeIdStart == null || attributeIdEnd == null || attributeIdStart != attributeIdEnd) return [false];
+    let tokenStart: any = startElement.getAttribute('data-tokenidx');
+    let tokenEnd: any = endElement.getAttribute('data-tokenidx');
+    if (tokenStart == null || tokenEnd == null) return [false];
+    tokenStart = Number(tokenStart);
+    tokenEnd = Number(tokenEnd);
+    if (tokenStart > tokenEnd) {
+        let tmp = tokenStart;
+        tokenStart = tokenEnd;
+        tokenEnd = tmp;
+    }
+
+    return [true, attributeIdStart, tokenStart, tokenEnd, startElement];
+}
+
+function getSelectionElement(selection: Selection, start: boolean, maxSteps: number = 5): HTMLElement {
+    let element = start ? selection.anchorNode : selection.focusNode;
+    let steps = 0;
+    while (steps < maxSteps) {
+        if (element instanceof HTMLElement && element.getAttribute('data-tokenidx') != null) return element;
+        element = element.parentElement;
+        steps++;
+    }
+    return null;
+}
