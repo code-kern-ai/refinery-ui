@@ -1,16 +1,16 @@
 import LoadingIcon from "@/src/components/shared/loading/LoadingIcon"
 import { selectUser } from "@/src/reduxStore/states/general"
-import { removeFromRlaById, selectRecordRequests, selectRecordRequestsRecord, selectSettings } from "@/src/reduxStore/states/pages/labeling"
+import { removeFromRlaById, selectRecordRequests, selectRecordRequestsRecord, selectSettings, selectUserDisplayId } from "@/src/reduxStore/states/pages/labeling"
 import { selectAttributes, selectLabelingTasksAll } from "@/src/reduxStore/states/pages/settings"
 import { selectProjectId } from "@/src/reduxStore/states/project"
 import { LabelingVars, TokenLookup } from "@/src/types/components/projects/projectId/labeling/labeling"
 import { LabelingTaskTaskType } from "@/src/types/components/projects/projectId/settings/labeling-tasks"
 import { UserRole } from "@/src/types/shared/sidebar"
-import { FULL_RECORD_ID, SWIM_LANE_SIZE_PX, buildLabelingRlaData, collectSelectionData, filterRlaDataForLabeling, findOrderPosItem, getDefaultLabelingVars, getFirstFitPos, getOrderLookupItem, getOrderLookupSort, getTaskTypeOrder, getTokenData } from "@/src/util/components/projects/projectId/labeling/labeling-helper"
+import { DEFAULT_LABEL_COLOR, FULL_RECORD_ID, SWIM_LANE_SIZE_PX, buildLabelingRlaData, collectSelectionData, filterRlaDataForLabeling, findOrderPosItem, getDefaultLabelingVars, getFirstFitPos, getGoldInfoForTask, getOrderLookupItem, getOrderLookupSort, getTaskTypeOrder, getTokenData } from "@/src/util/components/projects/projectId/labeling/labeling-helper"
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants"
 import { Tooltip } from "@nextui-org/react"
 import { IconAlertCircle, IconAssembly, IconBolt, IconCode, IconPointerStar, IconSparkles, IconStar, IconStarFilled, IconUsers } from "@tabler/icons-react"
-import { Fragment, useEffect, useState } from "react"
+import { Fragment, use, useEffect, useState } from "react"
 import { useDispatch, useSelector } from "react-redux"
 import ExtractionDisplay from "./ExtractionDisplay"
 import { LineBreaksType } from "@/src/types/components/projects/projectId/data-browser/data-browser"
@@ -18,12 +18,12 @@ import { jsonCopy } from "@/submodules/javascript-functions/general"
 import { InformationSourceType, LabelSource } from "@/submodules/javascript-functions/enums/enums"
 import { LabelingSuiteManager } from "@/src/util/classes/labeling/manager";
 import { useMutation } from "@apollo/client"
-import { ADD_CLASSIFICATION_LABELS_TO_RECORD, ADD_EXTRACTION_LABEL_TO_RECORD, DELETE_RECORD_LABEL_ASSOCIATION_BY_ID } from "@/src/services/gql/mutations/labeling"
-import { UserManager } from "@/src/util/classes/labeling/user-manager"
+import { ADD_CLASSIFICATION_LABELS_TO_RECORD, ADD_EXTRACTION_LABEL_TO_RECORD, CREATE_LABEL, DELETE_RECORD_LABEL_ASSOCIATION_BY_ID, REMOVE_GOLD_STAR_ANNOTATION_FOR_TASK, SET_GOLD_STAR_ANNOTATION_FOR_TASK } from "@/src/services/gql/mutations/labeling"
 import { SessionManager } from "@/src/util/classes/labeling/session-manager"
 import { GOLD_STAR_USER_ID } from "@/src/util/components/projects/projectId/labeling/labeling-main-component-helper"
 import { useRouter } from "next/router"
 import LabelSelectionBox from "./LabelSelectionBox"
+import { filterRlaDataForUser } from "@/src/util/components/projects/projectId/labeling/overview-table-helper"
 
 export default function LabelingSuiteLabeling() {
     const router = useRouter();
@@ -36,41 +36,50 @@ export default function LabelingSuiteLabeling() {
     const settings = useSelector(selectSettings);
     const user = useSelector(selectUser);
     const record = useSelector(selectRecordRequestsRecord);
+    const displayUserId = useSelector(selectUserDisplayId);
 
     const [lVars, setLVars] = useState<LabelingVars>(getDefaultLabelingVars());
     const [tokenLookup, setTokenLookup] = useState<TokenLookup>({});
-    const [rlaDataToDisplay, setRlaDataToDisplay] = useState<{ [taskId: string]: any }>({});
+    const [rlaDataToDisplay, setRlaDataToDisplay] = useState<{ [taskId: string]: any }>(null);
     const [fullRlaData, setFullRlaData] = useState<any[]>([]);
     const [canEditLabels, setCanEditLabels] = useState<boolean>(true);
     const [labelLookup, setLabelLookup] = useState<any>({});
-    const [labelAddButtonDisabled, setLabelAddButtonDisabled] = useState<boolean>(true);
+    const [labelAddButtonDisabled, setLabelAddButtonDisabled] = useState<boolean>(false);
     const [activeTasks, setActiveTasks] = useState<any[]>(null);
     const [position, setPosition] = useState({ top: 0, left: 0 });
 
     const [deleteRlaByIdMut] = useMutation(DELETE_RECORD_LABEL_ASSOCIATION_BY_ID);
     const [addClassificationLabelToRecordMut] = useMutation(ADD_CLASSIFICATION_LABELS_TO_RECORD);
     const [addExtractionLabelToRecordMut] = useMutation(ADD_EXTRACTION_LABEL_TO_RECORD);
+    const [createNewLabelMut] = useMutation(CREATE_LABEL);
+    const [setGoldStarMut] = useMutation(SET_GOLD_STAR_ANNOTATION_FOR_TASK);
+    const [removeGoldStarMut] = useMutation(REMOVE_GOLD_STAR_ANNOTATION_FOR_TASK);
 
     useEffect(() => {
         if (!projectId || !attributes || !recordRequests || !user) return;
         attributesChanged();
         prepareRlaData();
+        rebuildGoldInfo();
     }, [projectId, attributes, recordRequests, user]);
 
     useEffect(() => {
         if (!labelingTasks || !lVars) return;
         rebuildLabelLookup();
+        rebuildTaskLookup(lVars);
     }, [labelingTasks, lVars]);
 
     useEffect(() => {
-        if (!fullRlaData) return;
-        filterRlaDataForCurrent(fullRlaData);
-    }, [fullRlaData]);
+        if (!lVars || !fullRlaData || !recordRequests || !rlaDataToDisplay) return;
+        prepareRlaTokenLookup();
+        rebuildGoldInfo();
+    }, [lVars, fullRlaData, recordRequests, rlaDataToDisplay]);
 
     useEffect(() => {
-        if (!lVars || !fullRlaData) return;
-        prepareRlaTokenLookup();
-    }, [lVars, fullRlaData]);
+        if (!displayUserId) return;
+        if (!fullRlaData) return;
+        filterRlaDataForCurrent();
+        rebuildGoldInfo();
+    }, [displayUserId, fullRlaData]);
 
     function attributesChanged() {
         if (!attributes) return;
@@ -145,7 +154,6 @@ export default function LabelingSuiteLabeling() {
             }
         }
         setLVars(lVarsCopy);
-        // TODO: add rebuild for gold star
         if (activeTasks) {
             const activeTaskIds = activeTasks.map(x => x.task.id);
             for (const key in lVars.taskLookup) {
@@ -171,8 +179,35 @@ export default function LabelingSuiteLabeling() {
         checkLabelVisibleInSearch(labelLookup);
     }
 
-    function toggleGoldStar() {
-        // TODO: implement gold star
+    function toggleGoldStar(taskId: string, currentState: boolean) {
+        if (currentState) {
+            removeTaskAsGoldStar(taskId);
+        } else {
+            selectTaskAsGoldStar(taskId, displayUserId);
+        }
+    }
+
+    function selectTaskAsGoldStar(taskId: string, userId: string) {
+        if (!recordRequests.record.id) return;
+        LabelingSuiteManager.somethingLoading = true;
+        setGoldStarMut({ variables: { projectId: projectId, recordId: recordRequests.record.id, goldUserId: userId, labelingTaskId: taskId } }).then(res => {
+        });
+    }
+
+    function removeTaskAsGoldStar(taskId: string) {
+        if (!recordRequests.record.id) return;
+        LabelingSuiteManager.somethingLoading = true;
+        removeGoldStarMut({ variables: { projectId: projectId, recordId: recordRequests.record.id, labelingTaskId: taskId } }).then(res => {
+        });
+    }
+
+    function rebuildGoldInfo() {
+        if (!lVars?.taskLookup || !fullRlaData) return;
+        for (const attributeId in lVars.taskLookup) {
+            for (const task of lVars.taskLookup[attributeId].lookup) {
+                task.goldInfo = getGoldInfoForTask(task, user, fullRlaData, displayUserId);
+            }
+        }
     }
 
     function prepareRlaData() {
@@ -181,12 +216,13 @@ export default function LabelingSuiteLabeling() {
         setFullRlaData(fullDataData);
     }
 
-    function filterRlaDataForCurrent(fullDataData) {
+    function filterRlaDataForCurrent() {
         if (!fullRlaData) return;
-        let filtered = fullDataData;
-        // filtered = filterRlaDataForUser(filtered, user, 'rla');
+
+        let filtered = fullRlaData;
+        filtered = filterRlaDataForUser(filtered, user, displayUserId, 'rla');
         filtered = filterRlaDataForLabeling(filtered, settings, projectId, 'rla');
-        const rlaDataToDisplayCopy = { ...rlaDataToDisplay };
+        const rlaDataToDisplayCopy = {};
         for (const rla of filtered) {
             if (!rlaDataToDisplayCopy[rla.taskId]) rlaDataToDisplayCopy[rla.taskId] = [];
             rlaDataToDisplayCopy[rla.taskId].push(rla);
@@ -290,7 +326,7 @@ export default function LabelingSuiteLabeling() {
                 if (label.task.taskType == LabelingTaskTaskType.INFORMATION_EXTRACTION) {
                     label.visibleInSearch = true;
                 } else {
-                    // label.visibleInSearch = !label.task.displayLabels.find(x => x.id == labelId);
+                    label.visibleInSearch = !label.task.displayLabels?.find(x => x.id == labelId);
                 }
             }
         }
@@ -335,11 +371,11 @@ export default function LabelingSuiteLabeling() {
         if (!fullRlaData) return;
 
         const existingLabels = fullRlaData.filter(e =>
-            e.sourceTypeKey == LabelSource.MANUAL && e.createdBy == UserManager.displayUserId && e.labelId == labelId);
+            e.sourceTypeKey == LabelSource.MANUAL && e.createdBy == displayUserId && e.labelId == labelId);
 
         if (existingLabels.length == 1) return;
         const sourceId = SessionManager.getSourceId();
-        const asGoldStar = UserManager.displayUserId == GOLD_STAR_USER_ID ? true : null;
+        const asGoldStar = displayUserId == GOLD_STAR_USER_ID ? true : null;
         addClassificationLabelToRecordMut({ variables: { projectId: projectId, recordId: record.id, labelingTaskId: labelingTaskId, labelId: labelId, asGoldStar: asGoldStar, sourceId: sourceId } }).then((res) => {
             if (settings.main.autoNextRecord) {
                 SessionManager.nextRecord();
@@ -352,7 +388,7 @@ export default function LabelingSuiteLabeling() {
         const selectionData = collectSelectionData(attributeId, tokenLookup, attributes, recordRequests);
         if (!selectionData) return;
         const sourceId = SessionManager.getSourceId();
-        addExtractionLabelToRecordMut({ variables: { projectId: projectId, recordId: record.id, labelingTaskId: labelingTaskId, labelId: labelId, startIdx: selectionData.startIdx, endIdx: selectionData.endIdx, value: selectionData.value, sourceId: sourceId } }).then((res) => {
+        addExtractionLabelToRecordMut({ variables: { projectId: projectId, recordId: record.id, labelingTaskId: labelingTaskId, labelId: labelId, tokenStartIndex: selectionData.startIdx, tokenEndIndex: selectionData.endIdx, value: selectionData.value, sourceId: sourceId } }).then((res) => {
 
         });
     }
@@ -390,6 +426,12 @@ export default function LabelingSuiteLabeling() {
         setPosition({ top: posTop, left: posLeft });
     }
 
+    function addNewLabelToTask(newLabel: string, task: any) {
+        createNewLabelMut({ variables: { projectId: projectId, labelingTaskId: task.id, labelName: newLabel, labelColor: DEFAULT_LABEL_COLOR } }).then((res) => {
+            rebuildLabelLookup();
+        });
+    }
+
     return (<div className="bg-white relative p-4">
         {lVars.loading && <LoadingIcon size="lg" />}
         {!lVars.loading && recordRequests.record.deleted && <div className="flex items-center justify-center text-red-500">This Record has been deleted</div>}
@@ -405,7 +447,7 @@ export default function LabelingSuiteLabeling() {
                     </div>}
                     <div className={`col-start-3 h-full py-1.5 flex ${i % 2 == 0 ? 'bg-white' : 'bg-gray-50'}`}>
                         {task.goldInfo?.can && <Tooltip content={task.goldInfo.is ? TOOLTIPS_DICT.LABELING.REMOVE_LABELS_GOLD_STAR : TOOLTIPS_DICT.LABELING.SET_LABELS_GOLD_STAR} color="invert" placement="top">
-                            <div className="mt-0.5">
+                            <div className="mt-0.5" onClick={() => toggleGoldStar(task.task.id, task.goldInfo?.is)}>
                                 {task.goldInfo.is ? <IconStarFilled className="h-5 w-5" /> : <IconStar className="h-5 w-5" />}
                             </div>
                         </Tooltip>}
@@ -467,7 +509,10 @@ export default function LabelingSuiteLabeling() {
                                 </div>}
                             </>}
                         </div>
-                        <LabelSelectionBox activeTasks={activeTasks} position={position} labelLookup={labelLookup} />
+                        <LabelSelectionBox activeTasks={activeTasks} position={position} labelLookup={labelLookup} labelAddButtonDisabled={labelAddButtonDisabled}
+                            addRla={(task, labelId) => addRla(task, labelId)}
+                            addNewLabelToTask={(newLabel, task) => addNewLabelToTask(newLabel, task)}
+                            checkLabelVisibleInSearch={(newLabel, task) => checkLabelVisibleInSearch(labelLookup, newLabel, task)} />
                     </div>}
                 </Fragment>))}
             </Fragment>))}

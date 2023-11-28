@@ -32,7 +32,8 @@ export function buildOverviewTableDisplayArray(rlas, user: User): TableDisplayDa
             createdBy: getCreatedByName(e),
             label: getLabelData(e),
             canBeDeleted: canDeleteRla(e, user),
-            rla: e
+            rla: e,
+            shouldHighlightOn: getShouldHighlightOn(e),
         };
     }
     result.sort((a, b) => a.orderPos - b.orderPos || a.orderPosSec - b.orderPosSec || a.createdBy.localeCompare(b.createdBy) || a.label.name.localeCompare(b.label.name));
@@ -155,13 +156,12 @@ export function getEmptyHeaderHover() {
     }
 }
 
-export function filterRlaDataForUser(rlaData: any[], user: User, rlaKey?: string): any[] {
-    if (rlaKey) return rlaData.filter(entry => filterRlaCondition(entry[rlaKey], user));
-    return rlaData.filter(rla => filterRlaCondition(rla, user));
+export function filterRlaDataForUser(rlaData: any[], user: User, displayUserId: string, rlaKey?: string,): any[] {
+    if (rlaKey) return rlaData.filter(entry => filterRlaCondition(entry[rlaKey], user, displayUserId));
+    return rlaData.filter(rla => filterRlaCondition(rla, user, displayUserId));
 }
 
-export function filterRlaCondition(rla, user): boolean {
-    const displayUserId = UserManager.displayUserId;
+export function filterRlaCondition(rla, user, displayUserId): boolean {
     if (user.role != UserRole.ENGINEER) return rla.sourceType == LabelSource.MANUAL && rla.createdBy == displayUserId;
     if (rla.sourceType != LabelSource.MANUAL) return true;
     if (displayUserId == ALL_USERS_USER_ID) return true;
@@ -195,4 +195,8 @@ export function filterRlaLabelCondition(rla: any, settings, projectId): boolean 
             console.log("unknown source type in setting rla filter", rla)
             return false;
     }
+}
+
+export function getShouldHighlightOn(rla: any): string[] {
+    return [rla.id, rla.labelingTaskLabel.name]
 }

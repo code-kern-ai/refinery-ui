@@ -56,10 +56,10 @@ export default function LabelSettingsBox(props: LabelSettingsBoxProps) {
                     <input className="h-4 w-4 cursor-pointer" type="checkbox" onChange={() => toggleLabelDisplaySetting('showHeuristics')}
                         checked={settings.task[projectId][props.labelSettingsLabel.taskId][props.labelSettingsLabel.id].showHeuristics} />
                 </div>
-                <Tooltip content={TOOLTIPS_DICT.LABELING.ACTIVATE_ALL} color="invert" placement="top" onClick={() => props.setAllLabelDisplaySetting(true)}>
+                <Tooltip content={TOOLTIPS_DICT.LABELING.ACTIVATE_ALL} color="invert" placement="top" onClick={() => props.setAllLabelDisplaySetting(true, props.labelSettingsLabel)}>
                     <IconChecks className="h-6 w-6 text-gray-700" />
                 </Tooltip>
-                <Tooltip content={TOOLTIPS_DICT.LABELING.CLEAR_ALL} color="invert" placement="top" onClick={() => props.setAllLabelDisplaySetting(false)}>
+                <Tooltip content={TOOLTIPS_DICT.LABELING.CLEAR_ALL} color="invert" placement="top" onClick={() => props.setAllLabelDisplaySetting(false, props.labelSettingsLabel)}>
                     <IconX className="h-6 w-6 text-gray-700" />
                 </Tooltip>
             </div>

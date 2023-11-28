@@ -23,6 +23,8 @@ type LabelingSuiteState = {
         showUserIcons: boolean;
     },
     settings: LabelingSuiteSettings;
+    tmpHighlightIds: string[];
+    displayUserId: string;
 }
 
 function getInitState(): LabelingSuiteState {
@@ -41,6 +43,8 @@ function getInitState(): LabelingSuiteState {
             showUserIcons: false,
         },
         settings: getDefaultLabelingSuiteSettings(),
+        tmpHighlightIds: [],
+        displayUserId: null,
     };
 }
 
@@ -168,6 +172,17 @@ const labelingSlice = createSlice({
                 const index = state.recordRequests.rla.findIndex(rla => rla.id == rlaId);
                 if (index != -1) state.recordRequests.rla.splice(index, 1);
             }
+        },
+        tmpAddHighlightIds(state, action: PayloadAction<string[]>) {
+            if (action.payload) {
+                state.tmpHighlightIds = action.payload;
+            } else {
+                state.tmpHighlightIds = [];
+            }
+        },
+        setUserDisplayId(state, action: PayloadAction<string>) {
+            if (action.payload) state.displayUserId = action.payload;
+            else state.displayUserId = null;
         }
     },
 });
@@ -182,8 +197,10 @@ export const selectRecordRequestsRecord = (state: any) => state.labeling.recordR
 export const selectRecordRequestsRla = (state: any) => state.labeling.recordRequests.rla;
 export const selectUserIconsData = (state: any) => state.labeling.userIconsData;
 export const selectSettings = (state: any) => state.labeling.settings;
+export const selectTmpHighlightIds = (state: any) => state.labeling.tmpHighlightIds;
+export const selectUserDisplayId = (state: any) => state.labeling.displayUserId;
 
-export const { setAvailableLinks, setSelectedLink, updateRecordRequests, updateUsers, setSettings, updateSettings, removeFromRlaById } = labelingSlice.actions;
+export const { setAvailableLinks, setSelectedLink, updateRecordRequests, updateUsers, setSettings, updateSettings, removeFromRlaById, tmpAddHighlightIds, setUserDisplayId } = labelingSlice.actions;
 
 export const labelingReducer = labelingSlice.reducer;
 

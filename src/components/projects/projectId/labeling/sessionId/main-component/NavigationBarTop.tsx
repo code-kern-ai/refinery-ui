@@ -1,18 +1,16 @@
 import { selectUser } from "@/src/reduxStore/states/general";
-import { selectAvailableLinks, selectSelectedLink, selectUserIconsData, setSelectedLink } from "@/src/reduxStore/states/pages/labeling";
+import { selectAvailableLinks, selectSelectedLink, selectUserDisplayId, selectUserIconsData, setSelectedLink, setUserDisplayId } from "@/src/reduxStore/states/pages/labeling";
 import { selectProjectId } from "@/src/reduxStore/states/project";
 import { UserType } from "@/src/types/components/projects/projectId/labeling/labeling-main-component";
 import { UserRole } from "@/src/types/shared/sidebar";
 import { SessionManager } from "@/src/util/classes/labeling/session-manager";
-import { UserManager } from "@/src/util/classes/labeling/user-manager";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
 import Dropdown from "@/submodules/react-components/components/Dropdown";
 import { Tooltip } from "@nextui-org/react";
-import { IconArrowLeft, IconArrowRight } from "@tabler/icons-react";
+import { IconArrowLeft, IconArrowRight, IconCircle, IconStar } from "@tabler/icons-react";
 import { useRouter } from "next/router";
 import { useDispatch, useSelector } from "react-redux";
 import style from '@/src/styles/components/projects/projectId/labeling.module.css';
-import { use, useEffect } from "react";
 
 export default function NavigationBarTop() {
     const router = useRouter();
@@ -23,6 +21,7 @@ export default function NavigationBarTop() {
     const availableLinks = useSelector(selectAvailableLinks);
     const selectedLink = useSelector(selectSelectedLink);
     const userIconsData = useSelector(selectUserIconsData);
+    const displayId = useSelector(selectUserDisplayId);
 
     function goToRecordIde() {
         const sessionId = SessionManager.labelingLinkData.huddleId;
@@ -31,13 +30,11 @@ export default function NavigationBarTop() {
     }
 
     function previousRecord() {
-        // TODO: add init for record
         SessionManager.previousRecord();
         router.push(`/projects/${projectId}/labeling/${SessionManager.labelingLinkData.huddleId}?pos=${SessionManager.huddleData.linkData.requestedPos}&type=${SessionManager.huddleData.linkData.linkType}`);
     }
 
     function nextRecord() {
-        // todo: add init for record
         SessionManager.nextRecord();
         router.push(`/projects/${projectId}/labeling/${SessionManager.labelingLinkData.huddleId}?pos=${SessionManager.huddleData.linkData.requestedPos}&type=${SessionManager.huddleData.linkData.linkType}`);
     }
@@ -66,20 +63,17 @@ export default function NavigationBarTop() {
                         </div>
                         {userIconsData.userIcons.length > 0 && <>
                             {userIconsData.showUserIcons && <div className="flex justify-center overflow-visible">
-                                {userIconsData.userIcons.map((user, index) => (
+                                {userIconsData.userIcons.map((user) => (
                                     <Tooltip content={user.name} key={user.id} color="invert" placement="top" className="mr-3">
-                                        {user.userType == UserType.REGISTERED ? (<div className="w-8 h-8 flex cursor-pointer rounded-full justify-center items-center" onClick={() => UserManager.displayUserId = user.id}>
+                                        {user.userType == UserType.REGISTERED ? (<div className={`w-8 h-8 flex cursor-pointer rounded-full justify-center items-center ${user.id == displayId ? 'opacity-100' : 'opacity-50'}`}
+                                            onClick={() => dispatch(setUserDisplayId(user.id))}>
                                             <img src={`/refinery/avatars/${user.avatarUri}`} className="w-8 h-8" />
-                                        </div>) : (<div className="w-8 h-8 cursor-pointer relative" onClick={() => UserManager.displayUserId = user.id}>
-                                            {user.userType == UserType.GOLD && <div className="absolute -top-1 -left-1 -right-1 -bottom-1">
-                                                <svg xmlns="http://www.w3.org/2000/svg" className={`w-full h-full relative top-1 left-1 ${user.active ? style.specialUserActive : style.specialUserInActive}`} viewBox="0 0 24 24" stroke-width="2">
-                                                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                                                </svg>
+                                        </div>) : (<div className="w-8 h-8 cursor-pointer relative" onClick={() => dispatch(setUserDisplayId(user.id))}>
+                                            {user.userType == UserType.GOLD && <div className="absolute -top-1 -bottom-1">
+                                                <IconStar className={`w-full h-full ${user.id == displayId ? style.specialUserActive : style.specialUserInActive}`} />
                                             </div>}
                                             {user.userType == UserType.ALL && <div className="absolute top-0 left-0 right-0 bottom-0">
-                                                <svg xmlns="http://www.w3.org/2000/svg" className={`w-full h-full ${user.active ? style.specialUserActive : style.specialUserInActive}`} viewBox="0 0 24 24" stroke-width="2">
-                                                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                                                </svg>
+                                                <IconCircle className={`w-full h-full ${user.id == displayId ? style.specialUserActive : style.specialUserInActive}`} />
                                             </div>}
                                         </div>)}
                                     </Tooltip>

@@ -1,5 +1,5 @@
 import { selectAllUsers, selectUser } from "@/src/reduxStore/states/general";
-import { setAvailableLinks, updateRecordRequests, setSelectedLink, selectRecordRequestsRla, updateUsers, setSettings, selectSettings } from "@/src/reduxStore/states/pages/labeling";
+import { setAvailableLinks, updateRecordRequests, setSelectedLink, selectRecordRequestsRla, updateUsers, setSettings, selectSettings, setUserDisplayId } from "@/src/reduxStore/states/pages/labeling";
 import { selectProjectId } from "@/src/reduxStore/states/project"
 import { AVAILABLE_LABELING_LINKS, GET_RECORD_LABEL_ASSOCIATIONS, GET_TOKENIZED_RECORD, REQUEST_HUDDLE_DATA } from "@/src/services/gql/queries/labeling";
 import { LabelingLinkType } from "@/src/types/components/projects/projectId/labeling/labeling-main-component";
@@ -117,6 +117,7 @@ export default function LabelingMainComponent() {
         const [usersIcons, showUsersIcons] = UserManager.prepareUserIcons(rlas, user, users);
         dispatch(updateUsers('userIcons', usersIcons));
         dispatch(updateUsers('showUserIcons', showUsersIcons));
+        dispatch(setUserDisplayId(user.id));
     }, [rlas]);
 
     function previousRecord() {

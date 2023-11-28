@@ -23,7 +23,7 @@ const store = configureStore({
         heuristics: heuristicsReducer,
         dataBrowser: dataBrowserReducer,
         cache: cacheReducer,
-        labeling: labelingReducer
+        labeling: labelingReducer,
     },
     devTools: process.env.IS_DEV == '1',
 });

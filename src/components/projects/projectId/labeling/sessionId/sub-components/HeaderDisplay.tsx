@@ -117,6 +117,6 @@ export default function HeaderDisplay(props: HeaderDisplayProps) {
                 </tr>)}
             </tbody>
         </table>
-        <LabelSettingsBox labelSettingsLabel={labelSettingsLabel} position={position} setAllLabelDisplaySetting={(val) => setAllLabelDisplaySetting(val)} />
+        <LabelSettingsBox labelSettingsLabel={labelSettingsLabel} position={position} setAllLabelDisplaySetting={(val, labelSettingsLabel) => setAllLabelDisplaySetting(val, labelSettingsLabel)} />
     </div>);
 }

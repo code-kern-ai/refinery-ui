@@ -118,4 +118,8 @@ export class SessionManager {
         return this.huddleData.linkData.huddleId;
     }
 
+    public static getAllowedTask(): string {
+        return this.huddleData.allowedTask;
+    }
+
 }

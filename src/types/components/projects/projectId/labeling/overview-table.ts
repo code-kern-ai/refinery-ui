@@ -21,6 +21,7 @@ export type TableDisplayData = {
     },
     rla: any
     canBeDeleted: boolean,
+    shouldHighlightOn: string[]
 }
 
 export type HeaderHover = {

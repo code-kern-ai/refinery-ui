@@ -1,6 +1,6 @@
 import { selectUser } from "@/src/reduxStore/states/general";
 import { openModal } from "@/src/reduxStore/states/modal";
-import { removeFromRlaById, selectRecordRequestsRecord, selectRecordRequestsRla, selectSettings } from "@/src/reduxStore/states/pages/labeling";
+import { removeFromRlaById, selectRecordRequestsRecord, selectRecordRequestsRla, selectSettings, selectTmpHighlightIds, selectUserDisplayId, tmpAddHighlightIds } from "@/src/reduxStore/states/pages/labeling";
 import { selectProjectId } from "@/src/reduxStore/states/project";
 import { DELETE_RECORD_LABEL_ASSOCIATION_BY_ID } from "@/src/services/gql/mutations/labeling";
 import { HeaderHover, TableDisplayData } from "@/src/types/components/projects/projectId/labeling/overview-table";
@@ -14,6 +14,11 @@ import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import LabelingInfoTableModal from "./LabelingInfoTableModal";
 
+
+function shouldHighLight(tmpHighlightIds: string[], comparedIds: string[]) {
+    return tmpHighlightIds.some(id => comparedIds.includes(id));
+}
+
 export default function LabelingSuiteOverviewTable() {
     const dispatch = useDispatch();
 
@@ -22,6 +27,7 @@ export default function LabelingSuiteOverviewTable() {
     const user = useSelector(selectUser);
     const settings = useSelector(selectSettings);
     const projectId = useSelector(selectProjectId);
+    const displayUserId = useSelector(selectUserDisplayId);
 
     const [dataToDisplay, setDataToDisplay] = useState<TableDisplayData[]>(null);
     const [fullData, setFullData] = useState<TableDisplayData[]>([]);
@@ -46,6 +52,21 @@ export default function LabelingSuiteOverviewTable() {
         rebuildDataForDisplay();
     }, [settings, fullData]);
 
+    useEffect(() => {
+        if (!displayUserId) return;
+        rebuildDataForDisplay();
+    }, [displayUserId]);
+
+    function prepareDataForTableDisplay() {
+        if (!rlas) {
+            setDataToDisplay(null);
+            setFullData(null);
+        }
+        setFullData(buildOverviewTableDisplayArray(rlas, user));
+        checkAndRebuildTableHover();
+        setDataHasHeuristics(rlasHaveHeuristicData(rlas));
+    }
+
     function checkAndRebuildTableHover() {
         if (!fullData) return;
         setHeaderHover(getEmptyHeaderHover());
@@ -63,7 +84,7 @@ export default function LabelingSuiteOverviewTable() {
     function rebuildDataForDisplay() {
         if (fullData) {
             let filtered = fullData;
-            // filtered = filterRlaDataForUser(filtered, user, 'rla');
+            filtered = filterRlaDataForUser(filtered, user, displayUserId, 'rla');
             filtered = filterRlaDataForOverviewTable(filtered, 'rla');
             setDataToDisplay(filtered);
         } else {
@@ -91,6 +112,16 @@ export default function LabelingSuiteOverviewTable() {
         });
     }
 
+    const tmpHighlightIds = useSelector(selectTmpHighlightIds);
+
+    function onMouseEnter(ids: string[]) {
+        dispatch(tmpAddHighlightIds(ids));
+    }
+
+    function onMouseLeave() {
+        dispatch(tmpAddHighlightIds([]));
+    }
+
     return (<>
         {dataToDisplay && (dataToDisplay.length > 0) ? (<>
             <div className="flex flex-col p-4">
@@ -113,8 +144,9 @@ export default function LabelingSuiteOverviewTable() {
                                         <td className="whitespace-nowrap py-2 pl-4 pr-3 text-sm font-medium text-gray-500 sm:pl-6"> {ovItem.sourceType}</td>
                                         <td className="whitespace-nowrap px-3 py-2 text-sm text-gray-500">{ovItem.taskName}</td>
                                         <td className="whitespace-nowrap px-3 py-2 text-sm text-gray-500">{ovItem.createdBy}</td>
-                                        <td className="whitespace-nowrap px-3 py-2 text-sm text-gray-500">
-                                            <span className={`inline-flex items-center px-2.5 py-0.5 rounded-md border text-sm font-medium cursor-default relative ${ovItem.label.backgroundColor} ${ovItem.label.textColor} ${ovItem.label.borderColor}`}>
+                                        <td className={`whitespace-nowrap px-3 py-2 text-sm text-gray-500 ${shouldHighLight(tmpHighlightIds, ovItem.shouldHighlightOn) ? settings.main.hoverGroupBackgroundColorClass : ''}`}>
+                                            <span onMouseEnter={() => onMouseEnter([ovItem.label.name])} onMouseLeave={onMouseLeave}
+                                                className={`inline-flex items-center px-2.5 py-0.5 rounded-md border text-sm font-medium cursor-default relative ${ovItem.label.backgroundColor} ${ovItem.label.textColor} ${ovItem.label.borderColor}`}>
                                                 {ovItem.label.name}
                                                 <div className="label-overlay-base"></div>
                                             </span>

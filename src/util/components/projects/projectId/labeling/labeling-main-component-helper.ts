@@ -1,7 +1,10 @@
 import { LineBreaksType } from "@/src/types/components/projects/projectId/data-browser/data-browser";
 import { LabelingLinkType } from "@/src/types/components/projects/projectId/labeling/labeling-main-component";
 import { LabelingSuiteSettings, LabelingSuiteTaskHeaderLabelSettings } from "@/src/types/components/projects/projectId/labeling/settings";
+import { User } from "@/src/types/shared/general";
 import { UserRole } from "@/src/types/shared/sidebar";
+import { SessionManager } from "@/src/util/classes/labeling/session-manager";
+import { LabelSource } from "@/submodules/javascript-functions/enums/enums";
 import { countOccurrences } from "@/submodules/javascript-functions/general";
 
 export const ONE_DAY = 86400000; // 24 * 60 * 60 * 1000;
@@ -139,4 +142,21 @@ export function getDefaultTaskOverviewLabelSettings(): LabelingSuiteTaskHeaderLa
         showModel: false,
         showHeuristics: false,
     }
+}
+
+export function prepareRLADataForRole(rlaData: any[], user: User, displayUserId: string): any[] {
+    if (user.role != UserRole.ANNOTATOR) return rlaData;
+    const currentSourceId = SessionManager.getSourceId();
+    const allowedTask = SessionManager.getAllowedTask();
+    rlaData.forEach((rla) => {
+        if ((rla.sourceId && rla.sourceId == currentSourceId)) {
+            rla.sourceType = LabelSource.MANUAL;
+            rla.sourceId = null;
+        } else if (rla.createdBy == displayUserId && rla.labelingTaskLabel.labelingTask.id == allowedTask && rla.sourceType == LabelSource.MANUAL) {
+            // nothing to change (no deletion flag or modify of existing types)
+        } else {
+            rla.id = "x";
+        }
+    });
+    return rlaData.filter(rla => rla.id != "x");
 }

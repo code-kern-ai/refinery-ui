@@ -1,14 +1,17 @@
 import { LabelingVars, TokenLookup } from "@/src/types/components/projects/projectId/labeling/labeling";
 import { LabelingTaskTaskType } from "@/src/types/components/projects/projectId/settings/labeling-tasks";
-import { GOLD_STAR_USER_ID } from "./labeling-main-component-helper";
+import { ALL_USERS_USER_ID, GOLD_STAR_USER_ID } from "./labeling-main-component-helper";
 import { canDeleteRla, filterRlaLabelCondition, getCreatedByName, getHoverGroupsOverviewTable, getLabelSourceOrder } from "./overview-table-helper";
-import { LabelSource } from "@/submodules/javascript-functions/enums/enums";
+import { InformationSourceReturnType, LabelSource } from "@/submodules/javascript-functions/enums/enums";
 import { informationSourceTypeToString } from "@/submodules/javascript-functions/enums/enum-functions";
 import { User } from "@/src/types/shared/general";
 import { Attribute } from "@/src/types/components/projects/projectId/settings/data-schema";
+import { UserRole } from "@/src/types/shared/sidebar";
+import { UserManager } from "@/src/util/classes/labeling/user-manager";
 
 export const FULL_RECORD_ID = "FULL_RECORD";
 export const SWIM_LANE_SIZE_PX = 12;
+export const DEFAULT_LABEL_COLOR = "yellow";
 
 export function getDefaultLabelingVars(): LabelingVars {
     return {
@@ -167,4 +170,52 @@ export function getTokenData(attributeId: string, attributes: Attribute[], recor
         if (att.attributeId == attributeId) return att;
     }
     return null;
+}
+
+
+export function getGoldInfoForTask(task: any, user: User, fullRlaData: any, displayUserId: string): { can: boolean, is: boolean } {
+    if (user.role != UserRole.ENGINEER) return { can: false, is: false };
+    if (displayUserId == ALL_USERS_USER_ID) return { can: false, is: false };
+    if (task.task.taskType == LabelingTaskTaskType.NOT_USEABLE) return { can: false, is: false };
+    // const userId = UserManager.displayUserId;
+    const taskRlaData = fullRlaData.filter(x => x.sourceTypeKey == LabelSource.MANUAL && x.taskId == task.task.id);
+    const goldRlas = taskRlaData.filter(x => x.rla.isGoldStar);
+    if (displayUserId == GOLD_STAR_USER_ID) return { can: goldRlas.length > 0, is: goldRlas.length > 0 };
+
+    const userRlas = taskRlaData.filter(x => x.createdBy == displayUserId && !x.rla.isGoldStar);
+    if (userRlas.length == 0) return { can: false, is: false };
+    const otherRlas = taskRlaData.filter(x => x.createdBy != displayUserId && !x.rla.isGoldStar);
+
+    const allOtherGroups = otherRlas.reduce((f, c) => {
+        if (!f[c.createdBy]) f[c.createdBy] = [];
+        f[c.createdBy].push(c);
+        return f;
+    }, {});
+    let allMatch = true;
+    for (const key in allOtherGroups) {
+        const group = allOtherGroups[key];
+        if (!allRlasMatch(userRlas, group)) {
+            allMatch = false;
+            break;
+        }
+    }
+    return { can: !allMatch, is: goldRlas.length > 0 && allRlasMatch(goldRlas, userRlas) }
+}
+function allRlasMatch(groupA: any[], groupB: any[]): boolean {
+    if (groupA.length != groupB.length) return false;
+    for (let i = 0; i < groupA.length; i++) {
+        const found = groupB.find(x => rlaIsEqual(x.rla, groupA[i].rla));
+        if (!found) return false;
+    }
+    return true;
+}
+
+
+function rlaIsEqual(rlaA: any, rlaB: any): boolean {
+    if (rlaA.sourceType != rlaB.sourceType) return false;
+    if (rlaA.returnType != rlaB.returnType) return false;
+    if (rlaA.labelingTaskLabelId != rlaB.labelingTaskLabelId) return false;
+    if (rlaA.returnType == InformationSourceReturnType.YIELD && (rlaA.tokenStartIdx != rlaB.tokenStartIdx || rlaA.tokenEndIdx != rlaB.tokenEndIdx)) return false;
+
+    return true;
 }

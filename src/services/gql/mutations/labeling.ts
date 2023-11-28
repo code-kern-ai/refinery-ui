@@ -34,3 +34,30 @@ mutation ($projectId: ID!, $recordId: ID!, $labelingTaskId: ID!, $tokenStartInde
   }
 }
 `;
+
+export const CREATE_LABEL = gql`
+mutation ($projectId: ID!, $labelingTaskId: ID!, $labelName: String!, $labelColor: String!) {
+  createLabel(projectId: $projectId, labelingTaskId: $labelingTaskId, labelName: $labelName, labelColor: $labelColor) {
+    label {
+      id
+      name
+    }
+  }
+}
+`;
+
+export const SET_GOLD_STAR_ANNOTATION_FOR_TASK = gql`
+mutation ($projectId: ID!, $recordId: ID!, $labelingTaskId: ID!, $goldUserId: ID!) {
+  setGoldStarAnnotationForTask(projectId: $projectId, recordId: $recordId, labelingTaskId: $labelingTaskId, goldUserId: $goldUserId) {
+    ok
+  }
+}  
+`;
+
+export const REMOVE_GOLD_STAR_ANNOTATION_FOR_TASK = gql`
+mutation ($projectId: ID!, $recordId: ID!, $labelingTaskId: ID!) {
+  removeGoldStarAnnotationForTask(projectId: $projectId, recordId: $recordId, labelingTaskId: $labelingTaskId) {
+    ok
+  }
+}
+`;
