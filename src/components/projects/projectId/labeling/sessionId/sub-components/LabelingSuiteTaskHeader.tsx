@@ -25,25 +25,11 @@ export default function LabelingSuiteTaskHeader() {
 
     const [displayData, setDisplayData] = useState<LabelingSuiteTaskHeaderDisplayData[]>(null);
 
-    const [refetchLabelingTasksByProjectId] = useLazyQuery(GET_LABELING_TASKS_BY_PROJECT_ID, { fetchPolicy: "network-only" });
-
-    useEffect(() => {
-        if (!projectId) return;
-        refetchLabelingTasksAndProcess();
-    }, [projectId]);
-
     useEffect(() => {
         if (!projectId) return;
         if (!labelingTasks) return;
         setDisplayData(prepareDataForDisplay(labelingTasks))
     }, [projectId, labelingTasks]);
-
-    function refetchLabelingTasksAndProcess() {
-        refetchLabelingTasksByProjectId({ variables: { projectId: projectId } }).then((res) => {
-            const labelingTasks = postProcessLabelingTasks(res['data']['projectByProjectId']['labelingTasks']['edges']);
-            dispatch(setLabelingTasksAll(postProcessLabelingTasksSchema(labelingTasks)))
-        });
-    }
 
     function prepareDataForDisplay(data: any[]): any {
         if (!data) return null;

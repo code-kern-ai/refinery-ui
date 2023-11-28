@@ -360,7 +360,6 @@ export default function LabelingSuiteLabeling() {
     }
 
     function deleteRecordLabelAssociation(rlaId: string) {
-        LabelingSuiteManager.somethingLoading = true;
         deleteRlaByIdMut({ variables: { projectId: projectId, recordId: record.id, associationIds: [rlaId] } }).then(res => {
             dispatch(removeFromRlaById(rlaId));
         });
@@ -434,9 +433,9 @@ export default function LabelingSuiteLabeling() {
 
     return (<div className="bg-white relative p-4">
         {lVars.loading && <LoadingIcon size="lg" />}
-        {!lVars.loading && recordRequests.record.deleted && <div className="flex items-center justify-center text-red-500">This Record has been deleted</div>}
+        {!lVars.loading && !recordRequests.record && <div className="flex items-center justify-center text-red-500">This Record has been deleted</div>}
 
-        {!lVars.loading && lVars.loopAttributes && <div className="grid w-full border md:rounded-lg items-center" style={{ gridTemplateColumns: 'max-content max-content 40px auto' }}>
+        {recordRequests.record && !lVars.loading && lVars.loopAttributes && <div className="grid w-full border md:rounded-lg items-center" style={{ gridTemplateColumns: 'max-content max-content 40px auto' }}>
             {lVars.loopAttributes.map((attribute, i) => (<Fragment key={attribute.id}>
                 {lVars.taskLookup[attribute.id].lookup.map((task, j) => (<Fragment key={task.orderKey}>
                     <div className={`font-dmMono text-sm font-bold text-gray-500 py-2 pl-4 pr-3 sm:pl-6 col-start-1 h-full ${i % 2 == 0 ? 'bg-white' : 'bg-gray-50'}`}>

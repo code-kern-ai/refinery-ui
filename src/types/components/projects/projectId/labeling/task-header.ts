@@ -73,5 +73,5 @@ export type LabelSettingsBoxProps = {
 }
 
 export type InfoLabelBoxModalProps = {
-    toggleLabelDisplaySetting: (val: string, labelSettingsLabel: string) => void;
+    toggleLabelDisplaySetting: (val: string, labelSettingsLabel?: string) => void;
 }

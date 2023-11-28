@@ -23,6 +23,11 @@ export default function ExtractionDisplay(props: ExtractionDisplayProps) {
                     {props.tokenLookup[props.attributeId][token.idx] && <>
                         {props.tokenLookup[props.attributeId][token.idx].rlaArray.map((rlaItem, index) => (<div key={index} className={`absolute left-0 right-0 top-0 flex items-end z-n-2`} style={{ bottom: rlaItem.bottomPos }}>
                             <div className={`h-px flex items-end w-full relative ${props.labelLookup[rlaItem.labelId].color.backgroundColor} ${props.labelLookup[rlaItem.labelId].color.textColor} ${props.labelLookup[rlaItem.labelId].color.borderColor}`}
+                                onMouseEnter={(e: any) => {
+                                    e.target.classList.add('heightHover');
+                                }} onMouseLeave={(e: any) => {
+                                    e.target.classList.remove('heightHover');
+                                }}
                                 style={{
                                     borderBottomWidth: '1px',
                                     borderTopWidth: '1px',

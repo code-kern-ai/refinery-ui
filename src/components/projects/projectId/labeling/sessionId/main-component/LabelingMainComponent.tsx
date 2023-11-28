@@ -1,5 +1,5 @@
 import { selectAllUsers, selectUser } from "@/src/reduxStore/states/general";
-import { setAvailableLinks, updateRecordRequests, setSelectedLink, selectRecordRequestsRla, updateUsers, setSettings, selectSettings, setUserDisplayId } from "@/src/reduxStore/states/pages/labeling";
+import { setAvailableLinks, updateRecordRequests, setSelectedLink, selectRecordRequestsRla, updateUsers, setSettings, selectSettings, setUserDisplayId, selectRecordRequestsRecord } from "@/src/reduxStore/states/pages/labeling";
 import { selectProjectId } from "@/src/reduxStore/states/project"
 import { AVAILABLE_LABELING_LINKS, GET_RECORD_LABEL_ASSOCIATIONS, GET_TOKENIZED_RECORD, REQUEST_HUDDLE_DATA } from "@/src/services/gql/queries/labeling";
 import { LabelingLinkType } from "@/src/types/components/projects/projectId/labeling/labeling-main-component";
@@ -10,19 +10,22 @@ import { UserManager } from "@/src/util/classes/labeling/user-manager";
 import { DUMMY_HUDDLE_ID, getDefaultLabelingSuiteSettings, parseLabelingLink } from "@/src/util/components/projects/projectId/labeling/labeling-main-component-helper";
 import { useLazyQuery } from "@apollo/client";
 import { useRouter } from "next/router";
-import { useEffect } from "react";
+import { useCallback, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import style from "@/src/styles/components/projects/projectId/labeling.module.css";
 import NavigationBarTop from "./NavigationBarTop";
 import NavigationBarBottom from "./NavigationBarBottom";
-import { GET_ATTRIBUTES_BY_PROJECT_ID, GET_RECORD_BY_RECORD_ID } from "@/src/services/gql/queries/project-setting";
+import { GET_ATTRIBUTES_BY_PROJECT_ID, GET_LABELING_TASKS_BY_PROJECT_ID, GET_RECORD_BY_RECORD_ID } from "@/src/services/gql/queries/project-setting";
 import { combineLatest } from "rxjs";
 import LabelingSuiteTaskHeader from "../sub-components/LabelingSuiteTaskHeader";
 import { jsonCopy, transferNestedDict } from "@/submodules/javascript-functions/general";
 import LabelingSuiteOverviewTable from "../sub-components/LabelingSuiteOverviewTable";
 import LabelingSuiteLabeling from "../sub-components/LabelingSuiteLabeling";
-import { setAllAttributes } from "@/src/reduxStore/states/pages/settings";
+import { setAllAttributes, setLabelingTasksAll } from "@/src/reduxStore/states/pages/settings";
 import { postProcessingAttributes } from "@/src/util/components/projects/projectId/settings/data-schema-helper";
+import { WebSocketsService } from "@/src/services/base/web-sockets/WebSocketsService";
+import { CurrentPage } from "@/src/types/shared/general";
+import { postProcessLabelingTasks, postProcessLabelingTasksSchema } from "@/src/util/components/projects/projectId/settings/labeling-tasks-helper";
 
 const LOCAL_STORAGE_KEY = 'labelingSuiteSettings';
 
@@ -35,6 +38,7 @@ export default function LabelingMainComponent() {
     const rlas = useSelector(selectRecordRequestsRla);
     const users = useSelector(selectAllUsers);
     const settings = useSelector(selectSettings);
+    const record = useSelector(selectRecordRequestsRecord);
 
     const [refetchHuddleData] = useLazyQuery(REQUEST_HUDDLE_DATA, { fetchPolicy: 'no-cache' });
     const [refetchAvailableLinks] = useLazyQuery(AVAILABLE_LABELING_LINKS, { fetchPolicy: 'no-cache' });
@@ -42,6 +46,8 @@ export default function LabelingMainComponent() {
     const [refetchRecordByRecordId] = useLazyQuery(GET_RECORD_BY_RECORD_ID, { fetchPolicy: 'no-cache' });
     const [refetchRla] = useLazyQuery(GET_RECORD_LABEL_ASSOCIATIONS, { fetchPolicy: 'network-only' });
     const [refetchAttributes] = useLazyQuery(GET_ATTRIBUTES_BY_PROJECT_ID, { fetchPolicy: "network-only" });
+    const [refetchLabelingTasksByProjectId] = useLazyQuery(GET_LABELING_TASKS_BY_PROJECT_ID, { fetchPolicy: "network-only" });
+
 
     useEffect(() => {
         if (!projectId) return;
@@ -62,6 +68,7 @@ export default function LabelingMainComponent() {
         }
         dispatch(setSettings(settingsCopy));
         refetchAttributesAndProcess();
+        refetchLabelingTasksAndProcess();
     }, [projectId]);
 
     useEffect(() => {
@@ -79,6 +86,11 @@ export default function LabelingMainComponent() {
             SessionManager.jumpToPosition(SessionManager.labelingLinkData.requestedPos);
             router.push(`/projects/${projectId}/labeling/${SessionManager.labelingLinkData.huddleId}?pos=${SessionManager.huddleData.linkData.requestedPos}&type=${SessionManager.huddleData.linkData.linkType}`);
         }
+        WebSocketsService.subscribeToNotification(CurrentPage.LABELING, {
+            projectId: projectId,
+            whitelist: ['attributes_updated', 'calculate_attribute', 'payload_finished', 'weak_supervision_finished', 'record_deleted', 'rla_created', 'rla_deleted', 'access_link_changed', 'access_link_removed', 'label_created', 'label_deleted', 'labeling_task_deleted', 'labeling_task_updated', 'labeling_task_created'],
+            func: handleWebsocketNotification
+        });
     }, [projectId, router.query.sessionId]);
 
     useEffect(() => {
@@ -181,6 +193,46 @@ export default function LabelingMainComponent() {
             dispatch(setAllAttributes(postProcessingAttributes(res.data['attributesByProjectId'])));
         });
     }
+
+    function refetchLabelingTasksAndProcess() {
+        refetchLabelingTasksByProjectId({ variables: { projectId: projectId } }).then((res) => {
+            const labelingTasks = postProcessLabelingTasks(res['data']['projectByProjectId']['labelingTasks']['edges']);
+            dispatch(setLabelingTasksAll(postProcessLabelingTasksSchema(labelingTasks)))
+        });
+    }
+
+    const handleWebsocketNotification = useCallback((msgParts: string[]) => {
+        if (msgParts[1] == 'attributes_updated' || (msgParts[1] == 'calculate_attribute' && ['created', 'updated'].includes(msgParts[2]))) {
+            refetchAttributesAndProcess();
+        } else if (msgParts[1] == 'record_deleted') {
+            if (msgParts[2] == record.id) {
+                SessionManager.setCurrentRecordDeleted();
+                router.push(`/projects/${projectId}/labeling/${SessionManager.labelingLinkData.huddleId}?pos=${SessionManager.huddleData.linkData.requestedPos}&type=${SessionManager.huddleData.linkData.linkType}`);
+                dispatch(updateRecordRequests('token', null));
+                dispatch(updateRecordRequests('record', null));
+                dispatch(updateRecordRequests('rla', null));
+            }
+        } else if (['payload_finished', 'weak_supervision_finished', 'rla_created', 'rla_deleted'].includes(msgParts[1])) {
+            refetchRla({ variables: { projectId, recordId: SessionManager.currentRecordId } }).then((result) => {
+                dispatch(updateRecordRequests('rla', result?.data?.recordByRecordId?.recordLabelAssociations));
+            });
+        } else if (['access_link_changed', 'access_link_removed'].includes(msgParts[1])) {
+            if (router.pathname.includes(msgParts[3]) && SessionManager.labelingLinkData) {
+                //python "True" string
+                SessionManager.labelingLinkData.linkLocked = !msgParts[4] || msgParts[4] === 'True';
+                location.reload();
+            }
+        } else if (['label_created', 'label_deleted', 'labeling_task_deleted', 'labeling_task_updated', 'labeling_task_created'].includes(msgParts[1])) {
+            refetchLabelingTasksAndProcess();
+        } else {
+            console.log("unknown message in labeling suite task manager" + msgParts);
+        }
+    }, [record]);
+
+    useEffect(() => {
+        if (!projectId) return;
+        WebSocketsService.updateFunctionPointer(projectId, CurrentPage.LABELING, handleWebsocketNotification)
+    }, [handleWebsocketNotification, projectId]);
 
     return (<div className={`h-full bg-white flex flex-col ${LabelingSuiteManager.somethingLoading ? style.wait : ''}`}>
         {LabelingSuiteManager.absoluteWarning && <div className="absolute left-0 right-0 flex items-center justify-center pointer-events-none top-4 z-100">
