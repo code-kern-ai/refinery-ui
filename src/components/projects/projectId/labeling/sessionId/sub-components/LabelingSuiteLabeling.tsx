@@ -112,6 +112,12 @@ export default function LabelingSuiteLabeling() {
         };
     }, [tokenLookup]);
 
+    useEffect(() => {
+        if (!settings) return;
+        if (settings.labeling.showNLabelButton != 5) rebuildTaskLookup(lVars);
+
+    }, [settings]);
+
     function attributesChanged() {
         if (!attributes) return;
         const lVarsCopy = { ...lVars };

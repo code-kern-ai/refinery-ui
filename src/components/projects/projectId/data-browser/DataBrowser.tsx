@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from "react-redux"
 import DataBrowserSidebar from "./DataBrowserSidebar";
 import { useLazyQuery } from "@apollo/client";
 import { DATA_SLICES, GET_RECORD_COMMENTS, SEARCH_RECORDS_EXTENDED } from "@/src/services/gql/queries/data-browser";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { expandRecordList, setDataSlices, setRecordComments, setSearchRecordsExtended, setUsersMapCount, updateAdditionalDataState } from "@/src/reduxStore/states/pages/data-browser";
 import { postProcessDataSlices, postProcessRecordComments, postProcessRecordsExtended, postProcessUsersCount } from "@/src/util/components/projects/projectId/data-browser/data-browser-helper";
 import { GET_ATTRIBUTES_BY_PROJECT_ID, GET_EMBEDDING_SCHEMA_BY_PROJECT_ID, GET_LABELING_TASKS_BY_PROJECT_ID } from "@/src/services/gql/queries/project-setting";
@@ -14,6 +14,8 @@ import { GET_ORGANIZATION_USERS_WITH_COUNT } from "@/src/services/gql/queries/or
 import { selectAllUsers } from "@/src/reduxStore/states/general";
 import DataBrowserRecords from "./DataBrowserRecords";
 import { postProcessingEmbeddings } from "@/src/util/components/projects/projectId/settings/embeddings-helper";
+import { WebSocketsService } from "@/src/services/base/web-sockets/WebSocketsService";
+import { CurrentPage } from "@/src/types/shared/general";
 
 const SEARCH_REQUEST = { offset: 0, limit: 20 };
 
@@ -37,13 +39,16 @@ export default function DataBrowser() {
     useEffect(() => {
         if (!projectId) return;
         if (!users) return;
-        refetchDataSlices({ variables: { projectId: projectId } }).then((res) => {
-            dispatch(setDataSlices(postProcessDataSlices(res.data.dataSlices)));
-        });
+        refetchDataSlicesAndProcess();
         refetchAttributesAndProcess();
         refetchLabelingTasksAndProcess();
         refetchUsersCountAndProcess();
         refetchEmbeddingsAndPostProcess();
+        WebSocketsService.subscribeToNotification(CurrentPage.DATA_BROWSER, {
+            projectId: projectId,
+            whitelist: ['data_slice_created', 'data_slice_updated', 'data_slice_deleted', 'label_created', 'label_deleted', 'labeling_task_deleted', 'labeling_task_updated', 'labeling_task_created', 'information_source_created', 'information_source_updated', 'information_source_deleted', 'attributes_updated', 'calculate_attribute', 'embedding', 'embedding_deleted'],
+            func: handleWebsocketNotification
+        });
     }, [projectId, users]);
 
     useEffect(() => {
@@ -62,6 +67,12 @@ export default function DataBrowser() {
             refetchRecordCommentsAndProcess(parsedRecordData.recordList);
         });
     }, [searchRequest]);
+
+    function refetchDataSlicesAndProcess() {
+        refetchDataSlices({ variables: { projectId: projectId } }).then((res) => {
+            dispatch(setDataSlices(postProcessDataSlices(res.data.dataSlices)));
+        });
+    }
 
     function refetchAttributesAndProcess() {
         refetchAttributes({ variables: { projectId: projectId, stateFilter: ['ALL'] } }).then((res) => {
@@ -108,6 +119,23 @@ export default function DataBrowser() {
     function getNextRecords() {
         setSearchRequest({ offset: searchRequest.offset + searchRequest.limit, limit: searchRequest.limit });
     }
+
+    const handleWebsocketNotification = useCallback((msgParts: string[]) => {
+        if (['data_slice_created', 'data_slice_updated', 'data_slice_deleted'].includes(msgParts[1])) {
+            refetchDataSlicesAndProcess();
+        } else if (['label_created', 'label_deleted', 'labeling_task_deleted', 'labeling_task_updated', 'labeling_task_created', 'information_source_created', 'information_source_updated', 'information_source_deleted'].includes(msgParts[1])) {
+            refetchLabelingTasksAndProcess();
+        } else if (['calculate_attribute', 'attributes_updated'].includes(msgParts[1])) {
+            refetchAttributesAndProcess();
+        } else if ((msgParts[1] == 'embedding' && msgParts[3] == "state" && msgParts[4] == "FINISHED") || msgParts[1] == 'embedding_deleted') {
+            refetchEmbeddingsAndPostProcess();
+        }
+    }, [projectId]);
+
+    useEffect(() => {
+        if (!projectId) return;
+        WebSocketsService.updateFunctionPointer(projectId, CurrentPage.DATA_BROWSER, handleWebsocketNotification)
+    }, [handleWebsocketNotification, projectId]);
 
     return (<>
         {projectId && <div className="flex flex-row h-full">

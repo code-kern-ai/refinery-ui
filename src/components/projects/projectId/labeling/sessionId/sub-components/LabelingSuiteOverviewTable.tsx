@@ -10,12 +10,11 @@ import { buildOverviewTableDisplayArray, filterRlaDataForUser, filterRlaLabelCon
 import { LabelSource } from "@/submodules/javascript-functions/enums/enums";
 import { useMutation } from "@apollo/client";
 import { IconSearch, IconTrash } from "@tabler/icons-react";
-import { use, useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import LabelingInfoTableModal from "./LabelingInfoTableModal";
 import { LabelingPageParts } from "@/src/types/components/projects/projectId/labeling/labeling-main-component";
 import { jsonCopy } from "@/submodules/javascript-functions/general";
-import { useConsoleLog } from "@/submodules/react-components/hooks/useConsoleLog";
 
 
 function shouldHighLight(tmpHighlightIds: string[], comparedIds: string[]) {
@@ -118,9 +117,17 @@ export default function LabelingSuiteOverviewTable() {
 
     function onMouseEvent(update: boolean, labelId: string) {
         const hoverGroupsDictCopy = jsonCopy(hoverGroupsDict);
-        hoverGroupsDictCopy[labelId][LabelingPageParts.TASK_HEADER] = update;
-        hoverGroupsDictCopy[labelId][LabelingPageParts.LABELING] = update;
-        hoverGroupsDictCopy[labelId][LabelingPageParts.OVERVIEW_TABLE] = update;
+        for (const labelIdKey in hoverGroupsDictCopy) {
+            if (labelIdKey == labelId) {
+                hoverGroupsDictCopy[labelIdKey][LabelingPageParts.OVERVIEW_TABLE] = update;
+                hoverGroupsDictCopy[labelIdKey][LabelingPageParts.TASK_HEADER] = update;
+                hoverGroupsDictCopy[labelIdKey][LabelingPageParts.LABELING] = update;
+            } else {
+                hoverGroupsDictCopy[labelIdKey][LabelingPageParts.OVERVIEW_TABLE] = false;
+                hoverGroupsDictCopy[labelIdKey][LabelingPageParts.TASK_HEADER] = false;
+                hoverGroupsDictCopy[labelIdKey][LabelingPageParts.LABELING] = false;
+            }
+        }
         dispatch(setHoverGroupDict(hoverGroupsDictCopy));
     }
 

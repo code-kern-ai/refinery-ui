@@ -240,9 +240,9 @@ export default function LabelingMainComponent() {
         </div>}
         <NavigationBarTop />
         <div className="flex-grow overflow-y-auto" style={{ height: 'calc(100vh - 194px)' }}>
-            <LabelingSuiteTaskHeader />
+            {settings.task.show && <LabelingSuiteTaskHeader />}
             <LabelingSuiteLabeling />
-            <LabelingSuiteOverviewTable />
+            {settings.overviewTable.show && <LabelingSuiteOverviewTable />}
         </div>
         <NavigationBarBottom />
     </div>)
