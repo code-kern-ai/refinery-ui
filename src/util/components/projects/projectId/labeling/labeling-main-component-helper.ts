@@ -15,7 +15,7 @@ export const ALL_USERS_USER_ID = "ALL_USERS"
 export function parseLabelingLink(router: any) {
     const projectId = router.query.projectId;
     const id = router.query.sessionId;
-    const requestedPosStr = router.query.requestedPos;
+    const requestedPosStr = router.query.pos;
     const isPosNumber = !Number.isNaN(Number(requestedPosStr));
     const type = linkTypeFromStr(router.query.type);
 

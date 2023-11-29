@@ -130,6 +130,7 @@ export function getLabelData(e: any): any {
     const color = e.labelingTaskLabel.color
     return {
         name: e.labelingTaskLabel.name,
+        id: e.labelingTaskLabel.id,
         value: value,
         backgroundColor: 'bg-' + color + '-100',
         textColor: 'text-' + color + '-700',
@@ -148,11 +149,11 @@ export function getEmptyHeaderHover() {
     //holds dummy group as first element to not use a main group
     return {
         class: 'bg-gray-200 font-bold',
-        typeCollection: 'TYPE,',
-        taskCollection: 'TASK,',
-        labelCollection: 'LABEL,',
-        createdByCollection: 'CR,',
-        rlaCollection: 'RLA,',
+        typeCollection: ['Type'],
+        taskCollection: ['Task'],
+        labelCollection: ['Label'],
+        createdByCollection: ['Created by'],
+        rlaCollection: ['RLA ID'],
     }
 }
 
@@ -198,5 +199,6 @@ export function filterRlaLabelCondition(rla: any, settings, projectId): boolean 
 }
 
 export function getShouldHighlightOn(rla: any): string[] {
-    return [rla.id, rla.labelingTaskLabel.name]
+    const fullName = rla.user.firstName + ' ' + rla.user.lastName;
+    return [rla.id, rla.labelingTaskLabel.id, rla.sourceType, rla.labelingTaskLabel.labelingTask.name, fullName]
 }

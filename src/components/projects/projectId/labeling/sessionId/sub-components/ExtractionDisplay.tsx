@@ -1,16 +1,28 @@
-import { selectSettings } from "@/src/reduxStore/states/pages/labeling";
+import { selectHoverGroupDict, selectSettings, setHoverGroupDict } from "@/src/reduxStore/states/pages/labeling";
 import { LineBreaksType } from "@/src/types/components/projects/projectId/data-browser/data-browser";
 import { ExtractionDisplayProps } from "@/src/types/components/projects/projectId/labeling/labeling";
+import { LabelingPageParts } from "@/src/types/components/projects/projectId/labeling/labeling-main-component";
 import { LabelSource } from "@/submodules/javascript-functions/enums/enums";
-import { useConsoleLog } from "@/submodules/react-components/hooks/useConsoleLog";
+import { jsonCopy } from "@/submodules/javascript-functions/general";
 import { Tooltip } from "@nextui-org/react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 
 export default function ExtractionDisplay(props: ExtractionDisplayProps) {
+    const dispatch = useDispatch();
+
     const settings = useSelector(selectSettings);
+    const hoverGroupsDict = useSelector(selectHoverGroupDict);
 
     function deleteRecordLabelAssociation(rlaId: string) {
         props.deleteRla(rlaId);
+    }
+
+    function onMouseEvent(update: boolean, labelId?: string) {
+        const hoverGroupsDictCopy = jsonCopy(hoverGroupsDict);
+        hoverGroupsDictCopy[labelId][LabelingPageParts.TASK_HEADER] = update;
+        hoverGroupsDictCopy[labelId][LabelingPageParts.LABELING] = update;
+        hoverGroupsDictCopy[labelId][LabelingPageParts.OVERVIEW_TABLE] = update;
+        dispatch(setHoverGroupDict(hoverGroupsDictCopy));
     }
 
     return (<>
@@ -19,15 +31,19 @@ export default function ExtractionDisplay(props: ExtractionDisplayProps) {
                 style={{ marginBottom: props.tokenLookup[props.attributeId][token.idx]?.tokenMarginBottom }}
                 data-tokenidx={token.idx} data-attributeid={props.attributeId}>
                 {token.countLineBreaks == 0 ? (<>
-                    {token.type ? (<Tooltip content={'spaCy type: ' + token.type} color="invert" placement="top"><TokenValue token={token} attributeId={props.attributeId} setSelected={(e) => props.setSelected(token.idx, token.idx, e)} /></Tooltip>) : (<>
+                    {token.type ? (<Tooltip content={'spaCy type: ' + token.type} color="invert" placement="top">
+                        <TokenValue token={token} attributeId={props.attributeId} setSelected={(e) => props.setSelected(token.idx, token.idx, e)} />
+                    </Tooltip>) : (<>
                         <TokenValue token={token} attributeId={props.attributeId} setSelected={(e) => props.setSelected(token.idx, token.idx, e)} /></>)}
                     {props.tokenLookup[props.attributeId][token.idx] && <>
                         {props.tokenLookup[props.attributeId][token.idx].rlaArray.map((rlaItem, index) => (<div key={index} className={`absolute left-0 right-0 top-0 flex items-end z-n-2`} style={{ bottom: rlaItem.bottomPos }}>
-                            <div className={`h-px flex items-end w-full relative ${props.labelLookup[rlaItem.labelId].color.backgroundColor} ${props.labelLookup[rlaItem.labelId].color.textColor} ${props.labelLookup[rlaItem.labelId].color.borderColor}`}
+                            <div className={`h-px flex items-end w-full relative ${props.labelLookup[rlaItem.labelId].color.backgroundColor} ${props.labelLookup[rlaItem.labelId].color.textColor} ${props.labelLookup[rlaItem.labelId].color.borderColor} ${hoverGroupsDict[rlaItem.labelId][LabelingPageParts.LABELING] ? 'heightHover' : ''}`}
                                 onMouseEnter={(e: any) => {
                                     e.target.classList.add('heightHover');
+                                    onMouseEvent(true, rlaItem.labelId);
                                 }} onMouseLeave={(e: any) => {
                                     e.target.classList.remove('heightHover');
+                                    onMouseEvent(false, rlaItem.labelId);
                                 }}
                                 style={{
                                     borderBottomWidth: '1px',

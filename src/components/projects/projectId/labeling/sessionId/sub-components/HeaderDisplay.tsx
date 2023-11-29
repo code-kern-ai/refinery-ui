@@ -4,14 +4,16 @@ import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import QuickButtons from "./QuickButtons";
 import LabelSettingsBox from "./LabelSettingsBox";
-import { selectSettings, setSettings } from "@/src/reduxStore/states/pages/labeling";
+import { selectHoverGroupDict, selectSettings, setHoverGroupDict, setSettings } from "@/src/reduxStore/states/pages/labeling";
 import { jsonCopy } from "@/submodules/javascript-functions/general";
+import { LabelingPageParts } from "@/src/types/components/projects/projectId/labeling/labeling-main-component";
 
 export default function HeaderDisplay(props: HeaderDisplayProps) {
     const dispatch = useDispatch();
 
     const projectId = useSelector(selectProjectId);
     const settings = useSelector(selectSettings);
+    const hoverGroupsDict = useSelector(selectHoverGroupDict);
 
     const [labelSettingsLabel, setLabelSettingsLabel] = useState<LabelingSuiteTaskHeaderLabelDisplayData>(null);
     const [position, setPosition] = useState({ top: 0, left: 0 });
@@ -97,6 +99,14 @@ export default function HeaderDisplay(props: HeaderDisplayProps) {
         dispatch(setSettings(settingsCopy));
     }
 
+    function onMouseEvent(update: boolean, labelId: string) {
+        const hoverGroupsDictCopy = jsonCopy(hoverGroupsDict);
+        hoverGroupsDictCopy[labelId][LabelingPageParts.TASK_HEADER] = update;
+        hoverGroupsDictCopy[labelId][LabelingPageParts.LABELING] = update;
+        hoverGroupsDictCopy[labelId][LabelingPageParts.OVERVIEW_TABLE] = update;
+        dispatch(setHoverGroupDict(hoverGroupsDictCopy));
+    }
+
     return (<div className="border md:rounded-lg">
         <table className="min-w-full">
             <tbody className="bg-white divide-y divide-gray-200">
@@ -109,7 +119,8 @@ export default function HeaderDisplay(props: HeaderDisplayProps) {
                             {task.labelOrder.map((labelId, j) => (<div key={labelId} onClick={(e) => {
                                 setLabelSettingsLabelFunc(task.labels[labelId]);
                                 labelSettingsBoxPosition(e);
-                            }} className="text-sm font-medium px-2 py-0.5 rounded-md border focus:outline-none cursor-pointer flex flex-row flex-no-wrap gap-x-1 items-center">
+                            }} onMouseEnter={() => onMouseEvent(true, task.labels[labelId].id)} onMouseLeave={() => onMouseEvent(false, task.labels[labelId].id)}
+                                className={`text-sm font-medium px-2 py-0.5 rounded-md border focus:outline-none cursor-pointer flex flex-row flex-no-wrap gap-x-1 items-center ${hoverGroupsDict[task.labels[labelId].id][LabelingPageParts.TASK_HEADER] ? settings.main.hoverGroupBackgroundColorClass : ''}`}>
                                 {settings.task[projectId] && settings.task[projectId][task.id] && settings.task[projectId][task.id][labelId] && <div className="grid grid-cols-2 gap-0.5">
                                     <div className={`w-2.5 h-2.5 border rounded-full ${settings.task[projectId][task.id][labelId].showManual ? task.labels[labelId].color.backgroundColor : 'bg-white'} ${task.labels[labelId].color.borderColor}`}></div>
                                     <div className={`w-2.5 h-2.5 border rounded-full ${settings.task[projectId][task.id][labelId].showWeakSupervision ? task.labels[labelId].color.backgroundColor : 'bg-white'} ${task.labels[labelId].color.borderColor}`}></div>

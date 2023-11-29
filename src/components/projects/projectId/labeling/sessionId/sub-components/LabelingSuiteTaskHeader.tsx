@@ -6,7 +6,7 @@ import { LabelingSuiteTaskHeaderDisplayData } from "@/src/types/components/proje
 import { LabelingTaskTaskType } from "@/src/types/components/projects/projectId/settings/labeling-tasks";
 import { getHoverGroupsTaskOverview, setLabelsForDisplay } from "@/src/util/components/projects/projectId/labeling/task-header-helper";
 import { postProcessLabelingTasks, postProcessLabelingTasksSchema } from "@/src/util/components/projects/projectId/settings/labeling-tasks-helper";
-import { jsonCopy } from "@/submodules/javascript-functions/general";
+import { arrayToDict, jsonCopy } from "@/submodules/javascript-functions/general";
 import { useLazyQuery } from "@apollo/client";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -14,7 +14,8 @@ import style from "@/src/styles/components/projects/projectId/labeling.module.cs
 import { IconLayoutNavbarCollapse } from "@tabler/icons-react";
 import QuickButtons from "./QuickButtons";
 import HeaderDisplay from "./HeaderDisplay";
-import { selectSettings, setSettings, updateSettings } from "@/src/reduxStore/states/pages/labeling";
+import { selectSettings, setHoverGroupDict, setSettings, updateSettings } from "@/src/reduxStore/states/pages/labeling";
+import { LabelingPageParts } from "@/src/types/components/projects/projectId/labeling/labeling-main-component";
 
 export default function LabelingSuiteTaskHeader() {
     const dispatch = useDispatch();
@@ -39,6 +40,7 @@ export default function LabelingSuiteTaskHeader() {
         const settingsCopy = jsonCopy(settings);
         for (const task of data) {
             const taskCopy = jsonCopy(task);
+            if (!settingsCopy.task[projectId]) settingsCopy.task[projectId] = {};
             let taskSettings = settingsCopy.task[projectId][taskCopy.id];
             if (!taskSettings) {
                 taskSettings = {};
@@ -62,6 +64,17 @@ export default function LabelingSuiteTaskHeader() {
         const settingsCopy2 = jsonCopy(settings);
         settingsCopy2.task[projectId] = settingsCopy.task[projectId];
         dispatch(setSettings(settingsCopy2));
+
+        const labelIds = finalData.map(d => d.labelOrder).flat();
+        const labels = arrayToDict(labelingTasks.map(t => t.labels).flat(), "id");
+        for (const labelId of labelIds) {
+            labels[labelId] = {
+                [LabelingPageParts.TASK_HEADER]: false,
+                [LabelingPageParts.LABELING]: false,
+                [LabelingPageParts.OVERVIEW_TABLE]: false
+            }
+        }
+        dispatch(setHoverGroupDict(labels));
 
         finalData.sort((a, b) => a.orderPos - b.orderPos || a.name.localeCompare(b.name));
         return finalData;

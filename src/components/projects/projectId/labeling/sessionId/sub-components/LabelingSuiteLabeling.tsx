@@ -1,6 +1,6 @@
 import LoadingIcon from "@/src/components/shared/loading/LoadingIcon"
 import { selectUser } from "@/src/reduxStore/states/general"
-import { removeFromRlaById, selectRecordRequests, selectRecordRequestsRecord, selectSettings, selectUserDisplayId } from "@/src/reduxStore/states/pages/labeling"
+import { removeFromRlaById, selectHoverGroupDict, selectRecordRequests, selectRecordRequestsRecord, selectSettings, selectUserDisplayId, setHoverGroupDict } from "@/src/reduxStore/states/pages/labeling"
 import { selectAttributes, selectLabelingTasksAll } from "@/src/reduxStore/states/pages/settings"
 import { selectProjectId } from "@/src/reduxStore/states/project"
 import { LabelingVars, TokenLookup } from "@/src/types/components/projects/projectId/labeling/labeling"
@@ -10,7 +10,7 @@ import { DEFAULT_LABEL_COLOR, FULL_RECORD_ID, SWIM_LANE_SIZE_PX, buildLabelingRl
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants"
 import { Tooltip } from "@nextui-org/react"
 import { IconAlertCircle, IconAssembly, IconBolt, IconCode, IconPointerStar, IconSparkles, IconStar, IconStarFilled, IconUsers } from "@tabler/icons-react"
-import { Fragment, use, useEffect, useState } from "react"
+import { Fragment, useEffect, useState } from "react"
 import { useDispatch, useSelector } from "react-redux"
 import ExtractionDisplay from "./ExtractionDisplay"
 import { LineBreaksType } from "@/src/types/components/projects/projectId/data-browser/data-browser"
@@ -24,6 +24,8 @@ import { GOLD_STAR_USER_ID } from "@/src/util/components/projects/projectId/labe
 import { useRouter } from "next/router"
 import LabelSelectionBox from "./LabelSelectionBox"
 import { filterRlaDataForUser } from "@/src/util/components/projects/projectId/labeling/overview-table-helper"
+import { LabelingPageParts } from "@/src/types/components/projects/projectId/labeling/labeling-main-component"
+import style from '@/src/styles/components/projects/projectId/labeling.module.css';
 
 export default function LabelingSuiteLabeling() {
     const router = useRouter();
@@ -37,6 +39,7 @@ export default function LabelingSuiteLabeling() {
     const user = useSelector(selectUser);
     const record = useSelector(selectRecordRequestsRecord);
     const displayUserId = useSelector(selectUserDisplayId);
+    const hoverGroupsDict = useSelector(selectHoverGroupDict);
 
     const [lVars, setLVars] = useState<LabelingVars>(getDefaultLabelingVars());
     const [tokenLookup, setTokenLookup] = useState<TokenLookup>({});
@@ -462,6 +465,14 @@ export default function LabelingSuiteLabeling() {
         });
     }
 
+    function onMouseEvent(update: boolean, labelId: string) {
+        const hoverGroupsDictCopy = jsonCopy(hoverGroupsDict);
+        hoverGroupsDictCopy[labelId][LabelingPageParts.TASK_HEADER] = update;
+        hoverGroupsDictCopy[labelId][LabelingPageParts.LABELING] = update;
+        hoverGroupsDictCopy[labelId][LabelingPageParts.OVERVIEW_TABLE] = update;
+        dispatch(setHoverGroupDict(hoverGroupsDictCopy));
+    }
+
     return (<div className="bg-white relative p-4">
         {lVars.loading && <LoadingIcon size="lg" />}
         {!lVars.loading && !recordRequests.record && <div className="flex items-center justify-center text-red-500">This Record has been deleted</div>}
@@ -520,8 +531,8 @@ export default function LabelingSuiteLabeling() {
                                 {rlaDataToDisplay[task.task.id] && <div>
                                     <div className={`flex gap-2 ${settings.labeling.compactClassificationLabelDisplay ? 'flex-row flex-wrap items-center' : 'flex-col'}`}>
                                         {rlaDataToDisplay[task.task.id].map((rlaLabel, index) => (<Tooltip key={index} content={rlaLabel.dataTip} color="invert" placement="top" className="w-max">
-                                            <div onClick={() => rlaLabel.sourceTypeKey == 'WEAK_SUPERVISION' ? addRla(task.task, rlaLabel.labelId) : null}
-                                                className={`text-sm font-medium px-2 py-0.5 rounded-md border focus:outline-none relative flex items-center ${labelLookup[rlaLabel.labelId].color.backgroundColor} ${labelLookup[rlaLabel.labelId].color.textColor} ${labelLookup[rlaLabel.labelId].color.borderColor}`}>
+                                            <div onClick={() => rlaLabel.sourceTypeKey == 'WEAK_SUPERVISION' ? addRla(task.task, rlaLabel.labelId) : null} onMouseEnter={() => onMouseEvent(true, rlaLabel.labelId)} onMouseLeave={() => onMouseEvent(false, rlaLabel.labelId)}
+                                                className={`text-sm font-medium px-2 py-0.5 rounded-md border focus:outline-none relative flex items-center ${labelLookup[rlaLabel.labelId].color.backgroundColor} ${labelLookup[rlaLabel.labelId].color.textColor} ${labelLookup[rlaLabel.labelId].color.borderColor} ${hoverGroupsDict[rlaLabel.labelId][LabelingPageParts.LABELING] ? style.labelOverlayManual : ''}`}>
                                                 {rlaLabel.icon && <div className="mr-1">
                                                     {rlaLabel.icon == InformationSourceType.LABELING_FUNCTION && <IconCode size={20} strokeWidth={1.5} />}
                                                     {rlaLabel.icon == InformationSourceType.ACTIVE_LEARNING && <IconPointerStar size={20} strokeWidth={1.5} />}

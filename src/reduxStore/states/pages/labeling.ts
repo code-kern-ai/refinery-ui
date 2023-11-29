@@ -25,6 +25,7 @@ type LabelingSuiteState = {
     settings: LabelingSuiteSettings;
     tmpHighlightIds: string[];
     displayUserId: string;
+    hoverGroupDict: { [key: string]: any };
 }
 
 function getInitState(): LabelingSuiteState {
@@ -45,6 +46,7 @@ function getInitState(): LabelingSuiteState {
         settings: getDefaultLabelingSuiteSettings(),
         tmpHighlightIds: [],
         displayUserId: null,
+        hoverGroupDict: {},
     };
 }
 
@@ -183,6 +185,10 @@ const labelingSlice = createSlice({
         setUserDisplayId(state, action: PayloadAction<string>) {
             if (action.payload) state.displayUserId = action.payload;
             else state.displayUserId = null;
+        },
+        setHoverGroupDict(state, action: PayloadAction<any>) {
+            if (action.payload) state.hoverGroupDict = action.payload;
+            else state.hoverGroupDict = {};
         }
     },
 });
@@ -199,8 +205,9 @@ export const selectUserIconsData = (state: any) => state.labeling.userIconsData;
 export const selectSettings = (state: any) => state.labeling.settings;
 export const selectTmpHighlightIds = (state: any) => state.labeling.tmpHighlightIds;
 export const selectUserDisplayId = (state: any) => state.labeling.displayUserId;
+export const selectHoverGroupDict = (state: any) => state.labeling.hoverGroupDict;
 
-export const { setAvailableLinks, setSelectedLink, updateRecordRequests, updateUsers, setSettings, updateSettings, removeFromRlaById, tmpAddHighlightIds, setUserDisplayId } = labelingSlice.actions;
+export const { setAvailableLinks, setSelectedLink, updateRecordRequests, updateUsers, setSettings, updateSettings, removeFromRlaById, tmpAddHighlightIds, setUserDisplayId, setHoverGroupDict } = labelingSlice.actions;
 
 export const labelingReducer = labelingSlice.reducer;
 

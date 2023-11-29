@@ -18,6 +18,7 @@ export type TableDisplayData = {
         backgroundColor: string,
         textColor: string,
         borderColor: string,
+        id: string,
     },
     rla: any
     canBeDeleted: boolean,
@@ -26,11 +27,11 @@ export type TableDisplayData = {
 
 export type HeaderHover = {
     class: string,
-    typeCollection: string,
-    taskCollection: string,
-    labelCollection: string,
-    createdByCollection: string,
-    rlaCollection: string,
+    typeCollection: string[],
+    taskCollection: string[],
+    labelCollection: string[],
+    createdByCollection: string[],
+    rlaCollection: string[],
 }
 
 export type LabelingInfoTableModalProps = {
