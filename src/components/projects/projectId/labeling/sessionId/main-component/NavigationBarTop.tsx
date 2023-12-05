@@ -24,8 +24,8 @@ export default function NavigationBarTop() {
     const displayId = useSelector(selectUserDisplayId);
 
     function goToRecordIde() {
-        const sessionId = SessionManager.labelingLinkData.huddleId;
-        const pos = SessionManager.labelingLinkData.requestedPos;
+        const sessionId = router.query.sessionId as string;
+        const pos = router.query.pos as string;
         router.push(`/projects/${projectId}/record-ide/${sessionId}?pos=${pos}`);
     }
 

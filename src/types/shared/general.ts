@@ -20,6 +20,7 @@ export enum CurrentPage {
     ACTIVE_LEARNING = "ACTIVE_LEARNING",
     ZERO_SHOT = "ZERO_SHOT",
     CROWD_LABELER = "CROWD_LABELER",
+    RECORD_IDE = "RECORD_IDE",
 }
 
 export type User = {

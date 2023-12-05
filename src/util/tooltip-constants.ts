@@ -205,5 +205,15 @@ export const TOOLTIPS_DICT = {
         'SET_LABELS_GOLD_STAR': 'Set manual task labels as gold labels',
         'CHOOSE_LABELS': 'Choose from your labels',
         'CREATE_LABEL': 'Create label'
+    },
+    [CurrentPage.RECORD_IDE]: {
+        'GO_TO_LABELING': 'Go to labeling page',
+        'LOAD_STORAGE': 'Load code from local (browser) storage',
+        'SAVE_STORAGE': 'Save code to local (browser) storage',
+        'SWITCH_TO_HORIZONTAL': 'Switch to horizontal view',
+        'SWITCH_TO_VERTICAL': 'Switch to vertical view',
+        'IDX_SESSION': 'Number of the current index in session',
+        'RUN_CODE': 'Press Shift + Enter in the editor&#10;to run the code',
+        'CLEAR_SHELL': 'Clear shell output screen'
     }
 }
