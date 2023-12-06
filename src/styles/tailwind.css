@@ -35,6 +35,36 @@
     z-index: -1 !important;
 }
 
+@-webkit-keyframes yellow-fade {
+    from {
+        background: rgb(255, 214, 102);
+    }
+
+    to {
+        background: #fff;
+    }
+}
+
+@-moz-keyframes yellow-fade {
+    from {
+        background: rgb(255, 214, 102);
+    }
+
+    to {
+        background: #fff;
+    }
+}
+
+@keyframes yellow-fade {
+    from {
+        background: rgb(255, 214, 102);
+    }
+
+    to {
+        background: #fff;
+    }
+}
+
 #flash-it {
     -webkit-animation: yellow-fade 1s ease-in-out 0s;
     -moz-animation: yellow-fade 1s ease-in-out 0s;
