@@ -1,10 +1,14 @@
+import { openModal } from "@/src/reduxStore/states/modal";
 import { EditFieldProps } from "@/src/types/components/projects/projectId/edit-records";
 import { DataTypeEnum } from "@/src/types/shared/general";
+import { ModalEnum } from "@/src/types/shared/modal";
 import { buildAccessKey } from "@/src/util/components/projects/projectId/edit-records-helper";
 import { jsonCopy } from "@/submodules/javascript-functions/general";
 import { useRef, useState } from "react";
+import { useDispatch } from "react-redux";
 
 export default function EditField(props: EditFieldProps) {
+    const dispatch = useDispatch();
 
     const [inputValue, setInputValue] = useState(props.record.data[props.attribute.name]);
 
@@ -41,7 +45,7 @@ export default function EditField(props: EditFieldProps) {
             }
             erdDataCopy.cachedRecordChanges[accessKey] = cacheItem;
             if (!erdDataCopy.modals.hideExplainModal && Object.keys(erdDataCopy.cachedRecordChanges).length == 1) {
-                erdDataCopy.modals.explainModalOpen = true;
+                dispatch(openModal(ModalEnum.EXPLAIN_EDIT_RECORDS));
                 erdDataCopy.modals.hideExplainModal = true;
             }
 

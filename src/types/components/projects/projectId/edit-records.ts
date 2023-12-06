@@ -16,7 +16,6 @@ export type EditRecordComponentData = {
     },
     columnClass: string,
     modals: {
-        explainModalOpen: boolean,
         hideExplainModal: boolean
     }
     data?: EditRecordSessionData,
@@ -50,5 +49,15 @@ export type EditFieldProps = {
     attribute: Attribute;
     record: any;
     subKey?: number;
+    setErdData: (erdData: EditRecordComponentData) => void;
+}
+
+export type ExplainModalProps = {
+    erdData: EditRecordComponentData;
+    setErdData: (erdData: EditRecordComponentData) => void;
+}
+
+export type SyncRecordsModalProps = {
+    erdData: EditRecordComponentData;
     setErdData: (erdData: EditRecordComponentData) => void;
 }

@@ -31,7 +31,7 @@ export default function EditRecords() {
 
     return (<>{projectId && <div className="h-screen bg-white flex flex-col">
         <NavBarTopEditRecords erdData={erdData} setErdData={(erdData) => setErdData(erdData)} />
-        <div className={`grid items-start p-2 gap-2 flex-grow overflow-y-auto auto-rows-max ${erdData.columnClass}`} style={{ maxHeight: 'calc(100vh - 95px)' }}>
+        <div className={`grid items-start pt-2 px-2 pb-8 gap-2 flex-grow overflow-y-auto auto-rows-max ${erdData.columnClass}`} style={{ maxHeight: 'calc(100vh - 95px)' }}>
             {erdData.data && <>
                 {erdData.displayRecords.map((record) =>
                     <div key={record.id} className={`relative space-x-3 items-center bg-white overflow-hidden shadow rounded-lg border w-full scroll-mt-8 ${erdData.displayRecords?.length > 2 ? style.item : ''}`}

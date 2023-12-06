@@ -3,16 +3,15 @@ import { selectProjectId } from "@/src/reduxStore/states/project";
 import { NavBarTopEditRecordsProps } from "@/src/types/components/projects/projectId/edit-records";
 import { ModalEnum } from "@/src/types/shared/modal";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
-import { useConsoleLog } from "@/submodules/react-components/hooks/useConsoleLog";
 import { Tooltip } from "@nextui-org/react";
 import { IconColumns1, IconColumns2, IconColumns3, IconDatabase } from "@tabler/icons-react";
 import { useRouter } from "next/router";
-import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import SyncRecordsModal from "./SyncRecordsModal";
 import { timer } from "rxjs";
 import { scrollElementIntoView } from "@/submodules/javascript-functions/scrollHelper";
 import { jsonCopy } from "@/submodules/javascript-functions/general";
+import ExplainModal from "./ExplainModal";
 
 export default function NavBarTopEditRecords(props: NavBarTopEditRecordsProps) {
     const router = useRouter();
@@ -78,6 +77,7 @@ export default function NavBarTopEditRecords(props: NavBarTopEditRecordsProps) {
                 </div>
             </div >
         </div >
-        <SyncRecordsModal />
+        <ExplainModal erdData={props.erdData} setErdData={(erdData) => props.setErdData(erdData)} />
+        <SyncRecordsModal erdData={props.erdData} setErdData={(erdData) => props.setErdData(erdData)} />
     </div >)
 }

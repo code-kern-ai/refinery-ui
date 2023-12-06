@@ -11,7 +11,6 @@ export function createDefaultEditRecordComponentData(): EditRecordComponentData 
         errors: null,
         columnClass: columnClass,
         modals: {
-            explainModalOpen: false,
             hideExplainModal: isStringTrue(hideExplainModal),
         },
         navBar: {

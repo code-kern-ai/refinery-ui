@@ -28,7 +28,7 @@ export function RecordDisplay(props: any) {
     }, [props.record, attributes, isTextHighlightNeeded]);
 
     return (<>
-        {preparedAttributes && preparedAttributes.map((attribute, index) => (<div key={attribute.id}>
+        {preparedAttributes && preparedAttributes.map((attribute, index) => (<div key={index}>
             <div key={index} className="font-semibold text-sm text-gray-800">
                 <div className="flex flex-row items-center">
                     <span className="font-dmMono">{attributesDict[attribute.id]?.name}</span>
@@ -36,7 +36,7 @@ export function RecordDisplay(props: any) {
             </div>
             {attributesDict[attribute.id] && <div className="text-gray-800 text-sm mb-4 overflow-anywhere flex">
                 {attribute.dataType == DataTypeEnum.EMBEDDING_LIST ? (<div className="flex flex-col gap-y-1 divide-y">
-                    {preparedRecord.data[attributesDict[attribute.key].name].map((item) => (<div key={attributesDict[attribute.key].name} className="pt-1">
+                    {preparedRecord.data[attributesDict[attribute.key].name].map((item, indexJ) => (<div key={indexJ} className="pt-1">
                         {(configuration.highlightText && isTextHighlightNeeded[attribute.key]) ? (<Highlight text={item.toString()}
                             additionalClasses={[configuration.lineBreaks == LineBreaksType.NORMAL ? '' : (configuration.lineBreaks == LineBreaksType.IS_PRE_WRAP ? 'whitespace-pre-wrap' : 'whitespace-pre-line')]}
                             searchForExtended={textHighlight[attribute.id]} />) : (
