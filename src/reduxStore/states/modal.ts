@@ -200,6 +200,10 @@ const initialState: Modals = {
     [ModalEnum.INFO_LABEL_BOX]: {
         open: false,
         labelSettingsLabel: null,
+    },
+    [ModalEnum.SYNC_RECORDS]: {
+        open: false,
+        syncModalAmount: -1,
     }
 };
 

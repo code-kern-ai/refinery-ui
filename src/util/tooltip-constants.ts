@@ -215,5 +215,15 @@ export const TOOLTIPS_DICT = {
         'IDX_SESSION': 'Number of the current index in session',
         'RUN_CODE': 'Press Shift + Enter in the editor&#10;to run the code',
         'CLEAR_SHELL': 'Clear shell output screen'
+    },
+    [CurrentPage.EDIT_RECORDS]: {
+        'GO_TO_DATA_BROWSER': 'Go to data browser',
+        'DIFFERENT_RECORDS': 'If you want different records, you can select new filters in the browser',
+        'PERSIST_CHANGES': 'Persist changes',
+        'SWITCH_COLUMN': 'Switch column count',
+        'CACHED_VALUES': 'Cached values - not yet synchronized with backend',
+        'LABEL_ASSOCIATIONS': 'Has label associations',
+        'STOP_EDIT': 'Stop editing record',
+        'EDIT_RECORD': 'Editing record',
     }
 }

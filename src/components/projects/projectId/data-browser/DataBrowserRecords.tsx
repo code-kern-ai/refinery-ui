@@ -14,6 +14,7 @@ import { useRouter } from 'next/router';
 import { selectProjectId } from '@/src/reduxStore/states/project';
 import ConfigurationModal from './modals/ConfigurationModal';
 import { DataBrowserRecordsProps } from '@/src/types/components/projects/projectId/data-browser/data-browser';
+import { setSessionData } from '@/src/reduxStore/states/tmp';
 
 export default function DataBrowserRecords(props: DataBrowserRecordsProps) {
     const dispatch = useDispatch();
@@ -35,9 +36,14 @@ export default function DataBrowserRecords(props: DataBrowserRecordsProps) {
     }
 
     function storePreliminaryRecordIds(index: number, forEdit: boolean = false) {
-        // TODO: Add the session and the data to the store
         if (forEdit) {
-            router.push(`/projects/${projectId}/edit-record`);
+            const sessionData = {
+                records: extendedRecords.recordList,
+                selectedRecordId: extendedRecords.recordList[index].id,
+                attributes: attributes,
+            }
+            dispatch(setSessionData(sessionData));
+            router.push(`/projects/${projectId}/edit-records`);
         } else {
             router.push(`/projects/${projectId}/labeling`);
         }

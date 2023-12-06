@@ -10,6 +10,7 @@ import { heuristicsReducer } from './states/pages/heuristics';
 import { dataBrowserReducer } from './states/pages/data-browser';
 import { cacheReducer } from './states/cachedValues';
 import { labelingReducer } from './states/pages/labeling';
+import { tmpReducer } from './states/tmp';
 
 const store = configureStore({
     reducer: {
@@ -24,6 +25,7 @@ const store = configureStore({
         dataBrowser: dataBrowserReducer,
         cache: cacheReducer,
         labeling: labelingReducer,
+        tmp: tmpReducer
     },
     devTools: process.env.IS_DEV == '1',
 });
