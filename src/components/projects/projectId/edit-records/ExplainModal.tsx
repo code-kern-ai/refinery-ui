@@ -38,7 +38,7 @@ export default function ExplainModal(props: ExplainModalProps) {
             <IconInfoCircleFilled className="inline-block text-blue-400" />
         </h1>
         <div className="text-sm text-gray-700 flex flex-col gap-y-2 my-2 font-medium">
-            <div>Currently your changes are only <b>cached</b>. This means they aren't persisted/updated yet.</div>
+            <div>Currently your changes are only <b>cached</b>. This means they aren&apos;t persisted/updated yet.</div>
             <div>To persist the changes you need to <b>Synchronize with DB</b>. </div>
             <div>Note that this will rerun tokenization & embedding calculation for changed records.</div>
             <div>Further, already set labels for information extraction will be removed.</div>
