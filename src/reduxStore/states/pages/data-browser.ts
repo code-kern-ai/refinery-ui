@@ -1,4 +1,5 @@
 import { DataSlice, LineBreaksType, SearchRecordsExtended } from '@/src/types/components/projects/projectId/data-browser/data-browser';
+import { Slice } from '@/submodules/javascript-functions/enums/enums';
 import { arrayToDict } from '@/submodules/javascript-functions/general';
 import { createSelector, createSlice } from '@reduxjs/toolkit'
 import type { PayloadAction } from '@reduxjs/toolkit'
@@ -79,7 +80,8 @@ const dataBrowserSlice = createSlice({
             else state.all = [];
             const allRecords = {
                 name: 'All Records',
-                id: '@@NO_SLICE@@'
+                id: '@@NO_SLICE@@',
+                sliceType: Slice.STATIC_DEFAULT
             }
             state.all = [allRecords, ...state.all];
         },
@@ -195,6 +197,7 @@ export const selectRecordComments = (state) => state.dataBrowser.recordComments;
 
 export const selectDataSlicesAll = createSelector([selectDataSlices], (d): any => d ? d.filter((slice) => slice.id != '@@NO_SLICE@@') : null);
 export const selectDataSlicesDict = createSelector([selectDataSlicesAll], (a): any => a ? arrayToDict(a, 'id') : null);
+export const selectStaticSlices = createSelector([selectDataSlices], (a): any => a ? a.filter((slice) => slice.sliceType == Slice.STATIC_DEFAULT) : null);
 
 export const { setDataSlices, setActiveDataSlice, removeFromAllDataSlicesById, updateDataSlicesState, setUsersMapCount, setSearchRecordsExtended, setActiveSearchParams, extendAllDataSlices, updateConfigurationState, updateAdditionalDataState, setTextHighlight, setIsTextHighlightNeeded, setRecordComments, setRecordsInDisplay, expandRecordList } = dataBrowserSlice.actions;
 export const dataBrowserReducer = dataBrowserSlice.reducer;

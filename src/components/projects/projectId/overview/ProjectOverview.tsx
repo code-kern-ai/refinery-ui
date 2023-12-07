@@ -2,7 +2,7 @@ import { selectProjectId } from '@/src/reduxStore/states/project';
 import { WebSocketsService } from '@/src/services/base/web-sockets/WebSocketsService';
 import { CurrentPage } from '@/src/types/shared/general';
 import { useLazyQuery } from '@apollo/client';
-import { use, useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import ProjectOverviewHeader from './ProjectOverviewHeader';
 import { getEmptyProjectStats, postProcessConfusionMatrix, postProcessLabelDistribution, postProcessingStats } from '@/src/util/components/projects/projectId/project-overview/project-overview-helper';
@@ -18,7 +18,7 @@ import { postProcessLabelingTasks, postProcessLabelingTasksSchema } from '@/src/
 import { selectLabelingTasksAll, setAllAttributes, setLabelingTasksAll } from '@/src/reduxStore/states/pages/settings';
 import { postProcessingAttributes } from '@/src/util/components/projects/projectId/settings/data-schema-helper';
 import { DATA_SLICES } from '@/src/services/gql/queries/data-browser';
-import { selectDataSlices, setDataSlices } from '@/src/reduxStore/states/pages/data-browser';
+import { selectStaticSlices, setDataSlices } from '@/src/reduxStore/states/pages/data-browser';
 import { postProcessDataSlices } from '@/src/util/components/projects/projectId/data-browser/data-browser-helper';
 import { selectOverviewFilters, setOverviewFilters } from '@/src/reduxStore/states/tmp';
 import { DisplayGraphs } from '@/submodules/javascript-functions/enums/enums';
@@ -42,7 +42,7 @@ export default function ProjectOverview() {
 
     const projectId = useSelector(selectProjectId);
     const labelingTasks = useSelector(selectLabelingTasksAll);
-    const dataSlices = useSelector(selectDataSlices);
+    const dataSlices = useSelector(selectStaticSlices);
     const overviewFilters = useSelector(selectOverviewFilters);
     const isManaged = useSelector(selectIsManaged);
 

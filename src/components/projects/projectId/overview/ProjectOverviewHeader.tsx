@@ -1,4 +1,4 @@
-import { selectDataSlices } from "@/src/reduxStore/states/pages/data-browser";
+import { selectStaticSlices } from "@/src/reduxStore/states/pages/data-browser";
 import { selectLabelingTasksAll, selectUsableAttributesNoFiltered } from "@/src/reduxStore/states/pages/settings";
 import { selectOverviewFilters, setOverviewFilters, updateOverFilters } from "@/src/reduxStore/states/tmp";
 import { ProjectOverviewFilters } from "@/src/types/components/projects/projectId/project-overview/project-overview";
@@ -17,7 +17,7 @@ export default function ProjectOverviewHeader() {
 
     const labelingTasks = useSelector(selectLabelingTasksAll);
     const targetAttributes = useSelector(selectUsableAttributesNoFiltered);
-    const dataSlices = useSelector(selectDataSlices);
+    const dataSlices = useSelector(selectStaticSlices);
     const overviewFilters = useSelector(selectOverviewFilters);
 
     const [labelingTasksFiltered, setLabelingTasksFiltered] = useState<LabelingTask[]>([]);
