@@ -1,4 +1,7 @@
 import { ChartData, LabelDistribution } from "@/src/types/components/projects/projectId/project-overview/charts";
+import { ProjectOverviewFilters, ProjectStats } from "@/src/types/components/projects/projectId/project-overview/project-overview";
+import { jsonCopy } from "@/submodules/javascript-functions/general";
+import { GOLD_STAR_USER_ID } from "../labeling/labeling-main-component-helper";
 
 export function changeDataStructure(labelDistribution: LabelDistribution): ChartData {
     const group = labelDistribution.labelName;
@@ -51,4 +54,32 @@ export function squashData(data) {
         })
     });
     return squashedData;
+}
+
+export function addUserName(allUsers) {
+    allUsers.forEach(u => {
+        let name;
+        if (u.user.id == GOLD_STAR_USER_ID) name = "Gold Star";
+        else {
+            if (u.user.firstName) name = u.user.firstName[0] + '. ' + u.user.lastName;
+            else name = "Unknown";
+        }
+        u.name = name;
+    });
+    return allUsers;
+}
+
+export function parseOverviewSettingsToDict(interAnnotatorFormGroup: any, overviewFilters: ProjectOverviewFilters): {} {
+    let toReturn = {}
+    const values = interAnnotatorFormGroup;
+
+    toReturn["interAnnotatorAllUsers"] = values.allUsers;
+    toReturn["interAnnotatorGoldUser"] = values.goldUser;
+    toReturn["interAnnotatorDataSlice"] = values.dataSlice;
+    toReturn["labelingTasksTarget"] = overviewFilters.targetAttribute;
+    toReturn["labelingTasks"] = overviewFilters.labelingTask;
+    toReturn["displayGraphs"] = overviewFilters.graphTypeEnum;
+    toReturn["dataSlice"] = overviewFilters.dataSlice;
+
+    return toReturn;
 }

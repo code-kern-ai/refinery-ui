@@ -12,7 +12,7 @@ import { ProjectStats } from '@/src/types/components/projects/projectId/project-
 import style from '@/src/styles/components/projects/projectId/project-overview.module.css';
 import { unsubscribeWSOnDestroy } from '@/src/services/base/web-sockets/web-sockets-helper';
 import { useRouter } from 'next/router';
-import { GET_CONFIDENCE_DISTRIBUTION, GET_CONFUSION_MATRIX, GET_GENERAL_PROJECT_STATS, GET_LABEL_DISTRIBUTION, IS_RATS_TOKENIZAION_STILL_RUNNING } from '@/src/services/gql/queries/project-overview';
+import { GET_CONFIDENCE_DISTRIBUTION, GET_CONFUSION_MATRIX, GET_GENERAL_PROJECT_STATS, GET_INTER_ANNOTATOR_BY_PROJECT_ID, GET_LABEL_DISTRIBUTION, IS_RATS_TOKENIZAION_STILL_RUNNING } from '@/src/services/gql/queries/project-overview';
 import { GET_ATTRIBUTES_BY_PROJECT_ID, GET_LABELING_TASKS_BY_PROJECT_ID } from '@/src/services/gql/queries/project-setting';
 import { postProcessLabelingTasks, postProcessLabelingTasksSchema } from '@/src/util/components/projects/projectId/settings/labeling-tasks-helper';
 import { selectLabelingTasksAll, setAllAttributes, setLabelingTasksAll } from '@/src/reduxStore/states/pages/settings';
@@ -20,7 +20,7 @@ import { postProcessingAttributes } from '@/src/util/components/projects/project
 import { DATA_SLICES } from '@/src/services/gql/queries/data-browser';
 import { selectDataSlices, setDataSlices } from '@/src/reduxStore/states/pages/data-browser';
 import { postProcessDataSlices } from '@/src/util/components/projects/projectId/data-browser/data-browser-helper';
-import { selectOverviewFilters } from '@/src/reduxStore/states/tmp';
+import { selectOverviewFilters, setOverviewFilters } from '@/src/reduxStore/states/tmp';
 import { DisplayGraphs } from '@/submodules/javascript-functions/enums/enums';
 import LabelDistributionBarChart from './charts/LabelDistributionBarChart';
 import { LabelDistribution } from '@/src/types/components/projects/projectId/project-overview/charts';
@@ -28,6 +28,11 @@ import ConfidenceDistributionBarChart from './charts/ConfidenceDistributionBarCh
 import { LabelingTaskTaskType } from '@/src/types/components/projects/projectId/settings/labeling-tasks';
 import ConfusionMatrixBarChart from './charts/ConfusionMatrixBarChart';
 import LoadingIcon from '@/src/components/shared/loading/LoadingIcon';
+import { addUserName, parseOverviewSettingsToDict } from '@/src/util/components/projects/projectId/project-overview/charts-helper';
+import InterAnnotatorBarChart from './charts/InterAnnotatorBarChart';
+import { selectIsManaged } from '@/src/reduxStore/states/general';
+import { IconUsers } from '@tabler/icons-react';
+import { useConsoleLog } from '@/submodules/react-components/hooks/useConsoleLog';
 
 const PROJECT_STATS_INITIAL_STATE: ProjectStats = getEmptyProjectStats();
 
@@ -39,6 +44,7 @@ export default function ProjectOverview() {
     const labelingTasks = useSelector(selectLabelingTasksAll);
     const dataSlices = useSelector(selectDataSlices);
     const overviewFilters = useSelector(selectOverviewFilters);
+    const isManaged = useSelector(selectIsManaged);
 
     const [projectStats, setProjectStats] = useState<ProjectStats>(PROJECT_STATS_INITIAL_STATE);
     const [graphsHaveValues, setGraphsHaveValues] = useState<boolean>(false);
@@ -46,6 +52,9 @@ export default function ProjectOverview() {
     const [confidenceDistribution, setConfidenceDistribution] = useState<any[]>([]);
     const [confusionMatrix, setConfusionMatrix] = useState<any[]>([]);
     const [displayConfusion, setDisplayConfusion] = useState<boolean>(false);
+    const [interAnnotatorFormGroup, setInterAnnotatorFormGroup] = useState<any>({});
+    const [interAnnotatorMatrix, setInterAnnotatorMatrix] = useState<any>([[]]);
+    const [goldUserRequested, setGoldUserRequested] = useState<boolean>(false);
 
     const [refetchProjectStats] = useLazyQuery(GET_GENERAL_PROJECT_STATS, { fetchPolicy: "no-cache" });
     const [refetchLabelingTasksByProjectId] = useLazyQuery(GET_LABELING_TASKS_BY_PROJECT_ID, { fetchPolicy: "network-only" });
@@ -55,6 +64,7 @@ export default function ProjectOverview() {
     const [refetchConfidenceDistribution] = useLazyQuery(GET_CONFIDENCE_DISTRIBUTION, { fetchPolicy: "no-cache" });
     const [refetchConfusionMatrix] = useLazyQuery(GET_CONFUSION_MATRIX, { fetchPolicy: "no-cache" });
     const [refetchRatsTokenization] = useLazyQuery(IS_RATS_TOKENIZAION_STILL_RUNNING, { fetchPolicy: "no-cache" });
+    const [refetchInterAnnotator] = useLazyQuery(GET_INTER_ANNOTATOR_BY_PROJECT_ID, { fetchPolicy: "no-cache" });
 
     useEffect(unsubscribeWSOnDestroy(router, [CurrentPage.PROJECT_OVERVIEW]), []);
 
@@ -63,6 +73,7 @@ export default function ProjectOverview() {
         refetchAttributesAndProcess();
         refetchLabelingTasksAndProcess();
         refetchDataSlicesAndProcess();
+        prepareInterAnnotator();
         WebSocketsService.subscribeToNotification(CurrentPage.PROJECT_OVERVIEW, {
             projectId: projectId,
             whitelist: ['label_created', 'label_deleted', 'labeling_task_deleted', 'labeling_task_updated', 'labeling_task_created', 'weak_supervision_finished', 'data_slice_created', 'data_slice_updated', 'data_slice_deleted'],
@@ -70,24 +81,49 @@ export default function ProjectOverview() {
         });
     }, [projectId]);
 
-
     useEffect(() => {
-        if (!projectId || !labelingTasks) return;
-        getProjectStats();
-    }, [projectId, labelingTasks]);
-
-    useEffect(() => {
-        if (!overviewFilters || !projectId) return;
+        if (!overviewFilters || !projectId || !labelingTasks || !overviewFilters.labelingTask) return;
         setDisplayNERConfusion();
         getLabelDistributions();
         getConfidenceDistributions();
         getConfusionMatrix();
-    }, [overviewFilters, projectId]);
+        getInterAnnotatorMatrix();
+        getProjectStats();
+        saveSettingsToLocalStorage();
+    }, [overviewFilters, projectId, labelingTasks]);
 
     useEffect(() => {
         if (!labelDistribution) return;
         setGraphsHaveValues(labelDistribution?.length > 0);
     }, [labelDistribution]);
+
+    function prepareInterAnnotator() {
+        const overviewFiltersCopy = { ...overviewFilters };
+        const interAnnotatorFinal = {
+            goldUser: true,
+            allUsers: false,
+            dataSlice: "@@NO_SLICE@@",
+        };
+        let tmp = localStorage.getItem("projectOverviewData");
+        if (tmp) {
+            let parsedValues = JSON.parse(tmp);
+            if (!parsedValues[projectId]) return;
+            else parsedValues = parsedValues[projectId];
+
+            if (parsedValues["interAnnotatorAllUsers"] != undefined) interAnnotatorFinal.allUsers = parsedValues["interAnnotatorAllUsers"];
+            if (parsedValues["interAnnotatorGoldUser"] != undefined) interAnnotatorFinal.goldUser = parsedValues["interAnnotatorGoldUser"];
+            if (parsedValues["interAnnotatorDataSlice"]) interAnnotatorFinal.dataSlice = parsedValues["interAnnotatorDataSlice"];
+            if (parsedValues["labelingTasksTarget"]) overviewFiltersCopy.targetAttribute = parsedValues["labelingTasksTarget"];
+            if (parsedValues["labelingTasks"]) overviewFiltersCopy.labelingTask = parsedValues["labelingTask"];
+            if (parsedValues["displayGraphs"]) overviewFiltersCopy.graphTypeEnum = parsedValues["graphTypeEnum"];
+            if (parsedValues["dataSlice"]) overviewFiltersCopy.dataSlice = parsedValues["dataSlice"];
+        }
+        setInterAnnotatorFormGroup(interAnnotatorFinal);
+        dispatch(setOverviewFilters(overviewFiltersCopy));
+    }
+
+    useConsoleLog(interAnnotatorFormGroup, 'interAnnotatorFormGroup')
+
 
     function refetchAttributesAndProcess() {
         refetchAttributes({ variables: { projectId: projectId, stateFilter: ['ALL'] } }).then((res) => {
@@ -147,16 +183,33 @@ export default function ProjectOverview() {
         });
     }
 
-    useEffect(() => {
-        console.log(confusionMatrix);
-    }, [confusionMatrix]);
+    function getInterAnnotatorMatrix() {
+        let values = interAnnotatorFormGroup;
+        values.dataSlice = values.dataSlice == "@@NO_SLICE@@" ? null : values.dataSlice;
+        const labelingTaskId = labelingTasks.find((labelingTask) => labelingTask.name === overviewFilters.labelingTask)?.id;
+        refetchInterAnnotator({ variables: { projectId: projectId, labelingTaskId: labelingTaskId, includeGoldStar: values.goldUser, includeAllOrgUser: values.allUsers, onlyOnStaticSlice: values.dataSlice } }).then((res) => {
+            const matrix = res['data']['interAnnotatorMatrix'];
+            const matrixCopy = jsonCopy(matrix);
+            matrixCopy.allUsers = addUserName(matrixCopy.allUsers);
+            setInterAnnotatorMatrix(matrixCopy);
+        });
+        setGoldUserRequested(values.goldUser);
+    }
+
+    function saveSettingsToLocalStorage() {
+        let currentData = JSON.parse(localStorage.getItem("projectOverviewData"));
+        if (!currentData) currentData = {};
+        currentData[projectId] = parseOverviewSettingsToDict(interAnnotatorFormGroup, overviewFilters);
+        localStorage.setItem('projectOverviewData', JSON.stringify(currentData));
+    }
 
     function getProjectStats() {
         const projectStatsCopy = jsonCopy(projectStats);
         projectStatsCopy.generalLoading = true;
         projectStatsCopy.interAnnotatorLoading = true;
         setProjectStats(projectStatsCopy);
-        refetchProjectStats({ variables: { projectId: projectId, labelingTaskId: labelingTasks[0].id, sliceId: null } }).then((res) => {
+        const labelingTaskId = labelingTasks.find((labelingTask) => labelingTask.name === overviewFilters.labelingTask)?.id;
+        refetchProjectStats({ variables: { projectId: projectId, labelingTaskId: labelingTaskId, sliceId: null } }).then((res) => {
             setProjectStats(postProcessingStats(JSON.parse(res['data']['generalProjectStats'])));
         });
     }
@@ -210,6 +263,50 @@ export default function ProjectOverview() {
                         </>)}
                     </div>
                 </div>}
+
+                {(overviewFilters.graphTypeEnum == DisplayGraphs.ALL || overviewFilters.graphTypeEnum == DisplayGraphs.INTER_ANNOTATOR) && <div className="mt-8 grid w-full">
+                    <div className="text-lg leading-6 text-gray-900 font-medium inline-block">Inter annotator agreement</div>
+                    <div className="mt-1 text-sm leading-5 font-medium text-gray-700 inline-block">See how users agree or disagree on redundantely labeled records.</div>
+                    {interAnnotatorMatrix && <div>
+                        {interAnnotatorMatrix.countNames > (1 + (goldUserRequested ? 1 : 0)) ? (
+                            <div className={`mt-2 w-full h-full shadow ${style.stats} bg-white grid place-items-center flex-grow`}>
+                                {interAnnotatorMatrix && <div className="h-full w-full p-5">
+                                    <InterAnnotatorBarChart dataInput={interAnnotatorMatrix} />
+                                </div>}
+                            </div>
+                        ) : (<div className="mt-2">
+                            {!isManaged && <div className="overflow-hidden h-80 rounded-lg bg-indigo-700 shadow-xl lg:grid lg:grid-cols-2 lg:gap-4">
+                                <div className="px-6 pt-10 pb-12 sm:px-12 sm:pt-12 lg:py-12 lg:pr-0 xl:py-16 xl:px-16">
+                                    <div className="lg:self-center">
+                                        <h2 className="text-3xl font-bold tracking-tight text-white sm:text-4xl">
+                                            <span className="block">Do you require multi-user analytics?</span>
+                                        </h2>
+                                        <p className="mt-4 text-lg leading-6 text-indigo-200">Our open-source <span
+                                            className="font-dmMono">refinery</span> comes with a managed multi-user
+                                            version in
+                                            the cloud, as well as an enterprise solution for on-premises deployment.
+                                        </p>
+                                        <a onClick={() => router.push('/users')}
+                                            className="mt-8 cursor-pointer inline-flex items-center rounded-md border border-transparent bg-white px-5 py-3 text-base font-medium text-indigo-600 shadow hover:bg-indigo-50">See
+                                            our options</a>
+                                    </div>
+                                </div>
+                                <div>
+                                    <img src="https://images.unsplash.com/photo-1576502202167-791eca35a78d?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2081&q=80"
+                                        alt="App screenshot" />
+                                </div>
+                            </div>}
+                            {isManaged && <div className={`mt-2 shadow ${style.stats} bg-white grid place-items-center flex-grow w-full h-full p-5`}>
+                                <div className="text-center">
+                                    <IconUsers size={48} className="mx-auto text-gray-400" />
+                                    <h2 className="mt-2 text-lg font-medium text-gray-900">Label more data</h2>
+                                    <p className="mt-1 text-sm text-gray-500">None of your records are labeled redundantely yet.</p>
+                                </div>
+                            </div>}
+                        </div>)}
+                    </div>}
+
+                </div>}
             </div>
             ) : (<div>
                 <div className="mt-8 text-lg leading-6 text-gray-900 font-medium inline-block">Monitoring</div>
@@ -218,5 +315,5 @@ export default function ProjectOverview() {
                     <div className={`${style.statsTitle}`}>Add Labels to display charts</div>
                 </div></div>)}
         </div>}
-    </div>);
+    </div >);
 }

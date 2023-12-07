@@ -30,3 +30,25 @@ query ($projectId: ID!) {
   isRatsTokenizationStillRunning(projectId: $projectId)
 }
 `;
+
+export const GET_INTER_ANNOTATOR_BY_PROJECT_ID = gql`
+query ($projectId: ID!, $labelingTaskId: ID!, $includeGoldStar: Boolean, $includeAllOrgUser: Boolean, $onlyOnStaticSlice: ID) {
+  interAnnotatorMatrix(projectId: $projectId, labelingTaskId: $labelingTaskId, includeGoldStar: $includeGoldStar, includeAllOrgUser: $includeAllOrgUser, onlyOnStaticSlice: $onlyOnStaticSlice) {
+    countNames
+    allUsers {
+      count
+      user {
+        id
+        firstName
+        lastName
+        mail
+      }
+    }
+    elements {
+      userIdA
+      userIdB
+      percent
+    }
+  }
+}
+`;
