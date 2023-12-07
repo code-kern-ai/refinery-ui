@@ -4,7 +4,6 @@ import { useEffect, useRef, useState } from "react";
 import { changeDataStructure, squashData } from "@/src/util/components/projects/projectId/project-overview/charts-helper";
 import { ChartData } from "chart.js";
 import * as d3 from 'd3v4';
-import { TooltipBox } from "./TooltipBox";
 
 export default function LabelDistributionBarChart(props: BarChartProps) {
 
@@ -195,10 +194,9 @@ export default function LabelDistributionBarChart(props: BarChartProps) {
                 // ts is a bit strange here - so we ignore the error on .__data__
                 // @ts-ignore
                 var elementData = elements[l].__data__;
-                divTooltip.html(TooltipBox.buildAbsoluteHtml(elementData));
+                divTooltip.html(buildAbsoluteHtml(elementData));
                 d3.select(svgRef.current)
                     .style("opacity", "1");
-
             })
             .on("mouseout", function (d) {
                 divTooltip.style("display", "none")
@@ -221,6 +219,21 @@ export default function LabelDistributionBarChart(props: BarChartProps) {
             });
 
     }, [dataGrouped]);
+
+    function buildAbsoluteHtml(elementData): string {
+        return `<span style="font-family: \'DM Sans\', sans-serif;">
+          <div class="flex flex-col items-center">
+            <div class="font-bold">`+ elementData.key + `</div> 
+            <div style="display: grid;grid-template-columns: max-content max-content;">
+              <div class="font-bold">relative</div>
+              <div>`+ Math.round(elementData.value * 100) / 100 + `%</div>
+              <div class="font-bold">absolute</div>
+              <div>`+ elementData.absolute / 100 + `</div>
+            </div>
+          </div>
+        </span>
+        `
+    }
 
 
     return (<>

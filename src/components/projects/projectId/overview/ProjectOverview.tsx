@@ -32,7 +32,6 @@ import { addUserName, parseOverviewSettingsToDict } from '@/src/util/components/
 import InterAnnotatorBarChart from './charts/InterAnnotatorBarChart';
 import { selectIsManaged } from '@/src/reduxStore/states/general';
 import { IconUsers } from '@tabler/icons-react';
-import { useConsoleLog } from '@/submodules/react-components/hooks/useConsoleLog';
 
 const PROJECT_STATS_INITIAL_STATE: ProjectStats = getEmptyProjectStats();
 
@@ -121,9 +120,6 @@ export default function ProjectOverview() {
         setInterAnnotatorFormGroup(interAnnotatorFinal);
         dispatch(setOverviewFilters(overviewFiltersCopy));
     }
-
-    useConsoleLog(interAnnotatorFormGroup, 'interAnnotatorFormGroup')
-
 
     function refetchAttributesAndProcess() {
         refetchAttributes({ variables: { projectId: projectId, stateFilter: ['ALL'] } }).then((res) => {
