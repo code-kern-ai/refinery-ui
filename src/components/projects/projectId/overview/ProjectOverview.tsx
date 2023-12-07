@@ -12,7 +12,7 @@ import { ProjectStats } from '@/src/types/components/projects/projectId/project-
 import style from '@/src/styles/components/projects/projectId/project-overview.module.css';
 import { unsubscribeWSOnDestroy } from '@/src/services/base/web-sockets/web-sockets-helper';
 import { useRouter } from 'next/router';
-import { GET_GENERAL_PROJECT_STATS, GET_LABEL_DISTRIBUTION } from '@/src/services/gql/queries/project-overview';
+import { GET_CONFIDENCE_DISTRIBUTION, GET_GENERAL_PROJECT_STATS, GET_LABEL_DISTRIBUTION } from '@/src/services/gql/queries/project-overview';
 import { GET_ATTRIBUTES_BY_PROJECT_ID, GET_LABELING_TASKS_BY_PROJECT_ID } from '@/src/services/gql/queries/project-setting';
 import { postProcessLabelingTasks, postProcessLabelingTasksSchema } from '@/src/util/components/projects/projectId/settings/labeling-tasks-helper';
 import { selectLabelingTasksAll, setAllAttributes, setLabelingTasksAll } from '@/src/reduxStore/states/pages/settings';
@@ -24,6 +24,7 @@ import { selectOverviewFilters } from '@/src/reduxStore/states/tmp';
 import { DisplayGraphs } from '@/submodules/javascript-functions/enums/enums';
 import LabelDistributionBarChart from './charts/LabelDistributionBarChart';
 import { LabelDistribution } from '@/src/types/components/projects/projectId/project-overview/charts';
+import ConfidenceDistributionBarChart from './charts/ConfidenceDistributionBarChart';
 
 const PROJECT_STATS_INITIAL_STATE: ProjectStats = getEmptyProjectStats();
 
@@ -39,12 +40,14 @@ export default function ProjectOverview() {
     const [projectStats, setProjectStats] = useState<ProjectStats>(PROJECT_STATS_INITIAL_STATE);
     const [graphsHaveValues, setGraphsHaveValues] = useState<boolean>(false);
     const [labelDistribution, setLabelDistribution] = useState<LabelDistribution[]>([]);
+    const [confidenceDistribution, setConfidenceDistribution] = useState<any[]>([]);
 
     const [refetchProjectStats] = useLazyQuery(GET_GENERAL_PROJECT_STATS, { fetchPolicy: "no-cache" });
     const [refetchLabelingTasksByProjectId] = useLazyQuery(GET_LABELING_TASKS_BY_PROJECT_ID, { fetchPolicy: "network-only" });
     const [refetchAttributes] = useLazyQuery(GET_ATTRIBUTES_BY_PROJECT_ID, { fetchPolicy: "network-only" });
     const [refetchDataSlices] = useLazyQuery(DATA_SLICES, { fetchPolicy: 'network-only' });
     const [refetchLabelDistribution] = useLazyQuery(GET_LABEL_DISTRIBUTION, { fetchPolicy: "no-cache" });
+    const [refetchConfidenceDistribution] = useLazyQuery(GET_CONFIDENCE_DISTRIBUTION, { fetchPolicy: "no-cache" });
 
     useEffect(unsubscribeWSOnDestroy(router, [CurrentPage.PROJECT_OVERVIEW]), []);
 
@@ -67,9 +70,10 @@ export default function ProjectOverview() {
     }, [projectId, labelingTasks]);
 
     useEffect(() => {
-        if (!overviewFilters) return;
+        if (!overviewFilters || !projectId) return;
         getLabelDistributions();
-    }, [overviewFilters]);
+        getConfidenceDistributions();
+    }, [overviewFilters, projectId]);
 
     useEffect(() => {
         if (!labelDistribution) return;
@@ -104,6 +108,15 @@ export default function ProjectOverview() {
         });
     }
 
+    function getConfidenceDistributions() {
+        const labelingTaskId = labelingTasks.find((labelingTask) => labelingTask.name === overviewFilters.labelingTask)?.id;
+        const dataSliceFindId = dataSlices.find((dataSlice) => dataSlice.name === overviewFilters.dataSlice)?.id;
+        const dataSliceId = dataSliceFindId == "@@NO_SLICE@@" ? null : dataSliceFindId;
+        refetchConfidenceDistribution({ variables: { projectId: projectId, labelingTaskId: labelingTaskId, sliceId: dataSliceId } }).then((res) => {
+            setConfidenceDistribution(JSON.parse(res['data']['confidenceDistribution']));
+        });
+    }
+
     function getProjectStats() {
         const projectStatsCopy = jsonCopy(projectStats);
         projectStatsCopy.generalLoading = true;
@@ -124,19 +137,26 @@ export default function ProjectOverview() {
     }, [handleWebsocketNotification, projectId]);
 
     return (<div>
-        {projectId != null && <div className="p-4 bg-gray-100 flex-1 flex flex-col min-h-full">
+        {projectId != null && <div className="pt-4 px-4 pb-20 bg-gray-100 flex-1 flex flex-col min-h-full h-screen overflow-y-auto">
             <ProjectOverviewHeader />
             <ProjectOverviewCards projectStats={projectStats} />
             {graphsHaveValues ? (<div>
                 {(overviewFilters.graphTypeEnum == DisplayGraphs.ALL || overviewFilters.graphTypeEnum == DisplayGraphs.LABEL_DISTRIBUTION) && <div className="mt-8 grid w-full">
-                    <div className="text-lg leading-6 text-gray-900 font-medium inline-block">
-                        Label distribution
-                    </div>
-                    <div className="mt-1 text-sm leading-5 font-medium text-gray-700 inline-block">See the distribution of your
-                        manually labeled and weakly supervised records.</div>
-                    <div className="mt-2 w-full h-full shadow stats bg-white grid place-items-center flex-grow">
+                    <div className="text-lg leading-6 text-gray-900 font-medium inline-block">Label distribution</div>
+                    <div className="mt-1 text-sm leading-5 font-medium text-gray-700 inline-block">See the distribution of your manually labeled and weakly supervised records.</div>
+                    <div className={`mt-2 w-full h-full shadow ${style.stats} bg-white grid place-items-center flex-grow`}>
                         {labelDistribution && <div className="h-full w-full p-5">
                             <LabelDistributionBarChart dataInput={labelDistribution} />
+                        </div>}
+                    </div>
+                </div>}
+
+                {(overviewFilters.graphTypeEnum == DisplayGraphs.ALL || overviewFilters.graphTypeEnum == DisplayGraphs.CONFIDENCE_DISTRIBUTION) && <div className="mt-8 grid w-full">
+                    <div className="text-lg leading-6 text-gray-900 font-medium inline-block">Confidence distribution</div>
+                    <div className="mt-1 text-sm leading-5 font-medium text-gray-700 inline-block">See the confidence distribution of your weakly supervised records.</div>
+                    <div className={`mt-2 w-full h-full shadow ${style.stats} bg-white grid place-items-center flex-grow`}>
+                        {confidenceDistribution && <div className="h-full w-full p-5">
+                            <ConfidenceDistributionBarChart dataInput={confidenceDistribution} />
                         </div>}
                     </div>
                 </div>}
@@ -146,8 +166,7 @@ export default function ProjectOverview() {
                 <div className="mt-8 text-lg leading-6 text-gray-900 font-medium inline-block">
                     Monitoring
                 </div>
-                <div className="mt-1 text-sm leading-5 font-medium text-gray-700 block">Go to the settings page to add a
-                    labeling task.</div>
+                <div className="mt-1 text-sm leading-5 font-medium text-gray-700 block">Go to the settings page to add a labeling task.</div>
                 <div className={`mt-2 shadow w-full ${style.stats} bg-white place-content-center p-4`}>
                     <div className={`${style.statsTitle}`}>Add Labels to display charts</div>
                 </div></div>)}

@@ -11,3 +11,9 @@ query($projectId:ID!,$labelingTaskId:ID,$sliceId:ID){
   labelDistribution(projectId:$projectId,labelingTaskId:$labelingTaskId,sliceId:$sliceId)
 }
 `;
+
+export const GET_CONFIDENCE_DISTRIBUTION = gql`
+query ($projectId: ID!, $labelingTaskId: ID, $sliceId: ID) {
+  confidenceDistribution(projectId: $projectId, labelingTaskId: $labelingTaskId, sliceId: $sliceId)
+}  
+`;
