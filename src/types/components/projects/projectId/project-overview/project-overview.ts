@@ -1,3 +1,5 @@
+import { DisplayGraphs } from "@/submodules/javascript-functions/enums/enums";
+
 export type ProjectStats = {
     generalLoading: boolean;
     general: {};
@@ -25,4 +27,16 @@ export enum CardStatsEnum {
     WEAK_SUPERVISION = "WEAK_SUPERVISION",
     INFORMATION_SOURCE = "INFORMATION_SOURCE",
     INTER_ANNOTATOR = "INTER_ANNOTATOR",
+}
+
+export type ProjectOverviewFilters = {
+    graphType: string;
+    graphTypeEnum: DisplayGraphs;
+    targetAttribute: string;
+    labelingTask: string;
+    dataSlice: string;
+};
+
+export type BarChartProps = {
+    dataInput: any;
 }

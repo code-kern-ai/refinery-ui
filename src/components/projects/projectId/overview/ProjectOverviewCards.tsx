@@ -1,6 +1,6 @@
 import LoadingIcon from "@/src/components/shared/loading/LoadingIcon";
 import { selectProjectId } from "@/src/reduxStore/states/project";
-import { CardStats, CardStatsEnum, ProjectOverviewCardsProps } from "@/src/types/components/projects/projectId/overview";
+import { CardStats, CardStatsEnum, ProjectOverviewCardsProps } from "@/src/types/components/projects/projectId/project-overview/project-overview";
 import { NOT_AVAILABLE } from "@/src/util/constants";
 import { Tooltip } from "@nextui-org/react";
 import { IconBottle, IconBulb, IconClick, IconScale } from "@tabler/icons-react";

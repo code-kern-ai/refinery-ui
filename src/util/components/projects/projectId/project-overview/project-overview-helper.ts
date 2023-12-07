@@ -1,19 +1,19 @@
-import { ProjectStats } from "@/src/types/components/projects/projectId/overview";
+import { LabelDistribution } from "@/src/types/components/projects/projectId/project-overview/charts";
+import { CardStatsEnum, ProjectStats } from "@/src/types/components/projects/projectId/project-overview/project-overview";
 import { NOT_AVAILABLE } from "@/src/util/constants";
 import { displayGraphsTypeToString } from "@/submodules/javascript-functions/enums/enum-functions";
 import { DisplayGraphs, LabelSource } from "@/submodules/javascript-functions/enums/enums";
 import { percentRoundString } from "@/submodules/javascript-functions/general";
 
-export function getDisplayGraphValueArray(): [{ value: number, name: string }] {
+export function getDisplayGraphValueArray(): [{ value: DisplayGraphs, name: string }] {
     let toReturn = [];
-    for (const key in Object.keys(DisplayGraphs)) {
-        if (isNaN(Number(key))) continue;
-        const name = displayGraphsTypeToString(Number(key));
-        if (name) toReturn.push({ value: key, name: name })
-
+    for (const key in DisplayGraphs) {
+        const name = displayGraphsTypeToString(key as DisplayGraphs);
+        if (name) toReturn.push({ value: key as DisplayGraphs, name: name })
     }
-    return toReturn as [{ value: number, name: string }];
+    return toReturn as [{ value: DisplayGraphs, name: string }];
 }
+
 
 export function getEmptyProjectStats(): ProjectStats {
     return {
@@ -29,13 +29,6 @@ export function getEmptyProjectStats(): ProjectStats {
         interAnnotator: NOT_AVAILABLE,
         interAnnotatorStat: -1
     }
-}
-
-// TODO: change any when the labeling tasks are defined
-export function prepareLabelingTasks(labelingTasks: any) {
-    const preparedLabelingTasks = [];
-
-    return preparedLabelingTasks;
 }
 
 export function postProcessingStats(projectStats: ProjectStats[]): ProjectStats {
@@ -56,4 +49,36 @@ export function postProcessingStats(projectStats: ProjectStats[]): ProjectStats 
     });
     prepareProjectStats.generalLoading = false;
     return prepareProjectStats;
+}
+
+export function postProcessLabelDistribution(data: string): LabelDistribution[] {
+    const prepareLabelDistribution = JSON.parse(data);
+    return matchAndMergeLabelDistributionData(prepareLabelDistribution);
+}
+
+function matchAndMergeLabelDistributionData(data): LabelDistribution[] {
+    let returnData = [];
+    if (!data) return returnData;
+    data.forEach(e => {
+        let found = returnData.find(x => x.labelId == e.id);
+        if (!found) {
+            found = {
+                labelId: e.id,
+                labelName: e.name,
+                ratioScaleManually: 0,
+                absoluteScaleManually: 0,
+                ratioScaleProgrammatically: 0,
+                absoluteScaleProgrammatically: 0
+            };
+            returnData.push(found);
+        }
+        if (e.source_type == CardStatsEnum.MANUAL) {
+            found.ratioScaleManually = e.count_relative;
+            found.absoluteScaleManually = e.count_absolute;
+        } else if (e.source_type == CardStatsEnum.WEAK_SUPERVISION) {
+            found.ratioScaleProgrammatically = e.count_relative;
+            found.absoluteScaleProgrammatically = e.count_absolute;
+        }
+    });
+    return returnData;
 }

@@ -139,6 +139,7 @@ export const selectLabelingTasksAll = (state) => state.settings.labelingTasks.al
 export const selectAttributesDict = createSelector([selectAttributes], (a): any => a ? arrayToDict(a, 'id') : null);
 export const selectLabelingTasksDict = createSelector([selectLabelingTasksAll], (a): any => a ? arrayToDict(a, 'id') : null);
 export const selectUsableAttributesFiltered = createSelector([selectUsableAttributes], (a): any => a ? a.filter((attribute) => attribute.id != '@@NO_ATTRIBUTE@@') : null);
+export const selectUsableAttributesNoFiltered = createSelector([selectUsableAttributes], (a): any => a ? a.filter((attribute) => (attribute.dataType == DataTypeEnum.TEXT || attribute.id == '@@NO_ATTRIBUTE@@')) : null);
 
 export const { setAllAttributes, extendAllAttributes, removeFromAllAttributesById, updateAttributeById, setAllEmbeddings, setFilteredEmbeddings, removeFromAllEmbeddingsById, setAllRecommendedEncodersDict, setRecommendedEncodersAll, setLabelingTasksAll, removeFromAllLabelingTasksById, removeLabelFromLabelingTask } = settingsSlice.actions;
 export const settingsReducer = settingsSlice.reducer;

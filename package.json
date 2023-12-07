@@ -25,6 +25,8 @@
     "aws-sdk": "^2.1460.0",
     "chart.js": "^4.3.0",
     "clsx": "^1.2.1",
+    "d3": "^7.8.5",
+    "d3v4": "^4.2.2",
     "eslint": "8.47.0",
     "eslint-config-next": "13.4.19",
     "focus-visible": "^5.2.0",

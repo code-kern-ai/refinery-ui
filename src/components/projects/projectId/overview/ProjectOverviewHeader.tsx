@@ -1,13 +1,35 @@
-import { getDisplayGraphValueArray } from "@/src/util/components/projects/projectId/project-overview-helper";
+import { selectDataSlices } from "@/src/reduxStore/states/pages/data-browser";
+import { selectLabelingTasksAll, selectUsableAttributesNoFiltered } from "@/src/reduxStore/states/pages/settings";
+import { selectOverviewFilters, setOverviewFilters, updateOverFilters } from "@/src/reduxStore/states/tmp";
+import { ProjectOverviewFilters } from "@/src/types/components/projects/projectId/project-overview/project-overview";
+import { getDisplayGraphValueArray } from "@/src/util/components/projects/projectId/project-overview/project-overview-helper";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
 import Dropdown from "@/submodules/react-components/components/Dropdown";
 import { Tooltip } from "@nextui-org/react";
-import { useState } from "react";
+import { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
 
 const DISPLAY_GRAPHS_VALUE_ARRAY = getDisplayGraphValueArray();
 
 export default function ProjectOverviewHeader() {
-    const [displayGraphsSelectedValue, setDisplayGraphsSelectedValue] = useState(DISPLAY_GRAPHS_VALUE_ARRAY[0].name);
+    const dispatch = useDispatch();
+
+    const labelingTasks = useSelector(selectLabelingTasksAll);
+    const targetAttributes = useSelector(selectUsableAttributesNoFiltered);
+    const dataSlices = useSelector(selectDataSlices);
+    const overviewFilters = useSelector(selectOverviewFilters);
+
+    useEffect(() => {
+        if (!labelingTasks || !targetAttributes || !dataSlices || !targetAttributes[0] || !dataSlices[0]) return;
+        const overviewFiltersNew: ProjectOverviewFilters = {
+            graphType: DISPLAY_GRAPHS_VALUE_ARRAY[0].name,
+            targetAttribute: targetAttributes[0].name,
+            labelingTask: labelingTasks[0].name,
+            dataSlice: dataSlices[0].name,
+            graphTypeEnum: DISPLAY_GRAPHS_VALUE_ARRAY[0].value,
+        }
+        dispatch(setOverviewFilters(overviewFiltersNew));
+    }, [labelingTasks, targetAttributes, dataSlices]);
 
     return (
         <nav className="flex" aria-label="Breadcrumb">
@@ -17,8 +39,12 @@ export default function ProjectOverviewHeader() {
                         <Tooltip placement="bottom" trigger="hover" color="invert" content={TOOLTIPS_DICT.PROJECT_OVERVIEW.VISUALIZATION} className="relative z-10">
                             <span className={`cursor-help mr-2 underline text-black-800 filtersUnderline`}>Visualizations</span>
                         </Tooltip>
-                        <Dropdown buttonName={displayGraphsSelectedValue} options={DISPLAY_GRAPHS_VALUE_ARRAY} dropdownWidth="w-44"
-                            selectedOption={(option: string) => setDisplayGraphsSelectedValue(option)} />
+                        <Dropdown buttonName={overviewFilters?.graphType} options={DISPLAY_GRAPHS_VALUE_ARRAY} dropdownWidth="w-44"
+                            selectedOption={(option: string) => {
+                                dispatch(updateOverFilters('graphType', option));
+                                const graphTypeEnum = DISPLAY_GRAPHS_VALUE_ARRAY.find((graph) => graph.name === option)?.value;
+                                dispatch(updateOverFilters('graphTypeEnum', graphTypeEnum));
+                            }} />
                     </div>
                 </li>
                 <li>
@@ -30,6 +56,8 @@ export default function ProjectOverviewHeader() {
                         <Tooltip placement="bottom" trigger="hover" color="invert" content={TOOLTIPS_DICT.PROJECT_OVERVIEW.TARGET_TYPE} className="relative z-10">
                             <span className={`cursor-help mr-2 underline text-black-800 filtersUnderline`}>Target</span>
                         </Tooltip>
+                        {targetAttributes && <Dropdown buttonName={overviewFilters?.targetAttribute} options={targetAttributes} dropdownWidth="w-44"
+                            selectedOption={(option: string) => dispatch(updateOverFilters('targetAttribute', option))} />}
                     </div>
                 </li>
 
@@ -42,6 +70,8 @@ export default function ProjectOverviewHeader() {
                         <Tooltip placement="bottom" trigger="hover" color="invert" content={TOOLTIPS_DICT.PROJECT_OVERVIEW.LABELING_TASK} className="relative z-10">
                             <span className={`cursor-help mr-2 underline text-black-800 filtersUnderline`}>Labeling task</span>
                         </Tooltip>
+                        {labelingTasks && <Dropdown buttonName={overviewFilters?.labelingTask} options={labelingTasks} dropdownWidth="w-44"
+                            selectedOption={(option: string) => dispatch(updateOverFilters('labelingTask', option))} />}
                     </div>
                 </li>
 
@@ -54,6 +84,8 @@ export default function ProjectOverviewHeader() {
                         <Tooltip placement="bottom" color="invert" content={TOOLTIPS_DICT.PROJECT_OVERVIEW.STATIC_DATA_SLICE} className="z-10 relative">
                             <span className={`cursor-help mr-2 underline text-black-800 filtersUnderline`}>Data slice</span>
                         </Tooltip>
+                        {dataSlices && <Dropdown buttonName={overviewFilters?.dataSlice} options={dataSlices} dropdownWidth="w-44"
+                            selectedOption={(option: string) => dispatch(updateOverFilters('dataSlice', option))} />}
                     </div>
                 </li>
 

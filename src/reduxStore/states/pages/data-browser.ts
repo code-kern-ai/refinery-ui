@@ -4,7 +4,7 @@ import { createSelector, createSlice } from '@reduxjs/toolkit'
 import type { PayloadAction } from '@reduxjs/toolkit'
 
 type DataBrowserState = {
-    all: DataSlice[];
+    all: DataSlice[] | any[];
     active: DataSlice | null;
     additionalData: {
         displayOutdatedWarning: boolean;
@@ -77,6 +77,11 @@ const dataBrowserSlice = createSlice({
             state.all = [];
             if (action.payload) state.all = action.payload;
             else state.all = [];
+            const allRecords = {
+                name: 'All Records',
+                id: '@@NO_SLICE@@'
+            }
+            state.all = [allRecords, ...state.all];
         },
         setActiveDataSlice(state, action: PayloadAction<DataSlice>) {
             if (action.payload) state.active = { ...action.payload };
@@ -177,7 +182,7 @@ const dataBrowserSlice = createSlice({
 
 //selectors
 export const selectActiveSlice = (state) => state.dataBrowser.active;
-export const selectDataSlicesAll = (state) => state.dataBrowser.all;
+export const selectDataSlices = (state) => state.dataBrowser.all;
 export const selectAdditionalData = (state) => state.dataBrowser.additionalData;
 export const selectUsersCount = (state) => state.dataBrowser.usersMapCount;
 export const selectRecords = (state) => state.dataBrowser.searchRecordsExtended;
@@ -188,6 +193,7 @@ export const selectTextHighlight = (state) => state.dataBrowser.textHighlight;
 export const selectIsTextHighlightNeeded = (state) => state.dataBrowser.isTextHighlightNeeded;
 export const selectRecordComments = (state) => state.dataBrowser.recordComments;
 
+export const selectDataSlicesAll = createSelector([selectDataSlices], (d): any => d ? d.filter((slice) => slice.id != '@@NO_SLICE@@') : null);
 export const selectDataSlicesDict = createSelector([selectDataSlicesAll], (a): any => a ? arrayToDict(a, 'id') : null);
 
 export const { setDataSlices, setActiveDataSlice, removeFromAllDataSlicesById, updateDataSlicesState, setUsersMapCount, setSearchRecordsExtended, setActiveSearchParams, extendAllDataSlices, updateConfigurationState, updateAdditionalDataState, setTextHighlight, setIsTextHighlightNeeded, setRecordComments, setRecordsInDisplay, expandRecordList } = dataBrowserSlice.actions;

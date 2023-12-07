@@ -1,5 +1,4 @@
 import { SearchGroup } from "@/submodules/javascript-functions/enums/enums";
-import { type } from "os";
 
 export type DataSlice = {
     id: string;
