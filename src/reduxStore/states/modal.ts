@@ -207,6 +207,10 @@ const initialState: Modals = {
     },
     [ModalEnum.EXPLAIN_EDIT_RECORDS]: {
         open: false,
+    },
+    [ModalEnum.NEW_PERSONAL_TOKEN]: {
+        open: false,
+        tokenNames: []
     }
 };
 
