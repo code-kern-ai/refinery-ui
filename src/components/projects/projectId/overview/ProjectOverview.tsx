@@ -5,14 +5,14 @@ import { useLazyQuery } from '@apollo/client';
 import { use, useCallback, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import ProjectOverviewHeader from './ProjectOverviewHeader';
-import { getEmptyProjectStats, postProcessLabelDistribution, postProcessingStats } from '@/src/util/components/projects/projectId/project-overview/project-overview-helper';
+import { getEmptyProjectStats, postProcessConfusionMatrix, postProcessLabelDistribution, postProcessingStats } from '@/src/util/components/projects/projectId/project-overview/project-overview-helper';
 import ProjectOverviewCards from './ProjectOverviewCards';
 import { jsonCopy } from '@/submodules/javascript-functions/general';
 import { ProjectStats } from '@/src/types/components/projects/projectId/project-overview/project-overview';
 import style from '@/src/styles/components/projects/projectId/project-overview.module.css';
 import { unsubscribeWSOnDestroy } from '@/src/services/base/web-sockets/web-sockets-helper';
 import { useRouter } from 'next/router';
-import { GET_CONFIDENCE_DISTRIBUTION, GET_GENERAL_PROJECT_STATS, GET_LABEL_DISTRIBUTION } from '@/src/services/gql/queries/project-overview';
+import { GET_CONFIDENCE_DISTRIBUTION, GET_CONFUSION_MATRIX, GET_GENERAL_PROJECT_STATS, GET_LABEL_DISTRIBUTION, IS_RATS_TOKENIZAION_STILL_RUNNING } from '@/src/services/gql/queries/project-overview';
 import { GET_ATTRIBUTES_BY_PROJECT_ID, GET_LABELING_TASKS_BY_PROJECT_ID } from '@/src/services/gql/queries/project-setting';
 import { postProcessLabelingTasks, postProcessLabelingTasksSchema } from '@/src/util/components/projects/projectId/settings/labeling-tasks-helper';
 import { selectLabelingTasksAll, setAllAttributes, setLabelingTasksAll } from '@/src/reduxStore/states/pages/settings';
@@ -25,6 +25,9 @@ import { DisplayGraphs } from '@/submodules/javascript-functions/enums/enums';
 import LabelDistributionBarChart from './charts/LabelDistributionBarChart';
 import { LabelDistribution } from '@/src/types/components/projects/projectId/project-overview/charts';
 import ConfidenceDistributionBarChart from './charts/ConfidenceDistributionBarChart';
+import { LabelingTaskTaskType } from '@/src/types/components/projects/projectId/settings/labeling-tasks';
+import ConfusionMatrixBarChart from './charts/ConfusionMatrixBarChart';
+import LoadingIcon from '@/src/components/shared/loading/LoadingIcon';
 
 const PROJECT_STATS_INITIAL_STATE: ProjectStats = getEmptyProjectStats();
 
@@ -41,6 +44,8 @@ export default function ProjectOverview() {
     const [graphsHaveValues, setGraphsHaveValues] = useState<boolean>(false);
     const [labelDistribution, setLabelDistribution] = useState<LabelDistribution[]>([]);
     const [confidenceDistribution, setConfidenceDistribution] = useState<any[]>([]);
+    const [confusionMatrix, setConfusionMatrix] = useState<any[]>([]);
+    const [displayConfusion, setDisplayConfusion] = useState<boolean>(false);
 
     const [refetchProjectStats] = useLazyQuery(GET_GENERAL_PROJECT_STATS, { fetchPolicy: "no-cache" });
     const [refetchLabelingTasksByProjectId] = useLazyQuery(GET_LABELING_TASKS_BY_PROJECT_ID, { fetchPolicy: "network-only" });
@@ -48,6 +53,8 @@ export default function ProjectOverview() {
     const [refetchDataSlices] = useLazyQuery(DATA_SLICES, { fetchPolicy: 'network-only' });
     const [refetchLabelDistribution] = useLazyQuery(GET_LABEL_DISTRIBUTION, { fetchPolicy: "no-cache" });
     const [refetchConfidenceDistribution] = useLazyQuery(GET_CONFIDENCE_DISTRIBUTION, { fetchPolicy: "no-cache" });
+    const [refetchConfusionMatrix] = useLazyQuery(GET_CONFUSION_MATRIX, { fetchPolicy: "no-cache" });
+    const [refetchRatsTokenization] = useLazyQuery(IS_RATS_TOKENIZAION_STILL_RUNNING, { fetchPolicy: "no-cache" });
 
     useEffect(unsubscribeWSOnDestroy(router, [CurrentPage.PROJECT_OVERVIEW]), []);
 
@@ -71,8 +78,10 @@ export default function ProjectOverview() {
 
     useEffect(() => {
         if (!overviewFilters || !projectId) return;
+        setDisplayNERConfusion();
         getLabelDistributions();
         getConfidenceDistributions();
+        getConfusionMatrix();
     }, [overviewFilters, projectId]);
 
     useEffect(() => {
@@ -99,6 +108,18 @@ export default function ProjectOverview() {
         });
     }
 
+    function setDisplayNERConfusion() {
+        const labelingTaskTaskType = labelingTasks.find((labelingTask) => labelingTask.name === overviewFilters.labelingTask)?.taskType;
+        if (labelingTaskTaskType != LabelingTaskTaskType.INFORMATION_EXTRACTION) {
+            setDisplayConfusion(true);
+        } else {
+            refetchRatsTokenization({ variables: { projectId: projectId } }).then((res) => {
+                const resFinal = res['data']['isRatsTokenizationStillRunning'];
+                setDisplayConfusion(!resFinal);
+            });
+        }
+    }
+
     function getLabelDistributions() {
         const labelingTaskId = labelingTasks.find((labelingTask) => labelingTask.name === overviewFilters.labelingTask)?.id;
         const dataSliceFindId = dataSlices.find((dataSlice) => dataSlice.name === overviewFilters.dataSlice)?.id;
@@ -117,6 +138,19 @@ export default function ProjectOverview() {
         });
     }
 
+    function getConfusionMatrix() {
+        const labelingTaskId = labelingTasks.find((labelingTask) => labelingTask.name === overviewFilters.labelingTask)?.id;
+        const dataSliceFindId = dataSlices.find((dataSlice) => dataSlice.name === overviewFilters.dataSlice)?.id;
+        const dataSliceId = dataSliceFindId == "@@NO_SLICE@@" ? null : dataSliceFindId;
+        refetchConfusionMatrix({ variables: { projectId: projectId, labelingTaskId: labelingTaskId, sliceId: dataSliceId } }).then((res) => {
+            setConfusionMatrix(postProcessConfusionMatrix(res['data']['confusionMatrix']));
+        });
+    }
+
+    useEffect(() => {
+        console.log(confusionMatrix);
+    }, [confusionMatrix]);
+
     function getProjectStats() {
         const projectStatsCopy = jsonCopy(projectStats);
         projectStatsCopy.generalLoading = true;
@@ -128,7 +162,11 @@ export default function ProjectOverview() {
     }
 
     const handleWebsocketNotification = useCallback((msgParts: string[]) => {
-
+        if (['label_created', 'label_deleted', 'labeling_task_deleted', 'labeling_task_updated', 'labeling_task_created', 'weak_supervision_finished'].includes(msgParts[1])) {
+            refetchLabelingTasksAndProcess();
+        } else if (['data_slice_created', 'data_slice_updated', 'data_slice_deleted'].includes(msgParts[1])) {
+            refetchDataSlicesAndProcess();
+        }
     }, []);
 
     useEffect(() => {
@@ -161,11 +199,20 @@ export default function ProjectOverview() {
                     </div>
                 </div>}
 
+                {(overviewFilters.graphTypeEnum == DisplayGraphs.ALL || overviewFilters.graphTypeEnum == DisplayGraphs.CONFUSION_MATRIX) && <div className="mt-8 grid w-full">
+                    <div className="text-lg leading-6 text-gray-900 font-medium inline-block">Confusion matrix</div>
+                    <div className="mt-1 text-sm leading-5 font-medium text-gray-700 inline-block">See how often your manually labeled and weakly supervised records agree or disagree.</div>
+                    <div className={`mt-2 w-full h-full shadow ${style.stats} bg-white grid place-items-center flex-grow`}>
+                        {confusionMatrix && displayConfusion ? (<ConfusionMatrixBarChart dataInput={confusionMatrix} />) : (<>
+                            {displayConfusion ? (<div className={`flex items-center mb-3 ${style.statsTitle}`} style={{ height: '50px' }}>
+                                <LoadingIcon />
+                            </div>) : (<div className={`flex items-center ${style.statsTitle}`} style={{ height: '50px' }}>Tokenization is still running</div>)}
+                        </>)}
+                    </div>
+                </div>}
             </div>
             ) : (<div>
-                <div className="mt-8 text-lg leading-6 text-gray-900 font-medium inline-block">
-                    Monitoring
-                </div>
+                <div className="mt-8 text-lg leading-6 text-gray-900 font-medium inline-block">Monitoring</div>
                 <div className="mt-1 text-sm leading-5 font-medium text-gray-700 block">Go to the settings page to add a labeling task.</div>
                 <div className={`mt-2 shadow w-full ${style.stats} bg-white place-content-center p-4`}>
                     <div className={`${style.statsTitle}`}>Add Labels to display charts</div>

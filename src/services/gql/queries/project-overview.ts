@@ -17,3 +17,16 @@ query ($projectId: ID!, $labelingTaskId: ID, $sliceId: ID) {
   confidenceDistribution(projectId: $projectId, labelingTaskId: $labelingTaskId, sliceId: $sliceId)
 }  
 `;
+
+export const GET_CONFUSION_MATRIX = gql`
+query($projectId:ID!,$labelingTaskId:ID!,$sliceId:ID){
+  confusionMatrix(projectId:$projectId,labelingTaskId:$labelingTaskId,sliceId:$sliceId)
+}
+
+`;
+
+export const IS_RATS_TOKENIZAION_STILL_RUNNING = gql`
+query ($projectId: ID!) {
+  isRatsTokenizationStillRunning(projectId: $projectId)
+}
+`;

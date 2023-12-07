@@ -52,8 +52,7 @@ export function postProcessingStats(projectStats: ProjectStats[]): ProjectStats 
 }
 
 export function postProcessLabelDistribution(data: string): LabelDistribution[] {
-    const prepareLabelDistribution = JSON.parse(data);
-    return matchAndMergeLabelDistributionData(prepareLabelDistribution);
+    return matchAndMergeLabelDistributionData(JSON.parse(data));
 }
 
 function matchAndMergeLabelDistributionData(data): LabelDistribution[] {
@@ -81,4 +80,14 @@ function matchAndMergeLabelDistributionData(data): LabelDistribution[] {
         }
     });
     return returnData;
+}
+
+export function postProcessConfusionMatrix(data: string): any {
+    return JSON.parse(data).map((e) => {
+        return {
+            counts: e.count_absolute,
+            labelIdManual: e.label_name_manual == '@@OUTSIDE@@' ? 'Outside' : e.label_name_manual,
+            labelIdProgrammatic: e.label_name_ws == '@@OUTSIDE@@' ? 'Outside' : e.label_name_ws
+        }
+    });
 }
