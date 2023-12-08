@@ -34,19 +34,20 @@ export default function Header() {
     const [refetchNotifications] = useLazyQuery(NOTIFICATIONS, { fetchPolicy: 'network-only' });
 
     useEffect(() => {
+        if (!projectsNames) return;
         document.getElementById('notifications').addEventListener('click', () => {
-            dispatch(openModal(ModalEnum.NOTIFICATION_CENTER));
+            openModalAndRefetchNotifications();
         });
-    }, []);
+    }, [projectsNames]);
 
     useEffect(() => {
         setOrganizationInactive(organization == null);
     }, [organization]);
 
     function openModalAndRefetchNotifications() {
-        dispatch(openModal(ModalEnum.NOTIFICATION_CENTER));
         refetchNotifications().then((res) => {
             dispatch(setNotifications(postProcessNotifications(res.data['notifications'], projectsNames)));
+            dispatch(openModal(ModalEnum.NOTIFICATION_CENTER));
         });
     }
 
