@@ -1,4 +1,5 @@
 import { ModalEnum } from '@/src/types/shared/modal';
+import { Modal } from '@nextui-org/react';
 import { createSlice } from '@reduxjs/toolkit'
 import type { PayloadAction } from '@reduxjs/toolkit'
 
@@ -215,6 +216,9 @@ const initialState: Modals = {
     [ModalEnum.DELETE_PERSONAL_TOKEN]: {
         open: false,
         tokenId: ''
+    },
+    [ModalEnum.NOTIFICATION_CENTER]: {
+        open: false,
     }
 };
 

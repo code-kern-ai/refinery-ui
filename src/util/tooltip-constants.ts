@@ -10,6 +10,8 @@ export const TOOLTIPS_DICT = {
         'SUBMIT': 'Submit',
         'CANCEL': 'Cancel',
         'CLICK_TO_COPY': 'Click to copy',
+        'NOTIFICATION_CENTER': 'Notification center',
+        'MORE_INFO_AVAILABLE': 'More information available',
     },
     [CurrentPage.PROJECT_SETTINGS]: {
         'ADD_NEW_ATTRIBUTE': 'Add a new attribute',

@@ -1,5 +1,7 @@
-import { createSlice } from '@reduxjs/toolkit'
+import { arrayToDict } from '@/submodules/javascript-functions/general';
+import { createSelector, createSlice } from '@reduxjs/toolkit'
 import type { PayloadAction } from '@reduxjs/toolkit'
+import { create } from 'domain';
 
 export type Project = {
     id: string;
@@ -70,6 +72,8 @@ const projectSlice = createSlice({
 export const selectProject = (state) => state.projects.active;
 export const selectProjectId = (state) => state.projects.active?.id;
 export const selectAllProjects = (state) => state.projects.all;
+export const selectAllProjectsNames = createSelector([selectAllProjects], (a): any => a ? a.map(a => a.name) : null)
+export const selectAllProjectsNamesDict = createSelector([selectAllProjects], (a): any => a ? arrayToDict(a, 'id') : null)
 
 export const { updateProjectState, setActiveProject, setAllProjects, extendAllProjects, removeFromAllProjectsById } = projectSlice.actions;
 export const projectReducer = projectSlice.reducer;

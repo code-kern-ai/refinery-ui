@@ -1,4 +1,5 @@
 import { User } from "@/src/types/shared/general";
+import { NotificationListWrapper } from "@/src/types/shared/notification-center";
 import { UserRole } from "@/src/types/shared/sidebar";
 import { arrayToDict } from "@/submodules/javascript-functions/general";
 import { PayloadAction, createSelector, createSlice } from "@reduxjs/toolkit";
@@ -25,7 +26,8 @@ const initialState = {
         engineers: [],
         annotators: [],
         experts: [],
-    }
+    },
+    notifications: []
 } as {
     user: User;
     currentPage: string;
@@ -39,7 +41,8 @@ const initialState = {
         engineers: User[];
         annotators: User[];
         experts: User[];
-    }
+    },
+    notifications: NotificationListWrapper[];
 }
 
 const generalSlice = createSlice({
@@ -73,6 +76,10 @@ const generalSlice = createSlice({
             state.users.engineers = state.users.all.filter(user => user.role == UserRole.ENGINEER);
             state.users.annotators = state.users.all.filter(user => user.role == UserRole.ANNOTATOR);
             state.users.experts = state.users.all.filter(user => user.role == UserRole.EXPERT);
+        },
+        setNotifications(state, action: PayloadAction<NotificationListWrapper[]>) {
+            if (action.payload) state.notifications = [...action.payload];
+            else state.notifications = [];
         }
     },
 })
@@ -90,8 +97,9 @@ export const selectAllUsers = (state) => state.general.users.all;
 export const selectEngineers = (state) => state.general.users.engineers;
 export const selectAnnotators = (state) => state.general.users.annotators;
 export const selectExperts = (state) => state.general.users.experts;
+export const selectNotifications = (state) => state.general.notifications;
 
 export const selectAnnotatorsDict = createSelector([selectAnnotators], (a): any => a ? arrayToDict(a, 'id') : null);
 
-export const { setUser, setCurrentPage, setIsManaged, setIsDemo, setIsAdmin, setOrganization, setAllUsers } = generalSlice.actions;
+export const { setUser, setCurrentPage, setIsManaged, setIsDemo, setIsAdmin, setOrganization, setAllUsers, setNotifications } = generalSlice.actions;
 export const generalReducer = generalSlice.reducer;

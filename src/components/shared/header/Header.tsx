@@ -1,17 +1,25 @@
-import { selectCurrentPage, selectIsDemo, selectIsManaged, selectOrganization, selectUser } from "@/src/reduxStore/states/general";
+import { selectCurrentPage, selectIsDemo, selectIsManaged, selectOrganization, selectUser, setNotifications } from "@/src/reduxStore/states/general";
 import { CurrentPage } from "@/src/types/shared/general";
 import { UserRole } from "@/src/types/shared/sidebar";
 import { Tooltip } from "@nextui-org/react";
 import { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import style from "@/src/styles/shared/header.module.css";
 import LogoutDropdown from "./LogoutDropdown";
 import { useRouter } from "next/router";
-import { IconHexagons, IconHome, IconPlayCard } from "@tabler/icons-react";
-import { selectProject } from "@/src/reduxStore/states/project";
+import { IconBell, IconHexagons, IconHome, IconPlayCard } from "@tabler/icons-react";
+import { selectAllProjectsNamesDict, selectProject } from "@/src/reduxStore/states/project";
+import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
+import NotificationCenterModal from "../notification-center/NotificationCenterModal";
+import { openModal } from "@/src/reduxStore/states/modal";
+import { ModalEnum } from "@/src/types/shared/modal";
+import { useLazyQuery } from "@apollo/client";
+import { NOTIFICATIONS } from "@/src/services/gql/queries/projects";
+import { postProcessNotifications } from "@/src/util/shared/notification-center-helper";
 
 export default function Header() {
     const router = useRouter();
+    const dispatch = useDispatch();
 
     const isDemo = useSelector(selectIsDemo);
     const isManaged = useSelector(selectIsManaged);
@@ -19,12 +27,28 @@ export default function Header() {
     const organization = useSelector(selectOrganization);
     const user = useSelector(selectUser);
     const project = useSelector(selectProject);
+    const projectsNames = useSelector(selectAllProjectsNamesDict);
 
     const [organizationInactive, setOrganizationInactive] = useState(null);
+
+    const [refetchNotifications] = useLazyQuery(NOTIFICATIONS, { fetchPolicy: 'network-only' });
+
+    useEffect(() => {
+        document.getElementById('notifications').addEventListener('click', () => {
+            dispatch(openModal(ModalEnum.NOTIFICATION_CENTER));
+        });
+    }, []);
 
     useEffect(() => {
         setOrganizationInactive(organization == null);
     }, [organization]);
+
+    function openModalAndRefetchNotifications() {
+        dispatch(openModal(ModalEnum.NOTIFICATION_CENTER));
+        refetchNotifications().then((res) => {
+            dispatch(setNotifications(postProcessNotifications(res.data['notifications'], projectsNames)));
+        });
+    }
 
     return (
         <header className="sticky top-0 z-50 w-full">
@@ -71,9 +95,13 @@ export default function Header() {
                     <div className="flex items-center justify-center">
                         {/* TODO: Add comments here */}
                     </div>
-                    <div className="flex items-center justify-center">
-                        {/* TODO: Add notifications here */}
-                    </div>
+                    {user?.role == UserRole.ENGINEER && <div className="flex items-center justify-center">
+                        <Tooltip content={TOOLTIPS_DICT.GENERAL.NOTIFICATION_CENTER} placement="left" color="invert">
+                            <button className="flex mr-6 cursor-pointer" onClick={openModalAndRefetchNotifications}>
+                                <IconBell className="w-6 h-6" />
+                            </button>
+                        </Tooltip>
+                    </div>}
                     {user?.role == UserRole.ENGINEER ? (
                         <div className="flex items-center justify-center">
                             <div className={`${style.widget} ${style.widgetLg}`}><a className={style.btnx} href="https://github.com/code-kern-ai/refinery"
@@ -88,7 +116,7 @@ export default function Header() {
                     <LogoutDropdown />
                 </div>
             </div >
-
+            <NotificationCenterModal />
         </header >
     )
 }
