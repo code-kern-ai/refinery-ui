@@ -4,9 +4,10 @@ export function postProcessNotifications(notifications, projectNames: any) {
     const prepareNotifications = [];
     notifications.forEach(notification => {
         notification = { ...notification };
-        const convertDateAsUTCDate = dateAsUTCDate(new Date(notification.createdAt));
+        const tmpCreateDate = new Date(notification.createdAt);
+        const convertDateAsUTCDate = dateAsUTCDate(tmpCreateDate);
         notification.date = convertDateAsUTCDate.toLocaleString();
-        notification.timePassed = timeDiffCalc(convertDateAsUTCDate);
+        notification.timePassed = timeDiffCalc(tmpCreateDate);
         if (Object.keys(projectNames).length != 0) notification.projectName = projectNames[notification.projectId]?.name;
         applyPageChanges(notification)
         if (!(prepareNotifications.length)) {

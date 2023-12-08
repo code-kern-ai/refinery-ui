@@ -98,3 +98,13 @@ query {
   }
 }
 `;
+
+export const NOTIFICATIONS_BY_USER = gql`
+query {
+  notificationsByUserId {
+  message
+  level
+  id
+}
+}
+`;

@@ -118,7 +118,7 @@ export default function Modal(props: any) {
                     <div className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" />
                 </Transition.Child>
 
-                <div className="fixed inset-0 z-50 overflow-y-auto">
+                <div className="fixed inset-0 z-50">
                     <div className="flex min-h-full justify-center p-4 text-center items-center sm:p-0">
                         <Transition.Child
                             as={Fragment}

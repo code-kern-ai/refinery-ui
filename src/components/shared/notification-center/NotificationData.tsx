@@ -2,7 +2,7 @@ import { NotificationDataProps } from "@/src/types/shared/notification-center";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
 import { Tooltip } from "@nextui-org/react";
 import { useRouter } from "next/router";
-import { useState } from "react";
+import { Fragment, useState } from "react";
 
 export default function NotificationData(props: NotificationDataProps) {
     const router = useRouter();
@@ -38,5 +38,15 @@ export default function NotificationData(props: NotificationDataProps) {
         <div className={`mt-1 text-sm text-left text-${props.textColor}-700`}>
             <p>{props.notification[0].message}</p>
         </div>
+        {expandedNotifications[props.notification[0].id] && <div className="grid grid-cols-1 divide-y">
+            {props.notification.map((notification, index) => (<Fragment key={index}>
+                {index > 0 && <div className="py-1">
+                    <div className={`w-full flex justify-between text-sm text-${props.textColor}-700`}>
+                        <div>{props.notification[index].timePassed} ago</div>
+                        <div>{props.notification[index].date}</div>
+                    </div>
+                </div>}
+            </Fragment>))}
+        </div>}
     </div>)
 }
