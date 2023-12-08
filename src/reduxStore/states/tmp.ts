@@ -5,12 +5,14 @@ import { PayloadAction, createSlice } from "@reduxjs/toolkit";
 export type TmpState = {
     sessionData: EditRecordSessionData;
     overviewFilters: ProjectOverviewFilters;
+    notificationId: string;
 }
 
 function getInitState(): TmpState {
     return {
         sessionData: null,
-        overviewFilters: null
+        overviewFilters: null,
+        notificationId: null
     };
 }
 
@@ -40,12 +42,17 @@ const tmpSlice = createSlice({
                 };
             },
         },
+        setNotificationId: (state, action: PayloadAction<string>) => {
+            if (action.payload) state.notificationId = action.payload;
+            else state.notificationId = null;
+        }
     },
 });
 
 export const selectSessionData = (state) => state.tmp.sessionData;
 export const selectOverviewFilters = (state) => state.tmp.overviewFilters;
+export const selectNotificationId = (state) => state.tmp.notificationId;
 
-export const { setSessionData, setOverviewFilters, updateOverFilters } = tmpSlice.actions;
+export const { setSessionData, setOverviewFilters, updateOverFilters, setNotificationId } = tmpSlice.actions;
 
 export const tmpReducer = tmpSlice.reducer;

@@ -16,6 +16,8 @@ import { ModalEnum } from "@/src/types/shared/modal";
 import { useLazyQuery } from "@apollo/client";
 import { NOTIFICATIONS } from "@/src/services/gql/queries/projects";
 import { postProcessNotifications } from "@/src/util/shared/notification-center-helper";
+import { selectNotificationId } from "@/src/reduxStore/states/tmp";
+import { useConsoleLog } from "@/submodules/react-components/hooks/useConsoleLog";
 
 export default function Header() {
     const router = useRouter();
@@ -28,8 +30,11 @@ export default function Header() {
     const user = useSelector(selectUser);
     const project = useSelector(selectProject);
     const projectsNames = useSelector(selectAllProjectsNamesDict);
+    const notificationId = useSelector(selectNotificationId);
 
     const [organizationInactive, setOrganizationInactive] = useState(null);
+
+    useConsoleLog(notificationId, 'notificationId')
 
     const [refetchNotifications] = useLazyQuery(NOTIFICATIONS, { fetchPolicy: 'network-only' });
 
@@ -38,7 +43,7 @@ export default function Header() {
         document.getElementById('notifications').addEventListener('click', () => {
             openModalAndRefetchNotifications();
         });
-    }, [projectsNames]);
+    }, [projectsNames, notificationId]);
 
     useEffect(() => {
         setOrganizationInactive(organization == null);
@@ -46,7 +51,7 @@ export default function Header() {
 
     function openModalAndRefetchNotifications() {
         refetchNotifications().then((res) => {
-            dispatch(setNotifications(postProcessNotifications(res.data['notifications'], projectsNames)));
+            dispatch(setNotifications(postProcessNotifications(res.data['notifications'], projectsNames, notificationId)));
             dispatch(openModal(ModalEnum.NOTIFICATION_CENTER));
         });
     }

@@ -7,11 +7,13 @@ import { NotificationLevel } from "@/src/types/shared/notification-center";
 import { IconAlertTriangleFilled, IconCircleCheckFilled, IconInfoCircleFilled } from "@tabler/icons-react";
 import { WebSocketsService } from "@/src/services/base/web-sockets/WebSocketsService";
 import { CurrentPage } from "@/src/types/shared/general";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { selectUser } from "@/src/reduxStore/states/general";
 import { interval, timer } from "rxjs";
+import { setNotificationId } from "@/src/reduxStore/states/tmp";
 
 export default function Layout({ children }) {
+    const dispatch = useDispatch();
     const user = useSelector(selectUser);
 
     const [notifications, setNotifications] = useState([]);
@@ -88,7 +90,7 @@ export default function Layout({ children }) {
             </div>
             <div className="absolute flex flex-col z-50 bottom-0 left-24 mb-7 cursor-pointer content-start" id="notifications">
                 {notifications.map((notification) => (<Fragment key={notification.id}>
-                    {notification.level === NotificationLevel.INFO && <div>
+                    {notification.level === NotificationLevel.INFO && <div onClick={() => dispatch(setNotificationId(notification.id))}>
                         <div className="bg-blue-50 border-l-4 border-blue-400 p-4">
                             <div className="flex">
                                 <div className="flex-shrink-0">

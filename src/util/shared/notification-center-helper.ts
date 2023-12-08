@@ -1,6 +1,6 @@
 import { dateAsUTCDate, timeDiffCalc } from "@/submodules/javascript-functions/date-parser";
 
-export function postProcessNotifications(notifications, projectNames: any) {
+export function postProcessNotifications(notifications, projectNames: any, notificationId: string = null) {
     const prepareNotifications = [];
     notifications.forEach(notification => {
         notification = { ...notification };
@@ -23,6 +23,9 @@ export function postProcessNotifications(notifications, projectNames: any) {
                 highlightMe: false,
                 array: [notification]
             });
+        }
+        if (notificationId && notificationId === notification.id) {
+            prepareNotifications[prepareNotifications.length - 1].highlightMe = true;
         }
     });
     return prepareNotifications
