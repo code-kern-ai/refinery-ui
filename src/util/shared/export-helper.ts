@@ -66,7 +66,8 @@ export function buildForm(arr: any[]): ExportRecordFormGroup {
             active: i == 0,
             name: v.name,
             id: v.id,
-            value: v.value
+            value: v.value,
+            disabled: false
         }
     })
     return formGroup;

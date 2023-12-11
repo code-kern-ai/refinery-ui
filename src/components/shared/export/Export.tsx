@@ -5,8 +5,9 @@ import { Tooltip } from "@nextui-org/react";
 import { IconDownload } from "@tabler/icons-react";
 import { useDispatch } from "react-redux";
 import ExportRecordsModal from "./ExportRecordsModal";
+import { ExportProps } from "@/src/types/shared/export";
 
-export default function Export() {
+export default function Export(props: ExportProps) {
     const dispatch = useDispatch();
     return (<>
         <Tooltip content={TOOLTIPS_DICT.GENERAL.DOWNLOAD_RECORDS} color="invert" placement="bottom">
@@ -16,6 +17,6 @@ export default function Export() {
                 Download records
             </button>
         </Tooltip>
-        <ExportRecordsModal />
+        <ExportRecordsModal sessionId={props.sessionId} />
     </>)
 }

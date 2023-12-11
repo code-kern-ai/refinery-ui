@@ -6,16 +6,15 @@ import { useEffect, useState } from "react";
 import { selectProjectId } from "@/src/reduxStore/states/project";
 import { GET_RECORD_EXPORT_FORM_DATA, LAST_RECORD_EXPORT_CREDENTIALS } from "@/src/services/gql/queries/project-setting";
 import { useLazyQuery } from "@apollo/client";
-import { ExportEnums, ExportFileType, ExportFormat, ExportPreset, ExportRowType } from "@/src/types/shared/export";
+import { ExportEnums, ExportFileType, ExportFormat, ExportPreset, ExportProps, ExportRowType } from "@/src/types/shared/export";
 import { enumToArray } from "@/submodules/javascript-functions/general";
 import { caseType } from "@/submodules/javascript-functions/case-types-parser";
 import { LabelSource } from "@/submodules/javascript-functions/enums/enums";
 import { labelSourceToString } from "@/submodules/javascript-functions/enums/enum-functions";
-import postProcessExportRecordData, { buildForm } from "@/src/util/shared/export-helper";
+import postProcessExportRecordData, { buildForm, getExportTooltipFor } from "@/src/util/shared/export-helper";
 import GroupDisplay from "./GroupDisplay";
-import { useConsoleLog } from "@/submodules/react-components/hooks/useConsoleLog";
 
-export default function ExportRecordsModal() {
+export default function ExportRecordsModal(props: ExportProps) {
     const projectId = useSelector(selectProjectId);
     const modal = useSelector(selectModal(ModalEnum.EXPORT_RECORDS));
 
@@ -35,7 +34,9 @@ export default function ExportRecordsModal() {
 
     useEffect(() => {
         if (!enumArrays) return;
-        refreshForms();
+        if (!formGroup) {
+            buildForms();
+        }
     }, [enumArrays]);
 
     function requestRecordsExportCredentials() {
@@ -65,15 +66,14 @@ export default function ExportRecordsModal() {
             enumArraysCopy.set(ExportEnums.Attributes, postProcessedRes.attributes);
             enumArraysCopy.set(ExportEnums.LabelingTasks, postProcessedRes.labelingTasks);
             enumArraysCopy.set(ExportEnums.DataSlices, postProcessedRes.dataSlices);
+            enumArraysCopy.forEach((v, k) => {
+                v.forEach((v2: any) => {
+                    const tooltip = getExportTooltipFor(k, v2);
+                    if (tooltip) v2.tooltip = tooltip;
+                });
+            });
             setEnumArrays(enumArraysCopy);
         });
-    }
-
-    function refreshForms() {
-        if (!formGroup) {
-            buildForms();
-            return;
-        }
     }
 
     function buildForms() {
@@ -88,11 +88,12 @@ export default function ExportRecordsModal() {
     }
 
     function setPresetValues(preset: ExportPreset, formGroup: Map<ExportEnums, any>) {
-        // this.setOptionFormDisableState(preset);
+        let formGroupCopy = new Map<ExportEnums, any>(formGroup);
+        formGroupCopy = setOptionFormDisableState(preset, formGroupCopy);
         switch (preset) {
             case ExportPreset.DEFAULT:
-                initForms(formGroup);
-                setPresetValuesCurrent(formGroup);
+                initForms(formGroupCopy);
+                setPresetValuesCurrent(formGroupCopy);
                 break;
             case ExportPreset.CUSTOM:
                 break; //nothing else to do
@@ -121,7 +122,31 @@ export default function ExportRecordsModal() {
         for (const [key] of Object.entries(formGroupCopy.get(preset))) {
             formGroupCopy.get(preset)[key]['active'] = active;
         }
-        return formGroupCopy
+        return formGroupCopy;
+    }
+
+    function setOptionFormDisableState(type: ExportPreset, formGroup: Map<ExportEnums, any>) {
+        if (type == ExportPreset.DEFAULT) {
+            for (let [key, value] of formGroup) {
+                if (![ExportEnums.ExportPreset, ExportEnums.ExportFileType, ExportEnums.ExportRowType, ExportEnums.DataSlices].includes(key)) {
+                    for (let [key2, value2] of Object.entries(value)) {
+                        const val: any = value2;
+                        val.disabled = true;
+                    }
+                }
+            }
+        } else {
+            for (let [key, value] of formGroup) {
+                for (let [key2, value2] of Object.entries(value)) {
+                    const val: any = value2;
+                    val.disabled = false;
+                }
+            }
+        }
+        const session = formGroup.get(ExportEnums.ExportRowType)[ExportRowType.SESSION];
+        if (props.sessionId) session.disabled = false;
+        else session.disabled = true;
+        return formGroup;
     }
 
     return (<Modal modalName={ModalEnum.EXPORT_RECORDS}>

@@ -36,7 +36,8 @@ export type ExportRecordFormGroup = {
     active: boolean,
     name: string,
     id: string,
-    value: string
+    value: string,
+    disabled: boolean
 }
 
 export type GroupDisplayProps = {
@@ -49,4 +50,8 @@ export type GroupDisplayProps = {
     isCheckbox: boolean,
     setPresetValues: (formGroup: any) => void,
     updateFormGroup: (formGroup: any, type: ExportEnums) => void,
+}
+
+export type ExportProps = {
+    sessionId: string
 }

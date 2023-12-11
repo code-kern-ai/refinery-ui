@@ -9,7 +9,7 @@ export default function GroupDisplay(props: GroupDisplayProps) {
         if (isCheckBox || !activeStateCtrl) {
             control['active'] = !activeStateCtrl;
         }
-        if (type == ExportEnums.ExportPreset && activeStateCtrl) {
+        if (type == ExportEnums.ExportPreset) {
             props.setPresetValues(control['value']);
         }
         if (isEnumRadioGroup(type)) {
@@ -28,15 +28,15 @@ export default function GroupDisplay(props: GroupDisplayProps) {
             {props.subText && <p className="text-sm leading-5 text-gray-500 col-start-1 col-span-full -mt-3">{props.subText}</p>}
             {props.enumArrays && props.enumArrays.get(props.type).map((v, index) => (<div key={index} className="contents">
                 {(v.value ? v.value : v.name) && <>
-                    {props.formGroup.get(props.type)[v.value ? v.value : v.name] && <div className={`flex items-center`}
-                        onClick={() => flipControlValue(props.formGroup.get(props.type)[v.value ? v.value : v.name], props.type, props.isCheckbox)}>
+                    {props.formGroup.get(props.type)[v.value ? v.value : v.name] && <div className={`flex items-center ${props.formGroup.get(props.type)[v.value ? v.value : v.name].disabled ? 'cursor-not-allowed ' : 'cursor-pointer'} ${(props.formGroup.get(props.type)[v.value ? v.value : v.name].disabled && !v.tooltip) ? 'opacity-50' : ''}`}
+                        onClick={() => props.formGroup.get(props.type)[v.value ? v.value : v.name].disabled ? null : flipControlValue(props.formGroup.get(props.type)[v.value ? v.value : v.name], props.type, props.isCheckbox)}>
                         {(v.value ? v.value : v.name) != NONE_IN_PROJECT &&
                             <input checked={props.formGroup.get(props.type)[v.value ? v.value : v.name].active}
                                 type={props.isCheckbox ? 'checkbox' : 'radio'}
                                 onChange={() => flipControlValue(props.formGroup.get(props.type)[v.value ? v.value : v.name], props.type, props.isCheckbox)}
                                 className={`h-4 w-4 border-gray-300 text-indigo-600 focus:ring-indigo-500 pointer-events-none mr-2`} />}
                         {v.tooltip ? (<Tooltip content={v.tooltip} color="invert" placement={index % 3 == 0 ? 'right' : 'left'}>
-                            <span className={`mb-0 label-text ${props.formGroup.get(props.type).disabled || props.formGroup.get(props.type).disabled ? 'opacity-50' : 'cursor-help'}`}>
+                            <span className={`mb-0 label-text ${props.formGroup.get(props.type)[v.value ? v.value : v.name].disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-help'}`}>
                                 <span className="underline filtersUnderline">{v.name}</span></span>
                         </Tooltip>) : (<label
                             className="block text-sm font-medium text-gray-700 select-none pointer-events-none">{v.name}</label>)}
