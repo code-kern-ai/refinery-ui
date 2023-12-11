@@ -275,3 +275,9 @@ query ($projectId: ID!) {
 }  
 
 `;
+
+export const PREPARE_RECORD_EXPORT = gql`
+query ($projectId: ID!, $exportOptions: JSONString, $key: String) {
+  prepareRecordExport(projectId: $projectId, exportOptions: $exportOptions, key: $key)
+}
+`;

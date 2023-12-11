@@ -1,4 +1,4 @@
-import { ExportEnums, ExportRecordFormGroup } from "@/src/types/shared/export";
+import { ExportEnums, ExportRecordFormGroup, ExportRowType } from "@/src/types/shared/export";
 import { Status } from "@/src/types/shared/statuses";
 import { dateAsUTCDate } from "@/submodules/javascript-functions/date-parser";
 import { sliceTypeToString } from "@/submodules/javascript-functions/enums/enum-functions";

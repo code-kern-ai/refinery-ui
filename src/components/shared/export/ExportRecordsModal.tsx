@@ -1,10 +1,10 @@
 import { ModalEnum } from "@/src/types/shared/modal";
 import Modal from "../modal/Modal";
-import { useSelector } from "react-redux";
-import { selectModal } from "@/src/reduxStore/states/modal";
+import { useDispatch, useSelector } from "react-redux";
+import { closeModal, selectModal } from "@/src/reduxStore/states/modal";
 import { useEffect, useState } from "react";
 import { selectProjectId } from "@/src/reduxStore/states/project";
-import { GET_RECORD_EXPORT_FORM_DATA, LAST_RECORD_EXPORT_CREDENTIALS } from "@/src/services/gql/queries/project-setting";
+import { GET_RECORD_EXPORT_FORM_DATA, LAST_RECORD_EXPORT_CREDENTIALS, PREPARE_RECORD_EXPORT } from "@/src/services/gql/queries/project-setting";
 import { useLazyQuery } from "@apollo/client";
 import { ExportEnums, ExportFileType, ExportFormat, ExportPreset, ExportProps, ExportRowType } from "@/src/types/shared/export";
 import { enumToArray } from "@/submodules/javascript-functions/general";
@@ -13,17 +13,30 @@ import { LabelSource } from "@/submodules/javascript-functions/enums/enums";
 import { labelSourceToString } from "@/submodules/javascript-functions/enums/enum-functions";
 import postProcessExportRecordData, { buildForm, getExportTooltipFor } from "@/src/util/shared/export-helper";
 import GroupDisplay from "./GroupDisplay";
+import { IconDownload } from "@tabler/icons-react";
+import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
+import { Tooltip } from "@nextui-org/react";
+import { DownloadState } from "@/src/types/components/projects/projectId/settings/project-export";
+import LoadingIcon from "../loading/LoadingIcon";
+import { ExportHelper } from "@/src/util/classes/export";
+import { downloadFile } from "@/src/services/base/s3-service";
+import { downloadByteData } from "@/submodules/javascript-functions/export";
+import { timer } from "rxjs";
 
 export default function ExportRecordsModal(props: ExportProps) {
+    const dispatch = useDispatch();
+
     const projectId = useSelector(selectProjectId);
     const modal = useSelector(selectModal(ModalEnum.EXPORT_RECORDS));
 
     const [recordExportCredentials, setRecordExportCredentials] = useState(null);
     const [enumArrays, setEnumArrays] = useState<Map<ExportEnums, any[]>>(null);
     const [formGroup, setFormGroup] = useState(null);
+    const [downloadState, setDownloadState] = useState<DownloadState>(DownloadState.NONE);
 
     const [refetchLastRecordsExportCredentials] = useLazyQuery(LAST_RECORD_EXPORT_CREDENTIALS, { fetchPolicy: "no-cache" });
     const [refetchRecordExportFromData] = useLazyQuery(GET_RECORD_EXPORT_FORM_DATA, { fetchPolicy: "no-cache" });
+    const [refetchPrepareRecordExport] = useLazyQuery(PREPARE_RECORD_EXPORT, { fetchPolicy: "no-cache" })
 
     useEffect(() => {
         if (!modal || !modal.open) return;
@@ -149,7 +162,33 @@ export default function ExportRecordsModal(props: ExportProps) {
         return formGroup;
     }
 
-    return (<Modal modalName={ModalEnum.EXPORT_RECORDS}>
+    function exportViaFile() {
+        if (!recordExportCredentials) return;
+        setDownloadState(DownloadState.DOWNLOAD);
+        const fileName = recordExportCredentials.downloadFileName;
+        downloadFile(recordExportCredentials, false).subscribe((data) => {
+            downloadByteData(data, fileName);
+            timer(5000).subscribe(
+                () => (setDownloadState(DownloadState.NONE))
+            );
+        });
+    }
+
+    function prepareDownload() {
+        const jsonString = ExportHelper.buildExportData(props.sessionId, formGroup);
+        if (ExportHelper.error.length > 0) return;
+        setDownloadState(DownloadState.PREPARATION);
+        //TODO : add key to send
+        refetchPrepareRecordExport({ variables: { projectId: projectId, exportOptions: jsonString, key: null } }).then((res) => {
+            if (res.data['prepareRecordExport'] != "") {
+                ExportHelper.error.push("Something went wrong in the backend:");
+                ExportHelper.error.push(res.data['prepareRecordExport']);
+            }
+            setDownloadState(DownloadState.DOWNLOAD);
+        });
+    }
+
+    return (<Modal modalName={ModalEnum.EXPORT_RECORDS} hasOwnButtons={true}>
         <div className="flex flex-grow justify-center text-lg leading-6 text-gray-900 font-medium mb-2">Export record data </div>
         {formGroup && <div className="grid grid-cols-3 gap-2 items-center overflow-y-auto overflow-x-hidden pb-4" style={{ maxHeight: 'calc(80vh - 100px)' }}>
             {/* Export Preset */}
@@ -242,5 +281,28 @@ export default function ExportRecordsModal(props: ExportProps) {
                     setFormGroup(formGroupCopy);
                 }} />
         </div>}
+        {ExportHelper.error.length > 0 && <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mt-2">
+            <strong className="font-bold">Errors Detected!</strong>
+            <pre className="text-sm">{ExportHelper.error.join("\n")}</pre>
+        </div>}
+        <div className="flex mt-6 justify-end">
+            {recordExportCredentials && recordExportCredentials.downloadFileName && <Tooltip content={TOOLTIPS_DICT.PROJECT_SETTINGS.LATEST_SNAPSHOT} color="invert">
+                <button onClick={exportViaFile} className="bg-white text-gray-700 text-xs font-semibold mr-4 px-4 py-2 rounded-md border border-gray-300 cursor-pointer hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                    <IconDownload className="mr-1 h-5 w-5 inline-block" />
+                    {recordExportCredentials.downloadFileName}
+                </button>
+            </Tooltip>}
+            <button onClick={prepareDownload}
+                disabled={downloadState == DownloadState.PREPARATION || downloadState == DownloadState.DOWNLOAD}
+                className={`bg-green-100 flex items-center mr-4 text-green-700 border border-green-400 text-xs font-semibold px-4 rounded-md cursor-pointer hover:bg-green-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50 disabled:cursor-not-allowed`}
+                type="submit">
+                Prepare download
+                {downloadState == DownloadState.PREPARATION && <span className="ml-2"><LoadingIcon color="green" /></span>}
+            </button>
+            <button onClick={() => dispatch(closeModal(ModalEnum.EXPORT_RECORDS))}
+                className="bg-white text-gray-700 text-xs font-semibold px-4 py-2 rounded border border-gray-300 cursor-pointer hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                Close
+            </button>
+        </div>
     </Modal>)
 }
