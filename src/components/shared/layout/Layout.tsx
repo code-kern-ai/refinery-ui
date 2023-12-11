@@ -28,8 +28,11 @@ export default function Layout({ children }) {
             whitelist: ['notification_created', 'project_deleted', 'config_updated', 'admin_message'],
             func: handleWebsocketNotification
         });
-        initializeNotificationDeletion();
     }, []);
+
+    useEffect(() => {
+        if (notifications.length == 0) initializeNotificationDeletion();
+    }, [notifications]);
 
     function refetchNotificationsAndProcess() {
         refetchNotificationsByUser().then((res) => {
@@ -102,7 +105,7 @@ export default function Layout({ children }) {
                             </div>
                         </div>
                     </div>}
-                    {notification.level === NotificationLevel.WARNING && <div>
+                    {notification.level === NotificationLevel.WARNING && <div onClick={() => dispatch(setNotificationId(notification.id))}>
                         <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4">
                             <div className="flex">
                                 <div className="flex-shrink-0">
@@ -114,7 +117,7 @@ export default function Layout({ children }) {
                             </div>
                         </div>
                     </div>}
-                    {notification.level === NotificationLevel.ERROR && <div>
+                    {notification.level === NotificationLevel.ERROR && <div onClick={() => dispatch(setNotificationId(notification.id))}>
                         <div className="bg-red-50 border-l-4 border-red-400 p-4">
                             <div className="flex">
                                 <div className="flex-shrink-0">
@@ -126,7 +129,7 @@ export default function Layout({ children }) {
                             </div>
                         </div>
                     </div>}
-                    {notification.level === NotificationLevel.SUCCESS && <div>
+                    {notification.level === NotificationLevel.SUCCESS && <div onClick={() => dispatch(setNotificationId(notification.id))}>
                         <div className="bg-green-50 border-l-4 border-green-400 p-4">
                             <div className="flex">
                                 <div className="flex-shrink-0">

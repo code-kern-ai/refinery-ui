@@ -2,7 +2,7 @@ import { selectCurrentPage, selectIsDemo, selectIsManaged, selectOrganization, s
 import { CurrentPage } from "@/src/types/shared/general";
 import { UserRole } from "@/src/types/shared/sidebar";
 import { Tooltip } from "@nextui-org/react";
-import { useEffect, useState } from "react";
+import { use, useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import style from "@/src/styles/shared/header.module.css";
 import LogoutDropdown from "./LogoutDropdown";
@@ -43,11 +43,16 @@ export default function Header() {
         document.getElementById('notifications').addEventListener('click', () => {
             openModalAndRefetchNotifications();
         });
-    }, [projectsNames, notificationId]);
+    }, [projectsNames]);
 
     useEffect(() => {
         setOrganizationInactive(organization == null);
     }, [organization]);
+
+    useEffect(() => {
+        if (!notificationId) return;
+        openModalAndRefetchNotifications();
+    }, [notificationId]);
 
     function openModalAndRefetchNotifications() {
         refetchNotifications().then((res) => {
