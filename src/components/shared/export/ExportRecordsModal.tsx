@@ -13,6 +13,7 @@ import { LabelSource } from "@/submodules/javascript-functions/enums/enums";
 import { labelSourceToString } from "@/submodules/javascript-functions/enums/enum-functions";
 import postProcessExportRecordData, { buildForm } from "@/src/util/shared/export-helper";
 import GroupDisplay from "./GroupDisplay";
+import { useConsoleLog } from "@/submodules/react-components/hooks/useConsoleLog";
 
 export default function ExportRecordsModal() {
     const projectId = useSelector(selectProjectId);
@@ -60,7 +61,7 @@ export default function ExportRecordsModal() {
         if (!force && enumArraysCopy.get(ExportEnums.Heuristics)) return;
         refetchRecordExportFromData({ variables: { projectId: projectId } }).then((res) => {
             const postProcessedRes = postProcessExportRecordData(res['data']['projectByProjectId']);
-            enumArraysCopy.set(ExportEnums.Heuristics, postProcessedRes.heuristics);
+            enumArraysCopy.set(ExportEnums.Heuristics, postProcessedRes.informationSources);
             enumArraysCopy.set(ExportEnums.Attributes, postProcessedRes.attributes);
             enumArraysCopy.set(ExportEnums.LabelingTasks, postProcessedRes.labelingTasks);
             enumArraysCopy.set(ExportEnums.DataSlices, postProcessedRes.dataSlices);
@@ -126,8 +127,89 @@ export default function ExportRecordsModal() {
     return (<Modal modalName={ModalEnum.EXPORT_RECORDS}>
         <div className="flex flex-grow justify-center text-lg leading-6 text-gray-900 font-medium mb-2">Export record data </div>
         {formGroup && <div className="grid grid-cols-3 gap-2 items-center overflow-y-auto overflow-x-hidden pb-4" style={{ maxHeight: 'calc(80vh - 100px)' }}>
+            {/* Export Preset */}
             <GroupDisplay type={ExportEnums.ExportPreset} hiddenCheckCtrl={null} formGroup={formGroup} enumArrays={enumArrays}
                 heading="Export Presets" subText="Choose a preset to apply corresponding values" isCheckbox={false}
+                setPresetValues={(control) => setPresetValues(control, formGroup)}
+                updateFormGroup={(control, type) => {
+                    const formGroupCopy = new Map<ExportEnums, any>(formGroup);
+                    formGroupCopy[type] = control;
+                    setFormGroup(formGroupCopy);
+                }} />
+
+            {/* Export RowType */}
+            <GroupDisplay type={ExportEnums.ExportRowType} hiddenCheckCtrl={null} formGroup={formGroup} enumArrays={enumArrays}
+                heading="Export Amount" subText="Choose what rows should be exported" isCheckbox={false}
+                setPresetValues={(control) => setPresetValues(control, formGroup)}
+                updateFormGroup={(control, type) => {
+                    const formGroupCopy = new Map<ExportEnums, any>(formGroup);
+                    formGroupCopy[type] = control;
+                    setFormGroup(formGroupCopy);
+                }} />
+
+            {/* Export DataSlices */}
+            <GroupDisplay type={ExportEnums.DataSlices} hiddenCheckCtrl={formGroup.get(ExportEnums.ExportRowType)[ExportRowType.SLICE]['active']} formGroup={formGroup} enumArrays={enumArrays}
+                heading="Export data slice" subText={null} isCheckbox={false}
+                setPresetValues={(control) => setPresetValues(control, formGroup)}
+                updateFormGroup={(control, type) => {
+                    const formGroupCopy = new Map<ExportEnums, any>(formGroup);
+                    formGroupCopy[type] = control;
+                    setFormGroup(formGroupCopy);
+                }} />
+
+            {/* Export FileType */}
+            <GroupDisplay type={ExportEnums.ExportFileType} hiddenCheckCtrl={null} formGroup={formGroup} enumArrays={enumArrays}
+                heading="Export File" subText={null} isCheckbox={false}
+                setPresetValues={(control) => setPresetValues(control, formGroup)}
+                updateFormGroup={(control, type) => {
+                    const formGroupCopy = new Map<ExportEnums, any>(formGroup);
+                    formGroupCopy[type] = control;
+                    setFormGroup(formGroupCopy);
+                }} />
+
+            {/* Export Format */}
+            <GroupDisplay type={ExportEnums.ExportFormat} hiddenCheckCtrl={null} formGroup={formGroup} enumArrays={enumArrays}
+                heading="Export Format" subText={null} isCheckbox={false}
+                setPresetValues={(control) => setPresetValues(control, formGroup)}
+                updateFormGroup={(control, type) => {
+                    const formGroupCopy = new Map<ExportEnums, any>(formGroup);
+                    formGroupCopy[type] = control;
+                    setFormGroup(formGroupCopy);
+                }} />
+
+            {/* Export Attributes */}
+            <GroupDisplay type={ExportEnums.Attributes} hiddenCheckCtrl={null} formGroup={formGroup} enumArrays={enumArrays}
+                heading="Export Columns - Attributes" subText={null} isCheckbox={true}
+                setPresetValues={(control) => setPresetValues(control, formGroup)}
+                updateFormGroup={(control, type) => {
+                    const formGroupCopy = new Map<ExportEnums, any>(formGroup);
+                    formGroupCopy[type] = control;
+                    setFormGroup(formGroupCopy);
+                }} />
+
+            {/* Export LabelingTasks */}
+            <GroupDisplay type={ExportEnums.LabelingTasks} hiddenCheckCtrl={null} formGroup={formGroup} enumArrays={enumArrays}
+                heading="Export Columns - Labeling Tasks" subText={null} isCheckbox={true}
+                setPresetValues={(control) => setPresetValues(control, formGroup)}
+                updateFormGroup={(control, type) => {
+                    const formGroupCopy = new Map<ExportEnums, any>(formGroup);
+                    formGroupCopy[type] = control;
+                    setFormGroup(formGroupCopy);
+                }} />
+
+            {/* Export LabelSource */}
+            <GroupDisplay type={ExportEnums.LabelSource} hiddenCheckCtrl={null} formGroup={formGroup} enumArrays={enumArrays}
+                heading="Export Columns - Global" subText={null} isCheckbox={true}
+                setPresetValues={(control) => setPresetValues(control, formGroup)}
+                updateFormGroup={(control, type) => {
+                    const formGroupCopy = new Map<ExportEnums, any>(formGroup);
+                    formGroupCopy[type] = control;
+                    setFormGroup(formGroupCopy);
+                }} />
+
+            {/* Export Heuristics */}
+            <GroupDisplay type={ExportEnums.Heuristics} hiddenCheckCtrl={formGroup.get(ExportEnums.LabelSource)['INFORMATION_SOURCE']['active']} formGroup={formGroup} enumArrays={enumArrays}
+                heading="Export Columns - Heuristics" subText={null} isCheckbox={true}
                 setPresetValues={(control) => setPresetValues(control, formGroup)}
                 updateFormGroup={(control, type) => {
                     const formGroupCopy = new Map<ExportEnums, any>(formGroup);
