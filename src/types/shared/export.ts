@@ -53,5 +53,5 @@ export type GroupDisplayProps = {
 }
 
 export type ExportProps = {
-    sessionId: string
+    sessionId?: string
 }
