@@ -17,7 +17,6 @@ import { useLazyQuery } from "@apollo/client";
 import { NOTIFICATIONS } from "@/src/services/gql/queries/projects";
 import { postProcessNotifications } from "@/src/util/shared/notification-center-helper";
 import { selectNotificationId } from "@/src/reduxStore/states/tmp";
-import { useConsoleLog } from "@/submodules/react-components/hooks/useConsoleLog";
 
 export default function Header() {
     const router = useRouter();
@@ -33,8 +32,6 @@ export default function Header() {
     const notificationId = useSelector(selectNotificationId);
 
     const [organizationInactive, setOrganizationInactive] = useState(null);
-
-    useConsoleLog(notificationId, 'notificationId')
 
     const [refetchNotifications] = useLazyQuery(NOTIFICATIONS, { fetchPolicy: 'network-only' });
 

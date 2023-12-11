@@ -33,6 +33,7 @@ import LabelingTasks from "./labeling-tasks/LabelingTasks";
 import { jsonCopy } from "@/submodules/javascript-functions/general";
 import { unsubscribeWSOnDestroy } from "@/src/services/base/web-sockets/web-sockets-helper";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
+import Export from "@/src/components/shared/export/Export";
 
 const ACCEPT_BUTTON = { buttonCaption: "Accept", useButton: true, disabled: true }
 
@@ -241,22 +242,22 @@ export default function ProjectSettings() {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-2 mt-1 align-top">
                 <div className="items-center flex flex-row">
                     <Tooltip content={TOOLTIPS_DICT.PROJECT_SETTINGS.ADD_NEW_ATTRIBUTE} color="invert" placement="bottom">
-                        <label onClick={() => dispatch(setModalStates(ModalEnum.CREATE_NEW_ATTRIBUTE, { open: true, attributeName: findFreeAttributeName(attributes) }))} className="mr-1 inline-flex items-center px-2.5 py-1.5 border border-gray-300 shadow-sm text-xs font-semibold rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none cursor-pointer">
+                        <button onClick={() => dispatch(setModalStates(ModalEnum.CREATE_NEW_ATTRIBUTE, { open: true, attributeName: findFreeAttributeName(attributes) }))} className="mr-1 inline-flex items-center px-2.5 py-1.5 border border-gray-300 shadow-sm text-xs font-semibold rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none cursor-pointer">
                             <IconPlus className="mr-1 h-5 w-5 inline-block" />
                             Add new attribute
-                        </label>
+                        </button>
                     </Tooltip>
                     <Tooltip content={isAcRunning ? 'Attribute calculation in progress' : tokenizationProgress < 1 ? 'Tokenization in progress' : 'Upload more records to the project'} placement="right" color="invert">
                         <button disabled={isAcRunning || tokenizationProgress < 1} onClick={() => {
                             dispatch(setUploadFileType(UploadFileType.RECORDS_ADD));
                             router.push(`/projects/${project.id}/upload-records`);
                         }}
-                            className={`mr-1 inline-flex items-center px-2.5 py-2 border border-gray-300 shadow-sm text-xs font-semibold rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none cursor-pointer ${isAcRunning || tokenizationProgress < 1 ? 'opacity-50 cursor-not-allowed' : 'opacity-100 cursor-pointer'}`}>
-                            <IconUpload className="mr-1 h-4 w-4 inline-block" />
+                            className={`mr-1 inline-flex items-center px-2.5 py-1.5 border border-gray-300 shadow-sm text-xs font-semibold rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none cursor-pointer ${isAcRunning || tokenizationProgress < 1 ? 'opacity-50 cursor-not-allowed' : 'opacity-100 cursor-pointer'}`}>
+                            <IconUpload className="mr-1 h-5 w-5 inline-block" />
                             Upload records
                         </button>
                     </Tooltip>
-                    {/* TODO: Add option to export records -> together with data browser */}
+                    <Export />
                     <Tooltip content={TOOLTIPS_DICT.PROJECT_SETTINGS.PROJECT_SNAPSHOT} placement="bottom" color="invert">
                         <button onClick={() => dispatch(openModal(ModalEnum.PROJECT_SNAPSHOT))}
                             className="mr-1 inline-flex items-center px-2.5 py-1.5 border border-gray-300 shadow-sm text-xs font-semibold rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none cursor-pointer">

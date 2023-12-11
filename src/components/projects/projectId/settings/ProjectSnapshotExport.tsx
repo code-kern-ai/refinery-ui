@@ -49,7 +49,7 @@ export default function ProjectSnapshotExport() {
             whitelist: ['project_export'],
             func: handleWebsocketNotification
         });
-    }, [modal]);
+    }, [modal, projectId]);
 
     useEffect(() => {
         if (!projectExportArray) return;

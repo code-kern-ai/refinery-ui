@@ -219,6 +219,9 @@ const initialState: Modals = {
     },
     [ModalEnum.NOTIFICATION_CENTER]: {
         open: false,
+    },
+    [ModalEnum.EXPORT_RECORDS]: {
+        open: false,
     }
 };
 

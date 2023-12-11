@@ -222,3 +222,56 @@ query($projectId: ID!, $attributeId: ID!){
   }
 }
 `;
+
+export const LAST_RECORD_EXPORT_CREDENTIALS = gql`
+query ($projectId: ID!) {
+  lastRecordExportCredentials(projectId:$projectId)
+}`;
+
+export const GET_RECORD_EXPORT_FORM_DATA = gql`
+query ($projectId: ID!) {
+  projectByProjectId(projectId: $projectId) {
+    id
+    name
+    labelingTasks {
+      edges {
+        node {
+          id
+          name
+          attribute {
+            relativePosition
+          }
+        }
+      }
+    }
+    informationSources {
+      edges {
+        node {
+          id
+          name
+        }
+      }
+    }
+    attributes {
+      edges {
+        node {
+          id
+          name
+          state
+        }
+      }
+    }
+    dataSlices {
+      edges {
+        node {
+          id
+          name
+          sliceType
+          createdAt
+        }
+      }
+    }
+  }
+}  
+
+`;

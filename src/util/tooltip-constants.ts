@@ -12,6 +12,7 @@ export const TOOLTIPS_DICT = {
         'CLICK_TO_COPY': 'Click to copy',
         'NOTIFICATION_CENTER': 'Notification center',
         'MORE_INFO_AVAILABLE': 'More information available',
+        'DOWNLOAD_RECORDS': 'Download your records',
     },
     [CurrentPage.PROJECT_SETTINGS]: {
         'ADD_NEW_ATTRIBUTE': 'Add a new attribute',
