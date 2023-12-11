@@ -2,7 +2,7 @@ import { ModalEnum } from "@/src/types/shared/modal";
 import Modal from "../modal/Modal";
 import { useDispatch, useSelector } from "react-redux";
 import { closeModal, selectModal } from "@/src/reduxStore/states/modal";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { selectProjectId } from "@/src/reduxStore/states/project";
 import { GET_RECORD_EXPORT_FORM_DATA, LAST_RECORD_EXPORT_CREDENTIALS, PREPARE_RECORD_EXPORT } from "@/src/services/gql/queries/project-setting";
 import { useLazyQuery } from "@apollo/client";
@@ -22,17 +22,23 @@ import { ExportHelper } from "@/src/util/classes/export";
 import { downloadFile } from "@/src/services/base/s3-service";
 import { downloadByteData } from "@/submodules/javascript-functions/export";
 import { timer } from "rxjs";
+import { WebSocketsService } from "@/src/services/base/web-sockets/WebSocketsService";
+import { CurrentPage } from "@/src/types/shared/general";
+import { selectUser } from "@/src/reduxStore/states/general";
+import CryptedField from "../crypted-field/CryptedField";
 
 export default function ExportRecordsModal(props: ExportProps) {
     const dispatch = useDispatch();
 
     const projectId = useSelector(selectProjectId);
+    const user = useSelector(selectUser)
     const modal = useSelector(selectModal(ModalEnum.EXPORT_RECORDS));
 
     const [recordExportCredentials, setRecordExportCredentials] = useState(null);
     const [enumArrays, setEnumArrays] = useState<Map<ExportEnums, any[]>>(null);
     const [formGroup, setFormGroup] = useState(null);
     const [downloadState, setDownloadState] = useState<DownloadState>(DownloadState.NONE);
+    const [key, setKey] = useState('');
 
     const [refetchLastRecordsExportCredentials] = useLazyQuery(LAST_RECORD_EXPORT_CREDENTIALS, { fetchPolicy: "no-cache" });
     const [refetchRecordExportFromData] = useLazyQuery(GET_RECORD_EXPORT_FORM_DATA, { fetchPolicy: "no-cache" });
@@ -43,6 +49,11 @@ export default function ExportRecordsModal(props: ExportProps) {
         if (!projectId) return;
         requestRecordsExportCredentials();
         fetchSetupData();
+        WebSocketsService.subscribeToNotification(CurrentPage.EXPORT, {
+            projectId: projectId,
+            whitelist: ['record_export', 'calculate_attribute', 'labeling_task_deleted', 'labeling_task_created', 'data_slice_created', 'data_slice_deleted', 'information_source_created', 'information_source_deleted'],
+            func: handleWebsocketNotification
+        });
     }, [modal, projectId]);
 
     useEffect(() => {
@@ -178,8 +189,9 @@ export default function ExportRecordsModal(props: ExportProps) {
         const jsonString = ExportHelper.buildExportData(props.sessionId, formGroup);
         if (ExportHelper.error.length > 0) return;
         setDownloadState(DownloadState.PREPARATION);
-        //TODO : add key to send
-        refetchPrepareRecordExport({ variables: { projectId: projectId, exportOptions: jsonString, key: null } }).then((res) => {
+        let keyToSend = key;
+        if (!keyToSend) keyToSend = null;
+        refetchPrepareRecordExport({ variables: { projectId: projectId, exportOptions: jsonString, key: keyToSend } }).then((res) => {
             if (res.data['prepareRecordExport'] != "") {
                 ExportHelper.error.push("Something went wrong in the backend:");
                 ExportHelper.error.push(res.data['prepareRecordExport']);
@@ -187,6 +199,25 @@ export default function ExportRecordsModal(props: ExportProps) {
             setDownloadState(DownloadState.DOWNLOAD);
         });
     }
+
+    const handleWebsocketNotification = useCallback((msgParts: string[]) => {
+        let somethingToRerequest = false;
+        if ('calculate_attribute' == msgParts[1] && ['deleted', 'finished'].includes(msgParts[2])) {
+            somethingToRerequest = true;
+        } else if (['labeling_task_deleted', 'labeling_task_created', 'data_slice_created', 'data_slice_deleted', 'labeling_task_deleted', 'labeling_task_created'].includes(msgParts[1])) {
+            somethingToRerequest = true;
+        } else if (msgParts[1] == 'record_export' && user?.id == msgParts[2]) {
+            setRecordExportCredentials(null);
+            requestRecordsExportCredentials();
+        }
+        if (somethingToRerequest) fetchSetupData(true);
+    }, [user, projectId]);
+
+    useEffect(() => {
+        if (!projectId) return;
+        if (!modal || !modal.open) return;
+        WebSocketsService.updateFunctionPointer(projectId, CurrentPage.EXPORT, handleWebsocketNotification);
+    }, [handleWebsocketNotification, projectId, modal]);
 
     return (<Modal modalName={ModalEnum.EXPORT_RECORDS} hasOwnButtons={true}>
         <div className="flex flex-grow justify-center text-lg leading-6 text-gray-900 font-medium mb-2">Export record data </div>
@@ -285,6 +316,7 @@ export default function ExportRecordsModal(props: ExportProps) {
             <strong className="font-bold">Errors Detected!</strong>
             <pre className="text-sm">{ExportHelper.error.join("\n")}</pre>
         </div>}
+        <CryptedField label="Encrypt zip file with password" keyChange={(key: string) => setKey(key)} />
         <div className="flex mt-6 justify-end">
             {recordExportCredentials && recordExportCredentials.downloadFileName && <Tooltip content={TOOLTIPS_DICT.PROJECT_SETTINGS.LATEST_SNAPSHOT} color="invert">
                 <button onClick={exportViaFile} className="bg-white text-gray-700 text-xs font-semibold mr-4 px-4 py-2 rounded-md border border-gray-300 cursor-pointer hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
@@ -293,7 +325,7 @@ export default function ExportRecordsModal(props: ExportProps) {
                 </button>
             </Tooltip>}
             <button onClick={prepareDownload}
-                disabled={downloadState == DownloadState.PREPARATION || downloadState == DownloadState.DOWNLOAD}
+                disabled={downloadState == DownloadState.PREPARATION}
                 className={`bg-green-100 flex items-center mr-4 text-green-700 border border-green-400 text-xs font-semibold px-4 rounded-md cursor-pointer hover:bg-green-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50 disabled:cursor-not-allowed`}
                 type="submit">
                 Prepare download

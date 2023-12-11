@@ -5,10 +5,12 @@ import { ModalEnum } from "@/src/types/shared/modal";
 import { UserRole } from "@/src/types/shared/sidebar";
 import { UploadFileType, UploadOptions } from "@/src/types/shared/upload";
 import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux"
 import ModalUpload from "../shared/upload/ModalUpload";
 import SampleProjectsDropdown from "./SampleProjectsDropdown";
+import { WebSocketsService } from "@/src/services/base/web-sockets/WebSocketsService";
+import { CurrentPage } from "@/src/types/shared/general";
 
 const BASE_OPTIONS = { reloadOnFinish: false, deleteProjectOnFail: true, closeModalOnClick: true, isModal: true, navigateToProject: true, showBadPasswordMsg: null };
 
@@ -18,13 +20,29 @@ export default function ButtonsContainer() {
 
     const user = useSelector(selectUser);
 
-    // TODO : Display the bad password message when the user tries to upload a project with a bad password
-    const [showBadPasswordMsg, setShowBadPasswordMsg] = useState(false);
     const [uploadOptions, setUploadOptions] = useState<UploadOptions>(BASE_OPTIONS);
+    const [showBadPasswordMsg, setShowBadPasswordMsg] = useState(false);
 
     useEffect(() => {
-        setUploadOptions({ ...BASE_OPTIONS, showBadPasswordMsg });
+        WebSocketsService.subscribeToNotification(CurrentPage.PROJECTS, {
+            whitelist: ['bad_password'],
+            func: handleWebsocketNotification
+        });
+    }, []);
+
+    useEffect(() => {
+        setUploadOptions({ ...BASE_OPTIONS, showBadPasswordMsg: showBadPasswordMsg });
     }, [showBadPasswordMsg]);
+
+    const handleWebsocketNotification = useCallback((msgParts: string[]) => {
+        if (msgParts[1] == 'bad_password') {
+            setShowBadPasswordMsg(true);
+        }
+    }, []);
+
+    useEffect(() => {
+        WebSocketsService.updateFunctionPointer(null, CurrentPage.PROJECTS, handleWebsocketNotification)
+    }, [handleWebsocketNotification]);
 
     return (
         user && user.role === UserRole.ENGINEER ? (<div>

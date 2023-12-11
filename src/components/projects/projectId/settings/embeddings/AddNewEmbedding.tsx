@@ -194,9 +194,7 @@ export default function AddNewEmbedding(props: EmbeddingProps) {
         }
 
         const attributeId = useableEmbedableAttributes.find((a) => a.name == targetAttribute).id;
-        createEmbeddingMut({ variables: { projectId: projectId, attributeId: attributeId, config: JSON.stringify(config) } }).then((res) => {
-            // TODO: return embedding on the BE, so we can add it to the store, because that is used in the websocket
-        });
+        createEmbeddingMut({ variables: { projectId: projectId, attributeId: attributeId, config: JSON.stringify(config) } }).then((res) => { });
 
     }, [embeddingPlatforms, platform, granularity, model, apiToken, engine, url, version, termsAccepted, modalEmbedding]);
 

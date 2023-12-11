@@ -15,11 +15,11 @@ import { WebSocketsService } from "@/src/services/base/web-sockets/WebSocketsSer
 import { jsonCopy } from "@/submodules/javascript-functions/general";
 import { useRouter } from "next/router";
 import { extendAllProjects, removeFromAllProjectsById, selectAllProjects, selectProjectId } from "@/src/reduxStore/states/project";
-import CryptedField from "../crypted-field/CryptedField";
 import { unsubscribeWSOnDestroy } from "@/src/services/base/web-sockets/web-sockets-helper";
 import { GET_UPLOAD_CREDENTIALS_AND_ID, GET_UPLOAD_TASK_BY_TASK_ID } from "@/src/services/gql/queries/projects";
 import { UPLOAD_TOKENIZERS } from "@/src/util/constants";
-import { UploadHelper } from "@/src/util/classes/upload-helper";
+import { UploadHelper, ZIP_TYPE } from "@/src/util/classes/upload-helper";
+import CryptedField from "../crypted-field/CryptedField";
 
 export default function Upload(props: UploadProps) {
     const router = useRouter();
@@ -41,6 +41,8 @@ export default function Upload(props: UploadProps) {
     const [isProjectTitleDuplicate, setIsProjectTitleDuplicate] = useState<boolean>(false);
     const [isProjectTitleEmpty, setIsProjectTitleEmpty] = useState<boolean>(false);
     const [prepareTokenizedValues, setPrepareTokenizedValues] = useState<any[]>([]);
+    const [key, setKey] = useState("");
+    const [fileEndsWithZip, setFileEndsWithZip] = useState<boolean>(false);
 
     const [createProjectMut] = useMutation(CREATE_PROJECT);
     const [deleteProjectMut] = useMutation(DELETE_PROJECT);
@@ -199,9 +201,9 @@ export default function Upload(props: UploadProps) {
     }
 
     function finishUpUpload(finalFinalName: string, importOptionsPrep: string) {
-        let keyTosend = null; // TODO: update this with the key once the crypted key component is implemented
-        // if(!keyTosend) keyToSend = null;
-        uploadCredentialsMut({ variables: { projectId: UploadHelper.getProjectId(), fileName: finalFinalName, fileType: uploadFileType, fileImportOptions: importOptionsPrep, uploadType: UploadType.DEFAULT, key: keyTosend } }).then((results) => {
+        let keyToSend = key;
+        if (!keyToSend) keyToSend = null;
+        uploadCredentialsMut({ variables: { projectId: UploadHelper.getProjectId(), fileName: finalFinalName, fileType: uploadFileType, fileImportOptions: importOptionsPrep, uploadType: UploadType.DEFAULT, key: keyToSend } }).then((results) => {
             const credentialsAndUploadId = JSON.parse(JSON.parse(results.data['uploadCredentialsAndId']));
             uploadFileToMinio(credentialsAndUploadId, finalFinalName);
         });
@@ -273,9 +275,10 @@ export default function Upload(props: UploadProps) {
             {uploadFileType == UploadFileType.PROJECT && (<>
                 <UploadField isFileCleared={selectedFile == null} uploadStarted={uploadStarted} doingSomething={doingSomething} progressState={progressState} sendSelectedFile={(file) => {
                     setSelectedFile(file);
+                    setFileEndsWithZip(file.name.endsWith('.zip'));
                 }} />
-                {/* TODO: Add crypted field */}
-                {/* <CryptedField /> */}
+                {selectedFile && (selectedFile.type == ZIP_TYPE || fileEndsWithZip) &&
+                    <CryptedField placeholder="Enter password if zip file is protected..." keyChange={(key) => setKey(key)} />}
                 {props.uploadOptions.showBadPasswordMsg && (<div className="text-red-700 text-xs mt-2 text-center">Wrong password</div>)}
             </>
             )}
@@ -311,7 +314,7 @@ export default function Upload(props: UploadProps) {
                 <UploadWrapper uploadStarted={uploadStarted} doingSomething={doingSomething} progressState={progressState} submitted={submitted} isFileCleared={selectedFile == null}
                     isModal={props.uploadOptions.isModal} submitUpload={submitUpload} sendSelectedFile={(file) => {
                         setSelectedFile(file);
-                    }} />
+                    }} setKey={(key) => setKey(key)} />
             </>
             )}
 
@@ -323,13 +326,13 @@ export default function Upload(props: UploadProps) {
                 <UploadWrapper uploadStarted={uploadStarted} doingSomething={doingSomething} progressState={progressState} submitted={submitted} isFileCleared={selectedFile == null}
                     isModal={props.uploadOptions.isModal} submitUpload={submitUpload} sendSelectedFile={(file) => {
                         setSelectedFile(file);
-                    }} /></>)}
+                    }} setKey={(key) => setKey(key)} /></>)}
 
             {uploadFileType == UploadFileType.KNOWLEDGE_BASE && (
                 <UploadWrapper uploadStarted={uploadStarted} doingSomething={doingSomething} progressState={progressState} submitted={submitted} isFileCleared={selectedFile == null}
                     isModal={props.uploadOptions.isModal} submitUpload={submitUpload} sendSelectedFile={(file) => {
                         setSelectedFile(file);
-                    }} />)
+                    }} setKey={(key) => setKey(key)} />)
             }
         </section >
     )

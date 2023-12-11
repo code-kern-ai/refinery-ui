@@ -44,7 +44,6 @@ export default function LabelsModals(props: LabelingTasksProps) {
         const labelColor = LabelHelper.addLabel(modalAddLabel.taskId, modalAddLabel.labelName);
         dispatch(setModalStates(ModalEnum.ADD_LABEL, { ...modalAddLabel, labelName: '', open: true }));
         createLabelMut({ variables: { projectId: projectId, labelingTaskId: modalAddLabel.taskId, labelName: modalAddLabel.labelName, labelColor: labelColor } }).then((res) => {
-            // TODO: Currently fixed with websockets and refetching but another option would be to return from BE and add to redux
         })
     }, [modalAddLabel]);
 

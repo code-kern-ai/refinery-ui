@@ -1,10 +1,19 @@
 import { CryptoFieldProps } from "@/src/types/shared/crypted-field";
+import { useDefaults } from "@/submodules/react-components/hooks/useDefaults";
 import { IconEye, IconEyeOff } from "@tabler/icons-react";
 import { useRef, useState } from "react";
 
-export default function CryptedField({ label = 'Password', placeholder = 'Enter some password here...', displayOptionalAsText = true }, props: CryptoFieldProps) {
+const DEFAULTS = {
+    label: 'Password',
+    placeholder: 'Enter some password here...',
+    displayOptionalAsText: true,
+    keyChange: (key: string) => { }
+}
+
+export default function CryptedField(_props: CryptoFieldProps) {
     const [key, setKey] = useState<string>('');
     const [show, setShow] = useState<boolean>(false);
+    const [props] = useDefaults<CryptoFieldProps>(_props, DEFAULTS);
 
     const pwRef = useRef<HTMLInputElement>(null);
 
@@ -13,12 +22,12 @@ export default function CryptedField({ label = 'Password', placeholder = 'Enter 
     }
 
     return (
-        <div className="form-control">
+        <div className="form-control text-left">
             <label className="text-gray-500 text-sm font-medium m-1">
-                {label} {displayOptionalAsText && <em>- optional</em>}
+                {props.label} {props.displayOptionalAsText && <em>- optional</em>}
             </label>
             <div className="relative">
-                <input type={show || key.length == 0 ? 'text' : 'password'} value={key} placeholder={placeholder} ref={pwRef}
+                <input type={show || key.length == 0 ? 'text' : 'password'} value={key} placeholder={props.placeholder} ref={pwRef}
                     className="h-8 w-full border-gray-300 rounded-md placeholder-italic border text-gray-900 pl-4 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100"
                     onClick={() => show ? null : pwRef.current.type = 'password'} onInput={(e: any) => {
                         setKey(e.target.value);

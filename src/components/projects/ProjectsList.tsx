@@ -43,7 +43,7 @@ export default function ProjectsList() {
 
     useEffect(() => {
         WebSocketsService.subscribeToNotification(CurrentPage.PROJECTS, {
-            whitelist: ['project_created', 'project_deleted', 'project_update', 'file_upload', 'bad_password'],
+            whitelist: ['project_created', 'project_deleted', 'project_update', 'file_upload'],
             func: handleWebsocketNotification
         });
     }, []);
@@ -104,7 +104,6 @@ export default function ProjectsList() {
             refetchProjectsAndPostProcess();
             refetchStatsAndPostProcess();
         }
-        // TODO: add logic for bad password
     }, []);
 
     useEffect(() => {

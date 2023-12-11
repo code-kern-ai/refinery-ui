@@ -23,6 +23,7 @@ export enum CurrentPage {
     RECORD_IDE = "RECORD_IDE",
     EDIT_RECORDS = "EDIT_RECORDS",
     NOTIFICATION_CENTER = "NOTIFICATION_CENTER",
+    EXPORT = "EXPORT",
 }
 
 export type User = {

@@ -1,3 +1,4 @@
+import CryptedField from "@/src/components/shared/crypted-field/CryptedField";
 import LoadingIcon from "@/src/components/shared/loading/LoadingIcon";
 import Modal from "@/src/components/shared/modal/Modal";
 import { closeModal, selectModal } from "@/src/reduxStore/states/modal";
@@ -32,6 +33,7 @@ export default function ProjectSnapshotExport() {
     const [downloadSizeText, setDownloadSizeText] = useState('');
     const [projectExportCredentials, setProjectExportCredentials] = useState(null);
     const [downloadPrepareMessage, setDownloadPrepareMessage] = useState(null);
+    const [key, setKey] = useState('');
 
     const [refetchProjectSize] = useLazyQuery(GET_PROJECT_SIZE, { fetchPolicy: "network-only" });
     const [refetchLastProjectExportCredentials] = useLazyQuery(LAST_PROJECT_EXPORT_CREDENTIALS, { fetchPolicy: "no-cache" });
@@ -84,8 +86,9 @@ export default function ProjectSnapshotExport() {
         if (downloadPrepareMessage == DownloadState.PREPARATION || downloadPrepareMessage == DownloadState.DOWNLOAD) return;
         setDownloadPrepareMessage(DownloadState.PREPARATION);
         const exportOptions = buildJsonExportOptions();
-        // TODO: Add logic for sending encryption key
-        refetchProjectExport({ variables: { projectId: projectId, exportOptions: exportOptions, key: null } }).then((res) => {
+        let keyToSend = key;
+        if (!keyToSend) keyToSend = null;
+        refetchProjectExport({ variables: { projectId: projectId, exportOptions: exportOptions, key: keyToSend } }).then((res) => {
             setProjectExportCredentials(null);
         });
     }
@@ -180,7 +183,7 @@ export default function ProjectSnapshotExport() {
                 <span className="card-title mb-0 label-text">Final size estimate:</span>
                 <span className="card-title mb-0 label-text ml-2">{downloadSizeText}</span>
             </div>
-            {/* TODO: Add crypted field */}
+            <CryptedField label="Encrypt zip file with password" keyChange={(key: string) => setKey(key)} />
         </div>}
 
         <div className="flex mt-6 justify-end">

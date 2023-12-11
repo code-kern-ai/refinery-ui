@@ -73,6 +73,7 @@ export type UploadWrapperProps = {
     isFileCleared?: boolean;
     submitUpload: () => void;
     sendSelectedFile: (file: File) => void;
+    setKey: (key: string) => void;
 }
 
 export type UploadFieldProps = {

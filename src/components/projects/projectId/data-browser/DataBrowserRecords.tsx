@@ -15,6 +15,7 @@ import { selectProjectId } from '@/src/reduxStore/states/project';
 import ConfigurationModal from './modals/ConfigurationModal';
 import { DataBrowserRecordsProps } from '@/src/types/components/projects/projectId/data-browser/data-browser';
 import { setSessionData } from '@/src/reduxStore/states/tmp';
+import Export from '@/src/components/shared/export/Export';
 
 export default function DataBrowserRecords(props: DataBrowserRecordsProps) {
     const dispatch = useDispatch();
@@ -96,7 +97,7 @@ export default function DataBrowserRecords(props: DataBrowserRecordsProps) {
                         Configuration
                     </button>
                 </Tooltip>
-                {/* TODO: Add export option - shared component */}
+                <Export sessionId={extendedRecords?.sessionId} />
             </div>
         </div>}
         {!(activeSlice?.static) && <div className="flex flex-row flex-wrap mt-4">

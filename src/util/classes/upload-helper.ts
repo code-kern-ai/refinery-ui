@@ -1,5 +1,7 @@
 import { UploadTask } from "@/src/types/shared/upload";
 
+export const ZIP_TYPE = 'application/zip';
+
 export class UploadHelper {
     private static projectId: string | null = null;
     private static uploadTask: UploadTask | null = null;

@@ -10,9 +10,6 @@ export default function UploadField(props: UploadFieldProps) {
     const [file, setFile] = useState(null);
     const [fileSize, setFileSize] = useState(null);
 
-    // TODO: add this when the crypted field is added
-    // const fileEndsWithZip: boolean = file ? file.name.endsWith(".zip") : false;
-
     useEffect(() => {
         if (props.isFileCleared) {
             setFile(null);

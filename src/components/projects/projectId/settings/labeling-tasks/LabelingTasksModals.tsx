@@ -44,7 +44,6 @@ export default function LabelingTasksModals(props: LabelingTasksProps) {
                 projectId: projectId, labelingTaskName: modalAddLabelingTask.taskName, labelingTaskType: LabelingTaskTaskType.MULTICLASS_CLASSIFICATION, labelingTaskTargetId: taskTarget
             }
         }).then((res) => {
-            // TODO: Currently fixed with websockets and refetching but another option would be to return from BE and add to redux
         });
     }, [modalAddLabelingTask]);
 

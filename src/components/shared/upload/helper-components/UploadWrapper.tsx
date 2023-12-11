@@ -7,6 +7,9 @@ import { useRouter } from "next/router";
 import { IconAlertTriangle } from "@tabler/icons-react";
 import { selectEmbeddings } from "@/src/reduxStore/states/pages/settings";
 import { Embedding, PlatformType } from "@/src/types/components/projects/projectId/settings/embeddings";
+import CryptedField from "../../crypted-field/CryptedField";
+import { ZIP_TYPE } from "@/src/util/classes/upload-helper";
+
 
 export default function UploadWrapper(props: UploadWrapperProps) {
     const router = useRouter();
@@ -17,15 +20,15 @@ export default function UploadWrapper(props: UploadWrapperProps) {
     const embeddings = useSelector(selectEmbeddings);
     const recalculationCosts = embeddings.some((e: Embedding) => e.platform == PlatformType.COHERE || e.platform == PlatformType.OPEN_AI || e.platform == PlatformType.AZURE);
 
-
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
+    const [fileEndsWithZip, setFileEndsWithZip] = useState<boolean>(false);
 
     const textareaRef = useRef<HTMLTextAreaElement>(null);
-
 
     return (<>
         <UploadField isFileCleared={props.isFileCleared} uploadStarted={props.uploadStarted} doingSomething={props.doingSomething} progressState={props.progressState} sendSelectedFile={(file) => {
             setSelectedFile(file);
+            setFileEndsWithZip(file.name.endsWith('.zip'));
             props.sendSelectedFile(file)
         }} />
         {props.submitted && !selectedFile && props.uploadTask?.state !== UploadStates.IN_PROGRESS && <div className="rounded-md bg-yellow-50 p-4">
@@ -36,15 +39,14 @@ export default function UploadWrapper(props: UploadWrapperProps) {
                 <div className="ml-3">
                     <h3 className="text-sm font-medium text-yellow-800">File required</h3>
                     <div className="mt-2 text-sm text-yellow-700">
-                        <p>If you are choosing to start a project by uploading a file, you must specify one
-                            first. Please upload one.</p>
+                        <p>If you are choosing to start a project by uploading a file, you must specify one first. Please upload one.</p>
                     </div>
                 </div>
             </div>
         </div >}
 
-        {/* TODO: Add crypted field */}
-        {/* <CryptedField /> */}
+        {selectedFile && (selectedFile.type == ZIP_TYPE || fileEndsWithZip) &&
+            <CryptedField placeholder="Enter password if zip file is protected..." keyChange={(key) => props.setKey(key)} />}
 
         {
             uploadFileType != UploadFileType.KNOWLEDGE_BASE && <div className="form-group">
@@ -63,10 +65,9 @@ export default function UploadWrapper(props: UploadWrapperProps) {
                         placeholder={`E.g. for uncommon CSV ${'\n'} sep=t ${'\n'} lineterminator=r`}
                         onChange={() => dispatch(setImportOptions(textareaRef.current?.value))}></textarea>
                 </div>
-            </div>
+            </div >
         }
 
-        {/* TODO: check the condition if the embeddings that are recreated will cost */}
         {
             uploadFileType == UploadFileType.RECORDS_ADD && <div className="text-sm text-gray-500 font-normal">
                 <strong className="text-sm text-gray-700 font-medium">CAUTION:</strong> Submitting new records will automatically

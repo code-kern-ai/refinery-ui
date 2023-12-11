@@ -52,7 +52,7 @@ export default function Embeddings(props: EmbeddingProps) {
 
     useEffect(() => {
         if (!projectId) return;
-        setSomethingLoading(false); // TODO add the condition
+        setSomethingLoading(false);
         WebSocketsService.subscribeToNotification(CurrentPage.PROJECT_SETTINGS, {
             projectId: projectId,
             whitelist: ['embedding_updated', 'upload_embedding_payload'],
