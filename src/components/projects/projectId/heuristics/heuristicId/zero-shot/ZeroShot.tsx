@@ -20,7 +20,7 @@ import Dropdown from "@/submodules/react-components/components/Dropdown";
 import { jsonCopy } from "@/submodules/javascript-functions/general";
 import { ZeroShotSettings } from "@/src/types/components/projects/projectId/heuristics/heuristicId/zero-shot";
 import LoadingIcon from "@/src/components/shared/loading/LoadingIcon";
-import { selectIsManaged } from "@/src/reduxStore/states/general";
+import { selectAllUsers, selectIsManaged, setComments } from "@/src/reduxStore/states/general";
 import { IconArrowAutofitDown } from "@tabler/icons-react";
 import Playground from "./Playground";
 import HeuristicStatistics from "../shared/HeuristicStatistics";
@@ -29,6 +29,9 @@ import { DangerZoneEnum } from "@/src/types/shared/danger-zone";
 import CalculationProgress from "./CalculationProgress";
 import { Status } from "@/src/types/shared/statuses";
 import { unsubscribeWSOnDestroy } from "@/src/services/base/web-sockets/web-sockets-helper";
+import { REQUEST_COMMENTS } from "@/src/services/gql/queries/projects";
+import { CommentType } from "@/src/types/shared/comments";
+import { CommentDataManager } from "@/src/util/classes/comments";
 
 export default function ZeroShot() {
     const dispatch = useDispatch();
@@ -39,6 +42,7 @@ export default function ZeroShot() {
     const labelingTasks = useSelector(selectLabelingTasksAll);
     const textAttributes = useSelector(selectTextAttributes);
     const isManaged = useSelector(selectIsManaged);
+    const allUsers = useSelector(selectAllUsers);
 
     const [isModelDownloading, setIsModelDownloading] = useState(false);
     const [models, setModels] = useState([]);
@@ -47,6 +51,7 @@ export default function ZeroShot() {
     const [refetchLabelingTasksByProjectId] = useLazyQuery(GET_LABELING_TASKS_BY_PROJECT_ID, { fetchPolicy: "network-only" });
     const [updateHeuristicMut] = useMutation(UPDATE_INFORMATION_SOURCE);
     const [refetchZeroShotRecommendations] = useLazyQuery(GET_ZERO_SHOT_RECOMMENDATIONS, { fetchPolicy: 'network-only', nextFetchPolicy: 'cache-first' });
+    const [refetchComments] = useLazyQuery(REQUEST_COMMENTS, { fetchPolicy: "no-cache" });
 
     useEffect(unsubscribeWSOnDestroy(router, [CurrentPage.ZERO_SHOT]), []);
 
@@ -69,6 +74,26 @@ export default function ZeroShot() {
         if (!labelingTasks) return;
         refetchCurrentHeuristicAndProcess();
     }, [labelingTasks]);
+
+    useEffect(() => {
+        if (!projectId || allUsers.length == 0) return;
+        setUpCommentsRequests();
+    }, [allUsers, projectId]);
+
+    function setUpCommentsRequests() {
+        const requests = [];
+        requests.push({ commentType: CommentType.ATTRIBUTE, projectId: projectId });
+        requests.push({ commentType: CommentType.LABELING_TASK, projectId: projectId });
+        requests.push({ commentType: CommentType.HEURISTIC, projectId: projectId });
+        requests.push({ commentType: CommentType.LABEL, projectId: projectId });
+        CommentDataManager.registerCommentRequests(CurrentPage.ZERO_SHOT, requests);
+        const requestJsonString = CommentDataManager.buildRequestJSON();
+        refetchComments({ variables: { requested: requestJsonString } }).then((res) => {
+            CommentDataManager.parseCommentData(JSON.parse(res.data['getAllComments']));
+            CommentDataManager.parseToCurrentData(allUsers);
+            dispatch(setComments(CommentDataManager.currentDataOrder));
+        });
+    }
 
     function refetchCurrentHeuristicAndProcess() {
         refetchCurrentHeuristic({ variables: { projectId: projectId, informationSourceId: router.query.heuristicId } }).then((res) => {

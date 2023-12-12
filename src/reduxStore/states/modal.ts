@@ -204,7 +204,7 @@ const initialState: Modals = {
     },
     [ModalEnum.SYNC_RECORDS]: {
         open: false,
-        syncModalAmount: -1,
+        syncModalAmount: 0,
     },
     [ModalEnum.EXPLAIN_EDIT_RECORDS]: {
         open: false,

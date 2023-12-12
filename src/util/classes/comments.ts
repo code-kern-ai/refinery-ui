@@ -19,13 +19,13 @@ export class CommentDataManager {
 
     public static registerCommentRequests(currentPage: CurrentPage, requests: CommentRequest[]) {
         let comments = [...requests];
-        if (this.commentRequests.has(currentPage)) comments.push(...this.commentRequests.get(currentPage));
-        this.commentRequests.set(currentPage, comments);
+        if (!this.commentRequests.has(currentPage)) this.commentRequests.set(currentPage, comments);
         this.buildCommentTypeOptions();
     }
 
     public static buildRequestJSON(): string {
         let requestJSON = {};
+        console.log("building request json", CommentDataManager.commentRequests)
         CommentDataManager.commentRequests.forEach((value, key) => {
             value.forEach((commentRequest) => {
                 const key = commentRequestToKey(commentRequest);
@@ -42,6 +42,7 @@ export class CommentDataManager {
         }
         this.addCommentRequests = {};
         if (Object.keys(requestJSON).length == 0) return null;
+        console.log("request json", requestJSON)
         return JSON.stringify(requestJSON);
     }
 
@@ -181,8 +182,6 @@ export class CommentDataManager {
                 commentData.xfkeyAddName = this.getAddFromId(commentData.xfkey, commentData.xftype, commentData.project_id);
                 commentData.xfkeyAdd = commentTypeToString(commentData.xftype as CommentType, true) + ": " + commentData.xfkeyAddName;
             }
-            if (!commentData.open) commentData.open = false;
-            if (!commentData.edit) commentData.edit = false;
         }
     }
 
@@ -201,7 +200,7 @@ export class CommentDataManager {
         this.currentDataOrder = [];
         for (var key in this.currentData) {
             const findCurrentUser = allUsers.find(u => u.id == this.currentData[key].created_by);
-            this.currentData[key].avatarUri = getUserAvatarUri(findCurrentUser);
+            this.currentData[key] = { ...this.currentData[key], avatarUri: getUserAvatarUri(findCurrentUser) };
             const e = this.currentData[key];
             this.currentDataOrder.push(e);
         }
@@ -239,16 +238,5 @@ export class CommentDataManager {
             return [];
         }
         return list;
-    }
-
-    private static getProjectIdFromCommentType(commentType: string): string {
-        //only works if there aren't multiple projects in the requests (need to register & unregister correctly)
-        for (const kv of CommentDataManager.commentRequests) {
-            for (const comment of kv[1]) {
-                if (comment.commentType == commentType) return comment.projectId;
-            }
-        }
-
-        return CommentDataManager.globalProjectId;
     }
 }

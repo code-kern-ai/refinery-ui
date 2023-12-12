@@ -22,6 +22,10 @@ import AddCrowdLabelerModal from "./AddCrowdLabelerModal";
 import { postProcessingEmbeddings } from "@/src/util/components/projects/projectId/settings/embeddings-helper";
 import { useRouter } from "next/router";
 import { unsubscribeWSOnDestroy } from "@/src/services/base/web-sockets/web-sockets-helper";
+import { CommentType } from "@/src/types/shared/comments";
+import { CommentDataManager } from "@/src/util/classes/comments";
+import { REQUEST_COMMENTS } from "@/src/services/gql/queries/projects";
+import { selectAllUsers, setComments } from "@/src/reduxStore/states/general";
 
 export function HeuristicsOverview() {
     const dispatch = useDispatch();
@@ -31,6 +35,7 @@ export function HeuristicsOverview() {
     const heuristics = useSelector(selectHeuristicsAll);
     const embeddings = useSelector(selectEmbeddings);
     const attributes = useSelector(selectUsableNonTextAttributes);
+    const allUsers = useSelector(selectAllUsers);
 
     const [filteredList, setFilteredList] = useState([]);
 
@@ -38,6 +43,7 @@ export function HeuristicsOverview() {
     const [refetchHeuristics] = useLazyQuery(GET_HEURISTICS_OVERVIEW_DATA, { fetchPolicy: "network-only" });
     const [refetchEmbeddings] = useLazyQuery(GET_EMBEDDING_SCHEMA_BY_PROJECT_ID, { fetchPolicy: "no-cache" });
     const [refetchAttributes] = useLazyQuery(GET_ATTRIBUTES_BY_PROJECT_ID, { fetchPolicy: "network-only" });
+    const [refetchComments] = useLazyQuery(REQUEST_COMMENTS, { fetchPolicy: "no-cache" });
 
     useEffect(unsubscribeWSOnDestroy(router, [CurrentPage.HEURISTICS]), []);
 
@@ -59,6 +65,27 @@ export function HeuristicsOverview() {
             func: handleWebsocketNotification
         });
     }, [projectId, embeddings, attributes]);
+
+    useEffect(() => {
+        if (!projectId || allUsers.length == 0) return;
+        setUpCommentsRequests();
+    }, [allUsers, projectId]);
+
+    function setUpCommentsRequests() {
+        const requests = [];
+        requests.push({ commentType: CommentType.ATTRIBUTE, projectId: projectId });
+        requests.push({ commentType: CommentType.LABELING_TASK, projectId: projectId });
+        requests.push({ commentType: CommentType.HEURISTIC, projectId: projectId });
+        requests.push({ commentType: CommentType.EMBEDDING, projectId: projectId });
+        requests.push({ commentType: CommentType.LABEL, projectId: projectId });
+        CommentDataManager.registerCommentRequests(CurrentPage.HEURISTICS, requests);
+        const requestJsonString = CommentDataManager.buildRequestJSON();
+        refetchComments({ variables: { requested: requestJsonString } }).then((res) => {
+            CommentDataManager.parseCommentData(JSON.parse(res.data['getAllComments']));
+            CommentDataManager.parseToCurrentData(allUsers);
+            dispatch(setComments(CommentDataManager.currentDataOrder));
+        });
+    }
 
     function refetchLabelingTasksAndProcess() {
         refetchLabelingTasksByProjectId({ variables: { projectId: projectId } }).then((res) => {

@@ -30,6 +30,10 @@ import { copyToClipboard } from "@/submodules/javascript-functions/general";
 import { WebSocketsService } from "@/src/services/base/web-sockets/WebSocketsService";
 import { CurrentPage } from "@/src/types/shared/general";
 import { unsubscribeWSOnDestroy } from "@/src/services/base/web-sockets/web-sockets-helper";
+import { selectAllUsers, setComments } from "@/src/reduxStore/states/general";
+import { REQUEST_COMMENTS } from "@/src/services/gql/queries/projects";
+import { CommentType } from "@/src/types/shared/comments";
+import { CommentDataManager } from "@/src/util/classes/comments";
 
 export default function LabelingFunction() {
     const dispatch = useDispatch();
@@ -39,6 +43,7 @@ export default function LabelingFunction() {
     const currentHeuristic = useSelector(selectHeuristic);
     const labelingTasks = useSelector(selectLabelingTasksAll);
     const attributes = useSelector(selectAttributes);
+    const allUsers = useSelector(selectAllUsers);
 
     const [lastTaskLogs, setLastTaskLogs] = useState<string[]>([]);
     const [selectedAttribute, setSelectedAttribute] = useState<string>(null);
@@ -49,7 +54,8 @@ export default function LabelingFunction() {
     const [refetchLabelingTasksByProjectId] = useLazyQuery(GET_LABELING_TASKS_BY_PROJECT_ID, { fetchPolicy: "network-only" });
     const [updateHeuristicMut] = useMutation(UPDATE_INFORMATION_SOURCE);
     const [refetchTaskByTaskId] = useLazyQuery(GET_TASK_BY_TASK_ID, { fetchPolicy: "network-only" });
-    const [refetchRunOn10] = useLazyQuery(GET_LABELING_FUNCTION_ON_10_RECORDS, { fetchPolicy: "no-cache" })
+    const [refetchRunOn10] = useLazyQuery(GET_LABELING_FUNCTION_ON_10_RECORDS, { fetchPolicy: "no-cache" });
+    const [refetchComments] = useLazyQuery(REQUEST_COMMENTS, { fetchPolicy: "no-cache" });
 
     useEffect(unsubscribeWSOnDestroy(router, [CurrentPage.LABELING_FUNCTION]), []);
 
@@ -74,6 +80,27 @@ export default function LabelingFunction() {
         if (!currentHeuristic) return;
         refetchTaskByTaskIdAndProcess();
     }, [currentHeuristic]);
+
+    useEffect(() => {
+        if (!projectId || allUsers.length == 0) return;
+        setUpCommentsRequests();
+    }, [allUsers, projectId]);
+
+    function setUpCommentsRequests() {
+        const requests = [];
+        requests.push({ commentType: CommentType.ATTRIBUTE, projectId: projectId });
+        requests.push({ commentType: CommentType.LABELING_TASK, projectId: projectId });
+        requests.push({ commentType: CommentType.HEURISTIC, projectId: projectId });
+        requests.push({ commentType: CommentType.KNOWLEDGE_BASE, projectId: projectId });
+        requests.push({ commentType: CommentType.LABEL, projectId: projectId });
+        CommentDataManager.registerCommentRequests(CurrentPage.LABELING_FUNCTION, requests);
+        const requestJsonString = CommentDataManager.buildRequestJSON();
+        refetchComments({ variables: { requested: requestJsonString } }).then((res) => {
+            CommentDataManager.parseCommentData(JSON.parse(res.data['getAllComments']));
+            CommentDataManager.parseToCurrentData(allUsers);
+            dispatch(setComments(CommentDataManager.currentDataOrder));
+        });
+    }
 
     function refetchCurrentHeuristicAndProcess() {
         refetchCurrentHeuristic({ variables: { projectId: projectId, informationSourceId: router.query.heuristicId } }).then((res) => {

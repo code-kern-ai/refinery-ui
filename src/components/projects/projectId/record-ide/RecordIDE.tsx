@@ -1,6 +1,11 @@
 import LoadingIcon from "@/src/components/shared/loading/LoadingIcon";
+import { selectAllUsers, setComments } from "@/src/reduxStore/states/general";
 import { selectProjectId } from "@/src/reduxStore/states/project"
+import { REQUEST_COMMENTS } from "@/src/services/gql/queries/projects";
 import { RUN_RECORD_IDE } from "@/src/services/gql/queries/record-ide";
+import { CommentType } from "@/src/types/shared/comments";
+import { CurrentPage } from "@/src/types/shared/general";
+import { CommentDataManager } from "@/src/util/classes/comments";
 import { DEFAULT_CODE, PASS_ME, caesarCipher } from "@/src/util/components/projects/projectId/record-ide/record-ide-helper";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
 import { tryParseJSON } from "@/submodules/javascript-functions/general";
@@ -9,16 +14,18 @@ import { Editor } from "@monaco-editor/react";
 import { Tooltip } from "@nextui-org/react";
 import { IconArrowBack, IconArrowBigUp, IconBorderHorizontal, IconBorderVertical } from "@tabler/icons-react";
 import { useRouter } from "next/router";
-import { use, useCallback, useEffect, useState } from "react";
-import { useSelector } from "react-redux";
+import { useCallback, useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { timer } from "rxjs";
 
 const EDITOR_OPTIONS = { theme: 'vs-light', language: 'python' };
 
 export default function RecordIDE() {
+    const dispatch = useDispatch();
     const router = useRouter();
 
     const projectId = useSelector(selectProjectId);
+    const allUsers = useSelector(selectAllUsers);
 
     const [vertical, setVertical] = useState(true);
     const [canLoadFromLocalStorage, setCanLoadFromLocalStorage] = useState(false);
@@ -30,6 +37,7 @@ export default function RecordIDE() {
     const [debounceTimer, setDebounceTimer] = useState(null);
 
     const [refetchRecordIde] = useLazyQuery(RUN_RECORD_IDE, { fetchPolicy: "network-only" });
+    const [refetchComments] = useLazyQuery(REQUEST_COMMENTS, { fetchPolicy: "no-cache" });
 
     const huddleData = JSON.parse(localStorage.getItem("huddleData"));
 
@@ -53,6 +61,24 @@ export default function RecordIDE() {
         window.addEventListener("resize", changeScreenSize);
         return () => window.removeEventListener("resize", changeScreenSize);
     }, [vertical]);
+
+    useEffect(() => {
+        if (!projectId || allUsers.length == 0) return;
+        setUpCommentsRequests();
+    }, [allUsers, projectId]);
+
+    function setUpCommentsRequests() {
+        const requests = [];
+        requests.push({ commentType: CommentType.ATTRIBUTE, projectId: projectId });
+        requests.push({ commentType: CommentType.KNOWLEDGE_BASE, projectId: projectId });
+        CommentDataManager.registerCommentRequests(CurrentPage.RECORD_IDE, requests);
+        const requestJsonString = CommentDataManager.buildRequestJSON();
+        refetchComments({ variables: { requested: requestJsonString } }).then((res) => {
+            CommentDataManager.parseCommentData(JSON.parse(res.data['getAllComments']));
+            CommentDataManager.parseToCurrentData(allUsers);
+            dispatch(setComments(CommentDataManager.currentDataOrder));
+        });
+    }
 
     function goToLabelingPage() {
         const sessionId = router.query.sessionId as string;

@@ -29,6 +29,10 @@ import { WebSocketsService } from "@/src/services/base/web-sockets/WebSocketsSer
 import { timer } from "rxjs";
 import { unsubscribeWSOnDestroy } from "@/src/services/base/web-sockets/web-sockets-helper";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
+import { selectAllUsers, setComments } from "@/src/reduxStore/states/general";
+import { REQUEST_COMMENTS } from "@/src/services/gql/queries/projects";
+import { CommentDataManager } from "@/src/util/classes/comments";
+import { CommentType } from "@/src/types/shared/comments";
 
 const EDITOR_OPTIONS = { theme: 'vs-light', language: 'python', readOnly: false };
 
@@ -40,6 +44,7 @@ export default function AttributeCalculation() {
     const attributes = useSelector(selectAttributes);
     const usableAttributes = useSelector(selectUsableAttributesFiltered)
     const lookupLists = useSelector(selectAllLookupLists);
+    const allUsers = useSelector(selectAllUsers);
 
     const [currentAttribute, setCurrentAttribute] = useState<Attribute>(null);
     const [isHeaderNormal, setIsHeaderNormal] = useState(true);
@@ -55,6 +60,7 @@ export default function AttributeCalculation() {
     const [refetchLookupLists] = useLazyQuery(LOOKUP_LISTS_BY_PROJECT_ID, { fetchPolicy: "no-cache" });
     const [refetchProjectTokenization] = useLazyQuery(GET_PROJECT_TOKENIZATION, { fetchPolicy: "no-cache" });
     const [refetchAttributeByAttributeId] = useLazyQuery(GET_ATTRIBUTE_BY_ATTRIBUTE_ID, { fetchPolicy: "no-cache" });
+    const [refetchComments] = useLazyQuery(REQUEST_COMMENTS, { fetchPolicy: "no-cache" });
 
     useEffect(unsubscribeWSOnDestroy(router, [CurrentPage.ATTRIBUTE_CALCULATION]), []);
 
@@ -94,6 +100,25 @@ export default function AttributeCalculation() {
             setEditorOptions({ ...EDITOR_OPTIONS, readOnly: true });
         }
     }, [currentAttribute]);
+
+    useEffect(() => {
+        if (!projectId || allUsers.length == 0) return;
+        setUpCommentsRequests();
+    }, [allUsers, projectId]);
+
+    function setUpCommentsRequests() {
+        const requests = [];
+        requests.push({ commentType: CommentType.ATTRIBUTE, projectId: projectId });
+        requests.push({ commentType: CommentType.LABELING_TASK, projectId: projectId });
+        requests.push({ commentType: CommentType.KNOWLEDGE_BASE, projectId: projectId });
+        CommentDataManager.registerCommentRequests(CurrentPage.ATTRIBUTE_CALCULATION, requests);
+        const requestJsonString = CommentDataManager.buildRequestJSON();
+        refetchComments({ variables: { requested: requestJsonString } }).then((res) => {
+            CommentDataManager.parseCommentData(JSON.parse(res.data['getAllComments']));
+            CommentDataManager.parseToCurrentData(allUsers);
+            dispatch(setComments(CommentDataManager.currentDataOrder));
+        });
+    }
 
     function openName(open: boolean) {
         setIsNameOpen(open);

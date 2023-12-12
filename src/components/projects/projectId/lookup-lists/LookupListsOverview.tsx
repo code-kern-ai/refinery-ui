@@ -19,6 +19,10 @@ import { WebSocketsService } from "@/src/services/base/web-sockets/WebSocketsSer
 import { CurrentPage } from "@/src/types/shared/general";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
 import { unsubscribeWSOnDestroy } from "@/src/services/base/web-sockets/web-sockets-helper";
+import { selectAllUsers, setComments } from "@/src/reduxStore/states/general";
+import { REQUEST_COMMENTS } from "@/src/services/gql/queries/projects";
+import { CommentDataManager } from "@/src/util/classes/comments";
+import { CommentType } from "@/src/types/shared/comments";
 
 const ABORT_BUTTON = { buttonCaption: "Delete", useButton: true, disabled: false };
 
@@ -30,13 +34,15 @@ export default function LookupListsOverview() {
     const lookupLists = useSelector(selectAllLookupLists);
     const checkedLookupLists = useSelector(selectCheckedLookupLists);
     const modalDelete = useSelector(selectModal(ModalEnum.DELETE_LOOKUP_LIST));
+    const allUsers = useSelector(selectAllUsers);
+
+    const [selectionList, setSelectionList] = useState('');
+    const [countSelected, setCountSelected] = useState(0);
 
     const [refetchLookupLists] = useLazyQuery(LOOKUP_LISTS_BY_PROJECT_ID);
     const [createLookupListMut] = useMutation(CREATE_LOOKUP_LIST);
     const [deleteLookupListMut] = useMutation(DELETE_LOOKUP_LIST);
-
-    const [selectionList, setSelectionList] = useState('');
-    const [countSelected, setCountSelected] = useState(0);
+    const [refetchComments] = useLazyQuery(REQUEST_COMMENTS, { fetchPolicy: "no-cache" });
 
     const deleteLookupLists = useCallback(() => {
         checkedLookupLists.forEach((checked, index) => {
@@ -62,6 +68,23 @@ export default function LookupListsOverview() {
     const [abortButton, setAbortButton] = useState<ModalButton>(ABORT_BUTTON);
 
     useEffect(unsubscribeWSOnDestroy(router, [CurrentPage.LOOKUP_LISTS_OVERVIEW]), []);
+
+    useEffect(() => {
+        if (!projectId || allUsers.length == 0) return;
+        setUpCommentsRequests();
+    }, [allUsers, projectId]);
+
+    function setUpCommentsRequests() {
+        const requests = [];
+        requests.push({ commentType: CommentType.KNOWLEDGE_BASE, projectId: projectId });
+        CommentDataManager.registerCommentRequests(CurrentPage.LOOKUP_LISTS_OVERVIEW, requests);
+        const requestJsonString = CommentDataManager.buildRequestJSON();
+        refetchComments({ variables: { requested: requestJsonString } }).then((res) => {
+            CommentDataManager.parseCommentData(JSON.parse(res.data['getAllComments']));
+            CommentDataManager.parseToCurrentData(allUsers);
+            dispatch(setComments(CommentDataManager.currentDataOrder));
+        });
+    }
 
     useEffect(() => {
         if (!projectId) return;

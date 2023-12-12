@@ -11,7 +11,7 @@ import { useRouter } from "next/router";
 import { useCallback, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import HeuristicsLayout from "../shared/HeuristicsLayout";
-import { selectAnnotators } from "@/src/reduxStore/states/general";
+import { selectAllUsers, selectAnnotators, setComments } from "@/src/reduxStore/states/general";
 import DangerZone from "@/src/components/shared/danger-zone/DangerZone";
 import { DangerZoneEnum } from "@/src/types/shared/danger-zone";
 import HeuristicStatistics from "../shared/HeuristicStatistics";
@@ -20,6 +20,9 @@ import { postProcessCrowdLabeler } from "@/src/util/components/projects/projectI
 import { selectDataSlicesAll, setDataSlices } from "@/src/reduxStore/states/pages/data-browser";
 import { DATA_SLICES } from "@/src/services/gql/queries/data-browser";
 import { unsubscribeWSOnDestroy } from "@/src/services/base/web-sockets/web-sockets-helper";
+import { REQUEST_COMMENTS } from "@/src/services/gql/queries/projects";
+import { CommentDataManager } from "@/src/util/classes/comments";
+import { CommentType } from "@/src/types/shared/comments";
 
 
 export default function CrowdLabeler() {
@@ -31,10 +34,12 @@ export default function CrowdLabeler() {
     const labelingTasks = useSelector(selectLabelingTasksAll);
     const annotators = useSelector(selectAnnotators);
     const dataSlices = useSelector(selectDataSlicesAll);
+    const allUsers = useSelector(selectAllUsers);
 
     const [refetchCurrentHeuristic] = useLazyQuery(GET_HEURISTICS_BY_ID, { fetchPolicy: "network-only" });
     const [refetchLabelingTasksByProjectId] = useLazyQuery(GET_LABELING_TASKS_BY_PROJECT_ID, { fetchPolicy: "network-only" });
     const [refetchDataSlicesMut] = useLazyQuery(DATA_SLICES, { fetchPolicy: 'network-only' });
+    const [refetchComments] = useLazyQuery(REQUEST_COMMENTS, { fetchPolicy: "no-cache" });
 
     useEffect(unsubscribeWSOnDestroy(router, [CurrentPage.CROWD_LABELER]), []);
 
@@ -61,6 +66,27 @@ export default function CrowdLabeler() {
             func: handleWebsocketNotification
         });
     }, [currentHeuristic]);
+
+    useEffect(() => {
+        if (!projectId || allUsers.length == 0) return;
+        setUpCommentsRequests();
+    }, [allUsers, projectId]);
+
+    function setUpCommentsRequests() {
+        const requests = [];
+        requests.push({ commentType: CommentType.ATTRIBUTE, projectId: projectId });
+        requests.push({ commentType: CommentType.LABELING_TASK, projectId: projectId });
+        requests.push({ commentType: CommentType.HEURISTIC, projectId: projectId });
+        requests.push({ commentType: CommentType.DATA_SLICE, projectId: projectId });
+        requests.push({ commentType: CommentType.LABEL, projectId: projectId });
+        CommentDataManager.registerCommentRequests(CurrentPage.CROWD_LABELER, requests);
+        const requestJsonString = CommentDataManager.buildRequestJSON();
+        refetchComments({ variables: { requested: requestJsonString } }).then((res) => {
+            CommentDataManager.parseCommentData(JSON.parse(res.data['getAllComments']));
+            CommentDataManager.parseToCurrentData(allUsers);
+            dispatch(setComments(CommentDataManager.currentDataOrder));
+        });
+    }
 
     function refetchCurrentHeuristicAndProcess() {
         refetchCurrentHeuristic({ variables: { projectId: projectId, informationSourceId: router.query.heuristicId } }).then((res) => {

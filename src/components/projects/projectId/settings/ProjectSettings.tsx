@@ -16,14 +16,14 @@ import { useRouter } from "next/router";
 import { toPythonFunctionName } from "@/submodules/javascript-functions/python-functions-parser";
 import { setUploadFileType } from "@/src/reduxStore/states/upload";
 import { UploadFileType } from "@/src/types/shared/upload";
-import { GET_PROJECT_BY_ID } from "@/src/services/gql/queries/projects";
+import { GET_PROJECT_BY_ID, REQUEST_COMMENTS } from "@/src/services/gql/queries/projects";
 import { WebSocketsService } from "@/src/services/base/web-sockets/WebSocketsService";
 import { CurrentPage } from "@/src/types/shared/general";
 import ProjectSnapshotExport from "./ProjectSnapshotExport";
 import { Tooltip } from "@nextui-org/react";
 import ProjectMetaData from "./ProjectMetaData";
 import GatesIntegration from "./GatesIntegration";
-import { selectIsManaged, setCurrentPage } from "@/src/reduxStore/states/general";
+import { selectAllUsers, selectIsManaged, setComments, setCurrentPage } from "@/src/reduxStore/states/general";
 import Embeddings from "./embeddings/Embeddings";
 import { DATA_TYPES, findFreeAttributeName, postProcessingAttributes } from "@/src/util/components/projects/projectId/settings/data-schema-helper";
 import { postProcessingEmbeddings, postProcessingRecommendedEncoders } from "@/src/util/components/projects/projectId/settings/embeddings-helper";
@@ -34,6 +34,8 @@ import { jsonCopy } from "@/submodules/javascript-functions/general";
 import { unsubscribeWSOnDestroy } from "@/src/services/base/web-sockets/web-sockets-helper";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
 import Export from "@/src/components/shared/export/Export";
+import { CommentType } from "@/src/types/shared/comments";
+import { CommentDataManager } from "@/src/util/classes/comments";
 
 const ACCEPT_BUTTON = { buttonCaption: "Accept", useButton: true, disabled: true }
 
@@ -46,6 +48,7 @@ export default function ProjectSettings() {
     const isManaged = useSelector(selectIsManaged);
     const embeddings = useSelector(selectEmbeddings);
     const modalCreateNewAtt = useSelector(selectModal(ModalEnum.CREATE_NEW_ATTRIBUTE));
+    const allUsers = useSelector(selectAllUsers);
 
     const [pKeyValid, setPKeyValid] = useState<boolean | null>(null);
     const [pKeyCheckTimer, setPKeyCheckTimer] = useState(null);
@@ -61,6 +64,7 @@ export default function ProjectSettings() {
     const [refetchEmbeddings] = useLazyQuery(GET_EMBEDDING_SCHEMA_BY_PROJECT_ID, { fetchPolicy: "no-cache" });
     const [refetchQueuedTasks] = useLazyQuery(GET_QUEUED_TASKS, { fetchPolicy: "no-cache" });
     const [refetchRecommendedEncodersForEmbeddings] = useLazyQuery(GET_RECOMMENDED_ENCODERS_FOR_EMBEDDINGS, { fetchPolicy: "no-cache" });
+    const [refetchComments] = useLazyQuery(REQUEST_COMMENTS, { fetchPolicy: "no-cache" });
 
     useEffect(unsubscribeWSOnDestroy(router, [CurrentPage.PROJECT_SETTINGS]), []);
 
@@ -84,6 +88,26 @@ export default function ProjectSettings() {
             dispatch(setAllRecommendedEncodersDict(postProcessingRecommendedEncoders(attributes, project.tokenizer, encoder['data']['recommendedEncoders'])));
         });
     }, [attributes]);
+
+    useEffect(() => {
+        if (!project.id || allUsers.length == 0) return;
+        setUpCommentsRequests();
+    }, [allUsers, project]);
+
+    function setUpCommentsRequests() {
+        const requests = [];
+        requests.push({ commentType: CommentType.LABELING_TASK, projectId: project.id });
+        requests.push({ commentType: CommentType.ATTRIBUTE, projectId: project.id });
+        requests.push({ commentType: CommentType.EMBEDDING, projectId: project.id });
+        requests.push({ commentType: CommentType.LABEL, projectId: project.id });
+        CommentDataManager.registerCommentRequests(CurrentPage.PROJECT_SETTINGS, requests);
+        const requestJsonString = CommentDataManager.buildRequestJSON();
+        refetchComments({ variables: { requested: requestJsonString } }).then((res) => {
+            CommentDataManager.parseCommentData(JSON.parse(res.data['getAllComments']));
+            CommentDataManager.parseToCurrentData(allUsers);
+            dispatch(setComments(CommentDataManager.currentDataOrder));
+        });
+    }
 
     const createUserAttribute = useCallback(() => {
         const attributeTypeFinal = DATA_TYPES.find((type) => type.name === modalCreateNewAtt.attributeType).value;

@@ -19,12 +19,17 @@ import Terms from "./Terms";
 import { WebSocketsService } from "@/src/services/base/web-sockets/WebSocketsService";
 import { CurrentPage } from "@/src/types/shared/general";
 import { unsubscribeWSOnDestroy } from "@/src/services/base/web-sockets/web-sockets-helper";
+import { selectAllUsers, setComments } from "@/src/reduxStore/states/general";
+import { REQUEST_COMMENTS } from "@/src/services/gql/queries/projects";
+import { CommentType } from "@/src/types/shared/comments";
+import { CommentDataManager } from "@/src/util/classes/comments";
 
 export default function LookupListsDetails() {
     const router = useRouter();
     const dispatch = useDispatch();
 
     const projectId = useSelector(selectProjectId);
+    const allUsers = useSelector(selectAllUsers);
 
     const [lookupList, setLookupList] = useState<LookupList | null>(null);
     const [terms, setTerms] = useState<Term[]>([]);
@@ -36,6 +41,7 @@ export default function LookupListsDetails() {
     const [refetchCurrentLookupList] = useLazyQuery(LOOKUP_LIST_BY_LOOKUP_LIST_ID, { fetchPolicy: 'network-only', nextFetchPolicy: 'cache-first' });
     const [refetchTermsLookupList] = useLazyQuery(TERMS_BY_KNOWLEDGE_BASE_ID, { fetchPolicy: 'cache-and-network' });
     const [updateLookupListMut] = useMutation(UPDATE_KNOWLEDGE_BASE);
+    const [refetchComments] = useLazyQuery(REQUEST_COMMENTS, { fetchPolicy: "no-cache" });
 
     useEffect(unsubscribeWSOnDestroy(router, [CurrentPage.LOOKUP_LISTS_DETAILS]), []);
 
@@ -47,6 +53,23 @@ export default function LookupListsDetails() {
         refetchTerms();
         refetchWS();
     }, [projectId, router.query.lookupListId]);
+
+    useEffect(() => {
+        if (!projectId || allUsers.length == 0) return;
+        setUpCommentsRequests();
+    }, [allUsers, projectId]);
+
+    function setUpCommentsRequests() {
+        const requests = [];
+        requests.push({ commentType: CommentType.KNOWLEDGE_BASE, projectId: projectId });
+        CommentDataManager.registerCommentRequests(CurrentPage.LOOKUP_LISTS_DETAILS, requests);
+        const requestJsonString = CommentDataManager.buildRequestJSON();
+        refetchComments({ variables: { requested: requestJsonString } }).then((res) => {
+            CommentDataManager.parseCommentData(JSON.parse(res.data['getAllComments']));
+            CommentDataManager.parseToCurrentData(allUsers);
+            dispatch(setComments(CommentDataManager.currentDataOrder));
+        });
+    }
 
     function refetchWS() {
         WebSocketsService.subscribeToNotification(CurrentPage.LOOKUP_LISTS_DETAILS, {

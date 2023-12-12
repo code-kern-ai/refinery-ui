@@ -100,12 +100,12 @@ export default function CommentsMainSection(props: CommentMainSectionProps) {
 
     return (
         <Transition.Root show={props.open} as={Fragment}>
-            <Dialog as="div" className="relative z-10" onClose={props.toggleOpen}>
+            <Dialog as="div" className="relative z-50" onClose={props.toggleOpen}>
                 <div className="fixed inset-0" />
 
                 <div className="fixed inset-0 overflow-hidden">
                     <div className="absolute inset-0 overflow-hidden">
-                        <div className={`pointer-events-none fixed inset-y-0 flex max-w-full top-14 ${positionComment == CommentPosition.RIGHT ? 'right-0' : 'left-20'}`}>
+                        <div className={`pointer-events-none fixed inset-y-0 flex max-w-full top-16 ${positionComment == CommentPosition.RIGHT ? 'right-0' : 'left-20'}`}>
                             <Transition.Child
                                 as={Fragment}
                                 enter="transform transition ease-in-out duration-500 sm:duration-700"

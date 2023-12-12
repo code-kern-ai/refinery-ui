@@ -63,5 +63,12 @@ export function convertTypeToKey(type: string): string {
         case "Labeling tasks": return CommentType.LABELING_TASK;
         case "Labels": return CommentType.LABEL;
         case "Data slices": return CommentType.DATA_SLICE;
+        case "Embeddings": return CommentType.EMBEDDING;
+        case "Heuristics": return CommentType.HEURISTIC;
+        case "Knowledge bases": return CommentType.KNOWLEDGE_BASE;
+        case "Organizations": return CommentType.ORGANIZATION;
+        case "Records": return CommentType.RECORD;
+        case "Users": return CommentType.USER;
+        default: return type;
     }
 }

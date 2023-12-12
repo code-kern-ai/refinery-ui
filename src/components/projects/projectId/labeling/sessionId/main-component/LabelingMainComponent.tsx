@@ -1,4 +1,4 @@
-import { selectAllUsers, selectUser } from "@/src/reduxStore/states/general";
+import { selectAllUsers, selectUser, setComments } from "@/src/reduxStore/states/general";
 import { setAvailableLinks, updateRecordRequests, setSelectedLink, selectRecordRequestsRla, updateUsers, setSettings, selectSettings, setUserDisplayId, selectRecordRequestsRecord } from "@/src/reduxStore/states/pages/labeling";
 import { selectProjectId } from "@/src/reduxStore/states/project"
 import { AVAILABLE_LABELING_LINKS, GET_RECORD_LABEL_ASSOCIATIONS, GET_TOKENIZED_RECORD, REQUEST_HUDDLE_DATA } from "@/src/services/gql/queries/labeling";
@@ -26,6 +26,9 @@ import { postProcessingAttributes } from "@/src/util/components/projects/project
 import { WebSocketsService } from "@/src/services/base/web-sockets/WebSocketsService";
 import { CurrentPage } from "@/src/types/shared/general";
 import { postProcessLabelingTasks, postProcessLabelingTasksSchema } from "@/src/util/components/projects/projectId/settings/labeling-tasks-helper";
+import { CommentDataManager } from "@/src/util/classes/comments";
+import { REQUEST_COMMENTS } from "@/src/services/gql/queries/projects";
+import { CommentType } from "@/src/types/shared/comments";
 
 const LOCAL_STORAGE_KEY = 'labelingSuiteSettings';
 
@@ -39,6 +42,7 @@ export default function LabelingMainComponent() {
     const users = useSelector(selectAllUsers);
     const settings = useSelector(selectSettings);
     const record = useSelector(selectRecordRequestsRecord);
+    const allUsers = useSelector(selectAllUsers);
 
     const [refetchHuddleData] = useLazyQuery(REQUEST_HUDDLE_DATA, { fetchPolicy: 'no-cache' });
     const [refetchAvailableLinks] = useLazyQuery(AVAILABLE_LABELING_LINKS, { fetchPolicy: 'no-cache' });
@@ -47,6 +51,7 @@ export default function LabelingMainComponent() {
     const [refetchRla] = useLazyQuery(GET_RECORD_LABEL_ASSOCIATIONS, { fetchPolicy: 'network-only' });
     const [refetchAttributes] = useLazyQuery(GET_ATTRIBUTES_BY_PROJECT_ID, { fetchPolicy: "network-only" });
     const [refetchLabelingTasksByProjectId] = useLazyQuery(GET_LABELING_TASKS_BY_PROJECT_ID, { fetchPolicy: "network-only" });
+    const [refetchComments] = useLazyQuery(REQUEST_COMMENTS, { fetchPolicy: "no-cache" });
 
 
     useEffect(() => {
@@ -110,6 +115,11 @@ export default function LabelingMainComponent() {
     }, [projectId]);
 
     useEffect(() => {
+        if (!projectId || allUsers.length == 0 || router.query.sessionId) return;
+        setUpCommentsRequests();
+    }, [allUsers, projectId, router.query.sessionId]);
+
+    useEffect(() => {
         if (!SessionManager.currentRecordId) return;
         if (SessionManager.currentRecordId == "deleted") return;
         // TODO: Fix in the BE needed, projectId is missing
@@ -131,6 +141,21 @@ export default function LabelingMainComponent() {
         dispatch(updateUsers('showUserIcons', showUsersIcons));
         dispatch(setUserDisplayId(user.id));
     }, [rlas]);
+
+    function setUpCommentsRequests() {
+        const requests = [];
+        requests.push({ commentType: CommentType.LABELING_TASK, projectId: projectId });
+        requests.push({ commentType: CommentType.ATTRIBUTE, projectId: projectId });
+        requests.push({ commentType: CommentType.LABEL, projectId: projectId });
+        requests.push({ commentType: CommentType.HEURISTIC, projectId: projectId });
+        CommentDataManager.registerCommentRequests(CurrentPage.LABELING, requests);
+        const requestJsonString = CommentDataManager.buildRequestJSON();
+        refetchComments({ variables: { requested: requestJsonString } }).then((res) => {
+            CommentDataManager.parseCommentData(JSON.parse(res.data['getAllComments']));
+            CommentDataManager.parseToCurrentData(allUsers);
+            dispatch(setComments(CommentDataManager.currentDataOrder));
+        });
+    }
 
     function previousRecord() {
         SessionManager.previousRecord();
