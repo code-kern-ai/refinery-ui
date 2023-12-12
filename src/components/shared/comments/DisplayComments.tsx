@@ -1,4 +1,4 @@
-import { selectComments, selectCommentsTextArray, selectUser } from "@/src/reduxStore/states/general";
+import { selectComments, selectUser } from "@/src/reduxStore/states/general";
 import { CommentData, CommentPosition, DisplayCommentsProps } from "@/src/types/shared/comments";
 import { combineClassNames } from "@/submodules/javascript-functions/general";
 import { Menu, Transition } from "@headlessui/react";
@@ -9,7 +9,6 @@ import { useSelector } from "react-redux";
 
 export default function DisplayComments(props: DisplayCommentsProps) {
     const comments = useSelector(selectComments);
-    const commentTexts = useSelector(selectCommentsTextArray);
     const positionComment = localStorage.getItem('commentPosition') as CommentPosition;
     const user = useSelector(selectUser);
 
@@ -35,7 +34,7 @@ export default function DisplayComments(props: DisplayCommentsProps) {
                                         <Tooltip content={comment.creationUser} contentColor="invert" hideArrow={true} placement={positionComment == CommentPosition.RIGHT ? 'bottom' : 'right'}
                                             css={{ color: '#6B7280', border: '1px solid #6B7280', backgroundColor: '#F3F4F6', textAlign: 'center' }}>
                                             {!comment.is_private ? (<img className={`h-10 w-10 p-1 ${user?.id == comment.created_by ? 'border border-blue-400 rounded-full' : null}`} src={`/refinery/avatars/${comment.avatarUri}`} alt="" />) : (
-                                                <IconEyeOff className={`h-8 w-8 p-1 ${user?.id == comment.created_by ? 'border border-blue-400 rounded-full' : null}`} />
+                                                <IconEyeOff className={`h-10 w-10 p-1 ${user?.id == comment.created_by ? 'border border-blue-400 rounded-full' : null}`} />
                                             )}
                                         </Tooltip>
                                     </span>
@@ -144,7 +143,7 @@ export default function DisplayComments(props: DisplayCommentsProps) {
                             if (props.editComments[index]) props.editComment(event, comment.id, 'comment', event.target.value, index);
                         }}
                         onKeyDown={(event: any) => { checkIfKeyShiftEnterUpdate(event, comment.id, event.target.value, index); }}
-                        value={commentTexts[index]}
+                        value={props.commentTexts[index]}
                     ></textarea>
                 </div>
             ))}

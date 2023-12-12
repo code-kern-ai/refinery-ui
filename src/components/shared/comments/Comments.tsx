@@ -5,13 +5,90 @@ import { IconNotes } from "@tabler/icons-react";
 import { useDispatch, useSelector } from "react-redux";
 import { ModalEnum } from "@/src/types/shared/modal";
 import { selectModal, setModalStates } from "@/src/reduxStore/states/modal";
-import { useCallback } from "react";
-import { selectComments } from "@/src/reduxStore/states/general";
+import { useCallback, useEffect } from "react";
+import { selectAllUsers, selectComments, setComments } from "@/src/reduxStore/states/general";
+import { WebSocketsService } from "@/src/services/base/web-sockets/WebSocketsService";
+import { CurrentPage } from "@/src/types/shared/general";
+import { CommentDataManager } from "@/src/util/classes/comments";
+import { CommentRequest, CommentType } from "@/src/types/shared/comments";
+import { commentRequestToKey } from "@/src/util/shared/comments-helper";
+import { REQUEST_COMMENTS } from "@/src/services/gql/queries/projects";
+import { useLazyQuery } from "@apollo/client";
+import { selectProjectId } from "@/src/reduxStore/states/project";
 
 export default function Comments() {
     const dispatch = useDispatch();
+
+    const projectId = useSelector(selectProjectId);
     const commentsSideBar = useSelector(selectModal(ModalEnum.COMMENTS_SECTION));
     const comments = useSelector(selectComments);
+    const allUsers = useSelector(selectAllUsers);
+
+    const [refetchComments] = useLazyQuery(REQUEST_COMMENTS, { fetchPolicy: "no-cache" });
+
+    useEffect(() => {
+        WebSocketsService.subscribeToNotification(CurrentPage.COMMENTS, {
+            whitelist: ['comment_created', 'comment_updated', 'comment_deleted', 'project_created', 'project_deleted'],
+            func: handleWebsocketNotificationGlobal
+        });
+    }, []);
+
+    useEffect(() => {
+        if (!projectId) return;
+        WebSocketsService.subscribeToNotification(CurrentPage.COMMENTS, {
+            projectId: projectId,
+            whitelist: ['label_created', 'label_deleted'],
+            func: handleWebsocketNotification
+        });
+    }, [projectId]);
+
+    const handleWebsocketNotificationGlobal = useCallback((msgParts: string[]) => {
+        //messages will be GLOBAL:{messageType}:{projectId}:{additionalInfo}
+        let somethingToRerequest = false;
+        if (msgParts[1] == "comment_deleted") {
+            somethingToRerequest = CommentDataManager.removeCommentFromCache(msgParts[3]);
+        } else if (msgParts[1] == "comment_updated") {
+            somethingToRerequest = CommentDataManager.removeCommentFromCache(msgParts[3]);
+            somethingToRerequest = somethingToRerequest || CommentDataManager.isCommentUpdateInterestingForMe(msgParts);
+            if (somethingToRerequest) {
+                //create helper addon
+                const backRequest: CommentRequest = { commentType: msgParts[4] as CommentType, projectId: msgParts[2], commentKey: msgParts[5], commentId: msgParts[3] };
+                const key = commentRequestToKey(backRequest);
+                CommentDataManager.addCommentRequests[key] = backRequest;
+            }
+        } else if (msgParts[1] == "comment_created") {
+            somethingToRerequest = true;
+            //create helper addon
+            const backRequest: CommentRequest = { commentType: msgParts[3] as CommentType, projectId: msgParts[2], commentKey: msgParts[4], commentId: msgParts[5] };
+            const key = commentRequestToKey(backRequest);
+            CommentDataManager.addCommentRequests[key] = backRequest;
+        }
+        if (somethingToRerequest) {
+            const requestJsonString = CommentDataManager.buildRequestJSON();
+            refetchComments({ variables: { requested: requestJsonString } }).then((res) => {
+                CommentDataManager.parseCommentData(JSON.parse(res.data['getAllComments']));
+                CommentDataManager.parseToCurrentData(allUsers);
+                dispatch(setComments(CommentDataManager.currentDataOrder));
+            });
+        }
+    }, [allUsers]);
+
+    const handleWebsocketNotification = useCallback((msgParts: string[]) => {
+        // TODO: fix this
+        let somethingToRerequest = false;
+        if (['label_created', 'label_deleted'].includes(msgParts[1])) {
+            somethingToRerequest = CommentDataManager.modifyCacheFor(CommentType.LABEL, msgParts[0], msgParts[2], msgParts[1] == 'label_created');
+        }
+    }, [projectId]);
+
+    useEffect(() => {
+        WebSocketsService.updateFunctionPointer(null, CurrentPage.COMMENTS, handleWebsocketNotificationGlobal)
+    }, [handleWebsocketNotificationGlobal]);
+
+    useEffect(() => {
+        if (!projectId) return;
+        WebSocketsService.updateFunctionPointer(projectId, CurrentPage.COMMENTS, handleWebsocketNotification)
+    }, [handleWebsocketNotification, projectId]);
 
     const toggleModal = useCallback(() => {
         dispatch(setModalStates(ModalEnum.COMMENTS_SECTION, { open: !commentsSideBar.open }));

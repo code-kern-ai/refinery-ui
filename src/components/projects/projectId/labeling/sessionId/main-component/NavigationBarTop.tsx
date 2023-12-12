@@ -11,6 +11,9 @@ import { IconArrowLeft, IconArrowRight, IconCircle, IconStar } from "@tabler/ico
 import { useRouter } from "next/router";
 import { useDispatch, useSelector } from "react-redux";
 import style from '@/src/styles/components/projects/projectId/labeling.module.css';
+import { CommentDataManager } from "@/src/util/classes/comments";
+import { CurrentPage } from "@/src/types/shared/general";
+import { CommentType } from "@/src/types/shared/comments";
 
 export default function NavigationBarTop() {
     const router = useRouter();

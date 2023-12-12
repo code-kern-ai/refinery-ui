@@ -7,16 +7,18 @@ import { IconArrowLeft, IconArrowRight, IconX } from "@tabler/icons-react";
 import { Fragment, useCallback, useEffect, useState } from "react";
 import DisplayComments from "./DisplayComments";
 import { useSelector } from "react-redux";
-import { selectComments } from "@/src/reduxStore/states/general";
+import { selectAllUsers, selectComments } from "@/src/reduxStore/states/general";
 import { CREATE_COMMENT, DELETE_COMMENT, UPDATE_COMMENT } from "@/src/services/gql/mutations/projects";
 import { useMutation } from "@apollo/client";
 import { selectProjectId } from "@/src/reduxStore/states/project";
 import { CommentCreation } from "./CommentCreation";
 import { convertTypeToKey } from "@/src/util/shared/comments-helper";
+import { CommentDataManager } from "@/src/util/classes/comments";
 
 export default function CommentsMainSection(props: CommentMainSectionProps) {
     const comments = useSelector(selectComments);
     const projectId = useSelector(selectProjectId);
+    const allUsers = useSelector(selectAllUsers);
 
     const [positionComment, setPositionComment] = useLocalStorage<CommentPosition>('positionComment', 'comments', undefined, CommentPosition.RIGHT);
 
@@ -80,17 +82,19 @@ export default function CommentsMainSection(props: CommentMainSectionProps) {
         event.stopPropagation();
         const changes = {};
         changes[toChangeKey] = toChangeValue;
-        editCommentMut({ variables: { commentId: commentId, changes: JSON.stringify(changes) } });
+        editCommentMut({ variables: { commentId: commentId, changes: JSON.stringify(changes), projectId: projectId } });
         if (toChangeKey == 'comment') {
             handleEditComment(index);
         }
-    }, []);
+    }, [projectId]);
 
     const deleteComment = useCallback((commentId: string) => {
-        deleteCommentMut({ variables: { commentId: commentId, projectId: projectId } }).then(() => {
+        deleteCommentMut({ variables: { commentId: commentId, projectId: projectId } }).then((res) => {
             setCommentTextsArray(commentTextsArray.filter((commentText: string) => commentText != commentTextsArray[commentId]));
+            CommentDataManager.removeCommentFromData(commentId);
+            CommentDataManager.parseToCurrentData(allUsers);
         });
-    }, [commentTextsArray, projectId]);
+    }, [commentTextsArray, projectId, allUsers]);
 
     const saveComment = useCallback((type: string, commentId: string, comment: string, isPrivate: boolean) => {
         createCommentMut({ variables: { projectId: projectId, comment: comment, xftype: convertTypeToKey(type), xfkey: commentId, isPrivate: isPrivate } }).then(() => {

@@ -115,9 +115,11 @@ export default function LabelingMainComponent() {
     }, [projectId]);
 
     useEffect(() => {
-        if (!projectId || allUsers.length == 0 || router.query.sessionId) return;
+        if (!projectId || allUsers.length == 0 || !router.query.sessionId) return;
+        if (router.query.sessionId == DUMMY_HUDDLE_ID) return;
+        if (!SessionManager.currentRecordId) return;
         setUpCommentsRequests();
-    }, [allUsers, projectId, router.query.sessionId]);
+    }, [allUsers, projectId, router.query.sessionId, SessionManager.currentRecordId]);
 
     useEffect(() => {
         if (!SessionManager.currentRecordId) return;
@@ -148,6 +150,7 @@ export default function LabelingMainComponent() {
         requests.push({ commentType: CommentType.ATTRIBUTE, projectId: projectId });
         requests.push({ commentType: CommentType.LABEL, projectId: projectId });
         requests.push({ commentType: CommentType.HEURISTIC, projectId: projectId });
+        requests.push({ commentType: CommentType.RECORD, projectId: projectId, commentKey: SessionManager.currentRecordId });
         CommentDataManager.registerCommentRequests(CurrentPage.LABELING, requests);
         const requestJsonString = CommentDataManager.buildRequestJSON();
         refetchComments({ variables: { requested: requestJsonString } }).then((res) => {

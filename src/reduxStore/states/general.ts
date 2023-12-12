@@ -112,7 +112,6 @@ export const selectNotifications = (state) => state.general.notifications;
 export const selectComments = (state) => state.general.comments.all;
 
 export const selectAnnotatorsDict = createSelector([selectAnnotators], (a): any => a ? arrayToDict(a, 'id') : null);
-export const selectCommentsTextArray = createSelector([selectComments], (c): string[] => c ? c.map(comment => comment.comment) : null);
 
 export const { setUser, setCurrentPage, setIsManaged, setIsDemo, setIsAdmin, setOrganization, setAllUsers, setNotifications, setComments } = generalSlice.actions;
 export const generalReducer = generalSlice.reducer;

@@ -90,7 +90,7 @@ export default function ProjectSettings() {
     }, [attributes]);
 
     useEffect(() => {
-        if (!project.id || allUsers.length == 0) return;
+        if (!project || allUsers.length == 0) return;
         setUpCommentsRequests();
     }, [allUsers, project]);
 

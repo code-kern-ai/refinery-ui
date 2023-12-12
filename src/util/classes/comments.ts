@@ -6,8 +6,8 @@ import { getUserAvatarUri } from "@/submodules/javascript-functions/general";
 
 export class CommentDataManager {
     public static canCommentOnPage: boolean = false;
-    private static commentRequests: Map<Object, CommentRequest[]> = new Map<CurrentPage, CommentRequest[]>();
-    private static addCommentRequests: {} = {};
+    public static commentRequests: Map<Object, CommentRequest[]> = new Map<CurrentPage, CommentRequest[]>();
+    public static addCommentRequests: {} = {};
     private static globalProjectId: string = "GLOBAL";
     private static data: {} = {};
     private static addInfo: {} = {};
@@ -25,7 +25,6 @@ export class CommentDataManager {
 
     public static buildRequestJSON(): string {
         let requestJSON = {};
-        console.log("building request json", CommentDataManager.commentRequests)
         CommentDataManager.commentRequests.forEach((value, key) => {
             value.forEach((commentRequest) => {
                 const key = commentRequestToKey(commentRequest);
@@ -42,7 +41,6 @@ export class CommentDataManager {
         }
         this.addCommentRequests = {};
         if (Object.keys(requestJSON).length == 0) return null;
-        console.log("request json", requestJSON)
         return JSON.stringify(requestJSON);
     }
 
@@ -239,4 +237,79 @@ export class CommentDataManager {
         }
         return list;
     }
+
+    public static removeCommentFromCache(commentId: string): boolean {
+        return this.removeCommentFromData(commentId, true);
+    }
+
+    public static removeCommentFromData(commentId: string, onlyFlag: boolean = false): boolean {
+        let removedSomething = false;
+        let markedSomething = false;
+        for (const key in this.data) {
+            for (const projectId in this.data[key]) {
+                for (const commentKey in this.data[key][projectId]) {
+                    const arr = this.data[key][projectId][commentKey];
+                    const index = arr.findIndex(c => c.id == commentId);
+                    if (onlyFlag && index >= 0) {
+                        arr[index].markedForDeletion = true;
+                        markedSomething = true;
+                    } else {
+                        if (index >= 0) {
+                            arr.splice(index, 1);
+                            removedSomething = true;
+                        }
+                        if (removedSomething && arr.length == 0) delete this.data[key][projectId][commentKey];
+                    }
+                }
+                if (removedSomething && Object.keys(this.data[key][projectId]).length == 0) delete this.data[key][projectId];
+            }
+            if (removedSomething && Object.keys(this.data[key]).length == 0) delete this.data[key];
+        }
+        return removedSomething || markedSomething;
+    }
+
+    public static isCommentUpdateInterestingForMe(msgParts: string[]): boolean {
+        const commentType = msgParts[4] as CommentType;
+        const projectId = msgParts[2];
+        const interestingForMe = !!this.data[commentType]?.[projectId];
+        return interestingForMe;
+    }
+
+    public static getLastRecordInfo() {
+        return this.lastRecordInfo;
+    }
+
+    public static modifyCacheFor(commentType: string, projectId: string, xfkey: string, reReQuest: boolean): boolean {
+        const addInfoKey = commentType + "@" + projectId;
+        if (addInfoKey in this.addInfo) {
+            if (reReQuest) {
+                let backRequest: CommentRequest;
+                if (xfkey) {
+                    const item = this.addInfo[addInfoKey].values.find(v => v.id == xfkey);
+                    if (item) item.markedForDeletion = true;
+                    backRequest = { commentType: commentType as CommentType, projectId: projectId, commentKey: xfkey };
+                } else {
+                    this.addInfo[addInfoKey].values.forEach(v => v.markedForDeletion = true);
+                    backRequest = { commentType: commentType as CommentType, projectId: projectId };
+                }
+                const key = commentRequestToKey(backRequest);
+                this.addCommentRequests[key] = backRequest;
+            } else {
+                if (xfkey) {
+                    const arr = this.addInfo[addInfoKey].values
+                    const index = arr.findIndex(c => c.id == xfkey);
+                    if (index >= 0) {
+                        arr.splice(index, 1);
+                    }
+                } else {
+                    this.addInfo[addInfoKey].values = [];
+                }
+                //no need to refetch since everything is up to date with the delete 
+                return false;
+            }
+            return true;
+        }
+        return false;
+    }
+
 }

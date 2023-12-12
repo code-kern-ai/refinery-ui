@@ -24,6 +24,7 @@ export enum CurrentPage {
     EDIT_RECORDS = "EDIT_RECORDS",
     NOTIFICATION_CENTER = "NOTIFICATION_CENTER",
     EXPORT = "EXPORT",
+    COMMENTS = "COMMENTS",
 }
 
 export type User = {
