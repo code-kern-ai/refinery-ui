@@ -17,6 +17,7 @@ import { useLazyQuery } from "@apollo/client";
 import { NOTIFICATIONS } from "@/src/services/gql/queries/projects";
 import { postProcessNotifications } from "@/src/util/shared/notification-center-helper";
 import { selectNotificationId } from "@/src/reduxStore/states/tmp";
+import Comments from "../comments/Comments";
 
 export default function Header() {
     const router = useRouter();
@@ -101,7 +102,7 @@ export default function Header() {
                         </div>
                     ) : (<></>)}
                     <div className="flex items-center justify-center">
-                        {/* TODO: Add comments here */}
+                        <Comments />
                     </div>
                     {user?.role == UserRole.ENGINEER && <div className="flex items-center justify-center">
                         <Tooltip content={TOOLTIPS_DICT.GENERAL.NOTIFICATION_CENTER} placement="left" color="invert">

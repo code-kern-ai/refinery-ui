@@ -13,6 +13,11 @@ export const TOOLTIPS_DICT = {
         'NOTIFICATION_CENTER': 'Notification center',
         'MORE_INFO_AVAILABLE': 'More information available',
         'DOWNLOAD_RECORDS': 'Download your records',
+        'COMMENTS': 'Comments',
+        'MOVE_COMMENT_LEFT': 'Move comment window left',
+        'MOVE_COMMENT_RIGHT': 'Move comment window right',
+        'CLOSE_ALL': 'Close all',
+        'OPEN_ALL': 'Open all',
     },
     [CurrentPage.PROJECT_SETTINGS]: {
         'ADD_NEW_ATTRIBUTE': 'Add a new attribute',

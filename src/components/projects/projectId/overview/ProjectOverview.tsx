@@ -30,8 +30,11 @@ import ConfusionMatrixBarChart from './charts/ConfusionMatrixBarChart';
 import LoadingIcon from '@/src/components/shared/loading/LoadingIcon';
 import { addUserName, parseOverviewSettingsToDict } from '@/src/util/components/projects/projectId/project-overview/charts-helper';
 import InterAnnotatorBarChart from './charts/InterAnnotatorBarChart';
-import { selectIsManaged } from '@/src/reduxStore/states/general';
+import { selectAllUsers, selectIsManaged, setComments } from '@/src/reduxStore/states/general';
 import { IconUsers } from '@tabler/icons-react';
+import { CommentType } from '@/src/types/shared/comments';
+import { REQUEST_COMMENTS } from '@/src/services/gql/queries/projects';
+import { CommentDataManager } from '@/src/util/classes/comments';
 
 const PROJECT_STATS_INITIAL_STATE: ProjectStats = getEmptyProjectStats();
 
@@ -44,6 +47,7 @@ export default function ProjectOverview() {
     const dataSlices = useSelector(selectStaticSlices);
     const overviewFilters = useSelector(selectOverviewFilters);
     const isManaged = useSelector(selectIsManaged);
+    const allUsers = useSelector(selectAllUsers);
 
     const [projectStats, setProjectStats] = useState<ProjectStats>(PROJECT_STATS_INITIAL_STATE);
     const [graphsHaveValues, setGraphsHaveValues] = useState<boolean>(false);
@@ -64,6 +68,7 @@ export default function ProjectOverview() {
     const [refetchConfusionMatrix] = useLazyQuery(GET_CONFUSION_MATRIX, { fetchPolicy: "no-cache" });
     const [refetchRatsTokenization] = useLazyQuery(IS_RATS_TOKENIZAION_STILL_RUNNING, { fetchPolicy: "no-cache" });
     const [refetchInterAnnotator] = useLazyQuery(GET_INTER_ANNOTATOR_BY_PROJECT_ID, { fetchPolicy: "no-cache" });
+    const [refetchComments] = useLazyQuery(REQUEST_COMMENTS, { fetchPolicy: "no-cache" });
 
     useEffect(unsubscribeWSOnDestroy(router, [CurrentPage.PROJECT_OVERVIEW]), []);
 
@@ -81,6 +86,11 @@ export default function ProjectOverview() {
     }, [projectId]);
 
     useEffect(() => {
+        if (!projectId || allUsers.length == 0) return;
+        setUpCommentsRequests();
+    }, [allUsers, projectId]);
+
+    useEffect(() => {
         if (!overviewFilters || !projectId || !labelingTasks || !overviewFilters.labelingTask) return;
         setDisplayNERConfusion();
         getLabelDistributions();
@@ -95,6 +105,21 @@ export default function ProjectOverview() {
         if (!labelDistribution) return;
         setGraphsHaveValues(labelDistribution?.length > 0);
     }, [labelDistribution]);
+
+    function setUpCommentsRequests() {
+        const requests = [];
+        requests.push({ commentType: CommentType.ATTRIBUTE, projectId: projectId });
+        requests.push({ commentType: CommentType.LABELING_TASK, projectId: projectId });
+        requests.push({ commentType: CommentType.DATA_SLICE, projectId: projectId });
+        requests.push({ commentType: CommentType.LABEL, projectId: projectId });
+        CommentDataManager.registerCommentRequests(CurrentPage.PROJECT_OVERVIEW, requests);
+        const requestJsonString = CommentDataManager.buildRequestJSON();
+        refetchComments({ variables: { requested: requestJsonString } }).then((res) => {
+            CommentDataManager.parseCommentData(JSON.parse(res.data['getAllComments']));
+            CommentDataManager.parseToCurrentData(allUsers);
+            dispatch(setComments(CommentDataManager.currentDataOrder));
+        });
+    }
 
     function prepareInterAnnotator() {
         const overviewFiltersCopy = { ...overviewFilters };

@@ -108,3 +108,9 @@ query {
 }
 }
 `;
+
+export const REQUEST_COMMENTS = gql`
+query ($requested: JSONString!) {
+  getAllComments(requested: $requested)
+}
+`;

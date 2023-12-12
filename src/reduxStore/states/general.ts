@@ -1,3 +1,4 @@
+import { CommentData, CommentDataStore, CommentPosition } from "@/src/types/shared/comments";
 import { User } from "@/src/types/shared/general";
 import { NotificationListWrapper } from "@/src/types/shared/notification-center";
 import { UserRole } from "@/src/types/shared/sidebar";
@@ -27,7 +28,10 @@ const initialState = {
         annotators: [],
         experts: [],
     },
-    notifications: []
+    notifications: [],
+    comments: {
+        all: [],
+    },
 } as {
     user: User;
     currentPage: string;
@@ -43,6 +47,9 @@ const initialState = {
         experts: User[];
     },
     notifications: NotificationListWrapper[];
+    comments: {
+        all: CommentData[];
+    }
 }
 
 const generalSlice = createSlice({
@@ -80,6 +87,10 @@ const generalSlice = createSlice({
         setNotifications(state, action: PayloadAction<NotificationListWrapper[]>) {
             if (action.payload) state.notifications = [...action.payload];
             else state.notifications = [];
+        },
+        setComments: (state, action: PayloadAction<CommentData[]>) => {
+            if (action.payload) state.comments.all = action.payload;
+            else state.comments.all = null;
         }
     },
 })
@@ -98,8 +109,10 @@ export const selectEngineers = (state) => state.general.users.engineers;
 export const selectAnnotators = (state) => state.general.users.annotators;
 export const selectExperts = (state) => state.general.users.experts;
 export const selectNotifications = (state) => state.general.notifications;
+export const selectComments = (state) => state.general.comments.all;
 
 export const selectAnnotatorsDict = createSelector([selectAnnotators], (a): any => a ? arrayToDict(a, 'id') : null);
+export const selectCommentsTextArray = createSelector([selectComments], (c): string[] => c ? c.map(comment => comment.comment) : null);
 
-export const { setUser, setCurrentPage, setIsManaged, setIsDemo, setIsAdmin, setOrganization, setAllUsers, setNotifications } = generalSlice.actions;
+export const { setUser, setCurrentPage, setIsManaged, setIsDemo, setIsAdmin, setOrganization, setAllUsers, setNotifications, setComments } = generalSlice.actions;
 export const generalReducer = generalSlice.reducer;
