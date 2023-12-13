@@ -8,6 +8,7 @@ import { BricksIntegratorModalProps, IntegratorPage } from "@/src/types/shared/b
 import { IconRefresh } from "@tabler/icons-react";
 import PageSearch from "./PageSearch";
 import PageOverview from "./PageOverview";
+import PageInputExample from "./PageInputExample";
 
 const ACCEPT_BUTTON = { buttonCaption: '', useButton: true, disabled: false, closeAfterClick: false };
 
@@ -117,6 +118,7 @@ export default function BricksIntegratorModal(props: BricksIntegratorModalProps)
                 selectSearchResult={(id: number) => props.selectSearchResult(id)} />
             <PageOverview
                 setCodeTester={(code: string) => props.setCodeTester(code)} />
+            <PageInputExample />
         </>}
     </Modal >
     )
