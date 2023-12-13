@@ -37,7 +37,7 @@ export default function Comments() {
         if (!projectId) return;
         WebSocketsService.subscribeToNotification(CurrentPage.COMMENTS, {
             projectId: projectId,
-            whitelist: ['label_created', 'label_deleted'],
+            whitelist: ['label_created', 'label_deleted', 'attributes_updated', 'calculate_attribute', 'embedding_deleted', 'embedding', 'labeling_task_updated', 'labeling_task_deleted', 'labeling_task_created', 'data_slice_created', 'data_slice_updated', 'data_slice_deleted', 'information_source_created', 'information_source_updated', 'information_source_deleted', 'knowledge_base_created', 'knowledge_base_updated', 'knowledge_base_deleted'],
             func: handleWebsocketNotification
         });
     }, [projectId]);
@@ -74,12 +74,35 @@ export default function Comments() {
     }, [allUsers]);
 
     const handleWebsocketNotification = useCallback((msgParts: string[]) => {
-        // TODO: fix this
         let somethingToRerequest = false;
         if (['label_created', 'label_deleted'].includes(msgParts[1])) {
             somethingToRerequest = CommentDataManager.modifyCacheFor(CommentType.LABEL, msgParts[0], msgParts[2], msgParts[1] == 'label_created');
+        } else if (msgParts[1] == 'attributes_updated') {
+            somethingToRerequest = CommentDataManager.modifyCacheFor(CommentType.ATTRIBUTE, msgParts[0], null, true);
+        } else if (msgParts[1] == 'calculate_attribute') {
+            somethingToRerequest = CommentDataManager.modifyCacheFor(CommentType.ATTRIBUTE, msgParts[0], msgParts[3], msgParts[2] == 'created');
+        } else if (msgParts[1] == 'embedding_deleted') {
+            somethingToRerequest = CommentDataManager.modifyCacheFor(CommentType.EMBEDDING, msgParts[0], msgParts[2], false);
+        } else if (msgParts[1] == 'embedding' && msgParts[3] == 'state' && msgParts[4] == 'INITIALIZING') {
+            somethingToRerequest = CommentDataManager.modifyCacheFor(CommentType.EMBEDDING, msgParts[0], msgParts[2], true);
+        } else if (['labeling_task_updated', 'labeling_task_deleted', 'labeling_task_created'].includes(msgParts[1])) {
+            somethingToRerequest = CommentDataManager.modifyCacheFor(CommentType.LABELING_TASK, msgParts[0], msgParts[2], msgParts[1] != 'labeling_task_deleted');
+        } else if (['data_slice_created', 'data_slice_updated', 'data_slice_deleted'].includes(msgParts[1])) {
+            somethingToRerequest = CommentDataManager.modifyCacheFor(CommentType.DATA_SLICE, msgParts[0], msgParts[2], msgParts[1] != 'data_slice_deleted');
+        } else if (['information_source_created', 'information_source_updated', 'information_source_deleted'].includes(msgParts[1])) {
+            somethingToRerequest = CommentDataManager.modifyCacheFor(CommentType.HEURISTIC, msgParts[0], msgParts[2] == "all" ? null : msgParts[2], msgParts[1] != 'information_source_deleted');
+        } else if (['knowledge_base_created', 'knowledge_base_updated', 'knowledge_base_deleted'].includes(msgParts[1])) {
+            somethingToRerequest = CommentDataManager.modifyCacheFor(CommentType.KNOWLEDGE_BASE, msgParts[0], msgParts[2], msgParts[1] != 'knowledge_base_deleted');
         }
-    }, [projectId]);
+        if (somethingToRerequest) {
+            const requestJsonString = CommentDataManager.buildRequestJSON();
+            refetchComments({ variables: { requested: requestJsonString } }).then((res) => {
+                CommentDataManager.parseCommentData(JSON.parse(res.data['getAllComments']));
+                CommentDataManager.parseToCurrentData(allUsers);
+                dispatch(setComments(CommentDataManager.currentDataOrder));
+            });
+        }
+    }, [projectId, allUsers]);
 
     useEffect(() => {
         WebSocketsService.updateFunctionPointer(null, CurrentPage.COMMENTS, handleWebsocketNotificationGlobal)

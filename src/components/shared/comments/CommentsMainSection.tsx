@@ -34,6 +34,8 @@ export default function CommentsMainSection(props: CommentMainSectionProps) {
     useEffect(() => {
         if (!comments) return;
         prepareCommentTextArray();
+        setOpenCommentsArray(Array(comments.length).fill(false));
+        setEditCommentsArray(Array(comments.length).fill(false));
     }, [comments]);
 
     const flipCommentPosition = useCallback(() => {

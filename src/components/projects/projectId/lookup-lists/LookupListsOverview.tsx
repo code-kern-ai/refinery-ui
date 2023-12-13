@@ -146,7 +146,7 @@ export default function LookupListsOverview() {
                 dispatch(setAllLookupLists(postProcessLookupLists(res.data["knowledgeBasesByProjectId"])));
             });
         }
-    }, []);
+    }, [projectId]);
 
     useEffect(() => {
         if (!projectId) return;

@@ -19,7 +19,8 @@ export class CommentDataManager {
 
     public static registerCommentRequests(currentPage: CurrentPage, requests: CommentRequest[]) {
         let comments = [...requests];
-        if (!this.commentRequests.has(currentPage)) this.commentRequests.set(currentPage, comments);
+        if (this.commentRequests.has(currentPage)) comments.push(...this.commentRequests.get(currentPage));
+        this.commentRequests.set(currentPage, comments);
         this.buildCommentTypeOptions();
     }
 
