@@ -1,19 +1,19 @@
 import { openModal } from "@/src/reduxStore/states/modal";
 import { ModalEnum } from "@/src/types/shared/modal";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
-import { Modal, Tooltip } from "@nextui-org/react";
+import { Tooltip } from "@nextui-org/react";
 import { useDispatch, useSelector } from "react-redux";
 import BricksIntegratorModal from "./BricksIntegratorModal";
-import { useEffect, useState } from "react";
-import { BricksIntegratorProps, BricksSearchData, IntegratorPage } from "@/src/types/shared/bricks-integrator";
+import { useEffect } from "react";
+import { BricksIntegratorConfig, BricksIntegratorProps, BricksSearchData, IntegratorPage } from "@/src/types/shared/bricks-integrator";
 import { useDefaults } from "@/submodules/react-components/hooks/useDefaults";
 import { selectProjectId } from "@/src/reduxStore/states/project";
 import { selectBricksIntegrator, selectIsAdmin, selectUser, setBricksIntegrator } from "@/src/reduxStore/states/general";
-import { buildSearchUrl, filterMinVersion, getEmptyBricksIntegratorConfig, getGroupName } from "@/src/util/shared/bricks-integrator-helper";
+import { buildSearchUrl, filterMinVersion, getEmptyBricksIntegratorConfig, getGroupName, getHttpBaseLink } from "@/src/util/shared/bricks-integrator-helper";
 import { PASS_ME, caesarCipher } from "@/src/util/components/projects/projectId/record-ide/record-ide-helper";
 import { isStringTrue, jsonCopy, removeArrayFromArray } from "@/submodules/javascript-functions/general";
 import { BricksCodeParser } from "@/src/util/classes/bricks-integrator/bricks-integrator";
-import { GROUPS_TO_REMOVE, extendDummyElements } from "@/src/util/classes/bricks-integrator/dummy-nodes";
+import { GROUPS_TO_REMOVE, extendDummyElements, getDummyNodeByIdForApi } from "@/src/util/classes/bricks-integrator/dummy-nodes";
 import { getBricksIntegrator } from "@/src/services/base/data-fetch";
 
 const DEFAULTS = { forIde: false };
@@ -36,6 +36,9 @@ export default function BricksIntegrator(_props: BricksIntegratorProps) {
 
     useEffect(() => {
         if (!config) return;
+        const configCopy = jsonCopy(config);
+        configCopy.search.requesting = true;
+        dispatch(setBricksIntegrator(configCopy));
         requestSearch();
     }, [config?.querySourceSelectionRemote]);
 
@@ -81,7 +84,6 @@ export default function BricksIntegrator(_props: BricksIntegratorProps) {
 
     function requestSearch() {
         const configCopy = jsonCopy(config);
-        configCopy.search.requesting = true;
         configCopy.search.lastRequestUrl = buildSearchUrl(configCopy, props.moduleTypeFilter, props.executionTypeFilter);
         if (configCopy.search.currentRequest) configCopy.search.currentRequest.unsubscribe();
 
@@ -96,9 +98,13 @@ export default function BricksIntegrator(_props: BricksIntegratorProps) {
             saveLocalConfig();
         }
         getBricksIntegrator(configCopy.search.lastRequestUrl, options?.headers, (data) => {
-            if (!data) return;
+            if (!data) {
+                configCopy.search.requesting = false;
+                configCopy.search.currentRequest = null;
+                dispatch(setBricksIntegrator(configCopy));
+                return;
+            }
             configCopy.extendedIntegrator = data.data.some(e => e.attributes.partOfGroup); //new field in integrator
-            configCopy.search.requesting = false;
             configCopy.search.currentRequest = null;
             let finalData;
             if (configCopy.extendedIntegrator) {
@@ -119,9 +125,9 @@ export default function BricksIntegrator(_props: BricksIntegratorProps) {
             }
             finalData = filterMinVersion(finalData);
             extendDummyElements(finalData, configCopy.extendedIntegrator, user, isAdmin);
-            finalData = filterForExtendedIntegrator(finalData);
+            finalData = filterForExtendedIntegrator(finalData, configCopy);
             configCopy.search.results = finalData;
-            filterGroup();
+            filterGroup(configCopy);
             dispatch(setBricksIntegrator(configCopy));
         }, (error) => {
             console.log("error in search request", error);
@@ -131,23 +137,22 @@ export default function BricksIntegrator(_props: BricksIntegratorProps) {
     }
 
     function saveLocalConfig() {
-        const configCopy = { ...config }
         const localStrapiConfig = {
-            querySourceSelectionRemote: configCopy.querySourceSelectionRemote,
-            strapiPort: configCopy.querySourceSelectionLocalStrapiPort,
-            bricksPort: configCopy.querySourceSelectionLocalBricksPort,
-            token: configCopy.querySourceSelectionLocalStrapiToken
+            querySourceSelectionRemote: config.querySourceSelectionRemote,
+            strapiPort: config.querySourceSelectionLocalStrapiPort,
+            bricksPort: config.querySourceSelectionLocalBricksPort,
+            token: config.querySourceSelectionLocalStrapiToken
         };
         const ciphered = caesarCipher(JSON.stringify(localStrapiConfig), PASS_ME)
         localStorage.setItem("localStrapiConfig", ciphered);
     }
 
-    function filterForExtendedIntegrator(data: any[]): any[] {
-        addFilterPartOfGroup("all");
+    function filterForExtendedIntegrator(data: any[], configCopy?: BricksIntegratorConfig): any[] {
+        addFilterPartOfGroup("all", configCopy);
         for (let e of data) {
             if (!e.attributes.partOfGroup) continue;
             if (e.attributes.executionType && e.attributes.executionType != "activeLearner") e.attributes.partOfGroup.push(e.attributes.executionType);
-            e.attributes.partOfGroup.forEach(group => addFilterPartOfGroup(group));
+            e.attributes.partOfGroup.forEach(group => addFilterPartOfGroup(group, configCopy));
         }
         if (Object.keys(config.groupFilterOptions.filterValues).length < 2) return data;
 
@@ -155,17 +160,15 @@ export default function BricksIntegrator(_props: BricksIntegratorProps) {
 
     }
 
-    function addFilterPartOfGroup(key: string, forceNew: boolean = false) {
-        const configCopy = jsonCopy(config);
+    function addFilterPartOfGroup(key: string, configCopy?: BricksIntegratorConfig, forceNew: boolean = false) {
         if (configCopy.groupFilterOptions.filterValues[key] && !forceNew) return;
         const name = getGroupName(key);
-        configCopy.groupFilterOptions.filterValues[key] = { key: key, name: name, active: key == "all", countInGroup: -1 }
+        configCopy.groupFilterOptions.filterValues[key] = { key: key, name: name, active: key == "all", countInGroup: -1 };
     }
 
-    function filterGroup() {
-        const configCopy = jsonCopy(config);
+    function filterGroup(configCopy: BricksIntegratorConfig) {
         configCopy.search.results.forEach(e => e.groupVisible = filterForGroup(e));
-        requestSearchDebounce(configCopy.search.searchValue);
+        requestSearchDebounce(configCopy.search.searchValue, configCopy);
     }
 
     function filterForGroup(e: BricksSearchData): boolean {
@@ -181,8 +184,8 @@ export default function BricksIntegrator(_props: BricksIntegratorProps) {
         return activeGroups.every(group => e.attributes.partOfGroup.includes(group));
     }
 
-    function requestSearchDebounce(value: string) {
-        const configCopy = jsonCopy(config);
+    function requestSearchDebounce(value: string, configCopy?: BricksIntegratorConfig) {
+        if (!configCopy) configCopy = jsonCopy(config);
         //local search without requery
         if (!value) value = "";
         const searchFor = value.toLowerCase();
@@ -191,14 +194,13 @@ export default function BricksIntegrator(_props: BricksIntegratorProps) {
             e.searchVisible = e.id.toString().startsWith(searchFor) ||
             e.attributes.name.toLowerCase().includes(searchFor) ||
             e.attributes.description.toLowerCase().includes(searchFor));
-        configCopy.search.nothingMatches = !configCopy.search.results.find(e => e.searchVisible && e.groupVisible)
-        countGroupEntries();
+        configCopy.search.nothingMatches = !configCopy.search.results.find(e => e.searchVisible && e.groupVisible);
+        countGroupEntries(configCopy);
         //once real search is enabled change BricksIntegratorComponent.httpBaseLinkFilter & remove return
         return;
     }
 
-    function countGroupEntries() {
-        const configCopy = jsonCopy(config);
+    function countGroupEntries(configCopy?: BricksIntegratorConfig) {
         const data = configCopy.groupFilterOptions.filterValues;
         for (const key in data) data[key].countInGroup = 0;
 
@@ -211,6 +213,7 @@ export default function BricksIntegrator(_props: BricksIntegratorProps) {
         configCopy.groupFilterOptions.filterValuesArray = []
         for (const key in data) if (data[key].countInGroup > 0 || data[key].active) configCopy.groupFilterOptions.filterValuesArray.push(data[key]);
         configCopy.groupFilterOptions.filterValuesArray.sort((a, b) => b.countInGroup - a.countInGroup || a.name.localeCompare(b.name));
+        dispatch(setBricksIntegrator(configCopy));
     }
 
     function switchToPage(page: IntegratorPage) {
@@ -219,6 +222,89 @@ export default function BricksIntegrator(_props: BricksIntegratorProps) {
             configCopy.page = page;
             dispatch(setBricksIntegrator(configCopy));
         }
+    }
+
+    function setGroupActive(key: string) {
+        const configCopy = jsonCopy(config);
+        if (configCopy.groupFilterOptions.filterValues[key].active) return;
+        for (let k in configCopy.groupFilterOptions.filterValues) {
+            configCopy.groupFilterOptions.filterValues[k].active = false;
+        }
+        configCopy.groupFilterOptions.filterValues[key].active = true;
+        filterGroup(configCopy);
+    }
+
+    function selectSearchResult(id: number) {
+        const configCopy = jsonCopy(config);
+        configCopy.api.moduleId = id;
+        optionClicked("ACCEPT", configCopy);
+    }
+
+    function optionClicked(button: string, configCopy?: BricksIntegratorConfig) {
+        if (button == "CLOSE") dispatch(openModal(ModalEnum.BRICKS_INTEGRATOR));
+        else {
+            switch (configCopy.page) {
+                case IntegratorPage.SEARCH:
+                    configCopy.page = IntegratorPage.OVERVIEW;
+                    requestDataFromApi(configCopy);
+                    break;
+                // case IntegratorPage.OVERVIEW:
+                // case IntegratorPage.INPUT_EXAMPLE:
+                //     // jump to integration
+                //     configCopy.page = IntegratorPage.INTEGRATION;
+                //     if (configCopy.api.moduleId < 0) this.codeParser.prepareCode();
+                //     break;
+                // case IntegratorPage.INTEGRATION:
+                //     //transfer code to editor
+                //     this.finishUpIntegration();
+                //     break;
+            }
+            checkCanAccept();
+        }
+    }
+
+    function requestDataFromApi(configCopy?: BricksIntegratorConfig) {
+        if (!configCopy.api.moduleId) {
+            console.log("no module id -> shouldn't happen");
+            return;
+        }
+        if (configCopy.api.moduleId < 0) {
+            configCopy.api.data = getDummyNodeByIdForApi(configCopy.api.moduleId);
+            return;
+        }
+        configCopy.api.requestUrl = getHttpBaseLink(configCopy) + configCopy.api.moduleId;
+        configCopy.api.requesting = true;
+        let options = undefined;
+        if (!configCopy.querySourceSelectionRemote) {
+            options = {
+                headers: {
+                    "Authorization": `Bearer ${configCopy.querySourceSelectionLocalStrapiToken}`
+                }
+            };
+        }
+        getBricksIntegrator(configCopy.api.requestUrl, options?.headers, (c) => {
+            if (!c.data.attributes.integratorInputs) configCopy.api.data = c;
+            else {
+                // Additional parsing for integrator inputs used in the overview section in the bricks integrator
+                configCopy.api.data = c;
+                configCopy.api.data.data.attributes.partOfGroup = JSON.parse(c.data.attributes.partOfGroup);
+                configCopy.api.data.data.attributes.partOfGroup = removeArrayFromArray(configCopy.api.data.data.attributes.partOfGroup, GROUPS_TO_REMOVE);
+                configCopy.api.data.data.attributes.partOfGroupText = configCopy.api.data.data.attributes.partOfGroup.map(x => getGroupName(x)).join(", ");
+                configCopy.api.data.data.attributes.availableFor = JSON.parse(c.data.attributes.availableFor);
+                configCopy.api.data.data.attributes.integratorInputs = JSON.parse(c.data.attributes.integratorInputs);
+            }
+            configCopy.api.data.data.attributes.bricksLink = "https://bricks.kern.ai/" + c.data.attributes.moduleType + "s/" + c.data.id;
+            configCopy.api.data.data.attributes.issueLink = "https://github.com/code-kern-ai/bricks/issues/" + c.data.attributes.issueId;
+            configCopy.api.requesting = false;
+            configCopy.example.requestData = configCopy.api.data.data.attributes.inputExample;
+            BricksCodeParser.prepareCode(configCopy, props.executionTypeFilter, props.nameLookups, props.labelingTaskId, props.forIde);
+            checkCanAccept();
+            dispatch(setBricksIntegrator(configCopy));
+        }, (error) => {
+            console.log("error in search request", error);
+            configCopy.search.requesting = false;
+            configCopy.search.currentRequest = null;
+        });
     }
 
     return (
@@ -232,7 +318,10 @@ export default function BricksIntegrator(_props: BricksIntegratorProps) {
             <BricksIntegratorModal
                 requestSearch={requestSearch}
                 switchToPage={(page: IntegratorPage) => switchToPage(page)}
-                executionTypeFilter={props.executionTypeFilter} />
+                executionTypeFilter={props.executionTypeFilter}
+                requestSearchDebounce={(value: string) => requestSearchDebounce(value)}
+                setGroupActive={(key: string) => setGroupActive(key)}
+                selectSearchResult={(id: number) => selectSearchResult(id)} />
         </div>
     )
 }

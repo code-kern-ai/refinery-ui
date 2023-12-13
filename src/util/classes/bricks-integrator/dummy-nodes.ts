@@ -108,3 +108,92 @@ function addElementToList(finalData: any[], element: any, user: User) {
     if (user.firstName.toLowerCase() == "jens") finalData.unshift(element);
     else finalData.push(element);
 }
+
+export function getDummyNodeByIdForApi(id: DummyNodes): any {
+    const baseNode: any = {
+        data: {
+            attributes: {
+                name: null,
+                description: null,
+                updatedAt: null,
+                sourceCode: null,
+                issueId: null,
+                inputExample: null,
+                endpoint: null,
+                moduleType: null
+            },
+            id: id
+        },
+        meta: {}
+    }
+    switch (id) {
+        case DummyNodes.CODE_TESTER:
+            baseNode.data.attributes.name = "Code tester";
+            baseNode.data.attributes.description = "Lets you test random code for the integrator (only available for kern admins)";
+            return baseNode;
+        case DummyNodes.CODE_PARSER:
+            baseNode.data.attributes.name = "Code parser";
+            baseNode.data.attributes.description = "Lets you parse random code to the new structure (only available for kern admins)";
+            return baseNode;
+        case DummyNodes.REFACTOR_TESTER:
+            baseNode.data.attributes.name = "Refactor tester";
+            baseNode.data.attributes.description = "Lets you test the new structure with dummy data from vader sentiment (only available for kern admins)";
+            baseNode.data.attributes.availableFor = ["refinery"];
+            baseNode.data.attributes.sourceCode = DUMMY_CODE_VADER;
+            baseNode.data.attributes.partOfGroup = ["sentiment"];
+            baseNode.data.attributes.integratorInputs = {
+                "name": "vader_sentiment",
+                "refineryDataType": "text",
+                "variables": {
+                    "ATTRIBUTE": {
+                        "selectionType": SelectionType.CHOICE,
+                        "optional": "false",
+                        "addInfo": [
+                            BricksVariableType.ATTRIBUTE.toLowerCase(),
+                            BricksVariableType.GENERIC_STRING.toLowerCase()
+                        ]
+                    },
+                    "MODE": {
+                        "selectionType": SelectionType.CHOICE,
+                        "defaultValue": "classification",
+                        allowedValues: ["classification", "scores"],
+                        "description": "choose \"scores\" to only get the sentiment scores as floats",
+                        "optional": "false",
+                        "addInfo": [
+                            BricksVariableType.GENERIC_STRING.toLowerCase()
+                        ]
+                    },
+                    "MIN_SCORE": {
+                        "selectionType": SelectionType.RANGE,
+                        "defaultValue": 100,
+                        "allowedValueRange": [0, 100],
+                        "description": "The lowest possible sentiment score.",
+                        "addInfo": [BricksVariableType.GENERIC_INT],
+                        "optional": "false",
+                    },
+                }
+            }
+            return baseNode;
+    }
+}
+
+const DUMMY_CODE_VADER = `from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
+
+ATTRIBUTE: str = "text" # only text attributes
+MODE: str = "classification" # choose "scores" to only get the sentiment scores as floats
+MIN_SCORE:int = 100
+
+def vader_sentiment(record):
+    analyzer = SentimentIntensityAnalyzer()
+    text = record[ATTRIBUTE].text
+
+    vs = analyzer.polarity_scores(text)
+    if MODE == "classification":
+        if vs["compound"] >= 0.05:
+            return "positive"
+        elif vs["compound"] > -0.05: 
+            return "neutral"
+        elif vs["compound"] <= -0.05:
+            return "negative"
+    elif MODE == "scores": 
+        return vs`;

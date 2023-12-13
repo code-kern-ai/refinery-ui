@@ -139,7 +139,7 @@ export function buildSearchUrl(config: BricksIntegratorConfig, moduleTypeFilter:
     return getHttpBaseLink(config) + filter;
 }
 
-function getHttpBaseLink(config: BricksIntegratorConfig): string {
+export function getHttpBaseLink(config: BricksIntegratorConfig): string {
     if (config.querySourceSelectionRemote) return HTTP_BASE_LINK;
     else return `http://localhost:${config.querySourceSelectionLocalStrapiPort}/api/modules/`
 }

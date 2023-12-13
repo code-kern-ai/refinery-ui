@@ -210,7 +210,16 @@ export type ExpectedLabel = {
 }
 
 export type BricksIntegratorModalProps = {
+    executionTypeFilter?: string,
     requestSearch: () => void,
     switchToPage: (page: IntegratorPage) => void,
-    executionTypeFilter?: string,
+    requestSearchDebounce: (value: string) => void,
+    setGroupActive: (key: string) => void,
+    selectSearchResult: (id: number) => void,
 };
+
+export type PageSearchProps = {
+    requestSearchDebounce: (value: string) => void,
+    setGroupActive: (key: string) => void,
+    selectSearchResult: (id: number) => void,
+}

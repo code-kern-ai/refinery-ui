@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import { selectModal } from "@/src/reduxStore/states/modal";
 import { BricksIntegratorModalProps, IntegratorPage } from "@/src/types/shared/bricks-integrator";
 import { IconRefresh } from "@tabler/icons-react";
+import PageSearch from "./PageSearch";
 
 const ACCEPT_BUTTON = { buttonCaption: '', useButton: true, disabled: false, closeAfterClick: false };
 
@@ -108,6 +109,10 @@ export default function BricksIntegratorModal(props: BricksIntegratorModalProps)
                     </div>
                 </div>
             </div>
+            <PageSearch
+                requestSearchDebounce={(value) => props.requestSearchDebounce(value)}
+                setGroupActive={(key: string) => props.setGroupActive(key)}
+                selectSearchResult={(id: number) => props.selectSearchResult(id)} />
         </>}
     </Modal >
     )

@@ -6,7 +6,7 @@ import { capitalizeFirst, capitalizeFirstForClassName } from "@/submodules/javas
 import { getPythonClassName, getPythonFunctionName, toPythonFunctionName } from "@/submodules/javascript-functions/python-functions-parser";
 import { bricksVariableNeedsTaskId, canHaveDefaultValue, getChoiceType, getEmptyBricksExpectedLabels, getEmptyBricksVariable } from "../../shared/bricks-integrator-helper";
 import { DummyNodes, getAddInfo, getSelectionType } from "./dummy-nodes";
-import { isStringTrue } from "@/submodules/javascript-functions/general";
+import { enumToArray, isStringTrue } from "@/submodules/javascript-functions/general";
 import { BricksVariableComment, isCommentTrue } from "./comment-lookup";
 
 export class BricksCodeParser {
@@ -24,12 +24,7 @@ export class BricksCodeParser {
 
     public static integratorInputRef: IntegratorInput;// undefined if old bricks version
 
-
-    // constructor(private base: BricksIntegratorComponent) {
-    //     this.filterTypes = enumToArray(BricksVariableType).filter(x => x != BricksVariableType.UNKNOWN && !x.startsWith("GENERIC"));
-    // }
-
-    public static prepareCode(config: BricksIntegratorConfig, executionTypeFilter: string, nameLookups: string[], labelingTaskId: string, forIde: boolean = false) {
+    public static prepareCode(config: BricksIntegratorConfig, executionTypeFilter: string, nameLookups: string[], labelingTaskId: string, forIde: string | boolean = false) {
         this.errors = [];
         this.expected = getEmptyBricksExpectedLabels();
         if (!config.api.data) return;
@@ -49,7 +44,7 @@ export class BricksCodeParser {
         if (config.api.data.data.id == DummyNodes.CODE_PARSER) this.parseJsonCode(config, labelingTaskId);
     }
 
-    private static checkVariableLines(config: BricksIntegratorConfig, executionTypeFilter: string, labelingTaskId: string, forIde: boolean = false) {
+    private static checkVariableLines(config: BricksIntegratorConfig, executionTypeFilter: string, labelingTaskId: string, forIde: string | boolean = false) {
         const variableLines = this.collectVariableLinesFromCode(config);
 
         if (variableLines.length == 0) {
@@ -66,7 +61,7 @@ export class BricksCodeParser {
         }
     }
 
-    private static checkAndMatchVariables(forIde: boolean = false) {
+    private static checkAndMatchVariables(forIde: string | boolean = false) {
         if (!this.integratorInputRef) return;
 
         if (this.variables.length != Object.keys(this.integratorInputRef.variables).length) {
@@ -158,7 +153,7 @@ export class BricksCodeParser {
         return parsedName;
     }
 
-    public static replaceVariables(config: BricksIntegratorConfig, executionTypeFilter: string, labelingTaskId: string, forIde: boolean = false) {
+    public static replaceVariables(config: BricksIntegratorConfig, executionTypeFilter: string, labelingTaskId: string, forIde: string | boolean = false) {
         let replacedCode = this.replaceFunctionLine(this.baseCode, executionTypeFilter);
         for (let i = 0; i < this.variables.length; i++) {
             const variable = this.variables[i];
@@ -362,7 +357,7 @@ export class BricksCodeParser {
         return -1;
     }
 
-    private static extendCodeForRecordIde(config: BricksIntegratorConfig, forIde: boolean = false) {
+    private static extendCodeForRecordIde(config: BricksIntegratorConfig, forIde: string | boolean = false) {
         if (!forIde) return;
         if (this.functionName == null || this.functionName == "@@unknown@@") return;
         const isExtractor = config.api.data.data.attributes.moduleType == "extractor";
@@ -522,6 +517,9 @@ export class BricksCodeParser {
 
     private static getVariableType(variable: BricksVariable, labelingTaskId: string): BricksVariableType {
         //first try find a specific type
+        if (!this.filterTypes) {
+            this.filterTypes = enumToArray(BricksVariableType).filter(x => x != BricksVariableType.UNKNOWN && !x.startsWith("GENERIC"));
+        }
         const types = this.filterTypes;
         for (let i = 0; i < types.length; i++) {
             const type = types[i];
@@ -570,7 +568,7 @@ export class BricksCodeParser {
         // }
     }
 
-    private static checkFunctionNameAndSet(name: string, config: BricksIntegratorConfig, executionTypeFilter: string, nameLookups: string[], labelingTaskId: string = null, forIde: boolean = false) {
+    private static checkFunctionNameAndSet(name: string, config: BricksIntegratorConfig, executionTypeFilter: string, nameLookups: string[], labelingTaskId: string = null, forIde: string | boolean = false) {
         this.nameTaken = !!(nameLookups?.find(x => x == name));
         name = executionTypeFilter == "activeLearner" ? capitalizeFirstForClassName(name) : toPythonFunctionName(name);
         if (config.preparedCode) {
