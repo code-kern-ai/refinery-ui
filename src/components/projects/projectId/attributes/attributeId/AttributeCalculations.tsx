@@ -33,6 +33,7 @@ import { selectAllUsers, setComments } from "@/src/reduxStore/states/general";
 import { REQUEST_COMMENTS } from "@/src/services/gql/queries/projects";
 import { CommentDataManager } from "@/src/util/classes/comments";
 import { CommentType } from "@/src/types/shared/comments";
+import BricksIntegrator from "@/src/components/shared/bricks-integrator/BricksIntegrator";
 
 const EDITOR_OPTIONS = { theme: 'vs-light', language: 'python', readOnly: false };
 
@@ -169,8 +170,7 @@ export default function AttributeCalculation() {
     }
 
     function openBricksIntegrator() {
-        // TODO: add it when the bricks integrator is ready
-        console.log("TODO: add it when the bricks integrator is ready")
+        document.getElementById('bricks-integrator-open-button').click();
     }
 
     function onScrollEvent(event: any) {
@@ -311,10 +311,10 @@ export default function AttributeCalculation() {
                         ))}
                     </div>
                 </div>
-                {/* TODO Add bricks integrator */}
                 <div className="flex flex-row items-center justify-between my-3">
                     <div className="text-sm leading-5 font-medium text-gray-700 inline-block mr-2">Editor</div>
                     <div className="flex flex-row flex-nowrap">
+                        <BricksIntegrator moduleTypeFilter="generator,classifier" functionType="Attribute" />
                         <Tooltip content={TOOLTIPS_DICT.ATTRIBUTE_CALCULATION.AVAILABLE_LIBRARIES} placement="left" color="invert">
                             <a href="https://github.com/code-kern-ai/refinery-ac-exec-env/blob/dev/requirements.txt"
                                 target="_blank"

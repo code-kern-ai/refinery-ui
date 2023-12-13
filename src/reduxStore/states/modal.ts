@@ -225,6 +225,9 @@ const initialState: Modals = {
     },
     [ModalEnum.COMMENTS_SECTION]: {
         open: false
+    },
+    [ModalEnum.BRICKS_INTEGRATOR]: {
+        open: false
     }
 };
 

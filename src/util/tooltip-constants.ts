@@ -18,6 +18,7 @@ export const TOOLTIPS_DICT = {
         'MOVE_COMMENT_RIGHT': 'Move comment window right',
         'CLOSE_ALL': 'Close all',
         'OPEN_ALL': 'Open all',
+        'OPEN_BRICKS_INTEGRATOR': 'Open the Bricks integrator',
     },
     [CurrentPage.PROJECT_SETTINGS]: {
         'ADD_NEW_ATTRIBUTE': 'Add a new attribute',

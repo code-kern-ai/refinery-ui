@@ -1,3 +1,4 @@
+import { BricksIntegratorConfig } from "@/src/types/shared/bricks-integrator";
 import { CommentData, CommentDataStore, CommentPosition } from "@/src/types/shared/comments";
 import { User } from "@/src/types/shared/general";
 import { NotificationListWrapper } from "@/src/types/shared/notification-center";
@@ -32,6 +33,9 @@ const initialState = {
     comments: {
         all: [],
     },
+    bricksIntegrator: {
+        config: null,
+    }
 } as {
     user: User;
     currentPage: string;
@@ -49,6 +53,9 @@ const initialState = {
     notifications: NotificationListWrapper[];
     comments: {
         all: CommentData[];
+    },
+    bricksIntegrator: {
+        config: BricksIntegratorConfig;
     }
 }
 
@@ -91,6 +98,10 @@ const generalSlice = createSlice({
         setComments: (state, action: PayloadAction<CommentData[]>) => {
             if (action.payload) state.comments.all = action.payload;
             else state.comments.all = null;
+        },
+        setBricksIntegrator(state, action: PayloadAction<BricksIntegratorConfig>) {
+            if (action.payload) state.bricksIntegrator.config = action.payload;
+            else state.bricksIntegrator.config = null;
         }
     },
 })
@@ -110,8 +121,9 @@ export const selectAnnotators = (state) => state.general.users.annotators;
 export const selectExperts = (state) => state.general.users.experts;
 export const selectNotifications = (state) => state.general.notifications;
 export const selectComments = (state) => state.general.comments.all;
+export const selectBricksIntegrator = (state) => state.general.bricksIntegrator.config;
 
 export const selectAnnotatorsDict = createSelector([selectAnnotators], (a): any => a ? arrayToDict(a, 'id') : null);
 
-export const { setUser, setCurrentPage, setIsManaged, setIsDemo, setIsAdmin, setOrganization, setAllUsers, setNotifications, setComments } = generalSlice.actions;
+export const { setUser, setCurrentPage, setIsManaged, setIsDemo, setIsAdmin, setOrganization, setAllUsers, setNotifications, setComments, setBricksIntegrator } = generalSlice.actions;
 export const generalReducer = generalSlice.reducer;
