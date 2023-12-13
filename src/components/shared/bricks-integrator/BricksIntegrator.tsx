@@ -44,12 +44,12 @@ export default function BricksIntegrator(_props: BricksIntegratorProps) {
 
     useEffect(() => {
         if (!config) return;
-        checkCanAccept();
+        checkCanAccept(jsonCopy(config));
     }, [config?.page]);
 
     function openBricksIntegrator() {
         dispatch(openModal(ModalEnum.BRICKS_INTEGRATOR));
-        checkCanAccept();
+        checkCanAccept(jsonCopy(config));
         requestSearch();
     }
 
@@ -65,21 +65,25 @@ export default function BricksIntegrator(_props: BricksIntegratorProps) {
         }
     }
 
-    function checkCanAccept() {
-        const configCopy = { ...config };
+    function checkCanAccept(configCopy: BricksIntegratorConfig) {
         switch (configCopy.page) {
             case IntegratorPage.SEARCH:
                 configCopy.canAccept = configCopy.api.moduleId != null;
                 break;
             case IntegratorPage.OVERVIEW:
             case IntegratorPage.INPUT_EXAMPLE:
-                if (configCopy.api.moduleId == -1) configCopy.canAccept = !!configCopy.api.data.data.attributes.sourceCode;
+
+                if (configCopy.api.moduleId == -1) {
+                    console.log(configCopy.api.data.data.attributes.sourceCode)
+                    configCopy.canAccept = !!configCopy.api.data.data.attributes.sourceCode;
+                }
                 else configCopy.canAccept = !!configCopy.api.data;
                 break;
             case IntegratorPage.INTEGRATION:
                 configCopy.canAccept = configCopy.codeFullyPrepared && !BricksCodeParser.nameTaken && BricksCodeParser.functionName != "";
                 break;
         }
+        dispatch(setBricksIntegrator(configCopy));
     }
 
     function requestSearch() {
@@ -241,6 +245,7 @@ export default function BricksIntegrator(_props: BricksIntegratorProps) {
     }
 
     function optionClicked(button: string, configCopy?: BricksIntegratorConfig) {
+        if (!configCopy) configCopy = jsonCopy(config);
         if (button == "CLOSE") dispatch(openModal(ModalEnum.BRICKS_INTEGRATOR));
         else {
             switch (configCopy.page) {
@@ -248,18 +253,18 @@ export default function BricksIntegrator(_props: BricksIntegratorProps) {
                     configCopy.page = IntegratorPage.OVERVIEW;
                     requestDataFromApi(configCopy);
                     break;
-                // case IntegratorPage.OVERVIEW:
-                // case IntegratorPage.INPUT_EXAMPLE:
-                //     // jump to integration
-                //     configCopy.page = IntegratorPage.INTEGRATION;
-                //     if (configCopy.api.moduleId < 0) this.codeParser.prepareCode();
-                //     break;
-                // case IntegratorPage.INTEGRATION:
-                //     //transfer code to editor
-                //     this.finishUpIntegration();
-                //     break;
+                case IntegratorPage.OVERVIEW:
+                case IntegratorPage.INPUT_EXAMPLE:
+                    // jump to integration
+                    configCopy.page = IntegratorPage.INTEGRATION;
+                    if (configCopy.api.moduleId < 0) BricksCodeParser.prepareCode(configCopy, props.executionTypeFilter, props.nameLookups, props.labelingTaskId, props.forIde);
+                    break;
+                case IntegratorPage.INTEGRATION:
+                    //transfer code to editor
+                    finishUpIntegration();
+                    break;
             }
-            checkCanAccept();
+            checkCanAccept(jsonCopy(configCopy));
         }
     }
 
@@ -270,6 +275,7 @@ export default function BricksIntegrator(_props: BricksIntegratorProps) {
         }
         if (configCopy.api.moduleId < 0) {
             configCopy.api.data = getDummyNodeByIdForApi(configCopy.api.moduleId);
+            dispatch(setBricksIntegrator(configCopy));
             return;
         }
         configCopy.api.requestUrl = getHttpBaseLink(configCopy) + configCopy.api.moduleId;
@@ -298,14 +304,21 @@ export default function BricksIntegrator(_props: BricksIntegratorProps) {
             configCopy.api.requesting = false;
             configCopy.example.requestData = configCopy.api.data.data.attributes.inputExample;
             BricksCodeParser.prepareCode(configCopy, props.executionTypeFilter, props.nameLookups, props.labelingTaskId, props.forIde);
-            checkCanAccept();
-            dispatch(setBricksIntegrator(configCopy));
+            checkCanAccept(configCopy);
         }, (error) => {
             console.log("error in search request", error);
             configCopy.search.requesting = false;
             configCopy.search.currentRequest = null;
         });
     }
+
+    function setCodeTesterCode(code: string) {
+        const configCopy = jsonCopy(config);
+        configCopy.api.data.data.attributes.sourceCode = code;
+        checkCanAccept(configCopy);
+    }
+
+    function finishUpIntegration() { }
 
     return (
         <div className="flex items-center">
@@ -321,7 +334,9 @@ export default function BricksIntegrator(_props: BricksIntegratorProps) {
                 executionTypeFilter={props.executionTypeFilter}
                 requestSearchDebounce={(value: string) => requestSearchDebounce(value)}
                 setGroupActive={(key: string) => setGroupActive(key)}
-                selectSearchResult={(id: number) => selectSearchResult(id)} />
+                selectSearchResult={(id: number) => selectSearchResult(id)}
+                setCodeTester={(code: string) => setCodeTesterCode(code)}
+                optionClicked={(option: string) => optionClicked(option)} />
         </div>
     )
 }

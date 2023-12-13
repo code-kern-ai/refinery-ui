@@ -19,6 +19,7 @@ export const TOOLTIPS_DICT = {
         'CLOSE_ALL': 'Close all',
         'OPEN_ALL': 'Open all',
         'OPEN_BRICKS_INTEGRATOR': 'Open the Bricks integrator',
+        'COPIED': 'Copied',
     },
     [CurrentPage.PROJECT_SETTINGS]: {
         'ADD_NEW_ATTRIBUTE': 'Add a new attribute',

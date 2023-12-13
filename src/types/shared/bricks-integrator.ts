@@ -216,6 +216,8 @@ export type BricksIntegratorModalProps = {
     requestSearchDebounce: (value: string) => void,
     setGroupActive: (key: string) => void,
     selectSearchResult: (id: number) => void,
+    setCodeTester: (code: string) => void,
+    optionClicked: (option: string) => void,
 };
 
 export type PageSearchProps = {
@@ -223,3 +225,7 @@ export type PageSearchProps = {
     setGroupActive: (key: string) => void,
     selectSearchResult: (id: number) => void,
 }
+
+export type PageOverviewProps = {
+    setCodeTester: (code: string) => void,
+};

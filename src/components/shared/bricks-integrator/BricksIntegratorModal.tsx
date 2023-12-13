@@ -7,6 +7,7 @@ import { selectModal } from "@/src/reduxStore/states/modal";
 import { BricksIntegratorModalProps, IntegratorPage } from "@/src/types/shared/bricks-integrator";
 import { IconRefresh } from "@tabler/icons-react";
 import PageSearch from "./PageSearch";
+import PageOverview from "./PageOverview";
 
 const ACCEPT_BUTTON = { buttonCaption: '', useButton: true, disabled: false, closeAfterClick: false };
 
@@ -24,7 +25,8 @@ export default function BricksIntegratorModal(props: BricksIntegratorModalProps)
             ...acceptButton,
             useButton: config.page !== IntegratorPage.SEARCH,
             buttonCaption: config.page == IntegratorPage.INTEGRATION ? 'Finish up' : 'Proceed',
-            disabled: !config.canAccept
+            disabled: !config.canAccept,
+            emitFunction: props.optionClicked
         });
     }, [config, modalBricks]);
 
@@ -40,7 +42,7 @@ export default function BricksIntegratorModal(props: BricksIntegratorModalProps)
         dispatch(setBricksIntegrator(configCopy));
     }
 
-    return (<Modal modalName={ModalEnum.BRICKS_INTEGRATOR}>
+    return (<Modal modalName={ModalEnum.BRICKS_INTEGRATOR} acceptButton={acceptButton}>
         {config && <>
             <div className="flex flex-row items-center justify-center gap-x-2">
                 <span className="text-lg leading-6 text-gray-900 font-medium" onDoubleClick={() => {
@@ -113,6 +115,8 @@ export default function BricksIntegratorModal(props: BricksIntegratorModalProps)
                 requestSearchDebounce={(value) => props.requestSearchDebounce(value)}
                 setGroupActive={(key: string) => props.setGroupActive(key)}
                 selectSearchResult={(id: number) => props.selectSearchResult(id)} />
+            <PageOverview
+                setCodeTester={(code: string) => props.setCodeTester(code)} />
         </>}
     </Modal >
     )
