@@ -86,6 +86,7 @@ export default function ZeroShot() {
         requests.push({ commentType: CommentType.LABELING_TASK, projectId: projectId });
         requests.push({ commentType: CommentType.HEURISTIC, projectId: projectId });
         requests.push({ commentType: CommentType.LABEL, projectId: projectId });
+        CommentDataManager.unregisterCommentRequests(CurrentPage.ZERO_SHOT);
         CommentDataManager.registerCommentRequests(CurrentPage.ZERO_SHOT, requests);
         const requestJsonString = CommentDataManager.buildRequestJSON();
         refetchComments({ variables: { requested: requestJsonString } }).then((res) => {

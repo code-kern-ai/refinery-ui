@@ -112,6 +112,7 @@ export default function ProjectOverview() {
         requests.push({ commentType: CommentType.LABELING_TASK, projectId: projectId });
         requests.push({ commentType: CommentType.DATA_SLICE, projectId: projectId });
         requests.push({ commentType: CommentType.LABEL, projectId: projectId });
+        CommentDataManager.unregisterCommentRequests(CurrentPage.PROJECT_OVERVIEW);
         CommentDataManager.registerCommentRequests(CurrentPage.PROJECT_OVERVIEW, requests);
         const requestJsonString = CommentDataManager.buildRequestJSON();
         refetchComments({ variables: { requested: requestJsonString } }).then((res) => {

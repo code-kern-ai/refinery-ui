@@ -95,6 +95,7 @@ export default function ActiveLearning() {
         requests.push({ commentType: CommentType.HEURISTIC, projectId: projectId });
         requests.push({ commentType: CommentType.EMBEDDING, projectId: projectId });
         requests.push({ commentType: CommentType.LABEL, projectId: projectId });
+        CommentDataManager.unregisterCommentRequests(CurrentPage.ACTIVE_LEARNING);
         CommentDataManager.registerCommentRequests(CurrentPage.ACTIVE_LEARNING, requests);
         const requestJsonString = CommentDataManager.buildRequestJSON();
         refetchComments({ variables: { requested: requestJsonString } }).then((res) => {

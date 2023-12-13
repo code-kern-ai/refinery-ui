@@ -100,6 +100,7 @@ export default function ProjectSettings() {
         requests.push({ commentType: CommentType.ATTRIBUTE, projectId: project.id });
         requests.push({ commentType: CommentType.EMBEDDING, projectId: project.id });
         requests.push({ commentType: CommentType.LABEL, projectId: project.id });
+        CommentDataManager.unregisterCommentRequests(CurrentPage.PROJECT_SETTINGS);
         CommentDataManager.registerCommentRequests(CurrentPage.PROJECT_SETTINGS, requests);
         const requestJsonString = CommentDataManager.buildRequestJSON();
         refetchComments({ variables: { requested: requestJsonString } }).then((res) => {

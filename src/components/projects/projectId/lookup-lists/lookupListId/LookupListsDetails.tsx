@@ -62,6 +62,7 @@ export default function LookupListsDetails() {
     function setUpCommentsRequests() {
         const requests = [];
         requests.push({ commentType: CommentType.KNOWLEDGE_BASE, projectId: projectId });
+        CommentDataManager.unregisterCommentRequests(CurrentPage.LOOKUP_LISTS_DETAILS);
         CommentDataManager.registerCommentRequests(CurrentPage.LOOKUP_LISTS_DETAILS, requests);
         const requestJsonString = CommentDataManager.buildRequestJSON();
         refetchComments({ variables: { requested: requestJsonString } }).then((res) => {

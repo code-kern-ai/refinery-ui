@@ -24,12 +24,20 @@ export class CommentDataManager {
         this.buildCommentTypeOptions();
     }
 
+    public static unregisterCommentRequests(currentPage: CurrentPage) {
+        this.commentRequests = new Map<CurrentPage, CommentRequest[]>([]);
+    }
+
+    public static checkCanCommentOnPage() {
+        this.canCommentOnPage = CommentDataManager.commentRequests.size > 0;
+    }
+
     public static buildRequestJSON(): string {
         let requestJSON = {};
         CommentDataManager.commentRequests.forEach((value, key) => {
             value.forEach((commentRequest) => {
                 const key = commentRequestToKey(commentRequest);
-                if ((!(key in requestJSON) && !this.hasCommentDataAlready(commentRequest)) || commentRequest.commentType == CommentType.RECORD) {
+                if ((!(key in requestJSON)) || commentRequest.commentType == CommentType.RECORD) {
                     requestJSON[key] = this.buildJsonEntryFromCommentRequest(commentRequest);
                 }
             });
@@ -43,14 +51,6 @@ export class CommentDataManager {
         this.addCommentRequests = {};
         if (Object.keys(requestJSON).length == 0) return null;
         return JSON.stringify(requestJSON);
-    }
-
-    private static hasCommentDataAlready(commentRequest: CommentRequest): boolean {
-        if (!(commentRequest.commentType in this.data)) return false;
-        const projectId = commentRequest.projectId ? commentRequest.projectId : CommentDataManager.globalProjectId;
-        if (!(projectId in this.data[commentRequest.commentType])) return false;
-        if (commentRequest.commentKey && !(commentRequest.commentKey in this.data[commentRequest.commentType][projectId])) return false;
-        return true;
     }
 
     private static buildJsonEntryFromCommentRequest(commentRequest: CommentRequest) {

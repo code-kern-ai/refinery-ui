@@ -151,6 +151,7 @@ export default function LabelingMainComponent() {
         requests.push({ commentType: CommentType.LABEL, projectId: projectId });
         requests.push({ commentType: CommentType.HEURISTIC, projectId: projectId });
         requests.push({ commentType: CommentType.RECORD, projectId: projectId, commentKey: SessionManager.currentRecordId });
+        CommentDataManager.unregisterCommentRequests(CurrentPage.LABELING);
         CommentDataManager.registerCommentRequests(CurrentPage.LABELING, requests);
         const requestJsonString = CommentDataManager.buildRequestJSON();
         refetchComments({ variables: { requested: requestJsonString } }).then((res) => {
@@ -162,7 +163,8 @@ export default function LabelingMainComponent() {
 
     function previousRecord() {
         SessionManager.previousRecord();
-        SessionManager.currentRecordId = SessionManager.huddleData.recordIds[SessionManager.huddleData.linkData.requestedPos];
+        SessionManager.currentRecordId = SessionManager.huddleData.recordIds[SessionManager.huddleData.linkData.requestedPos - 1];
+        CommentDataManager.unregisterCommentRequests(CurrentPage.LABELING);
         CommentDataManager.registerCommentRequests(CurrentPage.LABELING, [{ commentType: CommentType.RECORD, projectId: projectId, commentKey: SessionManager.currentRecordId }]);
         const requestJsonString = CommentDataManager.buildRequestJSON();
         refetchComments({ variables: { requested: requestJsonString } }).then((res) => {
@@ -175,7 +177,8 @@ export default function LabelingMainComponent() {
 
     function nextRecord() {
         SessionManager.nextRecord();
-        SessionManager.currentRecordId = SessionManager.huddleData.recordIds[SessionManager.huddleData.linkData.requestedPos];
+        SessionManager.currentRecordId = SessionManager.huddleData.recordIds[SessionManager.huddleData.linkData.requestedPos - 1];
+        CommentDataManager.unregisterCommentRequests(CurrentPage.LABELING);
         CommentDataManager.registerCommentRequests(CurrentPage.LABELING, [{ commentType: CommentType.RECORD, projectId: projectId, commentKey: SessionManager.currentRecordId }]);
         const requestJsonString = CommentDataManager.buildRequestJSON();
         refetchComments({ variables: { requested: requestJsonString } }).then((res) => {

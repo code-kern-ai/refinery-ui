@@ -71,6 +71,7 @@ export default function RecordIDE() {
         const requests = [];
         requests.push({ commentType: CommentType.ATTRIBUTE, projectId: projectId });
         requests.push({ commentType: CommentType.KNOWLEDGE_BASE, projectId: projectId });
+        CommentDataManager.unregisterCommentRequests(CurrentPage.RECORD_IDE);
         CommentDataManager.registerCommentRequests(CurrentPage.RECORD_IDE, requests);
         const requestJsonString = CommentDataManager.buildRequestJSON();
         refetchComments({ variables: { requested: requestJsonString } }).then((res) => {

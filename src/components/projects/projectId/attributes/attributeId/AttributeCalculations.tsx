@@ -111,6 +111,7 @@ export default function AttributeCalculation() {
         requests.push({ commentType: CommentType.ATTRIBUTE, projectId: projectId });
         requests.push({ commentType: CommentType.LABELING_TASK, projectId: projectId });
         requests.push({ commentType: CommentType.KNOWLEDGE_BASE, projectId: projectId });
+        CommentDataManager.unregisterCommentRequests(CurrentPage.ATTRIBUTE_CALCULATION);
         CommentDataManager.registerCommentRequests(CurrentPage.ATTRIBUTE_CALCULATION, requests);
         const requestJsonString = CommentDataManager.buildRequestJSON();
         refetchComments({ variables: { requested: requestJsonString } }).then((res) => {

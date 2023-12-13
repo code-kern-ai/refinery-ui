@@ -79,6 +79,7 @@ export default function CrowdLabeler() {
         requests.push({ commentType: CommentType.HEURISTIC, projectId: projectId });
         requests.push({ commentType: CommentType.DATA_SLICE, projectId: projectId });
         requests.push({ commentType: CommentType.LABEL, projectId: projectId });
+        CommentDataManager.unregisterCommentRequests(CurrentPage.CROWD_LABELER);
         CommentDataManager.registerCommentRequests(CurrentPage.CROWD_LABELER, requests);
         const requestJsonString = CommentDataManager.buildRequestJSON();
         refetchComments({ variables: { requested: requestJsonString } }).then((res) => {

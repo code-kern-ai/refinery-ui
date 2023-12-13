@@ -93,6 +93,7 @@ export default function LabelingFunction() {
         requests.push({ commentType: CommentType.HEURISTIC, projectId: projectId });
         requests.push({ commentType: CommentType.KNOWLEDGE_BASE, projectId: projectId });
         requests.push({ commentType: CommentType.LABEL, projectId: projectId });
+        CommentDataManager.unregisterCommentRequests(CurrentPage.LABELING_FUNCTION);
         CommentDataManager.registerCommentRequests(CurrentPage.LABELING_FUNCTION, requests);
         const requestJsonString = CommentDataManager.buildRequestJSON();
         refetchComments({ variables: { requested: requestJsonString } }).then((res) => {

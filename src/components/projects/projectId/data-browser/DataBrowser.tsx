@@ -85,6 +85,7 @@ export default function DataBrowser() {
         requests.push({ commentType: CommentType.HEURISTIC, projectId: projectId });
         requests.push({ commentType: CommentType.EMBEDDING, projectId: projectId });
         requests.push({ commentType: CommentType.LABEL, projectId: projectId });
+        CommentDataManager.unregisterCommentRequests(CurrentPage.DATA_BROWSER);
         CommentDataManager.registerCommentRequests(CurrentPage.DATA_BROWSER, requests);
         const requestJsonString = CommentDataManager.buildRequestJSON();
         refetchComments({ variables: { requested: requestJsonString } }).then((res) => {

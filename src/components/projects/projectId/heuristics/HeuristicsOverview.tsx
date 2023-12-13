@@ -78,6 +78,7 @@ export function HeuristicsOverview() {
         requests.push({ commentType: CommentType.HEURISTIC, projectId: projectId });
         requests.push({ commentType: CommentType.EMBEDDING, projectId: projectId });
         requests.push({ commentType: CommentType.LABEL, projectId: projectId });
+        CommentDataManager.unregisterCommentRequests(CurrentPage.HEURISTICS);
         CommentDataManager.registerCommentRequests(CurrentPage.HEURISTICS, requests);
         const requestJsonString = CommentDataManager.buildRequestJSON();
         refetchComments({ variables: { requested: requestJsonString } }).then((res) => {
