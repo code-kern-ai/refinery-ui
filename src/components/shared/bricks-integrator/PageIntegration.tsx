@@ -30,7 +30,7 @@ export default function PageIntegration(props: PageIntegrationProps) {
         {config && <div className={`flex flex-col gap-y-2 justify-center items-center my-4 ${config.page != IntegratorPage.INTEGRATION ? 'hidden' : ''}`}>
             {BricksCodeParser?.errors.length > 0 && <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative flex flex-col">
                 <div className="self-center flex flex-row flex-nowrap items-center -mt-1 mb-1">
-                    <strong className="font-bold">Couldn't parse code</strong>
+                    <strong className="font-bold">Couldn&apos;t parse code</strong>
                     <IconAlertTriangle className="ml-1 w-5 h-5 text-red-400" />
                 </div>
                 <pre className="text-sm overflow-x-auto">{BricksCodeParser.errors.join("\n")}</pre>
@@ -42,7 +42,7 @@ export default function PageIntegration(props: PageIntegrationProps) {
                     <IconInfoCircle className="ml-1 w-5 h-5 text-blue-400" />
                 </div>
                 <div className="flex flex-col" style={{ maxWidth: '30rem' }}>
-                    {BricksCodeParser.globalComments.map((cLine, index) => (<span className="text-sm">{cLine}</span>))}
+                    {BricksCodeParser.globalComments.map((cLine, index) => (<span key={cLine} className="text-sm">{cLine}</span>))}
                 </div>
             </div>}
             {BricksCodeParser?.variables.length == 0 ? (<label>Nothing to parse, code can be used without changes</label>) : (
@@ -67,7 +67,7 @@ export default function PageIntegration(props: PageIntegrationProps) {
                             </label>
                         </Tooltip>
                         <VariableSelect variable={v} index={index} sendOption={() => {
-                            const configCopy = BricksCodeParser.replaceVariables(jsonCopy(config), props.executionTypeFilter);
+                            const configCopy = BricksCodeParser.replaceVariables(jsonCopy(config), props.executionTypeFilter, null, props.forIde);
                             dispatch(setBricksIntegrator(configCopy));
                         }} />
                         {v.comment && <Tooltip content={v.comment} color="invert" placement="top">
@@ -91,6 +91,7 @@ export default function PageIntegration(props: PageIntegrationProps) {
                     </div>
                 </div>
             </div>
+            {/* TODO [ngIf]="config.api.moduleId == -2" */}
         </div >}
     </>);
 }

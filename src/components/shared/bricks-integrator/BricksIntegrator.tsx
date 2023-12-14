@@ -4,7 +4,7 @@ import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
 import { Tooltip } from "@nextui-org/react";
 import { useDispatch, useSelector } from "react-redux";
 import BricksIntegratorModal from "./BricksIntegratorModal";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { BricksIntegratorConfig, BricksIntegratorProps, BricksSearchData, IntegratorPage } from "@/src/types/shared/bricks-integrator";
 import { useDefaults } from "@/submodules/react-components/hooks/useDefaults";
 import { selectProjectId } from "@/src/reduxStore/states/project";
@@ -27,12 +27,13 @@ export default function BricksIntegrator(_props: BricksIntegratorProps) {
     const config = useSelector(selectBricksIntegrator);
 
     const [props] = useDefaults<BricksIntegratorProps>(_props, DEFAULTS);
+    const [forIde, setForIde] = useState(props.forIde);
 
     useEffect(() => {
-        if (!projectId) return;
-        if (typeof props.forIde === 'string') props.forIde = isStringTrue(props.forIde);
+        if (!projectId || !user) return;
+        if (typeof props.forIde === 'string') setForIde(isStringTrue(props.forIde));
         initConfig();
-    }, [projectId, props.forIde]);
+    }, [projectId, user, props.forIde]);
 
     useEffect(() => {
         if (!config) return;
@@ -258,7 +259,7 @@ export default function BricksIntegrator(_props: BricksIntegratorProps) {
                 case IntegratorPage.INPUT_EXAMPLE:
                     // jump to integration
                     configCopy.page = IntegratorPage.INTEGRATION;
-                    if (configCopy.api.moduleId < 0) configCopy = BricksCodeParser.prepareCode(configCopy, props.executionTypeFilter, props.nameLookups, props.labelingTaskId, props.forIde);
+                    if (configCopy.api.moduleId < 0) configCopy = BricksCodeParser.prepareCode(configCopy, props.executionTypeFilter, props.nameLookups, props.labelingTaskId, forIde);
                     break;
                 case IntegratorPage.INTEGRATION:
                     //transfer code to editor
@@ -304,7 +305,7 @@ export default function BricksIntegrator(_props: BricksIntegratorProps) {
             configCopy.api.data.data.attributes.issueLink = "https://github.com/code-kern-ai/bricks/issues/" + c.data.attributes.issueId;
             configCopy.api.requesting = false;
             configCopy.example.requestData = configCopy.api.data.data.attributes.inputExample;
-            configCopy = BricksCodeParser.prepareCode(configCopy, props.executionTypeFilter, props.nameLookups, props.labelingTaskId, props.forIde);
+            configCopy = BricksCodeParser.prepareCode(configCopy, props.executionTypeFilter, props.nameLookups, props.labelingTaskId, forIde);
             checkCanAccept(configCopy);
         }, (error) => {
             console.log("error in search request", error);
@@ -362,6 +363,7 @@ export default function BricksIntegrator(_props: BricksIntegratorProps) {
                 executionTypeFilter={props.executionTypeFilter}
                 functionType={props.functionType}
                 nameLookups={props.nameLookups}
+                forIde={forIde}
                 requestSearch={requestSearch}
                 switchToPage={(page: IntegratorPage) => switchToPage(page)}
                 requestSearchDebounce={(value: string) => requestSearchDebounce(value)}

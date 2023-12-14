@@ -1,3 +1,4 @@
+import { Embedding, PlatformType } from "@/src/types/components/projects/projectId/settings/embeddings";
 import { ProjectSize } from "@/src/types/components/projects/projectId/settings/project-export";
 
 export enum ProjectExportGroup {
@@ -16,12 +17,12 @@ export function getMoveRight(tblName: string): boolean {
     }
 }
 
-export function postProcessingFormGroups(projectSize: any): ProjectSize[] {
+export function postProcessingFormGroups(projectSize: any, embeddings: Embedding[]): ProjectSize[] {
     const projectExportArray = [];
     projectSize.forEach((element: any) => {
         let hasGdpr = false;
         if (element.table == ProjectExportGroup.EMBEDDING_TENSORS) {
-            // hasGdpr = TODO: filter for embeddings
+            hasGdpr = embeddings.some((e: any) => e.name.split("-")[2] == PlatformType.COHERE || e.name.split("-")[2] == PlatformType.OPEN_AI || e.name.split("-")[2] == PlatformType.AZURE);
         }
         let group = {
             export: element.default,

@@ -2,6 +2,7 @@ import CryptedField from "@/src/components/shared/crypted-field/CryptedField";
 import LoadingIcon from "@/src/components/shared/loading/LoadingIcon";
 import Modal from "@/src/components/shared/modal/Modal";
 import { closeModal, selectModal } from "@/src/reduxStore/states/modal";
+import { selectEmbeddings } from "@/src/reduxStore/states/pages/settings";
 import { selectProjectId } from "@/src/reduxStore/states/project";
 import { downloadFile } from "@/src/services/base/s3-service";
 import { WebSocketsService } from "@/src/services/base/web-sockets/WebSocketsService";
@@ -26,7 +27,8 @@ export default function ProjectSnapshotExport() {
     const router = useRouter();
     const dispatch = useDispatch();
     const projectId = useSelector(selectProjectId);
-    const modal = useSelector(selectModal(ModalEnum.PROJECT_SNAPSHOT))
+    const modal = useSelector(selectModal(ModalEnum.PROJECT_SNAPSHOT));
+    const embeddings = useSelector(selectEmbeddings);
 
     const [projectSize, setProjectSize] = useState(null);
     const [projectExportArray, setProjectExportArray] = useState<ProjectSize[]>(null);
@@ -65,7 +67,7 @@ export default function ProjectSnapshotExport() {
     function requestProjectSize() {
         refetchProjectSize({ variables: { projectId: projectId } }).then((res) => {
             setProjectSize(res.data['projectSize']);
-            setProjectExportArray(postProcessingFormGroups(res.data['projectSize']));
+            setProjectExportArray(postProcessingFormGroups(res.data['projectSize'], embeddings));
         });
     }
 

@@ -123,6 +123,7 @@ export default function BricksIntegratorModal(props: BricksIntegratorModalProps)
             <PageIntegration
                 functionType={props.functionType}
                 executionTypeFilter={props.executionTypeFilter}
+                forIde={props.forIde}
                 nameLookups={props.nameLookups}
                 checkCanAccept={(configCopy) => props.checkCanAccept(configCopy)} />
         </>}

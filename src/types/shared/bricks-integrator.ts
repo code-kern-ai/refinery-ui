@@ -213,6 +213,7 @@ export type BricksIntegratorModalProps = {
     executionTypeFilter?: string,
     functionType: string,
     nameLookups?: string[],
+    forIde?: string | boolean,
     requestSearch: () => void,
     switchToPage: (page: IntegratorPage) => void,
     requestSearchDebounce: (value: string) => void,
@@ -242,11 +243,13 @@ export type PageIntegrationProps = {
     functionType: string,
     executionTypeFilter: string,
     nameLookups: string[],
+    forIde?: string | boolean,
     checkCanAccept: (configCopy) => void,
 }
 
 export type VariableSelectProps = {
     variable: BricksVariable,
     index: number,
+    labelingTaskId?: string,
     sendOption: () => void,
 }

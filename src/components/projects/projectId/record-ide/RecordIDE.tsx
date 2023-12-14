@@ -1,3 +1,4 @@
+import BricksIntegrator from "@/src/components/shared/bricks-integrator/BricksIntegrator";
 import LoadingIcon from "@/src/components/shared/loading/LoadingIcon";
 import { selectAllUsers, setComments } from "@/src/reduxStore/states/general";
 import { selectProjectId } from "@/src/reduxStore/states/project"
@@ -226,9 +227,15 @@ export default function RecordIDE() {
                             Clear
                         </button>
                     </Tooltip>
+                    <BricksIntegrator
+                        functionType="Function"
+                        forIde="X"
+                        preparedCode={(code) => setCode(code)}
+                    />
+
                     <a href="https://github.com/code-kern-ai/refinery-record-ide-env/blob/dev/requirements.txt"
                         target="_blank"
-                        className="hover:bg-gray-50 bg-white text-gray-700 font-semibold text-xs mr-2 px-4 py-2 rounded-md border border-gray-300">
+                        className="hover:bg-gray-50 bg-white text-gray-700 font-semibold text-xs mx-2 px-4 py-2 rounded-md border border-gray-300">
                         See installed libraries
                     </a>
                 </div>

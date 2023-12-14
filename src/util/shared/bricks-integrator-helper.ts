@@ -1,5 +1,6 @@
 import { BricksExpectedLabels, BricksIntegratorConfig, BricksVariable, BricksVariableType, IntegratorPage, SelectionType } from "@/src/types/shared/bricks-integrator";
 import { capitalizeFirst } from "@/submodules/javascript-functions/case-types-parser";
+import { isoCodes, mostRelevant } from "../classes/bricks-integrator/language-iso";
 
 const HTTP_BASE_LINK: string = "https://cms.bricks.kern.ai/api/modules/";
 const HTTP_BASE_LINK_EXAMPLE: string = "https://api.bricks.kern.ai/";
@@ -202,4 +203,8 @@ export function getGroupName(groupKey: string): string {
         case "no_api_key": return "No API Key";
         default: return capitalizeFirst(groupKey);
     }
+}
+
+export function getIsoCodes(onlyMostRelevant: boolean = true): { code: string, name: string }[] {
+    return isoCodes.filter(e => !onlyMostRelevant || mostRelevant.includes(e.code));
 }
