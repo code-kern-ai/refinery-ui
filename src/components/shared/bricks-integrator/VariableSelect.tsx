@@ -1,9 +1,10 @@
-import { selectBricksIntegratorAttributes, selectBricksIntegratorEmbeddings, selectBricksIntegratorLabelingTasks, selectBricksIntegratorLanguages, selectBricksIntegratorLookupLists, setAttributesBricksIntegrator, setEmbeddingsBricksIntegrator, setLabelingTasksBricksIntegrator, setLanguagesBricksIntegrator, setLookupListsBricksIntegrator } from "@/src/reduxStore/states/general";
+import { selectBricksIntegratorAttributes, selectBricksIntegratorEmbeddings, selectBricksIntegratorLabelingTasks, selectBricksIntegratorLabels, selectBricksIntegratorLanguages, selectBricksIntegratorLookupLists, setAttributesBricksIntegrator, setEmbeddingsBricksIntegrator, setLabelingTasksBricksIntegrator, setLabelsBricksIntegrator, setLanguagesBricksIntegrator, setLookupListsBricksIntegrator } from "@/src/reduxStore/states/general";
 import { selectProjectId } from "@/src/reduxStore/states/project";
 import { LOOKUP_LISTS_BY_PROJECT_ID } from "@/src/services/gql/queries/lookup-lists";
 import { GET_ATTRIBUTES_BY_PROJECT_ID, GET_EMBEDDING_SCHEMA_BY_PROJECT_ID, GET_LABELING_TASKS_BY_PROJECT_ID } from "@/src/services/gql/queries/project-setting";
 import { LabelingTaskTarget, LabelingTaskTaskType } from "@/src/types/components/projects/projectId/settings/labeling-tasks";
-import { BricksVariable, BricksVariableType, VariableSelectProps } from "@/src/types/shared/bricks-integrator";
+import { BricksVariableType, VariableSelectProps } from "@/src/types/shared/bricks-integrator";
+import { BricksCodeParser } from "@/src/util/classes/bricks-integrator/bricks-integrator";
 import { BricksVariableComment, isCommentTrue } from "@/src/util/classes/bricks-integrator/comment-lookup";
 import { postProcessingAttributes } from "@/src/util/components/projects/projectId/settings/data-schema-helper";
 import { postProcessLabelingTasks } from "@/src/util/components/projects/projectId/settings/labeling-tasks-helper";
@@ -11,7 +12,7 @@ import { getIsoCodes } from "@/src/util/shared/bricks-integrator-helper";
 import Dropdown from "@/submodules/react-components/components/Dropdown";
 import { useLazyQuery } from "@apollo/client";
 import { IconPlus, IconTrash } from "@tabler/icons-react";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
 export default function VariableSelect(props: VariableSelectProps) {
@@ -23,7 +24,7 @@ export default function VariableSelect(props: VariableSelectProps) {
     const embeddings = useSelector(selectBricksIntegratorEmbeddings);
     const labelingTasks = useSelector(selectBricksIntegratorLabelingTasks);
     const lookupLists = useSelector(selectBricksIntegratorLookupLists);
-    const labels = [];
+    const labels = useSelector(selectBricksIntegratorLabels);
 
     const [refetchAttributes] = useLazyQuery(GET_ATTRIBUTES_BY_PROJECT_ID, { fetchPolicy: "network-only" });
     const [refetchEmbeddings] = useLazyQuery(GET_EMBEDDING_SCHEMA_BY_PROJECT_ID, { fetchPolicy: "no-cache" });
@@ -58,12 +59,12 @@ export default function VariableSelect(props: VariableSelectProps) {
                 else if (isCommentTrue(comment, BricksVariableComment.LABELING_TASK_ONLY_EXTRACTION)) typeFilter = 'INFORMATION_EXTRACTION';
                 refetchLabelingTasksAndProcess(typeFilter)
                 break;
-            // case BricksVariableType.LABEL:
-            //     if (!this.base.labelingTaskId) {
-            //         console.log("no labeling task id given -> can't collect allowed labels");
-            //         return;
-            //     }
-            //     return this.base.dataRequestor.getLabels(this.base.labelingTaskId);
+            case BricksVariableType.LABEL:
+                if (!props.labelingTaskId) {
+                    console.log("no labeling task id given -> can't collect allowed labels");
+                    return;
+                }
+                return dispatch(setLabelsBricksIntegrator(BricksCodeParser.getLabels(props.labelingTaskId, labelingTasks)));
             case BricksVariableType.EMBEDDING:
                 if (!props.labelingTaskId) {
                     refetchEmbeddingsAndProcess();
@@ -197,14 +198,14 @@ export default function VariableSelect(props: VariableSelectProps) {
                         props.sendOption();
                     }}
                 />}
-            {/* {props.variable.type == BricksVariableType.LABEL &&
+            {props.variable.type == BricksVariableType.LABEL &&
                 <Dropdown options={labels} buttonName={props.variable.values[props.index] ? props.variable.values[props.index] : 'Select label'}
                     selectedOption={(option: any) => {
                         const propsCopy = { ...props };
                         propsCopy.variable.values[index] = option;
                         props.sendOption();
                     }}
-                />} */}
+                />}
             {props.variable.type == BricksVariableType.LABELING_TASK &&
                 <Dropdown options={labelingTasks} buttonName={props.variable.values[index] ? props.variable.values[index] : 'Select task'}
                     selectedOption={(option: any) => {

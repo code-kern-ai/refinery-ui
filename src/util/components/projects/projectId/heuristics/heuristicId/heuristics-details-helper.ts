@@ -20,6 +20,7 @@ export function postProcessCurrentHeuristic(heuristic: Heuristic, labelingTasks:
     const labelingTask = labelingTasks.find(a => a.id == heuristic.labelingTaskId);
     prepareHeuristic.labelingTaskName = labelingTask.name;
     prepareHeuristic.labels = labelingTask.labels;
+    prepareHeuristic.labelingTaskType = labelingTask.taskType;
 
     if (prepareHeuristic.lastTask) {
         const task = jsonCopy(prepareHeuristic.lastTask);

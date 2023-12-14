@@ -33,6 +33,7 @@ import { selectAllUsers, setComments } from "@/src/reduxStore/states/general";
 import { CommentType } from "@/src/types/shared/comments";
 import { CommentDataManager } from "@/src/util/classes/comments";
 import { REQUEST_COMMENTS } from "@/src/services/gql/queries/projects";
+import BricksIntegrator from "@/src/components/shared/bricks-integrator/BricksIntegrator";
 
 export default function ActiveLearning() {
     const dispatch = useDispatch();
@@ -187,6 +188,13 @@ export default function ActiveLearning() {
         WebSocketsService.updateFunctionPointer(projectId, CurrentPage.ACTIVE_LEARNING, handleWebsocketNotification)
     }, [handleWebsocketNotification, projectId]);
 
+    function setValueToLabelingTask(value: string) {
+        const labelingTask = labelingTasks.find(a => a.id == value);
+        updateHeuristicMut({ variables: { projectId: projectId, informationSourceId: currentHeuristic.id, labelingTaskId: labelingTask.id } }).then((res) => {
+            dispatch(updateHeuristicsState(currentHeuristic.id, { labelingTaskId: labelingTask.id, labelingTaskName: labelingTask.name, labels: labelingTask.labels }))
+        });
+    }
+
     return (
         <HeuristicsLayout updateSourceCode={(code) => updateSourceCodeToDisplay(code)}>
             {currentHeuristic && <div>
@@ -234,7 +242,14 @@ export default function ActiveLearning() {
                         )}
                     </div>
                     <div className="flex flex-row flex-nowrap items-center ml-auto">
-                        {/* TODO: Add bricks integrator */}
+                        <BricksIntegrator
+                            moduleTypeFilter={currentHeuristic.labelingTaskType == 'MULTICLASS_CLASSIFICATION' ? 'classifier' : 'extractor'}
+                            executionTypeFilter="activeLearner"
+                            functionType="Heuristic"
+                            labelingTaskId={currentHeuristic.labelingTaskId}
+                            preparedCode={(code: string) => updateSourceCode(code)}
+                            newTaskId={(value) => setValueToLabelingTask(value)}
+                        />
                     </div>
                 </div>
                 <HeuristicsEditor updatedSourceCode={(code: string) => updateSourceCode(code)} />

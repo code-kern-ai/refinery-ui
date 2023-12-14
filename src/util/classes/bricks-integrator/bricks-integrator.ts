@@ -18,13 +18,12 @@ export class BricksCodeParser {
     public static filterTypes: string[];
     public static labelingTaskName: string;
 
-    public static labelingTasks: any[];
     public static expected: BricksExpectedLabels = getEmptyBricksExpectedLabels();
     public static nameTaken: boolean = false;
 
     public static integratorInputRef: IntegratorInput;// undefined if old bricks version
 
-    public static prepareCode(config: BricksIntegratorConfig, executionTypeFilter: string, nameLookups: string[], labelingTaskId: string, forIde: string | boolean = false) {
+    public static prepareCode(config: BricksIntegratorConfig, executionTypeFilter: string, nameLookups: string[], labelingTaskId: string, forIde: string | boolean = false, labelingTasks: any[] = null) {
         this.errors = [];
         this.expected = getEmptyBricksExpectedLabels();
         if (!config.api.data) return;
@@ -36,11 +35,9 @@ export class BricksCodeParser {
         this.functionName = this.getFunctionName(executionTypeFilter);
         this.checkFunctionNameAndSet(this.functionName, config, executionTypeFilter, nameLookups, labelingTaskId, forIde);
         config = this.checkVariableLines(config, executionTypeFilter, labelingTaskId, forIde);
-        // if (this.base.labelingTaskId) {
-        //     this.labelingTaskName = this.base.dataRequestor.getLabelingTaskAttribute(this.base.labelingTaskId, 'name');
-        //     const taskType = this.base.dataRequestor.getLabelingTaskAttribute(this.base.labelingTaskId, 'taskType');
-        //     this.labelingTasks = this.base.dataRequestor.getLabelingTasks(taskType);
-        // }
+        if (labelingTaskId) {
+            this.labelingTaskName = BricksCodeParser.getLabelingTaskAttribute(labelingTaskId, 'name', labelingTasks);
+        }
         if (config.api.data.data.id == DummyNodes.CODE_PARSER) this.parseJsonCode(config, labelingTaskId);
         return config;
     }
@@ -127,7 +124,6 @@ export class BricksCodeParser {
                             variable.values[0] = inputV.defaultValue;
                         } else {
                             variable.type = newType;
-                            variable.allowedValues = this.getAllowedValues(variable.type, variable.comment);
                         }
                     }
                 }
@@ -482,7 +478,6 @@ export class BricksCodeParser {
             comment.shift();
             variable.comment = comment.join("#");
         }
-        variable.allowedValues = this.getAllowedValues(variable.type, variable.comment);
         variable.optional = isCommentTrue(variable.comment, BricksVariableComment.GLOBAL_OPTIONAL);
         variable.values = this.getValues(variable);
         this.setAddOptions(variable);
@@ -539,38 +534,6 @@ export class BricksCodeParser {
 
     }
 
-    private static getAllowedValues(forType: BricksVariableType, comment: string): any {
-        // switch (forType) {
-        //     case BricksVariableType.LANGUAGE:
-        //         const allLanguages = isCommentTrue(comment, BricksVariableComment.LANGUAGE_ALL);
-        //         return this.base.dataRequestor.getIsoCodes(!allLanguages);
-        //     case BricksVariableType.ATTRIBUTE:
-        //         if (isCommentTrue(comment, BricksVariableComment.ATTRIBUTE_ONLY_TEXT_LIKE)) return this.base.dataRequestor.getAttributes(['TEXT', 'CATEGORY']);
-        //         else if (isCommentTrue(comment, BricksVariableComment.ATTRIBUTE_ONLY_TEXT)) return this.base.dataRequestor.getAttributes(['TEXT']);
-        //         return this.base.dataRequestor.getAttributes(null);
-        //     case BricksVariableType.LABELING_TASK:
-        //         let typeFilter = null;
-        //         if (isCommentTrue(comment, BricksVariableComment.LABELING_TASK_ONLY_CLASSIFICATION)) typeFilter = 'MULTICLASS_CLASSIFICATION';
-        //         else if (isCommentTrue(comment, BricksVariableComment.LABELING_TASK_ONLY_EXTRACTION)) typeFilter = 'INFORMATION_EXTRACTION';
-        //         return this.base.dataRequestor.getLabelingTasks(typeFilter);
-        //     case BricksVariableType.LABEL:
-        //         if (!this.base.labelingTaskId) {
-        //             console.log("no labeling task id given -> can't collect allowed labels");
-        //             return;
-        //         }
-        //         return this.base.dataRequestor.getLabels(this.base.labelingTaskId);
-        //     case BricksVariableType.EMBEDDING:
-        //         if (!this.base.labelingTaskId) {
-        //             return this.base.dataRequestor.getEmbeddings();
-        //         }
-        //         return this.base.dataRequestor.getEmbeddings(this.base.labelingTaskId);
-        //     case BricksVariableType.LOOKUP_LIST:
-        //         return this.base.dataRequestor.getLookupLists();
-        //     default:
-        //         return null;
-        // }
-    }
-
     public static checkFunctionNameAndSet(name: string, config: BricksIntegratorConfig, executionTypeFilter: string, nameLookups: string[], labelingTaskId: string = null, forIde: string | boolean = false) {
         this.nameTaken = !!(nameLookups?.find(x => x == name));
         name = executionTypeFilter == "activeLearner" ? capitalizeFirstForClassName(name) : toPythonFunctionName(name);
@@ -589,5 +552,25 @@ export class BricksCodeParser {
         const getPythonName = executionTypeFilter == "activeLearner" ? getPythonClassName(splitBase[idxReplace]) : getPythonFunctionName(splitBase[idxReplace]);
         splitBase[idxReplace] = splitBase[idxReplace]?.replace(getPythonName, this.functionName);
         return splitBase.join("\n");
+    }
+
+    public static getLabelingTaskAttribute(labelingTaskId: string, attribute: string, labelingTasks: any[] = null) {
+        if (!labelingTasks) {
+            console.log("labeling Tasks not yet loaded");
+            return null;
+        }
+        let filtered = labelingTasks.find(lt => lt.id == labelingTaskId);
+        if (filtered) return filtered[attribute];
+        else return null;
+    }
+
+    public static getLabels(labelingTaskId: string, labelingTasks: any[]): any[] {
+        if (!labelingTasks) {
+            console.log("labeling Tasks not yet loaded");
+            return null;
+        }
+        let filtered = labelingTasks.find(lt => lt.id == labelingTaskId);
+        if (filtered && filtered.labels.length > 0) return filtered.labels;
+        else return ['No useable labels'];
     }
 }

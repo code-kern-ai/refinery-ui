@@ -34,6 +34,7 @@ import { selectAllUsers, setComments } from "@/src/reduxStore/states/general";
 import { REQUEST_COMMENTS } from "@/src/services/gql/queries/projects";
 import { CommentType } from "@/src/types/shared/comments";
 import { CommentDataManager } from "@/src/util/classes/comments";
+import BricksIntegrator from "@/src/components/shared/bricks-integrator/BricksIntegrator";
 
 export default function LabelingFunction() {
     const dispatch = useDispatch();
@@ -186,6 +187,13 @@ export default function LabelingFunction() {
         WebSocketsService.updateFunctionPointer(projectId, CurrentPage.LABELING_FUNCTION, handleWebsocketNotification)
     }, [handleWebsocketNotification, projectId]);
 
+    function setValueToLabelingTask(value: string) {
+        const labelingTask = labelingTasks.find(a => a.id == value);
+        updateHeuristicMut({ variables: { projectId: projectId, informationSourceId: currentHeuristic.id, labelingTaskId: labelingTask.id } }).then((res) => {
+            dispatch(updateHeuristicsState(currentHeuristic.id, { labelingTaskId: labelingTask.id, labelingTaskName: labelingTask.name, labels: labelingTask.labels }))
+        });
+    }
+
     return (
         <HeuristicsLayout updateSourceCode={(code: string) => updateSourceCodeToDisplay(code)}>
             {currentHeuristic && <div>
@@ -208,11 +216,19 @@ export default function LabelingFunction() {
                     </div>
                     <div className="flex items-center justify-center flex-shrink-0">
                         <div className="flex flex-row flex-nowrap items-center ml-auto">
-                            {/* TODO: Bricks integrator */}
+                            <BricksIntegrator
+                                moduleTypeFilter={currentHeuristic.labelingTaskType == 'MULTICLASS_CLASSIFICATION' ? 'classifier' : 'extractor'}
+                                executionTypeFilter="pythonFunction,premium"
+                                functionType="Heuristic"
+                                labelingTaskId={currentHeuristic.labelingTaskId}
+                                preparedCode={(code: string) => updateSourceCode(code)}
+                                newTaskId={(value) => setValueToLabelingTask(value)}
+                            />
+
                             <Tooltip content={TOOLTIPS_DICT.LABELING_FUNCTION.INSTALLED_LIBRARIES} color="invert" placement="left">
                                 <a href="https://github.com/code-kern-ai/refinery-lf-exec-env/blob/dev/requirements.txt"
                                     target="_blank"
-                                    className="bg-white text-gray-700 text-xs font-semibold  px-4 py-2 rounded-md border border-gray-300 hover:bg-gray-50 focus:outline-none">
+                                    className="bg-white text-gray-700 text-xs font-semibold ml-3 px-4 py-2 rounded-md border border-gray-300 hover:bg-gray-50 focus:outline-none">
                                     See installed libraries
                                 </a>
                             </Tooltip>

@@ -8,11 +8,15 @@ import { useDispatch, useSelector } from "react-redux";
 import VariableSelect from "./VariableSelect";
 import { copyToClipboard, jsonCopy } from "@/submodules/javascript-functions/general";
 import style from '@/src/styles/shared/bricks-integrator.module.css';
+import { Fragment } from "react";
+import Dropdown from "@/submodules/react-components/components/Dropdown";
+import { selectLabelingTasksAll } from "@/src/reduxStore/states/pages/settings";
 
 export default function PageIntegration(props: PageIntegrationProps) {
     const dispatch = useDispatch();
 
     const config = useSelector(selectBricksIntegrator);
+    const labelingTasks = useSelector(selectLabelingTasksAll);
 
     function onInputFunctionName(event: Event) {
         if (!(event.target instanceof HTMLInputElement)) return;
@@ -57,7 +61,19 @@ export default function PageIntegration(props: PageIntegrationProps) {
                             <IconAlertTriangle className="w-6 h-6 text-red-700" stroke={1.5} />
                         </Tooltip>}
                     </div>
-                    {/* TODO [ngIf]="codeParser.labelingTaskName" */}
+                    {BricksCodeParser.labelingTaskName && <Fragment>
+                        <label className="font-bold col-start-1">Labeling Task</label>
+                        <Dropdown options={labelingTasks} buttonName={BricksCodeParser.labelingTaskName}
+                            selectedOption={(option: string) => {
+                                const labelingTaskId = labelingTasks.find(lt => lt.name == option).id;
+                                BricksCodeParser.labelingTaskName = option;
+                                props.selectDifferentTask(labelingTaskId);
+                            }} />
+                        <Tooltip content={TOOLTIPS_DICT.HEURISTICS.SWITCH_LABELING_TASK} color="invert" placement="top">
+                            <IconAlertTriangle className="w-6 h-6 text-yellow-700" stroke={1.5} />
+                        </Tooltip>
+                    </Fragment>}
+
                     <label className="font-bold">Variable</label>
                     <label className="font-bold">Value</label>
                     {BricksCodeParser.variables.map((v, index) => (<div key={index} className="contents">

@@ -132,7 +132,8 @@ export const TOOLTIPS_DICT = {
         'EDIT_NAME': 'Edit name',
         'EDIT_DESCRIPTION': 'Edit description',
         'RUN': 'Creates a task to run the function',
-        'RUN_WS': 'Run weak supervision on current labeling task'
+        'RUN_WS': 'Run weak supervision on current labeling task',
+        'SWITCH_LABELING_TASK': 'Switching a task will reset the integrator progress!'
     },
     [CurrentPage.LABELING_FUNCTION]: {
         'LABELING_TASK': 'Pick the labeling task',

@@ -15,6 +15,7 @@ import { isStringTrue, jsonCopy, removeArrayFromArray } from "@/submodules/javas
 import { BricksCodeParser } from "@/src/util/classes/bricks-integrator/bricks-integrator";
 import { GROUPS_TO_REMOVE, extendDummyElements, getDummyNodeByIdForApi } from "@/src/util/classes/bricks-integrator/dummy-nodes";
 import { getBricksIntegrator, postBricksIntegrator } from "@/src/services/base/data-fetch";
+import { selectLabelingTasksAll } from "@/src/reduxStore/states/pages/settings";
 
 const DEFAULTS = { forIde: false };
 
@@ -25,6 +26,7 @@ export default function BricksIntegrator(_props: BricksIntegratorProps) {
     const user = useSelector(selectUser);
     const isAdmin = useSelector(selectIsAdmin);
     const config = useSelector(selectBricksIntegrator);
+    const labelingTasks = useSelector(selectLabelingTasksAll);
 
     const [props] = useDefaults<BricksIntegratorProps>(_props, DEFAULTS);
     const [forIde, setForIde] = useState(props.forIde);
@@ -75,7 +77,6 @@ export default function BricksIntegrator(_props: BricksIntegratorProps) {
             case IntegratorPage.INPUT_EXAMPLE:
 
                 if (configCopy.api.moduleId == -1) {
-                    console.log(configCopy.api.data.data.attributes.sourceCode)
                     configCopy.canAccept = !!configCopy.api.data.data.attributes.sourceCode;
                 }
                 else configCopy.canAccept = !!configCopy.api.data;
@@ -259,7 +260,7 @@ export default function BricksIntegrator(_props: BricksIntegratorProps) {
                 case IntegratorPage.INPUT_EXAMPLE:
                     // jump to integration
                     configCopy.page = IntegratorPage.INTEGRATION;
-                    if (configCopy.api.moduleId < 0) configCopy = BricksCodeParser.prepareCode(configCopy, props.executionTypeFilter, props.nameLookups, props.labelingTaskId, forIde);
+                    if (configCopy.api.moduleId < 0) configCopy = BricksCodeParser.prepareCode(configCopy, props.executionTypeFilter, props.nameLookups, props.labelingTaskId, forIde, labelingTasks);
                     break;
                 case IntegratorPage.INTEGRATION:
                     //transfer code to editor
@@ -305,7 +306,7 @@ export default function BricksIntegrator(_props: BricksIntegratorProps) {
             configCopy.api.data.data.attributes.issueLink = "https://github.com/code-kern-ai/bricks/issues/" + c.data.attributes.issueId;
             configCopy.api.requesting = false;
             configCopy.example.requestData = configCopy.api.data.data.attributes.inputExample;
-            configCopy = BricksCodeParser.prepareCode(configCopy, props.executionTypeFilter, props.nameLookups, props.labelingTaskId, forIde);
+            configCopy = BricksCodeParser.prepareCode(configCopy, props.executionTypeFilter, props.nameLookups, props.labelingTaskId, forIde, labelingTasks);
             checkCanAccept(configCopy);
         }, (error) => {
             console.log("error in search request", error);
@@ -351,6 +352,22 @@ export default function BricksIntegrator(_props: BricksIntegratorProps) {
         });
     }
 
+    function selectDifferentTask(taskId: string) {
+        if (props.labelingTaskId == taskId) {
+            BricksCodeParser.prepareCode(config, props.executionTypeFilter, props.nameLookups, props.labelingTaskId, forIde, labelingTasks);
+            return;
+        }
+        const currentTaskType = BricksCodeParser.getLabelingTaskAttribute(props.labelingTaskId, "taskType", labelingTasks);
+        const newTaskType = BricksCodeParser.getLabelingTaskAttribute(taskId, "taskType", labelingTasks);
+        if (currentTaskType != newTaskType) {
+            requestSearch();
+        } else {
+            const configCopy = BricksCodeParser.prepareCode(config, props.executionTypeFilter, props.nameLookups, props.labelingTaskId, forIde, labelingTasks);
+            dispatch(setBricksIntegrator(configCopy));
+        }
+        props.newTaskId(taskId)
+    }
+
     return (
         <div className="flex items-center">
             <Tooltip content={TOOLTIPS_DICT.GENERAL.OPEN_BRICKS_INTEGRATOR} placement="left" color="invert">
@@ -372,7 +389,9 @@ export default function BricksIntegrator(_props: BricksIntegratorProps) {
                 setCodeTester={(code: string) => setCodeTesterCode(code)}
                 optionClicked={(option: string) => optionClicked(option)}
                 requestExample={requestExample}
-                checkCanAccept={(configCopy) => checkCanAccept(configCopy)} />
+                checkCanAccept={(configCopy) => checkCanAccept(configCopy)}
+                selectDifferentTask={(taskId: string) => selectDifferentTask(taskId)}
+                newTaskId={(taskId: string) => props.newTaskId(taskId)} />
         </div>
     )
 }

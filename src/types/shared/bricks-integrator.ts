@@ -223,6 +223,8 @@ export type BricksIntegratorModalProps = {
     optionClicked: (option: string) => void,
     requestExample: () => void,
     checkCanAccept: (configCopy) => void,
+    selectDifferentTask: (taskId: string) => void,
+    newTaskId?: (taskId: string) => void
 };
 
 export type PageSearchProps = {
@@ -245,6 +247,7 @@ export type PageIntegrationProps = {
     nameLookups: string[],
     forIde?: string | boolean,
     checkCanAccept: (configCopy) => void,
+    selectDifferentTask: (taskId: string) => void,
 }
 
 export type VariableSelectProps = {
