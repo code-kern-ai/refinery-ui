@@ -2,6 +2,7 @@ import { BricksExpectedLabels, BricksIntegratorConfig, BricksVariable, BricksVar
 import { capitalizeFirst } from "@/submodules/javascript-functions/case-types-parser";
 
 const HTTP_BASE_LINK: string = "https://cms.bricks.kern.ai/api/modules/";
+const HTTP_BASE_LINK_EXAMPLE: string = "https://api.bricks.kern.ai/";
 
 export function getEmptyBricksIntegratorConfig(): BricksIntegratorConfig {
     return {
@@ -142,6 +143,11 @@ export function buildSearchUrl(config: BricksIntegratorConfig, moduleTypeFilter:
 export function getHttpBaseLink(config: BricksIntegratorConfig): string {
     if (config.querySourceSelectionRemote) return HTTP_BASE_LINK;
     else return `http://localhost:${config.querySourceSelectionLocalStrapiPort}/api/modules/`
+}
+
+export function getHttpBaseLinkExample(config: BricksIntegratorConfig): string {
+    if (config.querySourceSelectionRemote) return HTTP_BASE_LINK_EXAMPLE;
+    else return `http://localhost:${config.querySourceSelectionLocalBricksPort}/`
 }
 
 function extendUrl(value: string, attribute: string, executionTypeFilter: string): string {

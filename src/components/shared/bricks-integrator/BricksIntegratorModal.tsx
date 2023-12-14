@@ -118,7 +118,7 @@ export default function BricksIntegratorModal(props: BricksIntegratorModalProps)
                 selectSearchResult={(id: number) => props.selectSearchResult(id)} />
             <PageOverview
                 setCodeTester={(code: string) => props.setCodeTester(code)} />
-            <PageInputExample />
+            <PageInputExample requestExample={props.requestExample} />
         </>}
     </Modal >
     )

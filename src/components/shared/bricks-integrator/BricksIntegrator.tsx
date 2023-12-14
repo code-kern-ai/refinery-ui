@@ -9,12 +9,12 @@ import { BricksIntegratorConfig, BricksIntegratorProps, BricksSearchData, Integr
 import { useDefaults } from "@/submodules/react-components/hooks/useDefaults";
 import { selectProjectId } from "@/src/reduxStore/states/project";
 import { selectBricksIntegrator, selectIsAdmin, selectUser, setBricksIntegrator } from "@/src/reduxStore/states/general";
-import { buildSearchUrl, filterMinVersion, getEmptyBricksIntegratorConfig, getGroupName, getHttpBaseLink } from "@/src/util/shared/bricks-integrator-helper";
+import { buildSearchUrl, filterMinVersion, getEmptyBricksIntegratorConfig, getGroupName, getHttpBaseLink, getHttpBaseLinkExample } from "@/src/util/shared/bricks-integrator-helper";
 import { PASS_ME, caesarCipher } from "@/src/util/components/projects/projectId/record-ide/record-ide-helper";
 import { isStringTrue, jsonCopy, removeArrayFromArray } from "@/submodules/javascript-functions/general";
 import { BricksCodeParser } from "@/src/util/classes/bricks-integrator/bricks-integrator";
 import { GROUPS_TO_REMOVE, extendDummyElements, getDummyNodeByIdForApi } from "@/src/util/classes/bricks-integrator/dummy-nodes";
-import { getBricksIntegrator } from "@/src/services/base/data-fetch";
+import { getBricksIntegrator, postBricksIntegrator } from "@/src/services/base/data-fetch";
 
 const DEFAULTS = { forIde: false };
 
@@ -137,6 +137,7 @@ export default function BricksIntegrator(_props: BricksIntegratorProps) {
             console.log("error in search request", error);
             configCopy.search.requesting = false;
             configCopy.search.currentRequest = null;
+            dispatch(setBricksIntegrator(configCopy));
         });
     }
 
@@ -309,6 +310,7 @@ export default function BricksIntegrator(_props: BricksIntegratorProps) {
             console.log("error in search request", error);
             configCopy.search.requesting = false;
             configCopy.search.currentRequest = null;
+            dispatch(setBricksIntegrator(configCopy));
         });
     }
 
@@ -319,6 +321,27 @@ export default function BricksIntegrator(_props: BricksIntegratorProps) {
     }
 
     function finishUpIntegration() { }
+
+    function requestExample() {
+        const configCopy = jsonCopy(config);
+        if (!configCopy.example.requestData || configCopy.example.requestData.trim().length == 0) {
+            console.log("no data -> shouldn't happen");
+            return;
+        }
+        configCopy.example.requesting = true;
+        configCopy.example.requestUrl = getHttpBaseLinkExample(configCopy);
+        configCopy.example.requestUrl += configCopy.api.data.data.attributes.moduleType + "s/" + configCopy.api.data.data.attributes.endpoint;
+        const headers = { "Content-Type": "application/json" };
+        postBricksIntegrator(configCopy.example.requestUrl, { headers }, configCopy.example.requestData, (c) => {
+            configCopy.example.requesting = false;
+            configCopy.example.returnData = JSON.stringify(c, null, 2);
+            dispatch(setBricksIntegrator(configCopy));
+        }, (error) => {
+            configCopy.example.requesting = false;
+            configCopy.example.returnData = error;
+            dispatch(setBricksIntegrator(configCopy));
+        });
+    }
 
     return (
         <div className="flex items-center">
@@ -336,7 +359,8 @@ export default function BricksIntegrator(_props: BricksIntegratorProps) {
                 setGroupActive={(key: string) => setGroupActive(key)}
                 selectSearchResult={(id: number) => selectSearchResult(id)}
                 setCodeTester={(code: string) => setCodeTesterCode(code)}
-                optionClicked={(option: string) => optionClicked(option)} />
+                optionClicked={(option: string) => optionClicked(option)}
+                requestExample={requestExample} />
         </div>
     )
 }
