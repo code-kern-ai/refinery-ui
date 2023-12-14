@@ -6,7 +6,7 @@ import { Tooltip } from "@nextui-org/react";
 import { IconAlertTriangle, IconChevronsDown, IconInfoCircle } from "@tabler/icons-react";
 import { useDispatch, useSelector } from "react-redux";
 import VariableSelect from "./VariableSelect";
-import { jsonCopy } from "@/submodules/javascript-functions/general";
+import { copyToClipboard, jsonCopy } from "@/submodules/javascript-functions/general";
 import style from '@/src/styles/shared/bricks-integrator.module.css';
 
 export default function PageIntegration(props: PageIntegrationProps) {
@@ -91,7 +91,43 @@ export default function PageIntegration(props: PageIntegrationProps) {
                     </div>
                 </div>
             </div>
-            {/* TODO [ngIf]="config.api.moduleId == -2" */}
+            {config.api.moduleId == -2 && <div className="w-full">
+                <div className="flex flex-row justify-between cursor-pointer items-center" onClick={() => {
+                    const configCopy = BricksCodeParser.replaceVariables(jsonCopy(config), props.executionTypeFilter, null, props.forIde);
+                    configCopy.integratorParseOpen = !configCopy.integratorParseOpen;
+                    dispatch(setBricksIntegrator(configCopy));
+                }}>
+                    <label className="text-base font-bold text-gray-900 cursor-pointer">Final Json</label>
+                    <IconChevronsDown className={`w-6 h-6 ${config.integratorParseOpen ? style.rotateTransform : null}`} />
+                </div>
+                <div className={`flex flex-col mt-1 items-center ${config.integratorParseOpen ? '' : 'hidden'}`}>
+                    <div className="overflow-y-auto" style={{ maxHeight: '15rem', maxWidth: '35rem' }}>
+                        <pre className={`${style.editorPre}`} style={{ overflowX: config.overviewCodeOpen ? 'auto' : 'hidden' }}>{config.preparedJson}</pre>
+                    </div>
+                    <div className="flex flex-row flex-wrap gap-2">
+                        <div className="flex flex-row flex-nowrap cursor-pointer" onClick={() => {
+                            const configCopy = BricksCodeParser.replaceVariables(jsonCopy(config), props.executionTypeFilter, null, props.forIde);
+                            configCopy.prepareJsonAsPythonEnum = !configCopy.prepareJsonAsPythonEnum;
+                            dispatch(setBricksIntegrator(configCopy));
+                        }}>
+                            <input className="h-5 w-5 cursor-pointer" type="checkbox" checked={config.prepareJsonAsPythonEnum} onChange={() => { }} />
+                            <label className="text-sm ml-1">Prepare as enum</label>
+                        </div>
+                        <div className="flex flex-row flex-nowrap cursor-pointer" onClick={() => {
+                            const configCopy = BricksCodeParser.replaceVariables(jsonCopy(config), props.executionTypeFilter, null, props.forIde);
+                            configCopy.prepareJsonRemoveYOUR = !configCopy.prepareJsonRemoveYOUR;
+                            dispatch(setBricksIntegrator(configCopy));
+                        }}>
+                            <input className="h-5 w-5 cursor-pointer" type="checkbox" checked={config.prepareJsonRemoveYOUR} onChange={() => { }} />
+                            <label className="text-sm ml-1">Remove YOUR_</label>
+                        </div>
+                    </div>
+                    <Tooltip content={config.copied ? TOOLTIPS_DICT.GENERAL.COPIED : TOOLTIPS_DICT.GENERAL.CLICK_TO_COPY} color="invert" placement="top" className="mt-2">
+                        <button type="button" onClick={() => copyToClipboard(config.preparedJson)}
+                            className="bg-indigo-700 text-white text-xs font-semibold px-4 py-2 rounded-md border hover:bg-indigo-800 focus:outline-none">Copy</button>
+                    </Tooltip>
+                </div>
+            </div>}
         </div >}
     </>);
 }

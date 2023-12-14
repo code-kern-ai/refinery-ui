@@ -13,7 +13,6 @@ import { useLazyQuery } from "@apollo/client";
 import { IconPlus, IconTrash } from "@tabler/icons-react";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { timer } from "rxjs";
 
 export default function VariableSelect(props: VariableSelectProps) {
     const dispatch = useDispatch();
@@ -25,8 +24,6 @@ export default function VariableSelect(props: VariableSelectProps) {
     const labelingTasks = useSelector(selectBricksIntegratorLabelingTasks);
     const lookupLists = useSelector(selectBricksIntegratorLookupLists);
     const labels = [];
-
-    const [genericDebounceTimer, setGenericDebounceTimer] = useState(null);
 
     const [refetchAttributes] = useLazyQuery(GET_ATTRIBUTES_BY_PROJECT_ID, { fetchPolicy: "network-only" });
     const [refetchEmbeddings] = useLazyQuery(GET_EMBEDDING_SCHEMA_BY_PROJECT_ID, { fetchPolicy: "no-cache" });
