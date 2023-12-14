@@ -59,7 +59,7 @@ export default function PageOverview(props: PageOverviewProps) {
                                 dispatch(setBricksIntegrator(configCopy));
                             }}>
                                 <label className="text-base font-bold text-gray-900 cursor-pointer"><span className="underline">Source Code</span>
-                                    <span className="text-sm font-normal">&nbsp;(guided integration through tabvintegration)</span></label>
+                                    <span className="text-sm font-normal">&nbsp;(guided integration through tab integration)</span></label>
                                 <IconChevronsDown className={`w-6 h-6 ${config.overviewCodeOpen ? style.rotateTransform : null}`} />
                             </div>
                             <div className={`flex flex-col mt-1 items-center ${config.overviewCodeOpen ? '' : 'hidden'}`}>

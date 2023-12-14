@@ -1,4 +1,4 @@
-import { openModal } from "@/src/reduxStore/states/modal";
+import { closeModal, openModal } from "@/src/reduxStore/states/modal";
 import { ModalEnum } from "@/src/types/shared/modal";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
 import { Tooltip } from "@nextui-org/react";
@@ -258,7 +258,7 @@ export default function BricksIntegrator(_props: BricksIntegratorProps) {
                 case IntegratorPage.INPUT_EXAMPLE:
                     // jump to integration
                     configCopy.page = IntegratorPage.INTEGRATION;
-                    if (configCopy.api.moduleId < 0) BricksCodeParser.prepareCode(configCopy, props.executionTypeFilter, props.nameLookups, props.labelingTaskId, props.forIde);
+                    if (configCopy.api.moduleId < 0) configCopy = BricksCodeParser.prepareCode(configCopy, props.executionTypeFilter, props.nameLookups, props.labelingTaskId, props.forIde);
                     break;
                 case IntegratorPage.INTEGRATION:
                     //transfer code to editor
@@ -304,7 +304,7 @@ export default function BricksIntegrator(_props: BricksIntegratorProps) {
             configCopy.api.data.data.attributes.issueLink = "https://github.com/code-kern-ai/bricks/issues/" + c.data.attributes.issueId;
             configCopy.api.requesting = false;
             configCopy.example.requestData = configCopy.api.data.data.attributes.inputExample;
-            BricksCodeParser.prepareCode(configCopy, props.executionTypeFilter, props.nameLookups, props.labelingTaskId, props.forIde);
+            configCopy = BricksCodeParser.prepareCode(configCopy, props.executionTypeFilter, props.nameLookups, props.labelingTaskId, props.forIde);
             checkCanAccept(configCopy);
         }, (error) => {
             console.log("error in search request", error);
@@ -320,7 +320,14 @@ export default function BricksIntegrator(_props: BricksIntegratorProps) {
         checkCanAccept(configCopy);
     }
 
-    function finishUpIntegration() { }
+    function finishUpIntegration() {
+        if (config.codeFullyPrepared) {
+            dispatch(closeModal(ModalEnum.BRICKS_INTEGRATOR));
+            props.preparedCode(config.preparedCode);
+        } else {
+            console.log("code not fully prepared")
+        }
+    }
 
     function requestExample() {
         const configCopy = jsonCopy(config);
@@ -352,15 +359,18 @@ export default function BricksIntegrator(_props: BricksIntegratorProps) {
                 </button>
             </Tooltip>
             <BricksIntegratorModal
+                executionTypeFilter={props.executionTypeFilter}
+                functionType={props.functionType}
+                nameLookups={props.nameLookups}
                 requestSearch={requestSearch}
                 switchToPage={(page: IntegratorPage) => switchToPage(page)}
-                executionTypeFilter={props.executionTypeFilter}
                 requestSearchDebounce={(value: string) => requestSearchDebounce(value)}
                 setGroupActive={(key: string) => setGroupActive(key)}
                 selectSearchResult={(id: number) => selectSearchResult(id)}
                 setCodeTester={(code: string) => setCodeTesterCode(code)}
                 optionClicked={(option: string) => optionClicked(option)}
-                requestExample={requestExample} />
+                requestExample={requestExample}
+                checkCanAccept={(configCopy) => checkCanAccept(configCopy)} />
         </div>
     )
 }

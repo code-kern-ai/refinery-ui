@@ -122,7 +122,7 @@ export default function Sidebar() {
                         <div className="flex-1 flex flex-col min-h-0 overflow-y-auto bg-kernindigo overflow-initial">
                             <div className="flex-1 flex flex-col">
                                 <div className="flex-shrink-0 bg-kernindigo pt-4 pb-10 flex items-center justify-center">
-                                    <button onClick={() => router.push('/')}
+                                    <button onClick={() => router.push('/projects')}
                                         className="inline-flex items-center p-2 rounded-full hover:bg-kernindigo-dark focus:outline-none">
                                         <Image
                                             width={40}

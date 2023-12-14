@@ -4,7 +4,6 @@ import { jsonCopy } from "@/submodules/javascript-functions/general";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux"
 import LoadingIcon from "../loading/LoadingIcon";
-import { useConsoleLog } from "@/submodules/react-components/hooks/useConsoleLog";
 
 export default function PageInputExample(props: PageInputExampleProps) {
     const dispatch = useDispatch();

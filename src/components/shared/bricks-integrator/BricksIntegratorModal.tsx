@@ -9,6 +9,7 @@ import { IconRefresh } from "@tabler/icons-react";
 import PageSearch from "./PageSearch";
 import PageOverview from "./PageOverview";
 import PageInputExample from "./PageInputExample";
+import PageIntegration from "./PageIntegration";
 
 const ACCEPT_BUTTON = { buttonCaption: '', useButton: true, disabled: false, closeAfterClick: false };
 
@@ -119,6 +120,11 @@ export default function BricksIntegratorModal(props: BricksIntegratorModalProps)
             <PageOverview
                 setCodeTester={(code: string) => props.setCodeTester(code)} />
             <PageInputExample requestExample={props.requestExample} />
+            <PageIntegration
+                functionType={props.functionType}
+                executionTypeFilter={props.executionTypeFilter}
+                nameLookups={props.nameLookups}
+                checkCanAccept={(configCopy) => props.checkCanAccept(configCopy)} />
         </>}
     </Modal >
     )

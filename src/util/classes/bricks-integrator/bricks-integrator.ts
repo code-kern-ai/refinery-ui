@@ -35,13 +35,14 @@ export class BricksCodeParser {
         this.globalComments = this.collectGlobalComment();
         this.functionName = this.getFunctionName(executionTypeFilter);
         this.checkFunctionNameAndSet(this.functionName, config, executionTypeFilter, nameLookups, labelingTaskId, forIde);
-        this.checkVariableLines(config, executionTypeFilter, labelingTaskId, forIde);
+        config = this.checkVariableLines(config, executionTypeFilter, labelingTaskId, forIde);
         // if (this.base.labelingTaskId) {
         //     this.labelingTaskName = this.base.dataRequestor.getLabelingTaskAttribute(this.base.labelingTaskId, 'name');
         //     const taskType = this.base.dataRequestor.getLabelingTaskAttribute(this.base.labelingTaskId, 'taskType');
         //     this.labelingTasks = this.base.dataRequestor.getLabelingTasks(taskType);
         // }
         if (config.api.data.data.id == DummyNodes.CODE_PARSER) this.parseJsonCode(config, labelingTaskId);
+        return config;
     }
 
     private static checkVariableLines(config: BricksIntegratorConfig, executionTypeFilter: string, labelingTaskId: string, forIde: string | boolean = false) {
@@ -54,11 +55,12 @@ export class BricksCodeParser {
         try {
             this.variables = this.parseVariableLines(variableLines);
             this.checkAndMatchVariables(forIde);
-            this.replaceVariables(config, executionTypeFilter, labelingTaskId, forIde);
+            config = this.replaceVariables(config, executionTypeFilter, labelingTaskId, forIde);
         } catch (error: any) {
             this.errors.push(error);
             console.log("couldn't parse code", error);
         }
+        return config;
     }
 
     private static checkAndMatchVariables(forIde: string | boolean = false) {
@@ -153,7 +155,7 @@ export class BricksCodeParser {
         return parsedName;
     }
 
-    public static replaceVariables(config: BricksIntegratorConfig, executionTypeFilter: string, labelingTaskId: string, forIde: string | boolean = false) {
+    public static replaceVariables(config: BricksIntegratorConfig, executionTypeFilter: string, labelingTaskId: string = null, forIde: string | boolean = false) {
         let replacedCode = this.replaceFunctionLine(this.baseCode, executionTypeFilter);
         for (let i = 0; i < this.variables.length; i++) {
             const variable = this.variables[i];
@@ -166,6 +168,7 @@ export class BricksCodeParser {
         config.codeFullyPrepared = this.variables.every(v => v.optional || (v.values.length > 0 && v.values.every(va => va != null)));
         config.canAccept = config.codeFullyPrepared && !this.nameTaken && this.functionName != "";
         if (config.api.data.data.id == DummyNodes.CODE_PARSER) this.parseJsonCode(config, labelingTaskId);
+        return config;
     }
 
     private static parseJsonCode(config: BricksIntegratorConfig, labelingTaskId: string = null) {
@@ -568,14 +571,14 @@ export class BricksCodeParser {
         // }
     }
 
-    private static checkFunctionNameAndSet(name: string, config: BricksIntegratorConfig, executionTypeFilter: string, nameLookups: string[], labelingTaskId: string = null, forIde: string | boolean = false) {
+    public static checkFunctionNameAndSet(name: string, config: BricksIntegratorConfig, executionTypeFilter: string, nameLookups: string[], labelingTaskId: string = null, forIde: string | boolean = false) {
         this.nameTaken = !!(nameLookups?.find(x => x == name));
         name = executionTypeFilter == "activeLearner" ? capitalizeFirstForClassName(name) : toPythonFunctionName(name);
         if (config.preparedCode) {
             this.functionName = name;
-            this.replaceVariables(config, executionTypeFilter, labelingTaskId, forIde);
+            config = this.replaceVariables(config, executionTypeFilter, labelingTaskId, forIde);
         }
-        // this.base.checkCanAccept();
+        return config;
     }
 
     private static replaceFunctionLine(code: string, executionTypeFilter: string): string {

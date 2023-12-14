@@ -211,6 +211,8 @@ export type ExpectedLabel = {
 
 export type BricksIntegratorModalProps = {
     executionTypeFilter?: string,
+    functionType: string,
+    nameLookups?: string[],
     requestSearch: () => void,
     switchToPage: (page: IntegratorPage) => void,
     requestSearchDebounce: (value: string) => void,
@@ -218,7 +220,8 @@ export type BricksIntegratorModalProps = {
     selectSearchResult: (id: number) => void,
     setCodeTester: (code: string) => void,
     optionClicked: (option: string) => void,
-    requestExample: () => void
+    requestExample: () => void,
+    checkCanAccept: (configCopy) => void,
 };
 
 export type PageSearchProps = {
@@ -234,3 +237,16 @@ export type PageOverviewProps = {
 export type PageInputExampleProps = {
     requestExample: () => void
 };
+
+export type PageIntegrationProps = {
+    functionType: string,
+    executionTypeFilter: string,
+    nameLookups: string[],
+    checkCanAccept: (configCopy) => void,
+}
+
+export type VariableSelectProps = {
+    variable: BricksVariable,
+    index: number,
+    sendOption: () => void,
+}

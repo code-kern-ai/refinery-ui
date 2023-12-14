@@ -1,3 +1,4 @@
+import { Attribute } from "@/src/types/components/projects/projectId/settings/data-schema";
 import { BricksIntegratorConfig } from "@/src/types/shared/bricks-integrator";
 import { CommentData, CommentDataStore, CommentPosition } from "@/src/types/shared/comments";
 import { User } from "@/src/types/shared/general";
@@ -35,6 +36,7 @@ const initialState = {
     },
     bricksIntegrator: {
         config: null,
+        attributes: []
     }
 } as {
     user: User;
@@ -56,6 +58,7 @@ const initialState = {
     },
     bricksIntegrator: {
         config: BricksIntegratorConfig;
+        attributes: Attribute[]
     }
 }
 
@@ -102,6 +105,10 @@ const generalSlice = createSlice({
         setBricksIntegrator(state, action: PayloadAction<BricksIntegratorConfig>) {
             if (action.payload) state.bricksIntegrator.config = action.payload;
             else state.bricksIntegrator.config = null;
+        },
+        setAttributesBricksIntegrator(state, action: PayloadAction<any[]>) {
+            if (action.payload) state.bricksIntegrator.attributes = action.payload;
+            else state.bricksIntegrator.attributes = [];
         }
     },
 })
@@ -122,8 +129,9 @@ export const selectExperts = (state) => state.general.users.experts;
 export const selectNotifications = (state) => state.general.notifications;
 export const selectComments = (state) => state.general.comments.all;
 export const selectBricksIntegrator = (state) => state.general.bricksIntegrator.config;
+export const selectBricksIntegratorAttributes = (state) => state.general.bricksIntegrator.attributes;
 
 export const selectAnnotatorsDict = createSelector([selectAnnotators], (a): any => a ? arrayToDict(a, 'id') : null);
 
-export const { setUser, setCurrentPage, setIsManaged, setIsDemo, setIsAdmin, setOrganization, setAllUsers, setNotifications, setComments, setBricksIntegrator } = generalSlice.actions;
+export const { setUser, setCurrentPage, setIsManaged, setIsDemo, setIsAdmin, setOrganization, setAllUsers, setNotifications, setComments, setBricksIntegrator, setAttributesBricksIntegrator } = generalSlice.actions;
 export const generalReducer = generalSlice.reducer;

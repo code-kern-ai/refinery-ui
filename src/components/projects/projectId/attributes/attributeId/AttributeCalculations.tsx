@@ -314,7 +314,10 @@ export default function AttributeCalculation() {
                 <div className="flex flex-row items-center justify-between my-3">
                     <div className="text-sm leading-5 font-medium text-gray-700 inline-block mr-2">Editor</div>
                     <div className="flex flex-row flex-nowrap">
-                        <BricksIntegrator moduleTypeFilter="generator,classifier" functionType="Attribute" />
+                        <BricksIntegrator
+                            moduleTypeFilter="generator,classifier" functionType="Attribute"
+                            nameLookups={attributes.map(a => a.name)}
+                            preparedCode={(code: string) => updateSourceCode(code)} />
                         <Tooltip content={TOOLTIPS_DICT.ATTRIBUTE_CALCULATION.AVAILABLE_LIBRARIES} placement="left" color="invert">
                             <a href="https://github.com/code-kern-ai/refinery-ac-exec-env/blob/dev/requirements.txt"
                                 target="_blank"

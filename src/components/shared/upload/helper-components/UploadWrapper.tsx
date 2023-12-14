@@ -72,7 +72,7 @@ export default function UploadWrapper(props: UploadWrapperProps) {
             uploadFileType == UploadFileType.RECORDS_ADD && <div className="text-sm text-gray-500 font-normal">
                 <strong className="text-sm text-gray-700 font-medium">CAUTION:</strong> Submitting new records will automatically
                 run attribute calculation and embeddings
-                {recalculationCosts && <span>recreation of the embeddings will calculate them one more time and could cause additional fees</span>}
+                {recalculationCosts && <span>(recreation of the embeddings will calculate them one more time and could cause additional fees)</span>}
                 for all records
             </div>
         }
