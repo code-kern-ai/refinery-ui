@@ -281,3 +281,11 @@ query ($projectId: ID!, $exportOptions: JSONString, $key: String) {
   prepareRecordExport(projectId: $projectId, exportOptions: $exportOptions, key: $key)
 }
 `;
+
+export const CREATE_LABELS = gql`
+mutation ($projectId: ID!, $labelingTaskId: ID!, $labels: [String]!) {
+  createLabels(projectId: $projectId, labelingTaskId: $labelingTaskId, labels: $labels) {
+    ok
+  }
+}
+`;

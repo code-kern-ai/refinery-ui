@@ -3,7 +3,7 @@ import { IntegratorPage, PageIntegrationProps } from "@/src/types/shared/bricks-
 import { BricksCodeParser } from "@/src/util/classes/bricks-integrator/bricks-integrator";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
 import { Tooltip } from "@nextui-org/react";
-import { IconAlertTriangle, IconChevronsDown, IconInfoCircle } from "@tabler/icons-react";
+import { IconAlertTriangle, IconChevronsDown, IconInfoCircle, IconTrash, IconX } from "@tabler/icons-react";
 import { useDispatch, useSelector } from "react-redux";
 import VariableSelect from "./VariableSelect";
 import { copyToClipboard, jsonCopy } from "@/submodules/javascript-functions/general";
@@ -11,12 +11,20 @@ import style from '@/src/styles/shared/bricks-integrator.module.css';
 import { Fragment } from "react";
 import Dropdown from "@/submodules/react-components/components/Dropdown";
 import { selectLabelingTasksAll } from "@/src/reduxStore/states/pages/settings";
+import { CREATE_LABELS } from "@/src/services/gql/queries/project-setting";
+import { useMutation } from "@apollo/client";
+import { selectProjectId } from "@/src/reduxStore/states/project";
+import { CREATE_TASK_AND_LABELS } from "@/src/services/gql/mutations/project-settings";
 
 export default function PageIntegration(props: PageIntegrationProps) {
     const dispatch = useDispatch();
 
     const config = useSelector(selectBricksIntegrator);
     const labelingTasks = useSelector(selectLabelingTasksAll);
+    const projectId = useSelector(selectProjectId);
+
+    const [createLabelsMut] = useMutation(CREATE_LABELS);
+    const [createTaskAndLabelsMut] = useMutation(CREATE_TASK_AND_LABELS);
 
     function onInputFunctionName(event: Event) {
         if (!(event.target instanceof HTMLInputElement)) return;
@@ -30,6 +38,31 @@ export default function PageIntegration(props: PageIntegrationProps) {
         props.checkCanAccept(configCopy);
     }
 
+    function createNewLabelingTask(taskName: string, includedLabels: string[]) {
+        if (!includedLabels.length) return;
+        const taskType = 'MULTICLASS_CLASSIFICATION';// currently only option since extraction would require a new attribute as well!!
+        let finalTaskName = taskName;
+
+        let c = 0;
+        while (!!labelingTasks.find(lt => lt.name == finalTaskName)) {
+            finalTaskName = taskName + " " + ++c;
+        }
+        createTaskAndLabelsMut({ variables: { projectId: projectId, labelingTaskName: finalTaskName, labelingTaskType: taskType, labelingTaskTargetId: null, labels: includedLabels } }).then((res) => {
+            const taskId = res.data?.createTaskAndLabels?.taskId;
+            if (taskId) {
+                props.selectDifferentTask(taskId);
+            }
+        });
+    }
+
+    function addMissingLabelsToTask() {
+        if (!props.labelingTaskId) return;
+        const missing = BricksCodeParser.expected.expectedTaskLabels.filter(x => !x.exists).map(x => x.label);
+        createLabelsMut({ variables: { projectId: projectId, labelingTaskId: props.labelingTaskId, labels: missing } }).then((res) => {
+            props.selectDifferentTask(props.labelingTaskId)
+        });
+    }
+
     return (<>
         {config && <div className={`flex flex-col gap-y-2 justify-center items-center my-4 ${config.page != IntegratorPage.INTEGRATION ? 'hidden' : ''}`}>
             {BricksCodeParser?.errors.length > 0 && <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative flex flex-col">
@@ -39,7 +72,43 @@ export default function PageIntegration(props: PageIntegrationProps) {
                 </div>
                 <pre className="text-sm overflow-x-auto">{BricksCodeParser.errors.join("\n")}</pre>
             </div>}
-            {/* TODO: [ngIf]="codeParser?.expected.expectedTaskLabels && codeParser.expected.expectedTaskLabels.length>0" */}
+            {BricksCodeParser?.expected.expectedTaskLabels && BricksCodeParser.expected.expectedTaskLabels.length > 0 && <>
+                {BricksCodeParser.expected.labelWarning ? (
+                    <div className="bg-yellow-100 border border-yellow-400 text-yellow-700 px-4 py-3 rounded relative flex flex-col gap-y-2">
+                        <div className="self-center flex flex-row flex-nowrap items-center -mt-1">
+                            <strong className="font-bold">Warning</strong>
+                            <IconAlertTriangle className="ml-1 w-5 h-5 text-yellow-400" />
+                        </div>
+                        <label className="text-sm -mt-1">Your selected task doesn&apos;t have all necessary labels:</label>
+                        <div className="flex flex-row flex-wrap gap-2" style={{ maxWidth: '30rem' }}>
+                            {BricksCodeParser.expected.expectedTaskLabels.map((label, index) => (<span key={index} className="text-sm inline-flex items-center">
+                                <label className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium border ${label.backgroundColor} ${label.textColor} ${label.borderColor}`}>
+                                    {label.label}
+                                    {label.exists ? (<IconInfoCircle className="ml-1 w-4 h-4 text-green-400" />) : (<IconX className="ml-1 w-4 h-4 text-gray-400" />)}
+                                </label>
+                            </span>))}
+                        </div>
+                        <div className="flex flex-row justify-center gap-x-1">
+                            <button onClick={() => {
+                                const configCopy = BricksCodeParser.activeLabelMapping(jsonCopy(config), props.executionTypeFilter, props.labelingTaskId, props.forIde, labelingTasks);
+                                dispatch(setBricksIntegrator(configCopy));
+                            }}
+                                className="cursor-pointer bg-white text-gray-700 text-xs font-semibold whitespace-nowrap px-4 py-2 rounded-md border border-gray-300 hover:bg-gray-50 focus:outline-none">
+                                Map labels
+                            </button>
+                            {BricksCodeParser.expected.canCreateTask && <button onClick={() => createNewLabelingTask(config.api.data.data.attributes.name, BricksCodeParser.expected.expectedTaskLabels.map(x => x.label))}
+                                className="cursor-pointer bg-white text-gray-700 text-xs font-semibold whitespace-nowrap px-4 py-2 rounded-md border border-gray-300 hover:bg-gray-50 focus:outline-none">
+                                Create new task
+                            </button>}
+                            <button onClick={addMissingLabelsToTask}
+                                className="cursor-pointer bg-white text-gray-700 text-xs font-semibold whitespace-nowrap px-4 py-2 rounded-md border border-gray-300 hover:bg-gray-50 focus:outline-none">
+                                Add missing labels ({BricksCodeParser.expected.labelsToBeCreated}x)
+                            </button>
+                        </div>
+                    </div>
+                ) : (<></>)}
+            </>}
+
             {BricksCodeParser.globalComments && BricksCodeParser.globalComments.length > 0 && <div className="bg-blue-100 border border-blue-400 text-blue-700 px-4 py-3 rounded relative flex flex-col">
                 <div className="self-center flex flex-row flex-nowrap items-center -mt-1 mb-1">
                     <strong className="font-bold">Information</strong>
@@ -90,7 +159,26 @@ export default function PageIntegration(props: PageIntegrationProps) {
                             <IconInfoCircle className="w-6 h-6 " stroke={2} />
                         </Tooltip>}
                     </div>))}
-                    {/* TODO [ngIf]="codeParser.expected.labelMappingActive" */}
+                    {BricksCodeParser.expected.labelMappingActive && <Fragment>
+                        <label className="font-bold col-start-1">Bricks label</label>
+                        <label className="font-bold">Refinery label</label>
+                        {BricksCodeParser.expected.expectedTaskLabels.map((l, index) => (<div key={index} className="contents">
+                            <label className="text-sm col-start-1">{l.label}</label>
+                            <Dropdown options={BricksCodeParser.expected.availableLabels} buttonName={l.mappedLabel ? l.mappedLabel : 'Ignore'}
+                                selectedOption={(option: string) => {
+                                    BricksCodeParser.expected.expectedTaskLabels[index].mappedLabel = option;
+                                    const configCopy = BricksCodeParser.replaceVariables(jsonCopy(config), props.executionTypeFilter, null, props.forIde);
+                                    dispatch(setBricksIntegrator(configCopy));
+                                }} />
+                            {BricksCodeParser.expected.expectedTaskLabels[index].mappedLabel && <Tooltip content={TOOLTIPS_DICT.GENERAL.CLEAR}>
+                                <IconTrash strokeWidth={1.5} onClick={() => {
+                                    BricksCodeParser.expected.expectedTaskLabels[index].mappedLabel = null;
+                                    const configCopy = BricksCodeParser.replaceVariables(jsonCopy(config), props.executionTypeFilter, null, props.forIde);
+                                    dispatch(setBricksIntegrator(configCopy));
+                                }} />
+                            </Tooltip>}
+                        </div>))}
+                    </Fragment>}
                 </div>)}
             <div className="w-full">
                 <div className="flex flex-row justify-between cursor-pointer items-center" onClick={() => {

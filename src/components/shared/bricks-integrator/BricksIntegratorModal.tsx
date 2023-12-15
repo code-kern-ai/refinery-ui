@@ -124,6 +124,7 @@ export default function BricksIntegratorModal(props: BricksIntegratorModalProps)
                 functionType={props.functionType}
                 executionTypeFilter={props.executionTypeFilter}
                 forIde={props.forIde}
+                labelingTaskId={props.labelingTaskId}
                 nameLookups={props.nameLookups}
                 checkCanAccept={(configCopy) => props.checkCanAccept(configCopy)}
                 selectDifferentTask={(taskId: string) => props.selectDifferentTask(taskId)} />

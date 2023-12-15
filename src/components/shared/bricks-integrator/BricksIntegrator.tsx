@@ -381,6 +381,7 @@ export default function BricksIntegrator(_props: BricksIntegratorProps) {
                 functionType={props.functionType}
                 nameLookups={props.nameLookups}
                 forIde={forIde}
+                labelingTaskId={props.labelingTaskId}
                 requestSearch={requestSearch}
                 switchToPage={(page: IntegratorPage) => switchToPage(page)}
                 requestSearchDebounce={(value: string) => requestSearchDebounce(value)}

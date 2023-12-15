@@ -20,7 +20,8 @@ export const TOOLTIPS_DICT = {
         'OPEN_ALL': 'Open all',
         'OPEN_BRICKS_INTEGRATOR': 'Open the Bricks integrator',
         'COPIED': 'Copied',
-        'OPTIONAL': 'Optional'
+        'OPTIONAL': 'Optional',
+        'CLEAR': 'Clear',
     },
     [CurrentPage.PROJECT_SETTINGS]: {
         'ADD_NEW_ATTRIBUTE': 'Add a new attribute',

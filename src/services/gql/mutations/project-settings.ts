@@ -153,3 +153,12 @@ mutation($projectId: ID!, $attributeId: ID!){
   } 
 }
 `;
+
+export const CREATE_TASK_AND_LABELS = gql`
+mutation ($projectId: ID!, $labelingTaskName: String!,$labelingTaskType:String!, $labelingTaskTargetId: ID,$labels:[String]) {
+  createTaskAndLabels(projectId: $projectId, labelingTaskName: $labelingTaskName,labelingTaskType:$labelingTaskType, labelingTaskTargetId: $labelingTaskTargetId,labels:$labels) {
+    ok
+    taskId
+  }
+}
+`;

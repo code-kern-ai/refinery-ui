@@ -31,10 +31,10 @@ export class BricksCodeParser {
         if (this.integratorInputRef) this.baseCode = config.api.data.data.attributes.sourceCodeRefinery;
         else this.baseCode = config.api.data.data.attributes.sourceCode;
 
-        this.globalComments = this.collectGlobalComment();
+        this.globalComments = this.collectGlobalComment(labelingTaskId, labelingTasks);
         this.functionName = this.getFunctionName(executionTypeFilter);
         this.checkFunctionNameAndSet(this.functionName, config, executionTypeFilter, nameLookups, labelingTaskId, forIde);
-        config = this.checkVariableLines(config, executionTypeFilter, labelingTaskId, forIde);
+        config = this.checkVariableLines(config, executionTypeFilter, labelingTaskId, forIde, labelingTasks);
         if (labelingTaskId) {
             this.labelingTaskName = BricksCodeParser.getLabelingTaskAttribute(labelingTaskId, 'name', labelingTasks);
         }
@@ -42,7 +42,7 @@ export class BricksCodeParser {
         return config;
     }
 
-    private static checkVariableLines(config: BricksIntegratorConfig, executionTypeFilter: string, labelingTaskId: string, forIde: string | boolean = false) {
+    private static checkVariableLines(config: BricksIntegratorConfig, executionTypeFilter: string, labelingTaskId: string, forIde: string | boolean = false, labelingTasks: any[] = null) {
         const variableLines = this.collectVariableLinesFromCode(config);
 
         if (variableLines.length == 0) {
@@ -51,7 +51,7 @@ export class BricksCodeParser {
         }
         try {
             this.variables = this.parseVariableLines(variableLines);
-            this.checkAndMatchVariables(forIde);
+            this.checkAndMatchVariables(forIde, labelingTaskId, labelingTasks);
             config = this.replaceVariables(config, executionTypeFilter, labelingTaskId, forIde);
         } catch (error: any) {
             this.errors.push(error);
@@ -60,36 +60,36 @@ export class BricksCodeParser {
         return config;
     }
 
-    private static checkAndMatchVariables(forIde: string | boolean = false) {
+    private static checkAndMatchVariables(forIde: string | boolean = false, labelingTaskId: string = null, labelingTasks: any[] = null) {
         if (!this.integratorInputRef) return;
 
         if (this.variables.length != Object.keys(this.integratorInputRef.variables).length) {
             this.errors.push("different number of variable lines in code and integrator input detected");
         }
         if (this.integratorInputRef.outputs) {
-            // if (this.base.labelingTaskId) {
+            if (labelingTaskId) {
 
-            //     this.expected.expectedTaskLabels = [];
-            //     const existingLabels = this.base.dataRequestor.getLabels(this.base.labelingTaskId);
-            //     for (const label of this.integratorInputRef.outputs) {
-            //         const existingLabel = existingLabels.find(x => x.name == label);
-            //         this.expected.expectedTaskLabels.push({
-            //             label: label,
-            //             exists: !!existingLabel,
-            //             backgroundColor: 'bg-' + (existingLabel ? existingLabel.color : 'gray') + '-100',
-            //             textColor: 'text-' + (existingLabel ? existingLabel.color : 'gray') + '-700',
-            //             borderColor: 'border-' + (existingLabel ? existingLabel.color : 'gray') + '-400'
-            //         });
-            //     }
-            //     this.expected.expectedTaskLabels.sort((a, b) => (-a.exists) - (-b.exists) || a.label.localeCompare(b.label));
-            //     this.expected.labelsToBeCreated = this.expected.expectedTaskLabels.filter(x => !x.exists).length;
-            //     this.expected.labelWarning = !this.expected.expectedTaskLabels[this.expected.expectedTaskLabels.length - 1].exists;
-            //     this.expected.canCreateTask = this.base.dataRequestor.getLabelingTaskAttribute(this.base.labelingTaskId, 'taskType') == 'MULTICLASS_CLASSIFICATION';
-            // } else {
-            //     if (!this.globalComments.some(x => x.startsWith("Will return"))) {
-            //         this.globalComments.push("Will return: [\"" + this.integratorInputRef.outputs.join("\", \"") + "\"]");
-            //     }
-            // }
+                this.expected.expectedTaskLabels = [];
+                const existingLabels = BricksCodeParser.getLabels(labelingTaskId, labelingTasks);
+                for (const label of this.integratorInputRef.outputs) {
+                    const existingLabel = existingLabels.find(x => x.name == label);
+                    this.expected.expectedTaskLabels.push({
+                        label: label,
+                        exists: !!existingLabel,
+                        backgroundColor: 'bg-' + (existingLabel ? existingLabel.color : 'gray') + '-100',
+                        textColor: 'text-' + (existingLabel ? existingLabel.color : 'gray') + '-700',
+                        borderColor: 'border-' + (existingLabel ? existingLabel.color : 'gray') + '-400'
+                    });
+                }
+                this.expected.expectedTaskLabels.sort((a, b) => (-a.exists) - (-b.exists) || a.label.localeCompare(b.label));
+                this.expected.labelsToBeCreated = this.expected.expectedTaskLabels.filter(x => !x.exists).length;
+                this.expected.labelWarning = !this.expected.expectedTaskLabels[this.expected.expectedTaskLabels.length - 1].exists;
+                this.expected.canCreateTask = BricksCodeParser.getLabelingTaskAttribute(labelingTaskId, 'taskType') == 'MULTICLASS_CLASSIFICATION';
+            } else {
+                if (!this.globalComments.some(x => x.startsWith("Will return"))) {
+                    this.globalComments.push("Will return: [\"" + this.integratorInputRef.outputs.join("\", \"") + "\"]");
+                }
+            }
         }
 
         for (const variable of this.variables) {
@@ -229,7 +229,7 @@ export class BricksCodeParser {
     }
 
 
-    private static parseExpectedLabelsComment(comment: string, labelingTaskId: string = null): string {
+    private static parseExpectedLabelsComment(comment: string, labelingTaskId: string = null, labelingTasks: any[] = null): string {
         if (!comment) return "";
         const labelStringMatch = comment.match(/\[(.*?)\]/);
         if (labelingTaskId) {
@@ -237,22 +237,22 @@ export class BricksCodeParser {
                 const labels = labelStringMatch[1].split(",").map(x => x.replace(/\"/g, "").trim());
                 if (labels && labels.length > 0) {
 
-                    // this.expected.expectedTaskLabels = [];
-                    // const existingLabels = this.base.dataRequestor.getLabels(this.base.labelingTaskId);
-                    // for (const label of labels) {
-                    //     const existingLabel = existingLabels.find(x => x.name == label);
-                    //     this.expected.expectedTaskLabels.push({
-                    //         label: label,
-                    //         exists: !!existingLabel,
-                    //         backgroundColor: 'bg-' + (existingLabel ? existingLabel.color : 'gray') + '-100',
-                    //         textColor: 'text-' + (existingLabel ? existingLabel.color : 'gray') + '-700',
-                    //         borderColor: 'border-' + (existingLabel ? existingLabel.color : 'gray') + '-400'
-                    //     });
-                    // }
-                    // this.expected.expectedTaskLabels.sort((a, b) => (-a.exists) - (-b.exists) || a.label.localeCompare(b.label));
-                    // this.expected.labelsToBeCreated = this.expected.expectedTaskLabels.filter(x => !x.exists).length;
-                    // this.expected.labelWarning = !this.expected.expectedTaskLabels[this.expected.expectedTaskLabels.length - 1].exists;
-                    // this.expected.canCreateTask = this.base.dataRequestor.getLabelingTaskAttribute(this.base.labelingTaskId, 'taskType') == 'MULTICLASS_CLASSIFICATION';
+                    this.expected.expectedTaskLabels = [];
+                    const existingLabels = BricksCodeParser.getLabels(labelingTaskId, labelingTasks);
+                    for (const label of labels) {
+                        const existingLabel = existingLabels.find(x => x.name == label);
+                        this.expected.expectedTaskLabels.push({
+                            label: label,
+                            exists: !!existingLabel,
+                            backgroundColor: 'bg-' + (existingLabel ? existingLabel.color : 'gray') + '-100',
+                            textColor: 'text-' + (existingLabel ? existingLabel.color : 'gray') + '-700',
+                            borderColor: 'border-' + (existingLabel ? existingLabel.color : 'gray') + '-400'
+                        });
+                    }
+                    this.expected.expectedTaskLabels.sort((a, b) => (-a.exists) - (-b.exists) || a.label.localeCompare(b.label));
+                    this.expected.labelsToBeCreated = this.expected.expectedTaskLabels.filter(x => !x.exists).length;
+                    this.expected.labelWarning = !this.expected.expectedTaskLabels[this.expected.expectedTaskLabels.length - 1].exists;
+                    this.expected.canCreateTask = BricksCodeParser.getLabelingTaskAttribute(labelingTaskId, 'taskType') == 'MULTICLASS_CLASSIFICATION';
                 }
                 return ""; //task creation logic handled differently
             }
@@ -264,13 +264,14 @@ export class BricksCodeParser {
         return comment;
     }
 
-    public static activeLabelMapping(config: BricksIntegratorConfig, executionTypeFilter: string, labelingTaskId: string, forIde: boolean) {
-        // this.expected.availableLabels = this.base.dataRequestor.getLabels(this.base.labelingTaskId);
+    public static activeLabelMapping(config: BricksIntegratorConfig, executionTypeFilter: string, labelingTaskId: string, forIde: boolean | string, labelingTasks: any[] = null) {
+        this.expected.availableLabels = BricksCodeParser.getLabels(labelingTaskId, labelingTasks);
         this.expected.labelMappingActive = true;
         for (const label of this.expected.expectedTaskLabels) {
             label.mappedLabel = label.exists ? label.label : null;
         }
-        this.replaceVariables(config, executionTypeFilter, labelingTaskId, forIde);
+        config = this.replaceVariables(config, executionTypeFilter, labelingTaskId, forIde);
+        return config;
     }
 
     private static extendCodeForLabelMapping(config: BricksIntegratorConfig, executionTypeFilter: string) {
@@ -369,7 +370,7 @@ export class BricksCodeParser {
         config.preparedCode += printReturn;
     }
 
-    private static collectGlobalComment(): string[] {
+    private static collectGlobalComment(labelingTaskId: string = null, labelingTasks: any[] = null): string[] {
         const lines = this.baseCode.split("\n");
         const commentLines = [];
         for (let i = 0; i < lines.length; i++) {
@@ -378,7 +379,7 @@ export class BricksCodeParser {
             if (line.startsWith("#")) {
                 let tmpLine = line.replace("#", "").trim();
                 if (isCommentTrue(tmpLine, BricksVariableComment.TASK_REQUIRED_LABELS)) {
-                    tmpLine = this.parseExpectedLabelsComment(tmpLine);
+                    tmpLine = this.parseExpectedLabelsComment(tmpLine, labelingTaskId, labelingTasks);
                 }
                 const idx = tmpLine.indexOf("[");
                 if (idx > 0) {

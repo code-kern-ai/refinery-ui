@@ -214,6 +214,7 @@ export type BricksIntegratorModalProps = {
     functionType: string,
     nameLookups?: string[],
     forIde?: string | boolean,
+    labelingTaskId?: string,
     requestSearch: () => void,
     switchToPage: (page: IntegratorPage) => void,
     requestSearchDebounce: (value: string) => void,
@@ -246,6 +247,7 @@ export type PageIntegrationProps = {
     executionTypeFilter: string,
     nameLookups: string[],
     forIde?: string | boolean,
+    labelingTaskId?: string,
     checkCanAccept: (configCopy) => void,
     selectDifferentTask: (taskId: string) => void,
 }
