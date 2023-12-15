@@ -1,7 +1,7 @@
 import { useLazyQuery } from "@apollo/client";
 import Header from "../header/Header";
 import Sidebar from "../sidebar/Sidebar";
-import { NOTIFICATIONS_BY_USER } from "@/src/services/gql/queries/projects";
+import { GET_ALL_ACTIVE_ADMIN_MESSAGES, NOTIFICATIONS_BY_USER } from "@/src/services/gql/queries/projects";
 import { Fragment, useCallback, useEffect, useState } from "react";
 import { NotificationLevel } from "@/src/types/shared/notification-center";
 import { IconAlertTriangleFilled, IconCircleCheckFilled, IconInfoCircleFilled } from "@tabler/icons-react";
@@ -13,6 +13,9 @@ import { interval, timer } from "rxjs";
 import { setNotificationId } from "@/src/reduxStore/states/tmp";
 import { unsubscribeWSOnDestroy } from "@/src/services/base/web-sockets/web-sockets-helper";
 import { useRouter } from "next/router";
+import AdminMessages from "../admin-messages/AdminMessages";
+import { AdminMessage } from "@/src/types/shared/admin-messages";
+import { postProcessAdminMessages } from "@/src/util/shared/admin-messages-helper";
 
 export default function Layout({ children }) {
     const dispatch = useDispatch();
@@ -23,13 +26,16 @@ export default function Layout({ children }) {
     const [notifications, setNotifications] = useState([]);
     const [refetchTimer, setRefetchTimer] = useState(null);
     const [deletionTimer, setDeletionTimer] = useState(null);
+    const [activeAdminMessages, setActiveAdminMessages] = useState<AdminMessage[]>([]);
 
     const [refetchNotificationsByUser] = useLazyQuery(NOTIFICATIONS_BY_USER, { fetchPolicy: 'network-only' });
+    const [refetchAdminMessages] = useLazyQuery(GET_ALL_ACTIVE_ADMIN_MESSAGES, { fetchPolicy: 'network-only' });
 
     useEffect(unsubscribeWSOnDestroy(router, [CurrentPage.NOTIFICATION_CENTER]), []);
 
     useEffect(() => {
         refetchNotificationsAndProcess();
+        refetchAdminMessagesAndProcess();
         WebSocketsService.subscribeToNotification(CurrentPage.NOTIFICATION_CENTER, {
             whitelist: ['notification_created', 'project_deleted', 'config_updated', 'admin_message'],
             func: handleWebsocketNotification
@@ -43,6 +49,12 @@ export default function Layout({ children }) {
     function refetchNotificationsAndProcess() {
         refetchNotificationsByUser().then((res) => {
             setNotifications(res['data']['notificationsByUserId']);
+        });
+    }
+
+    function refetchAdminMessagesAndProcess() {
+        refetchAdminMessages().then((res) => {
+            setActiveAdminMessages(postProcessAdminMessages(res['data']['allActiveAdminMessages']));
         });
     }
 
@@ -79,6 +91,8 @@ export default function Layout({ children }) {
                 setRefetchTimer(null);
             });
             setRefetchTimer(timerSaved);
+        } else if (msgParts[1] == 'admin_message') {
+            refetchAdminMessagesAndProcess();
         }
     }, [user?.id]);
 
@@ -149,6 +163,9 @@ export default function Layout({ children }) {
                     </div>}
                 </Fragment>))}
             </div>
+            <AdminMessages
+                adminMessages={activeAdminMessages}
+                setActiveAdminMessages={(activeAdminMessages) => setActiveAdminMessages(activeAdminMessages)} />
         </>
     )
 }

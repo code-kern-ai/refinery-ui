@@ -114,3 +114,14 @@ query ($requested: JSONString!) {
   getAllComments(requested: $requested)
 }
 `;
+
+export const GET_ALL_ACTIVE_ADMIN_MESSAGES = gql`
+query {
+  allActiveAdminMessages {
+    id
+    text
+    level
+    archiveDate
+    createdAt
+  }
+}`;
