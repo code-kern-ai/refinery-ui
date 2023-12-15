@@ -11,9 +11,13 @@ import { useDispatch, useSelector } from "react-redux";
 import { selectUser } from "@/src/reduxStore/states/general";
 import { interval, timer } from "rxjs";
 import { setNotificationId } from "@/src/reduxStore/states/tmp";
+import { unsubscribeWSOnDestroy } from "@/src/services/base/web-sockets/web-sockets-helper";
+import { useRouter } from "next/router";
 
 export default function Layout({ children }) {
     const dispatch = useDispatch();
+    const router = useRouter();
+
     const user = useSelector(selectUser);
 
     const [notifications, setNotifications] = useState([]);
@@ -21,6 +25,8 @@ export default function Layout({ children }) {
     const [deletionTimer, setDeletionTimer] = useState(null);
 
     const [refetchNotificationsByUser] = useLazyQuery(NOTIFICATIONS_BY_USER, { fetchPolicy: 'network-only' });
+
+    useEffect(unsubscribeWSOnDestroy(router, [CurrentPage.NOTIFICATION_CENTER]), []);
 
     useEffect(() => {
         refetchNotificationsAndProcess();

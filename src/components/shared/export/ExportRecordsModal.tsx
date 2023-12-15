@@ -26,9 +26,12 @@ import { WebSocketsService } from "@/src/services/base/web-sockets/WebSocketsSer
 import { CurrentPage } from "@/src/types/shared/general";
 import { selectUser } from "@/src/reduxStore/states/general";
 import CryptedField from "../crypted-field/CryptedField";
+import { unsubscribeWSOnDestroy } from "@/src/services/base/web-sockets/web-sockets-helper";
+import { useRouter } from "next/router";
 
 export default function ExportRecordsModal(props: ExportProps) {
     const dispatch = useDispatch();
+    const router = useRouter();
 
     const projectId = useSelector(selectProjectId);
     const user = useSelector(selectUser)
@@ -42,7 +45,9 @@ export default function ExportRecordsModal(props: ExportProps) {
 
     const [refetchLastRecordsExportCredentials] = useLazyQuery(LAST_RECORD_EXPORT_CREDENTIALS, { fetchPolicy: "no-cache" });
     const [refetchRecordExportFromData] = useLazyQuery(GET_RECORD_EXPORT_FORM_DATA, { fetchPolicy: "no-cache" });
-    const [refetchPrepareRecordExport] = useLazyQuery(PREPARE_RECORD_EXPORT, { fetchPolicy: "no-cache" })
+    const [refetchPrepareRecordExport] = useLazyQuery(PREPARE_RECORD_EXPORT, { fetchPolicy: "no-cache" });
+
+    useEffect(unsubscribeWSOnDestroy(router, [CurrentPage.EXPORT]), []);
 
     useEffect(() => {
         if (!modal || !modal.open) return;

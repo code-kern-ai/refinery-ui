@@ -29,6 +29,7 @@ import { postProcessLabelingTasks, postProcessLabelingTasksSchema } from "@/src/
 import { CommentDataManager } from "@/src/util/classes/comments";
 import { REQUEST_COMMENTS } from "@/src/services/gql/queries/projects";
 import { CommentType } from "@/src/types/shared/comments";
+import { unsubscribeWSOnDestroy } from "@/src/services/base/web-sockets/web-sockets-helper";
 
 const LOCAL_STORAGE_KEY = 'labelingSuiteSettings';
 
@@ -52,6 +53,8 @@ export default function LabelingMainComponent() {
     const [refetchAttributes] = useLazyQuery(GET_ATTRIBUTES_BY_PROJECT_ID, { fetchPolicy: "network-only" });
     const [refetchLabelingTasksByProjectId] = useLazyQuery(GET_LABELING_TASKS_BY_PROJECT_ID, { fetchPolicy: "network-only" });
     const [refetchComments] = useLazyQuery(REQUEST_COMMENTS, { fetchPolicy: "no-cache" });
+
+    useEffect(unsubscribeWSOnDestroy(router, [CurrentPage.LABELING]), []);
 
 
     useEffect(() => {

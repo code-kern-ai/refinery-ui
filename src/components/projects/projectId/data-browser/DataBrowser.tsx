@@ -19,11 +19,15 @@ import { CurrentPage } from "@/src/types/shared/general";
 import { CommentType } from "@/src/types/shared/comments";
 import { CommentDataManager } from "@/src/util/classes/comments";
 import { REQUEST_COMMENTS } from "@/src/services/gql/queries/projects";
+import { unsubscribeWSOnDestroy } from "@/src/services/base/web-sockets/web-sockets-helper";
+import { useRouter } from "next/router";
 
 const SEARCH_REQUEST = { offset: 0, limit: 20 };
 
 export default function DataBrowser() {
     const dispatch = useDispatch();
+    const router = useRouter();
+
     const projectId = useSelector(selectProjectId);
     const users = useSelector(selectAllUsers);
     const labelingTasks = useSelector(selectLabelingTasksAll);
@@ -39,6 +43,8 @@ export default function DataBrowser() {
     const [refetchEmbeddings] = useLazyQuery(GET_EMBEDDING_SCHEMA_BY_PROJECT_ID, { fetchPolicy: "network-only" });
     const [refetchRecordComments] = useLazyQuery(GET_RECORD_COMMENTS, { fetchPolicy: "no-cache" });
     const [refetchComments] = useLazyQuery(REQUEST_COMMENTS, { fetchPolicy: "no-cache" });
+
+    useEffect(unsubscribeWSOnDestroy(router, [CurrentPage.DATA_BROWSER]), []);
 
     useEffect(() => {
         if (!projectId) return;

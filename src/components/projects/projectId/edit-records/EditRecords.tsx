@@ -13,6 +13,7 @@ import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
 import EditField from "./EditField";
 import { WebSocketsService } from "@/src/services/base/web-sockets/WebSocketsService";
 import { useRouter } from "next/router";
+import { unsubscribeWSOnDestroy } from "@/src/services/base/web-sockets/web-sockets-helper";
 
 
 export default function EditRecords() {
@@ -23,6 +24,8 @@ export default function EditRecords() {
 
     const [erdData, setErdData] = useState(createDefaultEditRecordComponentData());
     const [alertLastVisible, setAlertLastVisible] = useState<number>(null);
+
+    useEffect(unsubscribeWSOnDestroy(router, [CurrentPage.EDIT_RECORDS]), []);
 
     useEffect(() => {
         if (!projectId) return;

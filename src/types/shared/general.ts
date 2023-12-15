@@ -25,6 +25,7 @@ export enum CurrentPage {
     NOTIFICATION_CENTER = "NOTIFICATION_CENTER",
     EXPORT = "EXPORT",
     COMMENTS = "COMMENTS",
+    BRICKS_INTEGRATOR = "BRICKS_INTEGRATOR",
 }
 
 export type User = {

@@ -11,6 +11,7 @@ import ModalUpload from "../shared/upload/ModalUpload";
 import SampleProjectsDropdown from "./SampleProjectsDropdown";
 import { WebSocketsService } from "@/src/services/base/web-sockets/WebSocketsService";
 import { CurrentPage } from "@/src/types/shared/general";
+import { unsubscribeWSOnDestroy } from "@/src/services/base/web-sockets/web-sockets-helper";
 
 const BASE_OPTIONS = { reloadOnFinish: false, deleteProjectOnFail: true, closeModalOnClick: true, isModal: true, navigateToProject: true, showBadPasswordMsg: null };
 
@@ -22,6 +23,8 @@ export default function ButtonsContainer() {
 
     const [uploadOptions, setUploadOptions] = useState<UploadOptions>(BASE_OPTIONS);
     const [showBadPasswordMsg, setShowBadPasswordMsg] = useState(false);
+
+    useEffect(unsubscribeWSOnDestroy(router, [CurrentPage.PROJECTS]), []);
 
     useEffect(() => {
         WebSocketsService.subscribeToNotification(CurrentPage.PROJECTS, {

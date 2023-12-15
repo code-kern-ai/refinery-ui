@@ -15,9 +15,12 @@ import { commentRequestToKey } from "@/src/util/shared/comments-helper";
 import { REQUEST_COMMENTS } from "@/src/services/gql/queries/projects";
 import { useLazyQuery } from "@apollo/client";
 import { selectProjectId } from "@/src/reduxStore/states/project";
+import { unsubscribeWSOnDestroy } from "@/src/services/base/web-sockets/web-sockets-helper";
+import { useRouter } from "next/router";
 
 export default function Comments() {
     const dispatch = useDispatch();
+    const router = useRouter();
 
     const projectId = useSelector(selectProjectId);
     const commentsSideBar = useSelector(selectModal(ModalEnum.COMMENTS_SECTION));
@@ -25,6 +28,8 @@ export default function Comments() {
     const allUsers = useSelector(selectAllUsers);
 
     const [refetchComments] = useLazyQuery(REQUEST_COMMENTS, { fetchPolicy: "no-cache" });
+
+    useEffect(unsubscribeWSOnDestroy(router, [CurrentPage.COMMENTS]), []);
 
     useEffect(() => {
         WebSocketsService.subscribeToNotification(CurrentPage.COMMENTS, {

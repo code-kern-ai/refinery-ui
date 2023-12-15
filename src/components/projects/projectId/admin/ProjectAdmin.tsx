@@ -16,6 +16,7 @@ import { CurrentPage } from "@/src/types/shared/general";
 import { WebSocketsService } from "@/src/services/base/web-sockets/WebSocketsService";
 import { useRouter } from "next/router";
 import { selectIsAdmin } from "@/src/reduxStore/states/general";
+import { unsubscribeWSOnDestroy } from "@/src/services/base/web-sockets/web-sockets-helper";
 
 export default function ProjectAdmin() {
     const router = useRouter();
@@ -27,6 +28,8 @@ export default function ProjectAdmin() {
     const [accessTokens, setAccessTokens] = useState<PersonalAccessToken[]>([]);
 
     const [refetchAccessTokens] = useLazyQuery(GET_ALL_PERSONAL_ACCESS_TOKENS, { fetchPolicy: "network-only" });
+
+    useEffect(unsubscribeWSOnDestroy(router, [CurrentPage.ADMIN_PAGE]), []);
 
     useEffect(() => {
         if (!projectId) return;

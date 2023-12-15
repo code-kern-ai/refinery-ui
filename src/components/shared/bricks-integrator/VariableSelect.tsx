@@ -1,9 +1,12 @@
 import { selectBricksIntegratorAttributes, selectBricksIntegratorEmbeddings, selectBricksIntegratorLabelingTasks, selectBricksIntegratorLabels, selectBricksIntegratorLanguages, selectBricksIntegratorLookupLists, setAttributesBricksIntegrator, setEmbeddingsBricksIntegrator, setLabelingTasksBricksIntegrator, setLabelsBricksIntegrator, setLanguagesBricksIntegrator, setLookupListsBricksIntegrator } from "@/src/reduxStore/states/general";
 import { selectProjectId } from "@/src/reduxStore/states/project";
+import { WebSocketsService } from "@/src/services/base/web-sockets/WebSocketsService";
+import { unsubscribeWSOnDestroy } from "@/src/services/base/web-sockets/web-sockets-helper";
 import { LOOKUP_LISTS_BY_PROJECT_ID } from "@/src/services/gql/queries/lookup-lists";
 import { GET_ATTRIBUTES_BY_PROJECT_ID, GET_EMBEDDING_SCHEMA_BY_PROJECT_ID, GET_LABELING_TASKS_BY_PROJECT_ID } from "@/src/services/gql/queries/project-setting";
 import { LabelingTaskTarget, LabelingTaskTaskType } from "@/src/types/components/projects/projectId/settings/labeling-tasks";
 import { BricksVariableType, VariableSelectProps } from "@/src/types/shared/bricks-integrator";
+import { CurrentPage } from "@/src/types/shared/general";
 import { BricksCodeParser } from "@/src/util/classes/bricks-integrator/bricks-integrator";
 import { BricksVariableComment, isCommentTrue } from "@/src/util/classes/bricks-integrator/comment-lookup";
 import { postProcessingAttributes } from "@/src/util/components/projects/projectId/settings/data-schema-helper";
@@ -12,11 +15,13 @@ import { getIsoCodes } from "@/src/util/shared/bricks-integrator-helper";
 import Dropdown from "@/submodules/react-components/components/Dropdown";
 import { useLazyQuery } from "@apollo/client";
 import { IconPlus, IconTrash } from "@tabler/icons-react";
-import { useEffect } from "react";
+import { useRouter } from "next/router";
+import { use, useCallback, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
 export default function VariableSelect(props: VariableSelectProps) {
     const dispatch = useDispatch();
+    const router = useRouter();
 
     const projectId = useSelector(selectProjectId);
     const attributes = useSelector(selectBricksIntegratorAttributes);
@@ -30,6 +35,18 @@ export default function VariableSelect(props: VariableSelectProps) {
     const [refetchEmbeddings] = useLazyQuery(GET_EMBEDDING_SCHEMA_BY_PROJECT_ID, { fetchPolicy: "no-cache" });
     const [refetchLookupLists] = useLazyQuery(LOOKUP_LISTS_BY_PROJECT_ID);
     const [refetchLabelingTasksByProjectId] = useLazyQuery(GET_LABELING_TASKS_BY_PROJECT_ID, { fetchPolicy: "network-only" });
+
+    useEffect(unsubscribeWSOnDestroy(router, [CurrentPage.BRICKS_INTEGRATOR]), []);
+
+    useEffect(() => {
+        if (!projectId) return;
+
+        WebSocketsService.subscribeToNotification(CurrentPage.BRICKS_INTEGRATOR, {
+            projectId: projectId,
+            whitelist: ['attributes_updated', 'calculate_attribute', 'label_created', 'label_deleted', 'labeling_task_deleted', 'labeling_task_updated', 'labeling_task_created', 'embedding', 'embedding_deleted', 'knowledge_base_deleted', 'knowledge_base_created'],
+            func: handleWebsocketNotification
+        });
+    }, [projectId]);
 
     useEffect(() => {
         if (!props.variable) return;
@@ -164,6 +181,25 @@ export default function VariableSelect(props: VariableSelectProps) {
         props.sendOption();
     }
 
+    const handleWebsocketNotification = useCallback((msgParts: string[]) => {
+        if (msgParts[1] == 'attributes_updated' || (msgParts[1] == 'calculate_attribute' && msgParts[2] == 'created')) {
+            refetchAttributesAndProcess();
+        } else if (['label_created', 'label_deleted', 'labeling_task_deleted', 'labeling_task_updated', 'labeling_task_created'].includes(msgParts[1])) {
+            refetchLabelingTasksAndProcess(null);
+        } else if (msgParts[1] == 'embedding_deleted') {
+            refetchEmbeddingsAndProcess();
+        } else if (msgParts[1] == 'embedding' && msgParts[3] == "state" && msgParts[4] == "FINISHED") {
+            refetchEmbeddingsAndProcess();
+        } else if (['knowledge_base_deleted', 'knowledge_base_created'].includes(msgParts[1])) {
+            refetchLookupListsAndProcess();
+        }
+    }, [projectId]);
+
+    useEffect(() => {
+        if (!projectId) return;
+        WebSocketsService.updateFunctionPointer(projectId, CurrentPage.BRICKS_INTEGRATOR, handleWebsocketNotification)
+    }, [handleWebsocketNotification, projectId]);
+
     return (<>
         {props.variable && props.variable.values.map((v, index) => (<div key={index} className="col-start-2 flex flex-row flex-nowrap items-center gap-x-2">
             {props.variable.type == BricksVariableType.ATTRIBUTE &&
@@ -230,17 +266,17 @@ export default function VariableSelect(props: VariableSelectProps) {
                     className="h-9 w-full border-gray-300 rounded-md leading-8 placeholder-italic border text-gray-900 pl-4 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100" />}
 
             {props.variable.type == BricksVariableType.GENERIC_STRING &&
-                <input type="text" value={props.variable.values[index]} id={'GENERIC_STRING_' + props.index + '_' + index}
+                <input type="text" value={props.variable.values[index] ?? ''} id={'GENERIC_STRING_' + props.index + '_' + index}
                     onChange={(e) => changeInputValue(index, e.target.value)} style={{ minWidth: '10rem', maxWidth: '25rem' }}
                     className={`h-9 border-gray-300 rounded-md leading-8 placeholder-italic border text-gray-900 pl-4 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100 ${props.variable.values[index]?.length > 20 ? 'w-60' : 'w-50'}`} />}
 
             {props.variable.type == BricksVariableType.GENERIC_INT &&
-                <input type="number" step="1" value={props.variable.values[index]} id={'GENERIC_INT_' + props.index + '_' + index}
+                <input type="number" step="1" value={props.variable.values[index] ?? ''} id={'GENERIC_INT_' + props.index + '_' + index}
                     onChange={(e) => changeInputValue(index, e.target.value)}
                     className={`h-9 w-20 border-gray-300 rounded-md leading-8 placeholder-italic border text-gray-900 pl-4 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100`} />}
 
             {props.variable.type == BricksVariableType.GENERIC_FLOAT &&
-                <input type="number" step="0.01" value={props.variable.values[index]} id={'GENERIC_FLOAT_' + props.index + '_' + index}
+                <input type="number" step="0.01" value={props.variable.values[index] ?? ''} id={'GENERIC_FLOAT_' + props.index + '_' + index}
                     onChange={(e) => changeInputValue(index, e.target.value)}
                     className={`h-9 w-20 border-gray-300 rounded-md leading-8 placeholder-italic border text-gray-900 pl-4 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100`} />}
 
