@@ -6,7 +6,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { ModalEnum } from "@/src/types/shared/modal";
 import { selectModal, setModalStates } from "@/src/reduxStore/states/modal";
 import { useCallback, useEffect } from "react";
-import { selectAllUsers, selectComments, setComments } from "@/src/reduxStore/states/general";
+import { selectAllUsers, selectDisplayIconComments, setComments } from "@/src/reduxStore/states/general";
 import { WebSocketsService } from "@/src/services/base/web-sockets/WebSocketsService";
 import { CurrentPage } from "@/src/types/shared/general";
 import { CommentDataManager } from "@/src/util/classes/comments";
@@ -24,8 +24,8 @@ export default function Comments() {
 
     const projectId = useSelector(selectProjectId);
     const commentsSideBar = useSelector(selectModal(ModalEnum.COMMENTS_SECTION));
-    const comments = useSelector(selectComments);
     const allUsers = useSelector(selectAllUsers);
+    const displayComments = useSelector(selectDisplayIconComments);
 
     const [refetchComments] = useLazyQuery(REQUEST_COMMENTS, { fetchPolicy: "no-cache" });
 
@@ -123,7 +123,7 @@ export default function Comments() {
     }, [commentsSideBar]);
 
     return (<>
-        {comments && <Tooltip content={TOOLTIPS_DICT.GENERAL.COMMENTS} color="invert" placement="left">
+        {displayComments && <Tooltip content={TOOLTIPS_DICT.GENERAL.COMMENTS} color="invert" placement="left">
             <button className="cursor-pointer inline-block mr-6" onClick={toggleModal}>
                 <IconNotes className="w-6 h-6" />
             </button>

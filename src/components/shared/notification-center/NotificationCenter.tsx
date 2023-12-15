@@ -10,6 +10,7 @@ export default function NotificationCenter() {
 
     return (<div className="h-full w-full flex-1 flex flex-col overflow-y-auto" style={{ maxHeight: 'calc(100vh - 180px)' }}>
         <div className="h-full flex flex-col p-2">
+            {notifications && notifications.length === 0 && <div className="text-gray-400 text-sm">No notifications</div>}
             {notifications && notifications.length > 0 && notifications.map((notification, index) => (<div key={index}>
                 {notification.array[0].level === NotificationLevel.WARNING && <div className={`mb-2 rounded-md border border-yellow-300 bg-yellow-50 p-3 ${notification.highlightMe ? style.outlineKern : ''}`}>
                     <div className="flex">

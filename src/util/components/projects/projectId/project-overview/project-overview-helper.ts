@@ -83,6 +83,7 @@ function matchAndMergeLabelDistributionData(data): LabelDistribution[] {
 }
 
 export function postProcessConfusionMatrix(data: string): any {
+    if (!data) return [];
     return JSON.parse(data).map((e) => {
         return {
             counts: e.count_absolute,

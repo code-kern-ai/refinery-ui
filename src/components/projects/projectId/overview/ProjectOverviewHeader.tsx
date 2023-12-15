@@ -28,7 +28,7 @@ export default function ProjectOverviewHeader() {
         const overviewFiltersNew: ProjectOverviewFilters = {
             graphType: DISPLAY_GRAPHS_VALUE_ARRAY[0].name,
             targetAttribute: targetAttributes[0].name,
-            labelingTask: labelingTasksFinal.name,
+            labelingTask: labelingTasksFinal?.name,
             dataSlice: dataSlices[0].name,
             graphTypeEnum: DISPLAY_GRAPHS_VALUE_ARRAY[0].value,
         }
@@ -61,7 +61,7 @@ export default function ProjectOverviewHeader() {
                         <Tooltip placement="bottom" trigger="hover" color="invert" content={TOOLTIPS_DICT.PROJECT_OVERVIEW.TARGET_TYPE} className="relative z-10">
                             <span className={`cursor-help mr-2 underline text-black-800 filtersUnderline`}>Target</span>
                         </Tooltip>
-                        {targetAttributes && <Dropdown buttonName={overviewFilters?.targetAttribute} options={targetAttributes} dropdownWidth="w-44"
+                        {targetAttributes && <Dropdown buttonName={labelingTasks?.length == 0 ? '' : overviewFilters?.targetAttribute} options={labelingTasks?.length == 0 ? [] : targetAttributes} dropdownWidth="w-44"
                             selectedOption={(option: string) => {
                                 dispatch(updateOverFilters('targetAttribute', option));
                                 const labelingTasksFinal = labelingTasks.find((labelingTask) => labelingTask.targetName === option);

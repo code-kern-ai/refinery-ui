@@ -5,7 +5,6 @@ import { timer } from "rxjs";
 import { getUserAvatarUri } from "@/submodules/javascript-functions/general";
 
 export class CommentDataManager {
-    public static canCommentOnPage: boolean = false;
     public static commentRequests: Map<Object, CommentRequest[]> = new Map<CurrentPage, CommentRequest[]>();
     public static addCommentRequests: {} = {};
     private static globalProjectId: string = "GLOBAL";
@@ -26,10 +25,6 @@ export class CommentDataManager {
 
     public static unregisterCommentRequests(currentPage: CurrentPage) {
         this.commentRequests = new Map<CurrentPage, CommentRequest[]>([]);
-    }
-
-    public static checkCanCommentOnPage() {
-        this.canCommentOnPage = CommentDataManager.commentRequests.size > 0;
     }
 
     public static buildRequestJSON(): string {

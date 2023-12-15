@@ -35,6 +35,7 @@ const initialState = {
     notifications: [],
     comments: {
         all: [],
+        displayIcon: false
     },
     bricksIntegrator: {
         config: null,
@@ -61,6 +62,7 @@ const initialState = {
     notifications: NotificationListWrapper[];
     comments: {
         all: CommentData[];
+        displayIcon: boolean;
     },
     bricksIntegrator: {
         config: BricksIntegratorConfig;
@@ -140,6 +142,9 @@ const generalSlice = createSlice({
         setLabelsBricksIntegrator(state, action: PayloadAction<any[]>) {
             if (action.payload) state.bricksIntegrator.labels = action.payload;
             else state.bricksIntegrator.labels = [];
+        },
+        setDisplayIconComments(state, action: PayloadAction<boolean>) {
+            state.comments.displayIcon = action.payload;
         }
     },
 })
@@ -166,8 +171,9 @@ export const selectBricksIntegratorEmbeddings = (state) => state.general.bricksI
 export const selectBricksIntegratorLabelingTasks = (state) => state.general.bricksIntegrator.labelingTasks;
 export const selectBricksIntegratorLookupLists = (state) => state.general.bricksIntegrator.lookupLists;
 export const selectBricksIntegratorLabels = (state) => state.general.bricksIntegrator.labels;
+export const selectDisplayIconComments = (state) => state.general.comments.displayIcon;
 
 export const selectAnnotatorsDict = createSelector([selectAnnotators], (a): any => a ? arrayToDict(a, 'id') : null);
 
-export const { setUser, setCurrentPage, setIsManaged, setIsDemo, setIsAdmin, setOrganization, setAllUsers, setNotifications, setComments, setBricksIntegrator, setAttributesBricksIntegrator, setLanguagesBricksIntegrator, setEmbeddingsBricksIntegrator, setLabelingTasksBricksIntegrator, setLookupListsBricksIntegrator, setLabelsBricksIntegrator } = generalSlice.actions;
+export const { setUser, setCurrentPage, setIsManaged, setIsDemo, setIsAdmin, setOrganization, setAllUsers, setNotifications, setComments, setBricksIntegrator, setAttributesBricksIntegrator, setLanguagesBricksIntegrator, setEmbeddingsBricksIntegrator, setLabelingTasksBricksIntegrator, setLookupListsBricksIntegrator, setLabelsBricksIntegrator, setDisplayIconComments } = generalSlice.actions;
 export const generalReducer = generalSlice.reducer;

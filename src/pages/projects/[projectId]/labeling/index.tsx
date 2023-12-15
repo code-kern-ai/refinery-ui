@@ -1,5 +1,5 @@
 import LabelingMainComponent from "@/src/components/projects/projectId/labeling/sessionId/main-component/LabelingMainComponent";
-import { selectUser, setCurrentPage } from "@/src/reduxStore/states/general";
+import { selectUser, setCurrentPage, setDisplayIconComments } from "@/src/reduxStore/states/general";
 import { selectProjectId } from "@/src/reduxStore/states/project";
 import { CurrentPage } from "@/src/types/shared/general";
 import { SessionManager } from "@/src/util/classes/labeling/session-manager";
@@ -16,7 +16,8 @@ export default function LabelingRoutingPage() {
     const user = useSelector(selectUser);
 
     useEffect(() => {
-        dispatch(setCurrentPage(CurrentPage.LABELING))
+        dispatch(setCurrentPage(CurrentPage.LABELING));
+        dispatch(setDisplayIconComments(true));
     }, []);
 
     useEffect(() => {

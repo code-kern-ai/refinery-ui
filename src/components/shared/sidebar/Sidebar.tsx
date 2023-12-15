@@ -34,7 +34,7 @@ export default function Sidebar() {
 
     const [isFullScreen, setIsFullScreen] = useState(false);
     const [hasUpdates, setHasUpdates] = useState(false);
-    const [versionOverviewData, setVersionOverviewData] = useState<any>(null);
+    const [versionOverviewData, setVersionOverviewData] = useState<VersionOverview[]>(null);
     const [openTab, setOpenTab] = useState(0);
     const [routeColor, setRouteColor] = useState(null);
 
