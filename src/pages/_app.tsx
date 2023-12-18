@@ -9,7 +9,6 @@ import store from '../reduxStore/store'
 import { GlobalStoreDataComponent } from '../reduxStore/StoreManagerComponent'
 import { ConfigManager } from '../services/base/config'
 import { useEffect } from 'react'
-import { RouteManager } from '../services/base/route-manager'
 
 export default function App({ Component, pageProps }: AppProps) {
 

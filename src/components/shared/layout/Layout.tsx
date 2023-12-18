@@ -10,20 +10,21 @@ import { CurrentPage } from "@/src/types/shared/general";
 import { useDispatch, useSelector } from "react-redux";
 import { selectUser } from "@/src/reduxStore/states/general";
 import { interval, timer } from "rxjs";
-import { setNotificationId } from "@/src/reduxStore/states/tmp";
+import { selectNotificationsUser, setNotificationId, setNotificationsUser } from "@/src/reduxStore/states/tmp";
 import { unsubscribeWSOnDestroy } from "@/src/services/base/web-sockets/web-sockets-helper";
 import { useRouter } from "next/router";
 import AdminMessages from "../admin-messages/AdminMessages";
 import { AdminMessage } from "@/src/types/shared/admin-messages";
 import { postProcessAdminMessages } from "@/src/util/shared/admin-messages-helper";
+import { useConsoleLog } from "@/submodules/react-components/hooks/useConsoleLog";
 
 export default function Layout({ children }) {
     const dispatch = useDispatch();
     const router = useRouter();
 
     const user = useSelector(selectUser);
+    const notifications = useSelector(selectNotificationsUser);
 
-    const [notifications, setNotifications] = useState([]);
     const [refetchTimer, setRefetchTimer] = useState(null);
     const [deletionTimer, setDeletionTimer] = useState(null);
     const [activeAdminMessages, setActiveAdminMessages] = useState<AdminMessage[]>([]);
@@ -43,12 +44,12 @@ export default function Layout({ children }) {
     }, []);
 
     useEffect(() => {
-        if (notifications.length == 0) initializeNotificationDeletion();
+        initializeNotificationDeletion();
     }, [notifications]);
 
     function refetchNotificationsAndProcess() {
         refetchNotificationsByUser().then((res) => {
-            setNotifications(res['data']['notificationsByUserId']);
+            dispatch(setNotificationsUser(res['data']['notificationsByUserId']));
         });
     }
 
@@ -59,23 +60,21 @@ export default function Layout({ children }) {
     }
 
     function initializeNotificationDeletion() {
-        if (deletionTimer == null) {
-            const saveDelTimer = interval(3000).subscribe((x) => {
-                if (notifications.length > 0) {
-                    const notificationsCopy = [...notifications];
-                    notificationsCopy.shift();
-                    setNotifications(notificationsCopy);
-                    if (notificationsCopy.length == 0)
-                        unsubscribeDeletionTimer();
-                } else {
-                    unsubscribeDeletionTimer();
-                }
-            });
-            setDeletionTimer(saveDelTimer);
-        }
+        const saveDelTimer = interval(3000).subscribe((x) => {
+            if (notifications.length > 0) {
+                const notificationsCopy = [...notifications];
+                notificationsCopy.shift();
+                dispatch(setNotificationsUser(notificationsCopy));
+                if (notificationsCopy.length == 0)
+                    unsubscribeDeletionTimer(deletionTimer);
+            } else {
+                unsubscribeDeletionTimer(deletionTimer);
+            }
+        });
+        setDeletionTimer(saveDelTimer);
     }
 
-    function unsubscribeDeletionTimer() {
+    function unsubscribeDeletionTimer(deletionTimer) {
         if (deletionTimer != null) {
             deletionTimer.unsubscribe();
             setDeletionTimer(null);
