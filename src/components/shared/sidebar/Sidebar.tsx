@@ -1,5 +1,5 @@
 import { selectProject } from '@/src/reduxStore/states/project';
-import { selectCurrentPage, selectIsAdmin, selectIsManaged, selectUser } from '@/src/reduxStore/states/general';
+import { selectIsAdmin, selectIsManaged, selectRouteColor, selectUser } from '@/src/reduxStore/states/general';
 import { UserRole, VersionOverview } from '@/src/types/shared/sidebar';
 import Image from 'next/image';
 import { useDispatch, useSelector } from 'react-redux';
@@ -17,7 +17,6 @@ import style from '@/src/styles/shared/sidebar.module.css';
 import { copyToClipboard } from '@/submodules/javascript-functions/general';
 import { IconAlertCircle, IconApi, IconArrowRight, IconBrandDiscord, IconBulb, IconChartPie, IconClipboard, IconExternalLink, IconMaximize, IconMinimize, IconTriangleSquareCircle, IconUserCircle } from '@tabler/icons-react';
 import { IconSettings } from '@tabler/icons-react';
-import { RouteManager } from '@/src/services/base/route-manager';
 import { useRouter } from 'next/router';
 
 const ACCEPT_BUTTON = { buttonCaption: "How to update", useButton: true };
@@ -31,19 +30,15 @@ export default function Sidebar() {
     const project = useSelector(selectProject);
     const isAdmin = useSelector(selectIsAdmin);
     const isManaged = useSelector(selectIsManaged);
+    const routeColor = useSelector(selectRouteColor);
 
     const [isFullScreen, setIsFullScreen] = useState(false);
     const [hasUpdates, setHasUpdates] = useState(false);
     const [versionOverviewData, setVersionOverviewData] = useState<VersionOverview[]>(null);
     const [openTab, setOpenTab] = useState(0);
-    const [routeColor, setRouteColor] = useState(null);
 
     const [refetchVersionOverview] = useLazyQuery(GET_VERSION_OVERVIEW, { fetchPolicy: 'no-cache' });
     const [refetchHasUpdates] = useLazyQuery(GET_HAS_UPDATES, { fetchPolicy: 'no-cache' });
-
-    useEffect(() => {
-        setRouteColor(RouteManager.routeColor);
-    }, []);
 
     const howToUpdate = useCallback(() => {
         dispatch(closeModal(ModalEnum.VERSION_OVERVIEW));
@@ -133,7 +128,7 @@ export default function Sidebar() {
                                     </button>
                                 </div>
                                 <div>
-                                    {project && project.id ? (<div>
+                                    {(project && project.id && routeColor) ? (<div>
                                         {user.role === UserRole.ENGINEER && <div
                                             className="flex items-center justify-center overflow-visible">
                                             <Tooltip placement="right" trigger="hover" color="invert" content="Overview">

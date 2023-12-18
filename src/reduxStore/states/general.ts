@@ -44,7 +44,8 @@ const initialState = {
         embeddings: [],
         labelingTasks: [],
         labels: [],
-    }
+    },
+    routeColor: null
 } as {
     user: User;
     currentPage: string;
@@ -72,7 +73,8 @@ const initialState = {
         labelingTasks: any[];
         lookupLists: LookupList[];
         labels: any[];
-    }
+    },
+    routeColor: any;
 }
 
 const generalSlice = createSlice({
@@ -145,6 +147,10 @@ const generalSlice = createSlice({
         },
         setDisplayIconComments(state, action: PayloadAction<boolean>) {
             state.comments.displayIcon = action.payload;
+        },
+        setRouteColor(state, action: PayloadAction<any>) {
+            if (action.payload) state.routeColor = action.payload;
+            else state.routeColor = {};
         }
     },
 })
@@ -172,8 +178,9 @@ export const selectBricksIntegratorLabelingTasks = (state) => state.general.bric
 export const selectBricksIntegratorLookupLists = (state) => state.general.bricksIntegrator.lookupLists;
 export const selectBricksIntegratorLabels = (state) => state.general.bricksIntegrator.labels;
 export const selectDisplayIconComments = (state) => state.general.comments.displayIcon;
+export const selectRouteColor = (state) => state.general.routeColor;
 
 export const selectAnnotatorsDict = createSelector([selectAnnotators], (a): any => a ? arrayToDict(a, 'id') : null);
 
-export const { setUser, setCurrentPage, setIsManaged, setIsDemo, setIsAdmin, setOrganization, setAllUsers, setNotifications, setComments, setBricksIntegrator, setAttributesBricksIntegrator, setLanguagesBricksIntegrator, setEmbeddingsBricksIntegrator, setLabelingTasksBricksIntegrator, setLookupListsBricksIntegrator, setLabelsBricksIntegrator, setDisplayIconComments } = generalSlice.actions;
+export const { setUser, setCurrentPage, setIsManaged, setIsDemo, setIsAdmin, setOrganization, setAllUsers, setNotifications, setComments, setBricksIntegrator, setAttributesBricksIntegrator, setLanguagesBricksIntegrator, setEmbeddingsBricksIntegrator, setLabelingTasksBricksIntegrator, setLookupListsBricksIntegrator, setLabelsBricksIntegrator, setDisplayIconComments, setRouteColor } = generalSlice.actions;
 export const generalReducer = generalSlice.reducer;

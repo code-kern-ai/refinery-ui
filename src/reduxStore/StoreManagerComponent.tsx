@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { useDispatch, useSelector } from "react-redux";
-import { selectIsAdmin, selectIsDemo, selectIsManaged, setAllUsers, setIsAdmin, setIsDemo, setIsManaged, setOrganization, setUser } from "./states/general";
+import { selectIsAdmin, selectIsDemo, selectIsManaged, setAllUsers, setIsAdmin, setIsDemo, setIsManaged, setOrganization, setRouteColor, setUser } from "./states/general";
 import { getUserAvatarUri, jsonCopy } from "@/submodules/javascript-functions/general";
 import { setActiveProject } from "./states/project";
 import { GET_ALL_TOKENIZER_OPTIONS, GET_PROJECT_BY_ID } from "../services/gql/queries/projects";
@@ -79,9 +79,11 @@ export function GlobalStoreDataComponent(props: React.PropsWithChildren) {
     }, []);
 
     useEffect(() => {
-        RouteManager.checkRouteHighlight(router.asPath);
+        const routeColor = RouteManager.checkRouteHighlight(router.asPath);
+        dispatch(setRouteColor(routeColor));
         const something = (url: any) => {
-            RouteManager.checkRouteHighlight(url);
+            const routeColor = RouteManager.checkRouteHighlight(url);
+            dispatch(setRouteColor(routeColor));
         }
         router.events.on('routeChangeComplete', something)
         return () => {
