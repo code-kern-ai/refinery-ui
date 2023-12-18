@@ -5,7 +5,7 @@ import { ModalEnum } from '@/src/types/shared/modal';
 import { TOOLTIPS_DICT } from '@/src/util/tooltip-constants';
 import { Slice } from '@/submodules/javascript-functions/enums/enums';
 import { Tooltip } from '@nextui-org/react';
-import { IconAdjustments, IconChartCircles, IconFilter, IconFilterOff, IconTriangleFilled } from '@tabler/icons-react';
+import { IconAdjustments, IconAlertTriangleFilled, IconChartCircles, IconFilter, IconFilterOff, IconTriangleFilled } from '@tabler/icons-react';
 import { useDispatch, useSelector } from 'react-redux';
 import LoadingIcon from '@/src/components/shared/loading/LoadingIcon';
 import { selectAttributes } from '@/src/reduxStore/states/pages/settings';
@@ -63,12 +63,12 @@ export default function DataBrowserRecords(props: DataBrowserRecordsProps) {
                 Record{extendedRecords.fullCount === 1 ? '' : 's'}
             </div>
             <div className="flex flex-row items-center">
-                {activeSlice?.static || similaritySearch.recordsInDisplay && <div>
+                {(activeSlice?.static || similaritySearch.recordsInDisplay) && <div>
                     <div className="rounded-md border border-yellow-500 mr-2 select-none">
                         <div className="rounded-md bg-yellow-50 p-2">
                             <div className="flex items-center">
                                 <div className="flex-shrink-0">
-                                    <IconTriangleFilled className="h-5 w-5 text-yellow-400" />
+                                    <IconAlertTriangleFilled className="h-5 w-5 text-yellow-400" />
                                 </div>
                                 {activeSlice?.static ? (<div className="ml-3">
                                     <p className="text-sm font-medium text-yellow-800">Static data slice active. Filter
@@ -86,8 +86,7 @@ export default function DataBrowserRecords(props: DataBrowserRecordsProps) {
                 {(activeSlice != null || activeSearchParams.length > 0 || similaritySearch.recordsInDisplay) && <button onClick={() => {
                     props.clearFullSearch(true);
                     clearFilters();
-                }}
-                    className="mr-1 inline-flex items-center px-2.5 py-2 border border-gray-300 shadow-sm text-xs font-semibold rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none cursor-pointer">
+                }} className="mr-1 inline-flex items-center px-2.5 py-2 border border-gray-300 shadow-sm text-xs font-semibold rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none cursor-pointer">
                     <IconFilterOff className="h-4 w-4 mr-1" />Clear filters
                 </button>}
                 <Tooltip content={TOOLTIPS_DICT.DATA_BROWSER.CONFIGURATION} color="invert" placement='bottom'>
@@ -101,22 +100,22 @@ export default function DataBrowserRecords(props: DataBrowserRecordsProps) {
             </div>
         </div>}
         {!(activeSlice?.static) && <div className="flex flex-row flex-wrap mt-4">
-        </div>}
-        {activeSearchParams.map((searchParam, i) => (<div key={i}>
-            {searchParam.splittedText.map((searchText, j) => (<div key={j} className="flex flex-row items-center gap-y-1" style={{ maxWidth: '95%' }}>
-                <div className="whitespace-pre-line break-all rounded-full items-center py-0.5 px-2.5 text-sm font-medium border border-green-700 bg-green-100 text-green-700 grid grid-cols-2 mr-2"
-                    style={{ gridTemplateColumns: 'auto max-content' }}>
-                    <div className="flex items-center">
-                        <IconFilter className="h-4 w-4 mr-1" />
-                        <div className="whitespace-pre-line break-all m-auto">{searchText}</div>
+            {activeSearchParams.map((searchParam, i) => (<div key={i}>
+                {searchParam.splittedText.map((searchText, j) => (<div key={j} className="flex flex-row items-center gap-y-1">
+                    <div className="whitespace-pre-line break-all rounded-full items-center py-0.5 px-2.5 text-sm font-medium border border-green-700 bg-green-100 text-green-700 grid grid-cols-2 mr-2"
+                        style={{ gridTemplateColumns: 'auto max-content' }}>
+                        <div className="flex items-center">
+                            <IconFilter className="h-4 w-4 mr-1" />
+                            <div className="whitespace-pre-line break-all m-auto">{searchText}</div>
+                        </div>
                     </div>
-                </div>
-                {!(i == activeSearchParams.length - 1 && j == searchParam.splittedText.length - 1) && <Tooltip content={TOOLTIPS_DICT.DATA_BROWSER.INTERSECTION} color="invert" placement="top">
-                    <IconChartCircles className="h-4 w-4 mr-1" />
-                </Tooltip>}
-            </div>))}
+                    {!(i == activeSearchParams.length - 1 && j == searchParam.splittedText.length - 1) && <Tooltip content={TOOLTIPS_DICT.DATA_BROWSER.INTERSECTION} color="invert" placement="top">
+                        <IconChartCircles className="h-4 w-4 mr-1" />
+                    </Tooltip>}
+                </div>))}
 
-        </div>))}
+            </div>))}
+        </div>}
 
         <div className="mb-3 mt-4 grow overflow-y-auto" style={{ maxHeight: 'calc(100vh - 160px)' }} onScroll={(e: any) => refetchMoreRecords(e)}>
             {additionalData.loading && <LoadingIcon size='md' />}

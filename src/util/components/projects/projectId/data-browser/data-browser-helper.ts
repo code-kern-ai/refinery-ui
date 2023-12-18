@@ -1,9 +1,8 @@
 import { ColumnData, DataSlice } from "@/src/types/components/projects/projectId/data-browser/data-browser";
 import { LabelingTask } from "@/src/types/components/projects/projectId/settings/labeling-tasks";
-import { Project } from "@/src/types/components/projects/projects-list";
 import { User } from "@/src/types/shared/general";
 import { buildFullLink } from "@/src/util/shared/link-parser-helper";
-import { parseUTC } from "@/submodules/javascript-functions/date-parser";
+import { dateAsUTCDate } from "@/submodules/javascript-functions/date-parser";
 import { informationSourceTypeToString, labelSourceToString, sliceTypeToString } from "@/submodules/javascript-functions/enums/enum-functions";
 import { LabelSource, Slice } from "@/submodules/javascript-functions/enums/enums";
 import { jsonCopy, tryParseJSON } from "@/submodules/javascript-functions/general";
@@ -181,4 +180,10 @@ export function postProcessRecordComments(comments: any) {
         recordComments[e.record_id].push(e);
     });
     return recordComments;
+}
+
+function parseUTC(utc: string, forOutlier: boolean = false) {
+    const utcDate = dateAsUTCDate(new Date(utc));
+    if (forOutlier) return utcDate.toLocaleString().replace(", ", "\n");
+    else return utcDate.toLocaleString();
 }

@@ -82,9 +82,9 @@ export default function DataBrowserSidebar(props: DataBrowserSideBarProps) {
 
                 {dataSlices && <div className="mt-2 mb-4">
                     {dataSlices.length > 0 && <div className="w-full grid grid-cols-2 gap-y-1 items-center justify-center" style={{ gridColumnGap: '2px' }}>
-                        {filteredSlices.map((slice: DataSlice, index: number) => (<Tooltip content={slice.name} color="invert" placement={index % 2 == 0 ? 'right' : 'left'} key={slice.id}>
+                        {filteredSlices.map((slice: DataSlice, index: number) => (<Tooltip content={!slice.static ? slice.name : ''} color="invert" placement={index % 2 == 0 ? 'right' : 'left'} key={slice.id}>
                             <button onClick={() => toggleSlice(slice)} style={{ width: '180px' }}
-                                className={`cursor-pointer inline-flex items-center justify-between px-2.5 py-1.5 border border-gray-200 shadow-sm text-sm font-medium rounded text-gray-700 bg-white slice-width hover:bg-gray-50 focus:outline-none ${activeSlice == slice ? 'ring-2 ring-blue-500' : ''}`}>
+                                className={`cursor-pointer inline-flex border items-center justify-between px-2.5 py-1.5 shadow-sm text-sm font-medium rounded text-gray-700 bg-white hover:bg-gray-50 focus:outline-none ${activeSlice?.id == slice.id ? 'ring-blue-500 ring-2' : ' border-gray-200'}`}>
                                 <label className="cursor-pointer mr-2" onClick={() => { updateSliceInfo(slice) }}>
                                     <IconInfoCircle className={`w-5 h-5 ${slice.color.textColor} ${slice.color.fillColor}`} />
                                 </label>
@@ -102,7 +102,7 @@ export default function DataBrowserSidebar(props: DataBrowserSideBarProps) {
                     </div>
                     <div className="relative flex justify-start">
                         <span className="pr-2 bg-white text-lg font-medium text-gray-900">Filter</span>
-                        {!(activeSlice?.sliceType == Slice.STATIC_OUTLIER || !(additionalData.displayOutdatedWarning || (activeSlice?.static && additionalData.staticDataSliceCurrentCount != null && activeSlice.count != additionalData.staticDataSliceCurrentCount))) &&
+                        {(!(activeSlice?.sliceType == Slice.STATIC_OUTLIER || !(additionalData.displayOutdatedWarning || (activeSlice?.static && additionalData.staticDataSliceCurrentCount != null && activeSlice.count != additionalData.staticDataSliceCurrentCount)))) &&
                             <Tooltip content={TOOLTIPS_DICT.DATA_BROWSER.OUTDATED_SLICE} color="invert" placement="right">
                                 <div className="flex items-center tooltip-right text-gray-400">
                                     <IconAlertTriangle className="w-5 h-5" />

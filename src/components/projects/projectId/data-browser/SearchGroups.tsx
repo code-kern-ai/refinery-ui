@@ -1,7 +1,7 @@
 import { selectAttributes, selectAttributesDict, selectLabelingTasksAll } from "@/src/reduxStore/states/pages/settings";
 import { selectProjectId } from "@/src/reduxStore/states/project";
 import { attributeCreateSearchGroup, commentsCreateSearchGroup, generateRandomSeed, getBasicGroupItems, getBasicSearchGroup, getBasicSearchItem, labelingTasksCreateSearchGroup, orderByCreateSearchGroup, userCreateSearchGroup } from "@/src/util/components/projects/projectId/data-browser/search-groups-helper";
-import { SearchGroup, StaticOrderByKeys } from "@/submodules/javascript-functions/enums/enums";
+import { SearchGroup, Slice, StaticOrderByKeys } from "@/submodules/javascript-functions/enums/enums";
 import { IconArrowBadgeDown, IconArrowUp, IconArrowsRandom, IconFilterOff, IconInfoCircle, IconPlus, IconPointerOff, IconTrash } from "@tabler/icons-react";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -126,7 +126,8 @@ export default function SearchGroups(props: DataBrowserSideBarProps) {
 
     useEffect(() => {
         if (!activeSlice) return;
-        const activeParams = updateSearchParameters(Object.values(JSON.parse(activeSlice.filterRaw)), attributes, configuration.separator, fullSearch);
+        if (activeSlice.sliceType == Slice.STATIC_OUTLIER || activeSlice.sliceType == Slice.STATIC_OUTLIER) return;
+        const activeParams = updateSearchParameters(Object.values(JSON.parse(activeSlice.filterRaw)), attributes, configuration.separator, jsonCopy(fullSearch));
         dispatch(setActiveSearchParams(activeParams));
     }, [activeSlice]);
 
@@ -416,7 +417,7 @@ export default function SearchGroups(props: DataBrowserSideBarProps) {
     }
 
     function updateSearchParams(fullSearchCopy) {
-        const activeParams = updateSearchParameters(Object.values(fullSearchCopy), attributes, configuration.separator, fullSearchCopy);
+        const activeParams = updateSearchParameters(Object.values(fullSearchCopy), attributes, configuration.separator, jsonCopy(fullSearchCopy));
         dispatch(setActiveSearchParams(activeParams));
     }
 

@@ -4,6 +4,7 @@ import { SearchOperator } from "@/src/types/components/projects/projectId/data-b
 import { SearchGroup, StaticOrderByKeys } from "@/submodules/javascript-functions/enums/enums";
 import { getOrderByDisplayName } from "@/submodules/javascript-functions/enums/enum-functions";
 import { HighlightSearch } from "@/src/types/shared/highlight";
+import { jsonCopy } from "@/submodules/javascript-functions/general";
 
 export function updateSearchParameters(searchElement, attributes, separator, fullSearch) {
     const activeParams = [];
@@ -55,74 +56,75 @@ function createSplittedText(i, searchGroup, p) {
 
 
 function updateSearchParamText(searchElement, attributes, separator, nameAdd?) {
-    if (searchElement.type == SearchItemType.ATTRIBUTE) {
-        const attributeType = getAttributeType(attributes, searchElement.name);
-        if (searchElement.operator == SearchOperator.BETWEEN) {
+    const searchElementCopy = jsonCopy(searchElement);
+    if (searchElementCopy.type == SearchItemType.ATTRIBUTE) {
+        const attributeType = getAttributeType(attributes, searchElementCopy.name);
+        if (searchElementCopy.operator == SearchOperator.BETWEEN) {
             if (attributeType == "INTEGER" || attributeType == "FLOAT") {
-                searchElement.searchText =
-                    searchElement.name +
+                searchElementCopy.searchText =
+                    searchElementCopy.name +
                     ' ' +
-                    searchElement.operator +
+                    searchElementCopy.operator +
                     " " +
-                    searchElement.searchValue +
-                    "" + " AND " + searchElement.searchValueBetween;
+                    searchElementCopy.searchValue +
+                    "" + " AND " + searchElementCopy.searchValueBetween;
             } else {
-                searchElement.searchText =
-                    searchElement.name +
+                searchElementCopy.searchText =
+                    searchElementCopy.name +
                     ' ' +
-                    searchElement.operator +
+                    searchElementCopy.operator +
                     " '" +
-                    searchElement.searchValue +
-                    "'" + " AND '" + searchElement.searchValueBetween + "'";
+                    searchElementCopy.searchValue +
+                    "'" + " AND '" + searchElementCopy.searchValueBetween + "'";
             }
-        } else if (searchElement.operator == '') {
-            searchElement.searchText = searchElement.name;
-        } else if (searchElement.operator == SearchOperator.IN || searchElement.operator == "IN WC" || searchElement.operator == SearchOperator.IN_WC) {
+        } else if (searchElementCopy.operator == '') {
+            searchElementCopy.searchText = searchElementCopy.name;
+        } else if (searchElementCopy.operator == SearchOperator.IN || searchElementCopy.operator == "IN WC" || searchElementCopy.operator == SearchOperator.IN_WC) {
             if (attributeType == "INTEGER" || attributeType == "FLOAT") {
-                searchElement.searchText =
-                    searchElement.name +
+                searchElementCopy.searchText =
+                    searchElementCopy.name +
                     ' ' +
-                    searchElement.operator.split('_').join(' ') +
+                    searchElementCopy.operator.split('_').join(' ') +
                     " (" +
-                    searchElement.searchValue + ")";
+                    searchElementCopy.searchValue + ")";
             } else {
-                const splitTextBySeparator = searchElement.searchValue.split(separator).filter(i => i);
-                searchElement.searchText = searchElement.name + ' ' + searchElement.operator + " (" + splitTextBySeparator.map(x => "'" + x + "'").join(", ") + ")";
+                const splitTextBySeparator = searchElementCopy.searchValue.split(separator).filter(i => i);
+                searchElementCopy.searchText = searchElementCopy.name + ' ' + searchElementCopy.operator + " (" + splitTextBySeparator.map(x => "'" + x + "'").join(", ") + ")";
             }
         }
         else {
             if (attributeType == "INTEGER" || attributeType == "FLOAT") {
-                searchElement.searchText =
-                    searchElement.name +
+                searchElementCopy.searchText =
+                    searchElementCopy.name +
                     ' ' +
-                    searchElement.operator +
+                    searchElementCopy.operator +
                     " " +
-                    searchElement.searchValue;
+                    searchElementCopy.searchValue;
             }
             else {
-                searchElement.searchText =
-                    searchElement.name +
+                searchElementCopy.searchText =
+                    searchElementCopy.name +
                     ' ' +
-                    searchElement.operator +
+                    searchElementCopy.operator +
                     " '" +
-                    searchElement.searchValue +
+                    searchElementCopy.searchValue +
                     "'";
             }
         }
-        if (searchElement.negate)
-            searchElement.searchText = 'NOT (' + searchElement.searchText + ')';
+        if (searchElementCopy.negate)
+            searchElementCopy.searchText = 'NOT (' + searchElementCopy.searchText + ')';
         if (separator == "-")
-            searchElement.searchText = searchElement.searchText.replaceAll("-", ",");
-    } else if (searchElement.value.group == SearchGroup.LABELING_TASKS) {
-        searchElement.searchText = nameAdd + labelingTaskBuildSearchParamText(searchElement.groupElements);
-    } else if (searchElement.value.group == SearchGroup.USER_FILTER) {
-        searchElement.searchText = userBuildSearchParamText(searchElement.groupElements.users);
-    } else if (searchElement.value.group == SearchGroup.ORDER_STATEMENTS) {
-        searchElement.searchText = orderByBuildSearchParamText(searchElement.groupElements);
-    } else if (searchElement.value.group == SearchGroup.COMMENTS) {
-        searchElement.searchText = commentsBuildSearchParamText(searchElement.groupElements);
+            searchElementCopy.searchText = searchElementCopy.searchText.replaceAll("-", ",");
+    } else if (searchElementCopy.value.group == SearchGroup.LABELING_TASKS) {
+        searchElementCopy.searchText = nameAdd + labelingTaskBuildSearchParamText(searchElementCopy.groupElements);
+    } else if (searchElementCopy.value.group == SearchGroup.USER_FILTER) {
+        searchElementCopy.searchText = userBuildSearchParamText(searchElementCopy.groupElements.users);
+    } else if (searchElementCopy.value.group == SearchGroup.ORDER_STATEMENTS) {
+        searchElementCopy.searchText = orderByBuildSearchParamText(searchElementCopy.groupElements);
+    } else if (searchElementCopy.value.group == SearchGroup.COMMENTS) {
+        searchElementCopy.searchText = commentsBuildSearchParamText(searchElementCopy.groupElements);
     }
-    return searchElement;
+    return searchElementCopy;
 }
 
 function labelingTaskBuildSearchParamText(values): string {
