@@ -22,9 +22,10 @@ export default function NotificationData(props: NotificationDataProps) {
             <h3 className={`text-sm font-medium text-${props.textColor}-800`}>
                 <a className="underline" href={props.notification[0].docs} target="_blank" >{props.notification[0].title}</a>
                 ({props.notification[0].date}
-                {props.notification[0].projectId && <button className="underline" onClick={() => router.push(`/projects/${props.notification[0].projectId}/${props.notification[0].page}`)}>
-                    in {props.notification[0].projectName}
-                </button>})<div className="mt-1 text-left">{props.notification[0].timePassed} ago</div>
+                {props.notification[0].projectId && <span>&nbsp;in&nbsp;
+                    <button className="underline" onClick={() => router.push(`/projects/${props.notification[0].projectId}/${props.notification[0].page}`)}>
+                        {props.notification[0].projectName}
+                    </button></span>})<div className="mt-1 text-left">{props.notification[0].timePassed} ago</div>
             </h3>
             <div className="flex-grow">
                 {props.notification > 1 && <Tooltip content={TOOLTIPS_DICT.GENERAL.MORE_INFO_AVAILABLE} color="invert" placement="left">

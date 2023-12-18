@@ -8,16 +8,18 @@ import style from "@/src/styles/shared/header.module.css";
 import LogoutDropdown from "./LogoutDropdown";
 import { useRouter } from "next/router";
 import { IconBell, IconHexagons, IconHome, IconPlayCard } from "@tabler/icons-react";
-import { selectAllProjectsNamesDict, selectProject } from "@/src/reduxStore/states/project";
+import { selectAllProjectsNamesDict, selectProject, setAllProjects } from "@/src/reduxStore/states/project";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
 import NotificationCenterModal from "../notification-center/NotificationCenterModal";
 import { openModal } from "@/src/reduxStore/states/modal";
 import { ModalEnum } from "@/src/types/shared/modal";
 import { useLazyQuery } from "@apollo/client";
-import { NOTIFICATIONS } from "@/src/services/gql/queries/projects";
+import { GET_PROJECT_LIST, NOTIFICATIONS } from "@/src/services/gql/queries/projects";
 import { postProcessNotifications } from "@/src/util/shared/notification-center-helper";
 import { selectNotificationId } from "@/src/reduxStore/states/tmp";
 import Comments from "../comments/Comments";
+import { postProcessProjectsList } from "@/src/util/components/projects/projects-list-helper";
+import { arrayToDict } from "@/submodules/javascript-functions/general";
 
 export default function Header() {
     const router = useRouter();
@@ -35,6 +37,7 @@ export default function Header() {
     const [organizationInactive, setOrganizationInactive] = useState(null);
 
     const [refetchNotifications] = useLazyQuery(NOTIFICATIONS, { fetchPolicy: 'network-only' });
+    const [refetchProjects] = useLazyQuery(GET_PROJECT_LIST, { fetchPolicy: "no-cache" });
 
     useEffect(() => {
         if (!projectsNames) return;
@@ -53,9 +56,13 @@ export default function Header() {
     }, [notificationId]);
 
     function openModalAndRefetchNotifications() {
-        refetchNotifications().then((res) => {
-            dispatch(setNotifications(postProcessNotifications(res.data['notifications'], projectsNames, notificationId)));
-            dispatch(openModal(ModalEnum.NOTIFICATION_CENTER));
+        refetchProjects().then((res) => {
+            const projects = res.data["allProjects"].edges.map((edge: any) => edge.node);
+            dispatch(setAllProjects(postProcessProjectsList(projects)));
+            refetchNotifications().then((res) => {
+                dispatch(setNotifications(postProcessNotifications(res.data['notifications'], arrayToDict(projects, 'id'), notificationId)));
+                dispatch(openModal(ModalEnum.NOTIFICATION_CENTER));
+            });
         });
     }
 
