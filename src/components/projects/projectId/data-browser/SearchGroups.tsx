@@ -19,7 +19,7 @@ import { ModalEnum } from "@/src/types/shared/modal";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
 import { DataSliceOperations } from "./DataSliceOperations";
 import { useLazyQuery } from "@apollo/client";
-import { SEARCH_RECORDS_EXTENDED } from "@/src/services/gql/queries/data-browser";
+import { GET_RECORDS_BY_STATIC_SLICE, SEARCH_RECORDS_EXTENDED } from "@/src/services/gql/queries/data-browser";
 import { postProcessRecordsExtended } from "@/src/util/components/projects/projectId/data-browser/data-browser-helper";
 import { parseFilterToExtended } from "@/src/util/components/projects/projectId/data-browser/filter-parser-helper";
 import { getRegexFromFilter, updateSearchParameters } from "@/src/util/components/projects/projectId/data-browser/search-parameters";
@@ -67,6 +67,7 @@ export default function SearchGroups(props: DataBrowserSideBarProps) {
 
     const [refetchExtendedRecord] = useLazyQuery(SEARCH_RECORDS_EXTENDED, { fetchPolicy: "no-cache" });
     const [refetchCurrentWeakSupervision] = useLazyQuery(GET_CURRENT_WEAK_SUPERVISION_RUN, { fetchPolicy: "network-only" });
+    const [refetchRecordsStatic] = useLazyQuery(GET_RECORDS_BY_STATIC_SLICE, { fetchPolicy: "network-only" });
 
     useEffect(() => {
         if (!projectId) return;
@@ -110,18 +111,31 @@ export default function SearchGroups(props: DataBrowserSideBarProps) {
         if (!user) return;
         if (!activeSearchParams) return;
         if (!labelingTasks) return;
+        if (!attributes) return;
         refreshTextHighlightNeeded();
         setHighlightingToRecords();
         refetchCurrentWeakSupervisionAndProcess();
-        refetchExtendedRecord({
-            variables: {
-                projectId: projectId,
-                filterData: parseFilterToExtended(activeSearchParams, attributes, configuration, labelingTasks, user),
-                offset: 0, limit: 20
-            }
-        }).then((res) => {
-            dispatch(setSearchRecordsExtended(postProcessRecordsExtended(res.data['searchRecordsExtended'], labelingTasks)));
-        });
+        if (activeSlice && activeSlice.static) {
+            refetchRecordsStatic({
+                variables: {
+                    sliceId: activeSlice.id,
+                    projectId: projectId,
+                    offset: 0, limit: 20
+                }
+            }).then((res) => {
+                dispatch(setSearchRecordsExtended(postProcessRecordsExtended(res.data['recordsByStaticSlice'], labelingTasks)));
+            });
+        } else {
+            refetchExtendedRecord({
+                variables: {
+                    projectId: projectId,
+                    filterData: parseFilterToExtended(activeSearchParams, attributes, configuration, labelingTasks, user),
+                    offset: 0, limit: 20
+                }
+            }).then((res) => {
+                dispatch(setSearchRecordsExtended(postProcessRecordsExtended(res.data['searchRecordsExtended'], labelingTasks)));
+            });
+        }
     }, [activeSearchParams, user, projectId, attributes, labelingTasks, configuration, activeSlice]);
 
     useEffect(() => {

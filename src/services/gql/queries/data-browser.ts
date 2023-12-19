@@ -51,3 +51,17 @@ query ($projectId: ID!, $recordIds: [ID]!) {
   recordComments(projectId: $projectId, recordIds: $recordIds)
 }
 `;
+
+export const GET_RECORDS_BY_STATIC_SLICE = gql`
+query ($projectId: ID!, $sliceId: ID!, $orderBy: JSONString, $offset: Int, $limit: Int) {
+  recordsByStaticSlice(projectId: $projectId, sliceId: $sliceId,orderBy: $orderBy, offset: $offset, limit: $limit) {
+    queryLimit
+    queryOffset
+    fullCount
+    sessionId
+    recordList {
+      recordData
+    }
+  }
+}
+`;

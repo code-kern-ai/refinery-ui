@@ -32,12 +32,11 @@ export function DataSliceOperations(props: { fullSearch: {} }) {
     const [updateDataSliceMut] = useMutation(UPDATE_DATA_SLICE);
     const [createOutlierSliceMut] = useMutation(CREATE_OUTLIER_SLICE);
 
-    function updateSlice(isStatic = null) {
-        isStatic = isStatic == null ? activeSlice.static : isStatic;
+    function updateSlice() {
         updateDataSliceMut({
             variables: {
                 projectId: projectId,
-                static: isStatic,
+                static: activeSlice.static,
                 dataSliceId: activeSlice.id,
                 filterRaw: getRawFilterForSave(props.fullSearch),
                 filterData: parseFilterToExtended(activeSearchParams, attributes, configuration, labelingTasks, user)
