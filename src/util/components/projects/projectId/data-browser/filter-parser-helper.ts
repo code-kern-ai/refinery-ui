@@ -29,6 +29,7 @@ export function parseFilterToExtended(activeSearchParams, attributes: Attribute[
             toReturn.push(appendBlackAndWhiteListComments(toReturn, searchElement, user));
         }
     }
+    if (!toReturn[1]) return toReturn[0];
     return toReturn;
 }
 
@@ -104,6 +105,8 @@ function appendBlackAndWhiteListLabelingTask(appendTo, searchElement, labelingTa
     appendBlackAndWhiteListLabelingTaskForArray(appendTo, searchElement.values.heuristics, LabelSource.INFORMATION_SOURCE, drillDown);
     appendBlackAndWhiteListLabelingTaskForConfidence(appendTo, searchElement.values.weakSupervisionConfidence, labelingTask.labels.map(l => l.id), true);
     appendBlackAndWhiteListLabelingTaskForConfidence(appendTo, searchElement.values.modelCallbackConfidence, labelingTask.labels.map(l => l.id), false);
+
+    if (!appendTo) return;
 
     const isMixed = searchElement.values.isWithDifferentResults
     if (isMixed.active) {
@@ -190,7 +193,7 @@ function appendBlackAndWhiteListLabelingTaskForArray(
         return JSON.stringify(whitelist);
     if (blacklist.SUBQUERIES.length > 0)
         return JSON.stringify(blacklist);
-    return appendTo;
+    return null;
 }
 
 function appendBlackAndWhiteListLabelingTaskForConfidence(

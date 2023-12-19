@@ -335,15 +335,15 @@ export default function SearchGroups(props: DataBrowserSideBarProps) {
         checkDecimalPatterns(attributeType, event, formControlsIdx['operator'], '-');
     }
 
-    function updateLabelsFullSearch(labels: string[], groupKey: string, labelsKey: string) {
+    function updateLabelsFullSearch(label: any, groupKey: string, labelsKey: string) {
         const fullSearchCopy = jsonCopy(fullSearch);
-        for (let label of labels) {
-            const labelsInTask = fullSearchCopy[groupKey].groupElements[labelsKey];
-            const findLabel = labelsInTask.find((el) => el.name == label);
-            findLabel.active = !findLabel.active;
-        }
-        fullSearchCopy[groupKey].groupElements.active = true;
+        const labelsInTask = fullSearchCopy[groupKey].groupElements[labelsKey];
+        const findLabel = labelsInTask.find((el) => el.id == label.id);
+        findLabel.active = label.active;
+        findLabel.negate = label.negate;
+        fullSearchCopy[groupKey].groupElements[labelsKey] = labelsInTask;
         fullSearchCopy[groupKey].nameAdd = labelingTasks.find((el) => el.id == groupKey.split('_')[2]).name;
+        fullSearchCopy[groupKey].groupElements.active = true;
         setFullSearch(fullSearchCopy);
         updateSearchParams(fullSearchCopy);
     }
@@ -566,27 +566,21 @@ export default function SearchGroups(props: DataBrowserSideBarProps) {
 
                             <div>Manually labeled</div>
                             {fullSearch[group.key].groupElements['manualLabels'].length == 0 ? (<ButtonLabelsDisabled />) : (
-                                <Dropdown options={fullSearch[group.key].groupElements['manualLabels']} buttonName={manualLabels.length == 0 ? 'None selected' : manualLabels.join(',')} hasCheckboxes={true} keepDrownOpen={true}
+                                <Dropdown options={fullSearch[group.key].groupElements['manualLabels']} buttonName={manualLabels.length == 0 ? 'None selected' : manualLabels.join(',')} hasCheckboxesThreeStates={true} keepDrownOpen={true}
                                     selectedOption={(option: any) => {
-                                        const labels = [];
-                                        option.forEach((a: any) => {
-                                            if (a.checked) labels.push(a.name);
-                                        });
+                                        const labels = [...manualLabels, option.name]
                                         setManualLabels(labels);
-                                        updateLabelsFullSearch(labels, group.key, 'manualLabels');
+                                        updateLabelsFullSearch(option, group.key, 'manualLabels');
                                     }} />
                             )}
 
                             <div className="mt-2">Weakly supervised</div>
                             {fullSearch[group.key].groupElements['weakSupervisionLabels'].length == 0 ? (<ButtonLabelsDisabled />) : (
-                                <Dropdown options={fullSearch[group.key].groupElements['weakSupervisionLabels']} buttonName={weakSupervisionLabels.length == 0 ? 'None selected' : weakSupervisionLabels.join(',')} hasCheckboxes={true}
+                                <Dropdown options={fullSearch[group.key].groupElements['weakSupervisionLabels']} buttonName={weakSupervisionLabels.length == 0 ? 'None selected' : weakSupervisionLabels.join(',')} hasCheckboxesThreeStates={true}
                                     selectedOption={(option: any) => {
-                                        const labels = [];
-                                        option.forEach((a: any) => {
-                                            if (a.checked) labels.push(a.name);
-                                        });
+                                        const labels = [...weakSupervisionLabels, option.name]
                                         setWeakSupervisionLabels(labels);
-                                        updateLabelsFullSearch(labels, group.key, 'weakSupervisionLabels');
+                                        updateLabelsFullSearch(option, group.key, 'weakSupervisionLabels');
                                     }} />
                             )}
                             <div className="flex-grow min-w-0 mt-1">
@@ -609,14 +603,11 @@ export default function SearchGroups(props: DataBrowserSideBarProps) {
 
                             <div className="mt-2">Model callback</div>
                             {fullSearch[group.key].groupElements['modelCallbackLabels'].length == 0 ? (<ButtonLabelsDisabled />) : (
-                                <Dropdown options={fullSearch[group.key].groupElements['modelCallbackLabels']} buttonName={modelCallBacksLabels.length == 0 ? 'None selected' : modelCallBacksLabels.join(',')} hasCheckboxes={true}
+                                <Dropdown options={fullSearch[group.key].groupElements['modelCallbackLabels']} buttonName={modelCallBacksLabels.length == 0 ? 'None selected' : modelCallBacksLabels.join(',')} hasCheckboxesThreeStates={true}
                                     selectedOption={(option: any) => {
-                                        const labels = [];
-                                        option.forEach((a: any) => {
-                                            if (a.checked) labels.push(a.name);
-                                        });
+                                        const labels = [...modelCallBacksLabels, option.name]
                                         setModelCallBacksLabels(labels);
-                                        updateLabelsFullSearch(labels, group.key, 'modelCallbackLabels');
+                                        updateLabelsFullSearch(option, group.key, 'modelCallbackLabels');
                                     }} />
                             )}
                             <div className="flex-grow min-w-0 mt-1">

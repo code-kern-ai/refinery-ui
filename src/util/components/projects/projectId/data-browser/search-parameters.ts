@@ -5,6 +5,7 @@ import { SearchGroup, StaticOrderByKeys } from "@/submodules/javascript-function
 import { getOrderByDisplayName } from "@/submodules/javascript-functions/enums/enum-functions";
 import { HighlightSearch } from "@/src/types/shared/highlight";
 import { jsonCopy } from "@/submodules/javascript-functions/general";
+import { type } from "os";
 
 export function updateSearchParameters(searchElement, attributes, separator, fullSearch) {
     const activeParams = [];
@@ -36,6 +37,7 @@ export function updateSearchParameters(searchElement, attributes, separator, ful
         else if (p.value.group == SearchGroup.LABELING_TASKS) {
             if (!p.groupElements.active) return;
             param = createSplittedText(updateSearchParamText(p, attributes, separator, fullSearch[p.value.key].nameAdd), fullSearch, p);
+            if (!param) return;
             activeParams.push({ splittedText: param, values: { group: p.value.group, values: p.groupElements } });
         }
     });
@@ -49,6 +51,7 @@ function createSplittedText(i, searchGroup, p) {
     } else {
         groupName = searchGroup[p.value.key].groupElements.nameAdd + ':';
     }
+    if (i.searchText == null) return null;
     i.searchTextReplaced = i.searchText.replaceAll("\nAND", "\n<gn>" + groupName + "\n");
     i.splittedText = i.searchTextReplaced.split("\n<gn>");
     return i.splittedText;
@@ -117,6 +120,9 @@ function updateSearchParamText(searchElement, attributes, separator, nameAdd?) {
             searchElementCopy.searchText = searchElementCopy.searchText.replaceAll("-", ",");
     } else if (searchElementCopy.value.group == SearchGroup.LABELING_TASKS) {
         searchElementCopy.searchText = nameAdd + labelingTaskBuildSearchParamText(searchElementCopy.groupElements);
+        if (labelingTaskBuildSearchParamText(searchElementCopy.groupElements) === '') {
+            searchElementCopy.searchText = null;
+        }
     } else if (searchElementCopy.value.group == SearchGroup.USER_FILTER) {
         searchElementCopy.searchText = userBuildSearchParamText(searchElementCopy.groupElements.users);
     } else if (searchElementCopy.value.group == SearchGroup.ORDER_STATEMENTS) {
@@ -158,6 +164,7 @@ function labelingTaskBuildSearchParamText(values): string {
     }
     if (values.negate) text = '\nNOT (' + text + ')';
     else text = '\n' + text;
+    if (text === '\n') return '';
     return text;
 }
 
