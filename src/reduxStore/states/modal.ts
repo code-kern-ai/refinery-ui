@@ -228,6 +228,9 @@ const initialState: Modals = {
     },
     [ModalEnum.BRICKS_INTEGRATOR]: {
         open: false
+    },
+    [ModalEnum.SIZE_WARNING]: {
+        open: false
     }
 };
 

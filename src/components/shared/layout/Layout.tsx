@@ -16,7 +16,11 @@ import { useRouter } from "next/router";
 import AdminMessages from "../admin-messages/AdminMessages";
 import { AdminMessage } from "@/src/types/shared/admin-messages";
 import { postProcessAdminMessages } from "@/src/util/shared/admin-messages-helper";
-import { useConsoleLog } from "@/submodules/react-components/hooks/useConsoleLog";
+import SizeWarningModal from "./SizeWarningModal";
+import { closeModal, openModal } from "@/src/reduxStore/states/modal";
+import { ModalEnum } from "@/src/types/shared/modal";
+
+const MIN_WIDTH = 1250;
 
 export default function Layout({ children }) {
     const dispatch = useDispatch();
@@ -28,6 +32,7 @@ export default function Layout({ children }) {
     const [refetchTimer, setRefetchTimer] = useState(null);
     const [deletionTimer, setDeletionTimer] = useState(null);
     const [activeAdminMessages, setActiveAdminMessages] = useState<AdminMessage[]>([]);
+    const [windowWidth, setWindowWidth] = useState(window.innerWidth);
 
     const [refetchNotificationsByUser] = useLazyQuery(NOTIFICATIONS_BY_USER, { fetchPolicy: 'network-only' });
     const [refetchAdminMessages] = useLazyQuery(GET_ALL_ACTIVE_ADMIN_MESSAGES, { fetchPolicy: 'network-only' });
@@ -41,6 +46,24 @@ export default function Layout({ children }) {
             whitelist: ['notification_created', 'project_deleted', 'config_updated', 'admin_message'],
             func: handleWebsocketNotification
         });
+    }, []);
+
+    function handleResize() {
+        setWindowWidth(window.innerWidth);
+        if (window.innerWidth < MIN_WIDTH) {
+            dispatch(openModal(ModalEnum.SIZE_WARNING));
+        } else {
+            dispatch(closeModal(ModalEnum.SIZE_WARNING));
+        }
+    }
+
+    useEffect(() => {
+        // Add event listener on mount
+        window.addEventListener('resize', handleResize);
+        // Remove event listener on unmount
+        return () => {
+            window.removeEventListener('resize', handleResize);
+        };
     }, []);
 
     useEffect(() => {
@@ -101,7 +124,8 @@ export default function Layout({ children }) {
 
     return (
         <>
-            <div className="h-screen bg-gray-100 flex overflow-hidden">
+            <div className="h-screen bg-gray-100 flex overflow-hidden"
+                style={{ width: windowWidth < MIN_WIDTH ? MIN_WIDTH + 'px' : '100%', overflowX: windowWidth < MIN_WIDTH ? 'auto' : 'hidden' }}>
                 <Sidebar />
                 <div className="h-full w-full flex-1 flex flex-col">
                     <Header />
@@ -165,6 +189,7 @@ export default function Layout({ children }) {
             <AdminMessages
                 adminMessages={activeAdminMessages}
                 setActiveAdminMessages={(activeAdminMessages) => setActiveAdminMessages(activeAdminMessages)} />
+            <SizeWarningModal minWidth={MIN_WIDTH} />
         </>
     )
 }
