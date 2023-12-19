@@ -13,7 +13,7 @@ import { CurrentPage } from "@/src/types/shared/general";
 import { ModalEnum } from "@/src/types/shared/modal";
 import { postProcessingFormGroups } from "@/src/util/components/projects/projectId/settings/project-export-helper";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
-import { downloadByteData } from "@/submodules/javascript-functions/export";
+import { downloadByteDataNoStringify } from "@/submodules/javascript-functions/export";
 import { formatBytes } from "@/submodules/javascript-functions/general";
 import { useLazyQuery } from "@apollo/client";
 import { Tooltip } from "@nextui-org/react";
@@ -109,7 +109,7 @@ export default function ProjectSnapshotExport() {
         setDownloadPrepareMessage(DownloadState.DOWNLOAD);
         const fileName = projectExportCredentials.downloadFileName;
         downloadFile(projectExportCredentials, false).subscribe((data) => {
-            downloadByteData(data, fileName);
+            downloadByteDataNoStringify(data, fileName);
             timer(5000).subscribe(
                 () => (setDownloadPrepareMessage(DownloadState.NONE))
             );

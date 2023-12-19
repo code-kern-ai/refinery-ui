@@ -20,7 +20,7 @@ import { DownloadState } from "@/src/types/components/projects/projectId/setting
 import LoadingIcon from "../loading/LoadingIcon";
 import { ExportHelper } from "@/src/util/classes/export";
 import { downloadFile } from "@/src/services/base/s3-service";
-import { downloadByteData } from "@/submodules/javascript-functions/export";
+import { downloadByteDataNoStringify } from "@/submodules/javascript-functions/export";
 import { timer } from "rxjs";
 import { WebSocketsService } from "@/src/services/base/web-sockets/WebSocketsService";
 import { CurrentPage } from "@/src/types/shared/general";
@@ -183,7 +183,7 @@ export default function ExportRecordsModal(props: ExportProps) {
         setDownloadState(DownloadState.DOWNLOAD);
         const fileName = recordExportCredentials.downloadFileName;
         downloadFile(recordExportCredentials, false).subscribe((data) => {
-            downloadByteData(data, fileName);
+            downloadByteDataNoStringify(data, fileName);
             timer(5000).subscribe(
                 () => (setDownloadState(DownloadState.NONE))
             );
