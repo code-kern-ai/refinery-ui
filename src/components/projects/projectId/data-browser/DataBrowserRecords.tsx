@@ -16,6 +16,7 @@ import ConfigurationModal from './modals/ConfigurationModal';
 import { DataBrowserRecordsProps } from '@/src/types/components/projects/projectId/data-browser/data-browser';
 import { setSessionData } from '@/src/reduxStore/states/tmp';
 import Export from '@/src/components/shared/export/Export';
+import { LabelingLinkType } from '@/src/types/components/projects/projectId/labeling/labeling-main-component';
 
 export default function DataBrowserRecords(props: DataBrowserRecordsProps) {
     const dispatch = useDispatch();
@@ -46,7 +47,21 @@ export default function DataBrowserRecords(props: DataBrowserRecordsProps) {
             dispatch(setSessionData(sessionData));
             router.push(`/projects/${projectId}/edit-records`);
         } else {
-            router.push(`/projects/${projectId}/labeling`);
+            const huddleData: any = {
+                recordIds: extendedRecords.recordList.map((record) => record.id),
+                partial: true,
+                linkData: {
+                    projectId: projectId,
+                    huddleId: extendedRecords.sessionId,
+                    requestedPos: index,
+                    linkType: LabelingLinkType.SESSION,
+                },
+                allowedTask: null,
+                canEdit: true,
+                checkedAt: { db: null, local: new Date() },
+            }
+            localStorage.setItem('huddleData', JSON.stringify(huddleData));
+            router.push(`/projects/${projectId}/labeling/${extendedRecords.sessionId}?pos=${index + 1}&type=${LabelingLinkType.SESSION}`);
         }
     }
 

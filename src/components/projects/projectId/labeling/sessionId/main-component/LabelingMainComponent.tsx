@@ -10,7 +10,7 @@ import { UserManager } from "@/src/util/classes/labeling/user-manager";
 import { DUMMY_HUDDLE_ID, getDefaultLabelingSuiteSettings, parseLabelingLink } from "@/src/util/components/projects/projectId/labeling/labeling-main-component-helper";
 import { useLazyQuery } from "@apollo/client";
 import { useRouter } from "next/router";
-import { useCallback, useEffect } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import style from "@/src/styles/components/projects/projectId/labeling.module.css";
 import NavigationBarTop from "./NavigationBarTop";
@@ -45,6 +45,8 @@ export default function LabelingMainComponent() {
     const record = useSelector(selectRecordRequestsRecord);
     const allUsers = useSelector(selectAllUsers);
 
+    const [huddleData, setHuddleData] = useState(null);
+
     const [refetchHuddleData] = useLazyQuery(REQUEST_HUDDLE_DATA, { fetchPolicy: 'no-cache' });
     const [refetchAvailableLinks] = useLazyQuery(AVAILABLE_LABELING_LINKS, { fetchPolicy: 'no-cache' });
     const [refetchTokenizedRecord] = useLazyQuery(GET_TOKENIZED_RECORD, { fetchPolicy: 'no-cache' });
@@ -55,7 +57,6 @@ export default function LabelingMainComponent() {
     const [refetchComments] = useLazyQuery(REQUEST_COMMENTS, { fetchPolicy: "no-cache" });
 
     useEffect(unsubscribeWSOnDestroy(router, [CurrentPage.LABELING]), []);
-
 
     useEffect(() => {
         if (!projectId) return;
@@ -83,23 +84,19 @@ export default function LabelingMainComponent() {
         if (!projectId) return;
         if (!router.query.sessionId) return;
         SessionManager.labelingLinkData = parseLabelingLink(router);
-        SessionManager.readHuddleDataFromLocal();
-        const huddleId = SessionManager.prepareLabelingSession(projectId);
-        if (huddleId && SessionManager.huddleData) {
-            SessionManager.jumpToPosition(SessionManager.labelingLinkData.requestedPos);
-            router.push(`/projects/${projectId}/labeling/${huddleId}?pos=${SessionManager.labelingLinkData.requestedPos}&type=${SessionManager.huddleData.linkData.linkType}`);
-        }
-        if (huddleId == DUMMY_HUDDLE_ID) requestHuddleData(huddleId);
-        else {
-            SessionManager.jumpToPosition(SessionManager.labelingLinkData.requestedPos);
-            router.push(`/projects/${projectId}/labeling/${SessionManager.labelingLinkData.huddleId}?pos=${SessionManager.huddleData.linkData.requestedPos}&type=${SessionManager.huddleData.linkData.linkType}`);
-        }
+        const huddleData = (SessionManager.readHuddleDataFromLocal());
+        setHuddleData(huddleData);
         WebSocketsService.subscribeToNotification(CurrentPage.LABELING, {
             projectId: projectId,
             whitelist: ['attributes_updated', 'calculate_attribute', 'payload_finished', 'weak_supervision_finished', 'record_deleted', 'rla_created', 'rla_deleted', 'access_link_changed', 'access_link_removed', 'label_created', 'label_deleted', 'labeling_task_deleted', 'labeling_task_updated', 'labeling_task_created'],
             func: handleWebsocketNotification
         });
     }, [projectId, router.query.sessionId]);
+
+    useEffect(() => {
+        if (!huddleData) return;
+        requestHuddleData(SessionManager.labelingLinkData.huddleId);
+    }, [huddleData]);
 
     useEffect(() => {
         if (!projectId) return;
@@ -193,10 +190,6 @@ export default function LabelingMainComponent() {
     }
 
     function requestHuddleData(huddleId: string) {
-        if (huddleId != SessionManager.labelingLinkData.huddleId) {
-            console.log("something wrong with session/huddle integration");
-            return
-        }
         refetchHuddleData({ variables: { projectId: projectId, huddleId: huddleId, huddleType: SessionManager.labelingLinkData.linkType } }).then((result) => {
             const huddleData = result['data']['requestHuddleData'];
             if (huddleId == DUMMY_HUDDLE_ID) {

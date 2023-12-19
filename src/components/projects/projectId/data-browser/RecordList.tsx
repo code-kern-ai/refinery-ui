@@ -54,9 +54,9 @@ export default function RecordList(props: RecordListProps) {
                         </button>)}
                     </div>
                     <div className="float-right">
-                        <button className="text-green-700 hover:text-green-500 text-sm font-medium cursor-pointer">
+                        <button className="text-green-700 hover:text-green-500 text-sm font-medium cursor-pointer" onClick={() => props.recordClicked(index)}>
                             <span className="leading-5">Continue with this record
-                                <IconArrowRight className="h-4 w-4 inline-block" onClick={() => props.recordClicked(index)} />
+                                <IconArrowRight className="h-4 w-4 inline-block" />
                             </span>
                         </button>
                     </div>

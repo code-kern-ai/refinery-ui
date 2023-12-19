@@ -34,13 +34,13 @@ export class SessionManager {
             localStorage.removeItem("huddleData");
             this.huddleData = null;
         }
+        return this.huddleData;
     }
 
     private static huddleOutdated(): boolean {
         if (!this.huddleData) return true;
         for (const key in this.labelingLinkData) {
             if (key == 'linkLocked') continue;
-            if (this.labelingLinkData[key] != this.huddleData.linkData[key]) return true;
         }
         if (this.huddleData.checkedAt?.local) {
             if ((new Date().getTime() - this.huddleData.checkedAt.local.getTime()) > ONE_DAY) return true;
@@ -49,7 +49,8 @@ export class SessionManager {
     }
 
 
-    public static prepareLabelingSession(projectId: string) {
+    public static prepareLabelingSession(projectId: string, huddleData) {
+        if (huddleData) this.huddleData = huddleData;
         let huddleId = this.labelingLinkData.huddleId;
         let pos = this.labelingLinkData.requestedPos;
         if (pos == null && this.huddleData?.linkData.requestedPos) pos = this.huddleData.linkData.requestedPos;
