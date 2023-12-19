@@ -1,5 +1,5 @@
-import { selectAdditionalData, selectConfiguration, selectIsTextHighlightNeeded, selectTextHighlight } from "@/src/reduxStore/states/pages/data-browser";
-import { selectAttributes, selectAttributesDict, selectUsableAttributes } from "@/src/reduxStore/states/pages/settings";
+import { selectConfiguration, selectIsTextHighlightNeeded, selectTextHighlight } from "@/src/reduxStore/states/pages/data-browser";
+import { selectAttributesDict, selectUsableAttributes } from "@/src/reduxStore/states/pages/settings";
 import { LineBreaksType } from "@/src/types/components/projects/projectId/data-browser/data-browser";
 import { Attribute } from "@/src/types/components/projects/projectId/settings/data-schema";
 import { DataTypeEnum } from "@/src/types/shared/general";
@@ -23,7 +23,7 @@ export function RecordDisplay(props: any) {
         if (!props.record) return;
         if (!attributes) return;
         if (!isTextHighlightNeeded) return;
-        setPreparedRecord(postProcessRecord(props.record));
+        setPreparedRecord(postProcessRecord(props.record, attributes));
         setPreparedAttributes(postProcessAttributes(attributes));
     }, [props.record, attributes, isTextHighlightNeeded]);
 

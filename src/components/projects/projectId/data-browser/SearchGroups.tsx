@@ -269,7 +269,7 @@ export default function SearchGroups(props: DataBrowserSideBarProps) {
             const fullSearchCopy = { ...fullSearch };
             const formControlsIdx = fullSearchCopy[SearchGroup.ATTRIBUTES].groupElements[i];
             const attributeType = getAttributeType(attributesSortOrder, saveDropdownAttribute);
-            if (attributeType !== 'BOOLEAN') {
+            if (attributeType !== DataTypeEnum.BOOLEAN) {
                 for (let t of Object.values(SearchOperator)) {
                     operatorsCopy.push({
                         value: t.split("_").join(" "),
@@ -280,7 +280,7 @@ export default function SearchGroups(props: DataBrowserSideBarProps) {
                     if (formControlsIdx['operator'] == '') {
                         formControlsIdx['operator'] = SearchOperator.CONTAINS;
                     }
-                    formControlsIdx['addText'] = attributeType == 'INTEGER' ? 'Enter any number' : attributeType == 'FLOAT' ? 'Enter any float' : 'Enter any string';
+                    formControlsIdx['addText'] = attributeType == DataTypeEnum.INTEGER ? 'Enter any number' : attributeType == DataTypeEnum.FLOAT ? 'Enter any float' : 'Enter any string';
                 }
             } else {
                 formControlsIdx['operator'] = '';
@@ -314,10 +314,10 @@ export default function SearchGroups(props: DataBrowserSideBarProps) {
             const attributeType = getAttributeType(attributesSortOrder, value);
             setSaveDropdownAttribute(value);
             setSaveAttributeType(attributeType);
-            if (attributeType == "BOOLEAN" && formControlsIdx['searchValue'] != "") {
+            if (attributeType == DataTypeEnum.BOOLEAN && formControlsIdx['searchValue'] != "") {
                 formControlsIdx['searchValue'] = "";
                 formControlsIdx['searchValueBetween'] = "";
-            } else if (attributeType == 'INTEGER' || attributeType == 'FLOAT') {
+            } else if (attributeType == DataTypeEnum.INTEGER || attributeType == DataTypeEnum.FLOAT) {
                 if (isNaN(parseInt(formControlsIdx['searchValue']))) {
                     formControlsIdx['searchValue'] = "";
                     formControlsIdx['searchValueBetween'] = "";

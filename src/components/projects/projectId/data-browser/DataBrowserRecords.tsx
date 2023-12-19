@@ -17,6 +17,7 @@ import { DataBrowserRecordsProps } from '@/src/types/components/projects/project
 import { setSessionData } from '@/src/reduxStore/states/tmp';
 import Export from '@/src/components/shared/export/Export';
 import { LabelingLinkType } from '@/src/types/components/projects/projectId/labeling/labeling-main-component';
+import { Fragment } from 'react';
 
 export default function DataBrowserRecords(props: DataBrowserRecordsProps) {
     const dispatch = useDispatch();
@@ -35,6 +36,7 @@ export default function DataBrowserRecords(props: DataBrowserRecordsProps) {
         dispatch(setRecordsInDisplay(false));
         dispatch(setActiveDataSlice(null));
         dispatch(setTextHighlight([]));
+        dispatch(setIsTextHighlightNeeded({}));
     }
 
     function storePreliminaryRecordIds(index: number, forEdit: boolean = false) {
@@ -115,7 +117,7 @@ export default function DataBrowserRecords(props: DataBrowserRecordsProps) {
             </div>
         </div>}
         {!(activeSlice?.static) && <div className="flex flex-row flex-wrap mt-4">
-            {activeSearchParams.map((searchParam, i) => (<div key={i}>
+            {activeSearchParams.map((searchParam, i) => (<Fragment key={i}>
                 {searchParam.splittedText.map((searchText, j) => (<div key={j} className="flex flex-row items-center gap-y-1">
                     <div className="whitespace-pre-line break-all rounded-full items-center py-0.5 px-2.5 text-sm font-medium border border-green-700 bg-green-100 text-green-700 grid grid-cols-2 mr-2"
                         style={{ gridTemplateColumns: 'auto max-content' }}>
@@ -128,8 +130,7 @@ export default function DataBrowserRecords(props: DataBrowserRecordsProps) {
                         <IconChartCircles className="h-4 w-4 mr-1" />
                     </Tooltip>}
                 </div>))}
-
-            </div>))}
+            </Fragment>))}
         </div>}
 
         <div className="mb-3 mt-4 grow overflow-y-auto" style={{ maxHeight: 'calc(100vh - 160px)' }} onScroll={(e: any) => refetchMoreRecords(e)}>

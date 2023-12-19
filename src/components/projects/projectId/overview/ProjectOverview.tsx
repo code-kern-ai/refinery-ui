@@ -201,6 +201,10 @@ export default function ProjectOverview() {
         const dataSliceFindId = dataSlices.find((dataSlice) => dataSlice.name === overviewFilters.dataSlice)?.id;
         const dataSliceId = dataSliceFindId == "@@NO_SLICE@@" ? null : dataSliceFindId;
         refetchConfusionMatrix({ variables: { projectId: projectId, labelingTaskId: labelingTaskId, sliceId: dataSliceId } }).then((res) => {
+            if (res['data']['confusionMatrix'] == null) {
+                setConfusionMatrix([]);
+                return;
+            }
             setConfusionMatrix(postProcessConfusionMatrix(res['data']['confusionMatrix']));
         });
     }

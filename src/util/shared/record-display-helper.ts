@@ -1,7 +1,7 @@
 import { Attribute } from "@/src/types/components/projects/projectId/settings/data-schema";
 import { jsonCopy } from "@/submodules/javascript-functions/general";
 
-export function postProcessRecord(record: any) {
+export function postProcessRecord(record: any, attributes: Attribute[]) {
     const prepareRecord = jsonCopy(record);
     if (!prepareRecord.hasOwnProperty('data')) {
         if (prepareRecord.hasOwnProperty('fullRecordData')) {
@@ -13,6 +13,11 @@ export function postProcessRecord(record: any) {
             throw new Error("Cant find record data in record object");
         }
     }
+    attributes.forEach((attribute, index) => {
+        if (typeof prepareRecord.data[attribute.name] === 'boolean') {
+            prepareRecord.data[attribute.name] = prepareRecord.data[attribute.name].toString();
+        }
+    });
     return prepareRecord;
 }
 
