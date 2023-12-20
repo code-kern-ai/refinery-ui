@@ -65,3 +65,8 @@ query ($projectId: ID!, $sliceId: ID!, $orderBy: JSONString, $offset: Int, $limi
   }
 }
 `;
+
+export const GET_UNIQUE_VALUES_BY_ATTRIBUTES = gql`
+query ($projectId: ID!) {
+  uniqueValuesByAttributes(projectId: $projectId)
+}`;

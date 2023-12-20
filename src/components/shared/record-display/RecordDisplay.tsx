@@ -36,7 +36,7 @@ export function RecordDisplay(props: any) {
             </div>
             {attributesDict[attribute.id] && <div className="text-gray-800 text-sm mb-4 overflow-anywhere flex">
                 {attribute.dataType == DataTypeEnum.EMBEDDING_LIST ? (<div className="flex flex-col gap-y-1 divide-y">
-                    {preparedRecord.data[attributesDict[attribute.key].name].map((item, indexJ) => (<div key={indexJ} className="pt-1">
+                    {preparedRecord.data[attributesDict[attribute.key].name] && preparedRecord.data[attributesDict[attribute.key].name].map((item, indexJ) => (<div key={indexJ} className="pt-1">
                         {(configuration.highlightText && isTextHighlightNeeded[attribute.key]) ? (<Highlight text={item.toString()}
                             additionalClasses={[configuration.lineBreaks == LineBreaksType.NORMAL ? '' : (configuration.lineBreaks == LineBreaksType.IS_PRE_WRAP ? 'whitespace-pre-wrap' : 'whitespace-pre-line')]}
                             searchForExtended={textHighlight[attribute.id]} />) : (

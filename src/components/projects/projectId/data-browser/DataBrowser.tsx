@@ -2,12 +2,12 @@ import { selectProjectId } from "@/src/reduxStore/states/project"
 import { useDispatch, useSelector } from "react-redux"
 import DataBrowserSidebar from "./DataBrowserSidebar";
 import { useLazyQuery } from "@apollo/client";
-import { DATA_SLICES, GET_RECORD_COMMENTS, SEARCH_RECORDS_EXTENDED } from "@/src/services/gql/queries/data-browser";
+import { DATA_SLICES, GET_RECORD_COMMENTS, GET_UNIQUE_VALUES_BY_ATTRIBUTES, SEARCH_RECORDS_EXTENDED } from "@/src/services/gql/queries/data-browser";
 import { useCallback, useEffect, useState } from "react";
-import { expandRecordList, setDataSlices, setRecordComments, setSearchRecordsExtended, setUsersMapCount, updateAdditionalDataState } from "@/src/reduxStore/states/pages/data-browser";
-import { postProcessDataSlices, postProcessRecordComments, postProcessRecordsExtended, postProcessUsersCount } from "@/src/util/components/projects/projectId/data-browser/data-browser-helper";
+import { expandRecordList, setDataSlices, setRecordComments, setSearchRecordsExtended, setUniqueValuesDict, setUsersMapCount, updateAdditionalDataState } from "@/src/reduxStore/states/pages/data-browser";
+import { postProcessDataSlices, postProcessRecordComments, postProcessRecordsExtended, postProcessUniqueValues, postProcessUsersCount } from "@/src/util/components/projects/projectId/data-browser/data-browser-helper";
 import { GET_ATTRIBUTES_BY_PROJECT_ID, GET_EMBEDDING_SCHEMA_BY_PROJECT_ID, GET_LABELING_TASKS_BY_PROJECT_ID } from "@/src/services/gql/queries/project-setting";
-import { selectLabelingTasksAll, setAllAttributes, setAllEmbeddings, setLabelingTasksAll } from "@/src/reduxStore/states/pages/settings";
+import { selectAttributes, selectLabelingTasksAll, setAllAttributes, setAllEmbeddings, setLabelingTasksAll } from "@/src/reduxStore/states/pages/settings";
 import { postProcessingAttributes } from "@/src/util/components/projects/projectId/settings/data-schema-helper";
 import { postProcessLabelingTasks, postProcessLabelingTasksSchema } from "@/src/util/components/projects/projectId/settings/labeling-tasks-helper";
 import { GET_ORGANIZATION_USERS_WITH_COUNT } from "@/src/services/gql/queries/organizations";
@@ -31,6 +31,7 @@ export default function DataBrowser() {
     const projectId = useSelector(selectProjectId);
     const users = useSelector(selectAllUsers);
     const labelingTasks = useSelector(selectLabelingTasksAll);
+    const attributes = useSelector(selectAttributes);
 
     const [searchRequest, setSearchRequest] = useState(SEARCH_REQUEST);
     const [clearFullSearch, setClearFullSearch] = useState(false);
@@ -43,6 +44,7 @@ export default function DataBrowser() {
     const [refetchEmbeddings] = useLazyQuery(GET_EMBEDDING_SCHEMA_BY_PROJECT_ID, { fetchPolicy: "network-only" });
     const [refetchRecordComments] = useLazyQuery(GET_RECORD_COMMENTS, { fetchPolicy: "no-cache" });
     const [refetchComments] = useLazyQuery(REQUEST_COMMENTS, { fetchPolicy: "no-cache" });
+    const [refetchUniqueValues] = useLazyQuery(GET_UNIQUE_VALUES_BY_ATTRIBUTES, { fetchPolicy: "no-cache" });
 
     useEffect(unsubscribeWSOnDestroy(router, [CurrentPage.DATA_BROWSER]), []);
 
@@ -54,6 +56,7 @@ export default function DataBrowser() {
         refetchLabelingTasksAndProcess();
         refetchUsersCountAndProcess();
         refetchEmbeddingsAndPostProcess();
+        refetchUniqueValuesAndProcess();
         WebSocketsService.subscribeToNotification(CurrentPage.DATA_BROWSER, {
             projectId: projectId,
             whitelist: ['data_slice_created', 'data_slice_updated', 'data_slice_deleted', 'label_created', 'label_deleted', 'labeling_task_deleted', 'labeling_task_updated', 'labeling_task_created', 'information_source_created', 'information_source_updated', 'information_source_deleted', 'attributes_updated', 'calculate_attribute', 'embedding', 'embedding_deleted'],
@@ -151,6 +154,12 @@ export default function DataBrowser() {
 
     function getNextRecords() {
         setSearchRequest({ offset: searchRequest.offset + searchRequest.limit, limit: searchRequest.limit });
+    }
+
+    function refetchUniqueValuesAndProcess() {
+        refetchUniqueValues({ variables: { projectId: projectId } }).then((res) => {
+            dispatch(setUniqueValuesDict(postProcessUniqueValues(res.data['uniqueValuesByAttributes'], attributes)));
+        });
     }
 
     const handleWebsocketNotification = useCallback((msgParts: string[]) => {

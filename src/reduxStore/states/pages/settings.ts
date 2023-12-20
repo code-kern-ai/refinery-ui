@@ -57,7 +57,7 @@ const settingsSlice = createSlice({
             else state.attributes.all = [];
             state.attributes.useableEmbedableAttributes = state.attributes.all.filter((attribute) => (attribute.dataType === DataTypeEnum.TEXT || attribute.dataType === DataTypeEnum.EMBEDDING_LIST) &&
                 (attribute.state === AttributeState.UPLOADED || attribute.state === AttributeState.AUTOMATICALLY_CREATED || attribute.state === AttributeState.USABLE));
-            state.attributes.useableNonTextAttributes = state.attributes.all.filter((attribute) => attribute.dataType !== DataTypeEnum.TEXT &&
+            state.attributes.useableNonTextAttributes = state.attributes.all.filter((attribute) => (attribute.dataType !== DataTypeEnum.TEXT && attribute.dataType !== DataTypeEnum.EMBEDDING_LIST) &&
                 (attribute.state === AttributeState.UPLOADED || attribute.state === AttributeState.AUTOMATICALLY_CREATED || attribute.state === AttributeState.USABLE));
             const fullRecordEl = {
                 id: '@@NO_ATTRIBUTE@@',

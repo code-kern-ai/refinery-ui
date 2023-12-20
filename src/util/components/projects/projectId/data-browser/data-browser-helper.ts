@@ -6,6 +6,7 @@ import { dateAsUTCDate } from "@/submodules/javascript-functions/date-parser";
 import { informationSourceTypeToString, labelSourceToString, sliceTypeToString } from "@/submodules/javascript-functions/enums/enum-functions";
 import { LabelSource, Slice } from "@/submodules/javascript-functions/enums/enums";
 import { jsonCopy, tryParseJSON } from "@/submodules/javascript-functions/general";
+import { getAttributeType } from "./search-operators-helper";
 
 export function postProcessDataSlices(dataSlices: DataSlice[]) {
     const prepareDataSlices = jsonCopy(dataSlices);
@@ -186,4 +187,15 @@ function parseUTC(utc: string, forOutlier: boolean = false) {
     const utcDate = dateAsUTCDate(new Date(utc));
     if (forOutlier) return utcDate.toLocaleString().replace(", ", "\n");
     else return utcDate.toLocaleString();
+}
+
+export function postProcessUniqueValues(uniqueValues: any, attributesSortOrder: any) {
+    const uniqueValuesDict = JSON.parse(uniqueValues);
+    for (let key in uniqueValuesDict) {
+        const attributeType = getAttributeType(attributesSortOrder, key);
+        if (attributeType == 'TEXT') {
+            delete uniqueValuesDict[key];
+        }
+    }
+    return uniqueValuesDict;
 }

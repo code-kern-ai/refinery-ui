@@ -80,7 +80,7 @@ function buildFilterElementAttribute(first: boolean, searchElement: any, attribu
         if (filterElement.FILTER.length == 0) return null;
         else return filterElement;
     } else {
-        const attributeType = getAttributeType(attributes, searchElement.values.name);
+        const attributeType = attributes.find(a => a.name == searchElement.values.name).dataType;
         const searchEl = jsonCopy(searchElement);
         searchEl.values.operator = searchEl.values.operator.split(" ").join("_");
         filterElement = {

@@ -12,7 +12,7 @@ import { SearchOperator } from "@/src/types/components/projects/projectId/data-b
 import { checkDecimalPatterns, getAttributeType, getSearchOperatorTooltip } from "@/src/util/components/projects/projectId/data-browser/search-operators-helper";
 import { DataTypeEnum } from "@/src/types/shared/general";
 import { selectAllUsers, selectUser } from "@/src/reduxStore/states/general";
-import { selectActiveSearchParams, selectActiveSlice, selectConfiguration, selectIsTextHighlightNeeded, selectRecords, selectTextHighlight, selectUsersCount, setActiveSearchParams, setIsTextHighlightNeeded, setRecordsInDisplay, setSearchRecordsExtended, setTextHighlight } from "@/src/reduxStore/states/pages/data-browser";
+import { selectActiveSearchParams, selectActiveSlice, selectConfiguration, selectIsTextHighlightNeeded, selectRecords, selectTextHighlight, selectUniqueValuesDict, selectUsersCount, setActiveSearchParams, setIsTextHighlightNeeded, setRecordsInDisplay, setSearchRecordsExtended, setTextHighlight } from "@/src/reduxStore/states/pages/data-browser";
 import { Tooltip } from "@nextui-org/react";
 import { setModalStates } from "@/src/reduxStore/states/modal";
 import { ModalEnum } from "@/src/types/shared/modal";
@@ -49,6 +49,7 @@ export default function SearchGroups(props: DataBrowserSideBarProps) {
     const activeSlice = useSelector(selectActiveSlice);
     const textHighlight = useSelector(selectTextHighlight);
     const isTextHighlightNeeded = useSelector(selectIsTextHighlightNeeded);
+    const uniqueValuesDict = useSelector(selectUniqueValuesDict);
 
     const [fullSearch, setFullSearch] = useState<any>({});
     const [searchGroups, setSearchGroups] = useState<{ [key: string]: any }>({});
@@ -56,7 +57,6 @@ export default function SearchGroups(props: DataBrowserSideBarProps) {
     const [attributesSortOrder, setAttributeSortOrder] = useState([]);
     const [operatorsDropdown, setOperatorsDropdown] = useState([]);
     const [tooltipsArray, setTooltipArray] = useState([]);
-    const [saveDropdownAttribute, setSaveDropdownAttribute] = useState(null);
     const [saveAttributeType, setSaveAttributeType] = useState(null);
     const [manualLabels, setManualLabels] = useState([]);
     const [weakSupervisionLabels, setWeakSupervisionLabels] = useState([]);
@@ -276,33 +276,31 @@ export default function SearchGroups(props: DataBrowserSideBarProps) {
         return '#2563eb';
     }
 
-    function getOperatorDropdownValues(i?: number, value?: any) {
-        if (operatorsDropdown.length == 0) {
-            const operatorsCopy = [...operatorsDropdown];
-            const tooltipsCopy = [...tooltipsArray];
-            const fullSearchCopy = { ...fullSearch };
-            const formControlsIdx = fullSearchCopy[SearchGroup.ATTRIBUTES].groupElements[i];
-            const attributeType = getAttributeType(attributesSortOrder, saveDropdownAttribute);
-            if (attributeType !== DataTypeEnum.BOOLEAN) {
-                for (let t of Object.values(SearchOperator)) {
-                    operatorsCopy.push({
-                        value: t.split("_").join(" "),
-                    });
-                    tooltipsCopy.push(getSearchOperatorTooltip(t));
-                }
-                if (formControlsIdx) {
-                    if (formControlsIdx['operator'] == '') {
-                        formControlsIdx['operator'] = SearchOperator.CONTAINS;
-                    }
-                    formControlsIdx['addText'] = attributeType == DataTypeEnum.INTEGER ? 'Enter any number' : attributeType == DataTypeEnum.FLOAT ? 'Enter any float' : 'Enter any string';
-                }
-            } else {
-                formControlsIdx['operator'] = '';
+    function getOperatorDropdownValues(i?: number, value?: any, fullSearchCopyParam?: any) {
+        const operatorsCopy = [];
+        const tooltipsCopy = [];
+        const fullSearchCopy = fullSearchCopyParam ?? { ...fullSearch };
+        const formControlsIdx = fullSearchCopy[SearchGroup.ATTRIBUTES].groupElements[i];
+        const attributeType = getAttributeType(attributesSortOrder, value);
+        if (attributeType !== DataTypeEnum.BOOLEAN) {
+            for (let t of Object.values(SearchOperator)) {
+                operatorsCopy.push({
+                    value: t.split("_").join(" "),
+                });
+                tooltipsCopy.push(getSearchOperatorTooltip(t));
             }
-            setOperatorsDropdown(operatorsCopy);
-            setTooltipArray(tooltipsCopy);
-            setFullSearch(fullSearchCopy);
+            if (formControlsIdx) {
+                if (formControlsIdx['operator'] == '') {
+                    formControlsIdx['operator'] = SearchOperator.CONTAINS;
+                }
+                formControlsIdx['addText'] = attributeType == DataTypeEnum.INTEGER ? 'Enter any number' : attributeType == DataTypeEnum.FLOAT ? 'Enter any float' : 'Enter any string';
+            }
+        } else {
+            formControlsIdx['operator'] = '';
         }
+        setOperatorsDropdown(operatorsCopy);
+        setTooltipArray(tooltipsCopy);
+        setFullSearch(fullSearchCopy);
     }
 
     function removeSearchGroupItem(groupKey, index) {
@@ -326,7 +324,6 @@ export default function SearchGroups(props: DataBrowserSideBarProps) {
         formControlsIdx[field] = value;
         if (field == 'name') {
             const attributeType = getAttributeType(attributesSortOrder, value);
-            setSaveDropdownAttribute(value);
             setSaveAttributeType(attributeType);
             if (attributeType == DataTypeEnum.BOOLEAN && formControlsIdx['searchValue'] != "") {
                 formControlsIdx['searchValue'] = "";
@@ -339,7 +336,7 @@ export default function SearchGroups(props: DataBrowserSideBarProps) {
             }
         }
         setFullSearch(fullSearchCopy);
-        getOperatorDropdownValues(i, value);
+        getOperatorDropdownValues(i, value, fullSearchCopy);
         updateSearchParams(fullSearchCopy);
     }
 
@@ -531,18 +528,25 @@ export default function SearchGroups(props: DataBrowserSideBarProps) {
                                                 selectedOption={(option: string) => selectValueDropdown(option, index, 'operator', group.key)} />}
                                         </div>
                                     </div>
-                                    {/* TODO: Add check for unique values */}
-                                    <div className="my-2 flex-grow flex flex-row items-center">
-                                        {groupItem['operator'] != '' && <input placeholder={groupItem['addText']}
-                                            onChange={(e) => selectValueDropdown(e.target.value, index, 'searchValue', group.key)}
-                                            onKeyDown={(e) => checkIfDecimals(e, index, group.key)}
-                                            className="h-8 w-full border-gray-300 rounded-md placeholder-italic border text-gray-900 pl-4 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100" />}
-                                        {groupItem['operator'] == SearchOperator.BETWEEN && <span className="text-sm text-gray-500 mx-1">AND</span>}
-                                        {groupItem['operator'] == SearchOperator.BETWEEN && <input placeholder={groupItem['addText']}
-                                            onChange={(e) => selectValueDropdown(e.target.value, index, 'searchValueBetween', group.key)}
-                                            onKeyDown={(e) => checkIfDecimals(e, index, group.key)}
-                                            className="h-8 w-full border-gray-300 rounded-md placeholder-italic border text-gray-900 pl-4 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100" />}
-                                    </div>
+                                    {uniqueValuesDict[groupItem['name']] && groupItem['operator'] != '' && groupItem['operator'] != 'BETWEEN' && groupItem['operator'] != 'IN' && groupItem['operator'] != 'IN WC' ? (
+                                        <div className="my-2">
+                                            <Dropdown options={uniqueValuesDict[groupItem['name']]} buttonName={groupItem['searchValue'] ? groupItem['searchValue'] : 'Select value'}
+                                                selectedOption={(option) => selectValueDropdown(option, index, 'searchValue', group.key)} />
+                                        </div>
+                                    ) : (
+                                        <div className="my-2 flex-grow flex flex-row items-center">
+                                            {groupItem['operator'] != '' && <input placeholder={groupItem['addText']}
+                                                onChange={(e) => selectValueDropdown(e.target.value, index, 'searchValue', group.key)}
+                                                onKeyDown={(e) => checkIfDecimals(e, index, group.key)}
+                                                className="h-8 w-full border-gray-300 rounded-md placeholder-italic border text-gray-900 pl-4 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100" />}
+                                            {groupItem['operator'] == SearchOperator.BETWEEN && <span className="text-sm text-gray-500 mx-1">AND</span>}
+                                            {groupItem['operator'] == SearchOperator.BETWEEN && <input placeholder={groupItem['addText']}
+                                                onChange={(e) => selectValueDropdown(e.target.value, index, 'searchValueBetween', group.key)}
+                                                onKeyDown={(e) => checkIfDecimals(e, index, group.key)}
+                                                className="h-8 w-full border-gray-300 rounded-md placeholder-italic border text-gray-900 pl-4 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100" />}
+                                        </div>
+                                    )}
+
                                     {(groupItem['operator'] == SearchOperator.BEGINS_WITH || groupItem['operator'] == SearchOperator.ENDS_WITH || groupItem['operator'] == SearchOperator.CONTAINS || groupItem['operator'] == SearchOperator.IN_WC) && (saveAttributeType != DataTypeEnum.INTEGER && saveAttributeType != DataTypeEnum.FLOAT) &&
                                         <label htmlFor="caseSensitive" className="text-xs text-gray-500 cursor-pointer flex items-center pb-2"><input name="caseSensitive" className="mr-1 cursor-pointer"
                                             onChange={(e: any) => selectValueDropdown(e.target.checked, index, 'caseSensitive', group.key)} type="checkbox" />Case sensitive</label>}
