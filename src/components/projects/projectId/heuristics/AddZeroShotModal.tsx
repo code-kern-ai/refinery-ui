@@ -2,7 +2,7 @@ import Modal from "@/src/components/shared/modal/Modal";
 import { CacheEnum, selectCachedValue } from "@/src/reduxStore/states/cachedValues";
 import { selectModal } from "@/src/reduxStore/states/modal";
 import { selectHeuristicType } from "@/src/reduxStore/states/pages/heuristics";
-import { selectLabelingTasksAll, selectUsableNonTextAttributes } from "@/src/reduxStore/states/pages/settings";
+import { selectLabelingTasksAll, selectUseableEmbedableAttributes } from "@/src/reduxStore/states/pages/settings";
 import { selectProjectId } from "@/src/reduxStore/states/project";
 import { CREATE_ZERO_SHOT_INFORMATION_SOURCE } from "@/src/services/gql/mutations/heuristics";
 import { LabelingTaskTaskType } from "@/src/types/components/projects/projectId/settings/labeling-tasks";
@@ -24,22 +24,28 @@ export default function AddZeroShotModal() {
 
     const projectId = useSelector(selectProjectId);
     const labelingTasks = useSelector(selectLabelingTasksAll);
-    const attributes = useSelector(selectUsableNonTextAttributes);
+    const attributes = useSelector(selectUseableEmbedableAttributes);
     const modalZs = useSelector(selectModal(ModalEnum.ADD_ZERO_SHOT));
     const heuristicType = useSelector(selectHeuristicType);
     const models = useSelector(selectCachedValue(CacheEnum.ZERO_SHOT_RECOMMENDATIONS));
 
     const [labelingTask, setLabelingTask] = useState('');
-    const [attribute, setAttribute] = useState<string>('');
+    const [attribute, setAttribute] = useState<string>(null);
     const [model, setModel] = useState<string>('');
     const [labelingTasksClassification, setLabelingTasksClassification] = useState([]);
     const [showZSAttribute, setShowZSAttribute] = useState<boolean>(false);
 
+    useEffect(() => {
+        if (!attributes) return;
+        setAttribute(attributes[0]?.name);
+    }, [attributes]);
 
     const [createZeroShotMut] = useMutation(CREATE_ZERO_SHOT_INFORMATION_SOURCE);
 
     const createZeroShot = useCallback(() => {
-        const labelingTaskId = labelingTasks.find(lt => lt.name == labelingTask)?.id;
+        const parseTask = labelingTask.split(' - ');
+        const taskName = parseTask.length > 0 ? parseTask[parseTask.length - 1] : labelingTask;
+        const labelingTaskId = labelingTasks.find(lt => lt.name == taskName)?.id;
         const attributeId = attributes.find(a => a.name == attribute) ? attributes.find(a => a.name == attribute).id : '';
         createZeroShotMut({ variables: { projectId: projectId, targetConfig: model, labelingTaskId: labelingTaskId, attributeId: attributeId } }).then((res) => {
             let id = res['data']?.['createZeroShotInformationSource']['id'];

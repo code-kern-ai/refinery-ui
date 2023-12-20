@@ -121,7 +121,7 @@ export function HeuristicsOverview() {
         } else if (msgParts[1] == 'embedding_deleted' || (msgParts[1] == 'embedding' && msgParts[3] == 'state')) {
             refetchEmbeddingsAndProcess();
         }
-    }, []);
+    }, [projectId]);
 
     useEffect(() => {
         if (!projectId) return;

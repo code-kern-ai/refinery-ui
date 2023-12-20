@@ -43,7 +43,7 @@ function fillZeroShotSettings(settingsJson: string, labelingTasks: LabelingTask[
     if (!zeroShotSettings.attributeId) {
         zeroShotSettings.attributeId = findLabelingTask.attribute.id;
     };
-    zeroShotSettings.attributeName = findLabelingTask.attribute.name;
+    zeroShotSettings.attributeName = findLabelingTask.attribute?.name;
     return zeroShotSettings;
 }
 
