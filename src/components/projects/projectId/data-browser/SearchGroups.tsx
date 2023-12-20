@@ -74,8 +74,9 @@ export default function SearchGroups(props: DataBrowserSideBarProps) {
         if (!projectId) return;
         if (!users) return;
         if (!labelingTasks) return;
+        if (!attributesSortOrder) return;
         prepareSearchGroups();
-    }, [projectId, users, labelingTasks]);
+    }, [projectId, users, labelingTasks, attributesSortOrder]);
 
     useEffect(() => {
         if (!attributes) return;
@@ -149,10 +150,11 @@ export default function SearchGroups(props: DataBrowserSideBarProps) {
 
     useEffect(() => {
         if (!props.clearFullSearch) return;
+        if (!attributesSortOrder) return;
         setFullSearch({});
         setSearchGroups({});
         prepareSearchGroups();
-    }, [props.clearFullSearch]);
+    }, [props.clearFullSearch, attributesSortOrder]);
 
     useEffect(() => {
         if (!currentWeakSupervisionRun) return;

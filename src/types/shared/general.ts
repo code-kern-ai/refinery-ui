@@ -26,6 +26,7 @@ export enum CurrentPage {
     EXPORT = "EXPORT",
     COMMENTS = "COMMENTS",
     BRICKS_INTEGRATOR = "BRICKS_INTEGRATOR",
+    CONFIG = "CONFIG",
 }
 
 export type User = {

@@ -17,3 +17,19 @@ mutation ($userMail: String!, $organizationName: String!) {
   }
 }
 `;
+
+export const CHANGE_ORGANIZATION = gql`
+mutation ($orgId: ID!, $changes: JSONString!) {
+  changeOrganization(orgId: $orgId, changes: $changes) {
+    ok
+  }
+}
+`;
+
+export const UPDATE_CONFIG = gql`
+mutation ($dictStr: String!) {
+  updateConfig(dictStr: $dictStr) {
+    ok
+  }
+}      
+`;

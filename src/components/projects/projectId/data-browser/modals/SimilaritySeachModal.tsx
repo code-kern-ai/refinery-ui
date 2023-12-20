@@ -1,6 +1,6 @@
 import Modal from "@/src/components/shared/modal/Modal";
 import { selectModal } from "@/src/reduxStore/states/modal";
-import { selectActiveSearchParams, selectSimilaritySearch, setRecordsInDisplay, setSearchRecordsExtended } from "@/src/reduxStore/states/pages/data-browser";
+import { selectActiveSearchParams, selectSimilaritySearch, selectUniqueValuesDict, setRecordsInDisplay, setSearchRecordsExtended } from "@/src/reduxStore/states/pages/data-browser";
 import { selectEmbeddings, selectLabelingTasksAll, selectUsableAttributes } from "@/src/reduxStore/states/pages/settings";
 import { selectProjectId } from "@/src/reduxStore/states/project";
 import { SEARCH_SIMILAR_RECORDS } from "@/src/services/gql/queries/data-browser";
@@ -30,6 +30,7 @@ export default function SimilaritySearchModal() {
     const attributes = useSelector(selectUsableAttributes);
     const projectId = useSelector(selectProjectId);
     const labelingTasks = useSelector(selectLabelingTasksAll);
+    const uniqueValuesDict = useSelector(selectUniqueValuesDict);
 
     const [filterAttributesSS, setFilterAttributesSS] = useState<any>(null);
     const [filterAttributesForm, setFilterAttributesForm] = useState<any>([]);
@@ -128,7 +129,6 @@ export default function SimilaritySearchModal() {
             getIdxForm['searchValue'] = "";
             getIdxForm['searchValueBetween'] = "";
             getIdxForm['operator'] = operatorsDict[value][0];
-            prepareOperatorsAndTooltips();
         }
         getIdxForm[key] = value;
         const form = [...filterAttributesForm];
@@ -186,8 +186,12 @@ export default function SimilaritySearchModal() {
                                     selectedOption={(option: string) => setFilterDropdownVal(option, index, 'operator')} fontClass="font-dmMono" />
                             </div>
                         </div>
-                        {/* TODO: Add check for unique values */}
-                        <div className="my-2 flex-grow flex flex-row items-center">
+                        {uniqueValuesDict[form['name']] && form['operator'] != '' && form['operator'] == 'EQUAL' ? (
+                            <div className="w-full mt-2">
+                                <Dropdown options={uniqueValuesDict[form['name']]} buttonName={form['searchValue'] ? form['searchValue'] : 'Select value'}
+                                    selectedOption={(option: string) => setFilterDropdownVal(option, index, 'searchValue')} fontClass="font-dmMono" />
+                            </div>
+                        ) : (<div className="my-2 flex-grow flex flex-row items-center">
                             {form.operator != '' && <input placeholder={form.addText}
                                 onChange={(e) => setFilterDropdownVal(e.target.value, index, 'searchValue')}
                                 onKeyDown={(e) => checkIfDecimals(e, index, form)}
@@ -197,7 +201,8 @@ export default function SimilaritySearchModal() {
                                 onChange={(e) => setFilterDropdownVal(e.target.value, index, 'searchValueBetween')}
                                 onKeyDown={(e) => checkIfDecimals(e, index, form)}
                                 className="h-8 w-full border-gray-300 rounded-md placeholder-italic border text-gray-900 pl-4 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100" />}
-                        </div>
+                        </div>)}
+
                     </div>
                 </div>
                 <div className="w-full flex justify-center">
