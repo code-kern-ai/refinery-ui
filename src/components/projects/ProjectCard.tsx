@@ -52,7 +52,7 @@ export default function ProjectCard(props: ProjectCardProps) {
 
     return (
         <div key={props.project.id} className="relative card shadow bg-white m-4 rounded-2xl">
-            {props.project.status != ProjectStatus.IN_DELETION && (
+            {(props.project.status != ProjectStatus.IN_DELETION && props.project.status != ProjectStatus.HIDDEN) && (
                 <div className="card-body p-6">
                     {props.project.timeStamp != null && <div className="absolute top-0 left-2/4 flex flex-row flex-nowrap gap-x-1 bg-gray-100 px-1 rounded-br rounded-bl" style={{ 'transform': 'translate(-50%' }}>
                         <span className="text-sm text-gray-500">Created by</span>

@@ -4,7 +4,7 @@ import { jsonCopy } from "@/submodules/javascript-functions/general";
 
 export function postProcessProjectsList(projects: Project[]): Project[] {
     if (!projects) return [];
-    const projectsProcessed: Project[] = projects.filter(a => a.status != ProjectStatus.IN_DELETION)
+    const projectsProcessed: Project[] = projects.filter(a => a.status != ProjectStatus.IN_DELETION && a.status != ProjectStatus.HIDDEN)
         .map((project: Project) => {
             const projectItemCopy = jsonCopy(project);
             projectItemCopy.timeStamp = parseUTC(projectItemCopy.createdAt);
