@@ -9,3 +9,9 @@
 .borderBottom {
     border-bottom: 1px solid #4F46E5;
 }
+
+@media screen and (min-width: 1280px) {
+    .widthLine {
+        width: calc(100vw - 850px);
+    }
+}

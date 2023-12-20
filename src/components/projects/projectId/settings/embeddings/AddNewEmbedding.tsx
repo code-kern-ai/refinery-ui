@@ -299,7 +299,7 @@ export default function AddNewEmbedding(props: EmbeddingProps) {
                             <div className="flex flex-row items-center">
                                 <span className="card-title mb-0 label-text flex"><span className="cursor-help underline filtersUnderline">Version</span></span>
                                 <Tooltip content={TOOLTIPS_DICT.PROJECT_SETTINGS.EMBEDDINGS.VERSION} placement="right" color="invert">
-                                    <a href="https://learn.microsoft.com/en-us/rest/api/cognitiveservices/azureopenaistable/models/list?tabs=HTTP" target="_blank">
+                                    <a href="https://learn.microsoft.com/en-us/rest/api/azureopenai/models/list" target="_blank">
                                         <IconExternalLink className="cursor-help ml-1 h-5 w-5" /></a>
                                 </Tooltip>
                             </div>

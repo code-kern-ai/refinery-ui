@@ -2,8 +2,10 @@
     height: 34px;
 }
 
-.widthLine {
-    width: calc(100vw - 850px);
+@media screen and (min-width: 1280px) {
+    .widthLine {
+        width: calc(100vw - 850px);
+    }
 }
 
 .borderBottom {

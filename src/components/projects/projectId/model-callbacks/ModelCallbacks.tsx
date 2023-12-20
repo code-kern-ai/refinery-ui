@@ -151,7 +151,7 @@ export default function ModelCallbacks() {
                         </button>
                     </Tooltip>
                 </div>
-                <div className="grid grid-cols-1 gap-4 xs:flex xs:gap-0 flex-row items-center">
+                <div className="grid grid-cols-1 gap-4 xs:flex xs:gap-0 flex-row items-center mt-2 xl:mt-0">
                     {modelCallbacks && modelCallbacks.length > 0 ? (
                         <Dropdown options={ACTIONS_DROPDOWN_OPTIONS} buttonName="Actions" disabledOptions={[false, false, modelCallbacks.every((checked) => !checked)]}
                             selectedOption={(option: string) => executeOption(option)} dropdownClasses="mr-3" buttonClasses={`${style.actionsHeight} text-xs`} />
