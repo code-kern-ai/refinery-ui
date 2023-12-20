@@ -5,6 +5,7 @@ import { IconCheck, IconClipboard, IconClipboardOff } from "@tabler/icons-react"
 import { useState } from "react";
 import { first, timer } from "rxjs";
 import Logs from "./Logs";
+import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
 
 export default function ContainerLogs(props: ContainerLogsProps) {
 
@@ -26,13 +27,13 @@ export default function ContainerLogs(props: ContainerLogsProps) {
             <div className="font-medium text-gray-700">Container Logs</div>
 
             {props.logs ? (
-                <Tooltip content="Click to copy" color="invert" placement="top">
+                <Tooltip content={TOOLTIPS_DICT.GENERAL.CLICK_TO_COPY} color="invert" placement="top">
                     <button onClick={() => copyToClipboardLogs(props.logs.join('\n'), 0)}>
                         {copyClicked != 0 ? (<IconClipboard className="transition-all duration-500 ease-in-out" />) : (<IconCheck className="transition-all duration-500 ease-in-out" />)}
                     </button>
                 </Tooltip>
             ) : (
-                <Tooltip content='No runs to copy' color="invert" placement="top">
+                <Tooltip content='No runs to copy' color="invert" placement="top" className="cursor-auto">
                     <IconClipboardOff className="text-gray-400 h-5 w-5 mx-1" />
                 </Tooltip>)}
 

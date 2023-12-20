@@ -374,7 +374,7 @@ export default function AttributeCalculation() {
                         <div className=" mb-4 card border border-gray-200 bg-white flex-grow overflow-visible rounded-2xl">
                             <div className="card-body p-6">
                                 <div className="flex flex-row items-center">
-                                    <Tooltip content={TOOLTIPS_DICT.ATTRIBUTE_CALCULATION.BEING_EXECUTED} color="invert" placement="right" className="relative z-10"><LoadingIcon /></Tooltip>
+                                    <Tooltip content={TOOLTIPS_DICT.ATTRIBUTE_CALCULATION.BEING_EXECUTED} color="invert" placement="right" className="relative z-10 cursor-auto"><LoadingIcon /></Tooltip>
                                     <div className="text-sm leading-5 font-normal text-gray-500 w-full">
                                         <div className="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700">
                                             <div className="bg-green-400 h-2.5 rounded-full" style={{ 'width': currentAttribute.progress + '%' }}>
@@ -385,10 +385,10 @@ export default function AttributeCalculation() {
                             </div>
                         </div>}
                     {currentAttribute.state !== AttributeState.RUNNING && currentAttribute.state !== AttributeState.INITIAL && <div className="flex flex-row items-center">
-                        {currentAttribute.state == AttributeState.USABLE && <Tooltip content={TOOLTIPS_DICT.GENERAL.SUCCESSFULLY_CREATED} color="invert">
+                        {currentAttribute.state == AttributeState.USABLE && <Tooltip content={TOOLTIPS_DICT.GENERAL.SUCCESSFULLY_CREATED} color="invert" className="cursor-auto">
                             <IconCircleCheckFilled className="h-6 w-6 text-green-500" />
                         </Tooltip>}
-                        {currentAttribute.state == AttributeState.FAILED && <Tooltip content={TOOLTIPS_DICT.GENERAL.ERROR} color="invert">
+                        {currentAttribute.state == AttributeState.FAILED && <Tooltip content={TOOLTIPS_DICT.GENERAL.ERROR} color="invert" className="cursor-auto">
                             <IconAlertTriangleFilled className="h-6 w-6 text-red-500" />
                         </Tooltip>}
                         <div className="py-6 text-sm leading-5 font-normal text-gray-500">

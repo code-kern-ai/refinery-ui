@@ -32,16 +32,16 @@ export default function GridCards(props: GridCardsProps) {
                     <label htmlFor="heuristic-name" className="cursor-pointer flex justify-center">
                         <input type="checkbox" className="cursor-pointer" name="heuristic-name" checked={heuristic.selected} onChange={() => toggleHeuristic(projectId, heuristic.id)} />
                     </label>
-                    {heuristic.informationSourceType === InformationSourceType.LABELING_FUNCTION && <Tooltip content={TOOLTIPS_DICT.HEURISTICS.LABELING_FUNCTION} color="invert" placement="right">
+                    {heuristic.informationSourceType === InformationSourceType.LABELING_FUNCTION && <Tooltip content={TOOLTIPS_DICT.HEURISTICS.LABELING_FUNCTION} color="invert" placement="right" className="cursor-auto">
                         <IconCode size={20} strokeWidth={1.5} />
                     </Tooltip>}
-                    {heuristic.informationSourceType === InformationSourceType.ACTIVE_LEARNING && <Tooltip content={TOOLTIPS_DICT.HEURISTICS.ACTIVE_LEARNING} color="invert" placement="right">
+                    {heuristic.informationSourceType === InformationSourceType.ACTIVE_LEARNING && <Tooltip content={TOOLTIPS_DICT.HEURISTICS.ACTIVE_LEARNING} color="invert" placement="right" className="cursor-auto">
                         <IconPointerStar size={20} strokeWidth={1.5} />
                     </Tooltip>}
-                    {heuristic.informationSourceType === InformationSourceType.ZERO_SHOT && <Tooltip content={TOOLTIPS_DICT.HEURISTICS.ZERO_SHOT} color="invert" placement="right">
+                    {heuristic.informationSourceType === InformationSourceType.ZERO_SHOT && <Tooltip content={TOOLTIPS_DICT.HEURISTICS.ZERO_SHOT} color="invert" placement="right" className="cursor-auto">
                         <IconSparkles size={20} strokeWidth={1.5} />
                     </Tooltip>}
-                    {heuristic.informationSourceType === InformationSourceType.CROWD_LABELER && <Tooltip content={TOOLTIPS_DICT.HEURISTICS.CROWD_LABELING} color="invert" placement="right">
+                    {heuristic.informationSourceType === InformationSourceType.CROWD_LABELER && <Tooltip content={TOOLTIPS_DICT.HEURISTICS.CROWD_LABELING} color="invert" placement="right" className="cursor-auto">
                         <IconUsers size={20} strokeWidth={1.5} />
                     </Tooltip>}
                 </div>

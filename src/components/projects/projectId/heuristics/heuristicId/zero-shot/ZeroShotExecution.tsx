@@ -112,7 +112,7 @@ export default function ZeroShotExecution(props: ZeroShotExecutionProps) {
                                             </span>
                                         </div>
                                         <div className="flex flex-row items-center">
-                                            {(record.labels[0].confidence * 100) < currentHeuristic.zeroShotSettings.minConfidence ? <Tooltip content={TOOLTIPS_DICT.ZERO_SHOT.CONFIDENCE_TOO_LOW} color="invert" placement="top">
+                                            {(record.labels[0].confidence * 100) < currentHeuristic.zeroShotSettings.minConfidence ? <Tooltip content={TOOLTIPS_DICT.ZERO_SHOT.CONFIDENCE_TOO_LOW} color="invert" placement="top" className="cursor-auto">
                                                 <IconAlertTriangle className="text-yellow-500 h-5 w-5 ml-1 mr-3" />
                                             </Tooltip> : <div className="w-10"></div>}
                                         </div>
@@ -156,7 +156,7 @@ export default function ZeroShotExecution(props: ZeroShotExecutionProps) {
                         </div>
                         <div className="flex flex-row items-center">
                             <span className="text-sm select-none self-start ml-2">{result.confidenceText}</span>
-                            {(result.confidence * 100) < currentHeuristic.zeroShotSettings.minConfidence && <Tooltip content={TOOLTIPS_DICT.ZERO_SHOT.CONFIDENCE_TOO_LOW} color="invert" placement="top">
+                            {(result.confidence * 100) < currentHeuristic.zeroShotSettings.minConfidence && <Tooltip content={TOOLTIPS_DICT.ZERO_SHOT.CONFIDENCE_TOO_LOW} color="invert" placement="top" className="cursor-auto">
                                 <IconAlertTriangle className="text-yellow-500 h-5 w-5" />
                             </Tooltip>}
                         </div>

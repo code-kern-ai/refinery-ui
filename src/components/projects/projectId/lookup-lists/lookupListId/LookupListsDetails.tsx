@@ -181,7 +181,7 @@ export default function LookupListsDetails() {
                 </div>}
             </div>
             <div className="flex rounded-md mt-4 w-full">
-                <Tooltip content={TOOLTIPS_DICT.LOOKUP_LISTS_DETAILS.PYTHON_VARIABLE} color="invert" placement="right">
+                <Tooltip content={TOOLTIPS_DICT.LOOKUP_LISTS_DETAILS.PYTHON_VARIABLE} color="invert" placement="right" className="cursor-auto">
                     <span className="inline-flex items-center px-2 rounded-l-md border border-r-0 border-gray-300 bg-gray-50 text-gray-500 sm:text-xs">
                         Python variable
                     </span>

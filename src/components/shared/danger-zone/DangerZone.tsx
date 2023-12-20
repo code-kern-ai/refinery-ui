@@ -14,6 +14,7 @@ import { selectProjectId } from "@/src/reduxStore/states/project";
 import { DELETE_LOOKUP_LIST } from "@/src/services/gql/mutations/lookup-lists";
 import { removeFromAllLookupListById } from "@/src/reduxStore/states/pages/lookup-lists";
 import { DELETE_HEURISTIC } from "@/src/services/gql/mutations/heuristics";
+import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
 
 const ABORT_BUTTON = { buttonCaption: 'Delete', disabled: false, useButton: true };
 
@@ -70,7 +71,7 @@ export default function DangerZone(props: DangerZoneProps) {
             <div className="text-sm leading-5 font-normal mt-2 text-gray-500 inline-block">This action can not be reversed.
                 Are you sure you want to delete this {props.elementType}?</div>
 
-            <Tooltip content="This can't be reverted!" placement="right" color="invert">
+            <Tooltip content={TOOLTIPS_DICT.GENERAL.CANNOT_BE_REVERTED} placement="right" color="invert">
                 <button onClick={() => dispatch(setModalStates(ModalEnum.DELETE_ELEMENT, { open: true, id: props.id }))}
                     className="bg-red-100 text-red-700 border border-red-400 text-xs font-semibold px-4 py-2 rounded-md cursor-pointer ml-6 h-9 hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
                     Delete {props.name}

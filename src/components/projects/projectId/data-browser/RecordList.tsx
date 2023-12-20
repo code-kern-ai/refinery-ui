@@ -29,7 +29,7 @@ export default function RecordList(props: RecordListProps) {
             <div className="px-4 py-5 sm:p-6">
                 {recordComments[record.id] && <div className="cursor-pointer absolute top-10 right-4"
                     onClick={() => dispatch(setModalStates(ModalEnum.RECORD_COMMENTS, { commentsData: recordComments[record.id], open: true }))}>
-                    <Tooltip content={TOOLTIPS_DICT.DATA_BROWSER.RECORD_COMMENTS} color="invert" placement="left">
+                    <Tooltip content={TOOLTIPS_DICT.DATA_BROWSER.RECORD_COMMENTS} color="invert" placement="left" className="cursor-auto">
                         <IconNotes className="h-4 w-4" />
                     </Tooltip>
                 </div>}
@@ -42,7 +42,7 @@ export default function RecordList(props: RecordListProps) {
 
                 <div className="mt-3">
                     <div className="float-left">
-                        {embeddings.length == 0 ? (<Tooltip content={TOOLTIPS_DICT.DATA_BROWSER.ADD_EMBEDDING} color="invert" placement="right">
+                        {embeddings.length == 0 ? (<Tooltip content={TOOLTIPS_DICT.DATA_BROWSER.ADD_EMBEDDING} color="invert" placement="right" className="cursor-auto">
                             <label className="text-gray-700 text-sm font-medium">
                                 <span className="cursor-help leading-5 underline filtersUnderline">No embedding, can&apos;t find similar records</span>
                             </label>

@@ -16,13 +16,13 @@ export default function CalculationProgress() {
                 <div className="card-body p-6">
                     <div className="flex flex-row justify-between items-center">
                         <div className="flex flex-grow items-center">
-                            {currentHeuristic.lastTask.state === Status.CREATED && <Tooltip content={TOOLTIPS_DICT.LABELING_FUNCTION.CURRENTLY_RUNNING} color="invert" placement="right">
+                            {currentHeuristic.lastTask.state === Status.CREATED && <Tooltip content={TOOLTIPS_DICT.LABELING_FUNCTION.CURRENTLY_RUNNING} color="invert" placement="right" className="cursor-auto">
                                 <LoadingIcon />
                             </Tooltip>}
-                            {currentHeuristic.lastTask.state == Status.FINISHED && <Tooltip content={TOOLTIPS_DICT.GENERAL.SUCCESSFULLY_CREATED} color="invert">
+                            {currentHeuristic.lastTask.state == Status.FINISHED && <Tooltip content={TOOLTIPS_DICT.GENERAL.SUCCESSFULLY_CREATED} color="invert" className="cursor-auto">
                                 <IconCircleCheckFilled className="h-6 w-6 text-green-500" />
                             </Tooltip>}
-                            {currentHeuristic.lastTask.state == Status.FAILED && <Tooltip content={TOOLTIPS_DICT.GENERAL.ERROR} color="invert">
+                            {currentHeuristic.lastTask.state == Status.FAILED && <Tooltip content={TOOLTIPS_DICT.GENERAL.ERROR} color="invert" className="cursor-auto">
                                 <IconAlertTriangleFilled className="h-6 w-6 text-red-500" />
                             </Tooltip>}
                             {currentHeuristic.lastTask.state === Status.CREATED ? (<>
@@ -34,7 +34,7 @@ export default function CalculationProgress() {
                                     </div>
                                 </div>
                             </>) : (<><div className="text-sm leading-5 font-normal text-gray-500">run#{currentHeuristic.lastTask.iteration}</div>
-                                {currentHeuristic.lastTask.durationText && <Tooltip content={TOOLTIPS_DICT.LABELING_FUNCTION.EXECUTION_TIME} color="invert" placement="top">
+                                {currentHeuristic.lastTask.durationText && <Tooltip content={TOOLTIPS_DICT.LABELING_FUNCTION.EXECUTION_TIME} color="invert" placement="top" className="cursor-auto">
                                     <div className="text-sm leading-5 font-normal text-gray-500 ml-2 select-none flex items-center">
                                         <IconArrowRight className="h-4 w-4 text-gray-500" />
                                         <span className="ml-2">{currentHeuristic.lastTask.durationText}</span>

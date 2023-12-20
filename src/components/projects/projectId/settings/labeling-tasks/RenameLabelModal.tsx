@@ -7,6 +7,7 @@ import { CHECK_RENAME_LABEL } from "@/src/services/gql/queries/project-setting";
 import { LabelType, LabelingTask, LabelingTasksProps } from "@/src/types/components/projects/projectId/settings/labeling-tasks";
 import { ModalButton, ModalEnum } from "@/src/types/shared/modal";
 import { LabelHelper } from "@/src/util/classes/label-helper";
+import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
 import { jsonCopy } from "@/submodules/javascript-functions/general";
 import { useLazyQuery, useMutation } from "@apollo/client";
 import { Tooltip } from "@nextui-org/react";
@@ -151,7 +152,7 @@ export default function RenameLabelModal(props: LabelingTasksProps) {
                                         </div></div>}
                                     {warning.key == 'HEURISTIC' && <div className="flex flex-col gap-y-2">
                                         <span className="text-sm">
-                                            <Tooltip content="Open information source in new tab" placement="right" color="invert">
+                                            <Tooltip content={TOOLTIPS_DICT.PROJECT_SETTINGS.LABELING_TASK.OPEN_HEURISTICS} placement="right" color="invert">
                                                 <a href={'../heuristics/' + warning.id} target="_blank"
                                                     className="cursor-pointer underline font-bold">
                                                     Current source code:</a>

@@ -107,9 +107,9 @@ export default function ModelsDownload() {
                                         <span className="inline-block mr-2">{model.name}</span>
                                     </td>
                                     <td className="text-center px-3 py-2 text-sm text-gray-500 flex justify-center">
-                                        {model.zeroShotPipeline ? <Tooltip content={TOOLTIPS_DICT.MODELS_DOWNLOAD.USED_ZS} color="invert" placement="top">
+                                        {model.zeroShotPipeline ? <Tooltip content={TOOLTIPS_DICT.MODELS_DOWNLOAD.USED_ZS} color="invert" placement="top" className="cursor-auto">
                                             <IconCheckbox className="h-5 w-5"></IconCheckbox>
-                                        </Tooltip> : <Tooltip content={TOOLTIPS_DICT.MODELS_DOWNLOAD.NOT_USED_ZS} color="invert" placement="top">
+                                        </Tooltip> : <Tooltip content={TOOLTIPS_DICT.MODELS_DOWNLOAD.NOT_USED_ZS} color="invert" placement="top" className="cursor-auto">
                                             <IconBan className="h-5 w-5"></IconBan>
                                         </Tooltip>}
                                     </td>
@@ -129,16 +129,16 @@ export default function ModelsDownload() {
                                         {model.status === ModelsDownloadedStatus.FINISHED ? model.sizeFormatted : '-'}
                                     </td>
                                     <td className="whitespace-nowrap text-center px-3 py-2 text-sm text-gray-500 justify-center flex">
-                                        {model.status === ModelsDownloadedStatus.FINISHED && <Tooltip content={TOOLTIPS_DICT.GENERAL.SUCCESSFULLY_CREATED} color="invert" placement="top">
+                                        {model.status === ModelsDownloadedStatus.FINISHED && <Tooltip content={TOOLTIPS_DICT.GENERAL.SUCCESSFULLY_CREATED} color="invert" placement="top" className="cursor-auto">
                                             <IconCircleCheckFilled className="h-6 w-6 text-green-500" />
                                         </Tooltip>}
-                                        {model.status === ModelsDownloadedStatus.FAILED && <Tooltip content={TOOLTIPS_DICT.GENERAL.ERROR} color="invert" placement="top">
+                                        {model.status === ModelsDownloadedStatus.FAILED && <Tooltip content={TOOLTIPS_DICT.GENERAL.ERROR} color="invert" placement="top" className="cursor-auto">
                                             <IconAlertTriangleFilled className="h-6 w-6 text-red-500" />
                                         </Tooltip>}
-                                        {model.status === ModelsDownloadedStatus.DOWNLOADING && <Tooltip content={TOOLTIPS_DICT.GENERAL.DOWNLOADING} color="invert" placement="top">
+                                        {model.status === ModelsDownloadedStatus.DOWNLOADING && <Tooltip content={TOOLTIPS_DICT.GENERAL.DOWNLOADING} color="invert" placement="top" className="cursor-auto">
                                             <LoadingIcon />
                                         </Tooltip>}
-                                        {model.status === ModelsDownloadedStatus.INITIALIZING && <Tooltip content={TOOLTIPS_DICT.GENERAL.INITIALIZING} color="invert" placement="top">
+                                        {model.status === ModelsDownloadedStatus.INITIALIZING && <Tooltip content={TOOLTIPS_DICT.GENERAL.INITIALIZING} color="invert" placement="top" className="cursor-auto">
                                             <IconLoader className="h-6 w-6 text-gray-500" />
                                         </Tooltip>}
                                     </td>

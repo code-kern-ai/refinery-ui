@@ -104,7 +104,7 @@ export default function HeuristicsLayout(props: any) {
                         </button>
                         {!isHeaderNormal && <div className="mx-4 text-sm leading-5 font-medium text-gray-500 inline-block">{currentHeuristic.name}</div>}
                         <Statuses status={currentHeuristic.state} page="heuristics" initialCaption="Initial" />
-                        {currentHeuristic.lastTask && <Tooltip content={TOOLTIPS_DICT.HEURISTICS.EXECUTION_TIME} color="invert" placement="right">
+                        {currentHeuristic.lastTask && <Tooltip content={TOOLTIPS_DICT.HEURISTICS.EXECUTION_TIME} color="invert" placement="right" className="cursor-auto">
                             <div className="text-sm leading-5 font-normal text-gray-500 ml-3 mt-1 inline-block">{currentHeuristic.lastTask.durationText}</div>
                         </Tooltip>}
                         {(currentHeuristic.informationSourceType === InformationSourceType.CROWD_LABELER && currentHeuristic.lastTask) && <div className="text-sm leading-5 font-normal text-gray-500 w-36">

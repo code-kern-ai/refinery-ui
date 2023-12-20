@@ -54,7 +54,7 @@ export default function NavBarTopEditRecords(props: NavBarTopEditRecordsProps) {
             <div className="flex flex-row flex-nowrap items-center">
                 <div className="flex justify-center overflow-visible items-center">
                     <div className="text-sm leading-5 text-gray-500 flex-shrink-0 mr-3 my-3">
-                        <Tooltip content={TOOLTIPS_DICT.EDIT_RECORDS.DIFFERENT_RECORDS} color="invert" placement="bottom">
+                        <Tooltip content={TOOLTIPS_DICT.EDIT_RECORDS.DIFFERENT_RECORDS} color="invert" placement="bottom" className="cursor-auto">
                             <span className="cursor-help underline filtersUnderline">{props.erdData.navBar.positionString} current session</span>
                         </Tooltip>
                     </div>

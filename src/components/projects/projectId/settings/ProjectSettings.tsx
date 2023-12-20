@@ -292,7 +292,7 @@ export default function ProjectSettings() {
                     </Tooltip>
                 </div>
                 <div className="text-left lg:text-right flex flex-row items-center justify-end">
-                    <Tooltip content={project.tokenizer} color="invert" placement="bottom">
+                    <Tooltip content={project.tokenizer} color="invert" placement="bottom" className="cursor-auto">
                         <div className="font-medium inline-block">
                             <span className="cursor-help underline filtersUnderline">Tokenization</span>
                         </div>

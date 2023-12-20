@@ -112,7 +112,7 @@ export default function EditRecords() {
                                                 {record.data[attribute.name] != null && record.data[attribute.name] !== '' ? (<span className="whitespace-pre-wrap relative">
                                                     <span>{record.data[attribute.name]}</span>
                                                     {erdData.cachedRecordChanges[buildAccessKey(record.id, attribute.name)] && <div className="absolute -left-5 top-0 text-yellow-500">
-                                                        <Tooltip content={TOOLTIPS_DICT.EDIT_RECORDS.CACHED_VALUES} color="invert" placement="right">
+                                                        <Tooltip content={TOOLTIPS_DICT.EDIT_RECORDS.CACHED_VALUES} color="invert" placement="right" className="cursor-auto">
                                                             <IconAlertTriangleFilled size={16} stroke={2} />
                                                         </Tooltip>
                                                     </div>}
@@ -134,10 +134,10 @@ export default function EditRecords() {
                                 setErdData(erdDataCopy);
                             }}>
                                 {record.id == erdData.editRecordId ?
-                                    (<Tooltip content={TOOLTIPS_DICT.EDIT_RECORDS.STOP_EDIT} color="invert" placement="right">
+                                    (<Tooltip content={TOOLTIPS_DICT.EDIT_RECORDS.STOP_EDIT} color="invert" placement="right" className="cursor-auto">
                                         <IconBallpenOff size={18} stroke={2} />
                                     </Tooltip>) :
-                                    (<Tooltip content={TOOLTIPS_DICT.EDIT_RECORDS.EDIT_RECORD} color="invert" placement="right">
+                                    (<Tooltip content={TOOLTIPS_DICT.EDIT_RECORDS.EDIT_RECORD} color="invert" placement="right" className="cursor-auto">
                                         <IconBallpen size={18} />
                                     </Tooltip>)}
                             </div>

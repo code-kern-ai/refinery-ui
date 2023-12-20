@@ -721,7 +721,7 @@ export default function SearchGroups(props: DataBrowserSideBarProps) {
         }
         <div className="mt-4 grid items-center" style={{ gridTemplateColumns: 'max-content max-content max-content max-content max-content' }}>
             {fullSearch[SearchGroup.DRILL_DOWN] && <div className="flex flex-row items-center">
-                <Tooltip content={TOOLTIPS_DICT.DATA_BROWSER.CONNECT} color="invert" placement="right">
+                <Tooltip content={TOOLTIPS_DICT.DATA_BROWSER.CONNECT} color="invert" placement="right" className="cursor-auto">
                     <div className="cursor-help mr-2 underline filtersUnderline">
                         Connect by
                     </div>

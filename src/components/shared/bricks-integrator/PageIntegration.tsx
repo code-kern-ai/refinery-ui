@@ -126,7 +126,7 @@ export default function PageIntegration(props: PageIntegrationProps) {
                             value={BricksCodeParser.functionName} onChange={(e: any) => onInputFunctionName(e)} />
                     </div>
                     <div className="col-span-1 inline-flex">
-                        {BricksCodeParser.nameTaken && <Tooltip content={BricksCodeParser.functionName + ' name exists'} color="invert" placement="top">
+                        {BricksCodeParser.nameTaken && <Tooltip content={BricksCodeParser.functionName + ' name exists'} color="invert" placement="top" className="cursor-auto">
                             <IconAlertTriangle className="w-6 h-6 text-red-700" stroke={1.5} />
                         </Tooltip>}
                     </div>
@@ -138,7 +138,7 @@ export default function PageIntegration(props: PageIntegrationProps) {
                                 BricksCodeParser.labelingTaskName = option;
                                 props.selectDifferentTask(labelingTaskId);
                             }} />
-                        <Tooltip content={TOOLTIPS_DICT.HEURISTICS.SWITCH_LABELING_TASK} color="invert" placement="top">
+                        <Tooltip content={TOOLTIPS_DICT.HEURISTICS.SWITCH_LABELING_TASK} color="invert" placement="top" className="cursor-auto">
                             <IconAlertTriangle className="w-6 h-6 text-yellow-700" stroke={1.5} />
                         </Tooltip>
                     </Fragment>}
@@ -146,7 +146,7 @@ export default function PageIntegration(props: PageIntegrationProps) {
                     <label className="font-bold">Variable</label>
                     <label className="font-bold">Value</label>
                     {BricksCodeParser.variables.map((v, index) => (<div key={index} className="contents">
-                        <Tooltip content={TOOLTIPS_DICT.GENERAL.OPTIONAL} color="invert" placement="left">
+                        <Tooltip content={TOOLTIPS_DICT.GENERAL.OPTIONAL} color="invert" placement="left" className="cursor-auto">
                             <label className={`text-sm col-start-1 ${v.optional ? 'text-gray-400 text-left' : ''}`}>{v.displayName}
                                 {!v.optional && <span>*</span>}
                             </label>
@@ -155,7 +155,7 @@ export default function PageIntegration(props: PageIntegrationProps) {
                             const configCopy = BricksCodeParser.replaceVariables(jsonCopy(config), props.executionTypeFilter, null, props.forIde);
                             dispatch(setBricksIntegrator(configCopy));
                         }} />
-                        {v.comment && <Tooltip content={v.comment} color="invert" placement="top">
+                        {v.comment && <Tooltip content={v.comment} color="invert" placement="top" className="cursor-auto">
                             <IconInfoCircle className="w-6 h-6 " stroke={2} />
                         </Tooltip>}
                     </div>))}

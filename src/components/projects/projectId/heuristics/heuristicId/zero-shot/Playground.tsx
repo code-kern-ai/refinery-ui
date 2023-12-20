@@ -109,7 +109,7 @@ export default function Playground() {
                             </div>
                             <div className="flex flex-row items-center">
                                 <span className="text-sm select-none self-start mr-2">{result.confidenceText}</span>
-                                {(result.confidence * 100) < currentHeuristic.zeroShotSettings.minConfidence && <Tooltip content={TOOLTIPS_DICT.ZERO_SHOT.CONFIDENCE_TOO_LOW} color="invert" placement="top">
+                                {(result.confidence * 100) < currentHeuristic.zeroShotSettings.minConfidence && <Tooltip content={TOOLTIPS_DICT.ZERO_SHOT.CONFIDENCE_TOO_LOW} color="invert" placement="top" className="cursor-auto">
                                     <IconAlertTriangle className="text-yellow-500 h-5 w-5" />
                                 </Tooltip>}
                             </div>

@@ -155,7 +155,7 @@ export default function ProjectSnapshotExport() {
                                 </div>
                             </div>
                             <div className="flex items-center justify-items-center">
-                                {item.desc && <Tooltip content={item.desc} color="invert" placement="top">
+                                {item.desc && <Tooltip content={item.desc} color="invert" placement="top" className="cursor-auto">
                                     <IconInfoCircle className="h-6 w-6 text-gray-900" />
                                 </Tooltip>}
                             </div>

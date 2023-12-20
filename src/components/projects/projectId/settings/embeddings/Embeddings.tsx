@@ -221,10 +221,10 @@ export default function Embeddings(props: EmbeddingProps) {
                                                 </div>
                                                 <p className="text-xs italic">{embedding.state}</p>
                                             </div>}
-                                            {embedding.state == EmbeddingState.FINISHED && <Tooltip content={TOOLTIPS_DICT.GENERAL.SUCCESSFULLY_CREATED} color="invert">
+                                            {embedding.state == EmbeddingState.FINISHED && <Tooltip content={TOOLTIPS_DICT.GENERAL.SUCCESSFULLY_CREATED} color="invert" className="cursor-auto">
                                                 <IconCircleCheckFilled className="h-6 w-6 text-green-500" />
                                             </Tooltip>}
-                                            {embedding.state == EmbeddingState.FAILED && <Tooltip content={TOOLTIPS_DICT.GENERAL.ERROR} color="invert">
+                                            {embedding.state == EmbeddingState.FAILED && <Tooltip content={TOOLTIPS_DICT.GENERAL.ERROR} color="invert" className="cursor-auto">
                                                 <IconAlertTriangleFilled className="h-6 w-6 text-red-500" />
                                             </Tooltip>}
                                         </td>
@@ -274,7 +274,7 @@ export default function Embeddings(props: EmbeddingProps) {
                 List of filter attributes selected when creating an embedding</div>
             {modalFilteredAttributes.attributeNames && modalFilteredAttributes.attributeNames.length == 0 ? <div className="text-xs text-gray-500 text-center italic">No filter attributes selected</div> : <div className="flex justify-center items-center">
                 {modalFilteredAttributes.attributeNames.map((attribute) => (
-                    <Tooltip content={attribute.dataType} color="invert" placement="top" key={attribute.id}>
+                    <Tooltip content={attribute.dataType} color="invert" placement="top" key={attribute.id} className="cursor-auto">
                         <span className={`border items-center px-2 py-0.5 rounded text-xs font-medium text-center mr-2 bg-${attribute.color}-100 text-${attribute.color}-700 border-${attribute.color}-400 hover:bg-${attribute.color}-200`}>{attribute.name}</span>
                     </Tooltip>
                 ))}

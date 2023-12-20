@@ -18,6 +18,7 @@ import { copyToClipboard } from '@/submodules/javascript-functions/general';
 import { IconAlertCircle, IconApi, IconArrowRight, IconBrandDiscord, IconBulb, IconChartPie, IconClipboard, IconExternalLink, IconMaximize, IconMinimize, IconTriangleSquareCircle, IconUserCircle } from '@tabler/icons-react';
 import { IconSettings } from '@tabler/icons-react';
 import { useRouter } from 'next/router';
+import { TOOLTIPS_DICT } from '@/src/util/tooltip-constants';
 
 const ACCEPT_BUTTON = { buttonCaption: "How to update", useButton: true };
 const ABORT_BUTTON = { buttonCaption: "Back", useButton: true };
@@ -131,7 +132,7 @@ export default function Sidebar() {
                                     {(project && project.id && routeColor) ? (<div>
                                         {user.role === UserRole.ENGINEER && <div
                                             className="flex items-center justify-center overflow-visible">
-                                            <Tooltip placement="right" trigger="hover" color="invert" content="Overview">
+                                            <Tooltip placement="right" trigger="hover" color="invert" content={TOOLTIPS_DICT.SIDEBAR.OVERVIEW}>
                                                 <div className={`relative z-50 ${project.numDataScaleUploaded == 0 ? 'opacity-50 cursor-not-allowed pointer-events-none' : 'opacity-100 cursor-pointer'}`}>
                                                     <button onClick={() => router.push(`/projects/${project.id}/overview`)}
                                                         className={`circle ${routeColor.overview.active ? 'text-kernpurple' : 'text-white'}`}>
@@ -142,7 +143,7 @@ export default function Sidebar() {
                                         </div>}
                                         {user.role === UserRole.ENGINEER && <div
                                             className="flex items-center justify-center overflow-visible mt-10 2xl:mt-12">
-                                            <Tooltip placement="right" trigger="hover" color="invert" content="Data Browser">
+                                            <Tooltip placement="right" trigger="hover" color="invert" content={TOOLTIPS_DICT.SIDEBAR.DATA_BROWSER}>
                                                 <div className={`relative z-50 ${project.numDataScaleUploaded == 0 ? 'opacity-50 cursor-not-allowed pointer-events-none' : 'opacity-100 cursor-pointer'}`}>
                                                     <button onClick={() => router.push(`/projects/${project.id}/data-browser`)}
                                                         className={`circle ${routeColor.data.active ? 'text-kernpurple' : 'text-white'}`}>
@@ -152,7 +153,7 @@ export default function Sidebar() {
                                             </Tooltip>
                                         </div>}
                                         <div className={`flex items-center justify-center overflow-visible ${user?.role == 'ENGINEER' ? 'mt-10 2xl:mt-12' : ''}`}>
-                                            <Tooltip placement="right" trigger="hover" color="invert" content="Labeling">
+                                            <Tooltip placement="right" trigger="hover" color="invert" content={TOOLTIPS_DICT.SIDEBAR.LABELING}>
                                                 <div className={`relative z-50 ${project.numDataScaleUploaded == 0 ? 'opacity-50 cursor-not-allowed pointer-events-none' : 'opacity-100 cursor-pointer'}`}>
                                                     <button onClick={() => router.push(`/projects/${project.id}/labeling`)}
                                                         className={`circle ${routeColor.labeling.active ? 'text-kernpurple' : 'text-white'}`}>
@@ -168,7 +169,7 @@ export default function Sidebar() {
                                         </div>
                                         {user.role === UserRole.ENGINEER && <div
                                             className="flex items-center justify-center overflow-visible mt-10 2xl:mt-12">
-                                            <Tooltip placement="right" trigger="hover" color="invert" content="Heuristics">
+                                            <Tooltip placement="right" trigger="hover" color="invert" content={TOOLTIPS_DICT.SIDEBAR.HEURISTICS}>
                                                 <div className={`relative z-50 ${project.numDataScaleUploaded == 0 ? 'opacity-50 cursor-not-allowed pointer-events-none' : 'opacity-100 cursor-pointer'}`}>
                                                     <button onClick={() => router.push(`/projects/${project.id}/heuristics`)}
                                                         className={`circle ${routeColor.heuristics.active ? 'text-kernpurple' : 'text-white'}`}>
@@ -179,7 +180,7 @@ export default function Sidebar() {
                                         </div>}
                                         {user.role === UserRole.ENGINEER && <div
                                             className="flex items-center justify-center overflow-visible mt-10 2xl:mt-12">
-                                            <Tooltip placement="right" trigger="hover" color="invert" content="Settings">
+                                            <Tooltip placement="right" trigger="hover" color="invert" content={TOOLTIPS_DICT.SIDEBAR.SETTINGS}>
                                                 <div className={`relative z-50 ${project.numDataScaleUploaded == 0 ? 'opacity-50 cursor-not-allowed pointer-events-none' : 'opacity-100 cursor-pointer'}`}>
                                                     <button onClick={() => router.push(`/projects/${project.id}/settings`)}
                                                         className={`circle ${routeColor.settings.active ? 'text-kernpurple' : 'text-white'}`}>
@@ -190,7 +191,7 @@ export default function Sidebar() {
                                         </div>}
                                         {isAdmin && <div
                                             className="flex items-center justify-center overflow-visible mt-10 2xl:mt-12">
-                                            <Tooltip placement="right" trigger="hover" color="invert" content="Admin">
+                                            <Tooltip placement="right" trigger="hover" color="invert" content={TOOLTIPS_DICT.SIDEBAR.ADMIN}>
                                                 <div className={`relative z-50 opacity-100 cursor-pointer`}>
                                                     <button onClick={() => router.push(`/projects/${project.id}/admin`)}
                                                         className={`circle ${routeColor.admin.active ? 'text-kernpurple' : 'text-white'}`}>
@@ -210,7 +211,7 @@ export default function Sidebar() {
                                     </div>) : (<></>)}
                                     {user.role == UserRole.ENGINEER && <>
                                         {!isManaged && <div className={`flex items-center justify-center overflow-visible ${project?.id !== undefined ? 'mt-6' : ''}`}>
-                                            <Tooltip placement="right" trigger="hover" color="invert" content="Documentation" className="relative z-50">
+                                            <Tooltip placement="right" trigger="hover" color="invert" content={TOOLTIPS_DICT.SIDEBAR.DOCUMENTATION} className="relative z-50">
                                                 <a href="https://docs.kern.ai/" target="_blank" rel="noopener noreferrer" className="circle text-white">
                                                     <IconClipboard className="w-6 h-6" />
                                                 </a>
@@ -218,7 +219,7 @@ export default function Sidebar() {
                                         </div>}
                                     </>}
                                     <div className={`flex items-center justify-center overflow-visible ${isManaged ? (project?.id !== undefined ? 'mt-6' : '') : 'mt-10 2xl:mt-12'}`}>
-                                        <Tooltip placement="right" trigger="hover" color="invert" content="API" className="relative z-50">
+                                        <Tooltip placement="right" trigger="hover" color="invert" content={TOOLTIPS_DICT.SIDEBAR.API} className="relative z-50">
                                             <a href="https://github.com/code-kern-ai/kern-python" target="_blank"
                                                 rel="noopener noreferrer" className="circle text-white">
                                                 <IconApi className="w-6 h-6" />
@@ -228,7 +229,7 @@ export default function Sidebar() {
                                 </div>
 
                                 {user.role === UserRole.ENGINEER && !isManaged && <div className="flex items-center justify-center overflow-visible mt-10 2xl:mt-12">
-                                    <Tooltip placement="right" trigger="hover" color="invert" content="Join our community">
+                                    <Tooltip placement="right" trigger="hover" color="invert" content={TOOLTIPS_DICT.SIDEBAR.JOIN_OUR_COMMUNITY}>
                                         <div className="relative z-50">
                                             <a href="https://discord.com/invite/qf4rGCEphW" target="_blank" rel="noopener noreferrer"
                                                 className="circle text-white">
@@ -239,7 +240,7 @@ export default function Sidebar() {
                                 </div>}
                             </div>
                             {!isFullScreen && <div className="flex items-center justify-center mt-10 2xl:mt-12">
-                                <Tooltip placement="right" trigger="hover" color="invert" content="Maximize screen">
+                                <Tooltip placement="right" trigger="hover" color="invert" content={TOOLTIPS_DICT.SIDEBAR.MAXIMIZE_SCREEN}>
                                     <button onClick={openFullScreen}
                                         className="z-50 cursor-pointer">
                                         <IconMaximize className="text-white" />
@@ -248,7 +249,7 @@ export default function Sidebar() {
                             </div>}
 
                             {isFullScreen && <div className="flex items-center justify-center mt-10 2xl:mt-12">
-                                <Tooltip placement="right" trigger="hover" color="invert" content="Minimize screen">
+                                <Tooltip placement="right" trigger="hover" color="invert" content={TOOLTIPS_DICT.SIDEBAR.MINIMIZE_SCREEN}>
                                     <button onClick={closeFullScreen}
                                         className="z-50 cursor-pointer">
                                         <IconMinimize className="text-white" />
@@ -261,11 +262,11 @@ export default function Sidebar() {
                             </div>}
 
                             <div className="flex-shrink-0 flex pt-3 pb-10 justify-center">
-                                <Tooltip placement="right" trigger="hover" color="invert" content="Version overview">
+                                <Tooltip placement="right" trigger="hover" color="invert" content={TOOLTIPS_DICT.SIDEBAR.VERSION_OVERVIEW}>
                                     <div onClick={requestVersionOverview} id="refineryVersion"
                                         className="z-50 tooltip tooltip-right cursor-pointer select-none text-white flex items-center mr-1">
                                         v1.12.0
-                                        {hasUpdates && <Tooltip placement="right" trigger="hover" color="invert" content="Newer version available">
+                                        {hasUpdates && <Tooltip placement="right" trigger="hover" color="invert" content={TOOLTIPS_DICT.SIDEBAR.NEWER_VERSION_AVAILABLE} >
                                             <IconAlertCircle className="h-5 w-5 text-yellow-700" />
                                         </Tooltip>}
                                     </div>
@@ -313,7 +314,7 @@ export default function Sidebar() {
                                             <td className="text-center px-3 py-2 text-sm text-gray-500">
                                                 <div className="flex flex-row items-center justify-center">
                                                     <div className="mr-2">{service.remoteVersion}</div>
-                                                    {service.remoteHasNewer && <Tooltip placement="right" trigger="hover" color="invert" content="Newer version available">
+                                                    {service.remoteHasNewer && <Tooltip placement="right" trigger="hover" color="invert" content={TOOLTIPS_DICT.SIDEBAR.NEWER_VERSION_AVAILABLE} className="cursor-auto">
                                                         <IconAlertCircle className="h-5 w-5 text-yellow-700" />
                                                     </Tooltip>}
                                                 </div>
@@ -338,25 +339,25 @@ export default function Sidebar() {
                     <div className="flex border-b-2 border-b-gray-200 max-w-full text-center overflow-visible">
                         <div onClick={() => toggleTabs(0)}
                             className={`text-sm leading-5 font-medium mr-10 cursor-help py-3 ${openTab == 0 ? 'text-indigo-700 border-bottom' : 'text-gray-500'}`}>
-                            <Tooltip placement="bottom" content="Linux/Mac" color="invert">
+                            <Tooltip placement="bottom" content={TOOLTIPS_DICT.SIDEBAR['LINUX/MAC']} color="invert">
                                 <span className="border-dotted">Bash users</span>
                             </Tooltip>
                         </div>
                         <div onClick={() => toggleTabs(1)}
                             className={`text-sm leading-5 font-medium mr-10 cursor-help py-3 ${openTab == 1 ? 'text-indigo-700 border-bottom' : 'text-gray-500'}`}>
-                            <Tooltip placement="bottom" content="Installed refinery with pip" color="invert">
+                            <Tooltip placement="bottom" content={TOOLTIPS_DICT.SIDEBAR.PIP} color="invert">
                                 <span className="border-dotted">CLI users</span>
                             </Tooltip>
                         </div>
                         <div onClick={() => toggleTabs(2)}
                             className={`text-sm leading-5 font-medium mr-10 cursor-help py-3 ${openTab == 2 ? 'text-indigo-700 border-bottom' : 'text-gray-500'}`}>
-                            <Tooltip placement="bottom" content="Windows terminal" color="invert">
+                            <Tooltip placement="bottom" content={TOOLTIPS_DICT.SIDEBAR.WINDOWS_TERMINAL} color="invert">
                                 <span className="border-dotted">cmd</span>
                             </Tooltip>
                         </div>
                         <div onClick={() => toggleTabs(3)}
                             className={`text-sm leading-5 font-medium mr-10 cursor-help py-3 ${openTab == 3 ? 'text-indigo-700 border-bottom' : 'text-gray-500'}`}>
-                            <Tooltip placement="bottom" content="Windows from File Explorer" color="invert">
+                            <Tooltip placement="bottom" content={TOOLTIPS_DICT.SIDEBAR.WINDOWS_FILE_EXPLORER} color="invert">
                                 <span className="border-dotted">Executing from explorer</span>
                             </Tooltip>
                         </div>
@@ -370,7 +371,7 @@ export default function Sidebar() {
                             </li>
                             <li>Run the update script -&nbsp;
                                 <span className="bg-gray-200 text-red-700 rounded-md p-1 whitespace-nowrap">$
-                                    <Tooltip placement="top" content="Click to copy" color="invert">
+                                    <Tooltip placement="top" content={TOOLTIPS_DICT.GENERAL.CLICK_TO_COPY} color="invert">
                                         <span className="cursor-pointer" onClick={() => copyToClipboard('./update')}>./update</span>
                                     </Tooltip>
                                 </span>
@@ -394,7 +395,7 @@ export default function Sidebar() {
                             <li>
                                 Run the CLI update command&nbsp;
                                 <span className="bg-gray-200 text-red-700 rounded-md p-1 whitespace-nowrap">$
-                                    <Tooltip placement="top" content="Click to copy" color="invert">
+                                    <Tooltip placement="top" content={TOOLTIPS_DICT.GENERAL.CLICK_TO_COPY} color="invert">
                                         <span className="cursor-pointer" onClick={() => copyToClipboard('refinery update')}>refinery update</span>
                                     </Tooltip>
                                 </span>
@@ -410,7 +411,7 @@ export default function Sidebar() {
                             <li>
                                 Run the update script -&nbsp;
                                 <span className="bg-gray-200 text-red-700 rounded-md p-1 whitespace-nowrap">$
-                                    <Tooltip placement="top" content="Click to copy" color="invert">
+                                    <Tooltip placement="top" content={TOOLTIPS_DICT.GENERAL.CLICK_TO_COPY} color="invert">
                                         <span className="cursor-pointer" onClick={() => copyToClipboard('update.bat')}>update.bat</span>
                                     </Tooltip>
                                 </span>
@@ -423,7 +424,7 @@ export default function Sidebar() {
                             <li>
                                 Launch the update script by double-clicking&nbsp;
                                 <span className="bg-gray-200 text-red-700 rounded-md p-1 whitespace-nowrap">$
-                                    <Tooltip placement="top" content="Click to copy" color="invert">
+                                    <Tooltip placement="top" content={TOOLTIPS_DICT.GENERAL.CLICK_TO_COPY} color="invert">
                                         <span className="cursor-pointer" onClick={() => copyToClipboard('update.bat')}>update.bat</span>
                                     </Tooltip>
                                 </span>

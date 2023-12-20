@@ -34,7 +34,7 @@ export default function ProjectOverviewCards(props: ProjectOverviewCardsProps) {
                     <dd className="ml-16 pb-6 flex items-baseline sm:pb-7">
                         {props.projectStats.generalLoading ? (<LoadingIcon color={card.color} />) : (
                             <Tooltip content={card.stats !== CardStatsEnum.INTER_ANNOTATOR ? props.projectStats.general[card.stats] : props.projectStats.interAnnotator}
-                                placement="top" color="invert">
+                                placement="top" color="invert" className="cursor-auto">
                                 {(card.stats == CardStatsEnum.MANUAL || card.stats == CardStatsEnum.WEAK_SUPERVISION) &&
                                     <p className="text-2xl font-semibold text-gray-900">
                                         {props.projectStats.generalStats[card.stats]}
