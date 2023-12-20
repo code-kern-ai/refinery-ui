@@ -523,17 +523,17 @@ export default function SearchGroups(props: DataBrowserSideBarProps) {
                                     <div className="flex-grow flex flex-row flex-wrap gap-1">
                                         <div style={{ width: groupItem.operator != '' ? '49%' : '100%' }}>
                                             <Dropdown options={attributesSortOrder} buttonName={groupItem.name} backgroundColors={backgroundColors}
-                                                selectedOption={(option: string) => selectValueDropdown(option, index, 'name', group.key)} />
+                                                selectedOption={(option: string) => selectValueDropdown(option, index, 'name', group.key)} fontClass="font-dmMono" buttonClasses="whitespace-nowrap" />
                                         </div>
                                         <div style={{ width: '49%' }}>
                                             {groupItem.operator != '' && <Dropdown options={operatorsDropdown} buttonName={groupItem.operator} tooltipsArray={tooltipsArray} tooltipArrayPlacement="right"
-                                                selectedOption={(option: string) => selectValueDropdown(option, index, 'operator', group.key)} />}
+                                                selectedOption={(option: string) => selectValueDropdown(option, index, 'operator', group.key)} fontClass="font-dmMono" />}
                                         </div>
                                     </div>
                                     {uniqueValuesDict[groupItem['name']] && groupItem['operator'] != '' && groupItem['operator'] != 'BETWEEN' && groupItem['operator'] != 'IN' && groupItem['operator'] != 'IN WC' ? (
                                         <div className="my-2">
                                             <Dropdown options={uniqueValuesDict[groupItem['name']]} buttonName={groupItem['searchValue'] ? groupItem['searchValue'] : 'Select value'}
-                                                selectedOption={(option) => selectValueDropdown(option, index, 'searchValue', group.key)} />
+                                                selectedOption={(option) => selectValueDropdown(option, index, 'searchValue', group.key)} fontClass="font-dmMono" />
                                         </div>
                                     ) : (
                                         <div className="my-2 flex-grow flex flex-row items-center">

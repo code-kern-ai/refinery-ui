@@ -179,11 +179,11 @@ export default function SimilaritySearchModal() {
                         <div className="flex-grow flex flex-row flex-wrap gap-1">
                             <div style={{ width: '50%' }}>
                                 <Dropdown options={filterAttributesSS} buttonName={form.name} backgroundColors={colorsAttributes}
-                                    selectedOption={(option: string) => setFilterDropdownVal(option, index, 'name')} />
+                                    selectedOption={(option: string) => setFilterDropdownVal(option, index, 'name')} fontClass="font-dmMono" />
                             </div>
                             <div style={{ width: '49%' }}>
                                 <Dropdown options={operatorsDict[form.name]} buttonName={form.operator} tooltipsArray={tooltipsDict[form.operator]} tooltipArrayPlacement="left"
-                                    selectedOption={(option: string) => setFilterDropdownVal(option, index, 'operator')} />
+                                    selectedOption={(option: string) => setFilterDropdownVal(option, index, 'operator')} fontClass="font-dmMono" />
                             </div>
                         </div>
                         {/* TODO: Add check for unique values */}
