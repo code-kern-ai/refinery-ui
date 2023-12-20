@@ -1,7 +1,7 @@
 import LoadingIcon from "@/src/components/shared/loading/LoadingIcon"
 import { selectUser } from "@/src/reduxStore/states/general"
 import { removeFromRlaById, selectHoverGroupDict, selectRecordRequests, selectRecordRequestsRecord, selectSettings, selectUserDisplayId, setHoverGroupDict } from "@/src/reduxStore/states/pages/labeling"
-import { selectAttributes, selectLabelingTasksAll } from "@/src/reduxStore/states/pages/settings"
+import { selectAttributes, selectLabelingTasksAll, selectVisibleAttributesLabeling } from "@/src/reduxStore/states/pages/settings"
 import { selectProjectId } from "@/src/reduxStore/states/project"
 import { LabelingVars, TokenLookup } from "@/src/types/components/projects/projectId/labeling/labeling"
 import { LabelingTaskTaskType } from "@/src/types/components/projects/projectId/settings/labeling-tasks"
@@ -32,7 +32,7 @@ export default function LabelingSuiteLabeling() {
     const dispatch = useDispatch();
 
     const projectId = useSelector(selectProjectId);
-    const attributes = useSelector(selectAttributes);
+    const attributes = useSelector(selectVisibleAttributesLabeling);
     const labelingTasks = useSelector(selectLabelingTasksAll);
     const recordRequests = useSelector(selectRecordRequests);
     const settings = useSelector(selectSettings);

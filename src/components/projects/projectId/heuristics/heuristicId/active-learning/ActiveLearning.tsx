@@ -10,7 +10,7 @@ import { getClassLine, postProcessCurrentHeuristic, postProcessLastTaskLogs } fr
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
 import { Tooltip } from "@nextui-org/react";
 import Dropdown from "@/submodules/react-components/components/Dropdown";
-import { selectAttributes, selectEmbeddings, selectEmbeddingsFiltered, selectLabelingTasksAll, setAllEmbeddings, setFilteredEmbeddings, setLabelingTasksAll } from "@/src/reduxStore/states/pages/settings";
+import { selectAttributes, selectEmbeddings, selectEmbeddingsFiltered, selectLabelingTasksAll, selectVisibleAttributesHeuristics, setAllEmbeddings, setFilteredEmbeddings, setLabelingTasksAll } from "@/src/reduxStore/states/pages/settings";
 import { UPDATE_INFORMATION_SOURCE } from "@/src/services/gql/mutations/heuristics";
 import { postProcessLabelingTasks, postProcessLabelingTasksSchema } from "@/src/util/components/projects/projectId/settings/labeling-tasks-helper";
 import { GET_EMBEDDING_SCHEMA_BY_PROJECT_ID, GET_LABELING_TASKS_BY_PROJECT_ID } from "@/src/services/gql/queries/project-setting";
@@ -44,7 +44,7 @@ export default function ActiveLearning() {
     const labelingTasks = useSelector(selectLabelingTasksAll);
     const embeddings = useSelector(selectEmbeddings);
     const embeddingsFiltered = useSelector(selectEmbeddingsFiltered);
-    const attributes = useSelector(selectAttributes);
+    const attributes = useSelector(selectVisibleAttributesHeuristics);
     const allUsers = useSelector(selectAllUsers);
 
     const [lastTaskLogs, setLastTaskLogs] = useState<string[]>([]);

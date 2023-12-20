@@ -1,4 +1,4 @@
-import { Attribute, AttributeState } from '@/src/types/components/projects/projectId/settings/data-schema';
+import { Attribute, AttributeState, AttributeVisibility } from '@/src/types/components/projects/projectId/settings/data-schema';
 import { Embedding, RecommendedEncoder } from '@/src/types/components/projects/projectId/settings/embeddings';
 import { LabelingTask } from '@/src/types/components/projects/projectId/settings/labeling-tasks';
 import { DataTypeEnum } from '@/src/types/shared/general';
@@ -140,6 +140,9 @@ export const selectAttributesDict = createSelector([selectAttributes], (a): any 
 export const selectLabelingTasksDict = createSelector([selectLabelingTasksAll], (a): any => a ? arrayToDict(a, 'id') : null);
 export const selectUsableAttributesFiltered = createSelector([selectUsableAttributes], (a): any => a ? a.filter((attribute) => attribute.id != '@@NO_ATTRIBUTE@@') : null);
 export const selectUsableAttributesNoFiltered = createSelector([selectUsableAttributes], (a): any => a ? a.filter((attribute) => (attribute.dataType == DataTypeEnum.TEXT || attribute.id == '@@NO_ATTRIBUTE@@')) : null);
+export const selectVisibleAttributesLabeling = createSelector([selectUsableAttributes], (a): any => a ? a.filter((a) => a.visibility == AttributeVisibility.DO_NOT_HIDE || a.visibility == AttributeVisibility.HIDE_ON_DATA_BROWSER) : null);
+export const selectVisibleAttributeAC = createSelector([selectUsableAttributesFiltered], (a): any => a ? a.filter((a) => a.visibility != AttributeVisibility.HIDE) : null);
+export const selectVisibleAttributesHeuristics = createSelector([selectUsableAttributes], (a): any => a ? a.filter((a) => a.visibility != AttributeVisibility.HIDE) : null);
 
 export const { setAllAttributes, extendAllAttributes, removeFromAllAttributesById, updateAttributeById, setAllEmbeddings, setFilteredEmbeddings, removeFromAllEmbeddingsById, setAllRecommendedEncodersDict, setRecommendedEncodersAll, setLabelingTasksAll, removeFromAllLabelingTasksById, removeLabelFromLabelingTask } = settingsSlice.actions;
 export const settingsReducer = settingsSlice.reducer;

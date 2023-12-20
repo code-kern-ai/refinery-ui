@@ -1,6 +1,6 @@
 import Statuses from "@/src/components/shared/statuses/Statuses";
 import { selectAllLookupLists, setAllLookupLists } from "@/src/reduxStore/states/pages/lookup-lists";
-import { selectAttributes, selectUsableAttributesFiltered, setAllAttributes, updateAttributeById } from "@/src/reduxStore/states/pages/settings";
+import { selectAttributes, selectVisibleAttributeAC, setAllAttributes, updateAttributeById } from "@/src/reduxStore/states/pages/settings";
 import { selectProjectId } from "@/src/reduxStore/states/project"
 import { UPDATE_ATTRIBUTE } from "@/src/services/gql/mutations/project-settings";
 import { LOOKUP_LISTS_BY_PROJECT_ID } from "@/src/services/gql/queries/lookup-lists";
@@ -43,7 +43,7 @@ export default function AttributeCalculation() {
 
     const projectId = useSelector(selectProjectId);
     const attributes = useSelector(selectAttributes);
-    const usableAttributes = useSelector(selectUsableAttributesFiltered)
+    const usableAttributes = useSelector(selectVisibleAttributeAC)
     const lookupLists = useSelector(selectAllLookupLists);
     const allUsers = useSelector(selectAllUsers);
 

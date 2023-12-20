@@ -1,5 +1,5 @@
 import { selectConfiguration, selectIsTextHighlightNeeded, selectTextHighlight } from "@/src/reduxStore/states/pages/data-browser";
-import { selectAttributesDict, selectUsableAttributes } from "@/src/reduxStore/states/pages/settings";
+import { selectAttributesDict, selectUsableAttributes, selectVisibleAttributesHeuristics } from "@/src/reduxStore/states/pages/settings";
 import { LineBreaksType } from "@/src/types/components/projects/projectId/data-browser/data-browser";
 import { Attribute } from "@/src/types/components/projects/projectId/settings/data-schema";
 import { DataTypeEnum } from "@/src/types/shared/general";
@@ -10,7 +10,7 @@ import { useSelector } from "react-redux";
 import Highlight from "../highlight/Highlight";
 
 export function RecordDisplay(props: any) {
-    const attributes = useSelector(selectUsableAttributes);
+    const attributes = useSelector(selectVisibleAttributesHeuristics);
     const attributesDict = useSelector(selectAttributesDict);
     const configuration = useSelector(selectConfiguration);
     const textHighlight = useSelector(selectTextHighlight);

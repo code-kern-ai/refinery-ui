@@ -30,6 +30,7 @@ import { DataBrowserSideBarProps } from "@/src/types/components/projects/project
 import { GET_CURRENT_WEAK_SUPERVISION_RUN } from "@/src/services/gql/queries/heuristics";
 import { Status } from "@/src/types/shared/statuses";
 import { postProcessCurrentWeakSupervisionRun } from "@/src/util/components/projects/projectId/heuristics/heuristics-helper";
+import { AttributeVisibility } from "@/src/types/components/projects/projectId/settings/data-schema";
 
 const GROUP_SORT_ORDER = 0;
 let GLOBAL_SEARCH_GROUP_COUNT = 0;
@@ -80,6 +81,7 @@ export default function SearchGroups(props: DataBrowserSideBarProps) {
         if (!attributes) return;
         const attributesSort = [];
         const colors = [];
+        const visibleAttributes = attributes.filter((a) => a.visibility == AttributeVisibility.DO_NOT_HIDE);
         attributesSort.push({
 
             name: 'Any Attribute',
@@ -88,7 +90,7 @@ export default function SearchGroups(props: DataBrowserSideBarProps) {
             type: 'TEXT'
         });
         colors.push('gray');
-        attributes.forEach((att) => {
+        visibleAttributes.forEach((att) => {
             attributesSort.push({
                 name: att.name,
                 key: att.id,
