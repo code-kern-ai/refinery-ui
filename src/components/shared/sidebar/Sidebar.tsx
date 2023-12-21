@@ -54,7 +54,7 @@ export default function Sidebar() {
     useEffect(() => {
         setAcceptButton({ ...ACCEPT_BUTTON, useButton: !isManaged, emitFunction: howToUpdate });
         setBackButton({ ...ABORT_BUTTON, emitFunction: goBack });
-    }, [howToUpdate, goBack]);
+    }, [howToUpdate, goBack, isManaged]);
 
     const [acceptButton, setAcceptButton] = useState<ModalButton>(ACCEPT_BUTTON);
     const [backButton, setBackButton] = useState<ModalButton>(ABORT_BUTTON);
