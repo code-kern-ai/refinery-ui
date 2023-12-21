@@ -196,7 +196,8 @@ export default function ProjectSnapshotExport() {
                 </button>
             </Tooltip>}
             <button onClick={prepareDownload}
-                className={`bg-green-100 flex items-center mr-4 text-green-700 border border-green-400 text-xs font-semibold px-4 rounded-md cursor-pointer hover:bg-green-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 ${downloadPrepareMessage == DownloadState.PREPARATION || downloadPrepareMessage == DownloadState.DOWNLOAD ? 'cursor-not-allowed opacity-50' : 'cursor-pointer opacity-100'}`}
+                disabled={downloadPrepareMessage == DownloadState.PREPARATION || downloadPrepareMessage == DownloadState.DOWNLOAD}
+                className={`bg-green-100 flex items-center mr-4 text-green-700 border border-green-400 text-xs font-semibold px-4 rounded-md cursor-pointer hover:bg-green-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50 disabled:cursor-not-allowed`}
                 type="submit">
                 Prepare download
                 {downloadPrepareMessage == DownloadState.PREPARATION && <span className="ml-2"><LoadingIcon color="green" /></span>}

@@ -16,7 +16,7 @@ export default function SizeWarningModal(props: { minWidth: number }) {
             </div>
         </div>
         <div className="mt-5 flex justify-end">
-            <button className={`ml-2 bg-green-100 border border-green-400 text-green-700 text-xs font-semibold px-4 py-2 rounded-md cursor-pointer opacity-100 hover:bg-green-200 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50`}
+            <button className={`ml-2 bg-green-100 border border-green-400 text-green-700 text-xs font-semibold px-4 py-2 rounded-md cursor-pointer opacity-100 hover:bg-green-200 focus:outline-none`}
                 onClick={() => dispatch(closeModal(ModalEnum.SIZE_WARNING))}>Continue</button>
         </div>
     </Modal>)

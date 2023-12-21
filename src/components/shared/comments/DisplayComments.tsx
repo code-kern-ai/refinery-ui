@@ -130,7 +130,7 @@ export default function DisplayComments(props: DisplayCommentsProps) {
                     </li>
                     <textarea
                         disabled={props.editComments[index] ? false : true}
-                        className={`rounded-md placeholder-italic w-full max-h-28 h-16 p-2 line-height-textarea focus:outline-none border border-gray-300 text-sm ${props.openComments[index] ? '' : 'hidden'} ${props.editComments[index] ? '' : 'bg-gray-50 cursor-not-allowed'}`}
+                        className={`rounded-md placeholder-italic w-full max-h-28 h-16 p-2 line-height-textarea focus:outline-none border border-gray-300 text-sm ${props.openComments[index] ? '' : 'hidden'} disabled:cursor-not-allowed disabled:opacity-50`}
                         onChange={(event: any) => {
                             const target = event.target as HTMLTextAreaElement;
                             const finalHeight = target.scrollHeight + 2; // +2 for border

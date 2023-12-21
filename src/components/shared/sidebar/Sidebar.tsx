@@ -134,9 +134,10 @@ export default function Sidebar() {
                                         {user.role === UserRole.ENGINEER && <div
                                             className="flex items-center justify-center overflow-visible">
                                             <Tooltip placement="right" trigger="hover" color="invert" content={TOOLTIPS_DICT.SIDEBAR.OVERVIEW}>
-                                                <div className={`relative z-50 ${project.numDataScaleUploaded == 0 ? 'opacity-50 cursor-not-allowed pointer-events-none' : 'opacity-100 cursor-pointer'}`}>
+                                                <div className={`relative z-50`}>
                                                     <button onClick={() => router.push(`/projects/${project.id}/overview`)}
-                                                        className={`circle ${routeColor.overview.active ? 'text-kernpurple' : 'text-white'}`}>
+                                                        disabled={project.numDataScaleUploaded == 0}
+                                                        className={`disabled:opacity-50 disabled:cursor-not-allowed circle ${routeColor.overview.active ? 'text-kernpurple' : 'text-white'}`}>
                                                         <IconChartPie className="w-6 h-6" />
                                                     </button>
                                                 </div>
@@ -145,9 +146,10 @@ export default function Sidebar() {
                                         {user.role === UserRole.ENGINEER && <div
                                             className="flex items-center justify-center overflow-visible mt-10 2xl:mt-12">
                                             <Tooltip placement="right" trigger="hover" color="invert" content={TOOLTIPS_DICT.SIDEBAR.DATA_BROWSER}>
-                                                <div className={`relative z-50 ${project.numDataScaleUploaded == 0 ? 'opacity-50 cursor-not-allowed pointer-events-none' : 'opacity-100 cursor-pointer'}`}>
+                                                <div className={`relative z-50`}>
                                                     <button onClick={() => router.push(`/projects/${project.id}/data-browser`)}
-                                                        className={`circle ${routeColor.data.active ? 'text-kernpurple' : 'text-white'}`}>
+                                                        disabled={project.numDataScaleUploaded == 0}
+                                                        className={`disabled:opacity-50 disabled:cursor-not-allowed circle ${routeColor.data.active ? 'text-kernpurple' : 'text-white'}`}>
                                                         <IconTriangleSquareCircle className="w-6 h-6" />
                                                     </button>
                                                 </div>
@@ -155,9 +157,10 @@ export default function Sidebar() {
                                         </div>}
                                         <div className={`flex items-center justify-center overflow-visible ${user?.role == 'ENGINEER' ? 'mt-10 2xl:mt-12' : ''}`}>
                                             <Tooltip placement="right" trigger="hover" color="invert" content={TOOLTIPS_DICT.SIDEBAR.LABELING}>
-                                                <div className={`relative z-50 ${project.numDataScaleUploaded == 0 ? 'opacity-50 cursor-not-allowed pointer-events-none' : 'opacity-100 cursor-pointer'}`}>
+                                                <div className={`relative z-50`}>
                                                     <button onClick={() => router.push(`/projects/${project.id}/labeling`)}
-                                                        className={`circle ${routeColor.labeling.active ? 'text-kernpurple' : 'text-white'}`}>
+                                                        disabled={project.numDataScaleUploaded == 0}
+                                                        className={`disabled:opacity-50 disabled:cursor-not-allowed circle ${routeColor.labeling.active ? 'text-kernpurple' : 'text-white'}`}>
                                                         <svg xmlns="http://www.w3.org/2000/svg" className="w-6 h-6" viewBox="0 0 20 20"
                                                             fill="currentColor">
                                                             <path fillRule="evenodd"
@@ -171,9 +174,10 @@ export default function Sidebar() {
                                         {user.role === UserRole.ENGINEER && <div
                                             className="flex items-center justify-center overflow-visible mt-10 2xl:mt-12">
                                             <Tooltip placement="right" trigger="hover" color="invert" content={TOOLTIPS_DICT.SIDEBAR.HEURISTICS}>
-                                                <div className={`relative z-50 ${project.numDataScaleUploaded == 0 ? 'opacity-50 cursor-not-allowed pointer-events-none' : 'opacity-100 cursor-pointer'}`}>
+                                                <div className={`relative z-50`}>
                                                     <button onClick={() => router.push(`/projects/${project.id}/heuristics`)}
-                                                        className={`circle ${routeColor.heuristics.active ? 'text-kernpurple' : 'text-white'}`}>
+                                                        disabled={project.numDataScaleUploaded == 0}
+                                                        className={`disabled:opacity-50 disabled:cursor-not-allowed circle ${routeColor.heuristics.active ? 'text-kernpurple' : 'text-white'}`}>
                                                         <IconBulb className="w-6 h-6" />
                                                     </button>
                                                 </div>
@@ -182,8 +186,9 @@ export default function Sidebar() {
                                         {user.role === UserRole.ENGINEER && <div
                                             className="flex items-center justify-center overflow-visible mt-10 2xl:mt-12">
                                             <Tooltip placement="right" trigger="hover" color="invert" content={TOOLTIPS_DICT.SIDEBAR.SETTINGS}>
-                                                <div className={`relative z-50 ${project.numDataScaleUploaded == 0 ? 'opacity-50 cursor-not-allowed pointer-events-none' : 'opacity-100 cursor-pointer'}`}>
+                                                <div className={`relative z-50`}>
                                                     <button onClick={() => router.push(`/projects/${project.id}/settings`)}
+                                                        disabled={project.numDataScaleUploaded == 0}
                                                         className={`circle ${routeColor.settings.active ? 'text-kernpurple' : 'text-white'}`}>
                                                         <IconSettings className="w-6 h-6" />
                                                     </button>
@@ -195,7 +200,7 @@ export default function Sidebar() {
                                             <Tooltip placement="right" trigger="hover" color="invert" content={TOOLTIPS_DICT.SIDEBAR.ADMIN}>
                                                 <div className={`relative z-50 opacity-100 cursor-pointer`}>
                                                     <button onClick={() => router.push(`/projects/${project.id}/admin`)}
-                                                        className={`circle ${routeColor.admin.active ? 'text-kernpurple' : 'text-white'}`}>
+                                                        className={`disabled:opacity-50 disabled:cursor-not-allowed circle ${routeColor.admin.active ? 'text-kernpurple' : 'text-white'}`}>
                                                         <IconUserCircle className="w-6 h-6" />
                                                     </button>
                                                 </div>

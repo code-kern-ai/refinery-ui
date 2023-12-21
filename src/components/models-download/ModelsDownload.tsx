@@ -155,7 +155,8 @@ export default function ModelsDownload() {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-2 mt-1 align-top">
                 <div>
                     <button onClick={() => dispatch(openModal(ModalEnum.ADD_MODEL_DOWNLOAD))}
-                        className={`mr-1 inline-flex items-center px-2.5 py-2 border border-gray-300 shadow-sm text-xs font-semibold rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none cursor-pointer ${!isManaged ? 'pointer-events-none cursor-not-allowed opacity-50' : ''}`}>
+                        disabled={!isManaged}
+                        className={`mr-1 inline-flex items-center px-2.5 py-2 border border-gray-300 shadow-sm text-xs font-semibold rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none cursor-pointer disabled:cursor-not-allowed disabled:opacity-50`}>
                         <IconPlus className="h-4 w-4 mr-1" />
                         Add new model
                     </button>

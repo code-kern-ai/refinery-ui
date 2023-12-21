@@ -35,9 +35,9 @@ export default function CryptedField(_props: CryptoFieldProps) {
                     }} />
                 <button onClick={toggleKey} disabled={!key}>
                     {!show ? (
-                        <IconEye className={` text-gray-500 absolute top-1 right-3 cursor-pointer ${!key ? 'cursor-not-allowed opacity-50' : 'cursor-pointer opacity-100'}`} />
+                        <IconEye className={` text-gray-500 absolute top-1 right-3 cursor-pointer disabled:cursor-not-allowed disabled:opacity-50`} />
                     ) : (
-                        <IconEyeOff className={`text-gray-500 absolute top-1 right-3 ${!key ? 'cursor-not-allowed opacity-50' : 'cursor-pointer opacity-100'}`} />
+                        <IconEyeOff className={`text-gray-500 absolute top-1 right-3 disabled:cursor-not-allowed disabled:opacity-50`} />
                     )}
                 </button>
             </div>

@@ -261,7 +261,7 @@ export default function Embeddings(props: EmbeddingProps) {
                 </Tooltip>
                 <Tooltip content={!isManaged ? TOOLTIPS_DICT.PROJECT_SETTINGS.EMBEDDINGS.HOSTED_VERSION : TOOLTIPS_DICT.PROJECT_SETTINGS.EMBEDDINGS.NAVIGATE_MODELS_DOWNLOADED} color="invert" placement="right">
                     <button disabled={!isManaged} onClick={() => router.push('/models-download')}
-                        className={`"ml-1 inline-block items-center px-2.5 py-1.5 border border-gray-300 shadow-sm text-xs font-semibold rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none cursor-pointer ${!isManaged ? 'opacity-50 cursor-not-allowed' : 'opacity-100 cursor-pointer'}`}>
+                        className={`"ml-1 inline-block items-center px-2.5 py-1.5 border border-gray-300 shadow-sm text-xs font-semibold rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none cursor-pointer disabled:cursor-not-allowed disabled:opacity-50`}>
                         <IconArrowAutofitDown className="h-5 w-5 inline-block mr-1" />
                         See downloaded models
                     </button>

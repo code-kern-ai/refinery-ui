@@ -157,7 +157,7 @@ export default function ModelCallbacks() {
                             selectedOption={(option: string) => executeOption(option)} dropdownClasses="mr-3" buttonClasses={`${style.actionsHeight} text-xs`} />
                     ) : (
                         <Tooltip placement="left" content={TOOLTIPS_DICT.MODEL_CALLBACKS.ENABLE_ACTIONS} color="invert">
-                            <button type="button"
+                            <button type="button" disabled={true}
                                 className="mr-3 inline-flex items-center justify-center w-full rounded-md border border-gray-300 shadow-sm px-4 py-1.5 bg-white text-xs font-medium text-gray-700 opacity-50 cursor-not-allowed focus:ring-offset-2 focus:ring-offset-gray-400"
                                 id="menu-button" aria-expanded="true" aria-haspopup="true">
                                 Actions

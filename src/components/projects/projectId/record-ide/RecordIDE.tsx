@@ -178,7 +178,7 @@ export default function RecordIDE() {
                     </Tooltip>
                     <Tooltip content={TOOLTIPS_DICT.RECORD_IDE.SAVE_STORAGE} color="invert" placement="right">
                         <button onClick={saveCodeToLocalStorage}
-                            className="hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 bg-white text-gray-700 font-semibold text-xs mr-2 px-4 py-2 rounded-md border border-gray-300 disabled:opacity-50 disabled:cursor-not-allowed">
+                            className="hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 bg-white text-gray-700 font-semibold text-xs mr-2 px-4 py-2 rounded-md border border-gray-300">
                             <span>Save</span>
                         </button>
                     </Tooltip>

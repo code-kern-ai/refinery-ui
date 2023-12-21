@@ -302,7 +302,7 @@ export default function ProjectSettings() {
                             dispatch(setUploadFileType(UploadFileType.RECORDS_ADD));
                             router.push(`/projects/${project.id}/upload-records`);
                         }}
-                            className={`mr-1 inline-flex items-center px-2.5 py-1.5 border border-gray-300 shadow-sm text-xs font-semibold rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none cursor-pointer ${isAcRunning || tokenizationProgress < 1 ? 'opacity-50 cursor-not-allowed' : 'opacity-100 cursor-pointer'}`}>
+                            className={`mr-1 inline-flex items-center px-2.5 py-1.5 border border-gray-300 shadow-sm text-xs font-semibold rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none cursor-pointer disabled:cursor-not-allowed disabled:opacity-50`}>
                             <IconUpload className="mr-1 h-5 w-5 inline-block" />
                             Upload records
                         </button>

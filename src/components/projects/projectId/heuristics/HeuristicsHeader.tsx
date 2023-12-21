@@ -205,7 +205,7 @@ export default function HeuristicsHeader(props: HeuristicsHeaderProps) {
                         disabledOptions={[false, false, !(labelingTasks && labelingTasks.length > 0), !isManaged]}
                         selectedOption={(option: string) => executeOption(option)} buttonClasses={`${style.actionsHeight} text-xs whitespace-nowrap`} dropdownClasses="mr-3" dropdownItemsWidth='w-36' dropdownWidth='w-32' />
                 </Tooltip>) : (<Tooltip content={TOOLTIPS_DICT.HEURISTICS.DISABLED_NEW_HEURISTIC} color="invert">
-                    <button type="button"
+                    <button type="button" disabled={true}
                         className="mr-3 inline-flex items-center justify-center w-full rounded-md border border-gray-300 shadow-sm px-4 py-1.5 bg-white text-xs font-medium text-gray-700 opacity-50 cursor-not-allowed focus:ring-offset-2 focus:ring-offset-gray-400"
                         id="menu-button" aria-expanded="true" aria-haspopup="true">
                         New heuristic
@@ -223,7 +223,7 @@ export default function HeuristicsHeader(props: HeuristicsHeaderProps) {
                         selectedOption={(option: string) => executeOption(option)} dropdownClasses="mr-3" buttonClasses={`${style.actionsHeight} text-xs`} dropdownItemsWidth='w-36' dropdownWidth='w-32' />
                 ) : (
                     <Tooltip placement="left" content={TOOLTIPS_DICT.HEURISTICS.ENABLE_ACTIONS} color="invert">
-                        <button type="button"
+                        <button type="button" disabled={true}
                             className="mr-3 inline-flex items-center justify-center w-full rounded-md border border-gray-300 shadow-sm px-4 py-1.5 bg-white text-xs font-medium text-gray-700 opacity-50 cursor-not-allowed focus:ring-offset-2 focus:ring-offset-gray-400"
                             id="menu-button" aria-expanded="true" aria-haspopup="true">
                             Actions
@@ -242,7 +242,7 @@ export default function HeuristicsHeader(props: HeuristicsHeaderProps) {
                         {areValidHeuristicsSelected ? (
                             <Tooltip content={TOOLTIPS_DICT.HEURISTICS.WEAK_SUPERVISION} color="invert" placement="right">
                                 <button onClick={startWeakSupervision}
-                                    className="bg-indigo-700 text-white text-xs font-semibold mr-3 px-4 py-2 rounded-md border hover:bg-indigo-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed">
+                                    className="bg-indigo-700 text-white text-xs font-semibold mr-3 px-4 py-2 rounded-md border hover:bg-indigo-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
                                     Weak supervision
                                 </button>
                             </Tooltip>

@@ -72,7 +72,7 @@ export default function ProjectMetaData() {
                                 <Tooltip content={TOOLTIPS_DICT.PROJECT_SETTINGS.META_DATA.STORE_CHANGES} color="invert" placement="right">
                                     <button onClick={updateProjectNameAndDescription}
                                         disabled={projectName === '' && projectDescription === ''} type="button"
-                                        className={`inline-flex items-center px-2.5 py-1.5 border border-gray-300 shadow-sm text-xs font-medium rounded text-gray-700 bg-white hover:bg-gray-50 focus:outline-none ${projectName === '' && projectDescription === '' ? 'cursor-not-allowed opacity-50' : 'cursor-pointer opacity-100'}`}>
+                                        className={`inline-flex items-center px-2.5 py-1.5 border border-gray-300 shadow-sm text-xs font-medium rounded text-gray-700 bg-white hover:bg-gray-50 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50`}>
                                         Update</button>
                                 </Tooltip>
                             </div>
@@ -94,7 +94,7 @@ export default function ProjectMetaData() {
 
                     <Tooltip content={TOOLTIPS_DICT.PROJECT_SETTINGS.META_DATA.CANNOT_BE_REVERTED} placement="left" color="invert">
                         <button onClick={deleteProject} disabled={!(projectNameDelete === project.name)} type="button"
-                            className={`inline-flex text-xs items-center bg-red-100 border border-red-400 text-red-700 font-semibold px-4 py-2 rounded-md ml-6 hover:bg-red-200 focus:outline-none ${!(projectNameDelete === project.name) ? 'opacity-50 cursor-not-allowed' : 'opacity-100 cursor-pointer'} `}>
+                            className={`inline-flex text-xs items-center bg-red-100 border border-red-400 text-red-700 font-semibold px-4 py-2 rounded-md ml-6 hover:bg-red-200 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50 `}>
                             <IconWreckingBall className="h-4 w-4 mr-2" />
                             Delete</button>
                     </Tooltip>
