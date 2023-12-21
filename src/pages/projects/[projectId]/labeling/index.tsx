@@ -26,6 +26,8 @@ export default function LabelingRoutingPage() {
         if (!SessionManager.labelingLinkData) {
             const type = guessLinkType(user.role);
             router.push(`/projects/${projectId}/labeling/${DUMMY_HUDDLE_ID}?pos=0&type=${type}`);
+        } else {
+            router.push(`/projects/${projectId}/labeling/${SessionManager.labelingLinkData.huddleId}?pos=${SessionManager.labelingLinkData.requestedPos}&type=${SessionManager.labelingLinkData.linkType}`);
         }
     }, [projectId, user]);
 

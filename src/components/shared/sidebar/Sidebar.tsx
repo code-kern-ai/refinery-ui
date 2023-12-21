@@ -9,8 +9,7 @@ import AppSelectionDropdown from '@/submodules/react-components/components/AppSe
 import { ModalButton, ModalEnum } from '@/src/types/shared/modal';
 import { closeModal, openModal } from '@/src/reduxStore/states/modal';
 import { useLazyQuery } from '@apollo/client';
-import { GET_HAS_UPDATES, GET_VERSION_OVERVIEW } from '@/src/services/gql/queries/config';
-import { parseUTC } from '@/submodules/javascript-functions/date-parser';
+import { GET_HAS_UPDATES } from '@/src/services/gql/queries/config';
 import Modal from '../modal/Modal';
 import LoadingIcon from '../loading/LoadingIcon';
 import style from '@/src/styles/shared/sidebar.module.css';
@@ -19,6 +18,7 @@ import { IconAlertCircle, IconApi, IconArrowRight, IconBrandDiscord, IconBulb, I
 import { IconSettings } from '@tabler/icons-react';
 import { useRouter } from 'next/router';
 import { TOOLTIPS_DICT } from '@/src/util/tooltip-constants';
+import { CacheEnum, selectCachedValue } from '@/src/reduxStore/states/cachedValues';
 
 const ACCEPT_BUTTON = { buttonCaption: "How to update", useButton: true };
 const ABORT_BUTTON = { buttonCaption: "Back", useButton: true };
@@ -32,13 +32,12 @@ export default function Sidebar() {
     const isAdmin = useSelector(selectIsAdmin);
     const isManaged = useSelector(selectIsManaged);
     const routeColor = useSelector(selectRouteColor);
+    const versionOverviewData = useSelector(selectCachedValue(CacheEnum.VERSION_OVERVIEW));
 
     const [isFullScreen, setIsFullScreen] = useState(false);
     const [hasUpdates, setHasUpdates] = useState(false);
-    const [versionOverviewData, setVersionOverviewData] = useState<VersionOverview[]>(null);
     const [openTab, setOpenTab] = useState(0);
 
-    const [refetchVersionOverview] = useLazyQuery(GET_VERSION_OVERVIEW, { fetchPolicy: 'no-cache' });
     const [refetchHasUpdates] = useLazyQuery(GET_HAS_UPDATES, { fetchPolicy: 'no-cache' });
 
     const howToUpdate = useCallback(() => {
@@ -93,17 +92,11 @@ export default function Sidebar() {
 
     function requestVersionOverview() {
         dispatch(openModal(ModalEnum.VERSION_OVERVIEW));
-        refetchVersionOverview().then(res => {
-            const versionOverview: VersionOverview[] = res.data["versionOverview"];
-            versionOverview.forEach((version: any) => {
-                version.parseDate = parseUTC(version.lastChecked);
-            });
-            versionOverview.sort((a, b) => a.service.localeCompare(b.service));
-            setVersionOverviewData(versionOverview);
+        if (versionOverviewData) {
             refetchHasUpdates().then(res => {
                 setHasUpdates(res.data["hasUpdates"]);
             });
-        });
+        }
     }
 
     function toggleTabs(index: number) {
@@ -271,7 +264,7 @@ export default function Sidebar() {
                                 <Tooltip placement="right" trigger="hover" color="invert" content={TOOLTIPS_DICT.SIDEBAR.VERSION_OVERVIEW}>
                                     <div onClick={requestVersionOverview} id="refineryVersion"
                                         className="z-50 tooltip tooltip-right cursor-pointer select-none text-white flex items-center mr-1">
-                                        v1.12.0
+                                        v2.0.0
                                         {hasUpdates && <Tooltip placement="right" trigger="hover" color="invert" content={TOOLTIPS_DICT.SIDEBAR.NEWER_VERSION_AVAILABLE} >
                                             <IconAlertCircle className="h-5 w-5 text-yellow-700" />
                                         </Tooltip>}

@@ -11,7 +11,7 @@ const CARDS_DATA = [
     { color: 'yellow', stats: CardStatsEnum.MANUAL, label: 'Manually labeled', linkLabel: 'Continue labeling', link: 'labeling' },
     { color: 'green', stats: CardStatsEnum.WEAK_SUPERVISION, label: 'Weakly supervised', linkLabel: 'Manage heuristics', link: 'heuristics' },
     { color: 'red', stats: CardStatsEnum.INFORMATION_SOURCE, label: 'Heuristics', linkLabel: 'Manage heuristics', link: 'heuristics' },
-    { color: 'blue', stats: CardStatsEnum.INTER_ANNOTATOR, label: 'Inter annotator agreement', linkLabel: 'View records', link: 'data' },
+    { color: 'blue', stats: CardStatsEnum.INTER_ANNOTATOR, label: 'Inter annotator agreement', linkLabel: 'View records', link: 'data-browser' },
 ];
 
 export default function ProjectOverviewCards(props: ProjectOverviewCardsProps) {

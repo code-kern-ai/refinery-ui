@@ -7,7 +7,7 @@ import { setActiveProject } from "./states/project";
 import { GET_ALL_TOKENIZER_OPTIONS, GET_PROJECT_BY_ID } from "../services/gql/queries/projects";
 import { useLazyQuery } from "@apollo/client";
 import { GET_ORGANIZATION, GET_ORGANIZATION_USERS, GET_USER_INFO } from "../services/gql/queries/organizations";
-import { GET_IS_ADMIN } from "../services/gql/queries/config";
+import { GET_IS_ADMIN, GET_VERSION_OVERVIEW } from "../services/gql/queries/config";
 import { getIsDemo, getIsManaged } from "../services/base/data-fetch";
 import { WebSocketsService } from "../services/base/web-sockets/WebSocketsService";
 import { timer } from "rxjs";
@@ -18,6 +18,7 @@ import { CacheEnum, setCache } from "./states/cachedValues";
 import { postProcessingZeroShotEncoders } from "../util/components/models-downloaded/models-downloaded-helper";
 import { checkWhitelistTokenizer } from "../util/components/projects/new-project/new-project-helper";
 import { ConfigManager } from "../services/base/config";
+import postprocessVersionOverview from "../util/shared/sidebar-helper";
 
 export function GlobalStoreDataComponent(props: React.PropsWithChildren) {
     const router = useRouter();
@@ -37,6 +38,7 @@ export function GlobalStoreDataComponent(props: React.PropsWithChildren) {
     const [refetchZeroShotRecommendations] = useLazyQuery(GET_ZERO_SHOT_RECOMMENDATIONS, { fetchPolicy: 'cache-first' });
     const [refetchRecommendedEncoders] = useLazyQuery(GET_RECOMMENDED_ENCODERS_FOR_EMBEDDINGS, { fetchPolicy: 'cache-first' });
     const [refetchTokenizerValues] = useLazyQuery(GET_ALL_TOKENIZER_OPTIONS, { fetchPolicy: 'cache-first' });
+    const [refetchVersionOverview] = useLazyQuery(GET_VERSION_OVERVIEW, { fetchPolicy: 'no-cache' });
 
     useEffect(() => {
         getIsManaged((data) => {
@@ -75,6 +77,9 @@ export function GlobalStoreDataComponent(props: React.PropsWithChildren) {
             refetchRecommendedEncoders().then((resEncoders) => {
                 dispatch(setCache(CacheEnum.MODELS_LIST, postProcessingZeroShotEncoders(JSON.parse(resZeroShot.data['zeroShotRecommendations']), resEncoders.data['recommendedEncoders'])))
             });
+        });
+        refetchVersionOverview().then((res) => {
+            dispatch(setCache(CacheEnum.VERSION_OVERVIEW, postprocessVersionOverview(res.data['versionOverview'])));
         });
     }, []);
 

@@ -66,7 +66,7 @@ export default function ProjectCard(props: ProjectCardProps) {
                             <span className="text-sm text-gray-900 ">{props.project.time}</span>
                         </>}
                     </div>}
-                    {isAdmin &&
+                    {(isAdmin && props.project.status !== ProjectStatus.INIT_SAMPLE_PROJECT) &&
                         <div className="absolute top-0 left-0 cursor-pointer" onClick={() => adminOpenOrDeleteProject(props.project)}>
                             <Tooltip content={TOOLTIPS_DICT.PROJECTS.QUICK_DELETE} color="invert" offset={2} placement="right">
                                 <IconX className="h-6 w-6 text-gray-500" />
