@@ -1,7 +1,8 @@
 import { selectHeuristic } from "@/src/reduxStore/states/pages/heuristics";
 import { HeuristicsEditorProps } from "@/src/types/components/projects/projectId/heuristics/heuristicId/heuristics-details";
+import { InformationSourceCodeLookup } from "@/src/util/classes/heuristics";
 import { Editor } from "@monaco-editor/react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 
 const EDITOR_OPTIONS = { theme: 'vs-light', language: 'python', readOnly: false };
@@ -11,8 +12,13 @@ export default function HeuristicsEditor(props: HeuristicsEditorProps) {
 
     const [isInitial, setIsInitial] = useState(null);  //null as add state to differentiate between initial, not and unchecked
 
+    useEffect(() => {
+        if (!currentHeuristic) return;
+        setIsInitial(InformationSourceCodeLookup.isCodeStillTemplate(currentHeuristic.sourceCode) != null)
+    }, [currentHeuristic]);
+
     function openBricksIntegrator() {
-        // TODO: open bricks integrator
+        document.getElementById('bricks-integrator-open-button').click();
     }
 
     return (

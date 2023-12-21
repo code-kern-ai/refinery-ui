@@ -98,7 +98,6 @@ export class WebSocketsService {
             return;
         }
 
-
         const msgParts = msg.split(":");
         const projectId = msgParts[0];
         if (!WebSocketsService.registeredNotificationListeners.has(projectId)) return;

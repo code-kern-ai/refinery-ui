@@ -125,6 +125,7 @@ export default function Sidebar() {
                                             height={40}
                                             src="/refinery/images/refinery-icon.png"
                                             alt="Kern AI"
+                                            priority={true}
                                         />
                                     </button>
                                 </div>

@@ -52,7 +52,6 @@ export function getAddInfo(type: BricksVariableType, asPythonEnum: boolean): str
     return list;
 }
 
-// TODO: Remove this when grdp is removed from bricks
 export const GROUPS_TO_REMOVE = ['gdpr_compliant', 'not_gdpr_compliant'];
 
 function getDummyNodeByIdForSelection(id: DummyNodes, extendedIntegrator: boolean): any {

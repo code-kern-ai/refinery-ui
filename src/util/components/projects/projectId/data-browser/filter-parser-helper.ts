@@ -313,7 +313,6 @@ function appendBlackAndWhiteListComments(appendTo: string[], searchElement: any,
     return hasCommentsObj.active ? JSON.stringify(element) : appendTo;
 }
 
-// TODO: add BE changes for this
 function buildFilterRecordCategory(first: boolean) {
     const filterValue = "SCALE";
     let filterElement = {

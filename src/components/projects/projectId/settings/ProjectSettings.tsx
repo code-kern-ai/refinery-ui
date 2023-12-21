@@ -2,9 +2,9 @@ import { useDispatch, useSelector } from "react-redux";
 import DataSchema from "./DataSchema";
 import { selectProject, setActiveProject } from "@/src/reduxStore/states/project";
 import { useLazyQuery, useMutation } from "@apollo/client";
-import { CHECK_COMPOSITE_KEY, GET_ATTRIBUTES_BY_PROJECT_ID, GET_EMBEDDING_SCHEMA_BY_PROJECT_ID, GET_PROJECT_TOKENIZATION, GET_QUEUED_TASKS, GET_RECOMMENDED_ENCODERS_FOR_EMBEDDINGS } from "@/src/services/gql/queries/project-setting";
+import { CHECK_COMPOSITE_KEY, GET_ATTRIBUTES_BY_PROJECT_ID, GET_EMBEDDING_SCHEMA_BY_PROJECT_ID, GET_GATES_INTEGRATION_DATA, GET_PROJECT_TOKENIZATION, GET_QUEUED_TASKS, GET_RECOMMENDED_ENCODERS_FOR_EMBEDDINGS } from "@/src/services/gql/queries/project-setting";
 import { useCallback, useEffect, useState } from "react";
-import { selectAttributes, selectEmbeddings, setAllAttributes, setAllEmbeddings, setAllRecommendedEncodersDict, setRecommendedEncodersAll } from "@/src/reduxStore/states/pages/settings";
+import { selectAttributes, selectEmbeddings, selectGatesIntegration, setAllAttributes, setAllEmbeddings, setAllRecommendedEncodersDict, setGatesIntegration, setRecommendedEncodersAll } from "@/src/reduxStore/states/pages/settings";
 import { timer } from "rxjs";
 import { IconCamera, IconCheck, IconDots, IconPlus, IconUpload } from "@tabler/icons-react";
 import Modal from "@/src/components/shared/modal/Modal";
@@ -49,6 +49,7 @@ export default function ProjectSettings() {
     const embeddings = useSelector(selectEmbeddings);
     const modalCreateNewAtt = useSelector(selectModal(ModalEnum.CREATE_NEW_ATTRIBUTE));
     const allUsers = useSelector(selectAllUsers);
+    const gatesIntegrationData = useSelector(selectGatesIntegration);
 
     const [pKeyValid, setPKeyValid] = useState<boolean | null>(null);
     const [pKeyCheckTimer, setPKeyCheckTimer] = useState(null);
@@ -65,6 +66,7 @@ export default function ProjectSettings() {
     const [refetchQueuedTasks] = useLazyQuery(GET_QUEUED_TASKS, { fetchPolicy: "no-cache" });
     const [refetchRecommendedEncodersForEmbeddings] = useLazyQuery(GET_RECOMMENDED_ENCODERS_FOR_EMBEDDINGS, { fetchPolicy: "no-cache" });
     const [refetchComments] = useLazyQuery(REQUEST_COMMENTS, { fetchPolicy: "no-cache" });
+    const [refetchGatesIntegrationData] = useLazyQuery(GET_GATES_INTEGRATION_DATA, { fetchPolicy: 'no-cache' });
 
     useEffect(unsubscribeWSOnDestroy(router, [CurrentPage.PROJECT_SETTINGS]), []);
 
@@ -72,10 +74,11 @@ export default function ProjectSettings() {
         if (!project) return;
         refetchAttributesAndPostProcess();
         refetchEmbeddingsAndPostProcess();
+        refetchAndSetGatesIntegrationData();
         checkProjectTokenization();
         WebSocketsService.subscribeToNotification(CurrentPage.PROJECT_SETTINGS, {
             projectId: project.id,
-            whitelist: ['project_update', 'tokenization', 'calculate_attribute', 'embedding', 'attributes_updated'],
+            whitelist: ['project_update', 'tokenization', 'calculate_attribute', 'embedding', 'attributes_updated', 'gates_integration', 'information_source_deleted', 'information_source_updated', 'embedding_deleted'],
             func: handleWebsocketNotification
         });
     }, [project]);
@@ -249,13 +252,35 @@ export default function ProjectSettings() {
                 });
                 if (msgParts[2] == 'finished') timer(5000).subscribe(() => checkProjectTokenization());
             }
+        } else if (msgParts[1] == 'gates_integration') {
+            refetchAndSetGatesIntegrationData();
+        } else if (['information_source_deleted', 'information_source_updated'].includes(msgParts[1])) {
+            if (gatesIntegrationData?.missingInformationSources?.includes(msgParts[2])) {
+                refetchAndSetGatesIntegrationData();
+            }
+        } else if (msgParts[1] == 'tokenization' && msgParts[2] == 'docbin' && msgParts[3] == 'state' && msgParts[4] == 'FINISHED') {
+            refetchAndSetGatesIntegrationData();
+        } else if (msgParts[1] == 'embedding' && msgParts[3] == 'state' && msgParts[4] == 'FINISHED') {
+            if (gatesIntegrationData?.missingEmbeddings?.includes(msgParts[2])) {
+                refetchAndSetGatesIntegrationData();
+            }
+        } else if (msgParts[1] == 'embedding_deleted') {
+            if (gatesIntegrationData?.missingEmbeddings?.includes(msgParts[2])) {
+                refetchAndSetGatesIntegrationData();
+            }
         }
+    }
+
+    function refetchAndSetGatesIntegrationData() {
+        refetchGatesIntegrationData({ variables: { projectId: project.id } }).then((res) => {
+            dispatch(setGatesIntegration(res.data['getGatesIntegrationData']));
+        });
     }
 
     function refetchWS() {
         WebSocketsService.subscribeToNotification(CurrentPage.PROJECT_SETTINGS, {
             projectId: project.id,
-            whitelist: ['project_update', 'tokenization', 'calculate_attribute', 'embedding', 'attributes_updated'],
+            whitelist: ['project_update', 'tokenization', 'calculate_attribute', 'embedding', 'attributes_updated', 'gates_integration', 'information_source_deleted', 'information_source_updated', 'embedding_deleted'],
             func: handleWebsocketNotification
         });
     }
@@ -320,7 +345,7 @@ export default function ProjectSettings() {
 
             <Embeddings refetchWS={refetchWS} />
             <LabelingTasks />
-            {isManaged && <GatesIntegration />}
+            {isManaged && <GatesIntegration refetchWS={refetchWS} />}
             <ProjectMetaData />
 
             <Modal modalName={ModalEnum.CREATE_NEW_ATTRIBUTE} acceptButton={acceptButton}>

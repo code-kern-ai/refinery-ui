@@ -124,7 +124,6 @@ export default function LabelingMainComponent() {
     useEffect(() => {
         if (!SessionManager.currentRecordId) return;
         if (SessionManager.currentRecordId == "deleted") return;
-        // TODO: Fix in the BE needed, projectId is missing
         combineLatest([
             refetchTokenizedRecord({ variables: { recordId: SessionManager.currentRecordId } }),
             refetchRecordByRecordId({ variables: { projectId, recordId: SessionManager.currentRecordId } }),

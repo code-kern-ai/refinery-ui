@@ -34,6 +34,7 @@ import { REQUEST_COMMENTS } from "@/src/services/gql/queries/projects";
 import { CommentDataManager } from "@/src/util/classes/comments";
 import { CommentType } from "@/src/types/shared/comments";
 import BricksIntegrator from "@/src/components/shared/bricks-integrator/BricksIntegrator";
+import { AttributeCodeLookup } from "@/src/util/classes/attribute-calculation";
 
 const EDITOR_OPTIONS = { theme: 'vs-light', language: 'python', readOnly: false };
 
@@ -66,6 +67,11 @@ export default function AttributeCalculation() {
     useEffect(unsubscribeWSOnDestroy(router, [CurrentPage.ATTRIBUTE_CALCULATION]), []);
 
     useEffect(() => {
+        if (!currentAttribute) return;
+        setIsInitial(AttributeCodeLookup.isCodeStillTemplate(currentAttribute.sourceCode, currentAttribute.dataType))
+    }, [currentAttribute]);
+
+    useEffect(() => {
         if (!projectId) return;
         if (!currentAttribute || attributes.length == 0) {
             refetchAttributes({ variables: { projectId: projectId, stateFilter: ['ALL'] } }).then((res) => {
@@ -75,7 +81,7 @@ export default function AttributeCalculation() {
         }
         if (lookupLists.length == 0) {
             refetchLookupLists({ variables: { projectId: projectId } }).then((res) => {
-                dispatch(setAllLookupLists(res.data['knowledgeBasesByProjectId']));
+                dispatch(setAllLookupLists(postProcessLookupLists(res.data['knowledgeBasesByProjectId'])));
             });
         }
         checkProjectTokenization();

@@ -22,7 +22,8 @@ type SettingsState = {
     recommendedEncodersAll: RecommendedEncoder[];
     labelingTasks: {
         all: LabelingTask[];
-    }
+    },
+    gatesIntegration: any;
 }
 
 function getInitState(): SettingsState {
@@ -42,7 +43,8 @@ function getInitState(): SettingsState {
         recommendedEncodersAll: [],
         labelingTasks: {
             all: null
-        }
+        },
+        gatesIntegration: null
     };
 }
 
@@ -119,6 +121,10 @@ const settingsSlice = createSlice({
                     payload: [taskId, labelId]
                 };
             }
+        },
+        setGatesIntegration(state, action: PayloadAction<any>) {
+            if (action.payload) state.gatesIntegration = action.payload;
+            else state.gatesIntegration = null;
         }
     }
 });
@@ -129,6 +135,7 @@ export const selectUseableEmbedableAttributes = (state) => state.settings.attrib
 export const selectUsableNonTextAttributes = (state) => state.settings.attributes.useableNonTextAttributes;
 export const selectUsableAttributes = (state) => state.settings.attributes.usableAttributes;
 export const selectTextAttributes = (state) => state.settings.attributes.usableTextAttributes;
+export const selectGatesIntegration = (state) => state.settings.gatesIntegration;
 
 export const selectEmbeddings = (state) => state.settings.embeddings.all;
 export const selectEmbeddingsFiltered = (state) => state.settings.embeddings.filtered;
@@ -142,7 +149,7 @@ export const selectUsableAttributesFiltered = createSelector([selectUsableAttrib
 export const selectUsableAttributesNoFiltered = createSelector([selectUsableAttributes], (a): any => a ? a.filter((attribute) => (attribute.dataType == DataTypeEnum.TEXT || attribute.id == '@@NO_ATTRIBUTE@@')) : null);
 export const selectVisibleAttributesLabeling = createSelector([selectUsableAttributes], (a): any => a ? a.filter((a) => a.visibility == AttributeVisibility.DO_NOT_HIDE || a.visibility == AttributeVisibility.HIDE_ON_DATA_BROWSER) : null);
 export const selectVisibleAttributeAC = createSelector([selectUsableAttributesFiltered], (a): any => a ? a.filter((a) => a.visibility != AttributeVisibility.HIDE) : null);
-export const selectVisibleAttributesHeuristics = createSelector([selectUsableAttributes], (a): any => a ? a.filter((a) => a.visibility != AttributeVisibility.HIDE) : null);
+export const selectVisibleAttributesHeuristics = createSelector([selectUsableAttributesFiltered], (a): any => a ? a.filter((a) => a.visibility != AttributeVisibility.HIDE) : null);
 
-export const { setAllAttributes, extendAllAttributes, removeFromAllAttributesById, updateAttributeById, setAllEmbeddings, setFilteredEmbeddings, removeFromAllEmbeddingsById, setAllRecommendedEncodersDict, setRecommendedEncodersAll, setLabelingTasksAll, removeFromAllLabelingTasksById, removeLabelFromLabelingTask } = settingsSlice.actions;
+export const { setAllAttributes, extendAllAttributes, removeFromAllAttributesById, updateAttributeById, setAllEmbeddings, setFilteredEmbeddings, removeFromAllEmbeddingsById, setAllRecommendedEncodersDict, setRecommendedEncodersAll, setLabelingTasksAll, removeFromAllLabelingTasksById, removeLabelFromLabelingTask, setGatesIntegration } = settingsSlice.actions;
 export const settingsReducer = settingsSlice.reducer;

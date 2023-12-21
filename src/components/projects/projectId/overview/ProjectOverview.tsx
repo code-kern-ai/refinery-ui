@@ -201,7 +201,7 @@ export default function ProjectOverview() {
         const dataSliceFindId = dataSlices.find((dataSlice) => dataSlice.name === overviewFilters.dataSlice)?.id;
         const dataSliceId = dataSliceFindId == "@@NO_SLICE@@" ? null : dataSliceFindId;
         refetchConfusionMatrix({ variables: { projectId: projectId, labelingTaskId: labelingTaskId, sliceId: dataSliceId } }).then((res) => {
-            if (res['data']['confusionMatrix'] == null) {
+            if (!res['data']) {
                 setConfusionMatrix([]);
                 return;
             }
@@ -214,6 +214,7 @@ export default function ProjectOverview() {
         values.dataSlice = values.dataSlice == "@@NO_SLICE@@" ? null : values.dataSlice;
         const labelingTaskId = labelingTasks.find((labelingTask) => labelingTask.name === overviewFilters.labelingTask)?.id;
         refetchInterAnnotator({ variables: { projectId: projectId, labelingTaskId: labelingTaskId, includeGoldStar: values.goldUser, includeAllOrgUser: values.allUsers, onlyOnStaticSlice: values.dataSlice } }).then((res) => {
+            if (res['data'] == null) return;
             const matrix = res['data']['interAnnotatorMatrix'];
             const matrixCopy = jsonCopy(matrix);
             matrixCopy.allUsers = addUserName(matrixCopy.allUsers);

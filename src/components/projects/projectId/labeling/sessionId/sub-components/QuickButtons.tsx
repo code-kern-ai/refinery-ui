@@ -83,6 +83,5 @@ function QuickButton(props: QuickButtonProps) {
             </div>}
             {props.caption}
         </button>
-        {/* TODO add the background colors on hover */}
     </Tooltip>)
 }
