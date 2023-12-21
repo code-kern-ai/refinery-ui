@@ -1,8 +1,8 @@
-import { selectCurrentPage, selectIsDemo, selectIsManaged, selectOrganization, selectUser, setNotifications } from "@/src/reduxStore/states/general";
+import { selectCurrentPage, selectDisplayIconComments, selectIsDemo, selectIsManaged, selectOrganization, selectUser, setNotifications } from "@/src/reduxStore/states/general";
 import { CurrentPage } from "@/src/types/shared/general";
 import { UserRole } from "@/src/types/shared/sidebar";
 import { Tooltip } from "@nextui-org/react";
-import { use, useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import style from "@/src/styles/shared/header.module.css";
 import LogoutDropdown from "./LogoutDropdown";
@@ -33,6 +33,7 @@ export default function Header() {
     const project = useSelector(selectProject);
     const projectsNames = useSelector(selectAllProjectsNamesDict);
     const notificationId = useSelector(selectNotificationId);
+    const displayComments = useSelector(selectDisplayIconComments);
 
     const [organizationInactive, setOrganizationInactive] = useState(null);
 
@@ -114,7 +115,7 @@ export default function Header() {
                         </div>
                     ) : (<></>)}
                     <div className="flex items-center justify-center">
-                        <Comments />
+                        {displayComments && <Comments />}
                     </div>
                     {user?.role == UserRole.ENGINEER && <div className="flex items-center justify-center">
                         <Tooltip content={TOOLTIPS_DICT.GENERAL.NOTIFICATION_CENTER} placement="left" color="invert">

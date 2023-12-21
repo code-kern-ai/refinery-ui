@@ -53,7 +53,11 @@ export default function CrowdLabelerSettings() {
 
     function changeSettings(attributeName: string, newValue: any, saveToDb: boolean = true) {
         const crowdLabelerSettingsCopy = jsonCopy(currentHeuristic.crowdLabelerSettings);
-        crowdLabelerSettingsCopy[attributeName] = annotators.find(a => a.mail == newValue)?.id ?? newValue;
+        if (attributeName == 'annotatorId') {
+            crowdLabelerSettingsCopy[attributeName] = annotators.find(a => a.mail == newValue)?.id ?? newValue;
+        } else if (attributeName == 'dataSliceId') {
+            crowdLabelerSettingsCopy[attributeName] = dataSlices.find(a => a.name == newValue)?.id ?? newValue;
+        }
         dispatch(updateHeuristicsState(currentHeuristic.id, { crowdLabelerSettings: crowdLabelerSettingsCopy }));
         if (saveToDb) saveHeuristic(null, crowdLabelerSettingsCopy);
     }
@@ -127,7 +131,7 @@ export default function CrowdLabelerSettings() {
                 </Tooltip>
                 <p className="px-2"> is going to work on slice </p>
                 <Tooltip content={TOOLTIPS_DICT.CROWD_LABELER.SELECT_DATA_SLICE} color="invert" placement="right">
-                    <Dropdown options={dataSlices.map(s => s.name)} buttonName={dataSlicesDict[currentHeuristic?.crowdLabelerSettings?.dataSliceId]?.mail ?? 'Select data slice'}
+                    <Dropdown options={dataSlices.map(s => s.name)} buttonName={dataSlicesDict[currentHeuristic?.crowdLabelerSettings?.dataSliceId]?.name ?? 'Select data slice'}
                         disabled={dataSlices.length == 0} selectedOption={(option) => changeSettings('dataSliceId', option)} />
 
                 </Tooltip>
