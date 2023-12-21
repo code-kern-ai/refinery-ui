@@ -2,7 +2,7 @@ import { selectAttributes, selectAttributesDict, selectLabelingTasksAll } from "
 import { selectProjectId } from "@/src/reduxStore/states/project";
 import { attributeCreateSearchGroup, commentsCreateSearchGroup, generateRandomSeed, getBasicGroupItems, getBasicSearchGroup, getBasicSearchItem, labelingTasksCreateSearchGroup, orderByCreateSearchGroup, userCreateSearchGroup } from "@/src/util/components/projects/projectId/data-browser/search-groups-helper";
 import { SearchGroup, Slice, StaticOrderByKeys } from "@/submodules/javascript-functions/enums/enums";
-import { IconArrowBadgeDown, IconArrowUp, IconArrowsRandom, IconFilterOff, IconInfoCircle, IconPlus, IconPointerOff, IconTrash } from "@tabler/icons-react";
+import { IconArrowUp, IconArrowsRandom, IconFilterOff, IconInfoCircle, IconPlus, IconPointerOff, IconTrash } from "@tabler/icons-react";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import style from '@/src/styles/components/projects/projectId/data-browser.module.css';
@@ -31,6 +31,7 @@ import { GET_CURRENT_WEAK_SUPERVISION_RUN } from "@/src/services/gql/queries/heu
 import { Status } from "@/src/types/shared/statuses";
 import { postProcessCurrentWeakSupervisionRun } from "@/src/util/components/projects/projectId/heuristics/heuristics-helper";
 import { AttributeVisibility } from "@/src/types/components/projects/projectId/settings/data-schema";
+import { ChevronDownIcon } from "@heroicons/react/20/solid";
 
 const GROUP_SORT_ORDER = 0;
 let GLOBAL_SEARCH_GROUP_COUNT = 0;
@@ -493,7 +494,7 @@ export default function SearchGroups(props: DataBrowserSideBarProps) {
             <div onClick={() => toggleGroupMenu(group.key)}
                 className={`flex flex-row items-center ${style.transitionTransform} rounded-md hover:bg-gray-50 cursor-pointer`}>
                 <div className={`w-7 ${searchGroups[group.key].isOpen ? style.rotateTransform : null}`}>
-                    <IconArrowBadgeDown size={24} stroke={1.5} className="text-gray-700" />
+                    <ChevronDownIcon className="text-gray-700" />
                 </div>
                 <div className="flex flex-col">
                     <div className="font-bold truncate" style={{ maxWidth: '21rem' }}>

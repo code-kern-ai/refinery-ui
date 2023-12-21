@@ -37,8 +37,6 @@ export default function Layout({ children }) {
     const [refetchNotificationsByUser] = useLazyQuery(NOTIFICATIONS_BY_USER, { fetchPolicy: 'network-only' });
     const [refetchAdminMessages] = useLazyQuery(GET_ALL_ACTIVE_ADMIN_MESSAGES, { fetchPolicy: 'network-only' });
 
-    useEffect(unsubscribeWSOnDestroy(router, [CurrentPage.NOTIFICATION_CENTER]), []);
-
     useEffect(() => {
         refetchNotificationsAndProcess();
         refetchAdminMessagesAndProcess();
@@ -107,12 +105,7 @@ export default function Layout({ children }) {
     const handleWebsocketNotification = useCallback((msgParts: string[]) => {
         if (msgParts[1] == 'notification_created') {
             if (msgParts[2] != user?.id) return;
-            if (refetchTimer) return;
-            const timerSaved = timer(500).subscribe(() => {
-                refetchNotificationsAndProcess();
-                setRefetchTimer(null);
-            });
-            setRefetchTimer(timerSaved);
+            refetchNotificationsAndProcess();
         } else if (msgParts[1] == 'admin_message') {
             refetchAdminMessagesAndProcess();
         }

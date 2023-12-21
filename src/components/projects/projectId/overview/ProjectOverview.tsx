@@ -201,10 +201,7 @@ export default function ProjectOverview() {
         const dataSliceFindId = dataSlices.find((dataSlice) => dataSlice.name === overviewFilters.dataSlice)?.id;
         const dataSliceId = dataSliceFindId == "@@NO_SLICE@@" ? null : dataSliceFindId;
         refetchConfusionMatrix({ variables: { projectId: projectId, labelingTaskId: labelingTaskId, sliceId: dataSliceId } }).then((res) => {
-            if (!res['data']) {
-                setConfusionMatrix([]);
-                return;
-            }
+            if (res['data'] == null) return;
             setConfusionMatrix(postProcessConfusionMatrix(res['data']['confusionMatrix']));
         });
     }
@@ -236,7 +233,10 @@ export default function ProjectOverview() {
         projectStatsCopy.interAnnotatorLoading = true;
         setProjectStats(projectStatsCopy);
         const labelingTaskId = labelingTasks.find((labelingTask) => labelingTask.name === overviewFilters.labelingTask)?.id;
-        refetchProjectStats({ variables: { projectId: projectId, labelingTaskId: labelingTaskId, sliceId: null } }).then((res) => {
+        const dataSliceFindId = dataSlices.find((dataSlice) => dataSlice.name === overviewFilters.dataSlice)?.id;
+        const dataSliceId = dataSliceFindId == "@@NO_SLICE@@" ? null : dataSliceFindId;
+        refetchProjectStats({ variables: { projectId: projectId, labelingTaskId: labelingTaskId, sliceId: dataSliceId } }).then((res) => {
+            if (res['data'] == null) return;
             setProjectStats(postProcessingStats(JSON.parse(res['data']['generalProjectStats'])));
         });
     }
