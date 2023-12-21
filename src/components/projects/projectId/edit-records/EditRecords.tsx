@@ -5,7 +5,6 @@ import { selectSessionData } from "@/src/reduxStore/states/tmp";
 import { Fragment, useCallback, useEffect, useState } from "react";
 import { buildAccessKey, createDefaultEditRecordComponentData } from "@/src/util/components/projects/projectId/edit-records-helper";
 import style from '@/src/styles/components/projects/projectId/edit-records.module.css';
-import { scrollElementIntoView } from "@/submodules/javascript-functions/scrollHelper";
 import { CurrentPage, DataTypeEnum } from "@/src/types/shared/general";
 import { IconAlertCircle, IconAlertTriangle, IconAlertTriangleFilled, IconBallpen, IconBallpenOff } from "@tabler/icons-react";
 import { Tooltip } from "@nextui-org/react";
@@ -85,9 +84,8 @@ export default function EditRecords() {
                 {erdData.displayRecords.map((record) =>
                     <div key={record.id} className={`relative space-x-3 items-center bg-white overflow-hidden shadow rounded-lg border w-full scroll-mt-8 ${erdData.displayRecords?.length > 2 ? style.item : ''} `}
                         onDoubleClick={() => {
-                            if (erdData.editRecordId === record.id) return;
                             const erdDataCopy = { ...erdData };
-                            erdDataCopy.editRecordId = record.id;
+                            erdDataCopy.editRecordId = erdDataCopy.editRecordId == record.id ? null : record.id;
                             setErdData(erdDataCopy);
                         }} id={record.id == erdData.data.selectedRecordId ? 'flash-it' : null}>
                         <div className="px-4 py-5 sm:p-6">
@@ -101,14 +99,14 @@ export default function EditRecords() {
                                     <div className="text-gray-800 text-sm mb-4 overflow-anywhere flex">
                                         {attribute.dataType == DataTypeEnum.EMBEDDING_LIST ? (<div className="flex flex-col gap-y-1 divide-y w-full">
                                             {record.data[attribute.name].map((item, subKey) => (<div key={subKey} className="pt-1">
-                                                {(record.id == erdData.editRecordId && !attribute.isPrimary) ? <EditField attribute={attribute} record={record} subKey={subKey} erdData={erdData} setErdData={(erdData) => setErdData(erdData)} /> : <>
+                                                {(record.id == erdData.editRecordId && !attribute.isPrimaryKey) ? <EditField attribute={attribute} record={record} subKey={subKey} erdData={erdData} setErdData={(erdData) => setErdData(erdData)} /> : <>
                                                     {item != null && item !== '' ? (<span className="whitespace-pre-wrap">
                                                         <span>{item}</span>
                                                     </span>) : (<NotPresentInRecord />)}
                                                 </>}
                                             </div>))}
                                         </div>) : (<>
-                                            {(record.id == erdData.editRecordId && !attribute.isPrimary) ? <EditField attribute={attribute} record={record} erdData={erdData} setErdData={(erdData) => setErdData(erdData)} /> : <>
+                                            {(record.id == erdData.editRecordId && !attribute.isPrimaryKey) ? <EditField attribute={attribute} record={record} erdData={erdData} setErdData={(erdData) => setErdData(erdData)} /> : <>
                                                 {record.data[attribute.name] != null && record.data[attribute.name] !== '' ? (<span className="whitespace-pre-wrap relative">
                                                     <span>{record.data[attribute.name]}</span>
                                                     {erdData.cachedRecordChanges[buildAccessKey(record.id, attribute.name)] && <div className="absolute -left-5 top-0 text-yellow-500">

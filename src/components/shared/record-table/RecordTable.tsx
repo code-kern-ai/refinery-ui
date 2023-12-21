@@ -22,7 +22,7 @@ export default function RecordTable(props: RecordTableProps) {
                     <thead className="bg-gray-50">
                         <tr>
                             {preparedColumnsData.map((column, index) => (<th key={index} scope="col"
-                                className="px-3 py-2 text-left text-xs font-medium uppercase tracking-wide text-gray-500">
+                                className="px-3 py-2 text-center text-xs font-medium uppercase tracking-wide text-gray-500">
                                 {column.displayName}
                             </th>))}
                         </tr>
