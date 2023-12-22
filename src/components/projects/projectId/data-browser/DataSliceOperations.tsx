@@ -7,7 +7,7 @@ import { CREATE_OUTLIER_SLICE, UPDATE_DATA_SLICE } from "@/src/services/gql/muta
 import { ModalEnum } from "@/src/types/shared/modal";
 import { getRawFilterForSave, parseFilterToExtended } from "@/src/util/components/projects/projectId/data-browser/filter-parser-helper";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
-import { Slice } from "@/submodules/javascript-functions/enums/enums";
+import { SearchGroup, Slice } from "@/submodules/javascript-functions/enums/enums";
 import { useMutation } from "@apollo/client";
 import { Tooltip } from "@nextui-org/react";
 import { IconChartBubble, IconFilter, IconRotate } from "@tabler/icons-react";
@@ -39,7 +39,7 @@ export function DataSliceOperations(props: { fullSearch: {} }) {
                 static: activeSlice.static,
                 dataSliceId: activeSlice.id,
                 filterRaw: getRawFilterForSave(props.fullSearch),
-                filterData: parseFilterToExtended(activeSearchParams, attributes, configuration, labelingTasks, user)
+                filterData: parseFilterToExtended(activeSearchParams, attributes, configuration, labelingTasks, user, props.fullSearch[SearchGroup.DRILL_DOWN].value)
             }
         }).then((res) => { });
     }
