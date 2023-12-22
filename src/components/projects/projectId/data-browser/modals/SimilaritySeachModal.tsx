@@ -192,12 +192,12 @@ export default function SimilaritySearchModal() {
                                     selectedOption={(option: string) => setFilterDropdownVal(option, index, 'searchValue')} fontClass="font-dmMono" />
                             </div>
                         ) : (<div className="my-2 flex-grow flex flex-row items-center">
-                            {form.operator != '' && <input placeholder={form.addText}
+                            {form.operator != '' && <input placeholder={form.addText} value={form.searchValue}
                                 onChange={(e) => setFilterDropdownVal(e.target.value, index, 'searchValue')}
                                 onKeyDown={(e) => checkIfDecimals(e, index, form)}
                                 className="h-8 w-full border-gray-300 rounded-md placeholder-italic border text-gray-900 pl-4 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100" />}
                             {form.operator == SearchOperator.BETWEEN && <span className="text-sm text-gray-500 mx-1">AND</span>}
-                            {form.operator == SearchOperator.BETWEEN && <input placeholder={form.addText}
+                            {form.operator == SearchOperator.BETWEEN && <input placeholder={form.addText} value={form.searchValueBetween}
                                 onChange={(e) => setFilterDropdownVal(e.target.value, index, 'searchValueBetween')}
                                 onKeyDown={(e) => checkIfDecimals(e, index, form)}
                                 className="h-8 w-full border-gray-300 rounded-md placeholder-italic border text-gray-900 pl-4 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100" />}

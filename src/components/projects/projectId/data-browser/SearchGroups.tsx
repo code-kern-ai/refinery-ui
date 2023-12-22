@@ -2,7 +2,7 @@ import { selectAttributes, selectAttributesDict, selectLabelingTasksAll } from "
 import { selectProjectId } from "@/src/reduxStore/states/project";
 import { attributeCreateSearchGroup, commentsCreateSearchGroup, generateRandomSeed, getBasicGroupItems, getBasicSearchGroup, getBasicSearchItem, labelingTasksCreateSearchGroup, orderByCreateSearchGroup, userCreateSearchGroup } from "@/src/util/components/projects/projectId/data-browser/search-groups-helper";
 import { SearchGroup, Slice, StaticOrderByKeys } from "@/submodules/javascript-functions/enums/enums";
-import { IconArrowUp, IconArrowsRandom, IconFilterOff, IconInfoCircle, IconPlus, IconPointerOff, IconTrash } from "@tabler/icons-react";
+import { IconArrowDown, IconArrowsRandom, IconFilterOff, IconInfoCircle, IconPlus, IconPointerOff, IconTrash } from "@tabler/icons-react";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import style from '@/src/styles/components/projects/projectId/data-browser.module.css';
@@ -540,12 +540,12 @@ export default function SearchGroups(props: DataBrowserSideBarProps) {
                                         </div>
                                     ) : (
                                         <div className="my-2 flex-grow flex flex-row items-center">
-                                            {groupItem['operator'] != '' && <input placeholder={groupItem['addText']}
+                                            {groupItem['operator'] != '' && <input placeholder={groupItem['addText']} value={groupItem['searchValue']}
                                                 onChange={(e) => selectValueDropdown(e.target.value, index, 'searchValue', group.key)}
                                                 onKeyDown={(e) => checkIfDecimals(e, index, group.key)}
                                                 className="h-8 w-full border-gray-300 rounded-md placeholder-italic border text-gray-900 pl-4 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100" />}
                                             {groupItem['operator'] == SearchOperator.BETWEEN && <span className="text-sm text-gray-500 mx-1">AND</span>}
-                                            {groupItem['operator'] == SearchOperator.BETWEEN && <input placeholder={groupItem['addText']}
+                                            {groupItem['operator'] == SearchOperator.BETWEEN && <input placeholder={groupItem['addText']} value={groupItem['searchValueBetween']}
                                                 onChange={(e) => selectValueDropdown(e.target.value, index, 'searchValueBetween', group.key)}
                                                 onKeyDown={(e) => checkIfDecimals(e, index, group.key)}
                                                 className="h-8 w-full border-gray-300 rounded-md placeholder-italic border text-gray-900 pl-4 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100" />}
@@ -675,8 +675,8 @@ export default function SearchGroups(props: DataBrowserSideBarProps) {
                             <div className="form-control class mb-2">
                                 {groupItem['orderByKey'] != StaticOrderByKeys.RANDOM ? (<div className="mb-2 flex items-center">
                                     <div onClick={() => setSortFormControl(index, group)} className={`p-0 cursor-pointer ${groupItem['direction'] == 1 ? style.rotateTransform : null}`}>
-                                        <div className="ml-2 mr-2 h-4 w-4 border-gray-300 border rounded cursor-pointer hover:bg-gray-200">
-                                            {groupItem['active'] != 0 && <IconArrowUp className="text-gray-500 h-3 w-3" />}
+                                        <div className="ml-2 mr-2 h-4 w-4 border-gray-300 border rounded cursor-pointer flex justify-center items-center hover:bg-gray-200">
+                                            {groupItem['active'] != 0 && <IconArrowDown className="text-gray-500 h-3 w-3" />}
                                         </div>
                                     </div>
                                     <span className="ml-2 label-text truncate w-full">{groupItem['displayName']}</span>
