@@ -9,6 +9,7 @@ import { DataSlice } from "@/src/types/components/projects/projectId/data-browse
 import { ModalButton, ModalEnum } from "@/src/types/shared/modal"
 import { getRawFilterForSave, parseFilterToExtended } from "@/src/util/components/projects/projectId/data-browser/filter-parser-helper";
 import { getColorStruct } from "@/src/util/components/projects/projectId/heuristics/shared-helper";
+import { SearchGroup } from "@/submodules/javascript-functions/enums/enums";
 import { useMutation } from "@apollo/client";
 import { useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -40,13 +41,13 @@ export default function SaveDataSliceModal(props: { fullSearch: {} }) {
                 name: modalSaveDataSlice.sliceName,
                 static: isStatic,
                 filterRaw: getRawFilterForSave(props.fullSearch),
-                filterData: parseFilterToExtended(activeSearchParams, attributes, configuration, labelingTasks, user)
+                filterData: parseFilterToExtended(activeSearchParams, attributes, configuration, labelingTasks, user, props.fullSearch[SearchGroup.DRILL_DOWN].value)
             }
         }).then((res) => {
             const id = res["data"]["createDataSlice"]["id"];
             const slice = {
                 id: id, name: modalSaveDataSlice.sliceName, static: isStatic, filterRaw: getRawFilterForSave(props.fullSearch),
-                filterData: parseFilterToExtended(activeSearchParams, attributes, configuration, labelingTasks, user), color: getColorStruct(isStatic),
+                filterData: parseFilterToExtended(activeSearchParams, attributes, configuration, labelingTasks, user, props.fullSearch[SearchGroup.DRILL_DOWN].value), color: getColorStruct(isStatic),
                 displayName: modalSaveDataSlice.sliceName
             }
             dispatch(extendAllDataSlices(slice));
@@ -87,7 +88,7 @@ export default function SaveDataSliceModal(props: { fullSearch: {} }) {
                 static: isStatic,
                 dataSliceId: activeSlice.id,
                 filterRaw: getRawFilterForSave(props.fullSearch),
-                filterData: parseFilterToExtended(activeSearchParams, attributes, configuration, labelingTasks, user)
+                filterData: parseFilterToExtended(activeSearchParams, attributes, configuration, labelingTasks, user, props.fullSearch[SearchGroup.DRILL_DOWN].value)
             }
         }).then((res) => { });
     }

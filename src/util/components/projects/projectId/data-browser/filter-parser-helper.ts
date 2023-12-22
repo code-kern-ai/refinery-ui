@@ -6,7 +6,7 @@ import { LabelingTask } from "@/src/types/components/projects/projectId/settings
 import { jsonCopy } from "@/submodules/javascript-functions/general";
 import { SearchOperator } from "@/src/types/components/projects/projectId/data-browser/search-operators";
 
-export function parseFilterToExtended(activeSearchParams, attributes: Attribute[], configuration: any, labelingTasks: LabelingTask[], user: User): string[] {
+export function parseFilterToExtended(activeSearchParams, attributes: Attribute[], configuration: any, labelingTasks: LabelingTask[], user: User, drillDownVal: boolean): string[] {
     let toReturn = [];
     toReturn.push(JSON.stringify(buildFilterRecordCategory(true)));
     let first = false;
@@ -17,9 +17,11 @@ export function parseFilterToExtended(activeSearchParams, attributes: Attribute[
             attributeFilter = buildFilterElementAttribute(first, searchElement, attributes, configuration);
             if (attributeFilter) toReturn.push(JSON.stringify(attributeFilter));
         } else if (searchElement.values.group == SearchGroup.LABELING_TASKS) {
-            appendBlackAndWhiteListLabelingTask(toReturn, searchElement.values, labelingTasks)
+            appendBlackAndWhiteListLabelingTask(toReturn, searchElement.values, labelingTasks, drillDownVal);
+            toReturn = toReturn.filter((el) => el != null);
         } else if (searchElement.values.group == SearchGroup.USER_FILTER) {
-            toReturn.push(appendBlackAndWhiteListUser(toReturn, searchElement));
+            toReturn.push(appendBlackAndWhiteListUser(toReturn, searchElement, drillDownVal));
+            toReturn = toReturn.filter((el) => el != null);
         } else if (searchElement.values.group == SearchGroup.ORDER_STATEMENTS) {
             orderBy.ORDER_BY = appendActiveOrderBy(searchElement.values.orderBy, orderBy);
             if (orderBy.ORDER_BY.length > 0) {
@@ -96,8 +98,8 @@ function buildFilterElementAttribute(first: boolean, searchElement: any, attribu
     else return null;
 }
 
-function appendBlackAndWhiteListLabelingTask(appendTo, searchElement, labelingTasks: LabelingTask[]) {
-    const drillDown: boolean = false;
+function appendBlackAndWhiteListLabelingTask(appendTo, searchElement, labelingTasks: LabelingTask[], drillDownVal: boolean) {
+    const drillDown: boolean = drillDownVal;
     const labelingTask = labelingTasks.find(l => l.id == searchElement.values.taskId);
     appendTo.push(appendBlackAndWhiteListLabelingTaskForArray(appendTo, searchElement.values.manualLabels, LabelSource.MANUAL, drillDown));
     appendBlackAndWhiteListLabelingTaskForArray(appendTo, searchElement.values.weakSupervisionLabels, LabelSource.WEAK_SUPERVISION, drillDown);
@@ -131,9 +133,9 @@ function appendBlackAndWhiteListLabelingTaskForArray(
     if (drillDown) {
         for (const l of array) {
             if (l.id == 'NO_LABEL') {
-                appendBlackAndWhiteListLabelingTaskForArray(appendTo, array, labelSource, false, true);
+                appendTo.push(appendBlackAndWhiteListLabelingTaskForArray(appendTo, array, labelSource, false, true));
             } else {
-                appendBlackAndWhiteListLabelingTaskForArray(appendTo, [l], labelSource, false);
+                appendTo.push(appendBlackAndWhiteListLabelingTaskForArray(appendTo, [l], labelSource, false));
             }
         }
         return;
@@ -227,9 +229,8 @@ function appendBlackAndWhiteListLabelingTaskForConfidence(
     return JSON.stringify(list);
 }
 
-function appendBlackAndWhiteListUser(appendTo, searchElement) {
-    const drillDown: boolean = false;
-    return appendBlackAndWhiteListUserForArray(appendTo, searchElement.users, drillDown);
+function appendBlackAndWhiteListUser(appendTo, searchElement, drillDownVal) {
+    return appendBlackAndWhiteListUserForArray(appendTo, searchElement.users, drillDownVal);
 }
 
 function appendBlackAndWhiteListUserForArray(
@@ -239,7 +240,7 @@ function appendBlackAndWhiteListUserForArray(
 ): any {
     if (drillDown) {
         for (const l of array) {
-            appendBlackAndWhiteListUserForArray(appendTo, [l], false);
+            appendTo.push(appendBlackAndWhiteListUserForArray(appendTo, [l], false));
         }
         return;
     }

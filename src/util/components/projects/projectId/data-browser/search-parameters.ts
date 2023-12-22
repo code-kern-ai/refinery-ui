@@ -14,29 +14,29 @@ export function updateSearchParameters(searchElement, attributes, separator, ful
         if (p.value.group == SearchGroup.ATTRIBUTES) {
             for (let i of p.groupElements) {
                 if (!i.active) return;
-                param = createSplittedText(updateSearchParamText(i, attributes, separator), fullSearch, p);
+                param = createSplittedText(updateSearchParamText(i, attributes, separator, fullSearch[SearchGroup.DRILL_DOWN].value), fullSearch, p);
                 activeParams.push({ splittedText: param, values: i })
             }
         } else if (p.value.group == SearchGroup.COMMENTS) {
             if (!p.groupElements.hasComments.active) return;
-            param = createSplittedText(updateSearchParamText(p, attributes, separator), fullSearch, p);
+            param = createSplittedText(updateSearchParamText(p, attributes, separator, fullSearch[SearchGroup.DRILL_DOWN].value), fullSearch, p);
             activeParams.push({ splittedText: param, values: p.groupElements });
         } else if (p.value.key == SearchGroup.USER_FILTER) {
             for (let i of p.groupElements.users) {
                 if (!i.active) return;
-                param = createSplittedText(updateSearchParamText(p, attributes, separator), fullSearch, p);
+                param = createSplittedText(updateSearchParamText(p, attributes, separator, fullSearch[SearchGroup.DRILL_DOWN].value), fullSearch, p);
                 activeParams.push({ splittedText: param, values: { group: p.value.group }, users: p.groupElements.users });
             }
         } else if (p.value.group == SearchGroup.ORDER_STATEMENTS) {
             for (let i of p.groupElements.orderBy) {
                 if (!i.active) continue;
-                param = createSplittedText(updateSearchParamText(p, attributes, separator), fullSearch, p);
+                param = createSplittedText(updateSearchParamText(p, attributes, separator, fullSearch[SearchGroup.DRILL_DOWN].value), fullSearch, p);
                 activeParams.push({ splittedText: param, values: { group: p.value.group, orderBy: p.groupElements } });
             }
         }
         else if (p.value.group == SearchGroup.LABELING_TASKS) {
             if (!(p.groupElements.active || p.groupElements['weakSupervisionConfidence'].active || p.groupElements['modelCallbackConfidence'].active || p.groupElements['isWithDifferentResults'])) return;
-            param = createSplittedText(updateSearchParamText(p, attributes, separator, fullSearch[p.value.key].nameAdd), fullSearch, p);
+            param = createSplittedText(updateSearchParamText(p, attributes, separator, fullSearch[SearchGroup.DRILL_DOWN].value, fullSearch[p.value.key].nameAdd), fullSearch, p);
             if (!param) return;
             activeParams.push({ splittedText: param, values: { group: p.value.group, values: p.groupElements } });
         }
@@ -58,7 +58,7 @@ function createSplittedText(i, searchGroup, p) {
 }
 
 
-function updateSearchParamText(searchElement, attributes, separator, nameAdd?) {
+function updateSearchParamText(searchElement, attributes, separator, drillDownVal, nameAdd?) {
     const searchElementCopy = jsonCopy(searchElement);
     if (searchElementCopy.type == SearchItemType.ATTRIBUTE) {
         const attributeType = getAttributeType(attributes, searchElementCopy.name);
@@ -119,12 +119,12 @@ function updateSearchParamText(searchElement, attributes, separator, nameAdd?) {
         if (separator == "-")
             searchElementCopy.searchText = searchElementCopy.searchText.replaceAll("-", ",");
     } else if (searchElementCopy.value.group == SearchGroup.LABELING_TASKS) {
-        searchElementCopy.searchText = nameAdd + labelingTaskBuildSearchParamText(searchElementCopy.groupElements);
-        if (labelingTaskBuildSearchParamText(searchElementCopy.groupElements) === '') {
+        searchElementCopy.searchText = nameAdd + labelingTaskBuildSearchParamText(searchElementCopy.groupElements, drillDownVal);
+        if (labelingTaskBuildSearchParamText(searchElementCopy.groupElements, drillDownVal) === '') {
             searchElementCopy.searchText = null;
         }
     } else if (searchElementCopy.value.group == SearchGroup.USER_FILTER) {
-        searchElementCopy.searchText = userBuildSearchParamText(searchElementCopy.groupElements.users);
+        searchElementCopy.searchText = userBuildSearchParamText(searchElementCopy.groupElements.users, drillDownVal);
     } else if (searchElementCopy.value.group == SearchGroup.ORDER_STATEMENTS) {
         searchElementCopy.searchText = orderByBuildSearchParamText(searchElementCopy.groupElements);
     } else if (searchElementCopy.value.group == SearchGroup.COMMENTS) {
@@ -133,19 +133,19 @@ function updateSearchParamText(searchElement, attributes, separator, nameAdd?) {
     return searchElementCopy;
 }
 
-function labelingTaskBuildSearchParamText(values): string {
+function labelingTaskBuildSearchParamText(values, drillDownVal): string {
     let text = '';
 
-    let tmp = labelingTaskBuildSearchParamTextPart(values.manualLabels, 'M-label');
+    let tmp = labelingTaskBuildSearchParamTextPart(values.manualLabels, 'M-label', drillDownVal);
     if (tmp) text += '(' + tmp + ')';
 
-    tmp = labelingTaskBuildSearchParamTextPart(values.weakSupervisionLabels, 'WS-label');
+    tmp = labelingTaskBuildSearchParamTextPart(values.weakSupervisionLabels, 'WS-label', drillDownVal);
     if (tmp) text += (text ? '\nAND ' : '') + ' (' + tmp + ')';
 
-    tmp = labelingTaskBuildSearchParamTextPart(values.modelCallbackLabels, 'MC-label');
+    tmp = labelingTaskBuildSearchParamTextPart(values.modelCallbackLabels, 'MC-label', drillDownVal);
     if (tmp) text += (text ? '\nAND ' : '') + ' (' + tmp + ')';
 
-    tmp = labelingTaskBuildSearchParamTextPart(values.heuristics, 'IS');
+    tmp = labelingTaskBuildSearchParamTextPart(values.heuristics, 'IS', drillDownVal);
     if (tmp) text += (text ? '\nAND ' : '') + ' (' + tmp + ')';
 
     if (values.isWithDifferentResults.active) {
@@ -168,8 +168,8 @@ function labelingTaskBuildSearchParamText(values): string {
     return text;
 }
 
-function labelingTaskBuildSearchParamTextPart(arr: any[], blockname: string): string {
-    const drillDown: boolean = false
+function labelingTaskBuildSearchParamTextPart(arr: any[], blockname: string, drillDownVal: boolean): string {
+    const drillDown: boolean = drillDownVal;
     let text = '';
     let in_values = '';
     let not_in_values = '';
@@ -192,8 +192,8 @@ function labelingTaskBuildSearchParamTextPart(arr: any[], blockname: string): st
     return text;
 }
 
-function userBuildSearchParamText(values) {
-    let text = labelingTaskBuildSearchParamTextPart(values, 'User');
+function userBuildSearchParamText(values, drillDownVal) {
+    let text = labelingTaskBuildSearchParamTextPart(values, 'User', drillDownVal);
     if (values.negate) text = 'NOT (' + text + ')';
     return text;
 }
