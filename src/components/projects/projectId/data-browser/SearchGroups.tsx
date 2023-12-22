@@ -380,13 +380,15 @@ export default function SearchGroups() {
         } else {
             group['upper'] = event.target.value == '' ? 0 : parseInt(event.target.value);
         }
-        group['active'] = !group['active'];
+        group['active'] = true;
+        fullSearchCopy[key].nameAdd = labelingTasks.find((el) => el.id == key.split('_')[2]).name;
         setFullSearch(fullSearchCopy);
         updateSearchParams(fullSearchCopy);
     }
 
-    function clearConfidence(group) {
+    function clearConfidence(groupKey: string, key: string) {
         const fullSearchCopy = jsonCopy(fullSearch);
+        const group = fullSearchCopy[groupKey].groupElements[key];
         group['lower'] = 0;
         group['upper'] = 100;
         group['active'] = false;
@@ -398,6 +400,7 @@ export default function SearchGroups() {
         const fullSearchCopy = jsonCopy(fullSearch);
         fullSearchCopy[groupKey].groupElements['isWithDifferentResults'].active = !fullSearchCopy[groupKey].groupElements['isWithDifferentResults'].active
         fullSearchCopy[groupKey].groupElements['isWithDifferentResults'].color = getActiveNegateGroupColor(fullSearchCopy[groupKey].groupElements['isWithDifferentResults']);
+        fullSearchCopy[groupKey].nameAdd = labelingTasks.find((el) => el.id == groupKey.split('_')[2]).name;
         setFullSearch(fullSearchCopy);
         updateSearchParams(fullSearchCopy);
     }
@@ -608,7 +611,7 @@ export default function SearchGroups() {
                                     }} />
                             )}
                             <div className="flex-grow min-w-0 mt-1">
-                                <div className="flex flex-row items-center">
+                                <div className="flex flex-row items-center whitespace-nowrap">
                                     <span className="label-text mr-0.5 font-dmMono">CONFIDENCE BETWEEN</span>
                                     <input
                                         onChange={(e) => changeConfidence(e, 'lower', group.key, 'weakSupervisionConfidence')}
@@ -619,10 +622,10 @@ export default function SearchGroups() {
                                         onChange={(e) => changeConfidence(e, 'upper', group.key, 'weakSupervisionConfidence')}
                                         value={fullSearch[group.key].groupElements['weakSupervisionConfidence']['upper']}
                                         className="h-8 w-11 border-gray-300 rounded-md placeholder-italic border text-gray-900 pl-2 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100" />
-                                    {fullSearch[group.key].groupElements['weakSupervisionConfidence']['active'] && <Tooltip content={TOOLTIPS_DICT.DATA_BROWSER.CLEAR_WS_CONFIDENCE} color="invert">
-                                        <IconFilterOff className="text-red-700 cursor-pointer" onClick={() => clearConfidence(fullSearch[group.key].groupElements['weakSupervisionConfidence'])} />
-                                    </Tooltip>}
                                     <span className="label-text mx-0.5 font-dmMono">%</span>
+                                    {fullSearch[group.key].groupElements['weakSupervisionConfidence']['active'] && <Tooltip content={TOOLTIPS_DICT.DATA_BROWSER.CLEAR_WS_CONFIDENCE} color="invert">
+                                        <IconFilterOff className="text-red-700 cursor-pointer" onClick={() => clearConfidence(group.key, 'weakSupervisionConfidence')} />
+                                    </Tooltip>}
                                 </div>
                             </div>
 
@@ -636,7 +639,7 @@ export default function SearchGroups() {
                                     }} />
                             )}
                             <div className="flex-grow min-w-0 mt-1">
-                                <div className="flex flex-row items-center">
+                                <div className="flex flex-row items-center whitespace-nowrap">
                                     <span className="label-text mr-0.5 font-dmMono">CONFIDENCE BETWEEN</span>
                                     <input
                                         onChange={(e) => changeConfidence(e, 'lower', group.key, 'modelCallbackConfidence')}
@@ -647,10 +650,10 @@ export default function SearchGroups() {
                                         onChange={(e) => changeConfidence(e, 'upper', group.key, 'modelCallbackConfidence')}
                                         value={fullSearch[group.key].groupElements['modelCallbackConfidence']['upper']}
                                         className="h-8 w-11 border-gray-300 rounded-md placeholder-italic border text-gray-900 pl-2 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100" />
-                                    {fullSearch[group.key].groupElements['modelCallbackConfidence']['active'] && <Tooltip content={TOOLTIPS_DICT.DATA_BROWSER.CLEAR_MC_CONFIDENCE} color="invert">
-                                        <IconFilterOff className="text-red-700 cursor-pointer" onClick={() => clearConfidence(fullSearch[group.key].groupElements['modelCallbackConfidence'])} />
-                                    </Tooltip>}
                                     <span className="label-text mx-0.5 font-dmMono">%</span>
+                                    {fullSearch[group.key].groupElements['modelCallbackConfidence']['active'] && <Tooltip content={TOOLTIPS_DICT.DATA_BROWSER.CLEAR_MC_CONFIDENCE} color="invert">
+                                        <IconFilterOff className="text-red-700 cursor-pointer" onClick={() => clearConfidence(group.key, 'modelCallbackConfidence')} />
+                                    </Tooltip>}
                                 </div>
                             </div>
 

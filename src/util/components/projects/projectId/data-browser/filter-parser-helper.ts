@@ -29,7 +29,7 @@ export function parseFilterToExtended(activeSearchParams, attributes: Attribute[
             toReturn.push(appendBlackAndWhiteListComments(toReturn, searchElement, user));
         }
     }
-    if (!toReturn[1]) return toReturn[0];
+    if (!toReturn[1]) toReturn.splice(1, 1);
     return toReturn;
 }
 
@@ -105,7 +105,6 @@ function appendBlackAndWhiteListLabelingTask(appendTo, searchElement, labelingTa
     appendBlackAndWhiteListLabelingTaskForArray(appendTo, searchElement.values.heuristics, LabelSource.INFORMATION_SOURCE, drillDown);
     appendBlackAndWhiteListLabelingTaskForConfidence(appendTo, searchElement.values.weakSupervisionConfidence, labelingTask.labels.map(l => l.id), true);
     appendBlackAndWhiteListLabelingTaskForConfidence(appendTo, searchElement.values.modelCallbackConfidence, labelingTask.labels.map(l => l.id), false);
-
     if (!appendTo) return;
 
     const isMixed = searchElement.values.isWithDifferentResults
@@ -117,7 +116,7 @@ function appendBlackAndWhiteListLabelingTask(appendTo, searchElement, labelingTa
                 VALUES: [isMixed.taskId],
             }],
         };
-        return JSON.stringify(whitelist);
+        return appendTo.push(JSON.stringify(whitelist));
     }
     return appendTo;
 }

@@ -35,7 +35,7 @@ export function updateSearchParameters(searchElement, attributes, separator, ful
             }
         }
         else if (p.value.group == SearchGroup.LABELING_TASKS) {
-            if (!p.groupElements.active) return;
+            if (!(p.groupElements.active || p.groupElements['weakSupervisionConfidence'].active || p.groupElements['modelCallbackConfidence'].active || p.groupElements['isWithDifferentResults'])) return;
             param = createSplittedText(updateSearchParamText(p, attributes, separator, fullSearch[p.value.key].nameAdd), fullSearch, p);
             if (!param) return;
             activeParams.push({ splittedText: param, values: { group: p.value.group, values: p.groupElements } });
