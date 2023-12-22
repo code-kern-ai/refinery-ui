@@ -1,5 +1,5 @@
 import { openModal } from '@/src/reduxStore/states/modal';
-import { selectActiveSearchParams, selectActiveSlice, selectAdditionalData, selectRecords, selectSimilaritySearch, setActiveDataSlice, setActiveSearchParams, setIsTextHighlightNeeded, setRecordsInDisplay, setTextHighlight } from '@/src/reduxStore/states/pages/data-browser';
+import { selectActiveSearchParams, selectActiveSlice, selectAdditionalData, selectRecords, selectSimilaritySearch, setActiveDataSlice, setActiveSearchParams, setIsTextHighlightNeeded, setRecordsInDisplay, setTextHighlight, updateAdditionalDataState } from '@/src/reduxStore/states/pages/data-browser';
 import style from '@/src/styles/components/projects/projectId/data-browser.module.css';
 import { ModalEnum } from '@/src/types/shared/modal';
 import { TOOLTIPS_DICT } from '@/src/util/tooltip-constants';
@@ -37,6 +37,7 @@ export default function DataBrowserRecords(props: DataBrowserRecordsProps) {
         dispatch(setActiveDataSlice(null));
         dispatch(setTextHighlight([]));
         dispatch(setIsTextHighlightNeeded({}));
+        dispatch(updateAdditionalDataState('clearFullSearch', true));
     }
 
     function storePreliminaryRecordIds(index: number, forEdit: boolean = false) {
@@ -101,7 +102,6 @@ export default function DataBrowserRecords(props: DataBrowserRecordsProps) {
                     </div>
                 </div>}
                 {(activeSlice != null || activeSearchParams.length > 0 || similaritySearch.recordsInDisplay) && <button onClick={() => {
-                    props.clearFullSearch(true);
                     clearFilters();
                 }} className="mr-1 inline-flex items-center px-2.5 py-2 border border-gray-300 shadow-sm text-xs font-semibold rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none cursor-pointer">
                     <IconFilterOff className="h-4 w-4 mr-1" />Clear filters

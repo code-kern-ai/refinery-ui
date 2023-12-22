@@ -181,8 +181,8 @@ export default function DataBrowser() {
 
     return (<>
         {projectId && <div className="flex flex-row h-full">
-            <DataBrowserSidebar clearFullSearch={clearFullSearch} />
-            <DataBrowserRecords clearFullSearch={(val) => setClearFullSearch(val)} refetchNextRecords={getNextRecords} />
+            <DataBrowserSidebar />
+            <DataBrowserRecords refetchNextRecords={getNextRecords} />
         </div>}
     </>)
 }

@@ -12,7 +12,7 @@ import { SearchOperator } from "@/src/types/components/projects/projectId/data-b
 import { checkDecimalPatterns, getAttributeType, getSearchOperatorTooltip } from "@/src/util/components/projects/projectId/data-browser/search-operators-helper";
 import { DataTypeEnum } from "@/src/types/shared/general";
 import { selectAllUsers, selectUser } from "@/src/reduxStore/states/general";
-import { selectActiveSearchParams, selectActiveSlice, selectConfiguration, selectIsTextHighlightNeeded, selectRecords, selectTextHighlight, selectUniqueValuesDict, selectUsersCount, setActiveSearchParams, setIsTextHighlightNeeded, setRecordsInDisplay, setSearchRecordsExtended, setTextHighlight } from "@/src/reduxStore/states/pages/data-browser";
+import { selectActiveSearchParams, selectActiveSlice, selectAdditionalData, selectConfiguration, selectIsTextHighlightNeeded, selectRecords, selectTextHighlight, selectUniqueValuesDict, selectUsersCount, setActiveSearchParams, setIsTextHighlightNeeded, setRecordsInDisplay, setSearchRecordsExtended, setTextHighlight, updateAdditionalDataState } from "@/src/reduxStore/states/pages/data-browser";
 import { Tooltip } from "@nextui-org/react";
 import { setModalStates } from "@/src/reduxStore/states/modal";
 import { ModalEnum } from "@/src/types/shared/modal";
@@ -26,7 +26,6 @@ import { getRegexFromFilter, updateSearchParameters } from "@/src/util/component
 import { jsonCopy } from "@/submodules/javascript-functions/general";
 import UserInfoModal from "./modals/UserInfoModal";
 import { getColorForDataType } from "@/src/util/components/projects/projectId/settings/data-schema-helper";
-import { DataBrowserSideBarProps } from "@/src/types/components/projects/projectId/data-browser/data-browser";
 import { GET_CURRENT_WEAK_SUPERVISION_RUN } from "@/src/services/gql/queries/heuristics";
 import { Status } from "@/src/types/shared/statuses";
 import { postProcessCurrentWeakSupervisionRun } from "@/src/util/components/projects/projectId/heuristics/heuristics-helper";
@@ -36,7 +35,7 @@ import { ChevronDownIcon } from "@heroicons/react/20/solid";
 const GROUP_SORT_ORDER = 0;
 let GLOBAL_SEARCH_GROUP_COUNT = 0;
 
-export default function SearchGroups(props: DataBrowserSideBarProps) {
+export default function SearchGroups() {
     const dispatch = useDispatch();
 
     const projectId = useSelector(selectProjectId);
@@ -52,6 +51,7 @@ export default function SearchGroups(props: DataBrowserSideBarProps) {
     const textHighlight = useSelector(selectTextHighlight);
     const isTextHighlightNeeded = useSelector(selectIsTextHighlightNeeded);
     const uniqueValuesDict = useSelector(selectUniqueValuesDict);
+    const additionalData = useSelector(selectAdditionalData);
 
     const [fullSearch, setFullSearch] = useState<any>({});
     const [searchGroups, setSearchGroups] = useState<{ [key: string]: any }>({});
@@ -150,12 +150,12 @@ export default function SearchGroups(props: DataBrowserSideBarProps) {
     }, [activeSlice]);
 
     useEffect(() => {
-        if (!props.clearFullSearch) return;
+        if (!additionalData.clearFullSearch) return;
         if (!attributesSortOrder) return;
         setFullSearch({});
         setSearchGroups({});
         prepareSearchGroups();
-    }, [props.clearFullSearch, attributesSortOrder]);
+    }, [additionalData.clearFullSearch, attributesSortOrder]);
 
     useEffect(() => {
         if (!currentWeakSupervisionRun) return;
@@ -435,6 +435,7 @@ export default function SearchGroups(props: DataBrowserSideBarProps) {
     function updateSearchParams(fullSearchCopy) {
         const activeParams = updateSearchParameters(Object.values(fullSearchCopy), attributes, configuration.separator, jsonCopy(fullSearchCopy));
         dispatch(setActiveSearchParams(activeParams));
+        dispatch(updateAdditionalDataState('clearFullSearch', false));
     }
 
     function setHighlightingToRecords() {
