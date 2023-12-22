@@ -612,15 +612,16 @@ export default function SearchGroups(props: DataBrowserSideBarProps) {
                                     <input
                                         onChange={(e) => changeConfidence(e, 'lower', group.key, 'weakSupervisionConfidence')}
                                         value={fullSearch[group.key].groupElements['weakSupervisionConfidence']['lower']}
-                                        className="h-8 w-11 border-gray-300 rounded-md placeholder-italic border text-gray-900 pl-4 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100" />
+                                        className="h-8 w-11 border-gray-300 rounded-md placeholder-italic border text-gray-900 pl-2 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100" />
                                     <span className="label-text mx-0.5 font-dmMono">% AND</span>
                                     <input
                                         onChange={(e) => changeConfidence(e, 'upper', group.key, 'weakSupervisionConfidence')}
                                         value={fullSearch[group.key].groupElements['weakSupervisionConfidence']['upper']}
-                                        className="h-8 w-11 border-gray-300 rounded-md placeholder-italic border text-gray-900 pl-4 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100" />
+                                        className="h-8 w-11 border-gray-300 rounded-md placeholder-italic border text-gray-900 pl-2 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100" />
                                     {fullSearch[group.key].groupElements['weakSupervisionConfidence']['active'] && <Tooltip content={TOOLTIPS_DICT.DATA_BROWSER.CLEAR_WS_CONFIDENCE} color="invert">
                                         <IconFilterOff className="text-red-700 cursor-pointer" onClick={() => clearConfidence(fullSearch[group.key].groupElements['weakSupervisionConfidence'])} />
                                     </Tooltip>}
+                                    <span className="label-text mx-0.5 font-dmMono">%</span>
                                 </div>
                             </div>
 
@@ -639,15 +640,16 @@ export default function SearchGroups(props: DataBrowserSideBarProps) {
                                     <input
                                         onChange={(e) => changeConfidence(e, 'lower', group.key, 'modelCallbackConfidence')}
                                         value={fullSearch[group.key].groupElements['modelCallbackConfidence']['lower']}
-                                        className="h-8 w-11 border-gray-300 rounded-md placeholder-italic border text-gray-900 pl-4 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100" />
+                                        className="h-8 w-11 border-gray-300 rounded-md placeholder-italic border text-gray-900 pl-2 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100" />
                                     <span className="label-text mx-0.5 font-dmMono">% AND</span>
                                     <input
                                         onChange={(e) => changeConfidence(e, 'upper', group.key, 'modelCallbackConfidence')}
                                         value={fullSearch[group.key].groupElements['modelCallbackConfidence']['upper']}
-                                        className="h-8 w-11 border-gray-300 rounded-md placeholder-italic border text-gray-900 pl-4 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100" />
+                                        className="h-8 w-11 border-gray-300 rounded-md placeholder-italic border text-gray-900 pl-2 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100" />
                                     {fullSearch[group.key].groupElements['modelCallbackConfidence']['active'] && <Tooltip content={TOOLTIPS_DICT.DATA_BROWSER.CLEAR_MC_CONFIDENCE} color="invert">
                                         <IconFilterOff className="text-red-700 cursor-pointer" onClick={() => clearConfidence(fullSearch[group.key].groupElements['modelCallbackConfidence'])} />
                                     </Tooltip>}
+                                    <span className="label-text mx-0.5 font-dmMono">%</span>
                                 </div>
                             </div>
 
