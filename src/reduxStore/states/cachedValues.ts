@@ -5,6 +5,7 @@ export enum CacheEnum {
     TOKENIZER_VALUES = 'TOKENIZER_VALUES',
     ZERO_SHOT_RECOMMENDATIONS = 'ZERO_SHOT_RECOMMENDATIONS',
     VERSION_OVERVIEW = 'VERSION_OVERVIEW',
+    EMBEDDING_PLATFORMS = 'EMBEDDING_PLATFORMS',
 }
 
 export type CachedVales = {
@@ -16,6 +17,7 @@ const initialState: CachedVales = {
     [CacheEnum.TOKENIZER_VALUES]: null,
     [CacheEnum.ZERO_SHOT_RECOMMENDATIONS]: null,
     [CacheEnum.VERSION_OVERVIEW]: null,
+    [CacheEnum.EMBEDDING_PLATFORMS]: null,
 };
 
 const cacheSlice = createSlice({

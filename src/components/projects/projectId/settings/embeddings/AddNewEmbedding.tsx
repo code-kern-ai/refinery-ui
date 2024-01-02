@@ -1,11 +1,10 @@
 import Modal from "@/src/components/shared/modal/Modal";
-import { selectOrganization } from "@/src/reduxStore/states/general";
+import { CacheEnum, selectCachedValue } from "@/src/reduxStore/states/cachedValues";
 import { selectModal } from "@/src/reduxStore/states/modal";
 import { setModelsDownloaded } from "@/src/reduxStore/states/pages/models-downloaded";
 import { selectEmbeddings, selectRecommendedEncodersAll, selectRecommendedEncodersDict, selectUsableNonTextAttributes, selectUseableEmbedableAttributes, setAllRecommendedEncodersDict } from "@/src/reduxStore/states/pages/settings";
 import { selectProjectId } from "@/src/reduxStore/states/project";
 import { CREATE_EMBEDDING } from "@/src/services/gql/mutations/project-settings";
-import { GET_EMBEDDING_PLATFORMS } from "@/src/services/gql/queries/project-setting";
 import { GET_MODEL_PROVIDER_INFO } from "@/src/services/gql/queries/projects";
 import { ModelsDownloaded } from "@/src/types/components/models-downloaded/models-downloaded";
 import { Attribute } from "@/src/types/components/projects/projectId/settings/data-schema";
@@ -31,11 +30,11 @@ export default function AddNewEmbedding(props: EmbeddingProps) {
     const useableEmbedableAttributes = useSelector(selectUseableEmbedableAttributes);
     const embeddingHandles = useSelector(selectRecommendedEncodersDict);
     const embeddingHandlesAll = useSelector(selectRecommendedEncodersAll);
-    const organization = useSelector(selectOrganization);
     const projectId = useSelector(selectProjectId);
     const useableNonTextAttributes = useSelector(selectUsableNonTextAttributes);
     const modalEmbedding = useSelector(selectModal(ModalEnum.ADD_EMBEDDING));
     const embeddings = useSelector(selectEmbeddings);
+    const embeddingPlatforms = useSelector(selectCachedValue(CacheEnum.EMBEDDING_PLATFORMS));
 
     const [targetAttribute, setTargetAttribute] = useState(null);
     const [platform, setPlatform] = useState(null);
@@ -48,7 +47,6 @@ export default function AddNewEmbedding(props: EmbeddingProps) {
     const [version, setVersion] = useState('');
     const [termsAccepted, setTermsAccepted] = useState(false);
 
-    const [embeddingPlatforms, setEmbeddingPlatforms] = useState([]);
     const [azureEngines, setAzureEngines] = useState([]);
     const [azureUrls, setAzureUrls] = useState([]);
     const [azureVersions, setAzureVersions] = useState([]);
@@ -56,17 +54,13 @@ export default function AddNewEmbedding(props: EmbeddingProps) {
     const [granularityArray, setGranularityArray] = useState(GRANULARITY_TYPES_ARRAY);
     const [filteredAttributesArray, setFilteredAttributesArray] = useState<Attribute[]>([]);
 
-    const [refetchEmbeddingPlatforms] = useLazyQuery(GET_EMBEDDING_PLATFORMS, { fetchPolicy: 'cache-first' });
     const [createEmbeddingMut] = useMutation(CREATE_EMBEDDING);
 
     const gdprText = useRef<HTMLLabelElement>(null);
 
     useEffect(() => {
         prepareSuggestions();
-        refetchEmbeddingPlatforms().then((res) => {
-            setEmbeddingPlatforms(postProcessingEmbeddingPlatforms(res.data['embeddingPlatforms'], organization));
-            checkIfPlatformHasToken();
-        });
+        checkIfPlatformHasToken();
     }, []);
 
     useEffect(() => {

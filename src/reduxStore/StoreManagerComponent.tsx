@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { useDispatch, useSelector } from "react-redux";
-import { selectIsAdmin, selectIsDemo, selectIsManaged, setAllUsers, setIsAdmin, setIsDemo, setIsManaged, setOrganization, setRouteColor, setUser } from "./states/general";
+import { selectIsAdmin, selectIsDemo, selectIsManaged, selectOrganization, setAllUsers, setIsAdmin, setIsDemo, setIsManaged, setOrganization, setRouteColor, setUser } from "./states/general";
 import { getUserAvatarUri, jsonCopy } from "@/submodules/javascript-functions/general";
 import { setActiveProject } from "./states/project";
 import { GET_ALL_TOKENIZER_OPTIONS, GET_PROJECT_BY_ID } from "../services/gql/queries/projects";
@@ -13,12 +13,13 @@ import { WebSocketsService } from "../services/base/web-sockets/WebSocketsServic
 import { timer } from "rxjs";
 import { RouteManager } from "../services/base/route-manager";
 import { postProcessUsersList } from "../util/components/users/users-list-helper";
-import { GET_RECOMMENDED_ENCODERS_FOR_EMBEDDINGS, GET_ZERO_SHOT_RECOMMENDATIONS } from "../services/gql/queries/project-setting";
+import { GET_EMBEDDING_PLATFORMS, GET_RECOMMENDED_ENCODERS_FOR_EMBEDDINGS, GET_ZERO_SHOT_RECOMMENDATIONS } from "../services/gql/queries/project-setting";
 import { CacheEnum, setCache } from "./states/cachedValues";
 import { postProcessingZeroShotEncoders } from "../util/components/models-downloaded/models-downloaded-helper";
 import { checkWhitelistTokenizer } from "../util/components/projects/new-project/new-project-helper";
 import { ConfigManager } from "../services/base/config";
 import postprocessVersionOverview from "../util/shared/sidebar-helper";
+import { postProcessingEmbeddingPlatforms } from "../util/components/projects/projectId/settings/embeddings-helper";
 
 export function GlobalStoreDataComponent(props: React.PropsWithChildren) {
     const router = useRouter();
@@ -27,6 +28,7 @@ export function GlobalStoreDataComponent(props: React.PropsWithChildren) {
     const isManaged = useSelector(selectIsManaged);
     const isDemo = useSelector(selectIsDemo);
     const isAdmin = useSelector(selectIsAdmin);
+    const organization = useSelector(selectOrganization);
 
     const [dataLoaded, setDataLoaded] = useState(false);
 
@@ -39,6 +41,7 @@ export function GlobalStoreDataComponent(props: React.PropsWithChildren) {
     const [refetchRecommendedEncoders] = useLazyQuery(GET_RECOMMENDED_ENCODERS_FOR_EMBEDDINGS, { fetchPolicy: 'cache-first' });
     const [refetchTokenizerValues] = useLazyQuery(GET_ALL_TOKENIZER_OPTIONS, { fetchPolicy: 'cache-first' });
     const [refetchVersionOverview] = useLazyQuery(GET_VERSION_OVERVIEW, { fetchPolicy: 'no-cache' });
+    const [refetchEmbeddingPlatforms] = useLazyQuery(GET_EMBEDDING_PLATFORMS, { fetchPolicy: 'cache-first' });
 
     useEffect(() => {
         getIsManaged((data) => {
@@ -80,6 +83,9 @@ export function GlobalStoreDataComponent(props: React.PropsWithChildren) {
         });
         refetchVersionOverview().then((res) => {
             dispatch(setCache(CacheEnum.VERSION_OVERVIEW, postprocessVersionOverview(res.data['versionOverview'])));
+        });
+        refetchEmbeddingPlatforms().then((res) => {
+            dispatch(setCache(CacheEnum.EMBEDDING_PLATFORMS, postProcessingEmbeddingPlatforms(res.data['embeddingPlatforms'], organization)))
         });
     }, []);
 
