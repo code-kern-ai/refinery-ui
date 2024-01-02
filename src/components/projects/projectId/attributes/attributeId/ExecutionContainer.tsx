@@ -14,6 +14,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
 import ConfirmExecutionModal from "./ConfirmExecutionModal";
 import ViewRecordDetailsModal from "./ViewRecordDetailsModal";
+import { extendArrayElementsByUniqueId } from "@/submodules/javascript-functions/id-prep";
 
 export default function ExecutionContainer(props: ExecutionContainerProps) {
     const projectId = useSelector(selectProjectId);
@@ -38,7 +39,9 @@ export default function ExecutionContainer(props: ExecutionContainerProps) {
             setRunOn10HasError(sampleRecordsFinal.calculatedAttributes.length > 0 ? false : true);
             if (props.currentAttribute.dataType == 'EMBEDDING_LIST') {
                 sampleRecordsFinal.calculatedAttributesList = sampleRecordsFinal.calculatedAttributes.map((record: string) => JSON.parse(record));
+                sampleRecordsFinal.calculatedAttributesListDisplay = extendArrayElementsByUniqueId(sampleRecordsFinal.calculatedAttributesList);
             }
+            sampleRecordsFinal.calculatedAttributesDisplay = extendArrayElementsByUniqueId(sampleRecordsFinal.calculatedAttributes);
             setSampleRecords(sampleRecordsFinal);
             props.refetchCurrentAttribute();
         }, () => {
@@ -84,16 +87,16 @@ export default function ExecutionContainer(props: ExecutionContainerProps) {
             </div>
         </div>
 
-        {sampleRecords && sampleRecords.calculatedAttributes.length > 0 && <div className="mt-4 flex flex-col">
+        {sampleRecords && sampleRecords.calculatedAttributesDisplay.length > 0 && <div className="mt-4 flex flex-col">
             <div className="overflow-x-auto">
                 <div className="inline-block min-w-full align-middle">
                     <div className="overflow-hidden shadow ring-1 ring-black ring-opacity-5 md:rounded-lg">
                         <div className="min-w-full border divide-y divide-gray-300">
-                            {sampleRecords.calculatedAttributes.map((record: string, index: number) => (
-                                <div key={index} className="divide-y divide-gray-200 bg-white">
+                            {sampleRecords.calculatedAttributesDisplay.map((record: any, index: number) => (
+                                <div key={record.id} className="divide-y divide-gray-200 bg-white">
                                     <div className="flex-shrink-0 border-b border-gray-200 shadow-sm flex justify-between items-center">
                                         <div className="flex items-center text-xs leading-5 text-gray-500 font-normal mx-4 my-3 text-justify">
-                                            {record}
+                                            {record.value}
                                         </div>
                                         <div className="flex items-center justify-center mr-5 ml-auto">
                                             <button onClick={() => {

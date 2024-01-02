@@ -11,6 +11,7 @@ import { useMutation } from "@apollo/client";
 import { TOGGLE_HEURISTICS_SELECTED } from "@/src/services/gql/mutations/heuristics";
 import { useRouter } from "next/router";
 import Statuses from "../statuses/Statuses";
+import { useConsoleLog } from "@/submodules/react-components/hooks/useConsoleLog";
 
 export default function GridCards(props: GridCardsProps) {
     const router = useRouter();
@@ -63,7 +64,7 @@ export default function GridCards(props: GridCardsProps) {
                         </div>
                     </div>
                     {!(heuristic.stats.length == 1 && heuristic.stats[0].label == '-') && <>
-                        {heuristic.stats.map((stat: any, index) => (<div key={index} className="flex-row gap-16 font-normal text-gray-500 flex items-center">
+                        {heuristic.stats.map((stat: any) => (<div key={stat.labelId} className="flex-row gap-16 font-normal text-gray-500 flex items-center">
                             <div className="py-2">
                                 <span className={`inline-flex items-center px-2 py-0.5 rounded text-sm font-medium border ${stat.color.backgroundColor} ${stat.color.textColor} ${stat.color.borderColor} ${stat.color.hoverColor}`}>
                                     {stat.label}

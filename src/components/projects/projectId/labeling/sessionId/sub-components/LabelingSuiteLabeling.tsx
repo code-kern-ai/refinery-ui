@@ -536,7 +536,7 @@ export default function LabelingSuiteLabeling() {
                                 }
                                 {rlaDataToDisplay[task.task.id] && <div>
                                     <div className={`flex gap-2 ${settings.labeling.compactClassificationLabelDisplay ? 'flex-row flex-wrap items-center' : 'flex-col'}`}>
-                                        {rlaDataToDisplay[task.task.id].map((rlaLabel, index) => (<Tooltip key={index} content={rlaLabel.dataTip} color="invert" placement="top" className="w-max">
+                                        {rlaDataToDisplay[task.task.id].map((rlaLabel, index) => (<Tooltip key={rlaLabel.orderPos} content={rlaLabel.dataTip} color="invert" placement="top" className="w-max">
                                             <div onClick={() => rlaLabel.sourceTypeKey == 'WEAK_SUPERVISION' ? addRla(task.task, rlaLabel.labelId) : null} onMouseEnter={() => onMouseEvent(true, rlaLabel.labelId)} onMouseLeave={() => onMouseEvent(false, rlaLabel.labelId)}
                                                 className={`text-sm font-medium px-2 py-0.5 rounded-md border focus:outline-none relative flex items-center ${labelLookup[rlaLabel.labelId].color.backgroundColor} ${labelLookup[rlaLabel.labelId].color.textColor} ${labelLookup[rlaLabel.labelId].color.borderColor} ${hoverGroupsDict[rlaLabel.labelId][LabelingPageParts.LABELING] ? style.labelOverlayManual : ''}`}>
                                                 {rlaLabel.icon && <div className="mr-1">

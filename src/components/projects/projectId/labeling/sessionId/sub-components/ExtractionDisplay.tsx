@@ -27,7 +27,7 @@ export default function ExtractionDisplay(props: ExtractionDisplayProps) {
 
     return (<>
         {props.tokenLookup && <div className="flex flex-row flex-wrap items-start">
-            {props.tokenLookup[props.attributeId] && props.tokenLookup[props.attributeId].token.map((token, index) => (<div key={index} className={`relative z-10 ${token.countLineBreaks > 0 && settings.main.lineBreaks != LineBreaksType.NORMAL ? 'w-full' : ''}`}
+            {props.tokenLookup[props.attributeId] && props.tokenLookup[props.attributeId].token.map((token) => (<div key={token.idx} className={`relative z-10 ${token.countLineBreaks > 0 && settings.main.lineBreaks != LineBreaksType.NORMAL ? 'w-full' : ''}`}
                 style={{ marginBottom: props.tokenLookup[props.attributeId][token.idx]?.tokenMarginBottom }}
                 data-tokenidx={token.idx} data-attributeid={props.attributeId}>
                 {token.countLineBreaks == 0 ? (<>
@@ -36,7 +36,7 @@ export default function ExtractionDisplay(props: ExtractionDisplayProps) {
                     </Tooltip>) : (<>
                         <TokenValue token={token} attributeId={props.attributeId} setSelected={(e) => props.setSelected(token.idx, token.idx, e)} /></>)}
                     {props.tokenLookup[props.attributeId][token.idx] && <>
-                        {props.tokenLookup[props.attributeId][token.idx].rlaArray.map((rlaItem, index) => (<div key={index} className={`absolute left-0 right-0 top-0 flex items-end z-n-2`} style={{ bottom: rlaItem.bottomPos }}>
+                        {props.tokenLookup[props.attributeId][token.idx].rlaArray.map((rlaItem) => (<div key={rlaItem.orderPos} className={`absolute left-0 right-0 top-0 flex items-end z-n-2`} style={{ bottom: rlaItem.bottomPos }}>
                             <div className={`h-px flex items-end w-full relative ${props.labelLookup[rlaItem.labelId].color.backgroundColor} ${props.labelLookup[rlaItem.labelId].color.textColor} ${props.labelLookup[rlaItem.labelId].color.borderColor} ${hoverGroupsDict[rlaItem.labelId][LabelingPageParts.LABELING] ? 'heightHover' : ''}`}
                                 onMouseEnter={(e: any) => {
                                     e.target.classList.add('heightHover');

@@ -1,6 +1,7 @@
 import { HighlightProps, RegexDisplay } from "@/src/types/shared/highlight";
 import { buildRegex, buildRegexps, rebuildText } from "@/src/util/shared/highlight-helper";
 import { isStringTrue } from "@/submodules/javascript-functions/general";
+import { extendArrayElementsByUniqueId } from "@/submodules/javascript-functions/id-prep";
 import { useEffect, useState } from "react";
 
 export default function Highlight(props: any) {
@@ -37,11 +38,11 @@ export default function Highlight(props: any) {
             }
         }
         setFinalRegEx(finalRegex);
-        setParts(rebuildText(props.text, finalRegEx));
+        setParts(extendArrayElementsByUniqueId(rebuildText(props.text, finalRegEx)));
     }
 
     return (<span>
-        {parts && parts.map((part, index) => (<span key={index} className={`${part.isMatch ? highlightClass : null} ${addClassString}`}>
+        {parts && parts.map((part, index) => (<span key={part.id} className={`${part.isMatch ? highlightClass : null} ${addClassString}`}>
             {part.text}
         </span>))}
     </span>)

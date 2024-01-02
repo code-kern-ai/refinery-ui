@@ -28,8 +28,8 @@ export function RecordDisplay(props: any) {
     }, [props.record, attributes, isTextHighlightNeeded]);
 
     return (<>
-        {preparedAttributes && preparedAttributes.map((attribute, index) => (<div key={index}>
-            <div key={index} className="font-semibold text-sm text-gray-800">
+        {preparedAttributes && preparedAttributes.map((attribute, index) => (<div key={attribute.key}>
+            <div className="font-semibold text-sm text-gray-800">
                 <div className="flex flex-row items-center">
                     <span className="font-dmMono">{attributesDict[attribute.id]?.name}</span>
                 </div>

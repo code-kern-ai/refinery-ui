@@ -94,7 +94,7 @@ export default function Playground() {
                 {singleLineTesterResult.length > 0 && <div className="mt-2 text-sm leading-5">
                     <span className="text-gray-700 font-semibold">Prediction</span>
                     <div className="flex gap-x-2 items-center" style={{ gridTemplateColumns: 'max content 16.5rem max-content' }}>
-                        {singleLineTesterResult.map((result: any, index) => (<Fragment key={index}>
+                        {singleLineTesterResult.map((result: any) => (<Fragment key={result.labelName}>
                             {result.color ? (<div className={`border items-center px-2 py-0.5 rounded text-xs font-medium text-center m-2 ${result.color.backgroundColor} ${result.color.textColor} ${result.color.borderColor} ${result.color.hoverColor}`}>
                                 {result.labelName}
                             </div>) : (<div

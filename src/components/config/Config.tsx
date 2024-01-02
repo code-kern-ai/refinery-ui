@@ -151,7 +151,7 @@ export default function Config() {
                 <p className="text-gray-500">Availability of spaCy language models. You can add new options.</p>
             </div>
             {localConfig.spacyDownloads && <div className="flex flex-col gap-y-2">
-                {localConfig.spacyDownloads.map((myConfig, index) => <div key={index} className="flex flex-row flex-nowrap gap-x-2 items-center">
+                {localConfig.spacyDownloads.map((myConfig, index) => <div key={myConfig} className="flex flex-row flex-nowrap gap-x-2 items-center">
                     <Dropdown
                         options={prepareTokenizedValues}
                         buttonName={prepareTokenizedValues.find((tokenizer: any) => tokenizer.configString == myConfig)?.name}

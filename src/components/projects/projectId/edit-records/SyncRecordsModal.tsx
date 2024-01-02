@@ -100,7 +100,7 @@ export default function SyncRecordsModal(props: SyncRecordsModalProps) {
                     <strong className="font-bold">Errors while syncing changes</strong>
                     <IconAlertTriangleFilled className="h-5 w-5 text-red-400" />
                 </div>
-                {props.erdData.errors.map((error, index) => <div key={index} className="text-sm overflow-x-auto m-auto" style={{ maxWidth: '600px' }}>
+                {props.erdData.errors.map((error, index) => <div key={error} className="text-sm overflow-x-auto m-auto" style={{ maxWidth: '600px' }}>
                     {error}
                 </div>)}
             </div>}

@@ -517,7 +517,7 @@ export default function SearchGroups() {
             <div className={`${style.transitionAll} ml-4`} style={{ maxHeight: searchGroups[group.key].isOpen ? '500px' : '0px', display: searchGroups[group.key].isOpen ? 'block' : 'none' }}>
                 <form>
                     {fullSearch[group.key].value.group == SearchGroup.ATTRIBUTES && <div className="contents mx-2">
-                        {fullSearch[group.key].groupElements.map((groupItem, index) => (<div key={index}>
+                        {fullSearch[group.key].groupElements.map((groupItem, index) => (<div key={groupItem.id}>
                             <div className="flex flex-row items-center rounded-md hover:bg-gray-50 my-2">
                                 <div className="flex flex-col">
                                     <div onClick={() => setActiveNegateGroup(groupItem, index, group)} style={{ backgroundColor: groupItem.color, borderColor: groupItem.color }}

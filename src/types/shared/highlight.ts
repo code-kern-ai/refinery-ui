@@ -10,7 +10,8 @@ export type HighlightProps = {
 
 export type RegexDisplay = {
     text: string,
-    isMatch: boolean
+    isMatch: boolean,
+    id: number
 };
 
 export type RegexMatch = {

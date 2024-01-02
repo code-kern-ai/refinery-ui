@@ -11,6 +11,7 @@ import { postProcessRecordsExtended } from "@/src/util/components/projects/proje
 import { filterAttributesSSGroup, getPlaceholderText, prepareAttFilter, prepareFilterAttributes } from "@/src/util/components/projects/projectId/data-browser/filter-attributes-helper";
 import { checkDecimalPatterns, getAttributeType, getFilterIntegrationOperatorTooltip } from "@/src/util/components/projects/projectId/data-browser/search-operators-helper";
 import { getColorForDataType } from "@/src/util/components/projects/projectId/settings/data-schema-helper";
+import { extendArrayElementsByUniqueId } from "@/submodules/javascript-functions/id-prep";
 import Dropdown from "@/submodules/react-components/components/Dropdown";
 import { useLazyQuery } from "@apollo/client";
 import { IconPlus, IconTrash } from "@tabler/icons-react";
@@ -118,6 +119,7 @@ export default function SimilaritySearchModal() {
         if (!operatorsDict) return;
         let form = [];
         form.push(filterAttributesSSGroup(filterAttributesSS, operatorsDict, attributes));
+        form = extendArrayElementsByUniqueId(form);
         setFilterAttributesForm(form);
     }
 
@@ -149,8 +151,9 @@ export default function SimilaritySearchModal() {
     }
 
     function addFilterAttributesSS() {
-        const form = [...filterAttributesForm];
+        let form = [...filterAttributesForm];
         form.push(filterAttributesSSGroup(filterAttributesSS, operatorsDict, attributes));
+        form = extendArrayElementsByUniqueId(form);
         setFilterAttributesForm(form);
     }
 
@@ -166,7 +169,7 @@ export default function SimilaritySearchModal() {
         </div>}
 
         <div className="contents mx-2">
-            {filterAttributesForm && filterAttributesForm.map((form, index) => (<div key={index} className="contents mx-2">
+            {filterAttributesForm && filterAttributesForm.map((form, index) => (<div key={form.id} className="contents mx-2">
                 <div className="flex flex-row items-center rounded-md hover:bg-gray-50 my-2">
                     <div className="flex flex-col">
                         {filterAttributesForm.length > 1 &&

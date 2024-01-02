@@ -21,7 +21,7 @@ export default function LabelSelectionBox(props: LabelSelectionBoxProps) {
         onMouseDown={(e) => stopPropagation(e)} onMouseUp={(e) => stopPropagation(e)}
         className={`flex flex-col rounded-lg bg-white shadow absolute z-10 border border-gray-300 ${props.activeTasks && props.activeTasks.length > 0 ? null : 'hidden'}`}>
         {props.activeTasks && <div className="max-h-80 overflow-y-auto">
-            {props.activeTasks && props.activeTasks.map((task, index) => <Fragment key={index}>
+            {props.activeTasks && props.activeTasks.map((task, index) => <Fragment key={task.task.id}>
                 <div className={`flex flex-grow flex-row justify-center p-2 ${index != 0 ? 'border-t borders-gray' : null}`}>
                     <label className="mr-1 text-sm">Task:</label>
                     <label className="italic font-bold text-sm truncate pr-0.5" style={{ maxWidth: '12rem' }}>{task.task.name}</label>

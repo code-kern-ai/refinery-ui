@@ -8,7 +8,7 @@ import { Tooltip } from '@nextui-org/react';
 import { IconAdjustments, IconAlertTriangleFilled, IconChartCircles, IconFilter, IconFilterOff, IconTriangleFilled } from '@tabler/icons-react';
 import { useDispatch, useSelector } from 'react-redux';
 import LoadingIcon from '@/src/components/shared/loading/LoadingIcon';
-import { selectAttributes } from '@/src/reduxStore/states/pages/settings';
+import { selectAttributes, selectUsableAttributes, selectVisibleAttributesHeuristics } from '@/src/reduxStore/states/pages/settings';
 import RecordList from './RecordList';
 import { useRouter } from 'next/router';
 import { selectProjectId } from '@/src/reduxStore/states/project';
@@ -29,7 +29,7 @@ export default function DataBrowserRecords(props: DataBrowserRecordsProps) {
     const similaritySearch = useSelector(selectSimilaritySearch);
     const additionalData = useSelector(selectAdditionalData);
     const activeSearchParams = useSelector(selectActiveSearchParams);
-    const attributes = useSelector(selectAttributes);
+    const attributes = useSelector(selectVisibleAttributesHeuristics);
 
     function clearFilters() {
         dispatch(setActiveSearchParams([]));

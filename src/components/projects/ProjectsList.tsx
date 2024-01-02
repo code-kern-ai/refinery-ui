@@ -218,8 +218,8 @@ export default function ProjectsList() {
                             </div>
                             <div className="h-screen overflow-y-scroll my-3">
                                 <div className={style.scrollableSize}>
-                                    {projects && projects.map((project: Project, index: number) => (
-                                        <ProjectCard project={project} projectStatisticsById={projectStatisticsById} key={index}></ProjectCard>
+                                    {projects && projects.map((project: Project) => (
+                                        <ProjectCard project={project} projectStatisticsById={projectStatisticsById} key={project.id}></ProjectCard>
                                     ))}
                                 </div>
                                 <AdminDeleteProjectModal />

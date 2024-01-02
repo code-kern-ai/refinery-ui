@@ -21,15 +21,15 @@ export default function RecordTable(props: RecordTableProps) {
                 <table className="min-w-full border  divide-y divide-gray-300">
                     <thead className="bg-gray-50">
                         <tr>
-                            {preparedColumnsData.map((column, index) => (<th key={index} scope="col"
+                            {preparedColumnsData.map((column) => (<th key={column.order} scope="col"
                                 className="px-3 py-2 text-center text-xs font-medium uppercase tracking-wide text-gray-500">
                                 {column.displayName}
                             </th>))}
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-200 bg-white">
-                        {preparedTableData && Object.values(preparedTableData).map((data, index) => (<tr key={index} className={`${index % 2 != 0 ? 'bg-gray-50' : 'bg-white'} ${(data.type != WEAK_SUPERVISION && configuration.weakSupervisionRelated) ? 'hidden' : ''}`}>
-                            {preparedColumnsData.map((column, index) => (<td key={index} className="whitespace-nowrap text-center px-3 py-2 text-sm text-gray-500">
+                        {preparedTableData && Object.values(preparedTableData).map((data, index) => (<tr key={data.id} className={`${index % 2 != 0 ? 'bg-gray-50' : 'bg-white'} ${(data.type != WEAK_SUPERVISION && configuration.weakSupervisionRelated) ? 'hidden' : ''}`}>
+                            {preparedColumnsData.map((column) => (<td key={column.order} className="whitespace-nowrap text-center px-3 py-2 text-sm text-gray-500">
                                 {column.field !== 'label' ? (<span>{data[column.field]}</span>) : (
                                     <span className={`inline-flex items-center px-2.5 py-0.5 rounded-md text-sm font-medium border ${data.color.backgroundColor} ${data.color.textColor} ${data.color.borderColor} ${data.color.hoverColor}`}>
                                         {data[column.field]}

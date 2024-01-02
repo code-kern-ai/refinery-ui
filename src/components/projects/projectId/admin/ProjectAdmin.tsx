@@ -105,7 +105,7 @@ export default function ProjectAdmin() {
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-gray-200">
-                                {accessTokens.map((token: PersonalAccessToken, index: number) => (<tr key={index} className={`${index % 2 != 0 ? 'bg-gray-50' : 'bg-white'}`}>
+                                {accessTokens.map((token: PersonalAccessToken, index: number) => (<tr key={token.id} className={`${index % 2 != 0 ? 'bg-gray-50' : 'bg-white'}`}>
                                     <td className="whitespace-nowrap text-center px-3 py-2 text-sm text-gray-500">{token.name}</td>
                                     <td className="whitespace-nowrap text-center px-3 py-2 text-sm text-gray-500">{token.scope}</td>
                                     <td className="whitespace-nowrap text-center px-3 py-2 text-sm text-gray-500">{token.createdAt}</td>

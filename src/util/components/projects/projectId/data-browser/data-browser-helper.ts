@@ -114,7 +114,8 @@ export function parseRecordData(element, labelingTasks: LabelingTask[]) {
                     confidence: [],
                     confidenceAvg: "",
                     //manual, weak supervision & specific information sources are "related"
-                    isWSRelated: !(rlaLine.source_type == LabelSource.INFORMATION_SOURCE && !rlaLine.weak_supervision_id)
+                    isWSRelated: !(rlaLine.source_type == LabelSource.INFORMATION_SOURCE && !rlaLine.weak_supervision_id),
+                    id: rlaAggParts.key
                 };
             }
             element.rla_aggregation[rlaAggParts.key].amount++;
@@ -129,6 +130,7 @@ export function parseRecordData(element, labelingTasks: LabelingTask[]) {
             let sum = 0;
             for (const confidence of element.rla_aggregation[key].confidence) sum += confidence;
             element.rla_aggregation[key].confidenceAvg = Math.round((sum / element.rla_aggregation[key].confidence.length) * 10000) / 100 + "%";
+            element.rla_aggregation[key].id = key;
         }
         const len = Object.keys(element.rla_aggregation).length;
         if (len && len != countWsRelated) element.wsHint = (len - countWsRelated) + " elements aren't visible because of your config settings";

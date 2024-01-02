@@ -16,7 +16,7 @@ export default function SampleRecords(props: SampleRecordProps) {
                 <div className="overflow-hidden shadow ring-1 ring-black ring-opacity-5 md:rounded-lg">
                     <div className="min-w-full border divide-y divide-gray-300">
                         {props.sampleRecords.records.map((record, index) => (
-                            <div className="divide-y divide-gray-200 bg-white" key={index}>
+                            <div className="divide-y divide-gray-200 bg-white" key={record.id}>
                                 <div className="flex-shrink-0 border-b border-gray-200 shadow-sm flex justify-between items-center">
                                     <div className="flex items-center text-xs leading-5 text-gray-500 font-normal mx-4 my-3 text-justify">
                                         {record.fullRecordData[props.selectedAttribute]}

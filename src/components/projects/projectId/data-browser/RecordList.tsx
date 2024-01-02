@@ -25,7 +25,7 @@ export default function RecordList(props: RecordListProps) {
     const recordComments = useSelector(selectRecordComments);
 
     return (<>
-        {recordList && recordList.map((record, index) => (<div key={index} className="bg-white overflow-hidden shadow rounded-lg border mb-4 pb-4 relative">
+        {recordList && recordList.map((record, index) => (<div key={record.id} className="bg-white overflow-hidden shadow rounded-lg border mb-4 pb-4 relative">
             <div className="px-4 py-5 sm:p-6">
                 {recordComments[record.id] && <div className="cursor-pointer absolute top-10 right-4"
                     onClick={() => dispatch(setModalStates(ModalEnum.RECORD_COMMENTS, { commentsData: recordComments[record.id], open: true }))}>

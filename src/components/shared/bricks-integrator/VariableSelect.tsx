@@ -201,7 +201,7 @@ export default function VariableSelect(props: VariableSelectProps) {
     }, [handleWebsocketNotification, projectId]);
 
     return (<>
-        {props.variable && props.variable.values.map((v, index) => (<div key={index} className="col-start-2 flex flex-row flex-nowrap items-center gap-x-2">
+        {props.variable && props.variable.values.map((v, index) => (<div key={v} className="col-start-2 flex flex-row flex-nowrap items-center gap-x-2">
             {props.variable.type == BricksVariableType.ATTRIBUTE &&
                 <Dropdown options={attributes} buttonName={props.variable.values[index] ? props.variable.values[index] : 'Select attribute'}
                     selectedOption={(option: any) => {

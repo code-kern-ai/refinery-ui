@@ -22,7 +22,7 @@ export default function ViewRecordDetailsModal(props: ViewRecordDetailsModalProp
                     {props.currentAttribute.dataType != DataTypeEnum.EMBEDDING_LIST ? <span>
                         {props.sampleRecords.calculatedAttributes[modalViewRecordDetails.recordIdx]}
                     </span> : <div className="flex flex-col gap-y-2 divide-y">
-                        {props.sampleRecords.calculatedAttributesList[modalViewRecordDetails.recordIdx].map((item: string, index: number) => <span key={index} className="mt-1">
+                        {props.sampleRecords.calculatedAttributesListDisplay[modalViewRecordDetails.recordIdx].map((item: any) => <span key={item.id} className="mt-1">
                             {props.sampleRecords.calculatedAttributesList[modalViewRecordDetails.recordIdx]}
                         </span>)}
                     </div>}

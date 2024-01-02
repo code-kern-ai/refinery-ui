@@ -5,6 +5,7 @@ import { InformationSourceType } from "@/submodules/javascript-functions/enums/e
 import { jsonCopy } from "@/submodules/javascript-functions/general";
 import { parseContainerLogsData } from "@/submodules/javascript-functions/logs-parser";
 import { getColorStruct } from "../shared-helper";
+import { extendArrayElementsByUniqueId } from "@/submodules/javascript-functions/id-prep";
 
 export function embeddingRelevant(embedding: Embedding, attributes: Attribute[], labelingTasks: LabelingTask[], currentLabelingTaskId: string): boolean {
     if (!embedding) return false;
@@ -70,8 +71,8 @@ export function postProcessSampleRecords(sampleRecords: any, labelingTasks: Labe
             record.calculatedLabelsResult = resultDict;
         }
     });
-
-    return prepareSampleRecords;
+    prepareSampleRecords.records = extendArrayElementsByUniqueId(prepareSampleRecords.records);
+    return prepareSampleRecords
 }
 
 function getLabelFromExtractionResult(str: string) {

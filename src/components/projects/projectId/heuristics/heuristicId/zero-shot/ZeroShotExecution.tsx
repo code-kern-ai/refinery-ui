@@ -141,7 +141,7 @@ export default function ZeroShotExecution(props: ZeroShotExecutionProps) {
                 </div>
 
                 <div className="gap-x-2 items-center" style={{ gridTemplateColumns: 'max content 16.5rem max-content' }}>
-                    {modalRecord.record?.labels.map((result: any, index) => (<div key={index} className="flex items-center">
+                    {modalRecord.record?.labels.map((result: any, index) => (<div key={result.labelName} className="flex items-center">
                         {result.color ? (<div className={`border items-center px-2 py-0.5 rounded text-xs font-medium text-center mr-2 my-2 ${result.color.backgroundColor} ${result.color.textColor} ${result.color.borderColor} ${result.color.hoverColor}`}>
                             {result.labelName}
                         </div>) : (<div

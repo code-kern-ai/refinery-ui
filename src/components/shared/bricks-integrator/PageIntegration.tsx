@@ -81,7 +81,7 @@ export default function PageIntegration(props: PageIntegrationProps) {
                         </div>
                         <label className="text-sm -mt-1">Your selected task doesn&apos;t have all necessary labels:</label>
                         <div className="flex flex-row flex-wrap gap-2" style={{ maxWidth: '30rem' }}>
-                            {BricksCodeParser.expected.expectedTaskLabels.map((label, index) => (<span key={index} className="text-sm inline-flex items-center">
+                            {BricksCodeParser.expected.expectedTaskLabels.map((label, index) => (<span key={label.label} className="text-sm inline-flex items-center">
                                 <label className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium border ${label.backgroundColor} ${label.textColor} ${label.borderColor}`}>
                                     {label.label}
                                     {label.exists ? (<IconInfoCircle className="ml-1 w-4 h-4 text-green-400" />) : (<IconX className="ml-1 w-4 h-4 text-gray-400" />)}
@@ -145,7 +145,7 @@ export default function PageIntegration(props: PageIntegrationProps) {
 
                     <label className="font-bold">Variable</label>
                     <label className="font-bold">Value</label>
-                    {BricksCodeParser.variables.map((v, index) => (<div key={index} className="contents">
+                    {BricksCodeParser.variables.map((v, index) => (<div key={v.baseName} className="contents">
                         <Tooltip content={TOOLTIPS_DICT.GENERAL.OPTIONAL} color="invert" placement="left" className="cursor-auto">
                             <label className={`text-sm col-start-1 ${v.optional ? 'text-gray-400 text-left' : ''}`}>{v.displayName}
                                 {!v.optional && <span>*</span>}
@@ -162,7 +162,7 @@ export default function PageIntegration(props: PageIntegrationProps) {
                     {BricksCodeParser.expected.labelMappingActive && <Fragment>
                         <label className="font-bold col-start-1">Bricks label</label>
                         <label className="font-bold">Refinery label</label>
-                        {BricksCodeParser.expected.expectedTaskLabels.map((l, index) => (<div key={index} className="contents">
+                        {BricksCodeParser.expected.expectedTaskLabels.map((l, index) => (<div key={l.label} className="contents">
                             <label className="text-sm col-start-1">{l.label}</label>
                             <Dropdown options={BricksCodeParser.expected.availableLabels} buttonName={l.mappedLabel ? l.mappedLabel : 'Ignore'}
                                 selectedOption={(option: string) => {

@@ -40,7 +40,7 @@ export default function NotificationData(props: NotificationDataProps) {
             <p>{props.notification[0].message}</p>
         </div>
         {expandedNotifications[props.notification[0].id] && <div className="grid grid-cols-1 divide-y">
-            {props.notification.map((notification, index) => (<Fragment key={index}>
+            {props.notification.map((notification, index) => (<Fragment key={notification.id}>
                 {index > 0 && <div className="py-1">
                     <div className={`w-full flex justify-between text-sm text-${props.textColor}-700`}>
                         <div>{props.notification[index].timePassed} ago</div>

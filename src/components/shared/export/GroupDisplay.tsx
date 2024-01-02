@@ -26,7 +26,7 @@ export default function GroupDisplay(props: GroupDisplayProps) {
         {props.formGroup && props.formGroup.get(props.type) && <div className={`contents text-left ${props.hiddenCheckCtrl != null ? (!props.hiddenCheckCtrl ? 'hidden' : null) : null}`}>
             {props.heading && <label className="text-base font-medium text-gray-900 col-start-1 col-span-full">{props.heading}</label>}
             {props.subText && <p className="text-sm leading-5 text-gray-500 col-start-1 col-span-full -mt-3">{props.subText}</p>}
-            {props.enumArrays && props.enumArrays.get(props.type).map((v, index) => (<div key={index} className="contents">
+            {props.enumArrays && props.enumArrays.get(props.type).map((v, index) => (<div key={v.id} className="contents">
                 {(v.value ? v.value : v.name) && <>
                     {props.formGroup.get(props.type)[v.value ? v.value : v.name] && <div className={`flex items-center ${props.formGroup.get(props.type)[v.value ? v.value : v.name].disabled ? 'cursor-not-allowed ' : 'cursor-pointer'} ${(props.formGroup.get(props.type)[v.value ? v.value : v.name].disabled && !v.tooltip) ? 'opacity-50' : ''}`}
                         onClick={() => props.formGroup.get(props.type)[v.value ? v.value : v.name].disabled ? null : flipControlValue(props.formGroup.get(props.type)[v.value ? v.value : v.name], props.type, props.isCheckbox)}>

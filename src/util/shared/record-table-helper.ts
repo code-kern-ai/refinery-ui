@@ -1,4 +1,5 @@
 import { jsonCopy } from "@/submodules/javascript-functions/general";
+import { extendArrayElementsByUniqueId } from "@/submodules/javascript-functions/id-prep";
 
 export const WEAK_SUPERVISION = 'Weak Supervision';
 
@@ -70,7 +71,7 @@ export function getDefaultFieldKey(columnData: any, isString: boolean = true): s
 
 export function prepareTableData(tableData: any[] | {}): any[] {
     const finalArraySize = Array.isArray(tableData) ? tableData.length : Object.keys(tableData).length;
-    const finalArray = Array(finalArraySize);
+    let finalArray = Array(finalArraySize);
     if (Array.isArray(tableData)) {
         let i = 0;
         for (const element of tableData) {

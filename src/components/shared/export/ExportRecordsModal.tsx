@@ -28,6 +28,7 @@ import { selectUser } from "@/src/reduxStore/states/general";
 import CryptedField from "../crypted-field/CryptedField";
 import { unsubscribeWSOnDestroy } from "@/src/services/base/web-sockets/web-sockets-helper";
 import { useRouter } from "next/router";
+import { extendArrayElementsByUniqueId } from "@/submodules/javascript-functions/id-prep";
 
 export default function ExportRecordsModal(props: ExportProps) {
     const dispatch = useDispatch();
@@ -100,6 +101,7 @@ export default function ExportRecordsModal(props: ExportProps) {
                     const tooltip = getExportTooltipFor(k, v2);
                     if (tooltip) v2.tooltip = tooltip;
                 });
+                v = extendArrayElementsByUniqueId(v);
             });
             setEnumArrays(enumArraysCopy);
         });
