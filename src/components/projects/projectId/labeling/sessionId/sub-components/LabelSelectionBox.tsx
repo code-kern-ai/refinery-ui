@@ -36,7 +36,7 @@ export default function LabelSelectionBox(props: LabelSelectionBoxProps) {
                             setNewLabel('');
                         }
                     }} style={{ outline: 'none', boxShadow: 'none' }} placeholder="Search label name..."
-                        className="h-8 w-full border-gray-300 rounded-md placeholder-italic border text-gray-900 pl-4 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100" />
+                        className="h-8 w-full text-sm border-gray-300 rounded-md placeholder-italic border text-gray-900 pl-4 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100" />
 
                     {user && user.role == UserRole.ENGINEER && <Tooltip content={TOOLTIPS_DICT.LABELING.CREATE_LABEL} placement="left" color="invert">
                         <div className="flex items-center">

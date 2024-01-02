@@ -149,7 +149,7 @@ export default function LabelingTasks() {
                                             : <input type="text" defaultValue={task.name} onKeyDown={(event) => {
                                                 if (event.key == 'Enter') changeTaskName(task, index, event.currentTarget.value);
                                             }} onBlur={(event) => changeTaskName(task, index, event.currentTarget.value)} autoFocus={true}
-                                                className="h-8 w-full border-gray-300 rounded-md placeholder-italic border text-gray-900 pl-4 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100" />}
+                                                className="h-8 w-full text-sm border-gray-300 rounded-md placeholder-italic border text-gray-900 pl-4 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100" />}
                                     </td>
                                     <td className="whitespace-nowrap text-center px-3 py-2 text-sm text-gray-500">
                                         <Dropdown options={labelingTasksDropdownArray} buttonName={labelingTaskToString(task.taskType)}

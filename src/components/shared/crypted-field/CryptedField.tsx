@@ -28,7 +28,7 @@ export default function CryptedField(_props: CryptoFieldProps) {
             </label>
             <div className="relative">
                 <input type={show || key.length == 0 ? 'text' : 'password'} value={key} placeholder={props.placeholder} ref={pwRef}
-                    className="h-8 w-full border-gray-300 rounded-md placeholder-italic border text-gray-900 pl-4 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100"
+                    className="h-8 w-full text-sm border-gray-300 rounded-md placeholder-italic border text-gray-900 pl-4 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100"
                     onClick={() => show ? null : pwRef.current.type = 'password'} onInput={(e: any) => {
                         setKey(e.target.value);
                         props.keyChange(e.target.value);

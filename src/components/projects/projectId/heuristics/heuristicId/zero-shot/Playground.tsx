@@ -66,7 +66,7 @@ export default function Playground() {
 
                 <div>
                     <input value={testInput} onChange={e => setTestInput(e.target.value)} placeholder="Enter any text..." onKeyDown={(e) => { if (e.key == 'Enter') runZeroShotTest() }} type="text"
-                        className="h-8 w-full border-gray-300 rounded-md placeholder-italic border text-gray-900 pl-4 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100" />
+                        className="h-8 w-full text-sm border-gray-300 rounded-md placeholder-italic border text-gray-900 pl-4 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100" />
                 </div>
 
                 <div className="flex flex-row items-center mt-2">
@@ -74,7 +74,7 @@ export default function Playground() {
                         By default we use the labels from your selected task. You can also switch them on or off.
                     </span>
                     <input value={customLabels} onChange={e => setCustomLabels(e.target.value)} placeholder="You can test with different labels. Separate them by comma" type="text"
-                        className="h-8 w-full border-gray-300 rounded-md placeholder-italic border text-gray-900 pl-4 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100" />
+                        className="h-8 w-full text-sm border-gray-300 rounded-md placeholder-italic border text-gray-900 pl-4 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100" />
 
                     <div className="w-8">
                         {testerRequestedSomething && <Tooltip content={TOOLTIPS_DICT.ZERO_SHOT.WHY_SO_LONG} color="invert" placement="top">

@@ -117,7 +117,7 @@ export default function Config() {
                 <p className="text-gray-500">Maximum number of records per project.</p>
             </div>
             <input type="number" value={maxRows}
-                className="h-8 w-32 border-gray-300 rounded-md placeholder-italic border text-gray-900 pl-4 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100"
+                className="h-8 w-32 text-sm border-gray-300 rounded-md placeholder-italic border text-gray-900 pl-4 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100"
                 onChange={(e) => {
                     checkAndSaveValue(e.target.value, 'limit_checks', 'max_rows');
                     setMaxRows(Number(e.target.value));
@@ -128,7 +128,7 @@ export default function Config() {
                 <p className="text-gray-500">Maximum number of attributes per project.</p>
             </div>
             <input type="number" value={maxCols}
-                className="h-8 w-32 border-gray-300 rounded-md placeholder-italic border text-gray-900 pl-4 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100"
+                className="h-8 w-32 text-sm border-gray-300 rounded-md placeholder-italic border text-gray-900 pl-4 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100"
                 onChange={(e) => {
                     checkAndSaveValue(e.target.value, 'limit_checks', 'max_cols');
                     setMaxCols(Number(e.target.value));
@@ -139,7 +139,7 @@ export default function Config() {
                 <p className="text-gray-500">Maximum number of characters per record.</p>
             </div>
             <input type="number" value={maxChar}
-                className="h-8 w-32 border-gray-300 rounded-md placeholder-italic border text-gray-900 pl-4 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100"
+                className="h-8 w-32 text-sm border-gray-300 rounded-md placeholder-italic border text-gray-900 pl-4 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100"
                 onChange={(e) => {
                     checkAndSaveValue(e.target.value, 'limit_checks', 'max_char_count');
                     setMaxChar(Number(e.target.value));

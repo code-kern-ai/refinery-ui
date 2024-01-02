@@ -95,13 +95,13 @@ export default function Terms(props: TermsProps) {
                         if (e.key == "Enter") {
                             addTermToKnowledgeBase();
                         }
-                    }} className="h-8 w-full border-gray-300 rounded-md placeholder-italic border text-gray-900 pl-4 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100" placeholder="Enter term name" />
+                    }} className="h-8 w-full text-sm border-gray-300 rounded-md placeholder-italic border text-gray-900 pl-4 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100" placeholder="Enter term name" />
                 <input value={description} type="text" onInput={(e: any) => setDescription(e.target.value)} onKeyUp={(e: any) => isTermUnique(e.target.value, terms)}
                     onKeyDown={(e: any) => {
                         if (e.key == "Enter") {
                             addTermToKnowledgeBase();
                         }
-                    }} className="h-8 w-full border-gray-300 rounded-md placeholder-italic border text-gray-900 pl-4 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100" placeholder="Enter term description" />
+                    }} className="h-8 w-full text-sm border-gray-300 rounded-md placeholder-italic border text-gray-900 pl-4 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100" placeholder="Enter term description" />
                 <button disabled={name == '' || !isTermUnique(name, terms)} onClick={addTermToKnowledgeBase}
                     className="bg-indigo-700 flex-shrink-0 text-white text-xs font-semibold px-4 py-2 rounded-md cursor-pointer hover:bg-indigo-800 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed">
                     Add term</button>
@@ -128,7 +128,7 @@ export default function Terms(props: TermsProps) {
                             <div className="mt-2">
                                 <input type="text" onChange={(e: any) => updateProperty('comment', e.target.value, index)}
                                     placeholder="Description - optional" value={term.comment}
-                                    className="h-8 w-full border-gray-300 rounded-md placeholder-italic border text-gray-900 pl-4 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100" />
+                                    className="h-8 w-full text-sm border-gray-300 rounded-md placeholder-italic border text-gray-900 pl-4 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100" />
                             </div>
                             <div className="mt-2 flex">
                                 <Tooltip content={TOOLTIPS_DICT.GENERAL.SUBMIT} placement="top" color="invert">

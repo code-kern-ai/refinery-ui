@@ -257,14 +257,14 @@ export default function AddNewEmbedding(props: EmbeddingProps) {
                             <span className="card-title mb-0 label-text flex"><span className="cursor-help underline filtersUnderline">API token</span></span>
                         </Tooltip>
                         <input placeholder="Enter your API token" onChange={(e) => setApiToken(e.target.value)} value={apiToken}
-                            className="h-9 w-full border-gray-300 rounded-md placeholder-italic border text-gray-900 pl-4 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100" />
+                            className="h-9 w-full text-sm border-gray-300 rounded-md placeholder-italic border text-gray-900 pl-4 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100" />
                     </>}
                     {platform == platformNamesDict[PlatformType.COHERE] && <>
                         <Tooltip content={TOOLTIPS_DICT.PROJECT_SETTINGS.EMBEDDINGS.API_TOKEN} placement="right" color="invert">
                             <span className="card-title mb-0 label-text flex"><span className="cursor-help underline filtersUnderline">API token</span></span>
                         </Tooltip>
                         <input placeholder="Enter your API token" onChange={(e) => setApiToken(e.target.value)} value={apiToken}
-                            className="h-9 w-full border-gray-300 rounded-md placeholder-italic border text-gray-900 pl-4 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100" />
+                            className="h-9 w-full text-sm border-gray-300 rounded-md placeholder-italic border text-gray-900 pl-4 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100" />
                     </>}
                     {platform == platformNamesDict[PlatformType.PYTHON] && <SuggestionsModel options={embeddingHandles[targetAttribute]} selectedOption={(option: string) => setModel(option)} />}
 
@@ -273,14 +273,14 @@ export default function AddNewEmbedding(props: EmbeddingProps) {
                             <span className="card-title mb-0 label-text flex"><span className="cursor-help underline filtersUnderline">API token</span></span>
                         </Tooltip>
                         <input placeholder="Enter your API token" onChange={(e) => setApiToken(e.target.value)} value={apiToken}
-                            className="h-9 w-full border-gray-300 rounded-md placeholder-italic border text-gray-900 pl-4 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100" />
+                            className="h-9 w-full text-sm border-gray-300 rounded-md placeholder-italic border text-gray-900 pl-4 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100" />
 
                         {azureEngines.length == 0 ? <>
                             <Tooltip content={TOOLTIPS_DICT.PROJECT_SETTINGS.EMBEDDINGS.ENGINE} placement="right" color="invert">
                                 <span className="card-title mb-0 label-text flex"><span className="cursor-help underline filtersUnderline">Engine</span></span>
                             </Tooltip>
                             <input placeholder="Enter Azure engine" onChange={(e) => setEngine(e.target.value)} value={engine}
-                                className="h-9 w-full border-gray-300 rounded-md placeholder-italic border text-gray-900 pl-4 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100" />
+                                className="h-9 w-full text-sm border-gray-300 rounded-md placeholder-italic border text-gray-900 pl-4 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100" />
                         </> : <>
                             <SuggestionsAzure options={azureEngines} selectedOption={(option: string) => setEngine(option)} name="Engine" tooltip="This will be your custom engine name. You can find this in the Azure OpenAI studio in the deployments section." />
                         </>}
@@ -290,7 +290,7 @@ export default function AddNewEmbedding(props: EmbeddingProps) {
                                 <span className="card-title mb-0 label-text flex"><span className="cursor-help underline filtersUnderline">Azure URL</span></span>
                             </Tooltip>
                             <input placeholder="Enter Azure URL" onChange={(e) => setUrl(e.target.value)} value={url}
-                                className="h-9 w-full border-gray-300 rounded-md placeholder-italic border text-gray-900 pl-4 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100" />
+                                className="h-9 w-full text-sm border-gray-300 rounded-md placeholder-italic border text-gray-900 pl-4 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100" />
                         </> : <>
                             <SuggestionsAzure options={azureUrls} selectedOption={(option: string) => setUrl(option)} name="Azure URL" tooltip="This will be your custom URL, which looks like this: https://<your-api-base>.openai.azure.com/" />
                         </>}
@@ -304,7 +304,7 @@ export default function AddNewEmbedding(props: EmbeddingProps) {
                                 </Tooltip>
                             </div>
                             <input placeholder="Enter Azure version" onChange={(e) => setVersion(e.target.value)} value={version}
-                                className="h-9 w-full border-gray-300 rounded-md placeholder-italic border text-gray-900 pl-4 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100" />
+                                className="h-9 w-full text-sm border-gray-300 rounded-md placeholder-italic border text-gray-900 pl-4 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100" />
                         </> : <>
                             <SuggestionsAzure options={azureVersions} selectedOption={(option: string) => setVersion(option)} name="Version" tooltip="The latest version of the Azure OpenAI service can also be found here." />
                         </>}

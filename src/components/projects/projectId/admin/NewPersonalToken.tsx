@@ -56,7 +56,7 @@ export default function NewPersonalToken(props: PersonalTokenModalProps) {
             </Tooltip>
             <input value={tokenName} onChange={(e) => setTokenName(e.target.value)}
                 onInput={(e: any) => checkIfDuplicateTokenName(e.target.value)}
-                className="h-9 w-full border-gray-300 rounded-md placeholder-italic border text-gray-900 pl-4 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100" placeholder="Token name" />
+                className="h-9 w-full text-sm border-gray-300 rounded-md placeholder-italic border text-gray-900 pl-4 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100" placeholder="Token name" />
             <Tooltip content={TOOLTIPS_DICT.ADMIN_PAGE.VALUE_TOKEN} color="invert" placement="right">
                 <span className="cursor-help card-title mb-0 label-text flex"><span className="underline filtersUnderline">Token</span></span>
             </Tooltip>

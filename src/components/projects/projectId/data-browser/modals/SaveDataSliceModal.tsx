@@ -130,7 +130,7 @@ export default function SaveDataSliceModal(props: { fullSearch: {} }) {
                         if (e.key == 'Enter') {
                             modalSaveDataSlice.sliceNameExists ? updateDataSliceByName() : saveDataSlice()
                         }
-                    }} className="h-9 w-full border-gray-300 rounded-md placeholder-italic border text-gray-900 pl-4 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100" placeholder="Enter name..." />
+                    }} className="h-9 w-full text-sm border-gray-300 rounded-md placeholder-italic border text-gray-900 pl-4 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100" placeholder="Enter name..." />
             </div>
         </div>
     </Modal>)

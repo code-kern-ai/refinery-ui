@@ -74,7 +74,7 @@ export default function EditField(props: EditFieldProps) {
                 onInput={setDynamicStyles}
                 onBlur={(e) => addCache(props.record.id, props.attribute.name, e.target.value)}
                 style={{ height: 'auto', overflowY: 'hidden' }}
-                className="h-9 w-full border-gray-300 rounded-md leading-8 placeholder-italic border text-gray-900 pl-4 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100"
+                className="h-9 w-full text-sm border-gray-300 rounded-md leading-8 placeholder-italic border text-gray-900 pl-4 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100"
             >{props.record.data[props.attribute.name]}</textarea>}
         {props.attribute.dataType == DataTypeEnum.CATEGORY &&
             <input value={inputValue} ref={inputRef}
@@ -82,21 +82,21 @@ export default function EditField(props: EditFieldProps) {
                 onInput={setDynamicStyles}
                 onBlur={(e) => addCache(props.record.id, props.attribute.name, e.target.value)}
                 style={{ height: 'auto', overflowY: 'hidden' }} type="text" autoComplete="off"
-                className="h-9 w-full border-gray-300 rounded-md leading-8 placeholder-italic border text-gray-900 pl-4 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100"
+                className="h-9 w-full text-sm border-gray-300 rounded-md leading-8 placeholder-italic border text-gray-900 pl-4 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100"
             />}
         {props.attribute.dataType == DataTypeEnum.INTEGER &&
             <input value={inputValue} ref={inputRef}
                 onChange={(e) => setInputValue(e.target.value)}
                 onBlur={(e) => addCache(props.record.id, props.attribute.name, e.target.value)}
                 type="number" step="1" autoComplete="off"
-                className="h-9 w-full border-gray-300 rounded-md leading-8 placeholder-italic border text-gray-900 pl-4 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100"
+                className="h-9 w-full text-sm border-gray-300 rounded-md leading-8 placeholder-italic border text-gray-900 pl-4 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100"
             />}
         {props.attribute.dataType == DataTypeEnum.FLOAT &&
             <input value={inputValue} ref={inputRef}
                 onChange={(e) => setInputValue(e.target.value)}
                 onBlur={(e) => addCache(props.record.id, props.attribute.name, e.target.value)}
                 type="number" step="any" autoComplete="off"
-                className="h-9 w-full border-gray-300 rounded-md leading-8 placeholder-italic border text-gray-900 pl-4 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100"
+                className="h-9 w-full text-sm border-gray-300 rounded-md leading-8 placeholder-italic border text-gray-900 pl-4 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100"
             />}
         {props.attribute.dataType == DataTypeEnum.BOOLEAN &&
             <input checked={inputValue} ref={inputRef}

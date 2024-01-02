@@ -59,7 +59,7 @@ export default function NavigationBarBottom() {
                                 onBlur={(event) => setShowNLabelButtonFunc(event)}
                                 onKeyDown={(event) => {
                                     if (event.key == 'Enter') setShowNLabelButtonFunc(event)
-                                }} className="h-9 w-12 border-gray-300 rounded-md placeholder-italic border text-gray-900 pl-4 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100" />
+                                }} className="h-9 w-12 text-sm border-gray-300 rounded-md placeholder-italic border text-gray-900 pl-4 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100" />
                             <span className="flex-grow flex flex-col flex-shrink-0 ml-3">
                                 <span className="text-sm font-medium text-gray-900" id="availability-label">Display of label
                                     options</span>

@@ -86,7 +86,7 @@ export default function LabelingTasksModals(props: LabelingTasksProps) {
                     dispatch(setModalStates(ModalEnum.ADD_LABELING_TASK, { ...modalAddLabelingTask, taskName: event.target.value }));
                 }} onKeyDown={(event) => {
                     if (event.key == 'Enter') addLabelingTask();
-                }} className="h-8 w-full border-gray-300 rounded-md placeholder-italic border text-gray-900 pl-4 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100" />
+                }} className="h-8 w-full text-sm border-gray-300 rounded-md placeholder-italic border text-gray-900 pl-4 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100" />
             </div>
         </Modal>
     </>)

@@ -550,12 +550,12 @@ export default function SearchGroups() {
                                             {groupItem['operator'] != '' && <input placeholder={groupItem['addText']} value={groupItem['searchValue']}
                                                 onChange={(e) => selectValueDropdown(e.target.value, index, 'searchValue', group.key)}
                                                 onKeyDown={(e) => checkIfDecimals(e, index, group.key)}
-                                                className="h-8 w-full border-gray-300 rounded-md placeholder-italic border text-gray-900 pl-4 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100" />}
+                                                className="h-8 w-full text-sm border-gray-300 rounded-md placeholder-italic border text-gray-900 pl-4 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100" />}
                                             {groupItem['operator'] == SearchOperator.BETWEEN && <span className="text-sm text-gray-500 mx-1">AND</span>}
                                             {groupItem['operator'] == SearchOperator.BETWEEN && <input placeholder={groupItem['addText']} value={groupItem['searchValueBetween']}
                                                 onChange={(e) => selectValueDropdown(e.target.value, index, 'searchValueBetween', group.key)}
                                                 onKeyDown={(e) => checkIfDecimals(e, index, group.key)}
-                                                className="h-8 w-full border-gray-300 rounded-md placeholder-italic border text-gray-900 pl-4 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100" />}
+                                                className="h-8 w-full text-sm border-gray-300 rounded-md placeholder-italic border text-gray-900 pl-4 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100" />}
                                         </div>
                                     )}
 
@@ -619,12 +619,12 @@ export default function SearchGroups() {
                                     <input
                                         onChange={(e) => changeConfidence(e, 'lower', group.key, 'weakSupervisionConfidence')}
                                         value={fullSearch[group.key].groupElements['weakSupervisionConfidence']['lower']}
-                                        className="h-8 w-11 border-gray-300 rounded-md placeholder-italic border text-gray-900 pl-2 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100" />
+                                        className="h-8 w-11 text-sm border-gray-300 rounded-md placeholder-italic border text-gray-900 pl-2 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100" />
                                     <span className="label-text mx-0.5 font-dmMono">% AND</span>
                                     <input
                                         onChange={(e) => changeConfidence(e, 'upper', group.key, 'weakSupervisionConfidence')}
                                         value={fullSearch[group.key].groupElements['weakSupervisionConfidence']['upper']}
-                                        className="h-8 w-11 border-gray-300 rounded-md placeholder-italic border text-gray-900 pl-2 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100" />
+                                        className="h-8 w-11 text-sm border-gray-300 rounded-md placeholder-italic border text-gray-900 pl-2 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100" />
                                     <span className="label-text mx-0.5 font-dmMono">%</span>
                                     {fullSearch[group.key].groupElements['weakSupervisionConfidence']['active'] && <Tooltip content={TOOLTIPS_DICT.DATA_BROWSER.CLEAR_WS_CONFIDENCE} color="invert">
                                         <IconFilterOff className="text-red-700 cursor-pointer" onClick={() => clearConfidence(group.key, 'weakSupervisionConfidence')} />
@@ -647,12 +647,12 @@ export default function SearchGroups() {
                                     <input
                                         onChange={(e) => changeConfidence(e, 'lower', group.key, 'modelCallbackConfidence')}
                                         value={fullSearch[group.key].groupElements['modelCallbackConfidence']['lower']}
-                                        className="h-8 w-11 border-gray-300 rounded-md placeholder-italic border text-gray-900 pl-2 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100" />
+                                        className="h-8 w-11 text-sm border-gray-300 rounded-md placeholder-italic border text-gray-900 pl-2 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100" />
                                     <span className="label-text mx-0.5 font-dmMono">% AND</span>
                                     <input
                                         onChange={(e) => changeConfidence(e, 'upper', group.key, 'modelCallbackConfidence')}
                                         value={fullSearch[group.key].groupElements['modelCallbackConfidence']['upper']}
-                                        className="h-8 w-11 border-gray-300 rounded-md placeholder-italic border text-gray-900 pl-2 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100" />
+                                        className="h-8 w-11 text-sm border-gray-300 rounded-md placeholder-italic border text-gray-900 pl-2 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100" />
                                     <span className="label-text mx-0.5 font-dmMono">%</span>
                                     {fullSearch[group.key].groupElements['modelCallbackConfidence']['active'] && <Tooltip content={TOOLTIPS_DICT.DATA_BROWSER.CLEAR_MC_CONFIDENCE} color="invert">
                                         <IconFilterOff className="text-red-700 cursor-pointer" onClick={() => clearConfidence(group.key, 'modelCallbackConfidence')} />
@@ -703,7 +703,7 @@ export default function SearchGroups() {
                                         </span>
                                         <input placeholder={groupItem['seedString']}
                                             onChange={(e) => setRandomSeedGroup(e.target.value)}
-                                            className="h-8 w-36 border-gray-300 rounded-r-md placeholder-italic border text-gray-900 pl-4 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100" />
+                                            className="h-8 w-36 text-sm border-gray-300 rounded-r-md placeholder-italic border text-gray-900 pl-4 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100" />
                                     </div>
                                 </div>)}
                             </div>

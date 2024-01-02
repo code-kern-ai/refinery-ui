@@ -188,7 +188,7 @@ export default function SampleProjectsDropdown() {
                             if (e.key == "Enter") {
                                 importSampleProject();
                             }
-                        }} className="h-8 w-full border-gray-300 rounded-md placeholder-italic border text-gray-900 pl-4 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100" placeholder="Enter some title here..." />
+                        }} className="h-8 w-full text-sm border-gray-300 rounded-md placeholder-italic border text-gray-900 pl-4 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100" placeholder="Enter some title here..." />
                     </div>
                     {projectNameExists && (<div className="text-red-700 text-xs mt-2 text-left">Project title exists</div>)}
                     <div className="flex flex-row mt-2">

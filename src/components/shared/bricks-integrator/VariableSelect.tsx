@@ -263,22 +263,22 @@ export default function VariableSelect(props: VariableSelectProps) {
             {props.variable.type == BricksVariableType.REGEX &&
                 <input type="text" value={props.variable.values[index]} id={'REGEX_' + props.index + '_' + index}
                     onChange={(e) => changeInputValue(index, e.target.value)}
-                    className="h-9 w-full border-gray-300 rounded-md leading-8 placeholder-italic border text-gray-900 pl-4 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100" />}
+                    className="h-9 w-full text-sm border-gray-300 rounded-md leading-8 placeholder-italic border text-gray-900 pl-4 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100" />}
 
             {props.variable.type == BricksVariableType.GENERIC_STRING &&
                 <input type="text" value={props.variable.values[index] ?? ''} id={'GENERIC_STRING_' + props.index + '_' + index}
                     onChange={(e) => changeInputValue(index, e.target.value)} style={{ minWidth: '10rem', maxWidth: '25rem' }}
-                    className={`h-9 border-gray-300 rounded-md leading-8 placeholder-italic border text-gray-900 pl-4 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100 ${props.variable.values[index]?.length > 20 ? 'w-60' : 'w-50'}`} />}
+                    className={`h-9 text-sm border-gray-300 rounded-md leading-8 placeholder-italic border text-gray-900 pl-4 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100 ${props.variable.values[index]?.length > 20 ? 'w-60' : 'w-50'}`} />}
 
             {props.variable.type == BricksVariableType.GENERIC_INT &&
                 <input type="number" step="1" value={props.variable.values[index] ?? ''} id={'GENERIC_INT_' + props.index + '_' + index}
                     onChange={(e) => changeInputValue(index, e.target.value)}
-                    className={`h-9 w-20 border-gray-300 rounded-md leading-8 placeholder-italic border text-gray-900 pl-4 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100`} />}
+                    className={`h-9 w-20 text-sm border-gray-300 rounded-md leading-8 placeholder-italic border text-gray-900 pl-4 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100`} />}
 
             {props.variable.type == BricksVariableType.GENERIC_FLOAT &&
                 <input type="number" step="0.01" value={props.variable.values[index] ?? ''} id={'GENERIC_FLOAT_' + props.index + '_' + index}
                     onChange={(e) => changeInputValue(index, e.target.value)}
-                    className={`h-9 w-20 border-gray-300 rounded-md leading-8 placeholder-italic border text-gray-900 pl-4 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100`} />}
+                    className={`h-9 w-20 text-sm border-gray-300 rounded-md leading-8 placeholder-italic border text-gray-900 pl-4 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100`} />}
 
             {props.variable.type == BricksVariableType.GENERIC_BOOLEAN && <div className="mr-2 h-4 w-4 border-gray-300 border rounded cursor-pointer hover:bg-gray-200"
                 id={'GENERIC_BOOLEAN_' + props.index + '_' + index} style={{ backgroundColor: props.variable.options.colors[index], borderColor: props.variable.options.colors[index] }}
@@ -290,7 +290,7 @@ export default function VariableSelect(props: VariableSelectProps) {
                     <input type="range" step="0.1" value={props.variable.values[index]} id={'GENERIC_RANGE_' + props.index + '_' + index}
                         min={props.variable.allowedValues[0]} max={props.variable.allowedValues[1]}
                         onChange={(e) => changeInputValue(index, e.target.value)} style={{ minWidth: '10rem', maxWidth: '25rem' }}
-                        className={`h-9 border-gray-300 rounded-md leading-8 placeholder-italic border text-gray-900 pl-4 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100`} />
+                        className={`h-9 text-sm border-gray-300 rounded-md leading-8 placeholder-italic border text-gray-900 pl-4 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100`} />
                     <output>{props.variable.values[index]}</output>
                 </div>
             }

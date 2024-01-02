@@ -116,7 +116,7 @@ export default function LabelsModals(props: LabelingTasksProps) {
                 onChange={(event: any) => dispatch(setModalStates(ModalEnum.ADD_LABEL, { ...modalAddLabel, labelName: event.target.value }))}
                 onKeyDown={(event) => {
                     if (event.key == 'Enter') addLabel();
-                }} className="h-8 w-full border-gray-300 rounded-md placeholder-italic border text-gray-900 pl-4 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100" />
+                }} className="h-8 w-full text-sm border-gray-300 rounded-md placeholder-italic border text-gray-900 pl-4 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100" />
         </Modal>
 
         <Modal modalName={ModalEnum.CHANGE_COLOR}>

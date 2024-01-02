@@ -57,7 +57,7 @@ export default function ProjectMetaData() {
                                     e.preventDefault();
                                     updateProjectNameAndDescription();
                                 }
-                            }} className="appearance-none rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none"
+                            }} className="appearance-none rounded w-full text-sm py-2 px-3 text-gray-700 leading-tight focus:outline-none"
                         />
                         <textarea rows={2} placeholder={project.description} value={projectDescription} onChange={(e) => setProjectDescription(e.target.value)}
                             onKeyDown={(e) => {
@@ -88,7 +88,7 @@ export default function ProjectMetaData() {
                 Are you sure you want to delete this project?</div>
             <div className="form-control">
                 <div className="flex space-x-2 items-center">
-                    <input className="h-9 w-full border-gray-300 rounded-md placeholder-italic border text-gray-900 pl-4 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100"
+                    <input className="h-9 w-full text-sm border-gray-300 rounded-md placeholder-italic border text-gray-900 pl-4 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100"
                         value={projectNameDelete} type="text" placeholder="Please enter the project name to enable deletion" onChange={(e) => setProjectNameDelete(e.target.value)}
                         onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); (projectNameDelete === project.name) ? deleteProject() : null } }} />
 
