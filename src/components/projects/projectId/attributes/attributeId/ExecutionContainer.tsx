@@ -27,7 +27,7 @@ export default function ExecutionContainer(props: ExecutionContainerProps) {
     const [checkIfAtLeastQueued, setCheckIfAtLeastQueued] = useState(false);
 
     const [refetchSampleRecords] = useLazyQuery(CALCULATE_USER_ATTRIBUTE_SAMPLE_RECORDS, { fetchPolicy: 'no-cache' });
-    const [refetchRecordByRecordId] = useLazyQuery(GET_RECORD_BY_RECORD_ID);
+    const [refetchRecordByRecordId] = useLazyQuery(GET_RECORD_BY_RECORD_ID, { fetchPolicy: 'no-cache' });
 
     function calculateUserAttributeSampleRecords() {
         if (requestedSomething) return;

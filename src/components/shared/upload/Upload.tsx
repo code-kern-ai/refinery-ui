@@ -48,7 +48,7 @@ export default function Upload(props: UploadProps) {
     const [deleteProjectMut] = useMutation(DELETE_PROJECT);
     const [updateProjectTokenizerMut] = useMutation(UPDATE_PROJECT_TOKENIZER);
     const [updateProjectStatusMut] = useMutation(UPDATE_PROJECT_STATUS);
-    const [uploadCredentialsMut] = useLazyQuery(GET_UPLOAD_CREDENTIALS_AND_ID);
+    const [uploadCredentialsMut] = useLazyQuery(GET_UPLOAD_CREDENTIALS_AND_ID, { fetchPolicy: 'network-only' });
     const [getUploadTaskId] = useLazyQuery(GET_UPLOAD_TASK_BY_TASK_ID, { fetchPolicy: 'network-only' });
 
     useEffect(unsubscribeWSOnDestroy(router, [CurrentPage.PROJECTS, CurrentPage.NEW_PROJECT]), []);

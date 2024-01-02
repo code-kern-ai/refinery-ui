@@ -31,10 +31,10 @@ export function GlobalStoreDataComponent(props: React.PropsWithChildren) {
     const [dataLoaded, setDataLoaded] = useState(false);
 
     const [getIsAdmin] = useLazyQuery(GET_IS_ADMIN, { fetchPolicy: "no-cache" });
-    const [refetchUserInfo] = useLazyQuery(GET_USER_INFO);
-    const [refetchProjectByProjectId] = useLazyQuery(GET_PROJECT_BY_ID);
-    const [refetchOrganization] = useLazyQuery(GET_ORGANIZATION);
-    const [refetchOrganizationUsers] = useLazyQuery(GET_ORGANIZATION_USERS);
+    const [refetchUserInfo] = useLazyQuery(GET_USER_INFO, { fetchPolicy: 'no-cache' });
+    const [refetchProjectByProjectId] = useLazyQuery(GET_PROJECT_BY_ID, { fetchPolicy: 'no-cache' });
+    const [refetchOrganization] = useLazyQuery(GET_ORGANIZATION, { fetchPolicy: 'no-cache' });
+    const [refetchOrganizationUsers] = useLazyQuery(GET_ORGANIZATION_USERS, { fetchPolicy: 'no-cache' });
     const [refetchZeroShotRecommendations] = useLazyQuery(GET_ZERO_SHOT_RECOMMENDATIONS, { fetchPolicy: 'cache-first' });
     const [refetchRecommendedEncoders] = useLazyQuery(GET_RECOMMENDED_ENCODERS_FOR_EMBEDDINGS, { fetchPolicy: 'cache-first' });
     const [refetchTokenizerValues] = useLazyQuery(GET_ALL_TOKENIZER_OPTIONS, { fetchPolicy: 'cache-first' });

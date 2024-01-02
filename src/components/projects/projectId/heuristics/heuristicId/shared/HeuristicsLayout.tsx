@@ -34,7 +34,7 @@ export default function HeuristicsLayout(props: any) {
     const [isDescriptionOpen, setIsDescriptionOpen] = useState(false);
 
     const [refetchAttributes] = useLazyQuery(GET_ATTRIBUTES_BY_PROJECT_ID, { fetchPolicy: "network-only" });
-    const [refetchLookupLists] = useLazyQuery(LOOKUP_LISTS_BY_PROJECT_ID);
+    const [refetchLookupLists] = useLazyQuery(LOOKUP_LISTS_BY_PROJECT_ID, { fetchPolicy: "network-only" });
     const [updateHeuristicMut] = useMutation(UPDATE_INFORMATION_SOURCE);
 
     useEffect(() => {

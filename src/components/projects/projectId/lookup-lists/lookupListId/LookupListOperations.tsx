@@ -35,7 +35,7 @@ export default function LookupListOperations(props: LookupListOperationsProps) {
     const [inputSplit, setInputSplit] = useState("\\n");
     const [inputArea, setInputArea] = useState("");
 
-    const [refetchExportList] = useLazyQuery(EXPORT_LIST);
+    const [refetchExportList] = useLazyQuery(EXPORT_LIST, { fetchPolicy: 'no-cache' });
     const [pasteLookupListMut] = useMutation(PASTE_TERM);
 
     const pasteLookupList = useCallback(() => {

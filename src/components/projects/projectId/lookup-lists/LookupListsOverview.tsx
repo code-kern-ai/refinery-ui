@@ -39,7 +39,7 @@ export default function LookupListsOverview() {
     const [selectionList, setSelectionList] = useState('');
     const [countSelected, setCountSelected] = useState(0);
 
-    const [refetchLookupLists] = useLazyQuery(LOOKUP_LISTS_BY_PROJECT_ID);
+    const [refetchLookupLists] = useLazyQuery(LOOKUP_LISTS_BY_PROJECT_ID, { fetchPolicy: "network-only" });
     const [createLookupListMut] = useMutation(CREATE_LOOKUP_LIST);
     const [deleteLookupListMut] = useMutation(DELETE_LOOKUP_LIST);
     const [refetchComments] = useLazyQuery(REQUEST_COMMENTS, { fetchPolicy: "no-cache" });
