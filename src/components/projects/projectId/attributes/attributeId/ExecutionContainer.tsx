@@ -34,7 +34,7 @@ export default function ExecutionContainer(props: ExecutionContainerProps) {
         if (requestedSomething) return;
         setRequestedSomething(true);
         refetchSampleRecords({ variables: { projectId: projectId, attributeId: props.currentAttribute.id } }).then((res) => {
-            const sampleRecordsFinal = jsonCopy(res.data['calculateUserAttributeSampleRecords']);
+            const sampleRecordsFinal = { ...res.data['calculateUserAttributeSampleRecords'] };
             setRequestedSomething(false);
             setRunOn10HasError(sampleRecordsFinal.calculatedAttributes.length > 0 ? false : true);
             if (props.currentAttribute.dataType == 'EMBEDDING_LIST') {

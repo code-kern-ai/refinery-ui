@@ -15,10 +15,10 @@ import { selectHeuristicsAll, setAllHeuristics } from "@/src/reduxStore/states/p
 import GridCards from "@/src/components/shared/grid-cards/GridCards";
 import HeuristicsHeader from "./HeuristicsHeader";
 import { postProcessingAttributes } from "@/src/util/components/projects/projectId/settings/data-schema-helper";
-import AddLabelingFunctionModal from "./AddLabelingFunctionModal";
-import AddActiveLeanerModal from "./AddActiveLearnerModal";
-import AddZeroShotModal from "./AddZeroShotModal";
-import AddCrowdLabelerModal from "./AddCrowdLabelerModal";
+import AddLabelingFunctionModal from "./modals/AddLabelingFunctionModal";
+import AddActiveLeanerModal from "./modals/AddActiveLearnerModal";
+import AddZeroShotModal from "./modals/AddZeroShotModal";
+import AddCrowdLabelerModal from "./modals/AddCrowdLabelerModal";
 import { postProcessingEmbeddings } from "@/src/util/components/projects/projectId/settings/embeddings-helper";
 import { useRouter } from "next/router";
 import { unsubscribeWSOnDestroy } from "@/src/services/base/web-sockets/web-sockets-helper";

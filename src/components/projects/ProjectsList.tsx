@@ -72,7 +72,7 @@ export default function ProjectsList() {
             const statsDict = {};
             if (stats == null) return;
             stats.forEach((stat: ProjectStatistics) => {
-                const statCopy = jsonCopy(stat);
+                const statCopy = { ...stat };
                 stat.manuallyLabeled = percentRoundString(statCopy.numDataScaleManual / statCopy.numDataScaleUploaded, 2);
                 stat.weaklySupervised = percentRoundString(statCopy.numDataScaleProgrammatical / statCopy.numDataScaleUploaded, 2);
                 statsDict[stat.projectId] = stat;

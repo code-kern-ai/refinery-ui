@@ -8,3 +8,7 @@ export type SampleRecord = {
     codeHasErrors: boolean;
     containerLogs: any;
 }
+
+export type ViewDetailsLFModalProps = {
+    sampleRecords: SampleRecord;
+}

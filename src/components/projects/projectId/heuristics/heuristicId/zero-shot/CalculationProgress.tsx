@@ -12,28 +12,12 @@ import { Tooltip } from "@nextui-org/react";
 import { IconAlertTriangleFilled, IconArrowRight, IconCircleCheckFilled } from "@tabler/icons-react";
 import { useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-
-const ABORT_BUTTON = { buttonCaption: 'Cancel', useButton: true, disabled: false };
+import CancelExecutionModal from "./CancelExecutionModal";
 
 export default function CalculationProgress() {
     const dispatch = useDispatch();
 
-    const projectId = useSelector(selectProjectId);
     const currentHeuristic = useSelector(selectHeuristic);
-    const modalCancel = useSelector(selectModal(ModalEnum.CANCEL_EXECUTION));
-
-    const [abortButton, setAbortButton] = useState<ModalButton>(ABORT_BUTTON);
-
-    const [cancelExecutionMut] = useMutation(CANCEL_ZERO_SHOT_RUN);
-
-    const cancelExecution = useCallback(() => {
-        cancelExecutionMut({ variables: { projectId: projectId, informationSourceId: currentHeuristic.id, payloadId: currentHeuristic.lastTask.id } }).then(() => { });
-    }, [modalCancel]);
-
-    useEffect(() => {
-        setAbortButton({ ...abortButton, emitFunction: cancelExecution });
-    }, [modalCancel]);
-
 
     return (<div className="mt-8">
         <div className="text-sm leading-5 font-medium text-gray-700 inline-block">Last execution</div>
@@ -78,16 +62,7 @@ export default function CalculationProgress() {
                     </div>
                 </div>
             </div>
-            <Modal modalName={ModalEnum.CANCEL_EXECUTION} abortButton={abortButton}>
-                <div className="flex flex-col items-center">
-                    <h1 className="text-lg text-gray-900 mb-2">Cancel Execution</h1>
-                    <div className="text-sm text-gray-500 my-2">
-                        Are you sure you want to cancel?
-                        <div>This will stop the execution and remove already created labels.</div>
-                    </div>
-                </div>
-
-            </Modal>
+            <CancelExecutionModal />
         </>) : <>
             <div className="bg-white">
                 <div className="py-6 text-sm leading-5 font-normal text-gray-500">This heuristic was not yet run.</div>

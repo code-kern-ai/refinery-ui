@@ -26,6 +26,7 @@ import { IconPlus, IconWaveSine } from '@tabler/icons-react';
 import { useRouter } from 'next/router';
 import { useCallback, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import LastWeakSupervisionModal from './modals/LastWeakSupervisionModal';
 
 const ABORT_BUTTON = { buttonCaption: "Delete", useButton: true, disabled: false };
 
@@ -296,44 +297,12 @@ export default function HeuristicsHeader(props: HeuristicsHeaderProps) {
             <Modal modalName={ModalEnum.DELETE_HEURISTICS} abortButton={abortButton}>
                 <h1 className="text-lg text-gray-900 mb-2">Warning</h1>
                 <div className="text-sm text-gray-500 my-2 flex flex-col">
-                    <span>Are you sure you want to delete selected model {countSelected <= 1 ? 'callback' : 'callbacks'}?</span>
+                    <span>Are you sure you want to delete selected {countSelected <= 1 ? 'heuristic' : 'heuristics'}?</span>
                     <span>Currently selected {countSelected <= 1 ? 'is' : 'are'}:</span>
                     <span className="whitespace-pre-line font-bold">{selectionList}</span>
                 </div>
             </Modal>
-
-            <Modal modalName={ModalEnum.LAST_WEAK_SUPERVISION_RUN}>
-                <h1 className="text-lg text-gray-900 mb-2 text-center">Last Weak
-                    Supervision Run</h1>
-                {currentWeakSupervisionRun && <div className=" flex flex-grow justify-center my-4">
-                    <div className="grid items-center text-left" style={{ gridTemplateColumns: '215px auto' }}>
-                        <div className="text-sm font-bold">State</div>
-                        <div className="text text-sm">
-                            <Statuses status={currentWeakSupervisionRun.state} />
-                        </div>
-                        <div className="text-sm font-bold">Selected Heuristics</div>
-                        <div className="text-sm text-gray-500">{currentWeakSupervisionRun.selectedInformationSources}</div>
-
-                        <div className="text-sm font-bold">Selected labeling tasks</div>
-                        <div className="text-sm text-gray-500">{currentWeakSupervisionRun.selectedLabelingTasks}</div>
-
-                        <div className="text-sm font-bold">Distinct records</div>
-                        <div className="text-sm text-gray-500">{currentWeakSupervisionRun.distinctRecords}</div>
-
-                        <div className="text-sm font-bold">Created labels</div>
-                        <div className="text-sm text-gray-500">{currentWeakSupervisionRun.resultCount}</div>
-
-                        <div className="text-sm font-bold">Created by</div>
-                        <div className="text-sm text-gray-500">{currentWeakSupervisionRun.displayName}</div>
-
-                        <div className="text-sm font-bold">Started at</div>
-                        <div className="text-sm text-gray-500">{currentWeakSupervisionRun.createdAtDisplay}</div>
-
-                        <div className="text-sm font-bold">Finished at</div>
-                        <div className="text-sm text-gray-500">{currentWeakSupervisionRun.finishedAtDisplay}</div>
-                    </div>
-                </div>}
-            </Modal>
+            <LastWeakSupervisionModal currentWeakSupervisionRun={currentWeakSupervisionRun} />
         </div >
     )
 }
