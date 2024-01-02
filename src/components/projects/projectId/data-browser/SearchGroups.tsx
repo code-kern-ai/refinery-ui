@@ -341,6 +341,8 @@ export default function SearchGroups() {
                 }
             }
         }
+        formControlsIdx['active'] = true;
+        formControlsIdx['color'] = getActiveNegateGroupColor(formControlsIdx);
         setFullSearch(fullSearchCopy);
         getOperatorDropdownValues(i, value, fullSearchCopy);
         updateSearchParams(fullSearchCopy);
