@@ -139,7 +139,10 @@ export default function ModelCallbacks() {
                         <div className={`cursor-pointer text-sm leading-5 font-medium mr-10 py-5 ${openTab == index ? 'text-indigo-700 ' + style.borderBottom : 'text-gray-500'}`} onClick={() => toggleTabs(index, labelingTask)}>{labelingTask.name}</div>
                     </div>)}
                     <Tooltip color="invert" placement="right" content={TOOLTIPS_DICT.MODEL_CALLBACKS.ADD_LABELING_TASK} >
-                        <button onClick={() => router.push(`/projects/${projectId}/settings`)}>
+                        <button onClick={() => {
+                            localStorage.setItem('openModal', 'true');
+                            router.push(`/projects/${projectId}/settings`);
+                        }}>
                             <IconPlus size={20} strokeWidth={1.5} className="text-gray-500 cursor-pointer" />
                         </button>
                     </Tooltip>

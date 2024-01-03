@@ -194,9 +194,9 @@ const labelingSlice = createSlice({
 });
 
 // selectors
-export const selectAvailableLinks = (state: any) => state.labeling.availableLinks;
+export const selectAvailableLinks = (state: any) => state.labeling.links.availableLinks;
 export const selectAvailableLinksDict = createSelector([selectAvailableLinks], (a): any => a ? arrayToDict(a, 'id') : null);
-export const selectSelectedLink = (state: any) => state.labeling.selectedLink;
+export const selectSelectedLink = (state: any) => state.labeling.links.selectedLink;
 export const selectRecordRequests = (state: any) => state.labeling.recordRequests;
 export const selectRecordRequestsToken = (state: any) => state.labeling.recordRequests.token;
 export const selectRecordRequestsRecord = (state: any) => state.labeling.recordRequests.record;

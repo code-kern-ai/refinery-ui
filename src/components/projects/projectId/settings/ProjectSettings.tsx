@@ -73,6 +73,11 @@ export default function ProjectSettings() {
             whitelist: ['project_update', 'tokenization', 'calculate_attribute', 'embedding', 'attributes_updated', 'gates_integration', 'information_source_deleted', 'information_source_updated', 'embedding_deleted'],
             func: handleWebsocketNotification
         });
+        const openModal = JSON.parse(localStorage.getItem("openModal"));
+        if (openModal) {
+            dispatch(setModalStates(ModalEnum.ADD_LABELING_TASK, { open: true }));
+            localStorage.removeItem("openModal");
+        }
     }, [project]);
 
     useEffect(() => {

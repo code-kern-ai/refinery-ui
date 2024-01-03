@@ -191,10 +191,7 @@ export default function LabelingMainComponent() {
     function requestHuddleData(huddleId: string) {
         refetchHuddleData({ variables: { projectId: projectId, huddleId: huddleId, huddleType: SessionManager.labelingLinkData.linkType } }).then((result) => {
             const huddleData = result['data']['requestHuddleData'];
-            if (huddleId == DUMMY_HUDDLE_ID) {
-                SessionManager.labelingLinkData.huddleId = huddleData.huddleId;
-                collectAvailableLinks();
-            }
+            collectAvailableLinks();
             if (!huddleData.huddleId) {
                 //nothing was found (no slice / heuristic available)        
                 LabelingSuiteManager.somethingLoading = false;
