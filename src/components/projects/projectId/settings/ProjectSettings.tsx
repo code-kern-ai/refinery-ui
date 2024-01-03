@@ -261,7 +261,7 @@ export default function ProjectSettings() {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-2 mt-1 align-top">
                 <div className="items-center flex flex-row">
                     <Tooltip content={TOOLTIPS_DICT.PROJECT_SETTINGS.ADD_NEW_ATTRIBUTE} color="invert" placement="bottom">
-                        <button onClick={() => dispatch(setModalStates(ModalEnum.CREATE_NEW_ATTRIBUTE, { open: true, attributeName: findFreeAttributeName(attributes) }))} className="mr-1 inline-flex items-center px-2.5 py-1.5 border border-gray-300 shadow-sm text-xs font-semibold rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none cursor-pointer">
+                        <button onClick={() => dispatch(openModal(ModalEnum.CREATE_NEW_ATTRIBUTE))} className="mr-1 inline-flex items-center px-2.5 py-1.5 border border-gray-300 shadow-sm text-xs font-semibold rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none cursor-pointer">
                             <IconPlus className="mr-1 h-5 w-5 inline-block" />
                             Add new attribute
                         </button>

@@ -120,7 +120,6 @@ export class LabelHelper {
         for (let label of this.labelMap.get(taskId)) {
             if (label['name'] == trimmedName) return false;
         }
-
         return true;
     }
 

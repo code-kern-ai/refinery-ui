@@ -41,10 +41,7 @@ const initialState: Modals = {
         open: false,
     },
     [ModalEnum.CREATE_NEW_ATTRIBUTE]: {
-        open: false,
-        attributeName: '',
-        duplicateNameExists: false,
-        attributeType: null,
+        open: false
     },
     [ModalEnum.PROJECT_SNAPSHOT]: {
         open: false,
@@ -72,7 +69,6 @@ const initialState: Modals = {
     },
     [ModalEnum.ADD_MODEL_DOWNLOAD]: {
         open: false,
-        modelName: '',
     },
     [ModalEnum.DELETE_LABELING_TASK]: {
         open: false,
@@ -80,13 +76,10 @@ const initialState: Modals = {
     },
     [ModalEnum.ADD_LABELING_TASK]: {
         open: false,
-        targetAttribute: '',
-        taskName: ''
     },
     [ModalEnum.ADD_LABEL]: {
         open: false,
         taskId: '',
-        labelName: ''
     },
     [ModalEnum.DELETE_LABEL]: {
         open: false,

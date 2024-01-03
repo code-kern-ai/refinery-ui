@@ -37,21 +37,21 @@ export default function AddModelDownloadModal() {
     const [downloadModelMut] = useMutation(MODEL_PROVIDER_DOWNLOAD_MODEL);
 
     const addModel = useCallback(() => {
-        downloadModelMut({ variables: { modelName: modalAddModel.modelName } }).then((res) => {
+        downloadModelMut({ variables: { modelName: modelName } }).then((res) => {
             const newModel = {
-                "name": modalAddModel.modelName,
+                "name": modelName,
                 "date": dateAsUTCDate(new Date()).toLocaleString(),
                 "status": ModelsDownloadedStatus.INITIALIZING
             };
             dispatch(extentModelsDownloaded(newModel));
         });
-    }, [modalAddModel.modelName]);
+    }, [modelName]);
 
     useEffect(() => {
         if (!modelsDownloaded) return;
         const checkIfModelExists = modelsDownloaded.find((model: ModelsDownloaded) => model.name === modelName);
         setAcceptButton({ ...acceptButton, emitFunction: addModel, disabled: modelName === '' || checkIfModelExists !== undefined });
-    }, [modelsDownloaded, addModel]);
+    }, [modelsDownloaded, addModel, modalAddModel]);
 
     const [acceptButton, setAcceptButton] = useState<ModalButton>(ACCEPT_BUTTON);
 
@@ -66,7 +66,6 @@ export default function AddModelDownloadModal() {
                 <Dropdown options={modelsList && modelsList.map((model: any) => model.configString)} useDifferentTextColor={colorDownloadedModels} differentTextColor="green"
                     hasSearchBar={true} dropdownItemsClasses="max-h-80 overflow-y-auto"
                     selectedOption={(option: string) => {
-                        dispatch(setModalStates(ModalEnum.ADD_MODEL_DOWNLOAD, { modelName: option, open: true }));
                         setModelName(option);
                     }} />
             </div>
