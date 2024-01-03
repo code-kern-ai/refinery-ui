@@ -499,8 +499,8 @@ export default function SearchGroups() {
     return (<>
         {searchGroups && searchGroupsOrder.map((group) => (<div key={group.key} className="mt-4">
             <div onClick={() => toggleGroupMenu(group.key)}
-                className={`flex flex-row items-center ${style.transitionTransform} rounded-md hover:bg-gray-50 cursor-pointer`}>
-                <div className={`w-7 ${searchGroups[group.key].isOpen ? style.rotateTransform : null}`}>
+                className={`flex flex-row items-center rounded-md hover:bg-gray-50 cursor-pointer`}>
+                <div className={`w-7 ${searchGroups[group.key].isOpen ? style.rotateTransform : null} ${style.transitionTransform}`}>
                     <ChevronDownIcon className="text-gray-700" />
                 </div>
                 <div className="flex flex-col">

@@ -122,7 +122,11 @@ export default function LabelingSettingsModal() {
                 <span>Show task legend</span>
                 <span className="cursor-pointer flex items-center">
                     <input className="h-5 w-5 cursor-pointer" type="checkbox" checked={settings?.task.show} onChange={() => changeSetting(ComponentType.TASK_HEADER, 'show')} /></span>
-                <Tooltip content={TOOLTIPS_DICT.LABELING.SHOW_TASK_LEGEND} color="invert" placement="top" className="cursor-auto"><IconInfoCircle className="h-5 w-5" /></Tooltip>
+                <Tooltip content={<div>
+                    <p>Completely hide/show the feature.</p>
+                    <br></br>
+                    <p>Active settings are preserved</p>
+                </div>} color="invert" placement="top" className="cursor-auto"><IconInfoCircle className="h-5 w-5" /></Tooltip>
                 <span>Collapse</span>
                 <span className="cursor-pointer flex items-center">
                     <input className="h-5 w-5 cursor-pointer" type="checkbox" checked={settings?.task.isCollapsed} onChange={() => changeSetting(ComponentType.TASK_HEADER, 'isCollapsed')} /></span>
@@ -151,7 +155,11 @@ export default function LabelingSettingsModal() {
                 <span>Show heuristic confidence</span>
                 <span className="cursor-pointer flex items-center">
                     <input className="h-5 w-5 cursor-pointer" type="checkbox" checked={settings?.labeling.showHeuristicConfidence} onChange={() => changeSetting(ComponentType.LABELING, 'showHeuristicConfidence')} /></span>
-                <Tooltip content={TOOLTIPS_DICT.LABELING.SHOW_HEURISTIC_CONFIDENCE} color="invert" placement="top" className="cursor-auto"><IconInfoCircle className="h-5 w-5" /></Tooltip>
+                <Tooltip content={<div>
+                    <p>Display the heuristic label confidence.</p>
+                    <br></br>
+                    <p>Please see in our docs for more information on confidence calculation.</p>
+                </div>} color="invert" placement="top" className="cursor-auto"><IconInfoCircle className="h-5 w-5" /></Tooltip>
                 <span>Compact classification label display</span>
                 <span className="cursor-pointer flex items-center">
                     <input className="h-5 w-5 cursor-pointer" type="checkbox" checked={settings?.labeling.compactClassificationLabelDisplay} onChange={() => changeSetting(ComponentType.LABELING, 'compactClassificationLabelDisplay')} /></span>
@@ -168,7 +176,11 @@ export default function LabelingSettingsModal() {
                 <span>Show overview table</span>
                 <span className="cursor-pointer flex items-center">
                     <input className="h-5 w-5 cursor-pointer" type="checkbox" checked={settings?.overviewTable.show} onChange={() => changeSetting(ComponentType.OVERVIEW_TABLE, 'show')} /></span>
-                <Tooltip content={TOOLTIPS_DICT.LABELING.OVERVIEW_TABLE} color="invert" placement="top" className="cursor-auto"><IconInfoCircle className="h-5 w-5" /></Tooltip>
+                <Tooltip content={<div>
+                    <p>Completely hide/show the feature.</p>
+                    <br></br>
+                    <p>Active settings are preserved</p>
+                </div>} color="invert" placement="top" className="cursor-auto"><IconInfoCircle className="h-5 w-5" /></Tooltip>
                 <span>Show heuristics</span>
                 <span className="cursor-pointer flex items-center">
                     <input className="h-5 w-5 cursor-pointer" type="checkbox" checked={settings?.overviewTable.showHeuristics} onChange={() => changeSetting(ComponentType.OVERVIEW_TABLE, 'showHeuristics')} /></span>
@@ -176,7 +188,11 @@ export default function LabelingSettingsModal() {
                 <span>Include task legend settings</span>
                 <span className="cursor-pointer flex items-center">
                     <input className="h-5 w-5 cursor-pointer" type="checkbox" checked={settings?.overviewTable.includeLabelDisplaySettings} onChange={() => changeSetting(ComponentType.OVERVIEW_TABLE, 'includeLabelDisplaySettings')} /></span>
-                <Tooltip content={TOOLTIPS_DICT.LABELING.TASK_LEGEND_SETTINGS} color="invert" placement="top" className="cursor-auto"><IconInfoCircle className="h-5 w-5" /></Tooltip>
+                <Tooltip content={<div>
+                    <p>If active the table will filter entries depending on task legend settings.</p>
+                    <br></br>
+                    <p>Note that show heuristic disabled will overrule this</p>
+                </div>} color="invert" placement="top" className="cursor-auto"><IconInfoCircle className="h-5 w-5" /></Tooltip>
             </div>
         </div>}
     </Modal >)
