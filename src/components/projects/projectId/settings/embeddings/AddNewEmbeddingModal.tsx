@@ -24,7 +24,7 @@ import { useDispatch, useSelector } from "react-redux";
 
 const ACCEPT_BUTTON = { buttonCaption: 'Add embedding', disabled: false, useButton: true };
 
-export default function AddNewEmbedding(props: EmbeddingProps) {
+export default function AddNewEmbeddingModal(props: EmbeddingProps) {
     const dispatch = useDispatch();
 
     const useableEmbedableAttributes = useSelector(selectUseableEmbedableAttributes);

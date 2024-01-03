@@ -1,27 +1,22 @@
 import { selectProject } from '@/src/reduxStore/states/project';
 import { selectIsAdmin, selectIsManaged, selectRouteColor, selectUser } from '@/src/reduxStore/states/general';
-import { UserRole, VersionOverview } from '@/src/types/shared/sidebar';
+import { UserRole } from '@/src/types/shared/sidebar';
 import Image from 'next/image';
 import { useDispatch, useSelector } from 'react-redux';
 import { Tooltip } from '@nextui-org/react';
-import { useCallback, useEffect, useState } from 'react';
+import { useState } from 'react';
 import AppSelectionDropdown from '@/submodules/react-components/components/AppSelectionDropdown';
-import { ModalButton, ModalEnum } from '@/src/types/shared/modal';
-import { closeModal, openModal } from '@/src/reduxStore/states/modal';
+import { ModalEnum } from '@/src/types/shared/modal';
+import { openModal } from '@/src/reduxStore/states/modal';
 import { useLazyQuery } from '@apollo/client';
 import { GET_HAS_UPDATES } from '@/src/services/gql/queries/config';
-import Modal from '../modal/Modal';
-import LoadingIcon from '../loading/LoadingIcon';
-import style from '@/src/styles/shared/sidebar.module.css';
-import { copyToClipboard } from '@/submodules/javascript-functions/general';
-import { IconAlertCircle, IconApi, IconArrowRight, IconBrandDiscord, IconBulb, IconChartPie, IconClipboard, IconExternalLink, IconMaximize, IconMinimize, IconTriangleSquareCircle, IconUserCircle } from '@tabler/icons-react';
+import { IconAlertCircle, IconApi, IconBrandDiscord, IconBulb, IconChartPie, IconClipboard, IconMaximize, IconMinimize, IconTriangleSquareCircle, IconUserCircle } from '@tabler/icons-react';
 import { IconSettings } from '@tabler/icons-react';
 import { useRouter } from 'next/router';
 import { TOOLTIPS_DICT } from '@/src/util/tooltip-constants';
 import { CacheEnum, selectCachedValue } from '@/src/reduxStore/states/cachedValues';
-
-const ACCEPT_BUTTON = { buttonCaption: "How to update", useButton: true };
-const ABORT_BUTTON = { buttonCaption: "Back", useButton: true };
+import VersionOverviewModal from './VersionOverviewModal';
+import HowToUpdateModal from './HowToUpdateModal';
 
 export default function Sidebar() {
     const router = useRouter();
@@ -36,27 +31,8 @@ export default function Sidebar() {
 
     const [isFullScreen, setIsFullScreen] = useState(false);
     const [hasUpdates, setHasUpdates] = useState(false);
-    const [openTab, setOpenTab] = useState(0);
 
     const [refetchHasUpdates] = useLazyQuery(GET_HAS_UPDATES, { fetchPolicy: 'no-cache' });
-
-    const howToUpdate = useCallback(() => {
-        dispatch(closeModal(ModalEnum.VERSION_OVERVIEW));
-        dispatch(openModal(ModalEnum.HOW_TO_UPDATE));
-    }, []);
-
-    const goBack = useCallback(() => {
-        dispatch(closeModal(ModalEnum.HOW_TO_UPDATE));
-        dispatch(openModal(ModalEnum.VERSION_OVERVIEW));
-    }, []);
-
-    useEffect(() => {
-        setAcceptButton({ ...ACCEPT_BUTTON, useButton: !isManaged, emitFunction: howToUpdate });
-        setBackButton({ ...ABORT_BUTTON, emitFunction: goBack });
-    }, [howToUpdate, goBack, isManaged]);
-
-    const [acceptButton, setAcceptButton] = useState<ModalButton>(ACCEPT_BUTTON);
-    const [backButton, setBackButton] = useState<ModalButton>(ABORT_BUTTON);
 
     function openFullScreen() {
         setIsFullScreen(true);
@@ -97,10 +73,6 @@ export default function Sidebar() {
                 setHasUpdates(res.data["hasUpdates"]);
             });
         }
-    }
-
-    function toggleTabs(index: number) {
-        setOpenTab(index);
     }
 
     return (
@@ -274,163 +246,8 @@ export default function Sidebar() {
                         </div>
                     </div>
                 </div>
-                <Modal modalName={ModalEnum.VERSION_OVERVIEW} acceptButton={acceptButton}>
-                    <div className="inline-block justify-center text-lg leading-6 text-gray-900 font-medium">
-                        Version overview
-
-                        <a className="text-green-800 text-base font-medium ml-3" href="https://changelog.kern.ai/" target="_blank">
-                            <span className="leading-5">Changelog</span>
-                            <IconArrowRight className="h-4 w-4 inline-block text-green-800" />
-                        </a>
-                    </div>
-                    {versionOverviewData ? (<div className="inline-block min-w-full align-middle mt-3">
-                        <div className={`overflow-hidden shadow ring-1 ring-black ring-opacity-5 md:rounded-lg ${style.scrollableSize}`}>
-                            <table className="min-w-full divide-y divide-gray-300">
-                                <thead className="bg-gray-50">
-                                    <tr>
-                                        <th scope="col"
-                                            className="px-3 py-2 text-left text-xs font-medium uppercase tracking-wide text-gray-500">
-                                            Service</th>
-                                        <th scope="col"
-                                            className="px-3 py-2 text-center text-xs font-medium uppercase tracking-wide text-gray-500">
-                                            Installed version</th>
-                                        <th scope="col"
-                                            className="px-3 py-2 text-center text-xs font-medium uppercase tracking-wide text-gray-500">
-                                            Remote version</th>
-                                        <th scope="col"
-                                            className="px-3 py-2 text-center text-xs font-medium uppercase tracking-wide text-gray-500">
-                                            Last checked</th>
-                                        <th scope="col"
-                                            className="px-3 py-2 text-center text-xs font-medium uppercase tracking-wide text-gray-500">
-                                            Link</th>
-                                    </tr>
-                                </thead>
-                                <tbody className="divide-y divide-gray-200">
-                                    {versionOverviewData.map((service: VersionOverview, index: number) => (
-                                        <tr key={service.service} className={index % 2 != 0 ? 'bg-gray-50' : 'bg-white'}>
-                                            <td className="text-left px-3 py-2 text-sm text-gray-500">{service.service}</td>
-                                            <td className="text-center px-3 py-2 text-sm text-gray-500">{service.installedVersion}</td>
-                                            <td className="text-center px-3 py-2 text-sm text-gray-500">
-                                                <div className="flex flex-row items-center justify-center">
-                                                    <div className="mr-2">{service.remoteVersion}</div>
-                                                    {service.remoteHasNewer && <Tooltip placement="right" trigger="hover" color="invert" content={TOOLTIPS_DICT.SIDEBAR.NEWER_VERSION_AVAILABLE} className="cursor-auto">
-                                                        <IconAlertCircle className="h-5 w-5 text-yellow-700" />
-                                                    </Tooltip>}
-                                                </div>
-                                            </td>
-                                            <td className="text-center px-3 py-2 text-sm text-gray-500">{service.parseDate}</td>
-                                            <td className="text-center px-3 py-2 text-sm text-gray-500">
-                                                <a href={service.link} target="_blank" rel="noopener noreferrer" className="h-4 w-4 m-auto block p-0">
-                                                    <IconExternalLink className="h-4 w-4 m-auto" />
-                                                </a>
-                                            </td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>) : (<LoadingIcon />)}
-                </Modal>
-                <Modal modalName={ModalEnum.HOW_TO_UPDATE} backButton={backButton}>
-                    <div className="text-center justify-center text-lg leading-6 text-gray-900 font-medium">
-                        How to update
-                    </div>
-                    <div className="flex border-b-2 border-b-gray-200 max-w-full text-center overflow-visible">
-                        <div onClick={() => toggleTabs(0)}
-                            className={`text-sm leading-5 font-medium mr-10 cursor-help py-3 ${openTab == 0 ? 'text-indigo-700 border-bottom' : 'text-gray-500'}`}>
-                            <Tooltip placement="bottom" content={TOOLTIPS_DICT.SIDEBAR['LINUX/MAC']} color="invert">
-                                <span className="border-dotted">Bash users</span>
-                            </Tooltip>
-                        </div>
-                        <div onClick={() => toggleTabs(1)}
-                            className={`text-sm leading-5 font-medium mr-10 cursor-help py-3 ${openTab == 1 ? 'text-indigo-700 border-bottom' : 'text-gray-500'}`}>
-                            <Tooltip placement="bottom" content={TOOLTIPS_DICT.SIDEBAR.PIP} color="invert">
-                                <span className="border-dotted">CLI users</span>
-                            </Tooltip>
-                        </div>
-                        <div onClick={() => toggleTabs(2)}
-                            className={`text-sm leading-5 font-medium mr-10 cursor-help py-3 ${openTab == 2 ? 'text-indigo-700 border-bottom' : 'text-gray-500'}`}>
-                            <Tooltip placement="bottom" content={TOOLTIPS_DICT.SIDEBAR.WINDOWS_TERMINAL} color="invert">
-                                <span className="border-dotted">cmd</span>
-                            </Tooltip>
-                        </div>
-                        <div onClick={() => toggleTabs(3)}
-                            className={`text-sm leading-5 font-medium mr-10 cursor-help py-3 ${openTab == 3 ? 'text-indigo-700 border-bottom' : 'text-gray-500'}`}>
-                            <Tooltip placement="bottom" content={TOOLTIPS_DICT.SIDEBAR.WINDOWS_FILE_EXPLORER} color="invert">
-                                <span className="border-dotted">Executing from explorer</span>
-                            </Tooltip>
-                        </div>
-                    </div>
-                    <div className="mt-3 px-5 h-40 text-left">
-                        {openTab == 0 && <ol className="font-dmMono list-decimal grid gap-y-4">
-                            <li>Open a Terminal</li>
-                            <li>Change to refinery directory (using cd) -&nbsp;
-                                <span className="bg-gray-200 text-red-700 rounded-md p-1 whitespace-nowrap">$ cd
-                                    /path/to/refinery</span>
-                            </li>
-                            <li>Run the update script -&nbsp;
-                                <span className="bg-gray-200 text-red-700 rounded-md p-1 whitespace-nowrap">$
-                                    <Tooltip placement="top" content={TOOLTIPS_DICT.GENERAL.CLICK_TO_COPY} color="invert">
-                                        <span className="cursor-pointer" onClick={() => copyToClipboard('./update')}>./update</span>
-                                    </Tooltip>
-                                </span>
-                            </li>
-                        </ol>}
-
-                        {openTab == 1 && <ol className="font-dmMono list-decimal grid gap-y-4">
-                            <li>Open a Terminal</li>
-                            <li>Change to refinery directory
-                                <ol className={`px-8 grid gap-y-4 ${style.listLetters}`}>
-                                    <li>Linux/Mac -&nbsp;
-                                        <span className="bg-gray-200 text-red-700 rounded-md p-1 whitespace-nowrap">$ cd
-                                            path/to/refinery</span>
-                                    </li>
-                                    <li>Windows -&nbsp;
-                                        <span className="bg-gray-200 text-red-700 rounded-md p-1 whitespace-nowrap">cd
-                                            path\to\refinery</span>
-                                    </li>
-                                </ol>
-                            </li>
-                            <li>
-                                Run the CLI update command&nbsp;
-                                <span className="bg-gray-200 text-red-700 rounded-md p-1 whitespace-nowrap">$
-                                    <Tooltip placement="top" content={TOOLTIPS_DICT.GENERAL.CLICK_TO_COPY} color="invert">
-                                        <span className="cursor-pointer" onClick={() => copyToClipboard('refinery update')}>refinery update</span>
-                                    </Tooltip>
-                                </span>
-                            </li>
-                        </ol>}
-
-                        {openTab == 2 && <ol className="font-dmMono list-decimal grid gap-y-4">
-                            <li>Open a Terminal</li>
-                            <li>Change to refinery directory&nbsp;
-                                <span className="bg-gray-200 text-red-700 rounded-md p-1 whitespace-nowrap">cd
-                                    path\to\refinery</span>
-                            </li>
-                            <li>
-                                Run the update script -&nbsp;
-                                <span className="bg-gray-200 text-red-700 rounded-md p-1 whitespace-nowrap">$
-                                    <Tooltip placement="top" content={TOOLTIPS_DICT.GENERAL.CLICK_TO_COPY} color="invert">
-                                        <span className="cursor-pointer" onClick={() => copyToClipboard('update.bat')}>update.bat</span>
-                                    </Tooltip>
-                                </span>
-                            </li>
-                        </ol>}
-
-                        {openTab == 3 && <ol className="font-dmMono list-decimal grid gap-y-4">
-                            <li>Open the File Explorer</li>
-                            <li>Navigate to the refinery directory</li>
-                            <li>
-                                Launch the update script by double-clicking&nbsp;
-                                <span className="bg-gray-200 text-red-700 rounded-md p-1 whitespace-nowrap">$
-                                    <Tooltip placement="top" content={TOOLTIPS_DICT.GENERAL.CLICK_TO_COPY} color="invert">
-                                        <span className="cursor-pointer" onClick={() => copyToClipboard('update.bat')}>update.bat</span>
-                                    </Tooltip>
-                                </span>
-                            </li>
-                        </ol>}
-                    </div>
-                </Modal >
+                <VersionOverviewModal />
+                <HowToUpdateModal />
             </div >
         )
     )

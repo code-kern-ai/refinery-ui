@@ -23,9 +23,10 @@ import { Fragment, useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { timer } from "rxjs";
 
-export default function ProjectSnapshotExport() {
+export default function ProjectSnapshotExportModal() {
     const router = useRouter();
     const dispatch = useDispatch();
+
     const projectId = useSelector(selectProjectId);
     const modal = useSelector(selectModal(ModalEnum.PROJECT_SNAPSHOT));
     const embeddings = useSelector(selectEmbeddings);

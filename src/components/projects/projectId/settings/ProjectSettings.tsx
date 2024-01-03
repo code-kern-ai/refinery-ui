@@ -1,31 +1,26 @@
 import { useDispatch, useSelector } from "react-redux";
 import DataSchema from "./DataSchema";
 import { selectProject, setActiveProject } from "@/src/reduxStore/states/project";
-import { useLazyQuery, useMutation } from "@apollo/client";
+import { useLazyQuery } from "@apollo/client";
 import { CHECK_COMPOSITE_KEY, GET_ATTRIBUTES_BY_PROJECT_ID, GET_EMBEDDING_SCHEMA_BY_PROJECT_ID, GET_GATES_INTEGRATION_DATA, GET_PROJECT_TOKENIZATION, GET_QUEUED_TASKS, GET_RECOMMENDED_ENCODERS_FOR_EMBEDDINGS } from "@/src/services/gql/queries/project-setting";
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { selectAttributes, selectEmbeddings, selectGatesIntegration, setAllAttributes, setAllEmbeddings, setAllRecommendedEncodersDict, setGatesIntegration, setRecommendedEncodersAll } from "@/src/reduxStore/states/pages/settings";
 import { timer } from "rxjs";
 import { IconCamera, IconCheck, IconDots, IconPlus, IconUpload } from "@tabler/icons-react";
-import Modal from "@/src/components/shared/modal/Modal";
-import { ModalButton, ModalEnum } from "@/src/types/shared/modal";
-import { openModal, selectModal, setModalStates } from "@/src/reduxStore/states/modal";
-import Dropdown from "@/submodules/react-components/components/Dropdown";
-import { CREATE_USER_ATTRIBUTE } from "@/src/services/gql/mutations/project-settings";
+import { ModalEnum } from "@/src/types/shared/modal";
+import { openModal, setModalStates } from "@/src/reduxStore/states/modal";
 import { useRouter } from "next/router";
-import { toPythonFunctionName } from "@/submodules/javascript-functions/python-functions-parser";
 import { setUploadFileType } from "@/src/reduxStore/states/upload";
 import { UploadFileType } from "@/src/types/shared/upload";
 import { GET_PROJECT_BY_ID, REQUEST_COMMENTS } from "@/src/services/gql/queries/projects";
 import { WebSocketsService } from "@/src/services/base/web-sockets/WebSocketsService";
 import { CurrentPage } from "@/src/types/shared/general";
-import ProjectSnapshotExport from "./ProjectSnapshotExport";
 import { Tooltip } from "@nextui-org/react";
 import ProjectMetaData from "./ProjectMetaData";
 import GatesIntegration from "./GatesIntegration";
 import { selectAllUsers, selectIsManaged, setComments, setCurrentPage } from "@/src/reduxStore/states/general";
 import Embeddings from "./embeddings/Embeddings";
-import { DATA_TYPES, findFreeAttributeName, postProcessingAttributes } from "@/src/util/components/projects/projectId/settings/data-schema-helper";
+import { findFreeAttributeName, postProcessingAttributes } from "@/src/util/components/projects/projectId/settings/data-schema-helper";
 import { postProcessingEmbeddings, postProcessingRecommendedEncoders } from "@/src/util/components/projects/projectId/settings/embeddings-helper";
 import { AttributeState } from "@/src/types/components/projects/projectId/settings/data-schema";
 import { RecommendedEncoder } from "@/src/types/components/projects/projectId/settings/embeddings";
@@ -36,8 +31,8 @@ import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
 import Export from "@/src/components/shared/export/Export";
 import { CommentType } from "@/src/types/shared/comments";
 import { CommentDataManager } from "@/src/util/classes/comments";
-
-const ACCEPT_BUTTON = { buttonCaption: "Accept", useButton: true, disabled: true }
+import CreateNewAttributeModal from "./CreateNewAttributeModal";
+import ProjectSnapshotExportModal from "./ProjectSnapshotExportModal";
 
 export default function ProjectSettings() {
     const dispatch = useDispatch();
@@ -47,7 +42,6 @@ export default function ProjectSettings() {
     const attributes = useSelector(selectAttributes);
     const isManaged = useSelector(selectIsManaged);
     const embeddings = useSelector(selectEmbeddings);
-    const modalCreateNewAtt = useSelector(selectModal(ModalEnum.CREATE_NEW_ATTRIBUTE));
     const allUsers = useSelector(selectAllUsers);
     const gatesIntegrationData = useSelector(selectGatesIntegration);
 
@@ -59,7 +53,6 @@ export default function ProjectSettings() {
 
     const [refetchAttributes] = useLazyQuery(GET_ATTRIBUTES_BY_PROJECT_ID, { fetchPolicy: "network-only" });
     const [refetchPrimaryKey] = useLazyQuery(CHECK_COMPOSITE_KEY, { fetchPolicy: "no-cache" });
-    const [createAttributeMut] = useMutation(CREATE_USER_ATTRIBUTE);
     const [refetchProjectByProjectId] = useLazyQuery(GET_PROJECT_BY_ID, { fetchPolicy: "no-cache" });
     const [refetchProjectTokenization] = useLazyQuery(GET_PROJECT_TOKENIZATION, { fetchPolicy: "no-cache" });
     const [refetchEmbeddings] = useLazyQuery(GET_EMBEDDING_SCHEMA_BY_PROJECT_ID, { fetchPolicy: "no-cache" });
@@ -113,20 +106,6 @@ export default function ProjectSettings() {
         });
     }
 
-    const createUserAttribute = useCallback(() => {
-        const attributeTypeFinal = DATA_TYPES.find((type) => type.name === modalCreateNewAtt.attributeType).value;
-        createAttributeMut({ variables: { projectId: project.id, name: modalCreateNewAtt.attributeName, dataType: attributeTypeFinal } }).then((res) => {
-            const id = res?.data?.createUserAttribute.attributeId;
-            if (id) {
-                localStorage.setItem('isNewAttribute', "X");
-                dispatch(setCurrentPage(CurrentPage.ATTRIBUTE_CALCULATION));
-                router.push(`/projects/${project.id}/attributes/${id}`);
-            }
-        });
-    }, [modalCreateNewAtt]);
-
-    const [acceptButton, setAcceptButton] = useState<ModalButton>(ACCEPT_BUTTON);
-
     function refetchAttributesAndPostProcess() {
         refetchAttributes({ variables: { projectId: project.id, stateFilter: ['ALL'] } }).then((res) => {
             dispatch(setAllAttributes(postProcessingAttributes(res.data['attributesByProjectId'])));
@@ -145,15 +124,6 @@ export default function ProjectSettings() {
             });
         });
     }
-
-    function handleAttributeName(value: string) {
-        const checkName = attributes.some(attribute => attribute.name == value);
-        dispatch(setModalStates(ModalEnum.CREATE_NEW_ATTRIBUTE, { attributeName: toPythonFunctionName(value), duplicateNameExists: checkName }))
-    }
-
-    useEffect(() => {
-        setAcceptButton({ ...acceptButton, emitFunction: createUserAttribute, disabled: modalCreateNewAtt.duplicateNameExists || modalCreateNewAtt.attributeName.trim() == "" || modalCreateNewAtt.attributeType == null });
-    }, [modalCreateNewAtt]);
 
     function requestPKeyCheck() {
         if (!project) return;
@@ -347,34 +317,8 @@ export default function ProjectSettings() {
             <LabelingTasks />
             {isManaged && <GatesIntegration refetchWS={refetchWS} />}
             <ProjectMetaData />
-
-            <Modal modalName={ModalEnum.CREATE_NEW_ATTRIBUTE} acceptButton={acceptButton}>
-                <div className="flex flex-grow justify-center text-lg leading-6 text-gray-900 font-medium">
-                    Add new attribute </div>
-                <div className="mb-2 flex flex-grow justify-center text-sm text-gray-500">
-                    Choose a name for your attribute and pick a datatype you want to use</div>
-                <div className="grid grid-cols-2  gap-2 items-center" style={{ gridTemplateColumns: 'max-content auto' }}>
-                    <Tooltip content={TOOLTIPS_DICT.PROJECT_SETTINGS.ATTRIBUTE_NAME} color="invert" placement="right">
-                        <span className="cursor-help  card-title mb-0 label-text font-normal"><span className="underline filtersUnderline">Attribute name</span></span>
-                    </Tooltip>
-                    <input type="text" defaultValue={modalCreateNewAtt.attributeName} onInput={(e: any) => handleAttributeName(e.target.value)}
-                        onKeyDown={(e) => { if (e.key == 'Enter') createUserAttribute() }}
-                        className="h-9 w-full text-sm border-gray-300 rounded-md placeholder-italic border text-gray-900 pl-4 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100" placeholder="Enter an attribute name..." />
-                    <Tooltip content={TOOLTIPS_DICT.PROJECT_SETTINGS.SELECT_ATTRIBUTE_TYPE} color="invert" placement="right">
-                        <span className="cursor-help card-title mb-0 label-text font-normal"><span className="underline filtersUnderline">Attribute type</span></span>
-                    </Tooltip>
-                    <Dropdown buttonName={modalCreateNewAtt.attributeType ?? 'Select type'} options={DATA_TYPES} selectedOption={(option: string) => dispatch(setModalStates(ModalEnum.CREATE_NEW_ATTRIBUTE, { attributeType: option }))} />
-                </div>
-                {modalCreateNewAtt.duplicateNameExists && <div className="text-red-700 text-xs mt-2">Attribute name exists</div>}
-                {modalCreateNewAtt.attributeType == 'Embedding List' && <div className="border border-gray-300 text-xs text-gray-500 p-2.5 rounded-lg text-justify mt-2 max-w-2xl">
-                    <label className="text-gray-700">
-                        Embedding lists are special. They can only be used for similarity search. If a list
-                        entry is matched, the whole record is considered matched.
-                    </label>
-                </div>}
-            </Modal>
-
-            <ProjectSnapshotExport ></ProjectSnapshotExport>
+            <CreateNewAttributeModal />
+            <ProjectSnapshotExportModal ></ProjectSnapshotExportModal>
         </div >}
     </div >)
 }

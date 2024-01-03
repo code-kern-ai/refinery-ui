@@ -77,3 +77,10 @@ export type EmbeddingCreationEnabledProps = {
     version: string;
     embeddingPlatforms: EmbeddingPlatform[];
 };
+
+export type FilterAttributesModalProps = {
+    filterAttributesUpdate: any;
+    setFilterAttributesUpdate(value: any): void;
+    showEditOption: boolean;
+    setShowEditOption(value: boolean): void;
+}

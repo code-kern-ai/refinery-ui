@@ -17,11 +17,14 @@ import { IconColorPicker, IconPlus, IconTrash } from "@tabler/icons-react";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react"
 import { useDispatch, useSelector } from "react-redux";
-import LabelingTasksModals from "./LabelingTasksModals";
-import LabelsModals from "./LabelsModals";
 import RenameLabelModal from "./RenameLabelModal";
 import { UPDATE_LABELING_TASK } from "@/src/services/gql/mutations/project-settings";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
+import AddLabelingTaskModal from "./AddLabelingTaskModal";
+import DeleteLabelingTaskModal from "./DeleteLabelingTaskModal";
+import DeleteLabelModal from "./DeleteLabelModal";
+import AddLabelModal from "./AddLabelModal";
+import ChangeColorModal from "./ChangeColorModal";
 
 export default function LabelingTasks() {
     const router = useRouter();
@@ -192,8 +195,11 @@ export default function LabelingTasks() {
             </Tooltip>
         </div>
 
-        <LabelingTasksModals refetchWS={refetchWS} />
-        <LabelsModals refetchWS={refetchWS} />
+        <AddLabelingTaskModal refetchWS={refetchWS} />
+        <DeleteLabelingTaskModal refetchWS={refetchWS} />
+        <DeleteLabelModal refetchWS={refetchWS} />
+        <AddLabelModal refetchWS={refetchWS} />
+        <ChangeColorModal refetchWS={refetchWS} />
         <RenameLabelModal refetchWS={refetchWS} />
     </div >
     )

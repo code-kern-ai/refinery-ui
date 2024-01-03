@@ -1,39 +1,31 @@
 import LoadingIcon from "@/src/components/shared/loading/LoadingIcon";
-import Modal from "@/src/components/shared/modal/Modal";
 import { selectIsManaged } from "@/src/reduxStore/states/general";
-import { openModal, selectModal, setModalStates } from "@/src/reduxStore/states/modal";
-import { removeFromAllEmbeddingsById, selectAttributes, selectEmbeddings, selectUsableNonTextAttributes } from "@/src/reduxStore/states/pages/settings";
+import { openModal, setModalStates } from "@/src/reduxStore/states/modal";
+import { selectAttributes, selectEmbeddings } from "@/src/reduxStore/states/pages/settings";
 import { selectProjectId } from "@/src/reduxStore/states/project";
 import { WebSocketsService } from "@/src/services/base/web-sockets/WebSocketsService";
-import { DELETE_EMBEDDING, DELETE_FROM_TASK_QUEUE, UPDATE_EMBEDDING_PAYLOAD } from "@/src/services/gql/mutations/project-settings";
 import { Embedding, EmbeddingProps, EmbeddingState } from "@/src/types/components/projects/projectId/settings/embeddings";
 import { CurrentPage } from "@/src/types/shared/general";
-import { ModalButton, ModalEnum } from "@/src/types/shared/modal";
+import { ModalEnum } from "@/src/types/shared/modal";
 import { DATA_TYPES, getColorForDataType } from "@/src/util/components/projects/projectId/settings/data-schema-helper";
 import { jsonCopy } from "@/submodules/javascript-functions/general";
-import { useMutation } from "@apollo/client";
 import { Tooltip } from "@nextui-org/react";
 import { IconAlertTriangleFilled, IconArrowAutofitDown, IconCircleCheckFilled, IconNotes, IconPlus, IconTrash } from "@tabler/icons-react";
 import { useRouter } from "next/router";
 import { useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import AddNewEmbedding from "./AddNewEmbedding";
-import Dropdown from "@/submodules/react-components/components/Dropdown";
 import { unsubscribeWSOnDestroy } from "@/src/services/base/web-sockets/web-sockets-helper";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
+import AddNewEmbeddingModal from "./AddNewEmbeddingModal";
+import FilterAttributesModal from "./FilterAttributesModal";
+import DeleteEmbeddingModal from "./DeleteEmbeddingModal";
 
-const ABORT_BUTTON = { useButton: true, disabled: false };
-const EDIT_BUTTON = { buttonCaption: 'Edit', useButton: true, disabled: false, closeAfterClick: false };
-const ACCEPT_BUTTON = { buttonCaption: 'Save', useButton: false, disabled: false, closeAfterClick: false };
 
 export default function Embeddings(props: EmbeddingProps) {
     const dispatch = useDispatch();
     const router = useRouter();
 
-    const modalDeleteEmbedding = useSelector(selectModal(ModalEnum.DELETE_EMBEDDING));
-    const modalFilteredAttributes = useSelector(selectModal(ModalEnum.FILTERED_ATTRIBUTES));
     const attributes = useSelector(selectAttributes);
-    const usableAttributes = useSelector(selectUsableNonTextAttributes);
     const isManaged = useSelector(selectIsManaged);
     const embeddings = useSelector(selectEmbeddings);
     const projectId = useSelector(selectProjectId);
@@ -42,11 +34,6 @@ export default function Embeddings(props: EmbeddingProps) {
     const [loadingEmbeddingsDict, setLoadingEmbeddingsDict] = useState<{ [key: string]: boolean }>({});
     const [showEditOption, setShowEditOption] = useState(false);
     const [filterAttributesUpdate, setFilterAttributesUpdate] = useState([]);
-    const [checkedAttributes, setCheckedAttributes] = useState([]);
-
-    const [refetchDeleteEmbedding] = useMutation(DELETE_EMBEDDING);
-    const [refetchDeleteTaskQueue] = useMutation(DELETE_FROM_TASK_QUEUE);
-    const [updateEmbeddingPayloadMut] = useMutation(UPDATE_EMBEDDING_PAYLOAD);
 
     useEffect(unsubscribeWSOnDestroy(router, [CurrentPage.PROJECT_SETTINGS]), []);
 
@@ -59,70 +46,6 @@ export default function Embeddings(props: EmbeddingProps) {
             func: handleWebsocketNotification
         });
     }, []);
-
-    const deleteEmbedding = useCallback(() => {
-        const embeddingId = modalDeleteEmbedding.embeddingId;
-        if (!embeddingId) return;
-        if (modalDeleteEmbedding.isQueuedElement) {
-            refetchDeleteTaskQueue({ variables: { projectId: projectId, taskId: embeddingId } }).then((res) => {
-                dispatch(removeFromAllEmbeddingsById(embeddingId));
-            });
-        } else {
-            refetchDeleteEmbedding({ variables: { projectId: projectId, embeddingId: embeddingId } }).then((res) => {
-                dispatch(removeFromAllEmbeddingsById(embeddingId));
-            });
-        }
-    }, [modalDeleteEmbedding]);
-
-    useEffect(() => {
-        const abortButtonCopy = jsonCopy(abortButton);
-        abortButtonCopy.buttonCaption = modalDeleteEmbedding.isQueuedElement ? 'Dequeue embedding' : 'Delete embedding';
-        abortButtonCopy.emitFunction = deleteEmbedding;
-        setAbortButton(abortButtonCopy);
-    }, [modalDeleteEmbedding]);
-
-    const saveFilteredAttributes = useCallback(() => {
-        setShowEditOption(false);
-        dispatch(setModalStates(ModalEnum.FILTERED_ATTRIBUTES, { showEditOption: false }));
-        updateEmbeddingPayloadMut({ variables: { projectId: projectId, embeddingId: modalFilteredAttributes.embeddingId, filterAttributes: JSON.stringify(filterAttributesUpdate) } }).then((res) => { });
-    }, [filterAttributesUpdate]);
-
-    const editFilteredAttributes = useCallback(() => {
-        setShowEditOption(true);
-        dispatch(setModalStates(ModalEnum.FILTERED_ATTRIBUTES, { showEditOption: true }));
-    }, [modalFilteredAttributes]);
-
-    useEffect(() => {
-        const editButtonCopy = jsonCopy(editButton);
-        editButtonCopy.emitFunction = editFilteredAttributes;
-        setEditButton(editButtonCopy);
-    }, [modalFilteredAttributes]);
-
-    useEffect(() => {
-        const editButtonCopy = jsonCopy(editButton);
-        editButtonCopy.useButton = !showEditOption;
-        setEditButton(editButtonCopy);
-        const acceptButtonCopy = jsonCopy(acceptButton);
-        acceptButtonCopy.useButton = showEditOption;
-        acceptButtonCopy.emitFunction = saveFilteredAttributes;
-        setAcceptButton(acceptButtonCopy);
-    }, [showEditOption]);
-
-    const [abortButton, setAbortButton] = useState<ModalButton>(ABORT_BUTTON);
-    const [editButton, setEditButton] = useState<ModalButton>(EDIT_BUTTON);
-    const [acceptButton, setAcceptButton] = useState<ModalButton>(ACCEPT_BUTTON);
-
-
-    useEffect(() => {
-        if (!usableAttributes) return;
-        if (!modalFilteredAttributes.attributeNames) return;
-        const updated = usableAttributes.map((attribute) => {
-            const attributeCopy = jsonCopy(attribute);
-            attributeCopy.checked = modalFilteredAttributes.attributeNames.find((a) => a.name == attribute.name) != undefined;
-            return attributeCopy;
-        });
-        setCheckedAttributes(updated);
-    }, [usableAttributes, modalFilteredAttributes]);
 
     function prepareAttributeDataByNames(attributesNames: string[]) {
         if (!attributesNames) return [];
@@ -268,34 +191,14 @@ export default function Embeddings(props: EmbeddingProps) {
                 </Tooltip>
             </div>
         </div>
-        <Modal modalName={ModalEnum.FILTERED_ATTRIBUTES} acceptButton={acceptButton} backButton={editButton}>
-            <div className="flex flex-grow justify-center text-lg leading-6 text-gray-900 font-medium">Edit embedding with filter attributes</div>
-            <div className="my-2 flex flex-grow justify-center text-sm text-gray-500 text-center">
-                List of filter attributes selected when creating an embedding</div>
-            {modalFilteredAttributes.attributeNames && modalFilteredAttributes.attributeNames.length == 0 ? <div className="text-xs text-gray-500 text-center italic">No filter attributes selected</div> : <div className="flex justify-center items-center">
-                {modalFilteredAttributes.attributeNames.map((attribute) => (
-                    <Tooltip content={attribute.dataType} color="invert" placement="top" key={attribute.id} className="cursor-auto">
-                        <span className={`border items-center px-2 py-0.5 rounded text-xs font-medium text-center mr-2 bg-${attribute.color}-100 text-${attribute.color}-700 border-${attribute.color}-400 hover:bg-${attribute.color}-200`}>{attribute.name}</span>
-                    </Tooltip>
-                ))}
-            </div>}
-            {modalFilteredAttributes.showEditOption && <div className="mt-3">
-                <div className="text-xs text-gray-500 text-center italic">Add or remove filter attributes</div>
-                <Dropdown options={usableAttributes.map(a => a.name)} buttonName={filterAttributesUpdate.length == 0 ? 'None selected' : filterAttributesUpdate.join(',')} hasCheckboxes={true}
-                    selectedCheckboxes={checkedAttributes.map(a => a.checked)} hasSelectAll={true}
-                    selectedOption={(option: any) => {
-                        const attributes = option.filter((o: any) => o.checked).map((o: any) => o.name);
-                        setFilterAttributesUpdate(attributes);
-                    }} />
-            </div>}
-        </Modal>
-        <Modal modalName={ModalEnum.DELETE_EMBEDDING} abortButton={abortButton}>
-            <div className="flex flex-grow justify-center text-lg leading-6 text-gray-900 font-medium">
-                Warning </div>
-            <p className="mt-2 text-gray-500 text-sm">Are you sure you want to {modalDeleteEmbedding.isQueuedElement ? 'dequeue' : 'delete'} this embedding?</p>
-            {!modalDeleteEmbedding.isQueuedElement && <p className="mt-2 text-gray-500 text-sm">This will delete all corresponding tensors!</p>}
 
-        </Modal>
-        <AddNewEmbedding refetchWS={props.refetchWS} />
+        <FilterAttributesModal
+            showEditOption={showEditOption}
+            setShowEditOption={(value) => setShowEditOption(value)}
+            filterAttributesUpdate={filterAttributesUpdate}
+            setFilterAttributesUpdate={(value) => setFilterAttributesUpdate(value)} />
+
+        <DeleteEmbeddingModal />
+        <AddNewEmbeddingModal refetchWS={props.refetchWS} />
     </div>);
 }
