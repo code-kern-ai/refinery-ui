@@ -133,7 +133,10 @@ export function parseRecordData(element, labelingTasks: LabelingTask[]) {
             element.rla_aggregation[key].id = key;
         }
         const len = Object.keys(element.rla_aggregation).length;
-        if (len && len != countWsRelated) element.wsHint = (len - countWsRelated) + " elements aren't visible because of your config settings";
+        if (len && len != countWsRelated) {
+            if ((len - countWsRelated) == 1) element.wsHint = "1 element isn't visible because of your config settings";
+            else element.wsHint = (len - countWsRelated) + " elements aren't visible because of your config settings";
+        }
         else element.wsHint = "";
     }
     return element.rla_aggregation;

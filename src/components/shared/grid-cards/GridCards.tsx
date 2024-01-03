@@ -11,7 +11,6 @@ import { useMutation } from "@apollo/client";
 import { TOGGLE_HEURISTICS_SELECTED } from "@/src/services/gql/mutations/heuristics";
 import { useRouter } from "next/router";
 import Statuses from "../statuses/Statuses";
-import { useConsoleLog } from "@/submodules/react-components/hooks/useConsoleLog";
 
 export default function GridCards(props: GridCardsProps) {
     const router = useRouter();

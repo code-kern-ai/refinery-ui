@@ -668,7 +668,7 @@ export default function SearchGroups() {
                                     </div>
                                     <span className="label-text truncate w-full pl-2">Only with different results</span>
                                 </div>
-                                {fullSearch[group.key].groupElements['heuristics'].map((groupItem, index) => (<div key={groupItem.id} className={`my-1 ${selectedHeuristicsWS.includes(groupItem['name']) && configuration.weakSupervisionRelated ? '' : 'hidden'}`} >
+                                {fullSearch[group.key].groupElements['heuristics'].map((groupItem, index) => (<div key={groupItem.id} className="my-1" >
                                     <div className="flex flex-row items-center">
                                         <div onClick={() => setActiveNegateGroup(groupItem, index, group, true)} style={{ backgroundColor: groupItem.color, borderColor: groupItem.color }}
                                             className="ml-2 mr-2 h-4 w-4 border-gray-300 border rounded cursor-pointer hover:bg-gray-200">
