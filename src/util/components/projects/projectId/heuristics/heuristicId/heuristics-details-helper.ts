@@ -23,7 +23,7 @@ export function postProcessCurrentHeuristic(heuristic: Heuristic, labelingTasks:
     prepareHeuristic.labelingTaskType = labelingTask.taskType;
 
     if (prepareHeuristic.lastTask) {
-        const task = jsonCopy(prepareHeuristic.lastTask);
+        const task = { ...prepareHeuristic.lastTask };
         if (task.createdAt && task.finishedAt) {
             task.durationText = timeDiffCalc(dateAsUTCDate(new Date(task.createdAt)), dateAsUTCDate(new Date(task.finishedAt)));
         }
@@ -53,7 +53,7 @@ export function getClassLine(className: string = null, labelingTasks: LabelingTa
 
 export function postProcessLastTaskLogs(lastTask: any) {
     if (!lastTask) return null;
-    const payload = jsonCopy(lastTask);
+    const payload = { ...lastTask };
     payload.logs = parseContainerLogsData(payload.logs, payload.informationSource.type);
     return payload.logs;
 }

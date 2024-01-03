@@ -175,7 +175,7 @@ export function filterRlaLabelCondition(rla: any, settings, projectId): boolean 
     let taskSettings = settings.task[projectId][taskId];
     if (!taskSettings) {
         taskSettings = {};
-        const settingsCopy = jsonCopy(settings);
+        const settingsCopy = { ...settings };
         settingsCopy.task[projectId][taskId] = taskSettings;
     }
     let rlaSettings: LabelingSuiteTaskHeaderLabelSettings = taskSettings[rla.labelingTaskLabelId];

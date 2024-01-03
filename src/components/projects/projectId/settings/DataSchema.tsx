@@ -41,7 +41,7 @@ export default function DataSchema(props: DataSchemaProps) {
 
 
     function updatePrimaryKey(attribute: Attribute) {
-        const attributeNew = jsonCopy(attribute);
+        const attributeNew = { ...attribute };
         attributeNew.isPrimaryKey = !attributeNew.isPrimaryKey;
         updateAttributeMut({ variables: { projectId: projectId, attributeId: attributeNew.id, isPrimaryKey: attributeNew.isPrimaryKey } }).then(() => {
             dispatch(updateAttributeById(attributeNew));
@@ -50,7 +50,7 @@ export default function DataSchema(props: DataSchemaProps) {
 
     function updateVisibility(option: string, attribute: Attribute) {
         const visibility = ATTRIBUTES_VISIBILITY_STATES.find((state) => state.name === option).value;
-        const attributeNew = jsonCopy(attribute);
+        const attributeNew = { ...attribute };
         attributeNew.visibility = visibility;
         attributeNew.visibilityIndex = ATTRIBUTES_VISIBILITY_STATES.findIndex((state) => state.name === option);
         updateAttributeMut({ variables: { projectId: projectId, attributeId: attribute.id, visibility: attributeNew.visibility } }).then(() => {

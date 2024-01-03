@@ -41,16 +41,16 @@ export default function FilterAttributesModal(props: FilterAttributesModalProps)
     }, [modalFilteredAttributes]);
 
     useEffect(() => {
-        const editButtonCopy = jsonCopy(editButton);
+        const editButtonCopy = { ...editButton };
         editButtonCopy.emitFunction = editFilteredAttributes;
         setEditButton(editButtonCopy);
     }, [modalFilteredAttributes]);
 
     useEffect(() => {
-        const editButtonCopy = jsonCopy(editButton);
+        const editButtonCopy = { ...editButton }
         editButtonCopy.useButton = !props.showEditOption;
         setEditButton(editButtonCopy);
-        const acceptButtonCopy = jsonCopy(acceptButton);
+        const acceptButtonCopy = { ...acceptButton };
         acceptButtonCopy.useButton = props.showEditOption;
         acceptButtonCopy.emitFunction = saveFilteredAttributes;
         setAcceptButton(acceptButtonCopy);
@@ -60,7 +60,7 @@ export default function FilterAttributesModal(props: FilterAttributesModalProps)
         if (!usableAttributes) return;
         if (!modalFilteredAttributes.attributeNames) return;
         const updated = usableAttributes.map((attribute) => {
-            const attributeCopy = jsonCopy(attribute);
+            const attributeCopy = { ...attribute };
             attributeCopy.checked = modalFilteredAttributes.attributeNames.find((a) => a.name == attribute.name) != undefined;
             return attributeCopy;
         });

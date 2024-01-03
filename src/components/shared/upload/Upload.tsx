@@ -111,7 +111,7 @@ export default function Upload(props: UploadProps) {
                     setDoingSomething(false);
                 }
             } else {
-                const uploadTaskSave = jsonCopy(uploadTask);
+                const uploadTaskSave = { ...uploadTask };
                 uploadTaskSave.state = msgParts[4];
                 UploadHelper.setUploadTask(uploadTaskSave);
             }

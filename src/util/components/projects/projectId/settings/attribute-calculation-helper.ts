@@ -8,7 +8,7 @@ import { ATTRIBUTES_VISIBILITY_STATES, DATA_TYPES } from "./data-schema-helper";
 
 export function postProcessCurrentAttribute(attribute: Attribute): Attribute {
     if (!attribute) return null;
-    const prepareAttribute = jsonCopy(attribute);
+    const prepareAttribute = { ...attribute };
     prepareAttribute.logs = parseContainerLogsData(prepareAttribute.logs);
     prepareAttribute.progress = Number(prepareAttribute.progress?.toFixed(2));
     prepareAttribute.dataTypeName = DATA_TYPES.find((type) => type.value === attribute?.dataType).name;

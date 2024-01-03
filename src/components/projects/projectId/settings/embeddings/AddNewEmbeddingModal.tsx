@@ -85,7 +85,7 @@ export default function AddNewEmbeddingModal(props: EmbeddingProps) {
         if (!targetAttribute || !platform) return;
         const platformVal = embeddingPlatforms.find((p: EmbeddingPlatform) => p.name == platform).platform;
         const suggestionList = embeddingHandlesAll.filter((suggestion: any) => suggestion.platform == platformVal);
-        const embeddingHandlesCopy = jsonCopy(embeddingHandles);
+        const embeddingHandlesCopy = { ...embeddingHandles };
         embeddingHandlesCopy[targetAttribute] = suggestionList;
         dispatch(setAllRecommendedEncodersDict(embeddingHandlesCopy));
     }
@@ -120,7 +120,7 @@ export default function AddNewEmbeddingModal(props: EmbeddingProps) {
             }
         }
         checkIfAttributeHasToken();
-        const acceptButtonCopy = jsonCopy(ACCEPT_BUTTON);
+        const acceptButtonCopy = { ...ACCEPT_BUTTON };
         acceptButtonCopy.disabled = checkIfCreateEmbeddingIsDisabled({ platform, model, apiToken, termsAccepted, embeddings, targetAttribute, granularity, engine, url, version, embeddingPlatforms });
         setAcceptButton(acceptButtonCopy);
         setTermsAccepted(false);
@@ -142,20 +142,20 @@ export default function AddNewEmbeddingModal(props: EmbeddingProps) {
         const getAzureEngine = localStorage.getItem('azureEngines');
 
         if (getAzureUrl == undefined || !azureUrls.includes(url)) {
-            const azureUrlsCopy = jsonCopy(azureUrls);
+            const azureUrlsCopy = { ...azureUrls };
             azureUrlsCopy.push(url);
             setAzureUrls(azureUrlsCopy);
             localStorage.setItem('azureUrls', JSON.stringify(azureUrlsCopy));
         }
         if (getAzureVersion == undefined || !azureVersions.includes(version)) {
-            const azureVersionsCopy = jsonCopy(azureVersions);
+            const azureVersionsCopy = { ...azureVersions };
             azureVersionsCopy.push(version);
             setAzureUrls(azureVersionsCopy);
             localStorage.setItem('azureVersions', JSON.stringify(azureVersionsCopy));
         }
 
         if (getAzureEngine == undefined || !azureEngines.includes(engine)) {
-            const azureEnginesCopy = jsonCopy(azureEngines);
+            const azureEnginesCopy = { ...azureEngines };
             azureEnginesCopy.push(engine);
             setAzureUrls(azureEnginesCopy);
             localStorage.setItem('azureEngines', JSON.stringify(azureEnginesCopy));

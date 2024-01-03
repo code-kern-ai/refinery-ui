@@ -160,7 +160,6 @@ export default function ZeroShot() {
                 if ("finished" == msgParts[2]) setIsModelDownloading(false);
             }
         } else if (msgParts[1] == 'zero-shot') {
-            if (msgParts[2] != currentHeuristic.lastTask.id) return;
             if (msgParts[3] == 'progress') {
                 dispatch(updateHeuristicsState(currentHeuristic.id, { lastTask: { progress: Number(msgParts[4]), state: Status.CREATED, id: msgParts[2] } }))
             } else if (msgParts[3] == 'state') {

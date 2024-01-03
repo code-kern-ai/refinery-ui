@@ -213,7 +213,7 @@ export default function ProjectOverview() {
         refetchInterAnnotator({ variables: { projectId: projectId, labelingTaskId: labelingTaskId, includeGoldStar: values.goldUser, includeAllOrgUser: values.allUsers, onlyOnStaticSlice: values.dataSlice } }).then((res) => {
             if (res['data'] == null) return;
             const matrix = res['data']['interAnnotatorMatrix'];
-            const matrixCopy = jsonCopy(matrix);
+            const matrixCopy = { ...matrix };
             matrixCopy.allUsers = addUserName(matrixCopy.allUsers);
             setInterAnnotatorMatrix(matrixCopy);
         });
@@ -228,7 +228,7 @@ export default function ProjectOverview() {
     }
 
     function getProjectStats() {
-        const projectStatsCopy = jsonCopy(projectStats);
+        const projectStatsCopy = { ...projectStats };
         projectStatsCopy.generalLoading = true;
         projectStatsCopy.interAnnotatorLoading = true;
         setProjectStats(projectStatsCopy);

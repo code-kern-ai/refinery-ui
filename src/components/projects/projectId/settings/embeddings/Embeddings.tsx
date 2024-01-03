@@ -52,7 +52,7 @@ export default function Embeddings(props: EmbeddingProps) {
         const attributesNew = [];
         for (let name of attributesNames) {
             const attribute = attributes.find((a) => a.name == name);
-            const attributeCopy = jsonCopy(attribute);
+            const attributeCopy = { ...attribute };
             attributeCopy.color = getColorForDataType(attribute.dataType);
             attributeCopy.dataTypeName = DATA_TYPES.find((type) => type.value === attribute.dataType).name;
             attributeCopy.checked = true;
@@ -64,12 +64,12 @@ export default function Embeddings(props: EmbeddingProps) {
 
     const handleWebsocketNotification = useCallback((msgParts: string[]) => {
         if (msgParts[1] == 'embedding_updated') {
-            const loadingEmbeddingsDictCopy = jsonCopy(loadingEmbeddingsDict);
+            const loadingEmbeddingsDictCopy = { ...loadingEmbeddingsDict }
             delete loadingEmbeddingsDictCopy[msgParts[2]];
             setLoadingEmbeddingsDict(loadingEmbeddingsDictCopy);
         } else if (msgParts[1] == 'upload_embedding_payload') {
             if (loadingEmbeddingsDict[msgParts[2]] == undefined) {
-                const loadingEmbeddingsDictCopy = jsonCopy(loadingEmbeddingsDict);
+                const loadingEmbeddingsDictCopy = { ...loadingEmbeddingsDict };
                 loadingEmbeddingsDictCopy[msgParts[2]] = true;
                 setLoadingEmbeddingsDict(loadingEmbeddingsDictCopy);
             }

@@ -113,7 +113,7 @@ export default function LookupListsDetails() {
     }
 
     function changeLookupList(name: string, property: string) {
-        const lookupListCopy = jsonCopy(lookupList);
+        const lookupListCopy = { ...lookupList };
         lookupListCopy[property] = name;
         setLookupList(lookupListCopy);
     }

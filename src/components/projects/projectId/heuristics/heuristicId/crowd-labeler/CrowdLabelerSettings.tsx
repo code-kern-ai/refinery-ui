@@ -52,7 +52,7 @@ export default function CrowdLabelerSettings() {
     }
 
     function changeSettings(attributeName: string, newValue: any, saveToDb: boolean = true) {
-        const crowdLabelerSettingsCopy = jsonCopy(currentHeuristic.crowdLabelerSettings);
+        const crowdLabelerSettingsCopy = { ...currentHeuristic.crowdLabelerSettings };
         if (attributeName == 'annotatorId') {
             crowdLabelerSettingsCopy[attributeName] = annotators.find(a => a.mail == newValue)?.id ?? newValue;
         } else if (attributeName == 'dataSliceId') {

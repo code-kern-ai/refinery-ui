@@ -23,7 +23,7 @@ export function postProcessZeroShot(heuristic: Heuristic, labelingTasks: Labelin
     prepareHeuristic.labels = labelingTask.labels;
     prepareHeuristic.lastTask = heuristic['lastPayload'];
     if (prepareHeuristic.lastTask) {
-        const task = jsonCopy(prepareHeuristic.lastTask);
+        const task = { ...prepareHeuristic.lastTask }
         if (task.createdAt && task.finishedAt) {
             task.durationText = timeDiffCalc(dateAsUTCDate(new Date(task.createdAt)), dateAsUTCDate(new Date(task.finishedAt)));
         }

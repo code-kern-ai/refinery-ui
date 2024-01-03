@@ -28,7 +28,7 @@ export default function ProjectMetaData() {
         if (projectName === '') setProjectName(project.name);
         if (projectDescription === '') setProjectDescription(project.description);
         updateProjectNameAndDescMut({ variables: { projectId: project.id, name: projectName, description: projectDescription } }).then((res) => {
-            const activeProject = jsonCopy(project);
+            const activeProject = { ...project };
             activeProject.name = projectName;
             activeProject.description = projectDescription;
             dispatch(setActiveProject(activeProject));

@@ -88,7 +88,7 @@ export function checkSelectedHeuristics(heuristics: Heuristic[], onlyValid: bool
 
 export function postProcessCurrentWeakSupervisionRun(currentWeakSupervision: CurrentWeakSupervision): CurrentWeakSupervision {
     if (!currentWeakSupervision) return null;
-    const prepareWeakSupervision = jsonCopy(currentWeakSupervision);
+    const prepareWeakSupervision = { ...currentWeakSupervision };
     if (currentWeakSupervision.user.firstName) {
         prepareWeakSupervision.displayName = currentWeakSupervision.user.firstName[0] + '. ' + currentWeakSupervision.user.lastName;
     } else {

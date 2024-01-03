@@ -15,7 +15,7 @@ export function postProcessLookupLists(lookupLists: LookupList[]) {
 }
 
 export function postProcessLookupList(lookupList: LookupList) {
-    const prepareLookupList = jsonCopy(lookupList);
+    const prepareLookupList = { ...lookupList };
     prepareLookupList.pythonVariable = asPythonVariable(lookupList.name);
     return prepareLookupList;
 }

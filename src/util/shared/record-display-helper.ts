@@ -2,7 +2,7 @@ import { Attribute } from "@/src/types/components/projects/projectId/settings/da
 import { jsonCopy } from "@/submodules/javascript-functions/general";
 
 export function postProcessRecord(record: any, attributes: Attribute[]) {
-    const prepareRecord = jsonCopy(record);
+    const prepareRecord = { ...record };
     if (!prepareRecord.hasOwnProperty('data')) {
         if (prepareRecord.hasOwnProperty('fullRecordData')) {
             prepareRecord.data = prepareRecord.fullRecordData;

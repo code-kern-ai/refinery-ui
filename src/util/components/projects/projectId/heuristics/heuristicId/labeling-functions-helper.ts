@@ -16,7 +16,7 @@ export function embeddingRelevant(embedding: Embedding, attributes: Attribute[],
 }
 
 export function postProcessSampleRecordsFromBE(sampleRecords: any) {
-    const prepareSampleRecords = jsonCopy(sampleRecords);
+    const prepareSampleRecords = { ...sampleRecords };
     prepareSampleRecords.records = prepareSampleRecords.records.map((record: any) => {
         return {
             calculatedLabels: record['calculatedLabels'],

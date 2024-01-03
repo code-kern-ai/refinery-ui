@@ -35,7 +35,7 @@ export default function DeleteEmbeddingModal() {
     }, [modalDeleteEmbedding]);
 
     useEffect(() => {
-        const abortButtonCopy = jsonCopy(abortButton);
+        const abortButtonCopy = { ...abortButton };
         abortButtonCopy.buttonCaption = modalDeleteEmbedding.isQueuedElement ? 'Dequeue embedding' : 'Delete embedding';
         abortButtonCopy.emitFunction = deleteEmbedding;
         setAbortButton(abortButtonCopy);

@@ -60,7 +60,7 @@ export default function LabelingMainComponent() {
 
     useEffect(() => {
         if (!projectId) return;
-        let settingsCopy = jsonCopy(settings);
+        let settingsCopy = { ...settings };
         settingsCopy = getDefaultLabelingSuiteSettings();
         let tmp = localStorage.getItem(LOCAL_STORAGE_KEY);
         if (tmp) {

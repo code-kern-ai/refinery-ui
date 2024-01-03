@@ -176,13 +176,13 @@ export default function ProjectSettings() {
                             refetchEmbeddingsAndPostProcess();
                         }
                         else {
-                            const embedding = jsonCopy(e);
+                            const embedding = { ...e };
                             embedding.state = msgParts[4];
                             dispatch(setAllEmbeddings(embeddings.map((e) => e.id == embedding.id ? embedding : e)));
                         }
                     }
                     else if (msgParts[3] == "progress") {
-                        const embedding = jsonCopy(e);
+                        const embedding = { ...e };
                         embedding.progress = Number(msgParts[4]);
                         dispatch(setAllEmbeddings(embeddings.map((e) => e.id == embedding.id ? embedding : e)));
                     }

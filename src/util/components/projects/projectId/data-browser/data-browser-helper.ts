@@ -64,11 +64,11 @@ export function updateSliceInfoHelper(slice: DataSlice, projectId: string, users
 
 export function postProcessUsersCount(usersCount: any, users: User[]) {
     const usersMapCount = {}
-    const prepareUsersCount = jsonCopy(usersCount[0]);
+    const prepareUsersCount = { ...usersCount[0] };
     prepareUsersCount.counts = JSON.parse(prepareUsersCount.counts);
     users.forEach(user => {
         let sum = 0;
-        const userCopy = jsonCopy(user);
+        const userCopy = { ...user };
         if (prepareUsersCount.counts) prepareUsersCount.counts.forEach(e => {
             sum += e.count;
             e.source = labelSourceToString(e.source_type);
@@ -89,7 +89,7 @@ export const DATA_BROWSER_TABLE_COLUMN_HEADERS: ColumnData[] = [
 ]
 
 export function postProcessRecordsExtended(searchRecordsExtended, labelingTasks: LabelingTask[]) {
-    const prepareRecordsExtended = jsonCopy(searchRecordsExtended);
+    const prepareRecordsExtended = { ...searchRecordsExtended };
     const recordList = prepareRecordsExtended.recordList.map((record, index) => {
         const recordData = JSON.parse(record.recordData);
         recordData.rla_aggregation = parseRecordData(recordData, labelingTasks);

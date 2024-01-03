@@ -89,7 +89,7 @@ export function prepareTableData(tableData: any[] | {}): any[] {
 }
 
 export function fillColorInfo(element: any): void {
-    const elementCopy = jsonCopy(element);
+    const elementCopy = { ...element };
     if (!elementCopy.color) return;
     const color = elementCopy.color;
     if (!elementCopy.hasOwnProperty('backgroundColor')) {

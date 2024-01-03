@@ -6,7 +6,7 @@ export function postProcessProjectsList(projects: Project[]): Project[] {
     if (!projects) return [];
     const projectsProcessed: Project[] = projects.filter(a => a.status != ProjectStatus.IN_DELETION && a.status != ProjectStatus.HIDDEN)
         .map((project: Project) => {
-            const projectItemCopy = jsonCopy(project);
+            const projectItemCopy = { ...project };
             projectItemCopy.timeStamp = parseUTC(projectItemCopy.createdAt);
             const splitDateTime = projectItemCopy.timeStamp.split(',');
             projectItemCopy.date = splitDateTime[0].trim();

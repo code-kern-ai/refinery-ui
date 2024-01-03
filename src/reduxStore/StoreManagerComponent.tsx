@@ -54,7 +54,7 @@ export function GlobalStoreDataComponent(props: React.PropsWithChildren) {
             dispatch(setIsAdmin(data.data.isAdmin));
         });
         refetchUserInfo().then((res) => {
-            const userInfo = jsonCopy(res.data["userInfo"]);
+            const userInfo = { ...res.data["userInfo"] };
             userInfo.avatarUri = getUserAvatarUri(res.data["userInfo"]);
             dispatch(setUser(userInfo));
         });
