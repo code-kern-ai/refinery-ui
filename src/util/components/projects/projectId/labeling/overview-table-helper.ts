@@ -6,6 +6,7 @@ import { informationSourceTypeToString, labelSourceToString } from "@/submodules
 import { InformationSourceType, LabelSource } from "@/submodules/javascript-functions/enums/enums";
 import { ALL_USERS_USER_ID, GOLD_STAR_USER_ID, getDefaultTaskOverviewLabelSettings } from "./labeling-main-component-helper";
 import { LabelingSuiteTaskHeaderLabelSettings } from "@/src/types/components/projects/projectId/labeling/settings";
+import { jsonCopy } from "@/submodules/javascript-functions/general";
 
 export function rlasHaveHeuristicData(rlas): boolean {
     if (!rlas) return false;
@@ -173,7 +174,7 @@ export function filterRlaLabelCondition(rla: any, settings, projectId): boolean 
     let taskSettings = settings.task[projectId][taskId];
     if (!taskSettings) {
         taskSettings = {};
-        const settingsCopy = { ...settings };
+        const settingsCopy = jsonCopy(settings);
         settingsCopy.task[projectId][taskId] = taskSettings;
     }
     let rlaSettings: LabelingSuiteTaskHeaderLabelSettings = taskSettings[rla.labelingTaskLabelId];
