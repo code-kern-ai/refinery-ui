@@ -1,6 +1,5 @@
 import { ChartData, LabelDistribution } from "@/src/types/components/projects/projectId/project-overview/charts";
-import { ProjectOverviewFilters, ProjectStats } from "@/src/types/components/projects/projectId/project-overview/project-overview";
-import { jsonCopy } from "@/submodules/javascript-functions/general";
+import { ProjectOverviewFilters } from "@/src/types/components/projects/projectId/project-overview/project-overview";
 import { GOLD_STAR_USER_ID } from "../labeling/labeling-main-component-helper";
 
 export function changeDataStructure(labelDistribution: LabelDistribution): ChartData {

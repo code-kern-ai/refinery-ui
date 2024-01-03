@@ -4,7 +4,7 @@ import { WebSocketsService } from "@/src/services/base/web-sockets/WebSocketsSer
 import { GET_OVERVIEW_STATS, GET_PROJECT_LIST } from "@/src/services/gql/queries/projects";
 import { Project, ProjectStatistics } from "@/src/types/components/projects/projects-list";
 import { CurrentPage } from "@/src/types/shared/general";
-import { jsonCopy, percentRoundString } from "@/submodules/javascript-functions/general";
+import { percentRoundString } from "@/submodules/javascript-functions/general";
 import { useLazyQuery, useMutation } from "@apollo/client";
 import { useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";

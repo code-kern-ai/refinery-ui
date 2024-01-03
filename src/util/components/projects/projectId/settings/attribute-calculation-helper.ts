@@ -1,6 +1,5 @@
 import { Attribute } from "@/src/types/components/projects/projectId/settings/data-schema";
 import { AttributeCalculationExamples, AttributeCodeLookup } from "@/src/util/classes/attribute-calculation";
-import { jsonCopy } from "@/submodules/javascript-functions/general";
 import { parseContainerLogsData } from "@/submodules/javascript-functions/logs-parser";
 import { getPythonFunctionRegExMatch } from "@/submodules/javascript-functions/python-functions-parser";
 import { Record } from "@/src/types/components/projects/projectId/settings/attribute-calculation";

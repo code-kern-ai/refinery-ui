@@ -6,7 +6,6 @@ import { ExecutionContainerProps, SampleRecord } from "@/src/types/components/pr
 import { AttributeState } from "@/src/types/components/projects/projectId/settings/data-schema";
 import { ModalEnum } from "@/src/types/shared/modal";
 import { postProcessRecordByRecordId } from "@/src/util/components/projects/projectId/settings/attribute-calculation-helper";
-import { jsonCopy } from "@/submodules/javascript-functions/general";
 import { useLazyQuery } from "@apollo/client";
 import { Tooltip } from "@nextui-org/react";
 import { useState } from "react";

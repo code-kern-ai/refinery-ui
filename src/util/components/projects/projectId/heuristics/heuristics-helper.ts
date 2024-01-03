@@ -1,7 +1,5 @@
 import { CurrentWeakSupervision, Heuristic } from "@/src/types/components/projects/projectId/heuristics/heuristics";
 import { InformationSourceType, LabelSource } from "@/submodules/javascript-functions/enums/enums";
-import { Color } from "@/src/types/components/projects/projectId/heuristics/heuristics";
-import { jsonCopy } from "@/submodules/javascript-functions/general";
 import { InformationSourceCodeLookup, InformationSourceExamples } from "@/src/util/classes/heuristics";
 import { LabelingTaskTaskType } from "@/src/types/components/projects/projectId/settings/labeling-tasks";
 import { UNKNOWN_USER } from "@/src/util/constants";

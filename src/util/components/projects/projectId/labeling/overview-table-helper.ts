@@ -5,9 +5,7 @@ import { UserRole } from "@/src/types/shared/sidebar";
 import { informationSourceTypeToString, labelSourceToString } from "@/submodules/javascript-functions/enums/enum-functions";
 import { InformationSourceType, LabelSource } from "@/submodules/javascript-functions/enums/enums";
 import { ALL_USERS_USER_ID, GOLD_STAR_USER_ID, getDefaultTaskOverviewLabelSettings } from "./labeling-main-component-helper";
-import { UserManager } from "@/src/util/classes/labeling/user-manager";
 import { LabelingSuiteTaskHeaderLabelSettings } from "@/src/types/components/projects/projectId/labeling/settings";
-import { jsonCopy } from "@/submodules/javascript-functions/general";
 
 export function rlasHaveHeuristicData(rlas): boolean {
     if (!rlas) return false;

@@ -8,7 +8,6 @@ import { Attribute, DataSchemaProps } from "@/src/types/components/projects/proj
 import { CurrentPage } from "@/src/types/shared/general";
 import { ATTRIBUTES_VISIBILITY_STATES, getTooltipVisibilityState } from "@/src/util/components/projects/projectId/settings/data-schema-helper";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
-import { jsonCopy } from "@/submodules/javascript-functions/general";
 import Dropdown from "@/submodules/react-components/components/Dropdown";
 import { useMutation } from "@apollo/client";
 import { Tooltip } from "@nextui-org/react";

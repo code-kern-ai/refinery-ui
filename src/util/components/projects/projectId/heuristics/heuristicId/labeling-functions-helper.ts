@@ -2,7 +2,6 @@ import { Attribute } from "@/src/types/components/projects/projectId/settings/da
 import { Embedding } from "@/src/types/components/projects/projectId/settings/embeddings";
 import { LabelingTask, LabelingTaskTaskType } from "@/src/types/components/projects/projectId/settings/labeling-tasks";
 import { InformationSourceType } from "@/submodules/javascript-functions/enums/enums";
-import { jsonCopy } from "@/submodules/javascript-functions/general";
 import { parseContainerLogsData } from "@/submodules/javascript-functions/logs-parser";
 import { getColorStruct } from "../shared-helper";
 import { extendArrayElementsByUniqueId } from "@/submodules/javascript-functions/id-prep";

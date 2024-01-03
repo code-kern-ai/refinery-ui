@@ -25,7 +25,6 @@ import { postProcessingEmbeddings, postProcessingRecommendedEncoders } from "@/s
 import { AttributeState } from "@/src/types/components/projects/projectId/settings/data-schema";
 import { RecommendedEncoder } from "@/src/types/components/projects/projectId/settings/embeddings";
 import LabelingTasks from "./labeling-tasks/LabelingTasks";
-import { jsonCopy } from "@/submodules/javascript-functions/general";
 import { unsubscribeWSOnDestroy } from "@/src/services/base/web-sockets/web-sockets-helper";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
 import Export from "@/src/components/shared/export/Export";

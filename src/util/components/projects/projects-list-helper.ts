@@ -1,6 +1,5 @@
 import { Project, ProjectStatus } from "@/src/types/components/projects/projects-list";
 import { parseUTC } from "@/submodules/javascript-functions/date-parser";
-import { jsonCopy } from "@/submodules/javascript-functions/general";
 
 export function postProcessProjectsList(projects: Project[]): Project[] {
     if (!projects) return [];

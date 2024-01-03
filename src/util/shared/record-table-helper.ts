@@ -1,6 +1,3 @@
-import { jsonCopy } from "@/submodules/javascript-functions/general";
-import { extendArrayElementsByUniqueId } from "@/submodules/javascript-functions/id-prep";
-
 export const WEAK_SUPERVISION = 'Weak Supervision';
 
 export function prepareColumnsData(columnsData: any[] | {}): any[] {

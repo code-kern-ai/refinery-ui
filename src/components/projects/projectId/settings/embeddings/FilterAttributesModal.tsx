@@ -5,7 +5,6 @@ import { selectProjectId } from "@/src/reduxStore/states/project";
 import { UPDATE_EMBEDDING_PAYLOAD } from "@/src/services/gql/mutations/project-settings";
 import { FilterAttributesModalProps } from "@/src/types/components/projects/projectId/settings/embeddings";
 import { ModalButton, ModalEnum } from "@/src/types/shared/modal";
-import { jsonCopy } from "@/submodules/javascript-functions/general";
 import Dropdown from "@/submodules/react-components/components/Dropdown";
 import { useMutation } from "@apollo/client";
 import { Tooltip } from "@nextui-org/react";

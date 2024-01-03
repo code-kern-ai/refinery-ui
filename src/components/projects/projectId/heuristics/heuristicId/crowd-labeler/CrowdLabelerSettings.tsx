@@ -8,7 +8,7 @@ import { GET_ACCESS_LINK } from "@/src/services/gql/queries/heuristics";
 import { parseToSettingsJson } from "@/src/util/components/projects/projectId/heuristics/heuristicId/crowd-labeler-helper";
 import { buildFullLink, parseLinkFromText } from "@/src/util/shared/link-parser-helper";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
-import { copyToClipboard, jsonCopy } from "@/submodules/javascript-functions/general";
+import { copyToClipboard } from "@/submodules/javascript-functions/general";
 import Dropdown from "@/submodules/react-components/components/Dropdown";
 import { useLazyQuery, useMutation } from "@apollo/client";
 import { Tooltip } from "@nextui-org/react";
