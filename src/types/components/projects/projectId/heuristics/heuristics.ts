@@ -88,3 +88,9 @@ export type CurrentWeakSupervision = {
     selectedLabelingTasks: string;
     state: string;
 }
+
+export type DeleteHeuristicsModalProps = {
+    countSelected: number;
+    selectionList: string;
+    refetch: () => void;
+};

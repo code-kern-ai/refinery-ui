@@ -1,18 +1,17 @@
 import { selectProjectId } from "@/src/reduxStore/states/project";
 import React, { useCallback, useEffect, useState } from "react"
 import { useDispatch, useSelector } from "react-redux";
-import { extendAllLookupLists, removeFromAllLookupListById, selectAllLookupLists, selectCheckedLookupLists, setAllLookupLists, setCheckedLookupLists } from "@/src/reduxStore/states/pages/lookup-lists";
+import { extendAllLookupLists, selectAllLookupLists, selectCheckedLookupLists, setAllLookupLists, setCheckedLookupLists } from "@/src/reduxStore/states/pages/lookup-lists";
 import { Tooltip } from "@nextui-org/react";
 import Dropdown from "@/submodules/react-components/components/Dropdown";
-import Modal from "@/src/components/shared/modal/Modal";
 import { useLazyQuery, useMutation } from "@apollo/client";
 import { LOOKUP_LISTS_BY_PROJECT_ID } from "@/src/services/gql/queries/lookup-lists";
-import { CREATE_LOOKUP_LIST, DELETE_LOOKUP_LIST } from "@/src/services/gql/mutations/lookup-lists";
+import { CREATE_LOOKUP_LIST } from "@/src/services/gql/mutations/lookup-lists";
 import { LookupList } from "@/src/types/components/projects/projectId/lookup-lists";
 import { LookupListCard } from "./LookupListCard";
 import style from '@/src/styles/components/projects/projectId/lookup-lists.module.css';
 import { openModal, selectModal } from "@/src/reduxStore/states/modal";
-import { ModalButton, ModalEnum } from "@/src/types/shared/modal";
+import { ModalEnum } from "@/src/types/shared/modal";
 import { useRouter } from "next/router";
 import { ACTIONS_DROPDOWN_OPTIONS, postProcessLookupLists } from "@/src/util/components/projects/projectId/lookup-lists-helper";
 import { WebSocketsService } from "@/src/services/base/web-sockets/WebSocketsService";
@@ -23,49 +22,30 @@ import { selectAllUsers, setComments } from "@/src/reduxStore/states/general";
 import { REQUEST_COMMENTS } from "@/src/services/gql/queries/projects";
 import { CommentDataManager } from "@/src/util/classes/comments";
 import { CommentType } from "@/src/types/shared/comments";
+import DeleteLookupListsModal from "./DeleteLookupListsModal";
 
-const ABORT_BUTTON = { buttonCaption: "Delete", useButton: true, disabled: false };
 
 export default function LookupListsOverview() {
     const router = useRouter();
     const dispatch = useDispatch();
 
     const projectId = useSelector(selectProjectId);
-    const lookupLists = useSelector(selectAllLookupLists);
-    const checkedLookupLists = useSelector(selectCheckedLookupLists);
     const modalDelete = useSelector(selectModal(ModalEnum.DELETE_LOOKUP_LIST));
     const allUsers = useSelector(selectAllUsers);
+    const lookupLists = useSelector(selectAllLookupLists);
+    const checkedLookupLists = useSelector(selectCheckedLookupLists);
 
     const [selectionList, setSelectionList] = useState('');
     const [countSelected, setCountSelected] = useState(0);
 
     const [refetchLookupLists] = useLazyQuery(LOOKUP_LISTS_BY_PROJECT_ID, { fetchPolicy: "network-only" });
     const [createLookupListMut] = useMutation(CREATE_LOOKUP_LIST);
-    const [deleteLookupListMut] = useMutation(DELETE_LOOKUP_LIST);
     const [refetchComments] = useLazyQuery(REQUEST_COMMENTS, { fetchPolicy: "no-cache" });
 
-    const deleteLookupLists = useCallback(() => {
-        checkedLookupLists.forEach((checked, index) => {
-            if (checked) {
-                const lookupList = lookupLists[index];
-                deleteLookupListMut({
-                    variables: {
-                        projectId: projectId,
-                        knowledgeBaseId: lookupList.id
-                    }
-                }).then((res) => {
-                    dispatch(removeFromAllLookupListById(lookupList.id));
-                });
-            }
-        });
-    }, [checkedLookupLists]);
 
     useEffect(() => {
-        setAbortButton({ ...ABORT_BUTTON, emitFunction: deleteLookupLists });
         prepareSelectionList();
     }, [modalDelete]);
-
-    const [abortButton, setAbortButton] = useState<ModalButton>(ABORT_BUTTON);
 
     useEffect(unsubscribeWSOnDestroy(router, [CurrentPage.LOOKUP_LISTS_OVERVIEW]), []);
 
@@ -260,14 +240,7 @@ export default function LookupListsOverview() {
                             ))}
                         </div>
                     )}
-                    <Modal modalName={ModalEnum.DELETE_LOOKUP_LIST} abortButton={abortButton}>
-                        <h1 className="text-lg text-gray-900 mb-2">Warning</h1>
-                        <div className="text-sm text-gray-500 my-2 flex flex-col">
-                            <span>Are you sure you want to delete selected lookup {countSelected <= 1 ? 'list' : 'lists'}?</span>
-                            <span>Currently selected {countSelected <= 1 ? 'is' : 'are'}:</span>
-                            <span className="whitespace-pre-line font-bold">{selectionList}</span>
-                        </div>
-                    </Modal>
+                    <DeleteLookupListsModal countSelected={countSelected} selectionList={selectionList} />
                 </div>
 
             </div>

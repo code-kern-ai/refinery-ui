@@ -1,6 +1,4 @@
 import LoadingIcon from '@/src/components/shared/loading/LoadingIcon';
-import Modal from '@/src/components/shared/modal/Modal';
-import Statuses from '@/src/components/shared/statuses/Statuses';
 import { selectIsManaged } from '@/src/reduxStore/states/general';
 import { openModal, selectModal } from '@/src/reduxStore/states/modal';
 import { selectHeuristicsAll, setHeuristicType } from '@/src/reduxStore/states/pages/heuristics';
@@ -8,13 +6,13 @@ import { selectLabelingTasksAll } from '@/src/reduxStore/states/pages/settings';
 import { selectProjectId } from '@/src/reduxStore/states/project';
 import { WebSocketsService } from '@/src/services/base/web-sockets/WebSocketsService';
 import { unsubscribeWSOnDestroy } from '@/src/services/base/web-sockets/web-sockets-helper';
-import { CREATE_INFORMATION_SOURCE_PAYLOAD, DELETE_HEURISTIC, RUN_ZERO_SHOT_PROJECT, SET_ALL_HEURISTICS, START_WEAK_SUPERVISIONS } from '@/src/services/gql/mutations/heuristics';
+import { CREATE_INFORMATION_SOURCE_PAYLOAD, RUN_ZERO_SHOT_PROJECT, SET_ALL_HEURISTICS, START_WEAK_SUPERVISIONS } from '@/src/services/gql/mutations/heuristics';
 import { GET_CURRENT_WEAK_SUPERVISION_RUN } from '@/src/services/gql/queries/heuristics';
 import style from '@/src/styles/components/projects/projectId/heuristics/heuristics.module.css';
 import { Heuristic, HeuristicsHeaderProps } from '@/src/types/components/projects/projectId/heuristics/heuristics';
 import { LabelingTask } from '@/src/types/components/projects/projectId/settings/labeling-tasks';
 import { CurrentPage } from '@/src/types/shared/general';
-import { ModalButton, ModalEnum } from '@/src/types/shared/modal';
+import { ModalEnum } from '@/src/types/shared/modal';
 import { Status } from '@/src/types/shared/statuses';
 import { ACTIONS_DROPDOWN_OPTIONS, NEW_HEURISTICS, checkSelectedHeuristics, postProcessCurrentWeakSupervisionRun } from '@/src/util/components/projects/projectId/heuristics/heuristics-helper';
 import { TOOLTIPS_DICT } from '@/src/util/tooltip-constants';
@@ -27,8 +25,8 @@ import { useRouter } from 'next/router';
 import { useCallback, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import LastWeakSupervisionModal from './modals/LastWeakSupervisionModal';
+import DeleteHeuristicsModal from './DeleteHeuristicsModal';
 
-const ABORT_BUTTON = { buttonCaption: "Delete", useButton: true, disabled: false };
 
 export default function HeuristicsHeader(props: HeuristicsHeaderProps) {
     const dispatch = useDispatch();
@@ -48,7 +46,6 @@ export default function HeuristicsHeader(props: HeuristicsHeaderProps) {
     const [currentWeakSupervisionRun, setCurrentWeakSupervisionRun] = useState(null);
 
     const [setHeuristicsMut] = useMutation(SET_ALL_HEURISTICS);
-    const [deleteHeuristicMut] = useMutation(DELETE_HEURISTIC);
     const [startWeakSupervisionMut] = useMutation(START_WEAK_SUPERVISIONS);
     const [refetchCurrentWeakSupervision] = useLazyQuery(GET_CURRENT_WEAK_SUPERVISION_RUN, { fetchPolicy: "network-only" });
     const [createTaskMut] = useMutation(CREATE_INFORMATION_SOURCE_PAYLOAD);
@@ -65,14 +62,6 @@ export default function HeuristicsHeader(props: HeuristicsHeaderProps) {
         });
     }, [projectId]);
 
-    const deleteHeuristics = useCallback(() => {
-        heuristics.forEach((heuristic) => {
-            if (heuristic.selected) {
-                deleteHeuristicMut({ variables: { projectId: projectId, informationSourceId: heuristic.id } }).then(() => props.refetch());
-            }
-        });
-    }, [modalDelete]);
-
     useEffect(() => {
         if (!heuristics) return;
         setAreHeuristicsSelected(checkSelectedHeuristics(heuristics, false));
@@ -81,11 +70,9 @@ export default function HeuristicsHeader(props: HeuristicsHeaderProps) {
     }, [heuristics]);
 
     useEffect(() => {
-        setAbortButton({ ...ABORT_BUTTON, emitFunction: deleteHeuristics });
         prepareSelectionList();
     }, [modalDelete]);
 
-    const [abortButton, setAbortButton] = useState<ModalButton>(ABORT_BUTTON);
 
     function refetchCurrentWeakSupervisionAndProcess() {
         refetchCurrentWeakSupervision({ variables: { projectId: projectId } }).then((res) => {
@@ -294,14 +281,7 @@ export default function HeuristicsHeader(props: HeuristicsHeaderProps) {
                 </div>
             </div>
 
-            <Modal modalName={ModalEnum.DELETE_HEURISTICS} abortButton={abortButton}>
-                <h1 className="text-lg text-gray-900 mb-2">Warning</h1>
-                <div className="text-sm text-gray-500 my-2 flex flex-col">
-                    <span>Are you sure you want to delete selected {countSelected <= 1 ? 'heuristic' : 'heuristics'}?</span>
-                    <span>Currently selected {countSelected <= 1 ? 'is' : 'are'}:</span>
-                    <span className="whitespace-pre-line font-bold">{selectionList}</span>
-                </div>
-            </Modal>
+            <DeleteHeuristicsModal selectionList={selectionList} countSelected={countSelected} refetch={props.refetch} />
             <LastWeakSupervisionModal currentWeakSupervisionRun={currentWeakSupervisionRun} />
         </div >
     )

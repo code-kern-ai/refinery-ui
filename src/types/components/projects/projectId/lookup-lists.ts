@@ -34,3 +34,8 @@ export type TermsProps = {
 export type LookupListOperationsProps = {
     refetchWS: () => void;
 }
+
+export type DeleteLookupListsModalProps = {
+    countSelected: number;
+    selectionList: string;
+};

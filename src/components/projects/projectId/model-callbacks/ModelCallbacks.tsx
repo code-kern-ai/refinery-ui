@@ -21,8 +21,8 @@ import { WebSocketsService } from "@/src/services/base/web-sockets/WebSocketsSer
 import { CurrentPage } from "@/src/types/shared/general";
 import GridCards from "@/src/components/shared/grid-cards/GridCards";
 import { unsubscribeWSOnDestroy } from "@/src/services/base/web-sockets/web-sockets-helper";
+import DeleteModelCallBacksModal from "./DeleteModelCallbacksModal";
 
-const ABORT_BUTTON = { buttonCaption: "Delete", useButton: true, disabled: false };
 
 export default function ModelCallbacks() {
     const dispatch = useDispatch();
@@ -42,16 +42,9 @@ export default function ModelCallbacks() {
     const [refetchLabelingTasksByProjectId] = useLazyQuery(GET_LABELING_TASKS_BY_PROJECT_ID, { fetchPolicy: "network-only" });
     const [refetchModelCallbacks] = useLazyQuery(GET_MODEL_CALLBACKS_OVERVIEW_DATA, { fetchPolicy: "network-only" });
 
-    const deleteModelCallbacks = useCallback(() => {
-
-    }, [modalDelete, checkedModelCallbacks]);
-
     useEffect(() => {
-        setAbortButton({ ...ABORT_BUTTON, emitFunction: deleteModelCallbacks });
         prepareSelectionList();
     }, [modalDelete]);
-
-    const [abortButton, setAbortButton] = useState<ModalButton>(ABORT_BUTTON);
 
     useEffect(unsubscribeWSOnDestroy(router, [CurrentPage.MODEL_CALLBACKS]), []);
 
@@ -209,14 +202,15 @@ export default function ModelCallbacks() {
                     </div>
                 </div>
 
-                <Modal modalName={ModalEnum.DELETE_MODEL_CALLBACKS} abortButton={abortButton}>
-                    <h1 className="text-lg text-gray-900 mb-2">Warning</h1>
-                    <div className="text-sm text-gray-500 my-2 flex flex-col">
-                        <span>Are you sure you want to delete selected model {countSelected <= 1 ? 'callback' : 'callbacks'}?</span>
-                        <span>Currently selected {countSelected <= 1 ? 'is' : 'are'}:</span>
-                        <span className="whitespace-pre-line font-bold">{selectionList}</span>
-                    </div>
-                </Modal>
+                <DeleteModelCallBacksModal
+                    modelCallBacks={modelCallbacks}
+                    checkedModelCallbacks={checkedModelCallbacks}
+                    countSelected={countSelected}
+                    selectionList={selectionList}
+                    removeModelCallBack={(modelId: string) => {
+                        setModelCallbacks(modelCallbacks.filter((modelCallback) => modelCallback.id != modelId));
+                        setFilteredList(filteredList.filter((modelCallback) => modelCallback.id != modelId));
+                    }} />
             </>)}
         </div >
     </div >)
