@@ -11,6 +11,7 @@ import Modal from '../shared/modal/Modal';
 import { IconAlertTriangle, IconFishHook, IconMessageCircle, IconNews } from '@tabler/icons-react';
 import { CREATE_SAMPLE_PROJECT } from '@/src/services/gql/mutations/projects';
 import { ProjectStatus } from '@/src/types/components/projects/projects-list';
+import { setSearchGroupsStore } from '@/src/reduxStore/states/pages/data-browser';
 
 const ACCEPT_BUTTON = { buttonCaption: "Create", closeAfterClick: false, useButton: true, disabled: true };
 
@@ -44,6 +45,7 @@ export default function SampleProjectsDropdown() {
         }
         dispatch(extendAllProjects(projectSample));
         dispatch(closeModal(ModalEnum.SAMPLE_PROJECT_TITLE));
+        dispatch(setSearchGroupsStore({}));
         createSampleProjectMut({ variables: { name: projectNameFinal, projectType: projectTypeFinal } }).then((res) => {
             const projectUpdated = res.data.createSampleProject['project'];
             dispatch(updateProjectState('sample', { ...projectUpdated }));

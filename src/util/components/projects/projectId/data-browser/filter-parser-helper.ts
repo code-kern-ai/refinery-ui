@@ -130,6 +130,7 @@ function appendBlackAndWhiteListLabelingTaskForArray(
     drillDown: boolean = false,
     onlyNoLabel: boolean = false //for recursion of NO_LABEL only
 ): any {
+    if (!array || array.length == 0) return;
     if (drillDown) {
         for (const l of array) {
             if (l.id == 'NO_LABEL') {
@@ -203,7 +204,7 @@ function appendBlackAndWhiteListLabelingTaskForConfidence(
     labelIds: string[],
     forWeakSupervision: boolean = true
 ): any {
-    if (!confidence.active) return;
+    if (!confidence || !confidence.active) return;
 
     const source = forWeakSupervision ? LabelSource.WEAK_SUPERVISION : LabelSource.MODEL_CALLBACK;
     let whitelist = {

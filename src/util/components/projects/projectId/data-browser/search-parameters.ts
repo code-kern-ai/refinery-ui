@@ -1,44 +1,48 @@
-import { SearchItemType } from "@/src/types/components/projects/projectId/data-browser/search-groups";
 import { getAttributeType } from "./search-operators-helper";
 import { SearchOperator } from "@/src/types/components/projects/projectId/data-browser/search-operators";
 import { SearchGroup, StaticOrderByKeys } from "@/submodules/javascript-functions/enums/enums";
 import { getOrderByDisplayName } from "@/submodules/javascript-functions/enums/enum-functions";
 import { HighlightSearch } from "@/src/types/shared/highlight";
 import { jsonCopy } from "@/submodules/javascript-functions/general";
-import { type } from "os";
 
-export function updateSearchParameters(searchElement, attributes, separator, fullSearch) {
+export function updateSearchParameters(searchElement, attributes, separator, fullSearch, searchGroup, labelingTasks?) {
     const activeParams = [];
     searchElement.forEach(p => {
         let param = null;
-        if (p.value.group == SearchGroup.ATTRIBUTES) {
-            for (let i of p.groupElements) {
-                if (!i.active) return;
-                param = createSplittedText(updateSearchParamText(i, attributes, separator, fullSearch[SearchGroup.DRILL_DOWN].value), fullSearch, p);
-                activeParams.push({ splittedText: param, values: i })
-            }
-        } else if (p.value.group == SearchGroup.COMMENTS) {
-            if (!p.groupElements.hasComments.active) return;
-            param = createSplittedText(updateSearchParamText(p, attributes, separator, fullSearch[SearchGroup.DRILL_DOWN].value), fullSearch, p);
-            activeParams.push({ splittedText: param, values: p.groupElements });
-        } else if (p.value.key == SearchGroup.USER_FILTER) {
-            for (let i of p.groupElements.users) {
-                if (!i.active) return;
-                param = createSplittedText(updateSearchParamText(p, attributes, separator, fullSearch[SearchGroup.DRILL_DOWN].value), fullSearch, p);
-                activeParams.push({ splittedText: param, values: { group: p.value.group }, users: p.groupElements.users });
-            }
-        } else if (p.value.group == SearchGroup.ORDER_STATEMENTS) {
-            for (let i of p.groupElements.orderBy) {
-                if (!i.active) continue;
-                param = createSplittedText(updateSearchParamText(p, attributes, separator, fullSearch[SearchGroup.DRILL_DOWN].value), fullSearch, p);
-                activeParams.push({ splittedText: param, values: { group: p.value.group, orderBy: p.groupElements } });
+        if (!p.hasOwnProperty('groupElements')) return;
+        if (!p.groupElements.group) {
+            if (!(Array.isArray(p.groupElements) && p.groupElements[0].group)) {
+                p = addGroupToSearchElement(p, labelingTasks);
             }
         }
-        else if (p.value.group == SearchGroup.LABELING_TASKS) {
-            if (!(p.groupElements.active || p.groupElements['weakSupervisionConfidence'].active || p.groupElements['modelCallbackConfidence'].active || p.groupElements['isWithDifferentResults'])) return;
-            param = createSplittedText(updateSearchParamText(p, attributes, separator, fullSearch[SearchGroup.DRILL_DOWN].value, fullSearch[p.value.key].nameAdd), fullSearch, p);
+        if (Array.isArray(p.groupElements) && p.groupElements[0].group == SearchGroup.ATTRIBUTES) {
+            for (let i of p.groupElements) {
+                if (!i.active) return;
+                param = createSplittedText(updateSearchParamText(i, attributes, separator, fullSearch[SearchGroup.DRILL_DOWN]), fullSearch, p);
+                activeParams.push({ splittedText: param, values: i })
+            }
+        }
+        else if (p.groupElements.group == SearchGroup.COMMENTS) {
+            if (!p.groupElements.hasComments.active) return;
+            param = createSplittedText(updateSearchParamText(p, attributes, separator, fullSearch[SearchGroup.DRILL_DOWN]), fullSearch, p);
+            activeParams.push({ splittedText: param, values: p.groupElements });
+        } else if (p.groupElements.group == SearchGroup.USER_FILTER) {
+            for (let i of p.groupElements.users) {
+                if (!i.active) return;
+                param = createSplittedText(updateSearchParamText(p, attributes, separator, fullSearch[SearchGroup.DRILL_DOWN]), fullSearch, p);
+                activeParams.push({ splittedText: param, values: { group: p.groupElements.group }, users: p.groupElements.users });
+            }
+        } else if (p.groupElements.group == SearchGroup.ORDER_STATEMENTS) {
+            for (let i of p.groupElements.orderBy) {
+                if (!i.active) continue;
+                param = createSplittedText(updateSearchParamText(p, attributes, separator, fullSearch[SearchGroup.DRILL_DOWN]), fullSearch, p);
+                activeParams.push({ splittedText: param, values: { group: p.groupElements.group, orderBy: p.groupElements } });
+            }
+        } else if (p.groupElements.group == SearchGroup.LABELING_TASKS) {
+            if (!(p.groupElements.active || (p.groupElements['weakSupervisionConfidence'] && p.groupElements['weakSupervisionConfidence'].active) || (p.groupElements['modelCallbackConfidence'] && p.groupElements['modelCallbackConfidence'].active) || p.groupElements['isWithDifferentResults'])) return;
+            param = createSplittedText(updateSearchParamText(p, attributes, separator, fullSearch[SearchGroup.DRILL_DOWN], searchGroup[p.groupElements.groupKey].nameAdd), fullSearch, p);
             if (!param) return;
-            activeParams.push({ splittedText: param, values: { group: p.value.group, values: p.groupElements } });
+            activeParams.push({ splittedText: param, values: { group: p.groupElements.group, values: p.groupElements } });
         }
     });
     return activeParams;
@@ -46,10 +50,10 @@ export function updateSearchParameters(searchElement, attributes, separator, ful
 
 function createSplittedText(i, searchGroup, p) {
     let groupName = null;
-    if (p.value.key == SearchItemType.ATTRIBUTE) {
-        groupName = searchGroup[p.value.key].groupElements[0].nameAdd + ':';
+    if (Array.isArray(p.groupElements)) {
+        groupName = searchGroup[p.groupElements[0].groupKey]?.nameAdd + ':';
     } else {
-        groupName = searchGroup[p.value.key].groupElements.nameAdd + ':';
+        groupName = searchGroup[p.groupElements.groupKey]?.nameAdd + ':';
     }
     if (i.searchText == null) return null;
     i.searchTextReplaced = i.searchText.replaceAll("\nAND", "\n<gn>" + groupName + "\n");
@@ -60,7 +64,7 @@ function createSplittedText(i, searchGroup, p) {
 
 function updateSearchParamText(searchElement, attributes, separator, drillDownVal, nameAdd?) {
     const searchElementCopy = jsonCopy(searchElement);
-    if (searchElementCopy.type == SearchItemType.ATTRIBUTE) {
+    if (searchElementCopy.group == SearchGroup.ATTRIBUTES) {
         const attributeType = getAttributeType(attributes, searchElementCopy.name);
         if (searchElementCopy.operator == SearchOperator.BETWEEN) {
             if (attributeType == "INTEGER" || attributeType == "FLOAT") {
@@ -118,16 +122,16 @@ function updateSearchParamText(searchElement, attributes, separator, drillDownVa
             searchElementCopy.searchText = 'NOT (' + searchElementCopy.searchText + ')';
         if (separator == "-")
             searchElementCopy.searchText = searchElementCopy.searchText.replaceAll("-", ",");
-    } else if (searchElementCopy.value.group == SearchGroup.LABELING_TASKS) {
-        searchElementCopy.searchText = nameAdd + labelingTaskBuildSearchParamText(searchElementCopy.groupElements, drillDownVal);
+    } else if (searchElementCopy.groupElements.group == SearchGroup.LABELING_TASKS) {
+        searchElementCopy.searchText = searchElement.nameAdd + labelingTaskBuildSearchParamText(searchElementCopy.groupElements, drillDownVal);
         if (labelingTaskBuildSearchParamText(searchElementCopy.groupElements, drillDownVal) === '') {
             searchElementCopy.searchText = null;
         }
-    } else if (searchElementCopy.value.group == SearchGroup.USER_FILTER) {
+    } else if (searchElementCopy.groupElements.group == SearchGroup.USER_FILTER) {
         searchElementCopy.searchText = userBuildSearchParamText(searchElementCopy.groupElements.users, drillDownVal);
-    } else if (searchElementCopy.value.group == SearchGroup.ORDER_STATEMENTS) {
+    } else if (searchElementCopy.groupElements.group == SearchGroup.ORDER_STATEMENTS) {
         searchElementCopy.searchText = orderByBuildSearchParamText(searchElementCopy.groupElements);
-    } else if (searchElementCopy.value.group == SearchGroup.COMMENTS) {
+    } else if (searchElementCopy.groupElements.group == SearchGroup.COMMENTS) {
         searchElementCopy.searchText = commentsBuildSearchParamText(searchElementCopy.groupElements);
     }
     return searchElementCopy;
@@ -152,12 +156,13 @@ function labelingTaskBuildSearchParamText(values, drillDownVal): string {
         text += (text ? '\nAND ' : '') + ' (mixed IS results)';
     }
 
-    if (values.weakSupervisionConfidence.active) {
+    if (values.weakSupervisionConfidence && values.weakSupervisionConfidence.active) {
         text += (text ? '\nAND ' : '') + 'WS-Confidence '
         if (values.weakSupervisionConfidence.negate) text += "NOT "
         text += "BETWEEN " + values.weakSupervisionConfidence.lower + "% AND " + values.weakSupervisionConfidence.upper + "%";
     }
-    if (values.modelCallbackConfidence.active) {
+
+    if (values.modelCallbackConfidence && values.modelCallbackConfidence.active) {
         text += (text ? '\nAND ' : '') + 'MC-Confidence '
         if (values.modelCallbackConfidence.negate) text += "NOT "
         text += "BETWEEN " + values.modelCallbackConfidence.lower + "% AND " + values.modelCallbackConfidence.upper + "%";
@@ -169,6 +174,7 @@ function labelingTaskBuildSearchParamText(values, drillDownVal): string {
 }
 
 function labelingTaskBuildSearchParamTextPart(arr: any[], blockname: string, drillDownVal: boolean): string {
+    if (!arr) return '';
     const drillDown: boolean = drillDownVal;
     let text = '';
     let in_values = '';
@@ -234,4 +240,63 @@ export function getRegexFromFilter(searchElement): HighlightSearch {
             return { searchFor: searchValue, matchCase: searchElement.values.caseSensitive };
     }
     return null;
+}
+
+
+export function addGroupToSearchElement(searchElement, labelingTasks) {
+    if (searchElement.groupElements[0].hasOwnProperty('operator')) {
+        searchElement.groupElements.forEach(element => {
+            element.group = SearchGroup.ATTRIBUTES;
+        });
+    } else if (searchElement.groupElements[0].hasOwnProperty('users')) {
+        const saveEl = searchElement.groupElements[0];
+        const newElement = {
+            id: saveEl.id,
+            group: SearchGroup.USER_FILTER,
+            users: saveEl.users,
+            active: saveEl.active,
+            negate: saveEl.negate,
+            name: saveEl.name,
+            nameAdd: ''
+        };
+        searchElement.groupElements = newElement;
+    } else if (searchElement.groupElements[0].hasOwnProperty('manualLabels')) {
+        const saveEl = searchElement.groupElements[0];
+        const newElement = {
+            id: saveEl.id,
+            group: SearchGroup.LABELING_TASKS,
+            groupKey: SearchGroup.LABELING_TASKS + '_' + saveEl.taskId,
+            type: saveEl.type,
+            taskTarget: saveEl.taskTarget,
+            taskId: saveEl.taskId,
+            active: saveEl.active,
+            manualLabels: saveEl.manualLabels,
+            weakSupervisionLabels: saveEl.weakSupervisionLabels,
+            modelCallbackLabels: saveEl.modelCallbackLabels,
+            sortByWeakSupervisionConfidence: saveEl.sortByWeakSupervisionConfidence,
+            sortByModelCallbackConfidence: saveEl.sortByModelCallbackConfidence,
+            weakSupervisionConfidence: saveEl.weakSupervisionConfidence,
+            modelCallbackConfidence: saveEl.modelCallbackConfidence,
+            heuristics: saveEl.informationSources,
+            isWithDifferentResults: saveEl.isWithDifferentResults,
+        }
+        searchElement.groupElements = newElement;
+    } else if (searchElement.groupElements[0].hasOwnProperty('orderBy')) {
+        const saveEl = searchElement.groupElements[0];
+        const newElement = {
+            id: saveEl.id,
+            group: SearchGroup.ORDER_STATEMENTS,
+            orderBy: saveEl.orderBy,
+        }
+        searchElement.groupElements = newElement;
+    } else if (searchElement.groupElements[0].hasOwnProperty('hasComments')) {
+        const saveEl = searchElement.groupElements[0];
+        const newElement = {
+            id: saveEl.id,
+            group: SearchGroup.COMMENTS,
+            hasComments: saveEl.hasComments,
+        }
+        searchElement.groupElements = newElement;
+    }
+    return searchElement;
 }

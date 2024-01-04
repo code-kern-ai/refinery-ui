@@ -1,6 +1,6 @@
 import { DataSlice, LineBreaksType, SearchRecordsExtended } from '@/src/types/components/projects/projectId/data-browser/data-browser';
 import { postProcessDataSlices, postProcessRecordComments } from '@/src/util/components/projects/projectId/data-browser/data-browser-helper';
-import { Slice } from '@/submodules/javascript-functions/enums/enums';
+import { SearchGroup, Slice } from '@/submodules/javascript-functions/enums/enums';
 import { arrayToDict } from '@/submodules/javascript-functions/general';
 import { createSelector, createSlice } from '@reduxjs/toolkit'
 import type { PayloadAction } from '@reduxjs/toolkit'
@@ -31,6 +31,8 @@ type DataBrowserState = {
     isTextHighlightNeeded: { [key: string]: boolean };
     recordComments: any;
     uniqueValuesDict: { [key: string]: string[] };
+    fullSearch: any;
+    searchGroups: any;
 }
 
 function getInitState(): DataBrowserState {
@@ -65,7 +67,11 @@ function getInitState(): DataBrowserState {
         textHighlight: [],
         isTextHighlightNeeded: {},
         recordComments: {},
-        uniqueValuesDict: {}
+        uniqueValuesDict: {},
+        fullSearch: {
+            [SearchGroup.DRILL_DOWN]: false
+        },
+        searchGroups: {}
     };
 }
 
@@ -186,6 +192,26 @@ const dataBrowserSlice = createSlice({
         setUniqueValuesDict(state, action: PayloadAction<{ [key: string]: string[] }>) {
             if (action.payload) state.uniqueValuesDict = action.payload;
             else state.uniqueValuesDict = {};
+        },
+        setFullSearchStore(state, action: PayloadAction<any>) {
+            if (action.payload) state.fullSearch = action.payload;
+            else state.fullSearch = {};
+        },
+        updateFullSearchState: {
+            reducer(state, action: PayloadAction<any[]>) {
+                if (action.payload.length !== 2) throw new Error("updateFullSearchState must be called with exactly 2 arguments");
+                const [fullSearchField, changes] = action.payload;
+                state.fullSearch[fullSearchField] = changes;
+            },
+            prepare(fullSearchField: string, changes: any) {
+                return {
+                    payload: [fullSearchField, changes]
+                };
+            },
+        },
+        setSearchGroupsStore(state, action: PayloadAction<any>) {
+            if (action.payload) state.searchGroups = action.payload;
+            else state.searchGroups = {};
         }
     },
 })
@@ -204,10 +230,12 @@ export const selectTextHighlight = (state) => state.dataBrowser.textHighlight;
 export const selectIsTextHighlightNeeded = (state) => state.dataBrowser.isTextHighlightNeeded;
 export const selectRecordComments = (state) => state.dataBrowser.recordComments;
 export const selectUniqueValuesDict = (state) => state.dataBrowser.uniqueValuesDict;
+export const selectFullSearchStore = (state) => state.dataBrowser.fullSearch;
+export const selectSearchGroupsStore = (state) => state.dataBrowser.searchGroups;
 
 export const selectDataSlicesAll = createSelector([selectDataSlices], (d): any => d ? d.filter((slice) => slice.id != '@@NO_SLICE@@') : null);
 export const selectDataSlicesDict = createSelector([selectDataSlicesAll], (a): any => a ? arrayToDict(a, 'id') : null);
 export const selectStaticSlices = createSelector([selectDataSlices], (a): any => a ? a.filter((slice) => slice.sliceType == Slice.STATIC_DEFAULT) : null);
 
-export const { setDataSlices, setActiveDataSlice, removeFromAllDataSlicesById, updateDataSlicesState, setUsersMapCount, setSearchRecordsExtended, setActiveSearchParams, extendAllDataSlices, updateConfigurationState, updateAdditionalDataState, setTextHighlight, setIsTextHighlightNeeded, setRecordComments, setRecordsInDisplay, expandRecordList, setUniqueValuesDict } = dataBrowserSlice.actions;
+export const { setDataSlices, setActiveDataSlice, removeFromAllDataSlicesById, updateDataSlicesState, setUsersMapCount, setSearchRecordsExtended, setActiveSearchParams, extendAllDataSlices, updateConfigurationState, updateAdditionalDataState, setTextHighlight, setIsTextHighlightNeeded, setRecordComments, setRecordsInDisplay, expandRecordList, setUniqueValuesDict, setFullSearchStore, updateFullSearchState, setSearchGroupsStore } = dataBrowserSlice.actions;
 export const dataBrowserReducer = dataBrowserSlice.reducer;

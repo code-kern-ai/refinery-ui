@@ -18,7 +18,6 @@ export function getBasicSearchGroup(
         key: group + (keyAdd ? '_' + keyAdd : ''),
         sortOrder: sortOrder,
         isOpen: false,
-        inOpenTransition: false,
         name: nameForGroupKeyToString(group),
         nameAdd: nameAdd,
         subText: getSubTextForGroupKey(group),

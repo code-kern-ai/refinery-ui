@@ -204,3 +204,9 @@ export function postProcessUniqueValues(uniqueValues: any, attributesSortOrder: 
     }
     return uniqueValuesDict;
 }
+
+export function getActiveNegateGroupColor(group) {
+    if (!group['active']) return null;
+    if (group['negate']) return '#ef4444'
+    return '#2563eb';
+}

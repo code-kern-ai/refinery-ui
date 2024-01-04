@@ -52,7 +52,7 @@ const projectSlice = createSlice({
             if (action.payload) state.all = postProcessProjectsList(action.payload);
             else state.all = [];
         },
-        extendAllProjects(state, action: PayloadAction<Project>) {
+        extendAllProjects(state, action: PayloadAction<Project | any>) {
             if (action.payload) state.all.push(action.payload);
         },
         removeFromAllProjects(state, action: PayloadAction<Project>) {

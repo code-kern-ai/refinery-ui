@@ -22,7 +22,6 @@ export type SearchGroupElement = {
     key: string;
     sortOrder: number;
     isOpen: boolean;
-    inOpenTransition: boolean;
     name: string;
     nameAdd: string;
     subText: string;
