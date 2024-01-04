@@ -82,7 +82,6 @@ export default function SearchGroups() {
         const colors = [];
         const visibleAttributes = attributes.filter((a) => a.visibility == AttributeVisibility.DO_NOT_HIDE);
         attributesSort.push({
-
             name: 'Any Attribute',
             key: null,
             order: 0,
