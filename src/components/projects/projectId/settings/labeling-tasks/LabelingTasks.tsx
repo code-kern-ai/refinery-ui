@@ -8,7 +8,7 @@ import { LabelType, LabelingTask, LabelingTaskTaskType } from "@/src/types/compo
 import { CurrentPage } from "@/src/types/shared/general";
 import { ModalEnum } from "@/src/types/shared/modal";
 import { LabelHelper } from "@/src/util/classes/label-helper";
-import { isTaskNameUnique, labelingTaskFromString, labelingTaskToString, postProcessLabelingTasks, postProcessLabelingTasksSchema } from "@/src/util/components/projects/projectId/settings/labeling-tasks-helper";
+import { isTaskNameUnique, labelingTaskFromString, labelingTaskToString, postProcessLabelingTasks } from "@/src/util/components/projects/projectId/settings/labeling-tasks-helper";
 import { jsonCopy } from "@/submodules/javascript-functions/general";
 import Dropdown from "@/submodules/react-components/components/Dropdown";
 import { useLazyQuery, useMutation } from "@apollo/client";
@@ -51,7 +51,7 @@ export default function LabelingTasks() {
     function refetchLabelingTasksAndProcess() {
         refetchLabelingTasksByProjectId({ variables: { projectId: projectId } }).then((res) => {
             const labelingTasks = postProcessLabelingTasks(res['data']['projectByProjectId']['labelingTasks']['edges']);
-            dispatch(setLabelingTasksAll(postProcessLabelingTasksSchema(labelingTasks)))
+            dispatch(setLabelingTasksAll(labelingTasks));
         });
     }
 

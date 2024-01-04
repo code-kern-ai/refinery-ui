@@ -18,7 +18,6 @@ import { GET_PROJECT_LIST, NOTIFICATIONS } from "@/src/services/gql/queries/proj
 import { postProcessNotifications } from "@/src/util/shared/notification-center-helper";
 import { selectNotificationId } from "@/src/reduxStore/states/tmp";
 import Comments from "../comments/Comments";
-import { postProcessProjectsList } from "@/src/util/components/projects/projects-list-helper";
 import { arrayToDict } from "@/submodules/javascript-functions/general";
 
 export default function Header() {
@@ -59,7 +58,7 @@ export default function Header() {
     function openModalAndRefetchNotifications() {
         refetchProjects().then((res) => {
             const projects = res.data["allProjects"].edges.map((edge: any) => edge.node);
-            dispatch(setAllProjects(postProcessProjectsList(projects)));
+            dispatch(setAllProjects(projects));
             refetchNotifications().then((res) => {
                 dispatch(setNotifications(postProcessNotifications(res.data['notifications'], arrayToDict(projects, 'id'), notificationId)));
                 dispatch(openModal(ModalEnum.NOTIFICATION_CENTER));

@@ -1,7 +1,6 @@
 import { selectModelsDownloaded, setModelsDownloaded } from "@/src/reduxStore/states/pages/models-downloaded";
 import { GET_MODEL_PROVIDER_INFO } from "@/src/services/gql/queries/projects";
 import { ModelsDownloaded, ModelsDownloadedStatus } from "@/src/types/components/models-downloaded/models-downloaded";
-import { postProcessingModelsDownload } from "@/src/util/components/models-downloaded/models-downloaded-helper";
 import { useLazyQuery } from "@apollo/client";
 import { Tooltip } from "@nextui-org/react";
 import { IconAlertTriangleFilled, IconArrowLeft, IconBan, IconCheckbox, IconCircleCheckFilled, IconExternalLink, IconLoader, IconPlus, IconTrash } from "@tabler/icons-react";
@@ -41,7 +40,7 @@ export default function ModelsDownload() {
 
     function refetchModels() {
         refetchModelsDownload().then((res) => {
-            dispatch(setModelsDownloaded(postProcessingModelsDownload(res.data['modelProviderInfo'])));
+            dispatch(setModelsDownloaded(res.data['modelProviderInfo']));
         });
     }
 

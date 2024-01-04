@@ -168,7 +168,7 @@ export default function Terms(props: TermsProps) {
                     {term.blacklisted && <div className="flex items-center">
                         <div className="w-full relative rounded-lg border border-gray-300 bg-white px-4 py-3 shadow-sm items-center text-sm hover:border-gray-400 focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-indigo-500">
                             <div className="flex items-center">
-                                <div className="text-gray-900 font-medium float-left">{term.value}</div>
+                                <div className="text-gray-900 font-medium float-left w-full">{term.value}</div>
                                 <Dropdown dropdownClasses="flex justify-end" options={BLACKLISTED_TERMS_DROPDOWN_OPTIONS} hasButtonDots={true} selectedOption={(option) => executeOption(option, term)} />
                             </div>
 

@@ -2,6 +2,8 @@ import { Attribute, AttributeState, AttributeVisibility } from '@/src/types/comp
 import { Embedding, RecommendedEncoder } from '@/src/types/components/projects/projectId/settings/embeddings';
 import { LabelingTask } from '@/src/types/components/projects/projectId/settings/labeling-tasks';
 import { DataTypeEnum } from '@/src/types/shared/general';
+import { postProcessingAttributes } from '@/src/util/components/projects/projectId/settings/data-schema-helper';
+import { postProcessLabelingTasksSchema } from '@/src/util/components/projects/projectId/settings/labeling-tasks-helper';
 import { arrayToDict } from '@/submodules/javascript-functions/general';
 import { createSelector, createSlice } from '@reduxjs/toolkit'
 import type { PayloadAction } from '@reduxjs/toolkit'
@@ -55,7 +57,7 @@ const settingsSlice = createSlice({
     initialState,
     reducers: {
         setAllAttributes(state, action: PayloadAction<Attribute[]>) {
-            if (action.payload) state.attributes.all = action.payload;
+            if (action.payload) state.attributes.all = postProcessingAttributes(action.payload);
             else state.attributes.all = [];
             state.attributes.useableEmbedableAttributes = state.attributes.all.filter((attribute) => (attribute.dataType === DataTypeEnum.TEXT || attribute.dataType === DataTypeEnum.EMBEDDING_LIST) &&
                 (attribute.state === AttributeState.UPLOADED || attribute.state === AttributeState.AUTOMATICALLY_CREATED || attribute.state === AttributeState.USABLE));
@@ -101,7 +103,7 @@ const settingsSlice = createSlice({
             else state.recommendedEncodersAll = [];
         },
         setLabelingTasksAll(state, action: PayloadAction<LabelingTask[]>) {
-            if (action.payload) state.labelingTasks.all = action.payload;
+            if (action.payload) state.labelingTasks.all = postProcessLabelingTasksSchema(action.payload);
             else state.labelingTasks.all = [];
         },
         removeFromAllLabelingTasksById(state, action: PayloadAction<string>) {

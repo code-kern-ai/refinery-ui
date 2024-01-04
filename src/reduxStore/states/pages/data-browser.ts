@@ -1,4 +1,5 @@
 import { DataSlice, LineBreaksType, SearchRecordsExtended } from '@/src/types/components/projects/projectId/data-browser/data-browser';
+import { postProcessDataSlices, postProcessRecordComments } from '@/src/util/components/projects/projectId/data-browser/data-browser-helper';
 import { Slice } from '@/submodules/javascript-functions/enums/enums';
 import { arrayToDict } from '@/submodules/javascript-functions/general';
 import { createSelector, createSlice } from '@reduxjs/toolkit'
@@ -80,7 +81,7 @@ const dataBrowserSlice = createSlice({
     reducers: {
         setDataSlices(state, action: PayloadAction<DataSlice[]>) {
             state.all = [];
-            if (action.payload) state.all = action.payload;
+            if (action.payload) state.all = postProcessDataSlices(action.payload);
             else state.all = [];
             const allRecords = {
                 name: 'All Records',
@@ -166,7 +167,7 @@ const dataBrowserSlice = createSlice({
             else state.isTextHighlightNeeded = {};
         },
         setRecordComments(state, action: PayloadAction<any>) {
-            if (action.payload) state.recordComments = action.payload;
+            if (action.payload) state.recordComments = postProcessRecordComments(action.payload);
             else state.recordComments = {};
         },
         setRecordsInDisplay(state, action: PayloadAction<boolean>) {

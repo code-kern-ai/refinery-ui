@@ -12,7 +12,6 @@ import { getIsDemo, getIsManaged } from "../services/base/data-fetch";
 import { WebSocketsService } from "../services/base/web-sockets/WebSocketsService";
 import { timer } from "rxjs";
 import { RouteManager } from "../services/base/route-manager";
-import { postProcessUsersList } from "../util/components/users/users-list-helper";
 import { GET_EMBEDDING_PLATFORMS, GET_RECOMMENDED_ENCODERS_FOR_EMBEDDINGS, GET_ZERO_SHOT_RECOMMENDATIONS } from "../services/gql/queries/project-setting";
 import { CacheEnum, setCache } from "./states/cachedValues";
 import { postProcessingZeroShotEncoders } from "../util/components/models-downloaded/models-downloaded-helper";
@@ -71,7 +70,7 @@ export function GlobalStoreDataComponent(props: React.PropsWithChildren) {
             }
         });
         refetchOrganizationUsers().then((res) => {
-            dispatch(setAllUsers(postProcessUsersList(res.data["allUsers"])));
+            dispatch(setAllUsers(res.data["allUsers"]));
         });
 
         // Set cache

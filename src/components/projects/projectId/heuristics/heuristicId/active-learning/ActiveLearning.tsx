@@ -10,9 +10,9 @@ import { getClassLine, postProcessCurrentHeuristic, postProcessLastTaskLogs } fr
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
 import { Tooltip } from "@nextui-org/react";
 import Dropdown from "@/submodules/react-components/components/Dropdown";
-import { selectAttributes, selectEmbeddings, selectEmbeddingsFiltered, selectLabelingTasksAll, selectVisibleAttributesHeuristics, setAllEmbeddings, setFilteredEmbeddings, setLabelingTasksAll } from "@/src/reduxStore/states/pages/settings";
+import { selectEmbeddings, selectEmbeddingsFiltered, selectLabelingTasksAll, selectVisibleAttributesHeuristics, setAllEmbeddings, setFilteredEmbeddings, setLabelingTasksAll } from "@/src/reduxStore/states/pages/settings";
 import { UPDATE_INFORMATION_SOURCE } from "@/src/services/gql/mutations/heuristics";
-import { postProcessLabelingTasks, postProcessLabelingTasksSchema } from "@/src/util/components/projects/projectId/settings/labeling-tasks-helper";
+import { postProcessLabelingTasks } from "@/src/util/components/projects/projectId/settings/labeling-tasks-helper";
 import { GET_EMBEDDING_SCHEMA_BY_PROJECT_ID, GET_LABELING_TASKS_BY_PROJECT_ID } from "@/src/services/gql/queries/project-setting";
 import { postProcessingEmbeddings } from "@/src/util/components/projects/projectId/settings/embeddings-helper";
 import { embeddingRelevant } from "@/src/util/components/projects/projectId/heuristics/heuristicId/labeling-functions-helper";
@@ -133,7 +133,7 @@ export default function ActiveLearning() {
     function refetchLabelingTasksAndProcess() {
         refetchLabelingTasksByProjectId({ variables: { projectId: projectId } }).then((res) => {
             const labelingTasks = postProcessLabelingTasks(res['data']['projectByProjectId']['labelingTasks']['edges']);
-            dispatch(setLabelingTasksAll(postProcessLabelingTasksSchema(labelingTasks)));
+            dispatch(setLabelingTasksAll(labelingTasks));
         });
     }
 

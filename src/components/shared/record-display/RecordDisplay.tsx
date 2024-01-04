@@ -1,5 +1,5 @@
 import { selectConfiguration, selectIsTextHighlightNeeded, selectTextHighlight } from "@/src/reduxStore/states/pages/data-browser";
-import { selectAttributesDict, selectUsableAttributes, selectVisibleAttributesHeuristics } from "@/src/reduxStore/states/pages/settings";
+import { selectAttributesDict, selectVisibleAttributesHeuristics } from "@/src/reduxStore/states/pages/settings";
 import { LineBreaksType } from "@/src/types/components/projects/projectId/data-browser/data-browser";
 import { Attribute } from "@/src/types/components/projects/projectId/settings/data-schema";
 import { DataTypeEnum } from "@/src/types/shared/general";

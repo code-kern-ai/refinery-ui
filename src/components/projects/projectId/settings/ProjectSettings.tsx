@@ -18,9 +18,8 @@ import { CurrentPage } from "@/src/types/shared/general";
 import { Tooltip } from "@nextui-org/react";
 import ProjectMetaData from "./ProjectMetaData";
 import GatesIntegration from "./GatesIntegration";
-import { selectAllUsers, selectIsManaged, setComments, setCurrentPage } from "@/src/reduxStore/states/general";
+import { selectAllUsers, selectIsManaged, setComments } from "@/src/reduxStore/states/general";
 import Embeddings from "./embeddings/Embeddings";
-import { findFreeAttributeName, postProcessingAttributes } from "@/src/util/components/projects/projectId/settings/data-schema-helper";
 import { postProcessingEmbeddings, postProcessingRecommendedEncoders } from "@/src/util/components/projects/projectId/settings/embeddings-helper";
 import { AttributeState } from "@/src/types/components/projects/projectId/settings/data-schema";
 import { RecommendedEncoder } from "@/src/types/components/projects/projectId/settings/embeddings";
@@ -112,7 +111,7 @@ export default function ProjectSettings() {
 
     function refetchAttributesAndPostProcess() {
         refetchAttributes({ variables: { projectId: project.id, stateFilter: ['ALL'] } }).then((res) => {
-            dispatch(setAllAttributes(postProcessingAttributes(res.data['attributesByProjectId'])));
+            dispatch(setAllAttributes(res.data['attributesByProjectId']));
         });
     }
 
@@ -221,7 +220,7 @@ export default function ProjectSettings() {
                 timer(5000).subscribe(() => checkProjectTokenization());
             } else {
                 refetchAttributes({ variables: { projectId: project.id, stateFilter: ['ALL'] } }).then((res) => {
-                    dispatch(setAllAttributes(postProcessingAttributes(res.data['attributesByProjectId'])));
+                    dispatch(setAllAttributes(res.data['attributesByProjectId']));
                     setIsAcRunning(checkIfAcRunning());
                 });
                 if (msgParts[2] == 'finished') timer(5000).subscribe(() => checkProjectTokenization());

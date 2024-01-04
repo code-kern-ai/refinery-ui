@@ -2,10 +2,11 @@ import { LookupList } from "@/src/types/components/projects/projectId/lookup-lis
 import { Attribute } from "@/src/types/components/projects/projectId/settings/data-schema";
 import { Embedding } from "@/src/types/components/projects/projectId/settings/embeddings";
 import { BricksIntegratorConfig } from "@/src/types/shared/bricks-integrator";
-import { CommentData, CommentDataStore, CommentPosition } from "@/src/types/shared/comments";
+import { CommentData } from "@/src/types/shared/comments";
 import { User } from "@/src/types/shared/general";
 import { NotificationListWrapper } from "@/src/types/shared/notification-center";
 import { UserRole } from "@/src/types/shared/sidebar";
+import { postProcessUsersList } from "@/src/util/components/users/users-list-helper";
 import { arrayToDict } from "@/submodules/javascript-functions/general";
 import { PayloadAction, createSelector, createSlice } from "@reduxjs/toolkit";
 
@@ -103,7 +104,7 @@ const generalSlice = createSlice({
             state.organizationInactive = action.payload == null;
         },
         setAllUsers(state, action: PayloadAction<User[]>) {
-            if (action.payload) state.users.all = [...action.payload];
+            if (action.payload) state.users.all = postProcessUsersList([...action.payload]);
             else state.users.all = [];
             state.users.engineers = state.users.all.filter(user => user.role == UserRole.ENGINEER);
             state.users.annotators = state.users.all.filter(user => user.role == UserRole.ANNOTATOR);

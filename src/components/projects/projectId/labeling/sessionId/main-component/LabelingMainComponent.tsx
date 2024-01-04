@@ -22,10 +22,9 @@ import { transferNestedDict } from "@/submodules/javascript-functions/general";
 import LabelingSuiteOverviewTable from "../sub-components/LabelingSuiteOverviewTable";
 import LabelingSuiteLabeling from "../sub-components/LabelingSuiteLabeling";
 import { setAllAttributes, setLabelingTasksAll } from "@/src/reduxStore/states/pages/settings";
-import { postProcessingAttributes } from "@/src/util/components/projects/projectId/settings/data-schema-helper";
 import { WebSocketsService } from "@/src/services/base/web-sockets/WebSocketsService";
 import { CurrentPage } from "@/src/types/shared/general";
-import { postProcessLabelingTasks, postProcessLabelingTasksSchema } from "@/src/util/components/projects/projectId/settings/labeling-tasks-helper";
+import { postProcessLabelingTasks } from "@/src/util/components/projects/projectId/settings/labeling-tasks-helper";
 import { CommentDataManager } from "@/src/util/classes/comments";
 import { REQUEST_COMMENTS } from "@/src/services/gql/queries/projects";
 import { CommentType } from "@/src/types/shared/comments";
@@ -232,14 +231,14 @@ export default function LabelingMainComponent() {
 
     function refetchAttributesAndProcess() {
         refetchAttributes({ variables: { projectId: projectId, stateFilter: ['ALL'] } }).then((res) => {
-            dispatch(setAllAttributes(postProcessingAttributes(res.data['attributesByProjectId'])));
+            dispatch(setAllAttributes(res.data['attributesByProjectId']));
         });
     }
 
     function refetchLabelingTasksAndProcess() {
         refetchLabelingTasksByProjectId({ variables: { projectId: projectId } }).then((res) => {
             const labelingTasks = postProcessLabelingTasks(res['data']['projectByProjectId']['labelingTasks']['edges']);
-            dispatch(setLabelingTasksAll(postProcessLabelingTasksSchema(labelingTasks)))
+            dispatch(setLabelingTasksAll(labelingTasks));
         });
     }
 

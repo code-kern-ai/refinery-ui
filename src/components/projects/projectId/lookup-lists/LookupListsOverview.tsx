@@ -13,7 +13,7 @@ import style from '@/src/styles/components/projects/projectId/lookup-lists.modul
 import { openModal, selectModal } from "@/src/reduxStore/states/modal";
 import { ModalEnum } from "@/src/types/shared/modal";
 import { useRouter } from "next/router";
-import { ACTIONS_DROPDOWN_OPTIONS, postProcessLookupLists } from "@/src/util/components/projects/projectId/lookup-lists-helper";
+import { ACTIONS_DROPDOWN_OPTIONS } from "@/src/util/components/projects/projectId/lookup-lists-helper";
 import { WebSocketsService } from "@/src/services/base/web-sockets/WebSocketsService";
 import { CurrentPage } from "@/src/types/shared/general";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
@@ -70,7 +70,7 @@ export default function LookupListsOverview() {
     useEffect(() => {
         if (!projectId) return;
         refetchLookupLists({ variables: { projectId: projectId } }).then((res) => {
-            dispatch(setAllLookupLists(postProcessLookupLists(res.data["knowledgeBasesByProjectId"])));
+            dispatch(setAllLookupLists(res.data["knowledgeBasesByProjectId"]));
         });
         WebSocketsService.subscribeToNotification(CurrentPage.LOOKUP_LISTS_OVERVIEW, {
             projectId: projectId,
@@ -124,7 +124,7 @@ export default function LookupListsOverview() {
     const handleWebsocketNotification = useCallback((msgParts: string[]) => {
         if (['knowledge_base_updated', 'knowledge_base_deleted', 'knowledge_base_created'].includes(msgParts[1])) {
             refetchLookupLists({ variables: { projectId: projectId } }).then((res) => {
-                dispatch(setAllLookupLists(postProcessLookupLists(res.data["knowledgeBasesByProjectId"])));
+                dispatch(setAllLookupLists(res.data["knowledgeBasesByProjectId"]));
             });
         }
     }, [projectId]);

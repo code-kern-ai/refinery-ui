@@ -7,9 +7,8 @@ import { LOOKUP_LISTS_BY_PROJECT_ID } from "@/src/services/gql/queries/lookup-li
 import { GET_ATTRIBUTES_BY_PROJECT_ID, GET_ATTRIBUTE_BY_ATTRIBUTE_ID, GET_PROJECT_TOKENIZATION } from "@/src/services/gql/queries/project-setting";
 import { Attribute, AttributeState } from "@/src/types/components/projects/projectId/settings/data-schema";
 import { CurrentPage, DataTypeEnum } from "@/src/types/shared/general";
-import { postProcessLookupLists } from "@/src/util/components/projects/projectId/lookup-lists-helper";
 import { postProcessCurrentAttribute } from "@/src/util/components/projects/projectId/settings/attribute-calculation-helper";
-import { ATTRIBUTES_VISIBILITY_STATES, DATA_TYPES, getTooltipVisibilityState, postProcessingAttributes } from "@/src/util/components/projects/projectId/settings/data-schema-helper";
+import { ATTRIBUTES_VISIBILITY_STATES, DATA_TYPES, getTooltipVisibilityState } from "@/src/util/components/projects/projectId/settings/data-schema-helper";
 import { copyToClipboard } from "@/submodules/javascript-functions/general";
 import Dropdown from "@/submodules/react-components/components/Dropdown";
 import { useLazyQuery, useMutation } from "@apollo/client";
@@ -75,13 +74,13 @@ export default function AttributeCalculation() {
         if (!projectId) return;
         if (!currentAttribute || attributes.length == 0) {
             refetchAttributes({ variables: { projectId: projectId, stateFilter: ['ALL'] } }).then((res) => {
-                dispatch(setAllAttributes(postProcessingAttributes(res.data['attributesByProjectId'])));
+                dispatch(setAllAttributes(res.data['attributesByProjectId']));
                 setCurrentAttribute(postProcessCurrentAttribute(attributes.find((attribute) => attribute.id === router.query.attributeId)));
             });
         }
         if (lookupLists.length == 0) {
             refetchLookupLists({ variables: { projectId: projectId } }).then((res) => {
-                dispatch(setAllLookupLists(postProcessLookupLists(res.data['knowledgeBasesByProjectId'])));
+                dispatch(setAllLookupLists(res.data['knowledgeBasesByProjectId']));
             });
         }
         checkProjectTokenization();
@@ -211,7 +210,7 @@ export default function AttributeCalculation() {
                 setCurrentAttribute(currentAttributeCopy);
             } else {
                 refetchAttributes({ variables: { projectId: projectId, stateFilter: ['ALL'] } }).then((res) => {
-                    dispatch(setAllAttributes(postProcessingAttributes(res.data['attributesByProjectId'])));
+                    dispatch(setAllAttributes(res.data['attributesByProjectId']));
                 });
                 refetchAttributeByAttributeId({ variables: { projectId: projectId, attributeId: currentAttribute?.id } }).then((res) => {
                     const attribute = res.data['attributeByAttributeId'];
@@ -224,7 +223,7 @@ export default function AttributeCalculation() {
             }
         } else if (['knowledge_base_updated', 'knowledge_base_deleted', 'knowledge_base_created'].includes(msgParts[1])) {
             refetchLookupLists({ variables: { projectId: projectId } }).then((res) => {
-                dispatch(setAllLookupLists(postProcessLookupLists(res.data['knowledgeBasesByProjectId'])));
+                dispatch(setAllLookupLists(res.data['knowledgeBasesByProjectId']));
             });
         } else if (msgParts[1] == 'tokenization' && msgParts[2] == 'docbin') {
             if (msgParts[3] == 'progress') {

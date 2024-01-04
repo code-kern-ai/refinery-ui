@@ -4,7 +4,7 @@ import { GET_MODEL_CALLBACKS_OVERVIEW_DATA } from "@/src/services/gql/queries/mo
 import { GET_LABELING_TASKS_BY_PROJECT_ID } from "@/src/services/gql/queries/project-setting";
 import { LabelingTask } from "@/src/types/components/projects/projectId/settings/labeling-tasks";
 import { ACTIONS_DROPDOWN_OPTIONS, postProcessModelCallbacks } from "@/src/util/components/projects/projectId/model-callbacks-helper";
-import { postProcessLabelingTasks, postProcessLabelingTasksSchema } from "@/src/util/components/projects/projectId/settings/labeling-tasks-helper";
+import { postProcessLabelingTasks } from "@/src/util/components/projects/projectId/settings/labeling-tasks-helper";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
 import Dropdown from "@/submodules/react-components/components/Dropdown";
 import { useLazyQuery } from "@apollo/client";
@@ -14,9 +14,8 @@ import { useRouter } from "next/router";
 import { useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import style from '@/src/styles/components/projects/projectId/model-callbacks.module.css';
-import { ModalButton, ModalEnum } from "@/src/types/shared/modal";
+import { ModalEnum } from "@/src/types/shared/modal";
 import { openModal, selectModal } from "@/src/reduxStore/states/modal";
-import Modal from "@/src/components/shared/modal/Modal";
 import { WebSocketsService } from "@/src/services/base/web-sockets/WebSocketsService";
 import { CurrentPage } from "@/src/types/shared/general";
 import GridCards from "@/src/components/shared/grid-cards/GridCards";
@@ -67,7 +66,7 @@ export default function ModelCallbacks() {
     function refetchLabelingTasksAndProcess() {
         refetchLabelingTasksByProjectId({ variables: { projectId: projectId } }).then((res) => {
             const labelingTasks = postProcessLabelingTasks(res['data']['projectByProjectId']['labelingTasks']['edges']);
-            dispatch(setLabelingTasksAll(postProcessLabelingTasksSchema(labelingTasks)))
+            dispatch(setLabelingTasksAll(labelingTasks));
         });
     }
 

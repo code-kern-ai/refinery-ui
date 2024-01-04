@@ -8,8 +8,6 @@ import { LOOKUP_LISTS_BY_PROJECT_ID } from "@/src/services/gql/queries/lookup-li
 import { GET_ATTRIBUTES_BY_PROJECT_ID } from "@/src/services/gql/queries/project-setting";
 import { HeuristicsProperty } from "@/src/types/components/projects/projectId/heuristics/heuristicId/heuristics-details";
 import { Attribute } from "@/src/types/components/projects/projectId/settings/data-schema";
-import { postProcessLookupLists } from "@/src/util/components/projects/projectId/lookup-lists-helper";
-import { postProcessingAttributes } from "@/src/util/components/projects/projectId/settings/data-schema-helper";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
 import { InformationSourceType } from "@/submodules/javascript-functions/enums/enums";
 import { copyToClipboard } from "@/submodules/javascript-functions/general";
@@ -79,13 +77,13 @@ export default function HeuristicsLayout(props: any) {
 
     function refetchAttributesAndProcess() {
         refetchAttributes({ variables: { projectId: projectId, stateFilter: ['ALL'] } }).then((res) => {
-            dispatch(setAllAttributes(postProcessingAttributes(res.data['attributesByProjectId'])));
+            dispatch(setAllAttributes(res.data['attributesByProjectId']));
         });
     }
 
     function refetchLookupListsAndProcess() {
         refetchLookupLists({ variables: { projectId: projectId } }).then((res) => {
-            dispatch(setAllLookupLists(postProcessLookupLists(res.data["knowledgeBasesByProjectId"])));
+            dispatch(setAllLookupLists(res.data["knowledgeBasesByProjectId"]));
         });
     }
 

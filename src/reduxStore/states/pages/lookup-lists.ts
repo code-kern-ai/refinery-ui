@@ -1,4 +1,5 @@
 import { LookupList } from '@/src/types/components/projects/projectId/lookup-lists';
+import { postProcessLookupLists } from '@/src/util/components/projects/projectId/lookup-lists-helper';
 import { createSlice } from '@reduxjs/toolkit'
 import type { PayloadAction } from '@reduxjs/toolkit'
 
@@ -49,7 +50,7 @@ const lookupListsSlice = createSlice({
             },
         },
         setAllLookupLists(state, action: PayloadAction<LookupList[]>) {
-            if (action.payload) state.all = action.payload;
+            if (action.payload) state.all = postProcessLookupLists(action.payload);
             else state.all = [];
         },
         extendAllLookupLists(state, action: PayloadAction<LookupList>) {

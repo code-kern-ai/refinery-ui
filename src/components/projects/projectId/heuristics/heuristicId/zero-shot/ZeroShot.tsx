@@ -7,7 +7,7 @@ import { GET_HEURISTICS_BY_ID } from "@/src/services/gql/queries/heuristics";
 import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { GET_LABELING_TASKS_BY_PROJECT_ID, GET_ZERO_SHOT_RECOMMENDATIONS } from "@/src/services/gql/queries/project-setting";
-import { postProcessLabelingTasks, postProcessLabelingTasksSchema } from "@/src/util/components/projects/projectId/settings/labeling-tasks-helper";
+import { postProcessLabelingTasks } from "@/src/util/components/projects/projectId/settings/labeling-tasks-helper";
 import { selectLabelingTasksAll, selectTextAttributes, setLabelingTasksAll } from "@/src/reduxStore/states/pages/settings";
 import { CurrentPage } from "@/src/types/shared/general";
 import { WebSocketsService } from "@/src/services/base/web-sockets/WebSocketsService";
@@ -105,7 +105,7 @@ export default function ZeroShot() {
     function refetchLabelingTasksAndProcess() {
         refetchLabelingTasksByProjectId({ variables: { projectId: projectId } }).then((res) => {
             const labelingTasks = postProcessLabelingTasks(res['data']['projectByProjectId']['labelingTasks']['edges']);
-            dispatch(setLabelingTasksAll(postProcessLabelingTasksSchema(labelingTasks)));
+            dispatch(setLabelingTasksAll(labelingTasks));
         });
     }
 

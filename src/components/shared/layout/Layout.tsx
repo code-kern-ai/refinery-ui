@@ -9,9 +9,8 @@ import { WebSocketsService } from "@/src/services/base/web-sockets/WebSocketsSer
 import { CurrentPage } from "@/src/types/shared/general";
 import { useDispatch, useSelector } from "react-redux";
 import { selectUser } from "@/src/reduxStore/states/general";
-import { interval, timer } from "rxjs";
+import { interval } from "rxjs";
 import { selectNotificationsUser, setNotificationId, setNotificationsUser } from "@/src/reduxStore/states/tmp";
-import { unsubscribeWSOnDestroy } from "@/src/services/base/web-sockets/web-sockets-helper";
 import { useRouter } from "next/router";
 import AdminMessages from "../admin-messages/AdminMessages";
 import { AdminMessage } from "@/src/types/shared/admin-messages";

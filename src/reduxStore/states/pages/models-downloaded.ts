@@ -1,4 +1,5 @@
 import { ModelsDownloaded } from "@/src/types/components/models-downloaded/models-downloaded";
+import { postProcessingModelsDownload } from "@/src/util/components/models-downloaded/models-downloaded-helper";
 import { PayloadAction, createSlice } from "@reduxjs/toolkit";
 
 type ModelsDownloadedState = {
@@ -18,7 +19,7 @@ const modelsDownloadedSlice = createSlice({
     initialState,
     reducers: {
         setModelsDownloaded(state, action: PayloadAction<ModelsDownloaded[]>) {
-            if (action.payload) state.modelsDownloaded = action.payload;
+            if (action.payload) state.modelsDownloaded = postProcessingModelsDownload(action.payload);
             else state.modelsDownloaded = [];
         },
         removeModelDownloadByName(state, action: PayloadAction<string>) {

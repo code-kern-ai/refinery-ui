@@ -13,12 +13,10 @@ import { unsubscribeWSOnDestroy } from '@/src/services/base/web-sockets/web-sock
 import { useRouter } from 'next/router';
 import { GET_CONFIDENCE_DISTRIBUTION, GET_CONFUSION_MATRIX, GET_GENERAL_PROJECT_STATS, GET_INTER_ANNOTATOR_BY_PROJECT_ID, GET_LABEL_DISTRIBUTION, IS_RATS_TOKENIZAION_STILL_RUNNING } from '@/src/services/gql/queries/project-overview';
 import { GET_ATTRIBUTES_BY_PROJECT_ID, GET_LABELING_TASKS_BY_PROJECT_ID } from '@/src/services/gql/queries/project-setting';
-import { postProcessLabelingTasks, postProcessLabelingTasksSchema } from '@/src/util/components/projects/projectId/settings/labeling-tasks-helper';
+import { postProcessLabelingTasks } from '@/src/util/components/projects/projectId/settings/labeling-tasks-helper';
 import { selectLabelingTasksAll, setAllAttributes, setLabelingTasksAll } from '@/src/reduxStore/states/pages/settings';
-import { postProcessingAttributes } from '@/src/util/components/projects/projectId/settings/data-schema-helper';
 import { DATA_SLICES } from '@/src/services/gql/queries/data-browser';
 import { selectStaticSlices, setDataSlices } from '@/src/reduxStore/states/pages/data-browser';
-import { postProcessDataSlices } from '@/src/util/components/projects/projectId/data-browser/data-browser-helper';
 import { selectOverviewFilters, setOverviewFilters } from '@/src/reduxStore/states/tmp';
 import { DisplayGraphs } from '@/submodules/javascript-functions/enums/enums';
 import LabelDistributionBarChart from './charts/LabelDistributionBarChart';
@@ -148,20 +146,20 @@ export default function ProjectOverview() {
 
     function refetchAttributesAndProcess() {
         refetchAttributes({ variables: { projectId: projectId, stateFilter: ['ALL'] } }).then((res) => {
-            dispatch(setAllAttributes(postProcessingAttributes(res.data['attributesByProjectId'])));
+            dispatch(setAllAttributes(res.data['attributesByProjectId']));
         });
     }
 
     function refetchLabelingTasksAndProcess() {
         refetchLabelingTasksByProjectId({ variables: { projectId: projectId } }).then((res) => {
             const labelingTasks = postProcessLabelingTasks(res['data']['projectByProjectId']['labelingTasks']['edges']);
-            dispatch(setLabelingTasksAll(postProcessLabelingTasksSchema(labelingTasks)));
+            dispatch(setLabelingTasksAll(labelingTasks));
         });
     }
 
     function refetchDataSlicesAndProcess() {
         refetchDataSlices({ variables: { projectId: projectId } }).then((res) => {
-            dispatch(setDataSlices(postProcessDataSlices(res.data.dataSlices)));
+            dispatch(setDataSlices(res.data.dataSlices));
         });
     }
 

@@ -12,7 +12,7 @@ import { EmbeddingPlatform, EmbeddingProps, EmbeddingType, PlatformType, Suggest
 import { DataTypeEnum } from "@/src/types/shared/general";
 import { ModalButton, ModalEnum } from "@/src/types/shared/modal";
 import { postProcessingModelsDownload } from "@/src/util/components/models-downloaded/models-downloaded-helper";
-import { DEFAULT_AZURE_TYPE, GRANULARITY_TYPES_ARRAY, checkIfCreateEmbeddingIsDisabled, platformNamesDict, postProcessingEmbeddingPlatforms } from "@/src/util/components/projects/projectId/settings/embeddings-helper";
+import { DEFAULT_AZURE_TYPE, GRANULARITY_TYPES_ARRAY, checkIfCreateEmbeddingIsDisabled, platformNamesDict } from "@/src/util/components/projects/projectId/settings/embeddings-helper";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
 import Dropdown from "@/submodules/react-components/components/Dropdown";
 import { useLazyQuery, useMutation } from "@apollo/client";
@@ -336,7 +336,7 @@ function SuggestionsModel(props: SuggestionsProps) {
         if (!props.options) return;
         refetchModelsDownload().then((res) => {
             const modelsDownloaded = postProcessingModelsDownload(res.data['modelProviderInfo']);
-            dispatch(setModelsDownloaded(modelsDownloaded));
+            dispatch(setModelsDownloaded(res.data['modelProviderInfo']));
             const colorDownloadedModels = props.options.map((model: any) => {
                 const checkIfModelExists = modelsDownloaded.find((modelDownloaded: ModelsDownloaded) => modelDownloaded.name === model.configString);
                 return checkIfModelExists !== undefined;

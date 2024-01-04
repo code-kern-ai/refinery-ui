@@ -16,7 +16,6 @@ import { ADD_USER_TO_ORGANIZATION, CREATE_ORGANIZATION } from "@/src/services/gq
 import style from "@/src/styles/components/projects/projects-list.module.css";
 import { useRouter } from "next/router";
 import { unsubscribeWSOnDestroy } from "@/src/services/base/web-sockets/web-sockets-helper";
-import { postProcessProjectsList } from "@/src/util/components/projects/projects-list-helper";
 import AdminDeleteProjectModal from "./AdminDeleteProjectModal";
 
 export default function ProjectsList() {
@@ -61,7 +60,7 @@ export default function ProjectsList() {
     function refetchProjectsAndPostProcess() {
         refetchProjects().then((res) => {
             const projects = res.data["allProjects"].edges.map((edge: any) => edge.node);
-            dispatch(setAllProjects(postProcessProjectsList(projects)));
+            dispatch(setAllProjects(projects));
             setDataLoaded(true);
         });
     }

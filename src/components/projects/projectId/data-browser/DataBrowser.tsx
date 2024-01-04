@@ -5,11 +5,10 @@ import { useLazyQuery } from "@apollo/client";
 import { DATA_SLICES, GET_RECORD_COMMENTS, GET_UNIQUE_VALUES_BY_ATTRIBUTES, SEARCH_RECORDS_EXTENDED } from "@/src/services/gql/queries/data-browser";
 import { useCallback, useEffect, useState } from "react";
 import { expandRecordList, setDataSlices, setRecordComments, setSearchRecordsExtended, setUniqueValuesDict, setUsersMapCount, updateAdditionalDataState } from "@/src/reduxStore/states/pages/data-browser";
-import { postProcessDataSlices, postProcessRecordComments, postProcessRecordsExtended, postProcessUniqueValues, postProcessUsersCount } from "@/src/util/components/projects/projectId/data-browser/data-browser-helper";
+import { postProcessRecordsExtended, postProcessUniqueValues, postProcessUsersCount } from "@/src/util/components/projects/projectId/data-browser/data-browser-helper";
 import { GET_ATTRIBUTES_BY_PROJECT_ID, GET_EMBEDDING_SCHEMA_BY_PROJECT_ID, GET_LABELING_TASKS_BY_PROJECT_ID } from "@/src/services/gql/queries/project-setting";
 import { selectAttributes, selectLabelingTasksAll, setAllAttributes, setAllEmbeddings, setLabelingTasksAll } from "@/src/reduxStore/states/pages/settings";
-import { postProcessingAttributes } from "@/src/util/components/projects/projectId/settings/data-schema-helper";
-import { postProcessLabelingTasks, postProcessLabelingTasksSchema } from "@/src/util/components/projects/projectId/settings/labeling-tasks-helper";
+import { postProcessLabelingTasks } from "@/src/util/components/projects/projectId/settings/labeling-tasks-helper";
 import { GET_ORGANIZATION_USERS_WITH_COUNT } from "@/src/services/gql/queries/organizations";
 import { selectAllUsers, setComments } from "@/src/reduxStore/states/general";
 import DataBrowserRecords from "./DataBrowserRecords";
@@ -34,7 +33,6 @@ export default function DataBrowser() {
     const attributes = useSelector(selectAttributes);
 
     const [searchRequest, setSearchRequest] = useState(SEARCH_REQUEST);
-    const [clearFullSearch, setClearFullSearch] = useState(false);
 
     const [refetchDataSlices] = useLazyQuery(DATA_SLICES, { fetchPolicy: 'network-only' });
     const [refetchAttributes] = useLazyQuery(GET_ATTRIBUTES_BY_PROJECT_ID, { fetchPolicy: "network-only" });
@@ -106,20 +104,20 @@ export default function DataBrowser() {
 
     function refetchDataSlicesAndProcess() {
         refetchDataSlices({ variables: { projectId: projectId } }).then((res) => {
-            dispatch(setDataSlices(postProcessDataSlices(res.data.dataSlices)));
+            dispatch(setDataSlices(res.data.dataSlices));
         });
     }
 
     function refetchAttributesAndProcess() {
         refetchAttributes({ variables: { projectId: projectId, stateFilter: ['ALL'] } }).then((res) => {
-            dispatch(setAllAttributes(postProcessingAttributes(res.data['attributesByProjectId'])));
+            dispatch(setAllAttributes(res.data['attributesByProjectId']));
         });
     }
 
     function refetchLabelingTasksAndProcess() {
         refetchLabelingTasksByProjectId({ variables: { projectId: projectId } }).then((res) => {
             const labelingTasks = postProcessLabelingTasks(res['data']['projectByProjectId']['labelingTasks']['edges']);
-            dispatch(setLabelingTasksAll(postProcessLabelingTasksSchema(labelingTasks)));
+            dispatch(setLabelingTasksAll(labelingTasks));
         });
     }
 
@@ -148,7 +146,7 @@ export default function DataBrowser() {
         const currentRecordIds = parsedRecordData?.map((record) => record.id);
         if (!currentRecordIds || currentRecordIds.length == 0) return;
         refetchRecordComments({ variables: { projectId: projectId, recordIds: currentRecordIds } }).then((res) => {
-            dispatch(setRecordComments(postProcessRecordComments(res.data['recordComments'])));
+            dispatch(setRecordComments(res.data['recordComments']));
         });
     }
 

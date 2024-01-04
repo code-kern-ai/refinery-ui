@@ -1,7 +1,6 @@
-import Modal from "@/src/components/shared/modal/Modal";
-import { selectModal, setModalStates } from "@/src/reduxStore/states/modal";
+import { setModalStates } from "@/src/reduxStore/states/modal";
 import { selectHeuristic } from "@/src/reduxStore/states/pages/heuristics";
-import { selectLabelingTasksAll, selectUsableAttributes, selectVisibleAttributesHeuristics } from "@/src/reduxStore/states/pages/settings";
+import { selectLabelingTasksAll } from "@/src/reduxStore/states/pages/settings";
 import { selectProjectId } from "@/src/reduxStore/states/project";
 import { RUN_ZERO_SHOT_PROJECT } from "@/src/services/gql/mutations/heuristics";
 import { GET_ZERO_SHOT_10_RANDOM_RECORDS } from "@/src/services/gql/queries/heuristics";

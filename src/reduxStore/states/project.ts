@@ -1,11 +1,8 @@
+import { Project } from '@/src/types/components/projects/projects-list';
+import { postProcessProjectsList } from '@/src/util/components/projects/projects-list-helper';
 import { arrayToDict } from '@/submodules/javascript-functions/general';
 import { createSelector, createSlice } from '@reduxjs/toolkit'
 import type { PayloadAction } from '@reduxjs/toolkit'
-import { create } from 'domain';
-
-export type Project = {
-    id: string;
-}
 
 type ProjectState = {
     all: Project[];
@@ -52,7 +49,7 @@ const projectSlice = createSlice({
             },
         },
         setAllProjects(state, action: PayloadAction<Project[]>) {
-            if (action.payload) state.all = action.payload;
+            if (action.payload) state.all = postProcessProjectsList(action.payload);
             else state.all = [];
         },
         extendAllProjects(state, action: PayloadAction<Project>) {
