@@ -14,8 +14,8 @@ export default function Config() {
     const organization = useSelector(selectOrganization);
     const tokenizerValues = useSelector(selectCachedValue(CacheEnum.TOKENIZER_VALUES));
 
-    const [localConfig, setLocalConfig] = useState<LocalConfig>({} as LocalConfig);
-    const [maxRows, setMaxRows] = useState<number>(0);
+    const [localConfig, setLocalConfig] = useState<LocalConfig>({} as LocalConfig); // with the new guidelines this would be useState<LocalConfig>({}) or useState<LocalConfig>(null) depending on the usecase
+    const [maxRows, setMaxRows] = useState<number>(0); // useState(0)
     const [maxCols, setMaxCols] = useState<number>(0);
     const [maxChar, setMaxChar] = useState<number>(0);
     const [prepareTokenizedValues, setPrepareTokenizedValues] = useState<any[]>([]);
