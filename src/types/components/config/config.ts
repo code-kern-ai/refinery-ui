@@ -3,3 +3,9 @@ export type LocalConfig = {
     limitChecks: any;
     spacyDownloads: any[];
 }
+
+export type Configuration = {
+    maxCols: number;
+    maxRows: number;
+    maxCharCount: number;
+}

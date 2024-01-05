@@ -120,7 +120,6 @@ export function GlobalStoreDataComponent(props: React.PropsWithChildren) {
     }, [router.query.projectId]);
 
     useEffect(() => {
-        if (!isManaged) return;
         if (!ConfigManager.isInit()) return;
         refetchTokenizerValues().then((res) => {
             dispatch(setCache(CacheEnum.TOKENIZER_VALUES, checkWhitelistTokenizer(res.data['languageModels'], isManaged)));

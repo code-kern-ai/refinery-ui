@@ -2,7 +2,7 @@ import { CacheEnum, selectCachedValue } from "@/src/reduxStore/states/cachedValu
 import { selectOrganization } from "@/src/reduxStore/states/general";
 import { ConfigManager } from "@/src/services/base/config";
 import { CHANGE_ORGANIZATION, UPDATE_CONFIG } from "@/src/services/gql/mutations/organizations";
-import { LocalConfig } from "@/src/types/components/config/config"
+import { Configuration, LocalConfig } from "@/src/types/components/config/config"
 import { snakeCaseToCamelCase } from "@/submodules/javascript-functions/case-types-parser";
 import Dropdown from "@/submodules/react-components/components/Dropdown";
 import { useMutation } from "@apollo/client";
@@ -14,10 +14,8 @@ export default function Config() {
     const organization = useSelector(selectOrganization);
     const tokenizerValues = useSelector(selectCachedValue(CacheEnum.TOKENIZER_VALUES));
 
-    const [localConfig, setLocalConfig] = useState<LocalConfig>({} as LocalConfig);
-    const [maxRows, setMaxRows] = useState<number>(0);
-    const [maxCols, setMaxCols] = useState<number>(0);
-    const [maxChar, setMaxChar] = useState<number>(0);
+    const [localConfig, setLocalConfig] = useState<LocalConfig>(null);
+    const [configuration, setConfiguration] = useState<Configuration>(null);
     const [prepareTokenizedValues, setPrepareTokenizedValues] = useState<any[]>([]);
 
     const [changeOrganizationMut] = useMutation(CHANGE_ORGANIZATION);
@@ -34,9 +32,11 @@ export default function Config() {
 
     useEffect(() => {
         if (!organization) return;
-        setMaxRows(organization.maxRows);
-        setMaxCols(organization.maxCols);
-        setMaxChar(organization.maxCharCount);
+        setConfiguration({
+            maxRows: organization.maxRows,
+            maxCols: organization.maxCols,
+            maxCharCount: organization.maxCharCount,
+        });
     }, [organization]);
 
     useEffect(() => {
@@ -64,7 +64,6 @@ export default function Config() {
         } else {
             updateDict[key] = value;
         }
-        localStorage.removeItem("base_config");
         if (subkey == 'max_rows' || subkey == 'max_cols' || subkey == 'max_char_count') {
             changeOrganizationMut({ variables: { orgId: organization.id, changes: JSON.stringify(updateDict.limit_checks) } }).then((res) => {
                 if (!res?.data?.changeOrganization) {
@@ -106,6 +105,12 @@ export default function Config() {
         }
     }
 
+    function updateConfiguration(value: number, field: string) {
+        const configurationCopy = { ...configuration };
+        configurationCopy[field] = value;
+        setConfiguration(configurationCopy);
+    }
+
     return (<div className="h-screen bg-white py-6 px-4 space-y-6 sm:p-6">
         <div>
             <h3 className="text-lg leading-6 font-medium text-gray-900">Configuration</h3>
@@ -116,33 +121,33 @@ export default function Config() {
                 <label className="font-medium text-gray-700">Max rows</label>
                 <p className="text-gray-500">Maximum number of records per project.</p>
             </div>
-            <input type="number" value={maxRows}
+            <input type="number" value={configuration.maxRows}
                 className="h-8 w-32 text-sm border-gray-300 rounded-md placeholder-italic border text-gray-900 pl-4 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100"
                 onChange={(e) => {
                     checkAndSaveValue(e.target.value, 'limit_checks', 'max_rows');
-                    setMaxRows(Number(e.target.value));
+                    updateConfiguration(Number(e.target.value), 'maxRows');
                 }} />
 
             <div className="text-sm">
                 <label className="font-medium text-gray-700">Max attributes</label>
                 <p className="text-gray-500">Maximum number of attributes per project.</p>
             </div>
-            <input type="number" value={maxCols}
+            <input type="number" value={configuration.maxCols}
                 className="h-8 w-32 text-sm border-gray-300 rounded-md placeholder-italic border text-gray-900 pl-4 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100"
                 onChange={(e) => {
                     checkAndSaveValue(e.target.value, 'limit_checks', 'max_cols');
-                    setMaxCols(Number(e.target.value));
+                    updateConfiguration(Number(e.target.value), 'maxCols');
                 }} />
 
             <div className="text-sm">
                 <label className="font-medium text-gray-700">Max characters</label>
                 <p className="text-gray-500">Maximum number of characters per record.</p>
             </div>
-            <input type="number" value={maxChar}
+            <input type="number" value={configuration.maxCharCount}
                 className="h-8 w-32 text-sm border-gray-300 rounded-md placeholder-italic border text-gray-900 pl-4 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100"
                 onChange={(e) => {
                     checkAndSaveValue(e.target.value, 'limit_checks', 'max_char_count');
-                    setMaxChar(Number(e.target.value));
+                    updateConfiguration(Number(e.target.value), 'maxCharCount');
                 }} />
 
             <div className="h-full text-sm">
