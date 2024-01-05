@@ -544,8 +544,9 @@ export default function SearchGroups() {
                                     )}
 
                                     {(groupItem['operator'] == SearchOperator.BEGINS_WITH || groupItem['operator'] == SearchOperator.ENDS_WITH || groupItem['operator'] == SearchOperator.CONTAINS || groupItem['operator'] == SearchOperator.IN_WC) && (saveAttributeType != DataTypeEnum.INTEGER && saveAttributeType != DataTypeEnum.FLOAT) &&
-                                        <label htmlFor="caseSensitive" className="text-xs text-gray-500 cursor-pointer flex items-center pb-2"><input name="caseSensitive" className="mr-1 cursor-pointer"
-                                            onChange={(e: any) => selectValueDropdown(e.target.checked, index, 'caseSensitive', group.key)} type="checkbox" />Case sensitive</label>}
+                                        <label htmlFor="caseSensitive" className="text-xs text-gray-500 cursor-pointer flex items-center pb-2">
+                                            <input name="caseSensitive" className="mr-1 cursor-pointer" id="caseSensitive"
+                                                onChange={(e: any) => selectValueDropdown(e.target.checked, index, 'caseSensitive', group.key)} type="checkbox" />Case sensitive</label>}
                                 </div>
                             </div>
                             <div className="w-full flex justify-center">
@@ -562,10 +563,13 @@ export default function SearchGroups() {
                             <div className="flex flex-col">
                                 {fullSearchStore[group.key].groupElements['users'].map((groupItem, index) => (<div key={groupItem.id} className="my-1">
                                     <div className="form-control flex flex-row flex-nowrap items-center">
-                                        <div onClick={() => setActiveNegateGroup(groupItem, index, group)} style={{ backgroundColor: groupItem.color, borderColor: groupItem.color }}
-                                            className="ml-2 mr-2 h-4 w-4 border-gray-300 border rounded cursor-pointer hover:bg-gray-200">
-                                        </div>
-                                        <span className="label-text truncate">{groupItem['displayName']}</span>
+                                        <span className="flex flex-row items-center cursor-pointer" onClick={() => setActiveNegateGroup(groupItem, index, group)}>
+                                            <div style={{ backgroundColor: groupItem.color, borderColor: groupItem.color }}
+                                                className="ml-2 mr-2 h-4 w-4 border-gray-300 border rounded cursor-pointer hover:bg-gray-200">
+                                            </div>
+                                            <span className="text-sm truncate">{groupItem['displayName']}</span>
+                                        </span>
+
                                         {usersMap && usersMap[groupItem['id']] && <div><Tooltip content={groupItem['dataTip']} placement="left" color="invert">
                                             <IconInfoCircle className="ml-1 text-gray-700 h-5 w-5" onClick={() => dispatch(setModalStates(ModalEnum.USER_INFO, { open: true, userInfo: usersMap[groupItem['id']] }))} />
                                         </Tooltip></div>}
@@ -598,17 +602,17 @@ export default function SearchGroups() {
                             )}
                             <div className="flex-grow min-w-0 mt-1">
                                 <div className="flex flex-row items-center whitespace-nowrap">
-                                    <span className="label-text mr-0.5 font-dmMono">CONFIDENCE BETWEEN</span>
+                                    <span className="text-sm mr-0.5 font-dmMono">CONFIDENCE BETWEEN</span>
                                     <input
                                         onChange={(e) => changeConfidence(e, 'lower', group.key, 'weakSupervisionConfidence')}
                                         value={fullSearchStore[group.key].groupElements['weakSupervisionConfidence']['lower']}
                                         className="h-8 w-11 text-sm border-gray-300 rounded-md placeholder-italic border text-gray-900 pl-2 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100" />
-                                    <span className="label-text mx-0.5 font-dmMono">% AND</span>
+                                    <span className="text-sm mx-0.5 font-dmMono">% AND</span>
                                     <input
                                         onChange={(e) => changeConfidence(e, 'upper', group.key, 'weakSupervisionConfidence')}
                                         value={fullSearchStore[group.key].groupElements['weakSupervisionConfidence']['upper']}
                                         className="h-8 w-11 text-sm border-gray-300 rounded-md placeholder-italic border text-gray-900 pl-2 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100" />
-                                    <span className="label-text mx-0.5 font-dmMono">%</span>
+                                    <span className="text-sm mx-0.5 font-dmMono">%</span>
                                     {fullSearchStore[group.key].groupElements['weakSupervisionConfidence']['active'] && <Tooltip content={TOOLTIPS_DICT.DATA_BROWSER.CLEAR_WS_CONFIDENCE} color="invert">
                                         <IconFilterOff className="text-red-700 cursor-pointer" onClick={() => clearConfidence(group.key, 'weakSupervisionConfidence')} />
                                     </Tooltip>}
@@ -626,17 +630,17 @@ export default function SearchGroups() {
                             )}
                             <div className="flex-grow min-w-0 mt-1">
                                 <div className="flex flex-row items-center whitespace-nowrap">
-                                    <span className="label-text mr-0.5 font-dmMono">CONFIDENCE BETWEEN</span>
+                                    <span className="text-sm mr-0.5 font-dmMono">CONFIDENCE BETWEEN</span>
                                     <input
                                         onChange={(e) => changeConfidence(e, 'lower', group.key, 'modelCallbackConfidence')}
                                         value={fullSearchStore[group.key].groupElements['modelCallbackConfidence']['lower']}
                                         className="h-8 w-11 text-sm border-gray-300 rounded-md placeholder-italic border text-gray-900 pl-2 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100" />
-                                    <span className="label-text mx-0.5 font-dmMono">% AND</span>
+                                    <span className="text-sm mx-0.5 font-dmMono">% AND</span>
                                     <input
                                         onChange={(e) => changeConfidence(e, 'upper', group.key, 'modelCallbackConfidence')}
                                         value={fullSearchStore[group.key].groupElements['modelCallbackConfidence']['upper']}
                                         className="h-8 w-11 text-sm border-gray-300 rounded-md placeholder-italic border text-gray-900 pl-2 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100" />
-                                    <span className="label-text mx-0.5 font-dmMono">%</span>
+                                    <span className="text-sm mx-0.5 font-dmMono">%</span>
                                     {fullSearchStore[group.key].groupElements['modelCallbackConfidence']['active'] && <Tooltip content={TOOLTIPS_DICT.DATA_BROWSER.CLEAR_MC_CONFIDENCE} color="invert">
                                         <IconFilterOff className="text-red-700 cursor-pointer" onClick={() => clearConfidence(group.key, 'modelCallbackConfidence')} />
                                     </Tooltip>}
@@ -645,18 +649,18 @@ export default function SearchGroups() {
 
                             <div className="mt-2 font-bold">Heuristics</div>
                             {fullSearchStore[group.key].groupElements['heuristics'].length == 0 ? (<div className="text-sm text-gray-400">No heuristics associated with this task</div>) : (<div className="flex flex-col">
-                                <div className="flex items-center border-t border-t-gray-300 border-b border-b-gray-300">
-                                    <div onClick={() => updateIsDifferent(group.key, fullSearchStore[group.key].groupElements['isWithDifferentResults'])} style={{ backgroundColor: fullSearchStore[group.key].groupElements['isWithDifferentResults'].color, borderColor: fullSearchStore[group.key].groupElements['isWithDifferentResults'].color }}
+                                <div className="flex items-center cursor-pointer border-t border-t-gray-300 border-b border-b-gray-300" onClick={() => updateIsDifferent(group.key, fullSearchStore[group.key].groupElements['isWithDifferentResults'])}>
+                                    <div style={{ backgroundColor: fullSearchStore[group.key].groupElements['isWithDifferentResults'].color, borderColor: fullSearchStore[group.key].groupElements['isWithDifferentResults'].color }}
                                         className="ml-2 mr-2 h-4 w-4 border-gray-300 border rounded cursor-pointer hover:bg-gray-200">
                                     </div>
-                                    <span className="label-text truncate w-full pl-2">Only with different results</span>
+                                    <span className="text-sm truncate w-full pl-2">Only with different results</span>
                                 </div>
                                 {fullSearchStore[group.key].groupElements['heuristics'].map((groupItem, index) => (<div key={groupItem.id} className="my-1" >
-                                    <div className="flex flex-row items-center">
-                                        <div onClick={() => setActiveNegateGroup(groupItem, index, group, true)} style={{ backgroundColor: groupItem.color, borderColor: groupItem.color }}
+                                    <div className="flex flex-row items-center cursor-pointer" onClick={() => setActiveNegateGroup(groupItem, index, group, true)}>
+                                        <div style={{ backgroundColor: groupItem.color, borderColor: groupItem.color }}
                                             className="ml-2 mr-2 h-4 w-4 border-gray-300 border rounded cursor-pointer hover:bg-gray-200">
                                         </div>
-                                        <span className="label-text truncate w-full pl-2">{groupItem['name']}</span>
+                                        <span className="text-sm truncate w-full pl-2">{groupItem['name']}</span>
                                     </div>
                                 </div>))}
                             </div>)}
@@ -666,17 +670,22 @@ export default function SearchGroups() {
                         {fullSearchStore[group.key].groupElements['orderBy'].map((groupItem, index) => (<div key={groupItem.id}>
                             <div className="form-control class mb-2">
                                 {groupItem['orderByKey'] != StaticOrderByKeys.RANDOM ? (<div className="mb-2 flex items-center">
-                                    <div onClick={() => setSortFormControl(index, group)} className={`p-0 cursor-pointer ${groupItem['direction'] == 1 ? style.rotateTransform : null}`}>
-                                        <div className="ml-2 mr-2 h-4 w-4 border-gray-300 border rounded cursor-pointer flex justify-center items-center hover:bg-gray-200">
-                                            {groupItem['active'] != 0 && <IconArrowDown className="text-gray-500 h-3 w-3" />}
+                                    <div className="flex items-center cursor-pointer" onClick={() => setSortFormControl(index, group)}>
+                                        <div className={`p-0 cursor-pointer ${groupItem['direction'] == 1 ? style.rotateTransform : null}`}>
+                                            <div className="ml-2 mr-2 h-4 w-4 border-gray-300 border rounded cursor-pointer flex justify-center items-center hover:bg-gray-200">
+                                                {groupItem['active'] != 0 && <IconArrowDown className="text-gray-500 h-3 w-3" />}
+                                            </div>
                                         </div>
+                                        <span className="ml-2 text-sm truncate w-full">{groupItem['displayName']}</span>
                                     </div>
-                                    <span className="ml-2 label-text truncate w-full">{groupItem['displayName']}</span>
                                 </div>) : (<div className="flex flex-row items-center mr-2">
-                                    <div onClick={() => setActiveNegateGroup(groupItem, index, group)} style={{ backgroundColor: groupItem.color, borderColor: groupItem.color }}
-                                        className="ml-2 mr-2 h-4 w-4 border-gray-300 border rounded cursor-pointer hover:bg-gray-200">
+                                    <div className="flex flex-row items-center cursor-pointer" onClick={() => setActiveNegateGroup(groupItem, index, group)}>
+                                        <div style={{ backgroundColor: groupItem.color, borderColor: groupItem.color }}
+                                            className="ml-2 mr-2 h-4 w-4 border-gray-300 border rounded cursor-pointer hover:bg-gray-200">
+                                        </div>
+                                        <span className="text-sm truncate pl-2">{groupItem['displayName']}</span>
                                     </div>
-                                    <span className="label-text truncate pl-2">{groupItem['displayName']}</span>
+
                                     <div className="flex rounded-md shadow-sm">
                                         <span className="ml-2 inline-flex items-center px-2.5 text-sm rounded-l-md border border-r-0 border-gray-300 bg-gray-50 text-gray-500 sm:text-sm">
                                             Seed
@@ -697,10 +706,12 @@ export default function SearchGroups() {
                             <div className="flex flex-col">
                                 <div className="my-1">
                                     {fullSearchStore[group.key].groupElements['hasComments'] && <div className="form-control flex flex-row flex-nowrap items-center">
-                                        <div onClick={() => setActiveNegateGroup(fullSearchStore[group.key].groupElements['hasComments'], null, group)} style={{ backgroundColor: fullSearchStore[group.key].groupElements['hasComments'].color, borderColor: fullSearchStore[group.key].groupElements['hasComments'].color }}
-                                            className="ml-2 mr-2 h-4 w-4 border-gray-300 border rounded cursor-pointer hover:bg-gray-200">
+                                        <div className="flex flex-row items-center cursor-pointer" onClick={() => setActiveNegateGroup(fullSearchStore[group.key].groupElements['hasComments'], null, group)} >
+                                            <div style={{ backgroundColor: fullSearchStore[group.key].groupElements['hasComments'].color, borderColor: fullSearchStore[group.key].groupElements['hasComments'].color }}
+                                                className="ml-2 mr-2 h-4 w-4 border-gray-300 border rounded cursor-pointer hover:bg-gray-200">
+                                            </div>
+                                            <span className="ml-2 text-sm truncate">Record with comments</span>
                                         </div>
-                                        <span className="ml-2 label-text truncate">Record with comments</span>
                                     </div>}
                                 </div>
                             </div>
@@ -723,7 +734,7 @@ export default function SearchGroups() {
                     <input type="radio" id="radio-drill-down-inactive" name="radio-drill-down-inactive"
                         onChange={() => handleDrillDown(false)} checked={!fullSearchStore[SearchGroup.DRILL_DOWN]}
                         className="focus:ring-blue-500 h-4 w-4 text-blue-600 border-gray-200" />
-                    <label htmlFor="radio-drill-down-inactive" className="cursor-pointer label p-1 label-text pr-2 font-dmMono">
+                    <label htmlFor="radio-drill-down-inactive" className="cursor-pointer label p-1 text-sm pr-2 font-dmMono">
                         OR
                     </label>
                 </div>
@@ -731,7 +742,7 @@ export default function SearchGroups() {
                     <input type="radio" id="radio-drill-down-active" name="radio-drill-down-active"
                         onChange={() => handleDrillDown(true)} checked={fullSearchStore[SearchGroup.DRILL_DOWN]}
                         className="focus:ring-blue-500 h-4 w-4 text-blue-600 border-gray-200" />
-                    <label htmlFor="radio-drill-down-active" className="cursor-pointer label p-1 label-text pr-2 font-dmMono">
+                    <label htmlFor="radio-drill-down-active" className="cursor-pointer label p-1 text-sm pr-2 font-dmMono">
                         AND
                     </label>
                 </div>

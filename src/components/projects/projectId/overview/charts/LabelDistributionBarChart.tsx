@@ -238,7 +238,7 @@ export default function LabelDistributionBarChart(props: BarChartProps) {
 
     return (<>
         {dataGrouped && <>
-            <div className={`${style.labelDistTooltip}`}></div>
+            <div className={`${style.labelDistTooltip} labelDistTooltip`}></div>
             <svg ref={svgRef} id="horizontal-grouped-bar" className="w-full" width="100%" height="400"></svg></>}
     </>)
 }

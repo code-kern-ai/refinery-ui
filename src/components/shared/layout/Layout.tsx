@@ -9,7 +9,7 @@ import { WebSocketsService } from "@/src/services/base/web-sockets/WebSocketsSer
 import { CurrentPage } from "@/src/types/shared/general";
 import { useDispatch, useSelector } from "react-redux";
 import { selectUser } from "@/src/reduxStore/states/general";
-import { interval } from "rxjs";
+import { interval, timer } from "rxjs";
 import { selectNotificationsUser, setNotificationId, setNotificationsUser } from "@/src/reduxStore/states/tmp";
 import { useRouter } from "next/router";
 import AdminMessages from "../admin-messages/AdminMessages";
@@ -23,7 +23,6 @@ const MIN_WIDTH = 1250;
 
 export default function Layout({ children }) {
     const dispatch = useDispatch();
-    const router = useRouter();
 
     const user = useSelector(selectUser);
     const notifications = useSelector(selectNotificationsUser);
@@ -80,6 +79,7 @@ export default function Layout({ children }) {
     }
 
     function initializeNotificationDeletion() {
+        if (deletionTimer != null) return;
         const saveDelTimer = interval(3000).subscribe((x) => {
             if (notifications.length > 0) {
                 const notificationsCopy = [...notifications];
@@ -104,6 +104,11 @@ export default function Layout({ children }) {
     const handleWebsocketNotification = useCallback((msgParts: string[]) => {
         if (msgParts[1] == 'notification_created') {
             if (msgParts[2] != user?.id) return;
+            if (refetchTimer) return;
+            setRefetchTimer(timer(500).subscribe((x) => {
+                refetchNotificationsAndProcess();
+                setRefetchTimer(null);
+            }));
             refetchNotificationsAndProcess();
         } else if (msgParts[1] == 'admin_message') {
             refetchAdminMessagesAndProcess();

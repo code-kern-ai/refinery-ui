@@ -215,7 +215,7 @@ export default function ProjectsList() {
                             <div className="ml-4">
                                 <ButtonsContainer />
                             </div>
-                            <div className="h-screen overflow-y-scroll my-3">
+                            <div className="h-screen overflow-y-auto my-3">
                                 <div className={style.scrollableSize}>
                                     {projects && projects.map((project: Project) => (
                                         <ProjectCard project={project} projectStatisticsById={projectStatisticsById} key={project.id}></ProjectCard>

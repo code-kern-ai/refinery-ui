@@ -9,7 +9,7 @@ import { UserRole } from "@/src/types/shared/sidebar"
 import { DEFAULT_LABEL_COLOR, FULL_RECORD_ID, SWIM_LANE_SIZE_PX, buildLabelingRlaData, collectSelectionData, filterRlaDataForLabeling, findOrderPosItem, getDefaultLabelingVars, getFirstFitPos, getGoldInfoForTask, getOrderLookupItem, getOrderLookupSort, getTaskTypeOrder, getTokenData, parseSelectionData } from "@/src/util/components/projects/projectId/labeling/labeling-helper"
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants"
 import { Tooltip } from "@nextui-org/react"
-import { IconAlertCircle, IconAssembly, IconBolt, IconCode, IconPointerStar, IconSparkles, IconStar, IconStarFilled, IconUsers } from "@tabler/icons-react"
+import { IconAlertCircle, IconAssembly, IconBolt, IconCode, IconSparkles, IconStar, IconStarFilled, IconUsers } from "@tabler/icons-react"
 import { Fragment, useEffect, useState } from "react"
 import { useDispatch, useSelector } from "react-redux"
 import ExtractionDisplay from "./ExtractionDisplay"
@@ -537,11 +537,18 @@ export default function LabelingSuiteLabeling() {
                                 {rlaDataToDisplay[task.task.id] && <div>
                                     <div className={`flex gap-2 ${settings.labeling.compactClassificationLabelDisplay ? 'flex-row flex-wrap items-center' : 'flex-col'}`}>
                                         {rlaDataToDisplay[task.task.id].map((rlaLabel, index) => (<Tooltip key={rlaLabel.orderPos} content={rlaLabel.dataTip} color="invert" placement="top" className="w-max">
-                                            <div onClick={() => rlaLabel.sourceTypeKey == 'WEAK_SUPERVISION' ? addRla(task.task, rlaLabel.labelId) : null} onMouseEnter={() => onMouseEvent(true, rlaLabel.labelId)} onMouseLeave={() => onMouseEvent(false, rlaLabel.labelId)}
+                                            <div onClick={() => rlaLabel.sourceTypeKey == 'WEAK_SUPERVISION' ? addRla(task.task, rlaLabel.labelId) : null}
+                                                onMouseEnter={() => onMouseEvent(true, rlaLabel.labelId)}
+                                                onMouseLeave={() => onMouseEvent(false, rlaLabel.labelId)}
                                                 className={`text-sm font-medium px-2 py-0.5 rounded-md border focus:outline-none relative flex items-center ${labelLookup[rlaLabel.labelId].color.backgroundColor} ${labelLookup[rlaLabel.labelId].color.textColor} ${labelLookup[rlaLabel.labelId].color.borderColor} ${hoverGroupsDict[rlaLabel.labelId][LabelingPageParts.LABELING] ? rlaLabel.sourceTypeKey == 'WEAK_SUPERVISION' ? style.labelOverlayWeakSupervision : style.labelOverlayManual : ''}`}>
                                                 {rlaLabel.icon && <div className="mr-1">
                                                     {rlaLabel.icon == InformationSourceType.LABELING_FUNCTION && <IconCode size={20} strokeWidth={1.5} />}
-                                                    {rlaLabel.icon == InformationSourceType.ACTIVE_LEARNING && <IconPointerStar size={20} strokeWidth={1.5} />}
+                                                    {rlaLabel.icon == InformationSourceType.ACTIVE_LEARNING && <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5"
+                                                        viewBox="0 0 20 20" fill="currentColor">
+                                                        <path fillRule="evenodd"
+                                                            d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z"
+                                                            clipRule="evenodd" />
+                                                    </svg>}
                                                     {rlaLabel.icon == InformationSourceType.ZERO_SHOT && <IconSparkles size={20} strokeWidth={1.5} />}
                                                     {rlaLabel.icon == InformationSourceType.CROWD_LABELER && <IconUsers size={20} strokeWidth={1.5} />}
                                                     {rlaLabel.icon == LabelSource.MODEL_CALLBACK && <IconBolt size={20} strokeWidth={1.5} />}

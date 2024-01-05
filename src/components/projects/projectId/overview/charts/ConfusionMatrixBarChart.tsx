@@ -154,6 +154,6 @@ export default function ConfusionMatrixBarChart(props: BarChartProps) {
     }, [props.dataInput])
 
     return (<>
-        <div className={`${style.confusionMatrixTooltip}`}></div>
+        <div className={`${style.confusionMatrixTooltip} confusionMatrixTooltip`}></div>
         <div id="confusion-matrix" className="container w-full"></div></>)
 }

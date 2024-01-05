@@ -8,7 +8,7 @@ import { Tooltip } from '@nextui-org/react';
 import { IconAdjustments, IconAlertTriangleFilled, IconChartCircles, IconFilter, IconFilterOff, IconTriangleFilled } from '@tabler/icons-react';
 import { useDispatch, useSelector } from 'react-redux';
 import LoadingIcon from '@/src/components/shared/loading/LoadingIcon';
-import { selectAttributes, selectUsableAttributes, selectVisibleAttributesHeuristics } from '@/src/reduxStore/states/pages/settings';
+import { selectVisibleAttributesHeuristics } from '@/src/reduxStore/states/pages/settings';
 import RecordList from './RecordList';
 import { useRouter } from 'next/router';
 import { selectProjectId } from '@/src/reduxStore/states/project';
@@ -17,7 +17,7 @@ import { DataBrowserRecordsProps } from '@/src/types/components/projects/project
 import { setSessionData } from '@/src/reduxStore/states/tmp';
 import Export from '@/src/components/shared/export/Export';
 import { LabelingLinkType } from '@/src/types/components/projects/projectId/labeling/labeling-main-component';
-import { Fragment } from 'react';
+import { Fragment, useEffect } from 'react';
 
 export default function DataBrowserRecords(props: DataBrowserRecordsProps) {
     const dispatch = useDispatch();
@@ -30,6 +30,13 @@ export default function DataBrowserRecords(props: DataBrowserRecordsProps) {
     const additionalData = useSelector(selectAdditionalData);
     const activeSearchParams = useSelector(selectActiveSearchParams);
     const attributes = useSelector(selectVisibleAttributesHeuristics);
+
+    useEffect(() => {
+        router.events.on("routeChangeStart", clearFilters);
+        return () => {
+            router.events.off("routeChangeStart", clearFilters);
+        };
+    }, []);
 
     function clearFilters() {
         dispatch(setActiveSearchParams([]));

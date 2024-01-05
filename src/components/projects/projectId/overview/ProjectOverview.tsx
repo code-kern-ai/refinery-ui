@@ -288,7 +288,7 @@ export default function ProjectOverview() {
                     </div>
                 </div>}
 
-                {(overviewFilters.graphTypeEnum == DisplayGraphs.ALL || overviewFilters.graphTypeEnum == DisplayGraphs.INTER_ANNOTATOR) && <div className="mt-8 grid w-full">
+                {((overviewFilters.graphTypeEnum == DisplayGraphs.ALL || overviewFilters.graphTypeEnum == DisplayGraphs.INTER_ANNOTATOR) && isManaged) && <div className="mt-8 grid w-full">
                     <div className="text-lg leading-6 text-gray-900 font-medium inline-block">Inter annotator agreement</div>
                     <div className="mt-1 text-sm leading-5 font-medium text-gray-700 inline-block">See how users agree or disagree on redundantely labeled records.</div>
                     {interAnnotatorMatrix && <div>
@@ -299,7 +299,8 @@ export default function ProjectOverview() {
                                 </div>}
                             </div>
                         ) : (<div className="mt-2">
-                            {!isManaged && <div className="overflow-hidden h-80 rounded-lg bg-indigo-700 shadow-xl lg:grid lg:grid-cols-2 lg:gap-4">
+                            {/* Intentionally commented */}
+                            {/* {!isManaged && <div className="overflow-hidden h-80 rounded-lg bg-indigo-700 shadow-xl lg:grid lg:grid-cols-2 lg:gap-4">
                                 <div className="px-6 pt-10 pb-12 sm:px-12 sm:pt-12 lg:py-12 lg:pr-0 xl:py-16 xl:px-16">
                                     <div className="lg:self-center">
                                         <h2 className="text-3xl font-bold tracking-tight text-white sm:text-4xl">
@@ -319,7 +320,7 @@ export default function ProjectOverview() {
                                     <img src="https://images.unsplash.com/photo-1576502202167-791eca35a78d?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2081&q=80"
                                         alt="App screenshot" />
                                 </div>
-                            </div>}
+                            </div>} */}
                             {isManaged && <div className={`mt-2 shadow ${style.stats} bg-white grid place-items-center flex-grow w-full h-full p-5`}>
                                 <div className="text-center">
                                     <IconUsers size={48} className="mx-auto text-gray-400" />

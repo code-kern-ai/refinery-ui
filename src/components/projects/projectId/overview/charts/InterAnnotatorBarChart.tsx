@@ -193,6 +193,6 @@ export default function InterAnnotatorBarChart(props: BarChartProps) {
     }, [props.dataInput])
 
     return (<>
-        <div className={`${style.annotatorMatrixTooltip}`}></div>
+        <div className={`${style.annotatorMatrixTooltip} annotatorMatrixTooltip`}></div>
         <div id="annotator-matrix" className="container w-full"></div></>)
 }

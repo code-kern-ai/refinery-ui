@@ -1,4 +1,4 @@
-import { HighlightProps, RegexDisplay } from "@/src/types/shared/highlight";
+import { RegexDisplay } from "@/src/types/shared/highlight";
 import { buildRegex, buildRegexps, rebuildText } from "@/src/util/shared/highlight-helper";
 import { isStringTrue } from "@/submodules/javascript-functions/general";
 import { extendArrayElementsByUniqueId } from "@/submodules/javascript-functions/id-prep";

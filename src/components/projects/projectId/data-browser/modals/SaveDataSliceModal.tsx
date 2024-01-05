@@ -104,20 +104,20 @@ export default function SaveDataSliceModal(props: { fullSearch: {} }) {
             These are limited to 10,000 records and can be refreshed if necessary.
         </p>
         <div className="mt-2">
-            <div className="flex">
-                <div className=" items-center">
+            <div className="flex items-center gap-2">
+                <div className="flex gap-1 items-center">
                     <input type="radio" id="slice-type-dynamic" name="slice-type" value="dynamic"
                         onChange={() => setIsStatic(false)} checked={!isStatic}
                         style={{ accentColor: 'rgb(29,78,216)' }} className="h-4 w-4" />
-                    <label htmlFor="slice-type-dynamic" className="h-4 w-4 border-gray-200 cursor-pointer" >
+                    <label htmlFor="slice-type-dynamic" className=" border-gray-200 cursor-pointer" >
                         Dynamic
                     </label>
                 </div>
-                <div className=" items-center">
+                <div className="flex gap-1 items-center">
                     <input type="radio" id="slice-type-static" name="slice-type" value="static"
                         onChange={() => setIsStatic(true)} checked={isStatic}
                         style={{ accentColor: 'rgb(180,83,9)' }} className="h-4 w-4" />
-                    <label htmlFor="slice-type-static" className="h-4 w-4 border-gray-200 cursor-pointer" >
+                    <label htmlFor="slice-type-static" className=" border-gray-200 cursor-pointer" >
                         Static
                     </label>
                 </div>
