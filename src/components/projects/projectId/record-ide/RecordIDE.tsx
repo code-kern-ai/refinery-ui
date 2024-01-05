@@ -68,6 +68,20 @@ export default function RecordIDE() {
         setUpCommentsRequests();
     }, [allUsers, projectId]);
 
+    useEffect(() => {
+        if (!projectId || !huddleData || !code) return;
+        const shortcutRunIde = (event) => {
+            if (event.shiftKey && event.key === "Enter") {
+                runRecordIde();
+            }
+        };
+
+        document.addEventListener('keyup', shortcutRunIde);
+        return () => {
+            document.removeEventListener('keyup', shortcutRunIde);
+        };
+    }, [projectId, huddleData, code]);
+
     function setUpCommentsRequests() {
         const requests = [];
         requests.push({ commentType: CommentType.ATTRIBUTE, projectId: projectId });
@@ -202,6 +216,7 @@ export default function RecordIDE() {
                 </div>
                 <Editor
                     className="h-full w-full"
+                    defaultLanguage={'python'}
                     options={EDITOR_OPTIONS}
                     value={code}
                     height={screenHeight}
@@ -243,7 +258,7 @@ export default function RecordIDE() {
                     <code>{output}</code>
                 </div>}
                 {loading && <div className="h-full flex justify-center items-center" style={{ 'height': vertical ? 'calc(100vh - 150px)' : 'calc(50vh - 150px)' }}>
-                    <LoadingIcon size="btn-md" />
+                    <LoadingIcon size="lg" />
                 </div>}
             </div>
         </div>}
