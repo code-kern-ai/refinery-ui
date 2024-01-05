@@ -5,6 +5,7 @@ import { CHANGE_ORGANIZATION, UPDATE_CONFIG } from "@/src/services/gql/mutations
 import { LocalConfig } from "@/src/types/components/config/config"
 import { snakeCaseToCamelCase } from "@/submodules/javascript-functions/case-types-parser";
 import Dropdown from "@/submodules/react-components/components/Dropdown";
+import { useConsoleLog } from "@/submodules/react-components/hooks/useConsoleLog";
 import { useMutation } from "@apollo/client";
 import { IconPlus, IconTrash } from "@tabler/icons-react";
 import { useEffect, useState } from "react"
@@ -12,8 +13,10 @@ import { useSelector } from "react-redux";
 
 export default function Config() {
     const organization = useSelector(selectOrganization);
-    const tokenizerValues = useSelector(selectCachedValue(CacheEnum.TOKENIZER_VALUES));
+    const tokenizerValues = useSelector(selectCachedValue(CacheEnum.TOKENIZER_VALUES)); //this is null so i guess something is wrong with the initialization //i remember we talked about putting the config in the redux stu
 
+    // is there a specific reason we dont use a single state for all of the values? 
+    // note that to prevent race conditions (though they should be very unlikely here) for a combined state we should use the setXXXX((prev)=>{...prev, key: newValue}) notation 
     const [localConfig, setLocalConfig] = useState<LocalConfig>({} as LocalConfig); // with the new guidelines this would be useState<LocalConfig>({}) or useState<LocalConfig>(null) depending on the usecase
     const [maxRows, setMaxRows] = useState<number>(0); // useState(0)
     const [maxCols, setMaxCols] = useState<number>(0);
@@ -31,6 +34,15 @@ export default function Config() {
             spacyDownloads: Array.from(ConfigManager.getConfigValue("spacy_downloads")),
         });
     }, [ConfigManager.isInit()]);
+
+
+    //something is off here - isInit returns an object not a boolean (double negation missing)
+    useEffect(() => {
+        console.log("ConfigManager.isInit()", ConfigManager.isInit())
+    }, [ConfigManager.isInit()]);
+
+    useConsoleLog(prepareTokenizedValues)
+
 
     useEffect(() => {
         if (!organization) return;
@@ -64,7 +76,7 @@ export default function Config() {
         } else {
             updateDict[key] = value;
         }
-        localStorage.removeItem("base_config");
+        localStorage.removeItem("base_config"); //is this correct? 
         if (subkey == 'max_rows' || subkey == 'max_cols' || subkey == 'max_char_count') {
             changeOrganizationMut({ variables: { orgId: organization.id, changes: JSON.stringify(updateDict.limit_checks) } }).then((res) => {
                 if (!res?.data?.changeOrganization) {
@@ -105,7 +117,7 @@ export default function Config() {
             }
         }
     }
-
+    // might be a misunderstanding but I think h-screen is faulty here since the top bar is not part of the config screen
     return (<div className="h-screen bg-white py-6 px-4 space-y-6 sm:p-6">
         <div>
             <h3 className="text-lg leading-6 font-medium text-gray-900">Configuration</h3>
