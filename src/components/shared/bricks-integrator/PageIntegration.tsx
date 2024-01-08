@@ -70,7 +70,7 @@ export default function PageIntegration(props: PageIntegrationProps) {
                     <strong className="font-bold">Couldn&apos;t parse code</strong>
                     <IconAlertTriangle className="ml-1 w-5 h-5 text-red-400" />
                 </div>
-                <pre className="text-sm overflow-x-auto">{BricksCodeParser.errors.join("\n")}</pre>
+                <pre className="text-sm overflow-x-auto whitespace-pre-wrap">{BricksCodeParser.errors.join("\n")}</pre>
             </div>}
             {BricksCodeParser?.expected.expectedTaskLabels && BricksCodeParser.expected.expectedTaskLabels.length > 0 && <>
                 {BricksCodeParser.expected.labelWarning ? (

@@ -70,7 +70,7 @@ export default function NavigationBarBottom() {
                     </div>
                 </div>
                 {user.role !== UserRole.ANNOTATOR && <Tooltip onClick={() => dispatch(openModal(ModalEnum.LABELING_SETTINGS))}
-                    content={TOOLTIPS_DICT.LABELING.OPEN_SETTINGS} color="invert" placement="left">
+                    content={<div className="w-32">Open Labeling Suite settings</div>} color="invert" placement="left">
                     <div className="p-2 border border-gray-300 rounded-md">
                         <IconSettings className="h-6 w-6" />
                     </div>

@@ -95,7 +95,7 @@ export default function LabelingSettingsModal() {
                 <span>Hover background</span>
                 <Dropdown options={hoverColorOptions} buttonName={settings?.main.hoverGroupBackgroundColor} backgroundColors={hoverColorClassArray}
                     dropdownItemsClasses="max-h-80 overflow-y-auto" buttonCaptionBgColor={settings?.main.hoverGroupBackgroundColorClass}
-                    selectedOption={(option: string) => changeSetting(ComponentType.MAIN, 'hoverGroupBackgroundColor', option)} />
+                    selectedOption={(option: string) => changeSetting(ComponentType.MAIN, 'hoverGroupBackgroundColor', option)} dropdownWidth="w-32" />
                 <Tooltip content={TOOLTIPS_DICT.LABELING.HOVER_BACKGROUND} color="invert" placement="top" className="cursor-auto"><IconInfoCircle className="h-5 w-5" /></Tooltip>
                 <span>Visible line breaks</span>
                 <div className="flex items-center h-5">
