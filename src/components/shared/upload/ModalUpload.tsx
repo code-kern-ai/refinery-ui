@@ -69,7 +69,7 @@ export default function ModalUpload(props: UploadProps) {
             )}
             <Upload uploadOptions={uploadOptions} startUpload={startUpload} isFileUploaded={(isFileUploaded: boolean) => {
                 setAcceptButton({ ...acceptButton, disabled: isFileUploaded ? false : true });
-            }} />
+            }} closeModalEvent={props.closeModalEvent} />
         </Modal>
     );
 }

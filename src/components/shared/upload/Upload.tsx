@@ -20,6 +20,8 @@ import { GET_UPLOAD_CREDENTIALS_AND_ID, GET_UPLOAD_TASK_BY_TASK_ID } from "@/src
 import { UPLOAD_TOKENIZERS } from "@/src/util/constants";
 import { UploadHelper, ZIP_TYPE } from "@/src/util/classes/upload-helper";
 import CryptedField from "../crypted-field/CryptedField";
+import { closeModal } from "@/src/reduxStore/states/modal";
+import { ModalEnum } from "@/src/types/shared/modal";
 
 export default function Upload(props: UploadProps) {
     const router = useRouter();
@@ -221,6 +223,10 @@ export default function Upload(props: UploadProps) {
                     timer(500).subscribe(() => {
                         setSelectedFile(null);
                         setSubmitted(false);
+                        if (props.uploadOptions.isModal) {
+                            dispatch(closeModal(ModalEnum.MODAL_UPLOAD));
+                            props.closeModalEvent();
+                        }
                     });
                     if (progress.state === UploadStates.ERROR && props.uploadOptions.deleteProjectOnFail) {
                         deleteExistingProject();

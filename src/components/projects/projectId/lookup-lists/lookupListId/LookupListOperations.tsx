@@ -43,7 +43,7 @@ export default function LookupListOperations(props: LookupListOperationsProps) {
         setDownloadMessage(DownloadState.PREPARATION);
         refetchExportList({ variables: { projectId: projectId, listId: router.query.lookupListId } }).then((res) => {
             setDownloadMessage(DownloadState.DOWNLOAD);
-            const downloadContent = JSON.parse(res.data['exportKnowledgeBase']);
+            const downloadContent = JSON.parse(JSON.parse(res.data['exportKnowledgeBase']));
             downloadByteData(downloadContent, 'lookup_list.json');
             const timerTime = Math.max(2000, res.data['exportKnowledgeBase'].length * 0.0001);
             timer(timerTime).subscribe(() => setDownloadMessage(DownloadState.NONE));
@@ -79,7 +79,7 @@ export default function LookupListOperations(props: LookupListOperationsProps) {
                     <button onClick={() => dispatch(openModal(ModalEnum.PASTE_LOOKUP_LIST))}
                         className="ml-3 mr-1 inline-flex items-center px-4 py-2 border border-gray-200 shadow-sm text-xs font-semibold rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 cursor-pointer">
                         <IconClipboard className="h-4 w-4 mr-1" />
-                        Paste list
+                        Paste terms
                     </button>
                 </Tooltip>
             </div>
@@ -88,15 +88,15 @@ export default function LookupListOperations(props: LookupListOperationsProps) {
                     <button onClick={() => dispatch(openModal(ModalEnum.REMOVE_LOOKUP_LIST))}
                         className="ml-2 mr-1 inline-flex items-center px-4 py-2 border border-red-400 shadow-sm text-xs font-semibold rounded-md text-red-700 bg-red-100 hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 cursor-pointer">
                         <IconClipboardOff className="h-4 w-4 mr-1" />
-                        Remove list
+                        Remove terms
                     </button>
                 </Tooltip>
             </div>
 
         </div>
 
-        <ModalUpload uploadOptions={uploadOptions} />
-        <PasteLookupListModal refetchWS={() => props.refetchWS()} />
-        <RemoveLookupListModal refetchWS={() => props.refetchWS()} />
+        <ModalUpload uploadOptions={uploadOptions} closeModalEvent={props.refetchTerms} />
+        <PasteLookupListModal refetchWS={props.refetchWS} />
+        <RemoveLookupListModal refetchWS={props.refetchWS} />
     </div>)
 }

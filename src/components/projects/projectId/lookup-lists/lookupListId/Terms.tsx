@@ -21,6 +21,8 @@ export default function Terms(props: TermsProps) {
     const [description, setDescription] = useState("");
     const [termEditorOpen, setTermEditorOpen] = useState(false);
     const [editableTerm, setEditableTerm] = useState('');
+    const [newTermName, setNewTermName] = useState('');
+    const [newDescription, setNewDescription] = useState('');
 
     const [addTermsMut] = useMutation(ADD_TERM_TO_LOOKUP_LIST);
     const [removeTermMut] = useMutation(REMOVE_TERM);
@@ -40,6 +42,8 @@ export default function Terms(props: TermsProps) {
         switch (option) {
             case "Edit term":
                 openTermEditor(true, term.id, term.value, term.comment);
+                setNewTermName(term.value);
+                setNewDescription(term.comment);
                 break;
             case "Remove term":
                 removeTerm(term);
@@ -95,13 +99,13 @@ export default function Terms(props: TermsProps) {
                         if (e.key == "Enter") {
                             addTermToKnowledgeBase();
                         }
-                    }} className="h-8 w-full text-sm border-gray-300 rounded-md placeholder-italic border text-gray-900 pl-4 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100" placeholder="Enter term name" />
+                    }} className="h-8 w-96 text-sm border-gray-300 rounded-md placeholder-italic border text-gray-900 pl-4 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100" placeholder="Term" />
                 <input value={description} type="text" onInput={(e: any) => setDescription(e.target.value)} onKeyUp={(e: any) => isTermUnique(e.target.value, terms)}
                     onKeyDown={(e: any) => {
                         if (e.key == "Enter") {
                             addTermToKnowledgeBase();
                         }
-                    }} className="h-8 w-full text-sm border-gray-300 rounded-md placeholder-italic border text-gray-900 pl-4 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100" placeholder="Enter term description" />
+                    }} className="h-8 w-96 text-sm border-gray-300 rounded-md placeholder-italic border text-gray-900 pl-4 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100" placeholder="Description - optional" />
                 <button disabled={name == '' || !isTermUnique(name, terms)} onClick={addTermToKnowledgeBase}
                     className="bg-indigo-700 flex-shrink-0 text-white text-xs font-semibold px-4 py-2 rounded-md cursor-pointer hover:bg-indigo-800 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed">
                     Add term</button>
@@ -123,16 +127,20 @@ export default function Terms(props: TermsProps) {
                 </> : (<>
                     {editableTerm == term.id ? <>
                         {!term.blacklisted && <div className="relative rounded-lg border border-gray-300 bg-white px-4 py-3 shadow-sm items-center text-sm">
-                            <div><input type="text" value={term.value} onChange={(e: any) => updateProperty('value', e.target.value, index)}
+                            <div><input type="text" value={newTermName} onChange={(e: any) => setNewTermName(e.target.value)}
                                 className="h-8 w-full border-gray-300 rounded-md placeholder-italic border text-gray-900 pl-4 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100" /></div>
                             <div className="mt-2">
-                                <input type="text" onChange={(e: any) => updateProperty('comment', e.target.value, index)}
-                                    placeholder="Description - optional" value={term.comment}
+                                <input type="text" value={newDescription} onChange={(e: any) => setNewDescription(e.target.value)}
+                                    placeholder="Description - optional"
                                     className="h-8 w-full text-sm border-gray-300 rounded-md placeholder-italic border text-gray-900 pl-4 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100" />
                             </div>
                             <div className="mt-2 flex">
                                 <Tooltip content={TOOLTIPS_DICT.GENERAL.SUBMIT} placement="top" color="invert">
-                                    <button className="mx-2" onClick={() => openTermEditor(false, term.id, term.value, term.comment)}>
+                                    <button className="mx-2" onClick={() => {
+                                        updateProperty('value', newTermName, index);
+                                        updateProperty('comment', newDescription, index);
+                                        openTermEditor(false, term.id, newTermName, newDescription);
+                                    }}>
                                         <IconCircleCheckFilled />
                                     </button>
                                 </Tooltip>

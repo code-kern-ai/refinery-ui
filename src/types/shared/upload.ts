@@ -14,6 +14,7 @@ export type UploadProps = {
     uploadOptions?: UploadOptions;
     startUpload?: boolean;
     isFileUploaded?: (isFileUploaded: boolean) => void;
+    closeModalEvent?: () => void;
 }
 
 export type UploadOptions = {

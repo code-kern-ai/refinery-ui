@@ -97,8 +97,8 @@ export const TOOLTIPS_DICT = {
         'PYTHON_VARIABLE': 'The variable name can be used inside a labeling function',
         'UPLOAD_LOOKUP_LIST': 'Please ensure that the column is called "value"',
         'DOWNLOAD_LOOKUP_LIST': 'Download your lookup list to your local machine',
-        'PASTE_LOOKUP_LIST': 'Paste your lookup list here',
-        'DELETE_LOOKUP_LIST': 'Delete your lookup list',
+        'PASTE_LOOKUP_LIST': 'Paste terms to your lookup list',
+        'DELETE_LOOKUP_LIST': 'Delete terms from your lookup list',
     },
     [CurrentPage.MODEL_CALLBACKS]: {
         'ADD_LABELING_TASK': 'Add new labeling task',
