@@ -104,7 +104,7 @@ export default function Header() {
                             </a>
                         </Tooltip>
                     </div>
-                    {user?.role == UserRole.ENGINEER ? (
+                    {(user?.role == UserRole.ENGINEER && isManaged) ? (
                         <div className="flex items-center justify-center">
                             <Tooltip placement="left" trigger="hover" color="invert" content={TOOLTIPS_DICT.GENERAL.USERS}>
                                 <a className="flex mr-6" onClick={() => router.push('/users')}>

@@ -2,7 +2,7 @@ import Modal from "@/src/components/shared/modal/Modal";
 import { ModalEnum } from "@/src/types/shared/modal";
 import style from '@/src/styles/components/projects/projectId/heuristics/heuristics-details.module.css';
 import { RecordDisplay } from "@/src/components/shared/record-display/RecordDisplay";
-import { SampleRecordProps, ViewDetailsLFModalProps } from "@/src/types/components/projects/projectId/heuristics/heuristicId/labeling-function";
+import { ViewDetailsLFModalProps } from "@/src/types/components/projects/projectId/heuristics/heuristicId/labeling-function";
 import { useSelector } from "react-redux";
 import { selectModal } from "@/src/reduxStore/states/modal";
 
@@ -20,7 +20,7 @@ export default function ViewDetailsLFModal(props: ViewDetailsLFModalProps) {
                         {Object.entries(props.sampleRecords.records[modalSampleRecord.currentRecordIdx].calculatedLabelsResult).map(([key, value]: any) => (
                             <div key={key} className="ml-2 flex flex-row flex-nowrap items-center">
                                 {value.displayAmount && <span className="text-xs text-gray-500 font-normal">{value.count}x</span>}
-                                <label className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium border ${value.color.backgroundColor} ${value.color.hoverColor} ${value.color.textColor} ${value.color.borderColor}`}>
+                                <label className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium border ${value.color.backgroundColor} ${value.color.textColor} ${value.color.borderColor}`}>
                                     {value.label}
                                 </label>
                             </div>

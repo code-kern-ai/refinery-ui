@@ -12,7 +12,8 @@ export default function UsersList() {
     const experts = useSelector(selectExperts);
 
     return <div className="bg-slate-50 h-screen overflow-y-auto">
-        {!isManaged && <div>
+        {/* Intentionally commented */}
+        {/* {!isManaged && <div>
             <div className="mt-10 mx-auto px-4 sm:px-6 lg:px-8 pb-12">
                 <div className="mx-auto">
                     <div className="max-w-2xl md:mx-auto md:text-center xl:max-w-none">
@@ -175,7 +176,7 @@ export default function UsersList() {
                     </div>
                 </div>
             </div>
-        </div>}
+        </div>} */}
         {!organizationInactive && isManaged && <div>
             <div className="mx-auto mt-8 pb-12 px-4 sm:px-6">
                 <div className="grid grid-cols-1 gap-8 pb-12">

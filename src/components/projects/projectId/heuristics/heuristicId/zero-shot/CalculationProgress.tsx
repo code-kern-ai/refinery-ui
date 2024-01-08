@@ -1,16 +1,11 @@
 import LoadingIcon from "@/src/components/shared/loading/LoadingIcon";
-import Modal from "@/src/components/shared/modal/Modal";
-import { openModal, selectModal } from "@/src/reduxStore/states/modal";
+import { openModal } from "@/src/reduxStore/states/modal";
 import { selectHeuristic } from "@/src/reduxStore/states/pages/heuristics";
-import { selectProjectId } from "@/src/reduxStore/states/project";
-import { CANCEL_ZERO_SHOT_RUN } from "@/src/services/gql/mutations/heuristics";
-import { ModalButton, ModalEnum } from "@/src/types/shared/modal";
+import { ModalEnum } from "@/src/types/shared/modal";
 import { Status } from "@/src/types/shared/statuses";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
-import { useMutation } from "@apollo/client";
 import { Tooltip } from "@nextui-org/react";
 import { IconAlertTriangleFilled, IconArrowRight, IconCircleCheckFilled } from "@tabler/icons-react";
-import { useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import CancelExecutionModal from "./CancelExecutionModal";
 
@@ -21,7 +16,7 @@ export default function CalculationProgress() {
 
     return (<div className="mt-8">
         <div className="text-sm leading-5 font-medium text-gray-700 inline-block">Last execution</div>
-        {currentHeuristic.lastTask ? (<>
+        {(currentHeuristic.lastTask && currentHeuristic.lastTask.iteration != -1) ? (<>
             <div className="mb-4 card border border-gray-200 bg-white flex-grow overflow-visible rounded-2xl">
                 <div className="card-body p-6">
                     <div className="flex flex-row justify-between items-center">

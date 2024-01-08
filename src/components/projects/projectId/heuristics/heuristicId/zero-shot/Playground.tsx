@@ -37,7 +37,7 @@ export default function Playground() {
         const useTaskLabels = customLabels == "";
         if (useTaskLabels) {
             labels = labelingTasks.find(task => task.id == currentHeuristic.labelingTaskId).labels
-                .filter(l => currentHeuristic.zeroShotSettings.excludedLabels.includes(l.id))
+                .filter(l => !currentHeuristic.zeroShotSettings.excludedLabels.includes(l.id))
                 .map(l => l.name);
         }
         else labels = customLabels.split(",").map(l => l.trim());

@@ -29,6 +29,8 @@ export function postProcessZeroShot(heuristic: Heuristic, labelingTasks: Labelin
         }
         prepareHeuristic.state = heuristic['lastPayload']['state'];
         prepareHeuristic.lastTask = task;
+    } else {
+        prepareHeuristic.lastTask = null;
     }
     prepareHeuristic.zeroShotSettings = fillZeroShotSettings(prepareHeuristic.sourceCode, labelingTasks, prepareHeuristic.labelingTaskId, attributes);
     return prepareHeuristic;
@@ -39,11 +41,11 @@ function fillZeroShotSettings(settingsJson: string, labelingTasks: LabelingTask[
     const zeroShotSettings = parseZeroShotSettings(settingsJson);
     zeroShotSettings.taskId = labelingTaskId;
     const findLabelingTask = labelingTasks.find(task => task.id == labelingTaskId);
-    zeroShotSettings.attributeSelectDisabled = attributes.length == 0 || findLabelingTask.taskTarget == LabelingTaskTarget.ON_ATTRIBUTE;
+    zeroShotSettings.attributeSelectDisabled = attributes.length == 1 || findLabelingTask.taskTarget == LabelingTaskTarget.ON_ATTRIBUTE;
     if (!zeroShotSettings.attributeId) {
         zeroShotSettings.attributeId = findLabelingTask.attribute.id;
     };
-    zeroShotSettings.attributeName = findLabelingTask.attribute?.name;
+    zeroShotSettings.attributeName = attributes.find(a => a.id == zeroShotSettings.attributeId)?.name;
     return zeroShotSettings;
 }
 
@@ -56,6 +58,7 @@ export function parseZeroShotSettings(settingsJson: string): ZeroShotSettings {
         excludedLabels: tmp.excluded_labels,
         runIndividually: tmp.run_individually,
         attributeName: '',
+        attributeSelectDisabled: false,
     }
 }
 
@@ -67,6 +70,7 @@ export function parseToSettingsJson(settings: ZeroShotSettings): string {
         excluded_labels: settings.excludedLabels,
         run_individually: settings.runIndividually,
         attributeName: settings.attributeName,
+        attributeSelectDisabled: false
     }
     return JSON.stringify(tmp);
 }

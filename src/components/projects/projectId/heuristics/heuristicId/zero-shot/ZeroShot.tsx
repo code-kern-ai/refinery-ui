@@ -160,13 +160,14 @@ export default function ZeroShot() {
                 if ("finished" == msgParts[2]) setIsModelDownloading(false);
             }
         } else if (msgParts[1] == 'zero-shot') {
+            if (currentHeuristic.lastPayload?.id != msgParts[2]) return;
             if (msgParts[3] == 'progress') {
-                dispatch(updateHeuristicsState(currentHeuristic.id, { lastTask: { progress: Number(msgParts[4]), state: Status.CREATED, id: msgParts[2] } }))
+                dispatch(updateHeuristicsState(currentHeuristic.id, { lastTask: { progress: Number(msgParts[4]), state: Status.CREATED, id: msgParts[2], iteration: currentHeuristic.lastPayload ? currentHeuristic.lastPayload.iteration : 1 } }));
             } else if (msgParts[3] == 'state') {
                 if (msgParts[4] == Status.FINISHED) {
                     refetchCurrentHeuristicAndProcess();
                 } else {
-                    dispatch(updateHeuristicsState(currentHeuristic.id, { lastTask: { state: msgParts[4] } }))
+                    dispatch(updateHeuristicsState(currentHeuristic.id, { lastTask: { state: msgParts[4] } }));
                 }
             }
         }
@@ -193,7 +194,7 @@ export default function ZeroShot() {
                                     className={`inline-flex border items-center px-2 py-0.5 rounded text-xs font-medium cursor-pointer ml-3 ${label.color.backgroundColor} ${label.color.hoverColor} ${label.color.textColor} ${label.color.borderColor}`}>
                                     <span className="font-medium mr-3">{label.name}</span>
                                     <span className="pb-0.5">
-                                        <input className="cursor-pointer align-middle" type="checkbox" defaultChecked={currentHeuristic.zeroShotSettings.excludedLabels?.includes(label.id)} />
+                                        <input className="cursor-pointer align-middle" type="checkbox" defaultChecked={!currentHeuristic.zeroShotSettings.excludedLabels?.includes(label.id)} />
                                     </span>
                                 </span>
                             ))}

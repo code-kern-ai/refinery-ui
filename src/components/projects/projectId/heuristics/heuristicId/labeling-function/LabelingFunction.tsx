@@ -172,7 +172,7 @@ export default function LabelingFunction() {
             }
         } else if (msgParts[1] == 'payload_progress') {
             if (msgParts[2] != currentHeuristic.id) return;
-            dispatch(updateHeuristicsState(currentHeuristic.id, { lastTask: { progress: Number(msgParts[4]), state: Status.CREATED } }))
+            dispatch(updateHeuristicsState(currentHeuristic.id, { lastTask: { progress: Number(msgParts[4]), state: Status.CREATED, iteration: currentHeuristic.lastPayload.iteration } }))
         } else {
             if (msgParts[2] != currentHeuristic.id) return;
             refetchCurrentHeuristicAndProcess();
