@@ -1,9 +1,9 @@
 import Modal from "@/src/components/shared/modal/Modal";
-import { CacheEnum, selectCachedValue } from "@/src/reduxStore/states/cachedValues";
+import { CacheEnum, selectCachedValue, setCache } from "@/src/reduxStore/states/cachedValues";
 import { selectModal } from "@/src/reduxStore/states/modal";
 import { selectHeuristicType } from "@/src/reduxStore/states/pages/heuristics";
 import { selectLabelingTasksAll, selectUseableEmbedableAttributes } from "@/src/reduxStore/states/pages/settings";
-import { selectProjectId } from "@/src/reduxStore/states/project";
+import { selectProject, selectProjectId } from "@/src/reduxStore/states/project";
 import { CREATE_ZERO_SHOT_INFORMATION_SOURCE } from "@/src/services/gql/mutations/heuristics";
 import { LabelingTaskTaskType } from "@/src/types/components/projects/projectId/settings/labeling-tasks";
 import { ModalButton, ModalEnum } from "@/src/types/shared/modal";
@@ -15,18 +15,20 @@ import { useMutation } from "@apollo/client";
 import { Tooltip } from "@nextui-org/react";
 import { useRouter } from "next/router";
 import { useCallback, useEffect, useState } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 
 const ACCEPT_BUTTON = { buttonCaption: 'Create', useButton: true, disabled: true };
 
 export default function AddZeroShotModal() {
     const router = useRouter();
+    const dispatch = useDispatch();
 
     const projectId = useSelector(selectProjectId);
     const labelingTasks = useSelector(selectLabelingTasksAll);
     const attributes = useSelector(selectUseableEmbedableAttributes);
     const modalZs = useSelector(selectModal(ModalEnum.ADD_ZERO_SHOT));
     const heuristicType = useSelector(selectHeuristicType);
+    const project = useSelector(selectProject);
     const models = useSelector(selectCachedValue(CacheEnum.ZERO_SHOT_RECOMMENDATIONS));
 
     const [labelingTask, setLabelingTask] = useState('');
@@ -34,11 +36,29 @@ export default function AddZeroShotModal() {
     const [model, setModel] = useState<string>('');
     const [labelingTasksClassification, setLabelingTasksClassification] = useState([]);
     const [showZSAttribute, setShowZSAttribute] = useState<boolean>(false);
+    const [hoverBoxList, setHoverBoxList] = useState<any[]>([]);
 
     useEffect(() => {
         if (!attributes) return;
         setAttribute(attributes[0]?.name);
     }, [attributes]);
+
+    useEffect(() => {
+        if (!project.tokenizer) return;
+        const language = project.tokenizer.split("_")[0];
+        const modelsFiltered = models.filter(model => model.language == language).sort((a, b) => a.prio - b.prio);
+        dispatch(setCache(CacheEnum.ZERO_SHOT_RECOMMENDATIONS, modelsFiltered));
+        const hoverBoxList = [];
+        modelsFiltered.forEach(model => {
+            const hoverBoxModel = {
+                avgTime: model.avgTime,
+                base: model.base,
+                size: model.size
+            };
+            hoverBoxList.push(hoverBoxModel);
+        });
+        setHoverBoxList(hoverBoxList);
+    }, [project]);
 
     const [createZeroShotMut] = useMutation(CREATE_ZERO_SHOT_INFORMATION_SOURCE);
 
@@ -86,7 +106,7 @@ export default function AddZeroShotModal() {
         <div className="grid grid-cols-2 gap-2 items-center" style={{ gridTemplateColumns: 'max-content auto' }}>
             <Tooltip content={TOOLTIPS_DICT.HEURISTICS.CHOOSE_LABELING_TASK} color="invert" placement="right">
                 <div className="justify-self-start">
-                    <span className="cursor-help card-title mb-0 label-text text-left"><span className="underline filtersUnderline">Labeling task</span></span>
+                    <span className="cursor-help card-title mb-0 label-text text-left"><span className="underline filtersUnderline">Target task</span></span>
                 </div>
             </Tooltip>
             <Dropdown options={labelingTasksClassification} buttonName={labelingTask} disabled={labelingTasksClassification.length == 0} selectedOption={(option: string) => {
@@ -112,7 +132,10 @@ export default function AddZeroShotModal() {
                     <span className="cursor-help card-title mb-0 label-text text-left"><span className="underline filtersUnderline">Model</span></span>
                 </div>
             </Tooltip>
-            <Dropdown options={models && models.map(model => model.configString)} hasSearchBar={true} selectedOption={(option: string) => setModel(option)} />
+            <Dropdown options={models && models.map(model => model.configString)} hasSearchBar={true} optionsHaveLink={true} optionsHaveHoverBox={true}
+                linkList={models && models.map(model => model.link)}
+                selectedOption={(option: string) => setModel(option)}
+                hoverBoxList={hoverBoxList} />
         </div>
     </Modal>)
 }
