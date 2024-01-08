@@ -16,6 +16,7 @@ import { timer } from 'rxjs';
 import SearchGroups from './SearchGroups';
 import DeleteSliceModal from './modals/DeleteSliceModal';
 import DataSliceInfoModal from './modals/DataSliceInfoModal';
+import MultilineTooltip from '@/src/components/shared/multilines-tooltip/MultilineTooltip';
 
 export default function DataBrowserSidebar() {
     const dispatch = useDispatch();
@@ -103,7 +104,7 @@ export default function DataBrowserSidebar() {
                     <div className="relative flex justify-start">
                         <span className="pr-2 bg-white text-lg font-medium text-gray-900">Filter</span>
                         {(!(activeSlice?.sliceType == Slice.STATIC_OUTLIER || !(additionalData.displayOutdatedWarning || (activeSlice?.static && additionalData.staticDataSliceCurrentCount != null && activeSlice.count != additionalData.staticDataSliceCurrentCount)))) &&
-                            <Tooltip content={TOOLTIPS_DICT.DATA_BROWSER.OUTDATED_SLICE} color="invert" placement="right" className="cursor-auto">
+                            <Tooltip content={<MultilineTooltip tooltipLines={['Outdated slice', 'Save to update']} />} color="invert" placement="right" className="cursor-auto">
                                 <div className="flex items-center tooltip-right text-gray-400">
                                     <IconAlertTriangle className="w-5 h-5" />
                                 </div>

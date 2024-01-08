@@ -125,7 +125,7 @@ export default function LookupListsDetails() {
                     setLookupList(postProcessLookupList(res.data['knowledgeBaseByKnowledgeBaseId']));
                 });
             } else if (msgParts[1] == 'knowledge_base_deleted') {
-                // alert('Lookup list was deleted');
+                alert('Lookup list was deleted');
                 router.push(`/projects/${projectId}/lookup-lists`);
             } else if (msgParts[1] == 'knowledge_base_term_updated') {
                 refetchTerms();

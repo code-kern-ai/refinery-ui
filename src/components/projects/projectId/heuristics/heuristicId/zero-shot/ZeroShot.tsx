@@ -148,7 +148,7 @@ export default function ZeroShot() {
             alert('Parent labeling task was deleted!');
             router.push(`/projects/${projectId}/heuristics`);
         } else if ('information_source_deleted' == msgParts[1]) {
-            // alert('Information source was deleted!');
+            alert('Information source was deleted!');
             router.push(`/projects/${projectId}/heuristics`);
         } else if ('information_source_updated' == msgParts[1]) {
             if (currentHeuristic.id == msgParts[2]) {

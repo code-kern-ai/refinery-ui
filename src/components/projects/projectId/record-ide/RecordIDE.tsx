@@ -1,5 +1,6 @@
 import BricksIntegrator from "@/src/components/shared/bricks-integrator/BricksIntegrator";
 import LoadingIcon from "@/src/components/shared/loading/LoadingIcon";
+import MultilineTooltip from "@/src/components/shared/multilines-tooltip/MultilineTooltip";
 import { selectAllUsers, setComments } from "@/src/reduxStore/states/general";
 import { selectProjectId } from "@/src/reduxStore/states/project"
 import { REQUEST_COMMENTS } from "@/src/services/gql/queries/projects";
@@ -225,7 +226,7 @@ export default function RecordIDE() {
             <div className={`h-screen border-gray-300 ${vertical ? 'border-l' : 'border-t'}`}>
                 <div className="flex flex-row m-3 items-center">
                     <span className="mr-4">Shell</span>
-                    <Tooltip content={TOOLTIPS_DICT.RECORD_IDE.RUN_CODE} color="invert" placement="bottom">
+                    <Tooltip content={<MultilineTooltip tooltipLines={['Press Shift + Enter in the editor', 'to run the code']} />} color="invert" placement="bottom">
                         <button onClick={runRecordIde} className="whitespace-break-spaces">
                             <div className="items-center flex mr-2 px-4 py-2 border border-blue-300 shadow-sm text-xs font-medium rounded-md text-blue-700 bg-blue-50 hover:bg-blue-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 cursor-pointer">
                                 <span>Run</span>

@@ -193,7 +193,6 @@ export const TOOLTIPS_DICT = {
     },
     [CurrentPage.DATA_BROWSER]: {
         'ONLY_MANAGED': 'Only usable for the managed version',
-        'OUTDATED_SLICE': 'Outdated slice&#10;save to update',
         'CLEAR_WS_CONFIDENCE': 'Clear filter for weakly supervised confidence',
         'CLEAR_MC_CONFIDENCE': 'Clear filter for model callback confidence',
         'CONNECT': 'Connection within atomic filters',
@@ -216,7 +215,6 @@ export const TOOLTIPS_DICT = {
         'ARROW_RIGHT': 'Arrow right',
         'DELETE_CURRENT_RECORD': 'Delete current record',
         'OPEN_SETTINGS': 'Open Labeling Suite settings',
-        'SETTINGS': 'Note that your browser stores these settings.&#10;&#10;Not your user or your organization!',
         'AUTO_NEXT_RECORD': 'Jump to the next record after setting a manual classification label',
         'HOVER_BACKGROUND': 'Choose a color for the hover effects of the tables',
         'LINE_BREAKS': 'If checked, the attributes in the data-browser and labeling page will be shown with line breaks',
@@ -224,11 +222,9 @@ export const TOOLTIPS_DICT = {
         'PRE_LINE': 'Collapses multiple whitespaces and line breaks into a single space',
         'IS_COLLAPSED': 'Only show the quick selection buttons',
         'QUICK_BUTTON': 'Hide/show quick buttons in expanded form',
-        'LABEL_OPTIONS': 'Amount of label buttons shown before hiding the rest under:&#10;\'other \<task\> options\'',
         'CLOSE_LABEL_BOX': 'Close the label box after assigning a label',
         'SHOW_TASK_NAMES': 'Display the corresponding task names next to the attribute names in the labeling grid',
         'LABEL_DISPLAY': 'Reduce the display size of classification labels by ordering them into less rows',
-        'SWIM_LANE': 'Groups display of labels in type, task, creator & label. Same group gets the same distance to the text.&#10;&#10;Might use a lot of space',
         'SHOW_HEURISTICS': 'Hide/Show heuristics in overview table to reduce bias',
         'INFO_LABEL_BOX': 'What can I do here?',
         'ACTIVATE_ALL': 'Activate all',
@@ -245,7 +241,6 @@ export const TOOLTIPS_DICT = {
         'SWITCH_TO_HORIZONTAL': 'Switch to horizontal view',
         'SWITCH_TO_VERTICAL': 'Switch to vertical view',
         'IDX_SESSION': 'Number of the current index in session',
-        'RUN_CODE': 'Press Shift + Enter in the editor&#10;to run the code',
         'CLEAR_SHELL': 'Clear shell output screen'
     },
     [CurrentPage.EDIT_RECORDS]: {

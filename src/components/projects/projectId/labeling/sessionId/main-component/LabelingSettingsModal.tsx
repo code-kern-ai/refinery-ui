@@ -1,4 +1,5 @@
 import Modal from "@/src/components/shared/modal/Modal";
+import MultilineTooltip from "@/src/components/shared/multilines-tooltip/MultilineTooltip";
 import { selectSettings, updateSettings } from "@/src/reduxStore/states/pages/labeling";
 import { selectProject } from "@/src/reduxStore/states/project";
 import { LineBreaksType } from "@/src/types/components/projects/projectId/data-browser/data-browser";
@@ -64,7 +65,7 @@ export default function LabelingSettingsModal() {
             <span className="text-lg leading-6 text-gray-900 font-medium">
                 Settings
             </span>
-            <Tooltip content={TOOLTIPS_DICT.LABELING.SETTINGS} color="invert" placement="top" className="cursor-auto">
+            <Tooltip content={<MultilineTooltip tooltipLines={['Note that your browser stores these settings.', 'Not your user or your organization!']} />} color="invert" placement="top" className="cursor-auto">
                 <IconInfoCircle className="h-6 w-6" />
             </Tooltip>
         </div>
@@ -122,11 +123,7 @@ export default function LabelingSettingsModal() {
                 <span>Show task legend</span>
                 <span className="cursor-pointer flex items-center">
                     <input className="h-5 w-5 cursor-pointer" type="checkbox" checked={settings?.task.show} onChange={() => changeSetting(ComponentType.TASK_HEADER, 'show')} /></span>
-                <Tooltip content={<div>
-                    <p>Completely hide/show the feature.</p>
-                    <br></br>
-                    <p>Active settings are preserved</p>
-                </div>} color="invert" placement="top" className="cursor-auto"><IconInfoCircle className="h-5 w-5" /></Tooltip>
+                <Tooltip content={<MultilineTooltip tooltipLines={['Completely hide/show the feature.', 'Active settings are preserved']} />} color="invert" placement="top" className="cursor-auto"><IconInfoCircle className="h-5 w-5" /></Tooltip>
                 <span>Collapse</span>
                 <span className="cursor-pointer flex items-center">
                     <input className="h-5 w-5 cursor-pointer" type="checkbox" checked={settings?.task.isCollapsed} onChange={() => changeSetting(ComponentType.TASK_HEADER, 'isCollapsed')} /></span>
@@ -143,7 +140,7 @@ export default function LabelingSettingsModal() {
                 <span>Label options</span>
                 <input value={settings?.labeling.showNLabelButton} type="number" onChange={(e) => changeSetting(ComponentType.LABELING, 'showNLabelButton', e.target.value)}
                     className="h-9 w-12 text-sm border-gray-300 rounded-md placeholder-italic border text-gray-900 pl-4 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100" />
-                <Tooltip content={TOOLTIPS_DICT.LABELING.LABEL_OPTIONS} color="invert" placement="top" className="cursor-auto"><IconInfoCircle className="h-5 w-5" /></Tooltip>
+                <Tooltip content={<MultilineTooltip tooltipLines={['Amount of label buttons shown before hiding the rest under: \'other \<task\> options\'']} />} color="invert" placement="top" className="cursor-auto"><IconInfoCircle className="h-5 w-5" /></Tooltip>
                 <span>Close label box</span>
                 <span className="cursor-pointer flex items-center">
                     <input className="h-5 w-5 cursor-pointer" type="checkbox" checked={settings?.labeling.closeLabelBoxAfterLabel} onChange={() => changeSetting(ComponentType.LABELING, 'closeLabelBoxAfterLabel')} /></span>
@@ -155,11 +152,7 @@ export default function LabelingSettingsModal() {
                 <span>Show heuristic confidence</span>
                 <span className="cursor-pointer flex items-center">
                     <input className="h-5 w-5 cursor-pointer" type="checkbox" checked={settings?.labeling.showHeuristicConfidence} onChange={() => changeSetting(ComponentType.LABELING, 'showHeuristicConfidence')} /></span>
-                <Tooltip content={<div>
-                    <p>Display the heuristic label confidence.</p>
-                    <br></br>
-                    <p>Please see in our docs for more information on confidence calculation.</p>
-                </div>} color="invert" placement="top" className="cursor-auto"><IconInfoCircle className="h-5 w-5" /></Tooltip>
+                <Tooltip content={<MultilineTooltip tooltipLines={['Display the heuristic label confidence.', 'Please see in our docs for more information on confidence calculation.']} />} color="invert" placement="top" className="cursor-auto"><IconInfoCircle className="h-5 w-5" /></Tooltip>
                 <span>Compact classification label display</span>
                 <span className="cursor-pointer flex items-center">
                     <input className="h-5 w-5 cursor-pointer" type="checkbox" checked={settings?.labeling.compactClassificationLabelDisplay} onChange={() => changeSetting(ComponentType.LABELING, 'compactClassificationLabelDisplay')} /></span>
@@ -167,7 +160,7 @@ export default function LabelingSettingsModal() {
                 <span>Swim lane extraction labels</span>
                 <span className="cursor-pointer flex items-center">
                     <input className="h-5 w-5 cursor-pointer" type="checkbox" checked={settings?.labeling.swimLaneExtractionDisplay} onChange={() => changeSetting(ComponentType.LABELING, 'swimLaneExtractionDisplay')} /></span>
-                <Tooltip content={TOOLTIPS_DICT.LABELING.SWIM_LANE} color="invert" placement="top" className="cursor-auto"><IconInfoCircle className="h-5 w-5" /></Tooltip>
+                <Tooltip content={<MultilineTooltip tooltipLines={['Groups display of labels in type, task, creator & label. Same group gets the same distance to the text.', 'Might use a lot of space.']} />} color="invert" placement="top" className="cursor-auto"><IconInfoCircle className="h-5 w-5" /></Tooltip>
             </div>
         </div>}
         {/* Overview table */}
@@ -176,11 +169,7 @@ export default function LabelingSettingsModal() {
                 <span>Show overview table</span>
                 <span className="cursor-pointer flex items-center">
                     <input className="h-5 w-5 cursor-pointer" type="checkbox" checked={settings?.overviewTable.show} onChange={() => changeSetting(ComponentType.OVERVIEW_TABLE, 'show')} /></span>
-                <Tooltip content={<div>
-                    <p>Completely hide/show the feature.</p>
-                    <br></br>
-                    <p>Active settings are preserved</p>
-                </div>} color="invert" placement="top" className="cursor-auto"><IconInfoCircle className="h-5 w-5" /></Tooltip>
+                <Tooltip content={<MultilineTooltip tooltipLines={['Completely hide/show the feature.', 'Active settings are preserved']} />} color="invert" placement="top" className="cursor-auto"><IconInfoCircle className="h-5 w-5" /></Tooltip>
                 <span>Show heuristics</span>
                 <span className="cursor-pointer flex items-center">
                     <input className="h-5 w-5 cursor-pointer" type="checkbox" checked={settings?.overviewTable.showHeuristics} onChange={() => changeSetting(ComponentType.OVERVIEW_TABLE, 'showHeuristics')} /></span>
@@ -188,11 +177,7 @@ export default function LabelingSettingsModal() {
                 <span>Include task legend settings</span>
                 <span className="cursor-pointer flex items-center">
                     <input className="h-5 w-5 cursor-pointer" type="checkbox" checked={settings?.overviewTable.includeLabelDisplaySettings} onChange={() => changeSetting(ComponentType.OVERVIEW_TABLE, 'includeLabelDisplaySettings')} /></span>
-                <Tooltip content={<div>
-                    <p>If active the table will filter entries depending on task legend settings.</p>
-                    <br></br>
-                    <p>Note that show heuristic disabled will overrule this</p>
-                </div>} color="invert" placement="top" className="cursor-auto"><IconInfoCircle className="h-5 w-5" /></Tooltip>
+                <Tooltip content={<MultilineTooltip tooltipLines={['If active the table will filter entries depending on task legend settings.', 'Note that show heuristic disabled will overrule this']} />} color="invert" placement="top" className="cursor-auto"><IconInfoCircle className="h-5 w-5" /></Tooltip>
             </div>
         </div>}
     </Modal >)

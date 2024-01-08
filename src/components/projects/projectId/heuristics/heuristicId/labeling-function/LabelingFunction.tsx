@@ -164,7 +164,7 @@ export default function LabelingFunction() {
             alert('Parent labeling task was deleted!');
             router.push(`/projects/${projectId}/heuristics`);
         } else if ('information_source_deleted' == msgParts[1]) {
-            // alert('Information source was deleted!');
+            alert('Information source was deleted!');
             router.push(`/projects/${projectId}/heuristics`);
         } else if (['information_source_updated', 'model_callback_update_statistics'].includes(msgParts[1])) {
             if (currentHeuristic.id == msgParts[2]) {
