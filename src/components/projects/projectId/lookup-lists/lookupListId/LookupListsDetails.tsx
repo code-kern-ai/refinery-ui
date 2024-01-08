@@ -43,7 +43,7 @@ export default function LookupListsDetails() {
     const [updateLookupListMut] = useMutation(UPDATE_KNOWLEDGE_BASE);
     const [refetchComments] = useLazyQuery(REQUEST_COMMENTS, { fetchPolicy: "no-cache" });
 
-    useEffect(unsubscribeWSOnDestroy(router, [CurrentPage.LOOKUP_LISTS_DETAILS]), []);
+    useEffect(unsubscribeWSOnDestroy(router, [CurrentPage.LOOKUP_LISTS_DETAILS, CurrentPage.COMMENTS, CurrentPage.LOOKUP_LISTS_OVERVIEW], projectId), []);
 
     useEffect(() => {
         if (!projectId) return;

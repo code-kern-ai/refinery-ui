@@ -58,7 +58,7 @@ export default function LabelingFunction() {
     const [refetchRunOn10] = useLazyQuery(GET_LABELING_FUNCTION_ON_10_RECORDS, { fetchPolicy: "no-cache" });
     const [refetchComments] = useLazyQuery(REQUEST_COMMENTS, { fetchPolicy: "no-cache" });
 
-    useEffect(unsubscribeWSOnDestroy(router, [CurrentPage.LABELING_FUNCTION]), []);
+    useEffect(unsubscribeWSOnDestroy(router, [CurrentPage.HEURISTICS, CurrentPage.LABELING_FUNCTION, CurrentPage.ACTIVE_LEARNING, CurrentPage.CROWD_LABELER, CurrentPage.ZERO_SHOT, CurrentPage.COMMENTS], projectId), []);
 
     useEffect(() => {
         if (!projectId) return;

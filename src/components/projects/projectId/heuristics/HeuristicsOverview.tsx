@@ -44,7 +44,7 @@ export function HeuristicsOverview() {
     const [refetchAttributes] = useLazyQuery(GET_ATTRIBUTES_BY_PROJECT_ID, { fetchPolicy: "network-only" });
     const [refetchComments] = useLazyQuery(REQUEST_COMMENTS, { fetchPolicy: "no-cache" });
 
-    useEffect(unsubscribeWSOnDestroy(router, [CurrentPage.HEURISTICS]), []);
+    useEffect(unsubscribeWSOnDestroy(router, [CurrentPage.HEURISTICS, CurrentPage.LABELING_FUNCTION, CurrentPage.ACTIVE_LEARNING, CurrentPage.CROWD_LABELER, CurrentPage.ZERO_SHOT, CurrentPage.COMMENTS], projectId), []);
 
     useEffect(() => {
         if (!projectId) return;

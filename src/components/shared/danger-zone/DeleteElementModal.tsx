@@ -42,16 +42,18 @@ export default function DeleteElementModal(props: DangerZoneProps) {
                 deleteLookupListMut({ variables: { projectId: projectId, knowledgeBaseId: props.id } }).then(() => {
                     setIsDeleting(false);
                     dispatch(removeFromAllLookupListById(props.id));
-                    router.push(`/projects/${projectId}/lookup-lists`);
                 });
+                router.push(`/projects/${projectId}/lookup-lists`);
+                break;
             case DangerZoneEnum.LABELING_FUNCTION:
             case DangerZoneEnum.ACTIVE_LEARNING:
             case DangerZoneEnum.ZERO_SHOT:
             case DangerZoneEnum.CROWD_LABELER:
                 deleteHeuristicMut({ variables: { projectId: projectId, informationSourceId: props.id } }).then(() => {
                     setIsDeleting(false);
-                    router.push(`/projects/${projectId}/heuristics`);
                 });
+                router.push(`/projects/${projectId}/heuristics`);
+                break;
         }
 
     }, [modalDelete]);
@@ -65,7 +67,7 @@ export default function DeleteElementModal(props: DangerZoneProps) {
     return (<Modal modalName={ModalEnum.DELETE_ELEMENT} abortButton={abortButton}>
         <h1 className="text-lg text-gray-900 mb-2">Warning</h1>
         <div className="text-sm text-gray-500 my-2">
-            Are you sure you want to delete this attribute?
+            Are you sure you want to delete this {props.elementType}?
             <p>This will delete all data associated with it, including labeling tasks.</p>
             {isDeleting && <LoadingIcon color="red" />}
         </div>

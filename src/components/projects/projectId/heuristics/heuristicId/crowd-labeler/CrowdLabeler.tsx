@@ -41,7 +41,7 @@ export default function CrowdLabeler() {
     const [refetchDataSlicesMut] = useLazyQuery(DATA_SLICES, { fetchPolicy: 'network-only' });
     const [refetchComments] = useLazyQuery(REQUEST_COMMENTS, { fetchPolicy: "no-cache" });
 
-    useEffect(unsubscribeWSOnDestroy(router, [CurrentPage.CROWD_LABELER]), []);
+    useEffect(unsubscribeWSOnDestroy(router, [CurrentPage.HEURISTICS, CurrentPage.LABELING_FUNCTION, CurrentPage.ACTIVE_LEARNING, CurrentPage.CROWD_LABELER, CurrentPage.ZERO_SHOT, CurrentPage.COMMENTS], projectId), []);
 
     useEffect(() => {
         if (!projectId) return;

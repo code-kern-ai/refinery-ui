@@ -47,7 +47,7 @@ export default function LookupListsOverview() {
         prepareSelectionList();
     }, [modalDelete]);
 
-    useEffect(unsubscribeWSOnDestroy(router, [CurrentPage.LOOKUP_LISTS_OVERVIEW]), []);
+    useEffect(unsubscribeWSOnDestroy(router, [CurrentPage.LOOKUP_LISTS_OVERVIEW, CurrentPage.LOOKUP_LISTS_DETAILS, CurrentPage.COMMENTS], projectId), []);
 
     useEffect(() => {
         if (!projectId || allUsers.length == 0) return;
