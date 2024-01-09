@@ -1,6 +1,6 @@
 import { ModalEnum } from '@/src/types/shared/modal';
 import { Modal } from '@nextui-org/react';
-import { createSlice } from '@reduxjs/toolkit'
+import { createSelector, createSlice } from '@reduxjs/toolkit'
 import type { PayloadAction } from '@reduxjs/toolkit'
 
 // only values that need to be accessed from outside the modal
@@ -258,6 +258,10 @@ export const { setModalStates, openModal, closeModal, initModal } = modalSlice.a
 export const modalReducer = modalSlice.reducer;
 
 //selectors
+export const selectModals = (state) => state.modals;
+export const selectModalsValues = createSelector([selectModals], (a): any => a ? Object.values(a) : null)
+export const selectAllOpenModals = createSelector([selectModalsValues], (a): any => a ? a.filter(o => o.open) : null)
+
 
 // higher order selector (function that creates a function)
 export function selectModal(modalName: ModalEnum) {
