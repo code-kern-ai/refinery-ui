@@ -1,5 +1,5 @@
 import { selectProjectId } from "@/src/reduxStore/states/project"
-import { useSelector } from "react-redux"
+import { useDispatch, useSelector } from "react-redux"
 import NavBarTopEditRecords from "./NavBarTopEditRecords";
 import { selectSessionData } from "@/src/reduxStore/states/tmp";
 import { Fragment, useCallback, useEffect, useState } from "react";
@@ -13,9 +13,11 @@ import EditField from "./EditField";
 import { WebSocketsService } from "@/src/services/base/web-sockets/WebSocketsService";
 import { useRouter } from "next/router";
 import { unsubscribeWSOnDestroy } from "@/src/services/base/web-sockets/web-sockets-helper";
-
+import { ModalEnum } from "@/src/types/shared/modal";
+import { openModal } from "@/src/reduxStore/states/modal";
 
 export default function EditRecords() {
+    const dispatch = useDispatch();
     const router = useRouter();
 
     const projectId = useSelector(selectProjectId);
@@ -39,6 +41,9 @@ export default function EditRecords() {
         erdDataCopy.editRecordId = erdDataCopy.data.selectedRecordId;
         erdDataCopy.navBar.positionString = erdDataCopy.data.records.length + " records in";
         setErdData(erdDataCopy);
+        if (!erdDataCopy.modals.hideExplainModal) {
+            dispatch(openModal(ModalEnum.EXPLAIN_EDIT_RECORDS));
+        }
         WebSocketsService.subscribeToNotification(CurrentPage.EDIT_RECORDS, {
             projectId: projectId,
             whitelist: ['calculate_attribute'],
