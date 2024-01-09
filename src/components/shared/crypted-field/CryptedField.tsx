@@ -11,8 +11,8 @@ const DEFAULTS = {
 }
 
 export default function CryptedField(_props: CryptoFieldProps) {
-    const [key, setKey] = useState<string>('');
-    const [show, setShow] = useState<boolean>(false);
+    const [key, setKey] = useState('');
+    const [show, setShow] = useState(false);
     const [props] = useDefaults<CryptoFieldProps>(_props, DEFAULTS);
 
     const pwRef = useRef<HTMLInputElement>(null);
@@ -33,11 +33,11 @@ export default function CryptedField(_props: CryptoFieldProps) {
                         setKey(e.target.value);
                         props.keyChange(e.target.value);
                     }} />
-                <button onClick={toggleKey} disabled={!key}>
+                <button onClick={toggleKey} disabled={!key} className="disabled:cursor-not-allowed disabled:opacity-50">
                     {!show ? (
-                        <IconEye className={` text-gray-500 absolute top-1 right-3 cursor-pointer disabled:cursor-not-allowed disabled:opacity-50`} />
+                        <IconEye className={`text-gray-500 absolute top-1 right-3 ${!key ? 'cursor-not-allowed opacity-50' : 'cursor-pointer opacity-100'}`} />
                     ) : (
-                        <IconEyeOff className={`text-gray-500 absolute top-1 right-3 disabled:cursor-not-allowed disabled:opacity-50`} />
+                        <IconEyeOff className={`text-gray-500 absolute top-1 right-3 ${!key ? 'cursor-not-allowed opacity-50' : 'cursor-pointer opacity-100'}`} />
                     )}
                 </button>
             </div>

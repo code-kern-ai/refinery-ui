@@ -18,7 +18,6 @@ module.exports = {
     { pattern: /(fill)-(red|orange|amber|yellow|lime|green|emerald|teal|cyan|sky|blue|indigo|violet|purple|fuchsia|pink|rose|gray)-(900)/, },
     // patterns for submodules
     { pattern: /(border)-(gray)-(200|800)/, },
-    { pattern: /(bg)-(neutral)-(800)/, },
   ],
   theme: {
     colors: {

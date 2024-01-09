@@ -179,7 +179,7 @@ export type BricksVariable = {
     replacedLine: string,
     baseName: string,
     displayName: string,
-    values: string[],
+    values: any,
     allowedValues: any,
     pythonType: string,
     canMultipleValues: boolean,

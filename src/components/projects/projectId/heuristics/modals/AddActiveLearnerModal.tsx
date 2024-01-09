@@ -1,9 +1,10 @@
 import Modal from "@/src/components/shared/modal/Modal";
 import { selectHeuristicType } from "@/src/reduxStore/states/pages/heuristics";
-import { selectEmbeddings, selectLabelingTasksAll } from "@/src/reduxStore/states/pages/settings";
+import { selectEmbeddings, selectEmbeddingsFiltered, selectLabelingTasksAll, selectVisibleAttributesHeuristics, setFilteredEmbeddings } from "@/src/reduxStore/states/pages/settings";
 import { selectProjectId } from "@/src/reduxStore/states/project";
 import { CREATE_HEURISTIC } from "@/src/services/gql/mutations/heuristics";
 import { ModalButton, ModalEnum } from "@/src/types/shared/modal";
+import { embeddingRelevant } from "@/src/util/components/projects/projectId/heuristics/heuristicId/labeling-functions-helper";
 import { DEFAULT_DESCRIPTION, getFunctionName, getInformationSourceTemplate, getRouterLinkHeuristic } from "@/src/util/components/projects/projectId/heuristics/heuristics-helper";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
 import Dropdown from "@/submodules/react-components/components/Dropdown";
@@ -11,17 +12,20 @@ import { useMutation } from "@apollo/client";
 import { Tooltip } from "@nextui-org/react";
 import { useRouter } from "next/router";
 import { useCallback, useEffect, useState } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 
 const ACCEPT_BUTTON = { buttonCaption: 'Create', useButton: true, disabled: true };
 
 export default function AddActiveLeanerModal() {
     const router = useRouter();
+    const dispatch = useDispatch();
 
     const projectId = useSelector(selectProjectId);
     const labelingTasks = useSelector(selectLabelingTasksAll);
     const heuristicType = useSelector(selectHeuristicType);
     const embeddings = useSelector(selectEmbeddings);
+    const attributes = useSelector(selectVisibleAttributesHeuristics);
+    const embeddingsFiltered = useSelector(selectEmbeddingsFiltered);
 
     const [labelingTask, setLabelingTask] = useState('');
     const [name, setName] = useState('');
@@ -29,6 +33,14 @@ export default function AddActiveLeanerModal() {
     const [embedding, setEmbedding] = useState('');
 
     const [createHeuristicMut] = useMutation(CREATE_HEURISTIC);
+
+    useEffect(() => {
+        if (!embeddings || !labelingTask) return;
+        const findLabelingTask = labelingTasks.find(lt => lt.name == labelingTask);
+        const filteredEmbeddings = embeddings.filter(e => embeddingRelevant(e, attributes, labelingTasks, findLabelingTask?.id));
+        dispatch(setFilteredEmbeddings(filteredEmbeddings));
+        setEmbedding(filteredEmbeddings[0]?.name ?? undefined);
+    }, [embeddings, labelingTask]);
 
     const createHeuristic = useCallback(() => {
         const labelingTaskId = labelingTasks.find(lt => lt.name == labelingTask)?.id;
@@ -58,7 +70,7 @@ export default function AddActiveLeanerModal() {
 
     useEffect(() => {
         setAcceptButtonAL({ ...ACCEPT_BUTTON, emitFunction: createHeuristic, disabled: !(embedding && name) });
-    }, [labelingTask, name, createHeuristic]);
+    }, [labelingTask, embedding, name, createHeuristic]);
 
     useEffect(() => {
         if (!labelingTasks || labelingTasks.length == 0) return;
@@ -66,8 +78,12 @@ export default function AddActiveLeanerModal() {
         setLabelingTask(labelingTasks[0].name);
         setName(getFunctionName(heuristicType));
         setDescription(DEFAULT_DESCRIPTION);
-        setEmbedding(embeddings[0].name);
-    }, [labelingTasks, embedding, heuristicType]);
+    }, [labelingTasks, heuristicType]);
+
+    useEffect(() => {
+        if (!embeddingsFiltered || embeddingsFiltered.length == 0) return;
+        setEmbedding(embeddingsFiltered[0].name ?? undefined);
+    }, [embeddingsFiltered]);
 
     return (<Modal modalName={ModalEnum.ADD_ACTIVE_LEARNER} acceptButton={acceptButtonAL}>
         <h1 className="text-lg text-gray-900 text-center mb-4">Add new active learning</h1>
@@ -97,7 +113,7 @@ export default function AddActiveLeanerModal() {
                     <span className="cursor-help card-title mb-0 label-text text-left"><span className="underline filtersUnderline">Embedding</span></span>
                 </div>
             </Tooltip>
-            <Dropdown options={embeddings.map(e => e.name)} buttonName={embedding} selectedOption={(option: string) => setEmbedding(option)} disabled={embeddings.length == 0} />
+            <Dropdown options={embeddingsFiltered.map(e => e.name)} buttonName={embedding ?? ''} selectedOption={(option: string) => setEmbedding(option)} disabled={embeddingsFiltered.length == 0} />
         </div>
     </Modal>
     )

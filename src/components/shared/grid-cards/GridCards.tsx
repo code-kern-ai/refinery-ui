@@ -82,7 +82,7 @@ export default function GridCards(props: GridCardsProps) {
                                     </div>
                                     <div>
                                         <div>Coverage</div>
-                                        <div className="font-normal text-gray-500">{stat.values.Coverage}
+                                        <div className="font-normal text-gray-500">{stat.values.Coverage}&nbsp;
                                             {stat.values.Coverage == 1 ? 'record' : 'records'}
                                         </div>
 

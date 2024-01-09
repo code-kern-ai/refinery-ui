@@ -50,7 +50,7 @@ export class BricksCodeParser {
             config.codeFullyPrepared = true;
         }
         try {
-            this.variables = this.parseVariableLines(variableLines);
+            this.variables = this.parseVariableLines(variableLines, labelingTaskId);
             this.checkAndMatchVariables(forIde, labelingTaskId, labelingTasks);
             config = this.replaceVariables(config, executionTypeFilter, labelingTaskId, forIde);
         } catch (error: any) {
@@ -455,17 +455,17 @@ export class BricksCodeParser {
 
     }
 
-    private static parseVariableLines(variableLines: string[]): BricksVariable[] {
+    private static parseVariableLines(variableLines: string[], labelingTaskId: string = null): BricksVariable[] {
         const variables = [];
         for (let i = 0; i < variableLines.length; i++) {
             const line = variableLines[i];
-            const variable = this.parseVariableLine(line);
+            const variable = this.parseVariableLine(line, labelingTaskId);
             variables.push(variable);
         }
         return variables;
     }
 
-    private static parseVariableLine(line: string, labelingTaskId: string = null): BricksVariable {
+    private static parseVariableLine(line: string, labelingTaskId: string): BricksVariable {
         const variable = getEmptyBricksVariable();
         variable.line = line;
         variable.baseName = variable.line.split("=")[0].split(":")[0].trim();

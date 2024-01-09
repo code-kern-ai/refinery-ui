@@ -1,4 +1,5 @@
 import { selectBricksIntegratorAttributes, selectBricksIntegratorEmbeddings, selectBricksIntegratorLabelingTasks, selectBricksIntegratorLabels, selectBricksIntegratorLanguages, selectBricksIntegratorLookupLists, setAttributesBricksIntegrator, setEmbeddingsBricksIntegrator, setLabelingTasksBricksIntegrator, setLabelsBricksIntegrator, setLanguagesBricksIntegrator, setLookupListsBricksIntegrator } from "@/src/reduxStore/states/general";
+import { selectLabelingTasksAll } from "@/src/reduxStore/states/pages/settings";
 import { selectProjectId } from "@/src/reduxStore/states/project";
 import { WebSocketsService } from "@/src/services/base/web-sockets/WebSocketsService";
 import { unsubscribeWSOnDestroy } from "@/src/services/base/web-sockets/web-sockets-helper";
@@ -16,7 +17,7 @@ import Dropdown from "@/submodules/react-components/components/Dropdown";
 import { useLazyQuery } from "@apollo/client";
 import { IconPlus, IconTrash } from "@tabler/icons-react";
 import { useRouter } from "next/router";
-import { use, useCallback, useEffect } from "react";
+import { useCallback, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
 export default function VariableSelect(props: VariableSelectProps) {
@@ -27,7 +28,7 @@ export default function VariableSelect(props: VariableSelectProps) {
     const attributes = useSelector(selectBricksIntegratorAttributes);
     const languages = useSelector(selectBricksIntegratorLanguages);
     const embeddings = useSelector(selectBricksIntegratorEmbeddings);
-    const labelingTasks = useSelector(selectBricksIntegratorLabelingTasks);
+    const labelingTasks = useSelector(selectLabelingTasksAll);
     const lookupLists = useSelector(selectBricksIntegratorLookupLists);
     const labels = useSelector(selectBricksIntegratorLabels);
 
@@ -49,11 +50,11 @@ export default function VariableSelect(props: VariableSelectProps) {
     }, [projectId]);
 
     useEffect(() => {
-        if (!props.variable) return;
-        setAllowedValues(props.variable.type, props.variable.comment);
-    }, [props.variable]);
+        if (!props.variable || !labelingTasks) return;
+        setAllowedValues(props.variable.type, props.variable.comment, props.labelingTaskId);
+    }, [props.variable, labelingTasks]);
 
-    function setAllowedValues(forType: BricksVariableType, comment: string) {
+    function setAllowedValues(forType: BricksVariableType, comment: string, labelingTaskId: string) {
         switch (forType) {
             case BricksVariableType.LANGUAGE:
                 const allLanguages = isCommentTrue(comment, BricksVariableComment.LANGUAGE_ALL);
@@ -77,17 +78,17 @@ export default function VariableSelect(props: VariableSelectProps) {
                 refetchLabelingTasksAndProcess(typeFilter)
                 break;
             case BricksVariableType.LABEL:
-                if (!props.labelingTaskId) {
+                if (!labelingTaskId) {
                     console.log("no labeling task id given -> can't collect allowed labels");
                     return;
                 }
-                return dispatch(setLabelsBricksIntegrator(BricksCodeParser.getLabels(props.labelingTaskId, labelingTasks)));
+                return dispatch(setLabelsBricksIntegrator(BricksCodeParser.getLabels(labelingTaskId, labelingTasks)));
             case BricksVariableType.EMBEDDING:
-                if (!props.labelingTaskId) {
+                if (!labelingTaskId) {
                     refetchEmbeddingsAndProcess();
                     return;
                 }
-                refetchEmbeddingsAndProcess(props.labelingTaskId);
+                refetchEmbeddingsAndProcess(labelingTaskId);
                 break;
             case BricksVariableType.LOOKUP_LIST:
                 refetchLookupListsAndProcess();
@@ -235,7 +236,7 @@ export default function VariableSelect(props: VariableSelectProps) {
                     }}
                 />}
             {props.variable.type == BricksVariableType.LABEL &&
-                <Dropdown options={labels} buttonName={props.variable.values[props.index] ? props.variable.values[props.index] : 'Select label'}
+                <Dropdown options={labels} buttonName={props.variable.values[index] ? props.variable.values[index] : 'Select label'}
                     selectedOption={(option: any) => {
                         const propsCopy = { ...props };
                         propsCopy.variable.values[index] = option;

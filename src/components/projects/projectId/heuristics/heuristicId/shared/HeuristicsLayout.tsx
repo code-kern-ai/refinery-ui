@@ -87,7 +87,7 @@ export default function HeuristicsLayout(props: any) {
         });
     }
 
-    return (projectId && <div className="bg-white p-4 pb-16 overflow-y-auto h-screen" onScroll={onScrollEvent}>
+    return (projectId && <div className="bg-white p-4 pb-16 overflow-y-auto h-screen" style={{ width: 'calc(100vw - 75px)' }} onScroll={onScrollEvent}>
         {currentHeuristic && <div>
             <div className={`sticky z-40 h-12 ${isHeaderNormal ? 'top-1' : '-top-5'}`}>
                 <div className={`bg-white flex-grow ${isHeaderNormal ? '' : 'shadow'}`}>
@@ -131,7 +131,7 @@ export default function HeuristicsLayout(props: any) {
                                 : (<div className="mr-4 text-sm leading-5 font-medium text-gray-500 inline-block">{currentHeuristic.name}</div>)}
                         </div>
                     </div>}
-                    {isHeaderNormal && <div className="flex items-center mt-2">
+                    <div className="flex items-center mt-2">
                         <Tooltip color="invert" placement="bottom" content={TOOLTIPS_DICT.HEURISTICS.EDIT_DESCRIPTION}>
                             <button onClick={() => openProperty(true, HeuristicsProperty.DESCRIPTION)}
                                 className="flex-shrink-0 bg-white text-gray-700 text-xs font-semibold mr-3 px-4 py-2 rounded-md border border-gray-300 block float-left hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
@@ -145,7 +145,7 @@ export default function HeuristicsLayout(props: any) {
                                     className="h-8 border-gray-300 rounded-md placeholder-italic border text-gray-700 pl-4 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100" />)
                                 : (<div className="mr-4 text-sm leading-5 font-medium text-gray-500 inline-block">{currentHeuristic.description}</div>)}
                         </div>
-                    </div>}
+                    </div>
                 </div>
                 {(currentHeuristic.informationSourceType == InformationSourceType.LABELING_FUNCTION || currentHeuristic.informationSourceType == InformationSourceType.ACTIVE_LEARNING) && <div className="grid grid-cols-2 gap-2 items-center mt-8" style={{ gridTemplateColumns: 'max-content auto' }}>
                     <div className="text-sm leading-5 font-medium text-gray-700 inline-block">Attributes</div>

@@ -55,7 +55,7 @@ export default function HeuristicStatistics() {
                                 <tbody className="divide-y divide-gray-200">
                                     {currentHeuristic.stats.map((sourceContainer: Stat, j) => (<tr key={sourceContainer.label} className={`${j % 2 != 0 ? 'bg-gray-50' : 'bg-white'}`}>
                                         <td className="whitespace-nowrap py-2 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6">
-                                            <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium border ${sourceContainer.color.backgroundColor} ${sourceContainer.color.textColor} ${sourceContainer.color.borderColor} ${sourceContainer.color.hoverColor}`}>
+                                            <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium border ${sourceContainer.color.backgroundColor} ${sourceContainer.color.textColor} ${sourceContainer.color.borderColor}`}>
                                                 {sourceContainer.label}
                                             </span>
                                         </td>

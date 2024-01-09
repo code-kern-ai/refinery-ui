@@ -154,7 +154,7 @@ export default function PageIntegration(props: PageIntegrationProps) {
                         <VariableSelect variable={v} index={index} sendOption={() => {
                             const configCopy = BricksCodeParser.replaceVariables(jsonCopy(config), props.executionTypeFilter, null, props.forIde);
                             dispatch(setBricksIntegrator(configCopy));
-                        }} />
+                        }} labelingTaskId={props.labelingTaskId} />
                         {v.comment && <Tooltip content={v.comment} color="invert" placement="top" className="cursor-auto">
                             <IconInfoCircle className="w-6 h-6 " stroke={2} />
                         </Tooltip>}

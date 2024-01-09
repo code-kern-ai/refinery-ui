@@ -242,7 +242,7 @@ export default function AttributeCalculation() {
         WebSocketsService.updateFunctionPointer(projectId, CurrentPage.ATTRIBUTE_CALCULATION, handleWebsocketNotification)
     }, [handleWebsocketNotification, projectId]);
 
-    return (projectId && <div className="bg-white p-4 pb-16 overflow-y-auto h-screen" onScroll={(e: any) => onScrollEvent(e)}>
+    return (projectId && <div className="bg-white p-4 pb-16 overflow-y-auto h-screen" style={{ width: 'calc(100vw - 75px)' }} onScroll={(e: any) => onScrollEvent(e)}>
         {currentAttribute && <div>
             <div className={`sticky z-40 h-12 ${isHeaderNormal ? 'top-1' : '-top-5'}`}>
                 <div className={`bg-white flex-grow ${isHeaderNormal ? '' : 'shadow'}`}>
@@ -338,7 +338,7 @@ export default function AttributeCalculation() {
                         className="absolute top-0 bottom-0 left-0 right-0 bg-gray-200 flex items-center justify-center z-10" style={{ opacity: '0.7' }}>
                         <div className="flex flex-col gap-2">
                             <button onClick={openBricksIntegrator}
-                                className="bg-white text-gray-700 text font-semibold px-4 py-2 rounded-md border border-gray-300 hover:bg-gray-50 focus:outline-none">
+                                className="bg-white text-gray-900 text font-semibold px-4 py-2 rounded-md border border-gray-300 hover:bg-gray-50 focus:outline-none">
                                 Search in bricks
                             </button>
                             <button onClick={() => setIsInitial(false)}

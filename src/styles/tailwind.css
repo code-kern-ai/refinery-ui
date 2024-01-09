@@ -109,3 +109,14 @@
     background-size: 20px 20px;
     opacity: 0.6;
 }
+
+.label-text {
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+    opacity: 1;
+}
+
+.card-title {
+    font-weight: 600;
+    margin-bottom: 0.75rem;
+}
