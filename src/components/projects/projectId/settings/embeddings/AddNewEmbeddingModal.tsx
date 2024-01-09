@@ -329,6 +329,7 @@ function SuggestionsModel(props: SuggestionsProps) {
     const dispatch = useDispatch();
 
     const [colorDownloadedModels, setColorDownloadedModels] = useState<boolean[]>([]);
+    const [hoverBoxList, setHoverBoxList] = useState<any[]>([]);
 
     const [refetchModelsDownload] = useLazyQuery(GET_MODEL_PROVIDER_INFO, { fetchPolicy: 'network-only', nextFetchPolicy: 'cache-first' });
 
@@ -343,13 +344,14 @@ function SuggestionsModel(props: SuggestionsProps) {
             });
             setColorDownloadedModels(colorDownloadedModels);
         });
+        setHoverBoxList(props.options.map((model: any) => model.description));
     }, [props.options]);
 
     return <><Tooltip content={TOOLTIPS_DICT.PROJECT_SETTINGS.EMBEDDINGS.MODEL} placement="right" color="invert">
         <span className="card-title mb-0 label-text flex"><span className="cursor-help underline filtersUnderline">Model</span></span>
     </Tooltip>
         <Dropdown options={props.options.map((option: any) => option.configString)} hasSearchBar={true} differentTextColor="green" useDifferentTextColor={colorDownloadedModels}
-            selectedOption={(option: string) => props.selectedOption(option)} />
+            selectedOption={(option: string) => props.selectedOption(option)} optionsHaveHoverBox={true} hoverBoxList={hoverBoxList} />
     </>
 }
 

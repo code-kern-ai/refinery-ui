@@ -24,6 +24,8 @@ export default function AddModelDownloadModal() {
 
     const [modelName, setModelName] = useState('');
     const [colorDownloadedModels, setColorDownloadedModels] = useState<boolean[]>([]);
+    const [hoverBoxList, setHoverBoxList] = useState<any[]>([]);
+    const [lineSeparatorIndex, setLineSeparatorIndex] = useState(-1);
 
     useEffect(() => {
         if (!modelsDownloaded || !modelsList) return;
@@ -32,6 +34,16 @@ export default function AddModelDownloadModal() {
             return checkIfModelExists !== undefined;
         });
         setColorDownloadedModels(colorDownloadedModels);
+        const hoverBoxList = modelsList.map((model: any, index: number) => {
+            if (model.description) return model.description;
+            else return {
+                avgTime: model.avgTime,
+                base: model.base,
+                size: model.size,
+            }
+        });
+        setHoverBoxList(hoverBoxList);
+        setLineSeparatorIndex(modelsList.findIndex((model: any) => !model.description));
     }, [modelsDownloaded, modelsList]);
 
     const [downloadModelMut] = useMutation(MODEL_PROVIDER_DOWNLOAD_MODEL);
@@ -64,10 +76,10 @@ export default function AddModelDownloadModal() {
                     <span className="card-title mb-0 label-text flex"><span className="cursor-help underline filtersUnderline">Name</span></span>
                 </Tooltip>
                 <Dropdown options={modelsList && modelsList.map((model: any) => model.configString)} useDifferentTextColor={colorDownloadedModels} differentTextColor="green"
-                    hasSearchBar={true} dropdownItemsClasses="max-h-80 overflow-y-auto"
+                    hasSearchBar={true} dropdownItemsClasses="max-h-96 overflow-y-auto"
                     selectedOption={(option: string) => {
                         setModelName(option);
-                    }} />
+                    }} optionsHaveHoverBox={true} hoverBoxList={hoverBoxList} lineSeparatorIndex={lineSeparatorIndex} />
             </div>
         </form>
     </Modal>)

@@ -48,14 +48,12 @@ export default function AddZeroShotModal() {
         const language = project.tokenizer.split("_")[0];
         const modelsFiltered = models.filter(model => model.language == language).sort((a, b) => a.prio - b.prio);
         dispatch(setCache(CacheEnum.ZERO_SHOT_RECOMMENDATIONS, modelsFiltered));
-        const hoverBoxList = [];
-        modelsFiltered.forEach(model => {
-            const hoverBoxModel = {
+        const hoverBoxList = modelsFiltered.map(model => {
+            return {
                 avgTime: model.avgTime,
                 base: model.base,
-                size: model.size
-            };
-            hoverBoxList.push(hoverBoxModel);
+                size: model.size,
+            }
         });
         setHoverBoxList(hoverBoxList);
     }, [project]);
