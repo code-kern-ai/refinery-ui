@@ -1,18 +1,15 @@
 import Modal from "@/src/components/shared/modal/Modal";
-import { selectModal, setModalStates } from "@/src/reduxStore/states/modal";
+import { closeModal, selectModal, setModalStates } from "@/src/reduxStore/states/modal";
 import { selectUsableNonTextAttributes } from "@/src/reduxStore/states/pages/settings";
 import { selectProjectId } from "@/src/reduxStore/states/project";
 import { UPDATE_EMBEDDING_PAYLOAD } from "@/src/services/gql/mutations/project-settings";
 import { FilterAttributesModalProps } from "@/src/types/components/projects/projectId/settings/embeddings";
-import { ModalButton, ModalEnum } from "@/src/types/shared/modal";
+import { ModalEnum } from "@/src/types/shared/modal";
 import Dropdown from "@/submodules/react-components/components/Dropdown";
 import { useMutation } from "@apollo/client";
 import { Tooltip } from "@nextui-org/react";
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-
-const EDIT_BUTTON = { buttonCaption: 'Edit', useButton: true, disabled: false, closeAfterClick: false };
-const ACCEPT_BUTTON = { buttonCaption: 'Save', useButton: false, disabled: false, closeAfterClick: false };
 
 export default function FilterAttributesModal(props: FilterAttributesModalProps) {
     const dispatch = useDispatch();
@@ -23,37 +20,18 @@ export default function FilterAttributesModal(props: FilterAttributesModalProps)
 
     const [checkedAttributes, setCheckedAttributes] = useState([]);
 
-    const [editButton, setEditButton] = useState<ModalButton>(EDIT_BUTTON);
-    const [acceptButton, setAcceptButton] = useState<ModalButton>(ACCEPT_BUTTON);
-
     const [updateEmbeddingPayloadMut] = useMutation(UPDATE_EMBEDDING_PAYLOAD);
 
-    const saveFilteredAttributes = useCallback(() => {
+    function editFilteredAttributes() {
+        props.setShowEditOption(true);
+        dispatch(setModalStates(ModalEnum.FILTERED_ATTRIBUTES, { showEditOption: true }));
+    }
+
+    function saveFilteredAttributes() {
         props.setShowEditOption(false);
         dispatch(setModalStates(ModalEnum.FILTERED_ATTRIBUTES, { showEditOption: false }));
         updateEmbeddingPayloadMut({ variables: { projectId: projectId, embeddingId: modalFilteredAttributes.embeddingId, filterAttributes: JSON.stringify(props.filterAttributesUpdate) } }).then((res) => { });
-    }, [props.filterAttributesUpdate]);
-
-    const editFilteredAttributes = useCallback(() => {
-        props.setShowEditOption(true);
-        dispatch(setModalStates(ModalEnum.FILTERED_ATTRIBUTES, { showEditOption: true }));
-    }, [modalFilteredAttributes]);
-
-    useEffect(() => {
-        const editButtonCopy = { ...editButton };
-        editButtonCopy.emitFunction = editFilteredAttributes;
-        setEditButton(editButtonCopy);
-    }, [modalFilteredAttributes]);
-
-    useEffect(() => {
-        const editButtonCopy = { ...editButton }
-        editButtonCopy.useButton = !props.showEditOption;
-        setEditButton(editButtonCopy);
-        const acceptButtonCopy = { ...acceptButton };
-        acceptButtonCopy.useButton = props.showEditOption;
-        acceptButtonCopy.emitFunction = saveFilteredAttributes;
-        setAcceptButton(acceptButtonCopy);
-    }, [props.showEditOption]);
+    }
 
     useEffect(() => {
         if (!usableAttributes) return;
@@ -66,7 +44,7 @@ export default function FilterAttributesModal(props: FilterAttributesModalProps)
         setCheckedAttributes(updated);
     }, [usableAttributes, modalFilteredAttributes]);
 
-    return (<Modal modalName={ModalEnum.FILTERED_ATTRIBUTES} acceptButton={acceptButton} backButton={editButton}>
+    return (<Modal modalName={ModalEnum.FILTERED_ATTRIBUTES} hasOwnButtons={true}>
         <div className="flex flex-grow justify-center text-lg leading-6 text-gray-900 font-medium">Edit embedding with filter attributes</div>
         <div className="my-2 flex flex-grow justify-center text-sm text-gray-500 text-center">
             List of filter attributes selected when creating an embedding</div>
@@ -86,6 +64,20 @@ export default function FilterAttributesModal(props: FilterAttributesModalProps)
                     props.setFilterAttributesUpdate(attributes);
                 }} />
         </div>}
-    </Modal>
+        <div className="flex mt-6 justify-end">
+            {!props.showEditOption && <button onClick={editFilteredAttributes}
+                className="ml-2 bg-white text-gray-700 text-xs font-semibold px-4 py-2 rounded border border-gray-300 cursor-pointer hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                Edit
+            </button>}
+            {props.showEditOption && <button onClick={saveFilteredAttributes}
+                className="ml-2 bg-green-100 border border-green-400 text-green-700 text-xs font-semibold px-4 py-2 rounded-md cursor-pointer opacity-100 hover:bg-green-200 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50">
+                Save
+            </button>}
+            <button onClick={() => dispatch(closeModal(ModalEnum.FILTERED_ATTRIBUTES))}
+                className="ml-2 bg-white text-gray-700 text-xs font-semibold px-4 py-2 rounded border border-gray-300 cursor-pointer hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                Close
+            </button>
+        </div>
+    </Modal >
     )
 }

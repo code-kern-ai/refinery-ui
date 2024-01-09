@@ -46,7 +46,7 @@ export default function ProjectSettings() {
     const [pKeyValid, setPKeyValid] = useState<boolean | null>(null);
     const [pKeyCheckTimer, setPKeyCheckTimer] = useState(null);
     const [isAcRunning, setIsAcRunning] = useState(false);
-    const [tokenizationProgress, setTokenizationProgress] = useState(0);
+    const [tokenizationProgress, setTokenizationProgress] = useState(null);
     const [checkIfAcUploadedRecords, setCheckIfAcUploadedRecords] = useState(false);
 
     const [refetchAttributes] = useLazyQuery(GET_ATTRIBUTES_BY_PROJECT_ID, { fetchPolicy: "network-only" });
@@ -295,7 +295,7 @@ export default function ProjectSettings() {
                             <span className="cursor-help underline filtersUnderline">Tokenization</span>
                         </div>
                     </Tooltip>
-                    <div className="ml-2 w-8/12 items-center px-2.5 py-1.5 border border-gray-300 shadow-sm text-xs font-medium rounded text-gray-700 bg-white relative">
+                    {tokenizationProgress && <div className="ml-2 w-8/12 items-center px-2.5 py-1.5 border border-gray-300 shadow-sm text-xs font-medium rounded text-gray-700 bg-white relative">
                         {tokenizationProgress != 0 && <div className="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700">
                             <div className="bg-green-300 h-2.5 rounded-full" style={{ 'width': (tokenizationProgress * 100) + '%' }}>
                             </div>
@@ -312,7 +312,7 @@ export default function ProjectSettings() {
                             <div className="bg-green-300 h-2.5 rounded-full" style={{ 'width': '0%' }}>
                             </div>
                         </div>}
-                    </div>
+                    </div>}
                 </div>
             </div>
 
