@@ -68,7 +68,8 @@ export default function LabelingSuiteTaskHeader() {
             labels[labelId] = {
                 [LabelingPageParts.TASK_HEADER]: false,
                 [LabelingPageParts.LABELING]: false,
-                [LabelingPageParts.OVERVIEW_TABLE]: false
+                [LabelingPageParts.OVERVIEW_TABLE]: false,
+                [LabelingPageParts.TABLE_MODAL]: false,
             }
         }
         dispatch(setHoverGroupDict(labels));

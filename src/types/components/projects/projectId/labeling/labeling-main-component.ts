@@ -41,4 +41,5 @@ export enum LabelingPageParts {
     TASK_HEADER = 'TASK_HEADER',
     LABELING = 'LABELING',
     OVERVIEW_TABLE = 'OVERVIEW_TABLE',
+    TABLE_MODAL = 'TABLE_MODAL',
 }

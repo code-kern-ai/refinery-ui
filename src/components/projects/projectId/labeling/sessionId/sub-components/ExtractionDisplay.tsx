@@ -22,6 +22,7 @@ export default function ExtractionDisplay(props: ExtractionDisplayProps) {
         hoverGroupsDictCopy[labelId][LabelingPageParts.TASK_HEADER] = update;
         hoverGroupsDictCopy[labelId][LabelingPageParts.LABELING] = update;
         hoverGroupsDictCopy[labelId][LabelingPageParts.OVERVIEW_TABLE] = update;
+        hoverGroupsDictCopy[labelId][LabelingPageParts.TABLE_MODAL] = update;
         dispatch(setHoverGroupDict(hoverGroupsDictCopy));
     }
 

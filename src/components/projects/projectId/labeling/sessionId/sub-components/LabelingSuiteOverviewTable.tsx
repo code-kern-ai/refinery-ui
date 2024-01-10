@@ -112,10 +112,12 @@ export default function LabelingSuiteOverviewTable() {
                 hoverGroupsDictCopy[labelIdKey][LabelingPageParts.OVERVIEW_TABLE] = update;
                 hoverGroupsDictCopy[labelIdKey][LabelingPageParts.TASK_HEADER] = update;
                 hoverGroupsDictCopy[labelIdKey][LabelingPageParts.LABELING] = update;
+                hoverGroupsDictCopy[labelIdKey][LabelingPageParts.TABLE_MODAL] = update;
             } else {
                 hoverGroupsDictCopy[labelIdKey][LabelingPageParts.OVERVIEW_TABLE] = false;
                 hoverGroupsDictCopy[labelIdKey][LabelingPageParts.TASK_HEADER] = false;
                 hoverGroupsDictCopy[labelIdKey][LabelingPageParts.LABELING] = false;
+                hoverGroupsDictCopy[labelIdKey][LabelingPageParts.TABLE_MODAL] = false;
             }
         }
         dispatch(setHoverGroupDict(hoverGroupsDictCopy));
