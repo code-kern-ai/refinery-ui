@@ -11,14 +11,14 @@ import { SearchOperator } from "@/src/types/components/projects/projectId/data-b
 import { checkDecimalPatterns, getAttributeType, getSearchOperatorTooltip } from "@/src/util/components/projects/projectId/data-browser/search-operators-helper";
 import { DataTypeEnum } from "@/src/types/shared/general";
 import { selectAllUsers, selectUser } from "@/src/reduxStore/states/general";
-import { selectActiveSearchParams, selectActiveSlice, selectAdditionalData, selectConfiguration, selectFullSearchStore, selectIsTextHighlightNeeded, selectRecords, selectSearchGroupsStore, selectTextHighlight, selectUniqueValuesDict, selectUsersCount, setActiveSearchParams, setFullSearchStore, setIsTextHighlightNeeded, setRecordsInDisplay, setSearchGroupsStore, setSearchRecordsExtended, setTextHighlight, updateAdditionalDataState } from "@/src/reduxStore/states/pages/data-browser";
+import { selectActiveSearchParams, selectActiveSlice, selectAdditionalData, selectConfiguration, selectDataSlicesAll, selectFullSearchStore, selectIsTextHighlightNeeded, selectRecords, selectSearchGroupsStore, selectTextHighlight, selectUniqueValuesDict, selectUsersCount, setActiveSearchParams, setFullSearchStore, setIsTextHighlightNeeded, setRecordsInDisplay, setSearchGroupsStore, setSearchRecordsExtended, setTextHighlight, updateAdditionalDataState } from "@/src/reduxStore/states/pages/data-browser";
 import { Tooltip } from "@nextui-org/react";
 import { setModalStates } from "@/src/reduxStore/states/modal";
 import { ModalEnum } from "@/src/types/shared/modal";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
 import { DataSliceOperations } from "./DataSliceOperations";
 import { useLazyQuery } from "@apollo/client";
-import { GET_RECORDS_BY_STATIC_SLICE, SEARCH_RECORDS_EXTENDED } from "@/src/services/gql/queries/data-browser";
+import { GET_RECORDS_BY_STATIC_SLICE, GET_STATIC_DATA_SLICE_CURRENT_COUNT, SEARCH_RECORDS_EXTENDED } from "@/src/services/gql/queries/data-browser";
 import { getActiveNegateGroupColor, postProcessRecordsExtended } from "@/src/util/components/projects/projectId/data-browser/data-browser-helper";
 import { parseFilterToExtended } from "@/src/util/components/projects/projectId/data-browser/filter-parser-helper";
 import { getRegexFromFilter, updateSearchParameters } from "@/src/util/components/projects/projectId/data-browser/search-parameters";
@@ -51,6 +51,7 @@ export default function SearchGroups() {
     const isTextHighlightNeeded = useSelector(selectIsTextHighlightNeeded);
     const uniqueValuesDict = useSelector(selectUniqueValuesDict);
     const additionalData = useSelector(selectAdditionalData);
+    const dataSlices = useSelector(selectDataSlicesAll);
 
     const fullSearchStore = useSelector(selectFullSearchStore);
     const searchGroupsStore = useSelector(selectSearchGroupsStore);
@@ -70,10 +71,12 @@ export default function SearchGroups() {
     const [refetchExtendedRecord] = useLazyQuery(SEARCH_RECORDS_EXTENDED, { fetchPolicy: "no-cache" });
     const [refetchCurrentWeakSupervision] = useLazyQuery(GET_CURRENT_WEAK_SUPERVISION_RUN, { fetchPolicy: "network-only" });
     const [refetchRecordsStatic] = useLazyQuery(GET_RECORDS_BY_STATIC_SLICE, { fetchPolicy: "network-only" });
+    const [refetchStaticSliceCurrentCount] = useLazyQuery(GET_STATIC_DATA_SLICE_CURRENT_COUNT, { fetchPolicy: "network-only" });
 
     useEffect(() => {
         if (!projectId || !users || !labelingTasks || !attributesSortOrder) return;
         prepareSearchGroups();
+        refetchCurrentWeakSupervisionAndProcess();
     }, [projectId, users, labelingTasks, attributesSortOrder]);
 
     useEffect(() => {
@@ -112,7 +115,6 @@ export default function SearchGroups() {
         if (!fullSearchStore || fullSearchStore[SearchGroup.DRILL_DOWN] == undefined) return;
         refreshTextHighlightNeeded();
         setHighlightingToRecords();
-        refetchCurrentWeakSupervisionAndProcess();
         if (activeSlice && activeSlice.static) {
             refetchRecordsStatic({
                 variables: {
@@ -122,26 +124,33 @@ export default function SearchGroups() {
                 }
             }).then((res) => {
                 dispatch(setSearchRecordsExtended(postProcessRecordsExtended(res.data['recordsByStaticSlice'], labelingTasks)));
+                refetchStaticSliceCurrentCount({ variables: { projectId: projectId, sliceId: activeSlice.id } }).then((res) => {
+                    dispatch(updateAdditionalDataState('staticDataSliceCurrentCount', res['data']['staticDataSlicesCurrentCount']));
+                });
             });
         } else {
-            refetchExtendedRecord({
-                variables: {
-                    projectId: projectId,
-                    filterData: parseFilterToExtended(activeSearchParams, attributes, configuration, labelingTasks, user, fullSearchStore[SearchGroup.DRILL_DOWN]),
-                    offset: 0, limit: 20
-                }
-            }).then((res) => {
-                dispatch(setSearchRecordsExtended(postProcessRecordsExtended(res.data['searchRecordsExtended'], labelingTasks)));
-            });
+            const refetchTimer = setTimeout(() => {
+                refetchExtendedRecord({
+                    variables: {
+                        projectId: projectId,
+                        filterData: parseFilterToExtended(activeSearchParams, attributes, configuration, labelingTasks, user, fullSearchStore[SearchGroup.DRILL_DOWN]),
+                        offset: 0, limit: 20
+                    }
+                }).then((res) => {
+                    dispatch(setSearchRecordsExtended(postProcessRecordsExtended(res.data['searchRecordsExtended'], labelingTasks)));
+                });
+            }, 500);
+            return () => clearTimeout(refetchTimer);
         }
     }, [activeSearchParams, user, projectId, attributes, labelingTasks, configuration, activeSlice]);
 
     useEffect(() => {
-        if (!activeSlice || !labelingTasks || !fullSearchStore || !searchGroupsStore) return;
-        if (activeSlice.sliceType == Slice.STATIC_OUTLIER || activeSlice.sliceType == Slice.STATIC_OUTLIER) return;
-        const activeParams = updateSearchParameters(Object.values(JSON.parse(activeSlice.filterRaw)), attributes, configuration.separator, jsonCopy(fullSearchStore), searchGroupsStore, labelingTasks);
+        if (!activeSlice || !labelingTasks || !fullSearchStore || !searchGroupsStore || !dataSlices) return;
+        if (activeSlice.sliceType == Slice.STATIC_DEFAULT || activeSlice.sliceType == Slice.STATIC_OUTLIER) return;
+        const filterRaw = dataSlices.find((el) => el.id == activeSlice.id).filterRaw;
+        const activeParams = updateSearchParameters(Object.values(JSON.parse(filterRaw)), attributes, configuration.separator, jsonCopy(fullSearchStore), searchGroupsStore, labelingTasks);
         dispatch(setActiveSearchParams(activeParams));
-    }, [activeSlice, labelingTasks, fullSearchStore, searchGroupsStore]);
+    }, [activeSlice, labelingTasks, fullSearchStore, searchGroupsStore, dataSlices]);
 
     useEffect(() => {
         if (!additionalData.clearFullSearch) return;
@@ -426,6 +435,7 @@ export default function SearchGroups() {
         const activeParams = updateSearchParameters(Object.values(fullSearchCopy), attributes, configuration.separator, jsonCopy(fullSearchCopy), searchGroupsStore);
         dispatch(setActiveSearchParams(activeParams));
         dispatch(updateAdditionalDataState('clearFullSearch', false));
+        if (activeSlice && activeSlice.static) dispatch(updateAdditionalDataState('displayOutdatedWarning', true));
     }
 
     function setHighlightingToRecords() {

@@ -163,6 +163,10 @@ export default function DataBrowser() {
     const handleWebsocketNotification = useCallback((msgParts: string[]) => {
         if (['data_slice_created', 'data_slice_updated', 'data_slice_deleted'].includes(msgParts[1])) {
             refetchDataSlicesAndProcess();
+            if (msgParts[1] == 'data_slice_deleted') {
+                dispatch(updateAdditionalDataState('displayOutdatedWarning', false));
+                dispatch(updateAdditionalDataState('clearFullSearch', true));
+            }
         } else if (['label_created', 'label_deleted', 'labeling_task_deleted', 'labeling_task_updated', 'labeling_task_created', 'information_source_created', 'information_source_updated', 'information_source_deleted'].includes(msgParts[1])) {
             refetchLabelingTasksAndProcess();
         } else if (['calculate_attribute', 'attributes_updated'].includes(msgParts[1])) {

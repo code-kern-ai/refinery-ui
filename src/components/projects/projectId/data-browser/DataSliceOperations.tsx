@@ -1,6 +1,6 @@
 import { selectUser } from "@/src/reduxStore/states/general";
 import { openModal, selectModal } from "@/src/reduxStore/states/modal";
-import { selectActiveSearchParams, selectActiveSlice, selectAdditionalData, selectConfiguration, selectDataSlicesAll, setActiveDataSlice } from "@/src/reduxStore/states/pages/data-browser";
+import { selectActiveSearchParams, selectActiveSlice, selectAdditionalData, selectConfiguration, selectDataSlicesAll, setActiveDataSlice, updateAdditionalDataState } from "@/src/reduxStore/states/pages/data-browser";
 import { selectAttributes, selectEmbeddings, selectLabelingTasksAll } from "@/src/reduxStore/states/pages/settings";
 import { selectProjectId } from "@/src/reduxStore/states/project";
 import { CREATE_OUTLIER_SLICE, UPDATE_DATA_SLICE } from "@/src/services/gql/mutations/data-browser";
@@ -41,7 +41,10 @@ export function DataSliceOperations(props: { fullSearch: {} }) {
                 filterRaw: getRawFilterForSave(props.fullSearch),
                 filterData: parseFilterToExtended(activeSearchParams, attributes, configuration, labelingTasks, user, props.fullSearch[SearchGroup.DRILL_DOWN].value)
             }
-        }).then((res) => { });
+        }).then((res) => {
+            dispatch(setActiveDataSlice(activeSlice));
+        });
+        dispatch(updateAdditionalDataState('displayOutdatedWarning', false));
     }
 
     function requestOutlierSlice() {

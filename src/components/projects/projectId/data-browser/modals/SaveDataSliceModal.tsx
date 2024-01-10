@@ -1,7 +1,7 @@
 import Modal from "@/src/components/shared/modal/Modal"
 import { selectUser } from "@/src/reduxStore/states/general";
 import { selectModal, setModalStates } from "@/src/reduxStore/states/modal";
-import { extendAllDataSlices, selectActiveSearchParams, selectActiveSlice, selectAdditionalData, selectConfiguration, selectDataSlicesAll, setActiveDataSlice } from "@/src/reduxStore/states/pages/data-browser";
+import { extendAllDataSlices, selectActiveSearchParams, selectActiveSlice, selectAdditionalData, selectConfiguration, selectDataSlicesAll, setActiveDataSlice, updateAdditionalDataState } from "@/src/reduxStore/states/pages/data-browser";
 import { selectAttributes, selectLabelingTasksAll } from "@/src/reduxStore/states/pages/settings";
 import { selectProjectId } from "@/src/reduxStore/states/project";
 import { CREATE_DATA_SLICE, UPDATE_DATA_SLICE } from "@/src/services/gql/mutations/data-browser";
@@ -51,7 +51,8 @@ export default function SaveDataSliceModal(props: { fullSearch: {} }) {
                 displayName: modalSaveDataSlice.sliceName
             }
             dispatch(extendAllDataSlices(slice));
-        })
+        });
+        dispatch(updateAdditionalDataState('displayOutdatedWarning', false));
     }, [modalSaveDataSlice]);
 
     const updateDataSliceByName = useCallback(() => {

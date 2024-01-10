@@ -70,3 +70,9 @@ export const GET_UNIQUE_VALUES_BY_ATTRIBUTES = gql`
 query ($projectId: ID!) {
   uniqueValuesByAttributes(projectId: $projectId)
 }`;
+
+export const GET_STATIC_DATA_SLICE_CURRENT_COUNT = gql`
+query ($projectId: ID!, $sliceId: ID!) {
+  staticDataSlicesCurrentCount(projectId: $projectId, sliceId: $sliceId)
+}
+`;

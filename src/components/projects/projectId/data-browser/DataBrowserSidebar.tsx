@@ -1,12 +1,11 @@
 import { selectAllUsers } from '@/src/reduxStore/states/general';
 import { setModalStates } from '@/src/reduxStore/states/modal';
-import { selectActiveSlice, selectAdditionalData, selectDataSlicesAll, setActiveDataSlice } from '@/src/reduxStore/states/pages/data-browser';
+import { selectActiveSlice, selectAdditionalData, selectDataSlicesAll, setActiveDataSlice, updateAdditionalDataState } from '@/src/reduxStore/states/pages/data-browser';
 import { selectProjectId } from '@/src/reduxStore/states/project';
 import style from '@/src/styles/components/projects/projectId/data-browser.module.css';
 import { DataSlice } from '@/src/types/components/projects/projectId/data-browser/data-browser';
 import { ModalEnum } from '@/src/types/shared/modal';
 import { updateSliceInfoHelper } from '@/src/util/components/projects/projectId/data-browser/data-browser-helper';
-import { TOOLTIPS_DICT } from '@/src/util/tooltip-constants';
 import { Slice } from '@/submodules/javascript-functions/enums/enums';
 import { Tooltip } from '@nextui-org/react';
 import { IconAlertTriangle, IconInfoCircle, IconLayoutSidebar, IconTrash } from '@tabler/icons-react';
@@ -60,6 +59,7 @@ export default function DataBrowserSidebar() {
 
     function toggleSlice(slice) {
         dispatch(setActiveDataSlice(slice));
+        dispatch(updateAdditionalDataState('displayOutdatedWarning', false));
     }
 
     function updateSliceInfo(slice: DataSlice) {
