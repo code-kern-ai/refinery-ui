@@ -81,7 +81,7 @@ export default function DataBrowserRecords(props: DataBrowserRecordsProps) {
         }
     }
 
-    return (<div className={`pt-4 bg-gray-100 flex-auto flex flex-col px-2 h-full ${style.transitionAll} `}>
+    return (<div className={`pt-4 bg-gray-100 flex-auto flex flex-col px-2 h-full ${style.transitionAll} ${style.mainPageWidthOpen} `}>
         {extendedRecords && <div className='flex items-center justify-between'>
             <div className="text-sm select-none flex flex-row flex-nowrap whitespace-nowrap mr-2">
                 {extendedRecords.fullCount}&nbsp;

@@ -15,7 +15,7 @@ module.exports = {
     { pattern: /(border)-(red|orange|amber|yellow|lime|green|emerald|teal|cyan|sky|blue|indigo|violet|purple|fuchsia|pink|rose|gray)-(400|800)/, },
     { pattern: /(text)-(red|orange|amber|yellow|lime|green|emerald|teal|cyan|sky|blue|indigo|violet|purple|fuchsia|pink|rose)-(700|800)/, },
     { pattern: /(bg)-(gray)-(700)/, },
-    { pattern: /(fill)-(red|orange|amber|yellow|lime|green|emerald|teal|cyan|sky|blue|indigo|violet|purple|fuchsia|pink|rose|gray)-(900)/, },
+    { pattern: /(fill)-(red|orange|amber|yellow|lime|green|emerald|teal|cyan|sky|blue|indigo|violet|purple|fuchsia|pink|rose|gray)-(100|900)/, },
     // patterns for submodules
     { pattern: /(border)-(gray)-(200|800)/, },
   ],

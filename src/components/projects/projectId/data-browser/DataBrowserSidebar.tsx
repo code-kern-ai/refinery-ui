@@ -82,16 +82,16 @@ export default function DataBrowserSidebar() {
                 </div>}
 
                 {dataSlices && <div className="mt-2 mb-4">
-                    {dataSlices.length > 0 && <div className="w-full grid grid-cols-2 gap-y-1 items-center justify-center" style={{ gridColumnGap: '2px' }}>
+                    {dataSlices.length > 0 && <div className="w-full grid grid-cols-2 gap-y-1 items-center justify-center" style={{ gridColumnGap: '26px' }}>
                         {filteredSlices.map((slice: DataSlice, index: number) => (<Tooltip content={!slice.static ? slice.name : ''} color="invert" placement={index % 2 == 0 ? 'right' : 'left'} key={slice.id}>
-                            <button onClick={() => toggleSlice(slice)} style={{ width: '180px' }}
+                            <button onClick={() => toggleSlice(slice)} style={{ width: '170px' }}
                                 className={`cursor-pointer inline-flex border items-center justify-between px-2.5 py-1.5 shadow-sm text-sm font-medium rounded text-gray-700 bg-white hover:bg-gray-50 focus:outline-none ${activeSlice?.id == slice.id ? 'ring-blue-500 ring-2' : ' border-gray-200'}`}>
                                 <label className="cursor-pointer mr-2" onClick={() => { updateSliceInfo(slice) }}>
-                                    <IconInfoCircle className={`w-5 h-5 ${slice.color.textColor} ${slice.color.fillColor}`} />
+                                    <IconInfoCircle className={`w-6 h-6 ${slice.color.textColor} ${slice.color.fillColor}`} />
                                 </label>
                                 <label className={`text-gray-700 truncate label-max-width cursor-pointer ${slice.sliceType == Slice.STATIC_OUTLIER ? 'text-xs whitespace-pre' : 'text-sm'}`}>
                                     {slice.displayName}</label>
-                                <IconTrash className="text-red-700 h-5 w-5 ml-2 cursor-pointer" onClick={() => dispatch(setModalStates(ModalEnum.DELETE_SLICE, { sliceId: slice.id, open: true }))} />
+                                <IconTrash className="text-red-700 h-6 w-6 ml-2 cursor-pointer" onClick={() => dispatch(setModalStates(ModalEnum.DELETE_SLICE, { sliceId: slice.id, open: true }))} />
                             </button>
                         </Tooltip>))}
                     </div>}
