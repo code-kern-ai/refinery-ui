@@ -67,9 +67,10 @@ export default function LabelingSuiteTaskHeader() {
         for (const labelId of labelIds) {
             labels[labelId] = {
                 [LabelingPageParts.TASK_HEADER]: false,
-                [LabelingPageParts.LABELING]: false,
                 [LabelingPageParts.OVERVIEW_TABLE]: false,
                 [LabelingPageParts.TABLE_MODAL]: false,
+                [LabelingPageParts.MANUAL]: false,
+                [LabelingPageParts.WEAK_SUPERVISION]: false,
             }
         }
         dispatch(setHoverGroupDict(labels));

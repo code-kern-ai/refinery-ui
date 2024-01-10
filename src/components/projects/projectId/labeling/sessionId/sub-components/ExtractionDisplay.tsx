@@ -6,6 +6,7 @@ import { LabelSource } from "@/submodules/javascript-functions/enums/enums";
 import { jsonCopy } from "@/submodules/javascript-functions/general";
 import { Tooltip } from "@nextui-org/react";
 import { useDispatch, useSelector } from "react-redux";
+import style from '@/src/styles/components/projects/projectId/labeling.module.css';
 
 export default function ExtractionDisplay(props: ExtractionDisplayProps) {
     const dispatch = useDispatch();
@@ -20,9 +21,10 @@ export default function ExtractionDisplay(props: ExtractionDisplayProps) {
     function onMouseEvent(update: boolean, labelId?: string) {
         const hoverGroupsDictCopy = jsonCopy(hoverGroupsDict);
         hoverGroupsDictCopy[labelId][LabelingPageParts.TASK_HEADER] = update;
-        hoverGroupsDictCopy[labelId][LabelingPageParts.LABELING] = update;
         hoverGroupsDictCopy[labelId][LabelingPageParts.OVERVIEW_TABLE] = update;
         hoverGroupsDictCopy[labelId][LabelingPageParts.TABLE_MODAL] = update;
+        hoverGroupsDictCopy[labelId][LabelingPageParts.MANUAL] = update;
+        hoverGroupsDictCopy[labelId][LabelingPageParts.WEAK_SUPERVISION] = update;
         dispatch(setHoverGroupDict(hoverGroupsDictCopy));
     }
 
@@ -38,7 +40,7 @@ export default function ExtractionDisplay(props: ExtractionDisplayProps) {
                         <TokenValue token={token} attributeId={props.attributeId} setSelected={(e) => props.setSelected(token.idx, token.idx, e)} /></>)}
                     {props.tokenLookup[props.attributeId][token.idx] && <>
                         {props.tokenLookup[props.attributeId][token.idx].rlaArray.map((rlaItem) => (<div key={rlaItem.orderPos} className={`absolute left-0 right-0 top-0 flex items-end z-n-2`} style={{ bottom: rlaItem.bottomPos }}>
-                            <div className={`h-px flex items-end w-full relative ${props.labelLookup[rlaItem.labelId].color.backgroundColor} ${props.labelLookup[rlaItem.labelId].color.textColor} ${props.labelLookup[rlaItem.labelId].color.borderColor} ${hoverGroupsDict[rlaItem.labelId][LabelingPageParts.LABELING] ? 'heightHover' : ''}`}
+                            <div className={`h-px flex items-end w-full relative ${props.labelLookup[rlaItem.labelId].color.backgroundColor} ${props.labelLookup[rlaItem.labelId].color.textColor} ${props.labelLookup[rlaItem.labelId].color.borderColor} ${hoverGroupsDict[rlaItem.labelId][LabelingPageParts.MANUAL] || hoverGroupsDict[rlaItem.labelId][LabelingPageParts.WEAK_SUPERVISION] ? 'heightHover' : ''}`}
                                 onMouseEnter={(e: any) => {
                                     e.target.classList.add('heightHover');
                                     onMouseEvent(true, rlaItem.labelId);
@@ -64,6 +66,7 @@ export default function ExtractionDisplay(props: ExtractionDisplayProps) {
                                             clipRule="evenodd" />
                                     </svg>
                                 </div>}
+                                <div className={`label-overlay-base ${hoverGroupsDict[rlaItem.labelId][LabelingPageParts.MANUAL] && rlaItem.rla.sourceType == LabelingPageParts.MANUAL && style.labelOverlayManual} ${hoverGroupsDict[rlaItem.labelId][LabelingPageParts.WEAK_SUPERVISION] && rlaItem.rla.sourceType == LabelingPageParts.WEAK_SUPERVISION && style.labelOverlayWeakSupervision}`}></div>
                             </div>
                         </div>
                         ))}

@@ -102,9 +102,10 @@ export default function HeaderDisplay(props: HeaderDisplayProps) {
     function onMouseEvent(update: boolean, labelId: string) {
         const hoverGroupsDictCopy = jsonCopy(hoverGroupsDict);
         hoverGroupsDictCopy[labelId][LabelingPageParts.TASK_HEADER] = update;
-        hoverGroupsDictCopy[labelId][LabelingPageParts.LABELING] = update;
         hoverGroupsDictCopy[labelId][LabelingPageParts.OVERVIEW_TABLE] = update;
         hoverGroupsDictCopy[labelId][LabelingPageParts.TABLE_MODAL] = update;
+        hoverGroupsDictCopy[labelId][LabelingPageParts.MANUAL] = update;
+        hoverGroupsDictCopy[labelId][LabelingPageParts.WEAK_SUPERVISION] = update;
         dispatch(setHoverGroupDict(hoverGroupsDictCopy));
     }
 

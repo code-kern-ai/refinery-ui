@@ -39,7 +39,8 @@ export enum UpdateType {
 
 export enum LabelingPageParts {
     TASK_HEADER = 'TASK_HEADER',
-    LABELING = 'LABELING',
     OVERVIEW_TABLE = 'OVERVIEW_TABLE',
     TABLE_MODAL = 'TABLE_MODAL',
+    MANUAL = 'MANUAL',
+    WEAK_SUPERVISION = 'WEAK_SUPERVISION',
 }

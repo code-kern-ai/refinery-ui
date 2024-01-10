@@ -471,10 +471,10 @@ export default function LabelingSuiteLabeling() {
         });
     }
 
-    function onMouseEvent(update: boolean, labelId: string) {
+    function onMouseEvent(update: boolean, labelId: string, sourceTypeKey?: string) {
         const hoverGroupsDictCopy = jsonCopy(hoverGroupsDict);
         hoverGroupsDictCopy[labelId][LabelingPageParts.TASK_HEADER] = update;
-        hoverGroupsDictCopy[labelId][LabelingPageParts.LABELING] = update;
+        hoverGroupsDictCopy[labelId][sourceTypeKey] = update;
         hoverGroupsDictCopy[labelId][LabelingPageParts.OVERVIEW_TABLE] = update;
         hoverGroupsDictCopy[labelId][LabelingPageParts.TABLE_MODAL] = update;
         dispatch(setHoverGroupDict(hoverGroupsDictCopy));
@@ -539,9 +539,10 @@ export default function LabelingSuiteLabeling() {
                                     <div className={`flex gap-2 ${settings.labeling.compactClassificationLabelDisplay ? 'flex-row flex-wrap items-center' : 'flex-col'}`}>
                                         {rlaDataToDisplay[task.task.id].map((rlaLabel, index) => (<Tooltip key={rlaLabel.orderPos} content={rlaLabel.dataTip} color="invert" placement="top" className="w-max">
                                             <div onClick={() => rlaLabel.sourceTypeKey == 'WEAK_SUPERVISION' ? addRla(task.task, rlaLabel.labelId) : null}
-                                                onMouseEnter={() => onMouseEvent(true, rlaLabel.labelId)}
-                                                onMouseLeave={() => onMouseEvent(false, rlaLabel.labelId)}
-                                                className={`text-sm font-medium px-2 py-0.5 rounded-md border focus:outline-none relative flex items-center ${labelLookup[rlaLabel.labelId].color.backgroundColor} ${labelLookup[rlaLabel.labelId].color.textColor} ${labelLookup[rlaLabel.labelId].color.borderColor} ${hoverGroupsDict[rlaLabel.labelId][LabelingPageParts.LABELING] ? rlaLabel.sourceTypeKey == 'WEAK_SUPERVISION' ? style.labelOverlayWeakSupervision : style.labelOverlayManual : ''}`}>
+                                                onMouseEnter={() => onMouseEvent(true, rlaLabel.labelId, rlaLabel.sourceTypeKey)}
+                                                onMouseLeave={() => onMouseEvent(false, rlaLabel.labelId, rlaLabel.sourceTypeKey)}
+                                                className={`text-sm font-medium px-2 py-0.5 rounded-md border focus:outline-none relative flex items-center ${labelLookup[rlaLabel.labelId].color.backgroundColor} ${labelLookup[rlaLabel.labelId].color.textColor} ${labelLookup[rlaLabel.labelId].color.borderColor}`}>
+                                                <div className={`label-overlay-base ${hoverGroupsDict[rlaLabel.labelId][LabelingPageParts.MANUAL] && rlaLabel.sourceTypeKey == LabelingPageParts.MANUAL && style.labelOverlayManual} ${hoverGroupsDict[rlaLabel.labelId][LabelingPageParts.WEAK_SUPERVISION] && rlaLabel.sourceTypeKey == LabelingPageParts.WEAK_SUPERVISION && style.labelOverlayWeakSupervision}`}></div>
                                                 {rlaLabel.icon && <div className="mr-1">
                                                     {rlaLabel.icon == InformationSourceType.LABELING_FUNCTION && <IconCode size={20} strokeWidth={1.5} />}
                                                     {rlaLabel.icon == InformationSourceType.ACTIVE_LEARNING && <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5"
