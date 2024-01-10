@@ -52,9 +52,9 @@ export default function SearchGroups() {
     const uniqueValuesDict = useSelector(selectUniqueValuesDict);
     const additionalData = useSelector(selectAdditionalData);
     const dataSlices = useSelector(selectDataSlicesAll);
-
     const fullSearchStore = useSelector(selectFullSearchStore);
     const searchGroupsStore = useSelector(selectSearchGroupsStore);
+    const recordList = useSelector(selectRecords).recordList;
 
     const [searchGroupsOrder, setSearchGroupsOrder] = useState<{ order: number; key: string }[]>([]);
     const [attributesSortOrder, setAttributeSortOrder] = useState([]);
@@ -143,6 +143,12 @@ export default function SearchGroups() {
             return () => clearTimeout(refetchTimer);
         }
     }, [activeSearchParams, user, projectId, attributes, labelingTasks, configuration, activeSlice]);
+
+    useEffect(() => {
+        if (!recordList) return;
+        refreshTextHighlightNeeded();
+        setHighlightingToRecords();
+    }, [recordList]);
 
     useEffect(() => {
         if (!activeSlice || !labelingTasks || !fullSearchStore || !searchGroupsStore || !dataSlices) return;

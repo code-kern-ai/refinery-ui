@@ -2,14 +2,15 @@ import { RegexDisplay } from "@/src/types/shared/highlight";
 import { buildRegex, buildRegexps, rebuildText } from "@/src/util/shared/highlight-helper";
 import { isStringTrue } from "@/submodules/javascript-functions/general";
 import { extendArrayElementsByUniqueId } from "@/submodules/javascript-functions/id-prep";
+import { useConsoleLog } from "@/submodules/react-components/hooks/useConsoleLog";
 import { useEffect, useState } from "react";
 
 export default function Highlight(props: any) {
-    const [parts, setParts] = useState<RegexDisplay[]>([]);
+    const [parts, setParts] = useState<RegexDisplay[]>(null);
     const [finalRegEx, setFinalRegEx] = useState<RegExp[]>([]);
 
     const [highlightClass, setHighlightClass] = useState('');
-    const [addClassString, setAddClassString] = useState('')
+    const [addClassString, setAddClassString] = useState('');
 
     useEffect(() => {
         buildEverything();
@@ -38,8 +39,12 @@ export default function Highlight(props: any) {
             }
         }
         setFinalRegEx(finalRegex);
-        setParts(extendArrayElementsByUniqueId(rebuildText(props.text, finalRegEx)));
     }
+
+    useEffect(() => {
+        if (!finalRegEx || !props.text) return;
+        setParts(extendArrayElementsByUniqueId(rebuildText(props.text, finalRegEx)));
+    }, [finalRegEx, props.text]);
 
     return (<span>
         {parts && parts.map((part, index) => (<span key={part.id} className={`${part.isMatch ? highlightClass : null} ${addClassString}`}>

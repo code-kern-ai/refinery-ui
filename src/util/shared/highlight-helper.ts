@@ -1,4 +1,4 @@
-import { RegexDisplay, RegexMatch } from "@/src/types/shared/highlight";
+import { RegexMatch } from "@/src/types/shared/highlight";
 
 export function rebuildText(text: string, finalRegex: RegExp[]) {
     if (!text) return;
