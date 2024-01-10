@@ -174,13 +174,13 @@ export default function BricksIntegrator(_props: BricksIntegratorProps) {
     }
 
     function filterGroup(configCopy: BricksIntegratorConfig) {
-        configCopy.search.results.forEach(e => e.groupVisible = filterForGroup(e));
+        configCopy.search.results.forEach(e => e.groupVisible = filterForGroup(e, configCopy));
         requestSearchDebounce(configCopy.search.searchValue, configCopy);
     }
 
-    function filterForGroup(e: BricksSearchData): boolean {
-        if (!config.extendedIntegrator) return true;
-        const gRef = config.groupFilterOptions;
+    function filterForGroup(e: BricksSearchData, configCopy: any): boolean {
+        if (!configCopy.extendedIntegrator) return true;
+        const gRef = configCopy.groupFilterOptions;
         const activeGroups = [];
         Object.keys(gRef.filterValues).forEach((x) => {
             if (gRef.filterValues[x].active) activeGroups.push(x);
