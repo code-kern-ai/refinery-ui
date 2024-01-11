@@ -2,7 +2,7 @@ import { Attribute } from "@/src/types/components/projects/projectId/settings/da
 import { LabelingTask, LabelingTaskTarget, LabelingTaskTaskType } from "@/src/types/components/projects/projectId/settings/labeling-tasks";
 import { LabelHelper } from "@/src/util/classes/label-helper";
 
-export function postProcessLabelingTasks(labelingTasks: any[]): LabelingTask[] {
+export function postProcessLabelingTasks(labelingTasks: any[]): any[] {
     let rPos = { pos: 9990 }; //as object to increase in private funciton
     const prepareLabelingTasks = labelingTasks.map((labelingTask: any) => {
         const data = labelingTask.node;
@@ -11,25 +11,41 @@ export function postProcessLabelingTasks(labelingTasks: any[]): LabelingTask[] {
             name: data.name,
             taskTarget: data.taskTarget,
             attribute: data.attribute,
-            taskType: data.taskType,
-            relativePosition: labelingTaskRelativePosition(
-                data.attribute?.relativePosition,
-                rPos
-            ), //target record has no attribute --> endpos
-            labels: !data.labels.edges
-                ? []
-                : data.labels.edges.map((edge) => {
-                    return edge.node;
-                }),
-            informationSources: !data.informationSources.edges
-                ? []
-                : data.informationSources.edges.map((edge) => {
-                    return edge.node;
-                }),
+            taskType: data.taskType
         };
-    }).sort((a, b) => (a.relativePosition - b.relativePosition) || a.name.localeCompare(b.name));
+    });
     return prepareLabelingTasks;
 }
+
+// export function postProcessLabelingTasks(labelingTasks: any[]): LabelingTask[] {
+//     let rPos = { pos: 9990 }; //as object to increase in private funciton
+//     const prepareLabelingTasks = labelingTasks.map((labelingTask: any) => {
+//         const data = labelingTask.node;
+//         return {
+//             id: data.id,
+//             name: data.name,
+//             taskTarget: data.taskTarget,
+//             attribute: data.attribute,
+//             taskType: data.taskType,
+//             relativePosition: labelingTaskRelativePosition(
+//                 data.attribute?.relativePosition,
+//                 rPos
+//             ), //target record has no attribute --> endpos
+//             labels: !data.labels.edges
+//                 ? []
+//                 : data.labels.edges.map((edge) => {
+//                     return edge.node;
+//                 }),
+//             informationSources: !data.informationSources.edges
+//                 ? []
+//                 : data.informationSources.edges.map((edge) => {
+//                     return edge.node;
+//                 }),
+//         };
+//     }).sort((a, b) => (a.relativePosition - b.relativePosition) || a.name.localeCompare(b.name));
+//     return prepareLabelingTasks;
+// }
+
 
 function labelingTaskRelativePosition(
     relativePosition,
