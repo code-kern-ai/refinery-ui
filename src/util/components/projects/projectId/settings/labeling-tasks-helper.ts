@@ -27,7 +27,7 @@ export function postProcessLabelingTasks(labelingTasks: any[]): LabelingTask[] {
                     return edge.node;
                 }),
         };
-    }).sort((a, b) => a.relativePosition - b.relativePosition || a.name.localeCompare(b.name));
+    }).sort((a, b) => (a.relativePosition - b.relativePosition) || a.name.localeCompare(b.name));
     return prepareLabelingTasks;
 }
 
@@ -36,7 +36,7 @@ function labelingTaskRelativePosition(
     rPos: { pos: number }
 ): number {
     if (relativePosition) return relativePosition;
-    rPos.pos += 1;
+    rPos.pos = rPos.pos + 1;
     return rPos.pos;
 }
 
