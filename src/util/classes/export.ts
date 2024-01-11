@@ -30,7 +30,7 @@ export class ExportHelper {
     }
 
     public static firstActiveInGroup(group: ExportEnums, returnAttribute: string = null, formGroup: any): string {
-        const values = formGroup.get(group);
+        const values = formGroup[group];
         for (let key in values) {
             if (values[key].active) {
                 if (values[key].id == NONE_IN_PROJECT) {
@@ -44,7 +44,7 @@ export class ExportHelper {
         return null;
     }
     private static allActive(group: ExportEnums, returnAttribute: string, formGroup: any): any[] {
-        const values = formGroup.get(group);
+        const values = formGroup[group];
         let result = [];
         for (let key in values) {
             if (group == ExportEnums.LabelingTasks && values[key].id == NONE_IN_PROJECT) continue;

@@ -48,8 +48,8 @@ export type GroupDisplayProps = {
     heading: string,
     subText: string,
     isCheckbox: boolean,
-    setPresetValues: (formGroup: any) => void,
-    updateFormGroup: (formGroup: any, type: ExportEnums) => void,
+    setPresetValues?: (value: ExportPreset, formGroup: any) => void,
+    updateFormGroup?: (formGroup: any, type: ExportEnums) => void,
 }
 
 export type ExportProps = {
