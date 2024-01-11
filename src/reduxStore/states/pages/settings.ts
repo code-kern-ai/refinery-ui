@@ -103,7 +103,7 @@ const settingsSlice = createSlice({
             else state.recommendedEncodersAll = [];
         },
         setLabelingTasksAll(state, action: PayloadAction<LabelingTask[]>) {
-            if (action.payload) state.labelingTasks.all = postProcessLabelingTasksSchema(action.payload);
+            if (action.payload) state.labelingTasks.all = action.payload;
             else state.labelingTasks.all = [];
         },
         removeFromAllLabelingTasksById(state, action: PayloadAction<string>) {

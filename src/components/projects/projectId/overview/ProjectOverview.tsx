@@ -13,7 +13,7 @@ import { unsubscribeWSOnDestroy } from '@/src/services/base/web-sockets/web-sock
 import { useRouter } from 'next/router';
 import { GET_CONFIDENCE_DISTRIBUTION, GET_CONFUSION_MATRIX, GET_GENERAL_PROJECT_STATS, GET_INTER_ANNOTATOR_BY_PROJECT_ID, GET_LABEL_DISTRIBUTION, IS_RATS_TOKENIZAION_STILL_RUNNING } from '@/src/services/gql/queries/project-overview';
 import { GET_ATTRIBUTES_BY_PROJECT_ID, GET_LABELING_TASKS_BY_PROJECT_ID } from '@/src/services/gql/queries/project-setting';
-import { postProcessLabelingTasks } from '@/src/util/components/projects/projectId/settings/labeling-tasks-helper';
+import { postProcessLabelingTasks, postProcessLabelingTasksSchema } from '@/src/util/components/projects/projectId/settings/labeling-tasks-helper';
 import { selectLabelingTasksAll, setAllAttributes, setLabelingTasksAll } from '@/src/reduxStore/states/pages/settings';
 import { DATA_SLICES } from '@/src/services/gql/queries/data-browser';
 import { selectStaticSlices, setDataSlices } from '@/src/reduxStore/states/pages/data-browser';
@@ -153,7 +153,7 @@ export default function ProjectOverview() {
     function refetchLabelingTasksAndProcess() {
         refetchLabelingTasksByProjectId({ variables: { projectId: projectId } }).then((res) => {
             const labelingTasks = postProcessLabelingTasks(res['data']['projectByProjectId']['labelingTasks']['edges']);
-            dispatch(setLabelingTasksAll(labelingTasks));
+            dispatch(setLabelingTasksAll(postProcessLabelingTasksSchema(labelingTasks)));
         });
     }
 

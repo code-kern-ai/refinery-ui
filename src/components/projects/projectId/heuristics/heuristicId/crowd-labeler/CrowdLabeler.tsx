@@ -5,7 +5,7 @@ import { WebSocketsService } from "@/src/services/base/web-sockets/WebSocketsSer
 import { GET_HEURISTICS_BY_ID } from "@/src/services/gql/queries/heuristics";
 import { GET_LABELING_TASKS_BY_PROJECT_ID } from "@/src/services/gql/queries/project-setting";
 import { CurrentPage } from "@/src/types/shared/general";
-import { postProcessLabelingTasks } from "@/src/util/components/projects/projectId/settings/labeling-tasks-helper";
+import { postProcessLabelingTasks, postProcessLabelingTasksSchema } from "@/src/util/components/projects/projectId/settings/labeling-tasks-helper";
 import { useLazyQuery } from "@apollo/client";
 import { useRouter } from "next/router";
 import { useCallback, useEffect } from "react";
@@ -98,7 +98,7 @@ export default function CrowdLabeler() {
     function refetchLabelingTasksAndProcess() {
         refetchLabelingTasksByProjectId({ variables: { projectId: projectId } }).then((res) => {
             const labelingTasks = postProcessLabelingTasks(res['data']['projectByProjectId']['labelingTasks']['edges']);
-            dispatch(setLabelingTasksAll(labelingTasks));
+            dispatch(setLabelingTasksAll(postProcessLabelingTasksSchema(labelingTasks)));
         });
     }
 
