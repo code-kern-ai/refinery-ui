@@ -23,16 +23,10 @@ export function postProcessLabelingTasks(labelingTasks: any[]): any[] {
                 : data.informationSources.edges.map((edge) => {
                     return edge.node;
                 }),
-            relativePosition: 0
+            relativePosition: data.attribute?.relativePosition ?? rPos.pos++,
         };
     }).sort((a, b) => (a.relativePosition - b.relativePosition) || a.name.localeCompare(b.name));
     return prepareLabelingTasks;
-}
-
-function labelingTaskRelativePosition(relativePosition, rPos: { pos: number }): number {
-    if (relativePosition) return relativePosition;
-    rPos.pos += 1;
-    return rPos.pos;
 }
 
 export function postProcessLabelingTasksSchema(labelingTasks: LabelingTask[]): LabelingTask[] {
