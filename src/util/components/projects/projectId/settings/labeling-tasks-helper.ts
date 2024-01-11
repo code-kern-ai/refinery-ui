@@ -23,7 +23,7 @@ export function postProcessLabelingTasks(labelingTasks: any[]): any[] {
                 : data.informationSources.edges.map((edge) => {
                     return edge.node;
                 }),
-            relativePosition: labelingTaskRelativePosition(data.attribute?.relativePosition, rPos)
+            relativePosition: 0
         };
     }).sort((a, b) => (a.relativePosition - b.relativePosition) || a.name.localeCompare(b.name));
     return prepareLabelingTasks;
