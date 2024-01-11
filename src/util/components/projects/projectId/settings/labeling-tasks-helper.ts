@@ -2,8 +2,9 @@ import { Attribute } from "@/src/types/components/projects/projectId/settings/da
 import { LabelingTask, LabelingTaskTarget, LabelingTaskTaskType } from "@/src/types/components/projects/projectId/settings/labeling-tasks";
 import { LabelHelper } from "@/src/util/classes/label-helper";
 
+let rPos = { pos: 9990 }; //as object to increase in private funciton
+
 export function postProcessLabelingTasks(labelingTasks: any[]): any[] {
-    let rPos = { pos: 9990 }; //as object to increase in private funciton
     const prepareLabelingTasks = labelingTasks.map((labelingTask: any) => {
         const data = labelingTask.node;
         return {
@@ -22,6 +23,7 @@ export function postProcessLabelingTasks(labelingTasks: any[]): any[] {
                 : data.informationSources.edges.map((edge) => {
                     return edge.node;
                 }),
+            relativePosition: labelingTaskRelativePosition(data.attribute?.relativePosition, rPos)
         };
     });
     return prepareLabelingTasks;
@@ -56,13 +58,9 @@ export function postProcessLabelingTasks(labelingTasks: any[]): any[] {
 //     return prepareLabelingTasks;
 // }
 
-
-function labelingTaskRelativePosition(
-    relativePosition,
-    rPos: { pos: number }
-): number {
+function labelingTaskRelativePosition(relativePosition, rPos: { pos: number }): number {
     if (relativePosition) return relativePosition;
-    rPos.pos = rPos.pos + 1;
+    rPos.pos += 1;
     return rPos.pos;
 }
 
