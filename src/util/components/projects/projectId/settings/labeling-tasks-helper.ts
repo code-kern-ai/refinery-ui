@@ -11,7 +11,17 @@ export function postProcessLabelingTasks(labelingTasks: any[]): any[] {
             name: data.name,
             taskTarget: data.taskTarget,
             attribute: data.attribute,
-            taskType: data.taskType
+            taskType: data.taskType,
+            labels: !data.labels.edges
+                ? []
+                : data.labels.edges.map((edge) => {
+                    return edge.node;
+                }),
+            informationSources: !data.informationSources.edges
+                ? []
+                : data.informationSources.edges.map((edge) => {
+                    return edge.node;
+                }),
         };
     });
     return prepareLabelingTasks;
