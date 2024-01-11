@@ -46,7 +46,7 @@ export default function LabelingSuiteTaskHeader() {
             taskCopy.labels.sort((a, b) => a.name.localeCompare(b.name));
             const labels = setLabelsForDisplay(taskCopy, taskSettings);
             let pos = task.taskType == LabelingTaskTaskType.INFORMATION_EXTRACTION ? 0 : 10000;
-            // pos += task.attribute ? task.attribute.relativePosition : 0;
+            pos += task.attribute ? task.attribute.relativePosition : 0;
             finalData[i++] = {
                 id: task.id,
                 name: task.name,
