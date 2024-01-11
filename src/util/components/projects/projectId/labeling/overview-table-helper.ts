@@ -24,7 +24,7 @@ export function buildOverviewTableDisplayArray(rlas, user: User): TableDisplayDa
         result[i++] = {
             hoverGroups: getHoverGroupsOverviewTable(e),
             orderPos: getLabelSourceOrder(e.sourceType, e.informationSource?.type),
-            orderPosSec: getOrderPos(e),
+            orderPosSec: 0,
             sourceType: getSourceTypeText(e),
             sourceTypeKey: e.sourceType,
             taskName: e.labelingTaskLabel.labelingTask.name,

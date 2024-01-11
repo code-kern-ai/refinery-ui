@@ -6,6 +6,8 @@ import { Slice } from "@/submodules/javascript-functions/enums/enums";
 
 export const NONE_IN_PROJECT = "NONE_IN_PROJECT"
 
+let rPos = { pos: 9990 };
+
 export default function postProcessExportRecordData(data: any) {
     let x: any = {
         projectId: data.id,
@@ -20,7 +22,6 @@ export default function postProcessExportRecordData(data: any) {
             element.name = dateAsUTCDate(new Date(element.createdAt)).toLocaleString();
         }
     });
-    let rPos = { pos: 9990 };
     x.labelingTasks.forEach((task) => {
         task.relativePosition = labelingTaskRelativePosition(
             task.attribute?.relativePosition,

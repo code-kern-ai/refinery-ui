@@ -25,38 +25,9 @@ export function postProcessLabelingTasks(labelingTasks: any[]): any[] {
                 }),
             relativePosition: labelingTaskRelativePosition(data.attribute?.relativePosition, rPos)
         };
-    });
+    }).sort((a, b) => (a.relativePosition - b.relativePosition) || a.name.localeCompare(b.name));
     return prepareLabelingTasks;
 }
-
-// export function postProcessLabelingTasks(labelingTasks: any[]): LabelingTask[] {
-//     let rPos = { pos: 9990 }; //as object to increase in private funciton
-//     const prepareLabelingTasks = labelingTasks.map((labelingTask: any) => {
-//         const data = labelingTask.node;
-//         return {
-//             id: data.id,
-//             name: data.name,
-//             taskTarget: data.taskTarget,
-//             attribute: data.attribute,
-//             taskType: data.taskType,
-//             relativePosition: labelingTaskRelativePosition(
-//                 data.attribute?.relativePosition,
-//                 rPos
-//             ), //target record has no attribute --> endpos
-//             labels: !data.labels.edges
-//                 ? []
-//                 : data.labels.edges.map((edge) => {
-//                     return edge.node;
-//                 }),
-//             informationSources: !data.informationSources.edges
-//                 ? []
-//                 : data.informationSources.edges.map((edge) => {
-//                     return edge.node;
-//                 }),
-//         };
-//     }).sort((a, b) => (a.relativePosition - b.relativePosition) || a.name.localeCompare(b.name));
-//     return prepareLabelingTasks;
-// }
 
 function labelingTaskRelativePosition(relativePosition, rPos: { pos: number }): number {
     if (relativePosition) return relativePosition;
