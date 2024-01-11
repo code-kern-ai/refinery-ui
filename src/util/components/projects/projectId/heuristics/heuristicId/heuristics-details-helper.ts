@@ -38,7 +38,7 @@ export function postProcessCurrentHeuristic(heuristic: Heuristic, labelingTasks:
     } else if (prepareHeuristic.informationSourceType == InformationSourceType.ACTIVE_LEARNING) {
         const regMatch = getPythonClassRegExMatch(prepareHeuristic.sourceCode);
         if (regMatch[2] !== prepareHeuristic.name) {
-            prepareHeuristic.sourceCodeToDisplay = prepareHeuristic.sourceCode.replace(getClassLine(null, labelingTasks, heuristic.labelingTaskId), getClassLine(prepareHeuristic.name, labelingTasks, heuristic.labelingTaskId));
+            prepareHeuristic.sourceCodeToDisplay = prepareHeuristic.sourceCode.replace(regMatch[0], getClassLine(prepareHeuristic.name, labelingTasks, prepareHeuristic.labelingTaskId));
         }
     }
     return prepareHeuristic;

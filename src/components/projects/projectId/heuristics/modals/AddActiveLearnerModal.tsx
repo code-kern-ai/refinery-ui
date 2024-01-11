@@ -64,7 +64,7 @@ export default function AddActiveLeanerModal() {
                 console.log("can't find newly created id for " + heuristicType + " --> can't open");
             }
         });
-    }, [labelingTask, name, description]);
+    }, [labelingTask, name, description, heuristicType, embedding]);
 
     const [acceptButtonAL, setAcceptButtonAL] = useState<ModalButton>(ACCEPT_BUTTON);
 

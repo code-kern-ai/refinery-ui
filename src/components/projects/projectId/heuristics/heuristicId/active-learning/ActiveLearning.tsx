@@ -34,6 +34,8 @@ import { CommentType } from "@/src/types/shared/comments";
 import { CommentDataManager } from "@/src/util/classes/comments";
 import { REQUEST_COMMENTS } from "@/src/services/gql/queries/projects";
 import BricksIntegrator from "@/src/components/shared/bricks-integrator/BricksIntegrator";
+import { InformationSourceCodeLookup, InformationSourceExamples } from "@/src/util/classes/heuristics";
+import { getInformationSourceTemplate } from "@/src/util/components/projects/projectId/heuristics/heuristics-helper";
 
 export default function ActiveLearning() {
     const dispatch = useDispatch();
@@ -125,8 +127,9 @@ export default function ActiveLearning() {
 
     function saveHeuristic(labelingTaskName: string) {
         const labelingTask = labelingTasks.find(a => a.name == labelingTaskName);
+        checkTemplateCodeChange(labelingTask);
         updateHeuristicMut({ variables: { projectId: projectId, informationSourceId: currentHeuristic.id, labelingTaskId: labelingTask.id } }).then((res) => {
-            dispatch(updateHeuristicsState(currentHeuristic.id, { labelingTaskId: labelingTask.id, labelingTaskName: labelingTask.name, labels: labelingTask.labels }))
+            dispatch(updateHeuristicsState(currentHeuristic.id, { labelingTaskId: labelingTask.id, labelingTaskName: labelingTask.name, labels: labelingTask.labels }));
         });
     }
 
@@ -144,16 +147,38 @@ export default function ActiveLearning() {
         });
     }
 
+    function checkTemplateCodeChange(labelingTask) {
+        if (!currentHeuristic) return;
+        const template: InformationSourceExamples = InformationSourceCodeLookup.isCodeStillTemplate(currentHeuristic.sourceCode.replace(embeddingsFiltered[0].name, "@@EMBEDDING@@"));
+        if (template == null) return;
+        const matching = labelingTasks.filter(e => e.id == labelingTask.id);
+        const newEmbeddings = embeddings.filter(e => embeddingRelevant(e, attributes, labelingTasks, labelingTask.id));
+        if (newEmbeddings.length == 0) {
+            alert('No embeddings found for labeling task');
+        } else if (newEmbeddings.length > 1) {
+            alert('Multiple embeddings found for labeling task, the first one will be used');
+        }
+        const templateCode = getInformationSourceTemplate(matching, currentHeuristic.informationSourceType, newEmbeddings[0].name).code;
+        const currentHeuristicCopy = { ...currentHeuristic };
+        const regMatch = getPythonClassRegExMatch(currentHeuristicCopy.sourceCode);
+        if (regMatch[2] !== currentHeuristicCopy.name) {
+            currentHeuristicCopy.sourceCodeToDisplay = templateCode.replace(regMatch[0], getClassLine(currentHeuristicCopy.name, labelingTasks, labelingTask.id));
+        }
+        updateSourceCode(currentHeuristicCopy.sourceCodeToDisplay, labelingTask.id)
+        dispatch(updateHeuristicsState(currentHeuristic.id, { sourceCodeToDisplay: currentHeuristicCopy.sourceCodeToDisplay }))
+    }
+
     function updateSourceCodeToDisplay(value: string) {
         const finalSourceCode = value.replace(getClassLine(null, labelingTasks, currentHeuristic.labelingTaskId), getClassLine(currentHeuristic.name, labelingTasks, currentHeuristic.labelingTaskId))
         dispatch(updateHeuristicsState(currentHeuristic.id, { sourceCodeToDisplay: finalSourceCode }))
     }
 
-    function updateSourceCode(value: string) {
+    function updateSourceCode(value: string, labelingTaskId?: string) {
         var regMatch: any = getPythonClassRegExMatch(value);
         if (!regMatch) return value;
-        const finalSourceCode = value.replace(regMatch[0], getClassLine(null, labelingTasks, currentHeuristic.labelingTaskId));
-        updateHeuristicMut({ variables: { projectId: projectId, informationSourceId: currentHeuristic.id, labelingTaskId: currentHeuristic.labelingTaskId, code: finalSourceCode } }).then((res) => {
+        const labelingTaskFinalId = labelingTaskId ?? currentHeuristic.labelingTaskId;
+        const finalSourceCode = value.replace(regMatch[0], getClassLine(null, labelingTasks, labelingTaskFinalId));
+        updateHeuristicMut({ variables: { projectId: projectId, informationSourceId: currentHeuristic.id, labelingTaskId: labelingTaskFinalId, code: finalSourceCode } }).then((res) => {
             dispatch(updateHeuristicsState(currentHeuristic.id, { sourceCode: finalSourceCode }))
         });
     }
@@ -252,7 +277,7 @@ export default function ActiveLearning() {
                         />
                     </div>
                 </div>
-                <HeuristicsEditor updatedSourceCode={(code: string) => updateSourceCode(code)} />
+                <HeuristicsEditor updatedSourceCode={(code: string) => updateSourceCode(code)} embedding={embeddingsFiltered[0]?.name} />
 
                 <div className="mt-2 flex flex-grow justify-between items-center float-right">
                     <div className="flex items-center">

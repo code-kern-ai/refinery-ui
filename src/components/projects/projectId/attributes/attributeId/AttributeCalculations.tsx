@@ -335,7 +335,7 @@ export default function AttributeCalculation() {
 
                 <div className="border mt-1 relative">
                     {isInitial && <div
-                        className="absolute top-0 bottom-0 left-0 right-0 bg-gray-200 flex items-center justify-center z-10" style={{ opacity: '0.7' }}>
+                        className="absolute top-0 bottom-0 left-0 right-0 bg-gray-200 flex items-center justify-center z-10" style={{ opacity: '0.9' }}>
                         <div className="flex flex-col gap-2">
                             <button onClick={openBricksIntegrator}
                                 className="bg-white text-gray-900 text font-semibold px-4 py-2 rounded-md border border-gray-300 hover:bg-gray-50 focus:outline-none">

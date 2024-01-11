@@ -35,6 +35,8 @@ import { REQUEST_COMMENTS } from "@/src/services/gql/queries/projects";
 import { CommentType } from "@/src/types/shared/comments";
 import { CommentDataManager } from "@/src/util/classes/comments";
 import BricksIntegrator from "@/src/components/shared/bricks-integrator/BricksIntegrator";
+import { InformationSourceCodeLookup, InformationSourceExamples } from "@/src/util/classes/heuristics";
+import { getInformationSourceTemplate } from "@/src/util/components/projects/projectId/heuristics/heuristics-helper";
 
 export default function LabelingFunction() {
     const dispatch = useDispatch();
@@ -119,6 +121,7 @@ export default function LabelingFunction() {
 
     function saveHeuristic(labelingTaskName: string) {
         const labelingTask = labelingTasks.find(a => a.name == labelingTaskName);
+        checkTemplateCodeChange(labelingTask);
         updateHeuristicMut({ variables: { projectId: projectId, informationSourceId: currentHeuristic.id, labelingTaskId: labelingTask.id } }).then((res) => {
             dispatch(updateHeuristicsState(currentHeuristic.id, { labelingTaskId: labelingTask.id, labelingTaskName: labelingTask.name, labels: labelingTask.labels }))
         });
@@ -147,11 +150,26 @@ export default function LabelingFunction() {
         });
     }
 
-    function updateSourceCode(value: string) {
+    function checkTemplateCodeChange(labelingTask) {
+        if (!currentHeuristic) return;
+        const template: InformationSourceExamples = InformationSourceCodeLookup.isCodeStillTemplate(currentHeuristic.sourceCode);
+        if (template == null) return;
+        const matching = labelingTasks.filter(e => e.id == labelingTask.id);
+        const templateCode = getInformationSourceTemplate(matching, currentHeuristic.informationSourceType, null).code;
+        const currentHeuristicCopy = { ...currentHeuristic };
+        const regMatch = getPythonFunctionRegExMatch(currentHeuristicCopy.sourceCode);
+        if (regMatch[2] !== currentHeuristicCopy.name) {
+            currentHeuristicCopy.sourceCodeToDisplay = templateCode.replace(regMatch[2], currentHeuristicCopy.name);
+        }
+        updateSourceCode(currentHeuristicCopy.sourceCodeToDisplay, labelingTask.id)
+        dispatch(updateHeuristicsState(currentHeuristic.id, { sourceCodeToDisplay: currentHeuristicCopy.sourceCodeToDisplay }))
+    }
+
+    function updateSourceCode(value: string, labelingTaskId?: string) {
         var regMatch: any = getPythonFunctionRegExMatch(value);
         if (!regMatch) return value;
         const finalSourceCode = value.replace(regMatch[0], 'def lf(record)');
-        updateHeuristicMut({ variables: { projectId: projectId, informationSourceId: currentHeuristic.id, labelingTaskId: currentHeuristic.labelingTaskId, code: finalSourceCode } }).then((res) => {
+        updateHeuristicMut({ variables: { projectId: projectId, informationSourceId: currentHeuristic.id, labelingTaskId: labelingTaskId ?? currentHeuristic.labelingTaskId, code: finalSourceCode } }).then((res) => {
             dispatch(updateHeuristicsState(currentHeuristic.id, { sourceCode: finalSourceCode }))
         });
     }

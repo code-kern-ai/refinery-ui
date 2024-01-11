@@ -6,6 +6,7 @@ export enum HeuristicsProperty {
 
 export type HeuristicsEditorProps = {
     updatedSourceCode: (code: string) => void;
+    embedding?: string;
 }
 
 export type HeuristicRunButtonsProps = {
