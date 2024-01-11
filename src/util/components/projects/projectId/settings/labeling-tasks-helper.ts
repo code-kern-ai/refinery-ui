@@ -2,7 +2,7 @@ import { Attribute } from "@/src/types/components/projects/projectId/settings/da
 import { LabelingTask, LabelingTaskTarget, LabelingTaskTaskType } from "@/src/types/components/projects/projectId/settings/labeling-tasks";
 import { LabelHelper } from "@/src/util/classes/label-helper";
 
-let rPos = { pos: 9990 }; //as object to increase in private funciton
+let rPos = { pos: 9990 }; //as object to increase in private function
 
 export function postProcessLabelingTasks(labelingTasks: any[]): any[] {
     const prepareLabelingTasks = labelingTasks.map((labelingTask: any) => {
