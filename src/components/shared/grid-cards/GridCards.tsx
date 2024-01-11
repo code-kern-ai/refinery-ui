@@ -4,7 +4,7 @@ import { GridCardsProps } from "@/src/types/shared/grid-cards";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
 import { InformationSourceType } from "@/submodules/javascript-functions/enums/enums";
 import { Tooltip } from "@nextui-org/react";
-import { IconArrowRight, IconCode, IconSparkles, IconUsers } from "@tabler/icons-react";
+import { IconArrowRight, IconBolt, IconCode, IconSparkles, IconUsers } from "@tabler/icons-react";
 import { useSelector } from "react-redux";
 import style from '@/src/styles/components/projects/projectId/heuristics/heuristics.module.css';
 import { useMutation } from "@apollo/client";
@@ -36,12 +36,7 @@ export default function GridCards(props: GridCardsProps) {
                         <IconCode size={20} strokeWidth={1.5} />
                     </Tooltip>}
                     {heuristic.informationSourceType === InformationSourceType.ACTIVE_LEARNING && <Tooltip content={TOOLTIPS_DICT.HEURISTICS.ACTIVE_LEARNING} color="invert" placement="right" className="cursor-auto">
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5"
-                            viewBox="0 0 20 20" fill="currentColor">
-                            <path fillRule="evenodd"
-                                d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z"
-                                clipRule="evenodd" />
-                        </svg>
+                        <IconBolt size={20} strokeWidth={1.5} />
                     </Tooltip>}
                     {heuristic.informationSourceType === InformationSourceType.ZERO_SHOT && <Tooltip content={TOOLTIPS_DICT.HEURISTICS.ZERO_SHOT} color="invert" placement="right" className="cursor-auto">
                         <IconSparkles size={20} strokeWidth={1.5} />

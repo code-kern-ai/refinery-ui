@@ -134,7 +134,7 @@ export default function ModelCallbacks() {
             <div className="flex-shrink-0 block xl:flex justify-between items-center">
                 <div className={`flex ${style.widthLine} border-b-2 border-b-gray-200 max-w-full overflow-x-auto`}>
                     <div className={`cursor-pointer text-sm leading-5 font-medium mr-10 py-5 ${openTab == -1 ? 'text-indigo-700 ' + style.borderBottom : 'text-gray-500'}`} onClick={() => toggleTabs(-1, null)}>All</div>
-                    {labelingTasks.map((labelingTask, index) => <div key={labelingTask.id}>
+                    {labelingTasks && labelingTasks.map((labelingTask, index) => <div key={labelingTask.id}>
                         <div className={`cursor-pointer text-sm leading-5 font-medium mr-10 py-5 ${openTab == index ? 'text-indigo-700 ' + style.borderBottom : 'text-gray-500'}`} onClick={() => toggleTabs(index, labelingTask)}>{labelingTask.name}</div>
                     </div>)}
                     <Tooltip color="invert" placement="right" content={TOOLTIPS_DICT.MODEL_CALLBACKS.ADD_LABELING_TASK} >
@@ -149,6 +149,7 @@ export default function ModelCallbacks() {
                 <div className="grid grid-cols-1 gap-4 xs:flex xs:gap-0 flex-row items-center mt-2 xl:mt-0">
                     {modelCallbacks && modelCallbacks.length > 0 ? (
                         <Dropdown options={ACTIONS_DROPDOWN_OPTIONS} buttonName="Actions" disabledOptions={[false, false, modelCallbacks.every((checked) => !checked)]}
+                            iconsArray={['IconSquareCheck', 'IconSquare', 'IconTrash']}
                             selectedOption={(option: string) => executeOption(option)} dropdownClasses="mr-3" buttonClasses={`${style.actionsHeight} text-xs`} />
                     ) : (
                         <Tooltip placement="left" content={TOOLTIPS_DICT.MODEL_CALLBACKS.ENABLE_ACTIONS} color="invert">

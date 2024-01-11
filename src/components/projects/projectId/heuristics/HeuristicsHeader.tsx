@@ -194,7 +194,8 @@ export default function HeuristicsHeader(props: HeuristicsHeaderProps) {
                 {labelingTasks && labelingTasks.length > 0 ? (<Tooltip content={TOOLTIPS_DICT.HEURISTICS.ENABLED_NEW_HEURISTIC} color="invert" placement="right">
                     <Dropdown options={NEW_HEURISTICS} buttonName="New heuristic" tooltipsArray={[null, null, null, isManaged ? null : 'Only available for managed projects']}
                         disabledOptions={[false, false, !(labelingTasks && labelingTasks.length > 0), !isManaged]}
-                        selectedOption={(option: string) => executeOption(option)} buttonClasses={`${style.actionsHeight} text-xs whitespace-nowrap`} dropdownClasses="mr-3" dropdownItemsWidth='w-36' dropdownWidth='w-32' />
+                        selectedOption={(option: string) => executeOption(option)} buttonClasses={`${style.actionsHeight} text-xs whitespace-nowrap`} dropdownClasses="mr-3" dropdownItemsWidth='w-40' dropdownWidth='w-32'
+                        iconsArray={['IconCode', 'IconBolt', 'IconSparkles', 'IconUsers']} />
                 </Tooltip>) : (<Tooltip content={TOOLTIPS_DICT.HEURISTICS.DISABLED_NEW_HEURISTIC} color="invert">
                     <button type="button" disabled={true}
                         className="mr-3 inline-flex items-center justify-center w-full rounded-md border border-gray-300 shadow-sm px-4 py-1.5 bg-white text-xs font-medium text-gray-700 opacity-50 cursor-not-allowed focus:ring-offset-2 focus:ring-offset-gray-400"
@@ -211,7 +212,8 @@ export default function HeuristicsHeader(props: HeuristicsHeaderProps) {
 
                 {heuristics && heuristics.length > 0 ? (
                     <Dropdown options={ACTIONS_DROPDOWN_OPTIONS} buttonName="Actions" disabledOptions={[false, false, heuristics.every((checked) => !checked), heuristics.every((checked) => !checked)]}
-                        selectedOption={(option: string) => executeOption(option)} dropdownClasses="mr-3" buttonClasses={`${style.actionsHeight} text-xs`} dropdownItemsWidth='w-36' dropdownWidth='w-32' />
+                        selectedOption={(option: string) => executeOption(option)} dropdownClasses="mr-3" buttonClasses={`${style.actionsHeight} text-xs`} dropdownItemsWidth='w-40' dropdownWidth='w-32'
+                        iconsArray={['IconSquareCheck', 'IconSquare', 'IconPlayerPlayFilled', 'IconTrash']} />
                 ) : (
                     <Tooltip placement="left" content={TOOLTIPS_DICT.HEURISTICS.ENABLE_ACTIONS} color="invert">
                         <button type="button" disabled={true}
