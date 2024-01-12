@@ -31,7 +31,7 @@ export default function DeleteModelDownloadModal() {
     return (<Modal modalName={ModalEnum.DELETE_MODEL_DOWNLOAD} abortButton={abortButton}>
         <div className="flex flex-grow justify-center text-lg leading-6 text-gray-900 font-medium">
             Warning </div>
-        <p className="mt-2 text-gray-500 text-sm">Are you sure you want to delete this embedding?</p>
+        <p className="mt-2 text-gray-500 text-sm">Are you sure you want to delete this model?</p>
         <p className="text-gray-500 text-sm">This will delete all data associated with it!</p>
     </Modal>)
 }
