@@ -77,7 +77,7 @@ export function parseOverviewSettingsToDict(interAnnotatorFormGroup: any, overvi
     toReturn["interAnnotatorDataSlice"] = values.dataSlice;
     toReturn["labelingTasksTarget"] = overviewFilters.targetAttribute;
     toReturn["labelingTasks"] = overviewFilters.labelingTask;
-    toReturn["displayGraphs"] = overviewFilters.graphTypeEnum;
+    toReturn["displayGraphs"] = overviewFilters.graphType;
     toReturn["dataSlice"] = overviewFilters.dataSlice;
 
     return toReturn;
