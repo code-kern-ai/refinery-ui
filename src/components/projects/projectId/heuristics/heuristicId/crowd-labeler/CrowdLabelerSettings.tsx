@@ -10,6 +10,7 @@ import { buildFullLink, parseLinkFromText } from "@/src/util/shared/link-parser-
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
 import { copyToClipboard } from "@/submodules/javascript-functions/general";
 import Dropdown from "@/submodules/react-components/components/Dropdown";
+import Dropdown2 from "@/submodules/react-components/components/Dropdown2";
 import { useLazyQuery, useMutation } from "@apollo/client";
 import { Tooltip } from "@nextui-org/react";
 import { IconLock, IconLockOpen, IconTrash } from "@tabler/icons-react";
@@ -43,10 +44,10 @@ export default function CrowdLabelerSettings() {
         });
     }, [projectId]);
 
-    function saveHeuristic(labelingTaskName: string, crowdLabelerSettings: any = null) {
-        const labelingTask = labelingTaskName ? labelingTasks.find(a => a.name == labelingTaskName) : labelingTasks.find(a => a.id == currentHeuristic.labelingTaskId);
+    function saveHeuristic(labelingTaskParam: any, crowdLabelerSettings: any = null) {
+        const labelingTask = labelingTaskParam ? labelingTaskParam.id : currentHeuristic.labelingTaskId;
         const code = parseToSettingsJson(crowdLabelerSettings ? crowdLabelerSettings : currentHeuristic.crowdLabelerSettings);
-        updateHeuristicMut({ variables: { projectId: projectId, informationSourceId: currentHeuristic.id, labelingTaskId: labelingTask.id, code: code } }).then((res) => {
+        updateHeuristicMut({ variables: { projectId: projectId, informationSourceId: currentHeuristic.id, labelingTaskId: labelingTask, code: code } }).then((res) => {
             dispatch(updateHeuristicsState(currentHeuristic.id, { labelingTaskId: labelingTask.id, labelingTaskName: labelingTask.name, labels: labelingTask.labels }));
         });
     }
@@ -54,7 +55,7 @@ export default function CrowdLabelerSettings() {
     function changeSettings(attributeName: string, newValue: any, saveToDb: boolean = true) {
         const crowdLabelerSettingsCopy = { ...currentHeuristic.crowdLabelerSettings };
         if (attributeName == 'annotatorId') {
-            crowdLabelerSettingsCopy[attributeName] = annotators.find(a => a.mail == newValue)?.id ?? newValue;
+            crowdLabelerSettingsCopy[attributeName] = annotators.find(a => a.mail == newValue.mail)?.id ?? newValue;
         } else if (attributeName == 'dataSliceId') {
             crowdLabelerSettingsCopy[attributeName] = dataSlices.find(a => a.name == newValue)?.id ?? newValue;
         }
@@ -102,7 +103,9 @@ export default function CrowdLabelerSettings() {
                 <div className="flex items-center flex-wrap mt-3">
                     <div className="text-sm leading-5 font-medium text-gray-700 inline-block mr-2">Editor</div>
                     <Tooltip content={TOOLTIPS_DICT.LABELING_FUNCTION.LABELING_TASK} color="invert" placement="top">
-                        <Dropdown options={labelingTasks.map(a => a.name)} buttonName={currentHeuristic?.labelingTaskName} selectedOption={(option: string) => saveHeuristic(option)} />
+                        {/* <Dropdown options={labelingTasks.map(a => a.name)} buttonName={currentHeuristic?.labelingTaskName} selectedOption={(option: string) => saveHeuristic(option)} /> */}
+                        <Dropdown2 options={labelingTasks} buttonName={currentHeuristic?.labelingTaskName} selectedOption={(option: any) => saveHeuristic(option)} />
+
                     </Tooltip>
                     {currentHeuristic.labels?.length == 0 ? (<div className="text-sm font-normal text-gray-500 ml-3">No labels for target task</div>) : <>
                         {currentHeuristic.labels?.map((label: any, index: number) => (
@@ -119,14 +122,20 @@ export default function CrowdLabelerSettings() {
             <div className="font-normal mt-2">Annotator and slice</div>
             <div className="flex items-center">
                 <Tooltip content={TOOLTIPS_DICT.CROWD_LABELER.SELECT_ANNOTATOR} color="invert" placement="right">
-                    <Dropdown options={annotators.map(u => u.mail)} buttonName={annotatorsDict[currentHeuristic?.crowdLabelerSettings?.annotatorId]?.mail ?? 'Select annotator'}
-                        disabled={annotators.length == 0} selectedOption={(option) => changeSettings('annotatorId', option)} />
+                    {/* <Dropdown options={annotators.map(u => u.mail)} buttonName={annotatorsDict[currentHeuristic?.crowdLabelerSettings?.annotatorId]?.mail ?? 'Select annotator'}
+                        disabled={annotators.length == 0} selectedOption={(option) => changeSettings('annotatorId', option)} /> */}
+
+                    <Dropdown2 options={annotators} buttonName={annotatorsDict[currentHeuristic?.crowdLabelerSettings?.annotatorId]?.mail ?? 'Select annotator'}
+                        disabled={annotators.length == 0} selectedOption={(option) => changeSettings('annotatorId', option)} valuePropertyPath="mail" />
 
                 </Tooltip>
                 <p className="px-2"> is going to work on slice </p>
                 <Tooltip content={TOOLTIPS_DICT.CROWD_LABELER.SELECT_DATA_SLICE} color="invert" placement="right">
-                    <Dropdown options={dataSlices.map(s => s.name)} buttonName={dataSlicesDict[currentHeuristic?.crowdLabelerSettings?.dataSliceId]?.name ?? 'Select data slice'}
-                        disabled={dataSlices.length == 0} selectedOption={(option) => changeSettings('dataSliceId', option)} />
+                    {/* <Dropdown options={dataSlices.map(s => s.name)} buttonName={dataSlicesDict[currentHeuristic?.crowdLabelerSettings?.dataSliceId]?.name ?? 'Select data slice'}
+                        disabled={dataSlices.length == 0} selectedOption={(option) => changeSettings('dataSliceId', option)} /> */}
+
+                    <Dropdown2 options={dataSlices} buttonName={dataSlicesDict[currentHeuristic?.crowdLabelerSettings?.dataSliceId]?.name ?? 'Select data slice'}
+                        disabled={dataSlices.length == 0} selectedOption={(option) => changeSettings('dataSliceId', option.name)} />
 
                 </Tooltip>
             </div>

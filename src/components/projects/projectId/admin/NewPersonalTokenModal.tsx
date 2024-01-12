@@ -8,6 +8,7 @@ import { EXPIRATION_TIME, READ_WRITE_SCOPE } from "@/src/util/components/project
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
 import { copyToClipboard } from "@/submodules/javascript-functions/general";
 import Dropdown from "@/submodules/react-components/components/Dropdown";
+import Dropdown2 from "@/submodules/react-components/components/Dropdown2";
 import { useMutation } from "@apollo/client";
 import { Tooltip } from "@nextui-org/react";
 import { useCallback, useState } from "react";
@@ -19,7 +20,7 @@ export default function NewPersonalToken(props: PersonalTokenModalProps) {
     const projectId = useSelector(selectProjectId);
     const modalNewToken = useSelector(selectModal(ModalEnum.NEW_PERSONAL_TOKEN));
 
-    const [expirationTime, setExpirationTime] = useState(EXPIRATION_TIME[0].name);
+    const [expirationTime, setExpirationTime] = useState(EXPIRATION_TIME[0]);
     const [tokenName, setTokenName] = useState('');
     const [duplicateTokenName, setDuplicateTokenName] = useState(false);
     const [newToken, setNewToken] = useState<string>(null);
@@ -28,8 +29,8 @@ export default function NewPersonalToken(props: PersonalTokenModalProps) {
     const [createNewTokenMut] = useMutation(CREATE_PERSONAL_ACCESS_TOKEN);
 
     const createNewToken = useCallback(() => {
-        const expirationValue = EXPIRATION_TIME.find(a => a.name == expirationTime).value;
-        createNewTokenMut({ variables: { projectId: projectId, name: tokenName, expiresAt: expirationValue, scope: READ_WRITE_SCOPE } }).then((res) => {
+        // const expirationValue = EXPIRATION_TIME.find(a => a.name == expirationTime).value;
+        createNewTokenMut({ variables: { projectId: projectId, name: tokenName, expiresAt: expirationTime.value, scope: READ_WRITE_SCOPE } }).then((res) => {
             setNewToken(res['data']['createPersonalAccessToken']['token']);
             props.refetchTokens();
         });
@@ -49,7 +50,9 @@ export default function NewPersonalToken(props: PersonalTokenModalProps) {
             <Tooltip content={TOOLTIPS_DICT.ADMIN_PAGE.EXPIRATION_TIME} color="invert" placement="right">
                 <span className="cursor-help card-title mb-0 label-text flex"><span className="underline filtersUnderline">Expiration time</span></span>
             </Tooltip>
-            <Dropdown buttonName={expirationTime} options={EXPIRATION_TIME.map(a => a.name)} selectedOption={(option: string) => setExpirationTime(option)} dropdownClasses="w-full" />
+            {/* <Dropdown buttonName={expirationTime} options={EXPIRATION_TIME.map(a => a.name)} selectedOption={(option: string) => setExpirationTime(option)} dropdownClasses="w-full" /> */}
+            <Dropdown2 buttonName={expirationTime.name} options={EXPIRATION_TIME} selectedOption={(option: any) => setExpirationTime(option)} dropdownClasses="w-full" />
+
 
             <Tooltip content={TOOLTIPS_DICT.ADMIN_PAGE.NAME_TOKEN} color="invert" placement="right">
                 <span className="cursor-help card-title mb-0 label-text flex"><span className="underline filtersUnderline">Name</span></span>
@@ -85,7 +88,7 @@ export default function NewPersonalToken(props: PersonalTokenModalProps) {
             <button onClick={() => {
                 dispatch(closeModal(ModalEnum.NEW_PERSONAL_TOKEN));
                 setTokenName('');
-                setExpirationTime(EXPIRATION_TIME[0].name);
+                setExpirationTime(EXPIRATION_TIME[0]);
                 setNewToken(null);
             }} className="bg-white text-gray-700 text-xs font-semibold px-4 py-2 rounded border border-gray-300 cursor-pointer hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
                 Close

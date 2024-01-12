@@ -12,6 +12,7 @@ import { dateAsUTCDate } from "@/submodules/javascript-functions/date-parser";
 import { extentModelsDownloaded, selectModelsDownloaded } from "@/src/reduxStore/states/pages/models-downloaded";
 import { ModelsDownloaded, ModelsDownloadedStatus } from "@/src/types/components/models-downloaded/models-downloaded";
 import { CacheEnum, selectCachedValue } from "@/src/reduxStore/states/cachedValues";
+import Dropdown2 from "@/submodules/react-components/components/Dropdown2";
 
 const ACCEPT_BUTTON = { buttonCaption: 'Accept', useButton: true };
 
@@ -75,7 +76,12 @@ export default function AddModelDownloadModal() {
                 <Tooltip content={TOOLTIPS_DICT.MODELS_DOWNLOAD.MODEL} placement="right" color="invert">
                     <span className="card-title mb-0 label-text flex"><span className="cursor-help underline filtersUnderline">Name</span></span>
                 </Tooltip>
-                <Dropdown options={modelsList && modelsList.map((model: any) => model.configString)} useDifferentTextColor={colorDownloadedModels} differentTextColor="green"
+                {/* <Dropdown options={modelsList && modelsList.map((model: any) => model.configString)} useDifferentTextColor={colorDownloadedModels} differentTextColor="green"
+                    hasSearchBar={true} dropdownItemsClasses="max-h-96 overflow-y-auto"
+                    selectedOption={(option: string) => {
+                        setModelName(option);
+                    }} optionsHaveHoverBox={true} hoverBoxList={hoverBoxList} lineSeparatorIndex={lineSeparatorIndex} /> */}
+                <Dropdown2 options={modelsList && modelsList} useDifferentTextColor={colorDownloadedModels} differentTextColor="green" valuePropertyPath="configString"
                     hasSearchBar={true} dropdownItemsClasses="max-h-96 overflow-y-auto"
                     selectedOption={(option: string) => {
                         setModelName(option);

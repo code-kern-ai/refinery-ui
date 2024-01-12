@@ -5,6 +5,7 @@ import { selectEmbeddings, selectLabelingTasksAll, selectUsableAttributes } from
 import { selectProjectId } from "@/src/reduxStore/states/project";
 import { SEARCH_SIMILAR_RECORDS } from "@/src/services/gql/queries/data-browser";
 import { FilterIntegrationOperator, SearchOperator } from "@/src/types/components/projects/projectId/data-browser/search-operators";
+import { Embedding } from "@/src/types/components/projects/projectId/settings/embeddings";
 import { DataTypeEnum } from "@/src/types/shared/general";
 import { ModalButton, ModalEnum } from "@/src/types/shared/modal";
 import { postProcessRecordsExtended } from "@/src/util/components/projects/projectId/data-browser/data-browser-helper";
@@ -13,6 +14,7 @@ import { checkDecimalPatterns, getAttributeType, getFilterIntegrationOperatorToo
 import { getColorForDataType } from "@/src/util/components/projects/projectId/settings/data-schema-helper";
 import { extendArrayElementsByUniqueId } from "@/submodules/javascript-functions/id-prep";
 import Dropdown from "@/submodules/react-components/components/Dropdown";
+import Dropdown2 from "@/submodules/react-components/components/Dropdown2";
 import { useLazyQuery } from "@apollo/client";
 import { IconPlus, IconTrash } from "@tabler/icons-react";
 import { useCallback, useEffect, useState } from "react";
@@ -35,7 +37,7 @@ export default function SimilaritySearchModal() {
 
     const [filterAttributesSS, setFilterAttributesSS] = useState<any>(null);
     const [filterAttributesForm, setFilterAttributesForm] = useState<any>([]);
-    const [selectedEmbedding, setSelectedEmbedding] = useState<string>(null);
+    const [selectedEmbedding, setSelectedEmbedding] = useState<Embedding>(null);
     const [colorsAttributes, setColorAttributes] = useState<string[]>([]);
     const [operatorsDict, setOperatorsDict] = useState<{ [key: string]: string[] }>({});
     const [tooltipsDict, setTooltipsDict] = useState<{ [key: string]: string[] }>({});
@@ -46,7 +48,7 @@ export default function SimilaritySearchModal() {
         refetchSimilarRecords({
             variables: {
                 projectId: projectId,
-                embeddingId: embeddings.find((embedding: any) => embedding.name === selectedEmbedding).id,
+                embeddingId: selectedEmbedding.id,
                 recordId: modalSS.recordId,
                 attFilter: hasFilter ? prepareAttFilter(filterAttributesForm, attributes) : null,
                 recordSubKey: null
@@ -74,8 +76,8 @@ export default function SimilaritySearchModal() {
     const [secondAcceptButton, setSecondAcceptButton] = useState<ModalButton>(SECOND_ACCEPT_BUTTON);
 
     useEffect(() => {
-        if (!embeddings) return;
-        setFilterAttributesSS(prepareFilterAttributes(embeddings, selectedEmbedding));
+        if (!embeddings || !selectedEmbedding) return;
+        setFilterAttributesSS(prepareFilterAttributes(embeddings, selectedEmbedding.name));
     }, [embeddings, selectedEmbedding]);
 
     useEffect(() => {
@@ -123,7 +125,7 @@ export default function SimilaritySearchModal() {
         setFilterAttributesForm(form);
     }
 
-    function setFilterDropdownVal(value: string, index: number, key: string) {
+    function setFilterDropdownVal(value: any, index: number, key: string) {
         const getIdxForm = filterAttributesForm[index];
         if (key === "name") {
             const attributeType = getAttributeType(attributes, value);
@@ -161,7 +163,9 @@ export default function SimilaritySearchModal() {
         <div className="flex flex-grow justify-center text-lg leading-6 text-gray-900 font-medium">Select embedding for similarity search </div>
         {(activeSearchParams.length > 0 || similaritySearch.recordsInDisplay) && <div className="text-red-500 mb-2 flex flex-grow justify-center text-sm">Warning: your current filter selection will be removed!</div>}
 
-        <Dropdown options={embeddings} buttonName={selectedEmbedding ?? 'Select embedding'} selectedOption={(value) => setSelectedEmbedding(value)} dropdownClasses="my-2" />
+        {/* <Dropdown options={embeddings} buttonName={selectedEmbedding ?? 'Select embedding'} selectedOption={(value) => setSelectedEmbedding(value)} dropdownClasses="my-2" /> */}
+        <Dropdown2 options={embeddings} buttonName={selectedEmbedding ? selectedEmbedding.name : 'Select embedding'} selectedOption={(value) => setSelectedEmbedding(value)} dropdownClasses="my-2" />
+
         {filterAttributesSS && filterAttributesSS.length > 0 && <div className="flex flex-col justify-start mt-4">
             <div className="pr-2 bg-white text-md font-medium text-gray-900">Filter attributes</div>
             <div className="text-sm text-gray-400">You can filter similarity search based on the attributes selected when
@@ -181,17 +185,23 @@ export default function SimilaritySearchModal() {
                     <div className="flex-grow mr-2.5 flex flex-col  mt-2 ">
                         <div className="flex-grow flex flex-row flex-wrap gap-1">
                             <div style={{ width: '50%' }}>
-                                <Dropdown options={filterAttributesSS} buttonName={form.name} backgroundColors={colorsAttributes}
-                                    selectedOption={(option: string) => setFilterDropdownVal(option, index, 'name')} fontClass="font-dmMono" />
+                                {/* <Dropdown options={filterAttributesSS} buttonName={form.name} backgroundColors={colorsAttributes}
+                                    selectedOption={(option: string) => setFilterDropdownVal(option, index, 'name')} fontClass="font-dmMono" /> */}
+                                <Dropdown2 options={filterAttributesSS} buttonName={form.name} backgroundColors={colorsAttributes}
+                                    selectedOption={(option: any) => setFilterDropdownVal(option, index, 'name')} fontClass="font-dmMono" />
                             </div>
                             <div style={{ width: '49%' }}>
-                                <Dropdown options={operatorsDict[form.name]} buttonName={form.operator} tooltipsArray={tooltipsDict[form.operator]} tooltipArrayPlacement="left"
-                                    selectedOption={(option: string) => setFilterDropdownVal(option, index, 'operator')} fontClass="font-dmMono" />
+                                {/* <Dropdown options={operatorsDict[form.name]} buttonName={form.operator} tooltipsArray={tooltipsDict[form.operator]} tooltipArrayPlacement="left"
+                                    selectedOption={(option: string) => setFilterDropdownVal(option, index, 'operator')} fontClass="font-dmMono" /> */}
+                                <Dropdown2 options={operatorsDict[form.name]} buttonName={form.operator} tooltipsArray={tooltipsDict[form.operator]} tooltipArrayPlacement="left"
+                                    selectedOption={(option: any) => setFilterDropdownVal(option, index, 'operator')} fontClass="font-dmMono" />
                             </div>
                         </div>
                         {uniqueValuesDict[form['name']] && form['operator'] != '' && form['operator'] == 'EQUAL' ? (
                             <div className="w-full mt-2">
-                                <Dropdown options={uniqueValuesDict[form['name']]} buttonName={form['searchValue'] ? form['searchValue'] : 'Select value'}
+                                {/* <Dropdown options={uniqueValuesDict[form['name']]} buttonName={form['searchValue'] ? form['searchValue'] : 'Select value'}
+                                    selectedOption={(option: string) => setFilterDropdownVal(option, index, 'searchValue')} fontClass="font-dmMono" /> */}
+                                <Dropdown2 options={uniqueValuesDict[form['name']]} buttonName={form['searchValue'] ? form['searchValue'] : 'Select value'}
                                     selectedOption={(option: string) => setFilterDropdownVal(option, index, 'searchValue')} fontClass="font-dmMono" />
                             </div>
                         ) : (<div className="my-2 flex-grow flex flex-row items-center">

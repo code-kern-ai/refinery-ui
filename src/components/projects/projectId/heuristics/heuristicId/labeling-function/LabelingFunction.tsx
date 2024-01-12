@@ -37,6 +37,8 @@ import { CommentDataManager } from "@/src/util/classes/comments";
 import BricksIntegrator from "@/src/components/shared/bricks-integrator/BricksIntegrator";
 import { InformationSourceCodeLookup, InformationSourceExamples } from "@/src/util/classes/heuristics";
 import { getInformationSourceTemplate } from "@/src/util/components/projects/projectId/heuristics/heuristics-helper";
+import Dropdown2 from "@/submodules/react-components/components/Dropdown2";
+import { Attribute } from "@/src/types/components/projects/projectId/settings/data-schema";
 
 export default function LabelingFunction() {
     const dispatch = useDispatch();
@@ -49,7 +51,7 @@ export default function LabelingFunction() {
     const allUsers = useSelector(selectAllUsers);
 
     const [lastTaskLogs, setLastTaskLogs] = useState<string[]>([]);
-    const [selectedAttribute, setSelectedAttribute] = useState<string>(null);
+    const [selectedAttribute, setSelectedAttribute] = useState<Attribute>(null);
     const [sampleRecords, setSampleRecords] = useState<SampleRecord>(null);
     const [displayLogWarning, setDisplayLogWarning] = useState<boolean>(false);
 
@@ -119,8 +121,8 @@ export default function LabelingFunction() {
         });
     }
 
-    function saveHeuristic(labelingTaskName: string) {
-        const labelingTask = labelingTasks.find(a => a.name == labelingTaskName);
+    function saveHeuristic(labelingTask: any) {
+        // const labelingTask = labelingTasks.find(a => a.name == labelingTaskName);
         checkTemplateCodeChange(labelingTask);
         updateHeuristicMut({ variables: { projectId: projectId, informationSourceId: currentHeuristic.id, labelingTaskId: labelingTask.id } }).then((res) => {
             dispatch(updateHeuristicsState(currentHeuristic.id, { labelingTaskId: labelingTask.id, labelingTaskName: labelingTask.name, labels: labelingTask.labels }))
@@ -219,7 +221,9 @@ export default function LabelingFunction() {
                     <div className="flex items-center flex-wrap mt-3">
                         <div className="text-sm leading-5 font-medium text-gray-700 inline-block mr-2">Editor</div>
                         <Tooltip content={TOOLTIPS_DICT.LABELING_FUNCTION.LABELING_TASK} color="invert" placement="top">
-                            <Dropdown options={labelingTasks.map(a => a.name)} buttonName={currentHeuristic?.labelingTaskName} selectedOption={(option: string) => saveHeuristic(option)} />
+                            {/* <Dropdown options={labelingTasks.map(a => a.name)} buttonName={currentHeuristic?.labelingTaskName} selectedOption={(option: string) => saveHeuristic(option)} /> */}
+                            <Dropdown2 options={labelingTasks} buttonName={currentHeuristic?.labelingTaskName} selectedOption={(option: any) => saveHeuristic(option)} />
+
                         </Tooltip>
                         {currentHeuristic.labels?.length == 0 ? (<div className="text-sm font-normal text-gray-500 ml-3">No labels for target task</div>) : <>
                             {currentHeuristic.labels?.map((label: any, index: number) => (
@@ -258,8 +262,10 @@ export default function LabelingFunction() {
                 <div className="mt-2 flex flex-grow justify-between items-center float-right">
                     <div className="flex items-center">
                         <div className="flex items-center mr-2">
-                            <Dropdown options={attributes} buttonName={selectedAttribute ?? 'Select display attribute'} buttonClasses="text-xs font-semibold actionsHeight"
-                                selectedOption={(option: string) => setSelectedAttribute(option)} />
+                            {/* <Dropdown options={attributes} buttonName={selectedAttribute ?? 'Select display attribute'} buttonClasses="text-xs font-semibold actionsHeight"
+                                selectedOption={(option: string) => setSelectedAttribute(option)} /> */}
+                            <Dropdown2 options={attributes} buttonName={selectedAttribute ? selectedAttribute.name : 'Select display attribute'} buttonClasses="text-xs font-semibold actionsHeight"
+                                selectedOption={(option: any) => setSelectedAttribute(option)} />
                         </div>
                         <Tooltip content={selectedAttribute == null ? TOOLTIPS_DICT.LABELING_FUNCTION.SELECT_ATTRIBUTE : TOOLTIPS_DICT.LABELING_FUNCTION.RUN_ON_10} color="invert" placement="left">
                             <button disabled={selectedAttribute == null} onClick={getLabelingFunctionOn10Records}
@@ -271,7 +277,7 @@ export default function LabelingFunction() {
                     </div>
                 </div>
                 {sampleRecords && sampleRecords.records.length > 0 && !sampleRecords.codeHasErrors && <>
-                    <SampleRecords sampleRecords={sampleRecords} selectedAttribute={selectedAttribute} />
+                    <SampleRecords sampleRecords={sampleRecords} selectedAttribute={selectedAttribute.name} />
                     {displayLogWarning && <div className="text-sm inline-block font-normal text-gray-500 italic">
                         This is a temporary log from your last &quot;Run on 10&quot; execution. It will vanish once you leave/reload the page or &quot;Run&quot; the heuristic.
                     </div>}

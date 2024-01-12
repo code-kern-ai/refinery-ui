@@ -1,7 +1,6 @@
 import { ExportEnums, GroupDisplayProps } from "@/src/types/shared/export";
 import { NONE_IN_PROJECT, isEnumRadioGroup } from "@/src/util/shared/export-helper";
 import { jsonCopy } from "@/submodules/javascript-functions/general";
-import { useConsoleLog } from "@/submodules/react-components/hooks/useConsoleLog";
 import { Tooltip } from "@nextui-org/react";
 
 export default function GroupDisplay(props: GroupDisplayProps) {

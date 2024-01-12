@@ -30,8 +30,7 @@ export enum CardStatsEnum {
 }
 
 export type ProjectOverviewFilters = {
-    graphType: string;
-    graphTypeEnum: DisplayGraphs;
+    graphType: { name: string, value: DisplayGraphs };
     targetAttribute: string;
     labelingTask: string;
     dataSlice: string;

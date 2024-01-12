@@ -36,6 +36,7 @@ import { REQUEST_COMMENTS } from "@/src/services/gql/queries/projects";
 import BricksIntegrator from "@/src/components/shared/bricks-integrator/BricksIntegrator";
 import { InformationSourceCodeLookup, InformationSourceExamples } from "@/src/util/classes/heuristics";
 import { getInformationSourceTemplate } from "@/src/util/components/projects/projectId/heuristics/heuristics-helper";
+import Dropdown2 from "@/submodules/react-components/components/Dropdown2";
 
 export default function ActiveLearning() {
     const dispatch = useDispatch();
@@ -125,8 +126,8 @@ export default function ActiveLearning() {
         });
     }
 
-    function saveHeuristic(labelingTaskName: string) {
-        const labelingTask = labelingTasks.find(a => a.name == labelingTaskName);
+    function saveHeuristic(labelingTask: any) {
+        // const labelingTask = labelingTasks.find(a => a.name == labelingTaskName);
         checkTemplateCodeChange(labelingTask);
         updateHeuristicMut({ variables: { projectId: projectId, informationSourceId: currentHeuristic.id, labelingTaskId: labelingTask.id } }).then((res) => {
             dispatch(updateHeuristicsState(currentHeuristic.id, { labelingTaskId: labelingTask.id, labelingTaskName: labelingTask.name, labels: labelingTask.labels }));
@@ -149,7 +150,7 @@ export default function ActiveLearning() {
 
     function checkTemplateCodeChange(labelingTask) {
         if (!currentHeuristic) return;
-        const template: InformationSourceExamples = InformationSourceCodeLookup.isCodeStillTemplate(currentHeuristic.sourceCode.replace(embeddingsFiltered[0].name, "@@EMBEDDING@@"));
+        const template: InformationSourceExamples = InformationSourceCodeLookup.isCodeStillTemplate(currentHeuristic.sourceCode.replace(embeddingsFiltered[0]?.name, "@@EMBEDDING@@"));
         if (template == null) return;
         const matching = labelingTasks.filter(e => e.id == labelingTask.id);
         const newEmbeddings = embeddings.filter(e => embeddingRelevant(e, attributes, labelingTasks, labelingTask.id));
@@ -158,7 +159,7 @@ export default function ActiveLearning() {
         } else if (newEmbeddings.length > 1) {
             alert('Multiple embeddings found for labeling task, the first one will be used');
         }
-        const templateCode = getInformationSourceTemplate(matching, currentHeuristic.informationSourceType, newEmbeddings[0].name).code;
+        const templateCode = getInformationSourceTemplate(matching, currentHeuristic.informationSourceType, newEmbeddings[0]?.name).code;
         const currentHeuristicCopy = { ...currentHeuristic };
         const regMatch = getPythonClassRegExMatch(currentHeuristicCopy.sourceCode);
         if (regMatch[2] !== currentHeuristicCopy.name) {
@@ -227,7 +228,9 @@ export default function ActiveLearning() {
                     <div className="flex items-center flex-wrap mt-3">
                         <div className="text-sm leading-5 font-medium text-gray-700 inline-block mr-2">Editor</div>
                         <Tooltip content={TOOLTIPS_DICT.LABELING_FUNCTION.LABELING_TASK} color="invert" placement="top">
-                            <Dropdown options={labelingTasks.map(a => a.name)} buttonName={currentHeuristic?.labelingTaskName} selectedOption={(option: string) => saveHeuristic(option)} />
+                            {/* <Dropdown options={labelingTasks.map(a => a.name)} buttonName={currentHeuristic?.labelingTaskName} selectedOption={(option: string) => saveHeuristic(option)} /> */}
+                            <Dropdown2 options={labelingTasks} buttonName={currentHeuristic?.labelingTaskName} selectedOption={(option: any) => saveHeuristic(option)} />
+
                         </Tooltip>
                         {currentHeuristic.labels?.length == 0 ? (<div className="text-sm font-normal text-gray-500 ml-3">No labels for target task</div>) : <>
                             {currentHeuristic.labels?.map((label: any, index: number) => (

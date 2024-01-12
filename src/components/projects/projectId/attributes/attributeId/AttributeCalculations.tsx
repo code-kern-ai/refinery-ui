@@ -34,6 +34,7 @@ import { CommentDataManager } from "@/src/util/classes/comments";
 import { CommentType } from "@/src/types/shared/comments";
 import BricksIntegrator from "@/src/components/shared/bricks-integrator/BricksIntegrator";
 import { AttributeCodeLookup } from "@/src/util/classes/attribute-calculation";
+import Dropdown2 from "@/submodules/react-components/components/Dropdown2";
 
 const EDITOR_OPTIONS = { theme: 'vs-light', language: 'python', readOnly: false };
 
@@ -149,12 +150,12 @@ export default function AttributeCalculation() {
         });
     }
 
-    function updateVisibility(option: string) {
-        const visibility = ATTRIBUTES_VISIBILITY_STATES.find((state) => state.name === option).value;
+    function updateVisibility(option: any) {
+        // const visibility = ATTRIBUTES_VISIBILITY_STATES.find((state) => state.name === option).value;
         const attributeNew = { ...currentAttribute };
-        attributeNew.visibility = visibility;
+        attributeNew.visibility = option.value;
         attributeNew.visibilityIndex = ATTRIBUTES_VISIBILITY_STATES.findIndex((state) => state.name === option);
-        attributeNew.visibilityName = option;
+        attributeNew.visibilityName = option.name;
         attributeNew.saveSourceCode = false;
         updateAttributeMut({ variables: { projectId: projectId, attributeId: currentAttribute.id, visibility: attributeNew.visibility } }).then(() => {
             setCurrentAttribute(postProcessCurrentAttribute(attributeNew));
@@ -162,11 +163,11 @@ export default function AttributeCalculation() {
         });
     }
 
-    function updateDataType(option: string) {
-        const dataType = DATA_TYPES.find((state) => state.name === option).value;
+    function updateDataType(option: any) {
+        // const dataType = DATA_TYPES.find((state) => state.name === option).value;
         const attributeNew = { ...currentAttribute };
-        attributeNew.dataType = dataType;
-        attributeNew.dataTypeName = option;
+        attributeNew.dataType = option.value;
+        attributeNew.dataTypeName = option.name;
         attributeNew.saveSourceCode = false;
         updateAttributeMut({ variables: { projectId: projectId, attributeId: currentAttribute.id, dataType: attributeNew.dataType } }).then(() => {
             setCurrentAttribute(postProcessCurrentAttribute(attributeNew));
@@ -278,13 +279,18 @@ export default function AttributeCalculation() {
                 {duplicateNameExists && <div className="text-red-700 text-xs mt-2">Attribute name exists</div>}
                 <div className="grid grid-cols-2 gap-2 items-center mt-8" style={{ gridTemplateColumns: 'max-content auto' }}>
                     <div className="text-sm leading-5 font-medium text-gray-700">Visibility</div>
-                    <Dropdown buttonName={currentAttribute.visibilityName} options={ATTRIBUTES_VISIBILITY_STATES} dropdownWidth="w-52" tooltipArrayPlacement="right" tooltipsArray={tooltipsArray}
-                        selectedOption={(option: string) => updateVisibility(option)} disabled={currentAttribute.state == AttributeState.USABLE} />
+                    {/* <Dropdown buttonName={currentAttribute.visibilityName} options={ATTRIBUTES_VISIBILITY_STATES} dropdownWidth="w-52" tooltipArrayPlacement="right" tooltipsArray={tooltipsArray}
+                        selectedOption={(option: string) => updateVisibility(option)} disabled={currentAttribute.state == AttributeState.USABLE} /> */}
+                    <Dropdown2 buttonName={currentAttribute.visibilityName} options={ATTRIBUTES_VISIBILITY_STATES} dropdownWidth="w-52" tooltipArrayPlacement="right" tooltipsArray={tooltipsArray}
+                        selectedOption={(option: any) => updateVisibility(option)} disabled={currentAttribute.state == AttributeState.USABLE} />
+
                     <div className="text-sm leading-5 font-medium text-gray-700">Data type</div>
                     <div className="flex flex-row items-center">
                         <Tooltip color="invert" placement="right" content={currentAttribute.state == AttributeState.USABLE || currentAttribute.state == AttributeState.RUNNING ? TOOLTIPS_DICT.ATTRIBUTE_CALCULATION.CANNOT_EDIT_DATATYPE : TOOLTIPS_DICT.ATTRIBUTE_CALCULATION.EDIT_DATATYPE}>
-                            <Dropdown buttonName={currentAttribute.dataTypeName} options={DATA_TYPES} dropdownWidth="w-52"
-                                selectedOption={(option: string) => updateDataType(option)} disabled={currentAttribute.state == AttributeState.USABLE} />
+                            {/* <Dropdown buttonName={currentAttribute.dataTypeName} options={DATA_TYPES} dropdownWidth="w-52"
+                                selectedOption={(option: string) => updateDataType(option)} disabled={currentAttribute.state == AttributeState.USABLE} /> */}
+                            <Dropdown2 buttonName={currentAttribute.dataTypeName} options={DATA_TYPES} dropdownWidth="w-52"
+                                selectedOption={(option: any) => updateDataType(option)} disabled={currentAttribute.state == AttributeState.USABLE} />
                         </Tooltip>
                         {currentAttribute.dataType == DataTypeEnum.EMBEDDING_LIST && <div className="text-gray-700 text-sm ml-3">Only useable for similarity search</div>}
                     </div>

@@ -2,7 +2,6 @@ import { RegexDisplay } from "@/src/types/shared/highlight";
 import { buildRegex, buildRegexps, rebuildText } from "@/src/util/shared/highlight-helper";
 import { isStringTrue } from "@/submodules/javascript-functions/general";
 import { extendArrayElementsByUniqueId } from "@/submodules/javascript-functions/id-prep";
-import { useConsoleLog } from "@/submodules/react-components/hooks/useConsoleLog";
 import { useEffect, useState } from "react";
 
 export default function Highlight(props: any) {

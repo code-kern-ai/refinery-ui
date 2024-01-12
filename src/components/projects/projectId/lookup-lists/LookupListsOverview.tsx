@@ -23,6 +23,7 @@ import { REQUEST_COMMENTS } from "@/src/services/gql/queries/projects";
 import { CommentDataManager } from "@/src/util/classes/comments";
 import { CommentType } from "@/src/types/shared/comments";
 import DeleteLookupListsModal from "./DeleteLookupListsModal";
+import Dropdown2 from "@/submodules/react-components/components/Dropdown2";
 
 
 export default function LookupListsOverview() {
@@ -145,8 +146,11 @@ export default function LookupListsOverview() {
                         </div>
                         <div className="grid grid-cols-1 gap-4 xs:flex xs:gap-0 flex-row items-center">
                             {lookupLists && lookupLists.length > 0 ? (
-                                <Dropdown options={ACTIONS_DROPDOWN_OPTIONS} buttonName="Actions" disabledOptions={[false, false, checkedLookupLists.every((checked) => !checked)]}
-                                    selectedOption={(option: string) => executeOption(option)} dropdownClasses="mr-3" buttonClasses={`${style.actionsHeight} text-xs`} dropdownItemsWidth='w-40' dropdownWidth='w-32'
+                                // <Dropdown options={ACTIONS_DROPDOWN_OPTIONS} buttonName="Actions" disabledOptions={[false, false, checkedLookupLists.every((checked) => !checked)]}
+                                //     selectedOption={(option: string) => executeOption(option)} dropdownClasses="mr-3" buttonClasses={`${style.actionsHeight} text-xs`} dropdownItemsWidth='w-40' dropdownWidth='w-32'
+                                //     iconsArray={['IconSquareCheck', 'IconSquare', 'IconTrash']} />
+                                <Dropdown2 options={ACTIONS_DROPDOWN_OPTIONS} buttonName="Actions" disabledOptions={[false, false, checkedLookupLists.every((checked) => !checked)]}
+                                    selectedOption={(option: any) => executeOption(option)} dropdownClasses="mr-3" buttonClasses={`${style.actionsHeight} text-xs`} dropdownItemsWidth='w-40' dropdownWidth='w-32'
                                     iconsArray={['IconSquareCheck', 'IconSquare', 'IconTrash']} />
                             ) : (
                                 <Tooltip placement="left" content={TOOLTIPS_DICT.LOOKUP_LISTS_OVERVIEW.ENABLE_ACTIONS} color="invert">

@@ -3,8 +3,10 @@ import { selectActiveSearchParams, selectSimilaritySearch } from "@/src/reduxSto
 import { selectEmbeddings } from "@/src/reduxStore/states/pages/settings";
 import { selectProjectId } from "@/src/reduxStore/states/project";
 import { CREATE_OUTLIER_SLICE } from "@/src/services/gql/mutations/data-browser";
+import { Embedding } from "@/src/types/components/projects/projectId/settings/embeddings";
 import { ModalButton, ModalEnum } from "@/src/types/shared/modal";
 import Dropdown from "@/submodules/react-components/components/Dropdown";
+import Dropdown2 from "@/submodules/react-components/components/Dropdown2";
 import { useMutation } from "@apollo/client";
 import { useCallback, useEffect, useState } from "react";
 import { useSelector } from "react-redux";
@@ -18,14 +20,14 @@ export default function CreateOutlierSliceModal() {
     const similaritySearch = useSelector(selectSimilaritySearch);
     const embeddings = useSelector(selectEmbeddings);
 
-    const [selectedEmbedding, setSelectedEmbedding] = useState<string>(null);
+    const [selectedEmbedding, setSelectedEmbedding] = useState<Embedding>(null);
     const [acceptButton, setAcceptButton] = useState<ModalButton>(ACCEPT_BUTTON);
 
     const [createOutlierSliceMut] = useMutation(CREATE_OUTLIER_SLICE);
 
     const requestOutlierSlice = useCallback(() => {
-        const embeddingId = embeddings.find((embedding) => embedding.name == selectedEmbedding).id;
-        createOutlierSliceMut({ variables: { projectId: projectId, embeddingId: embeddingId } }).then((res) => { });
+        // const embeddingId = embeddings.find((embedding) => embedding.name == selectedEmbedding).id;
+        createOutlierSliceMut({ variables: { projectId: projectId, embeddingId: selectedEmbedding.id } }).then((res) => { });
     }, [selectedEmbedding]);
 
     useEffect(() => {
@@ -37,6 +39,7 @@ export default function CreateOutlierSliceModal() {
         {(activeSearchParams.length > 0 || similaritySearch.recordsInDisplay) && <div className="text-red-500 mb-2 flex flex-grow justify-center text-sm">
             Warning: your current filter selection will be removed!</div>}
 
-        <Dropdown options={embeddings} buttonName={selectedEmbedding ?? 'Select embedding'} selectedOption={(option: string) => setSelectedEmbedding(option)} />
+        {/* <Dropdown options={embeddings} buttonName={selectedEmbedding ?? 'Select embedding'} selectedOption={(option: string) => setSelectedEmbedding(option)} /> */}
+        <Dropdown2 options={embeddings} buttonName={selectedEmbedding ? selectedEmbedding.name : 'Select embedding'} selectedOption={(option: any) => setSelectedEmbedding(option)} />
     </Modal>)
 }

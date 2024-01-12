@@ -256,7 +256,7 @@ export default function ProjectOverview() {
             <ProjectOverviewHeader />
             <ProjectOverviewCards projectStats={projectStats} />
             {graphsHaveValues ? (<div>
-                {(overviewFilters.graphTypeEnum == DisplayGraphs.ALL || overviewFilters.graphTypeEnum == DisplayGraphs.LABEL_DISTRIBUTION) && <div className="mt-8 grid w-full">
+                {(overviewFilters.graphType.value == DisplayGraphs.ALL || overviewFilters.graphType.value == DisplayGraphs.LABEL_DISTRIBUTION) && <div className="mt-8 grid w-full">
                     <div className="text-lg leading-6 text-gray-900 font-medium inline-block">Label distribution</div>
                     <div className="mt-1 text-sm leading-5 font-medium text-gray-700 inline-block">See the distribution of your manually labeled and weakly supervised records.</div>
                     <div className={`mt-2 w-full h-full shadow ${style.stats} bg-white grid place-items-center flex-grow`}>
@@ -266,7 +266,7 @@ export default function ProjectOverview() {
                     </div>
                 </div>}
 
-                {(overviewFilters.graphTypeEnum == DisplayGraphs.ALL || overviewFilters.graphTypeEnum == DisplayGraphs.CONFIDENCE_DISTRIBUTION) && <div className="mt-8 grid w-full">
+                {(overviewFilters.graphType.value == DisplayGraphs.ALL || overviewFilters.graphType.value == DisplayGraphs.CONFIDENCE_DISTRIBUTION) && <div className="mt-8 grid w-full">
                     <div className="text-lg leading-6 text-gray-900 font-medium inline-block">Confidence distribution</div>
                     <div className="mt-1 text-sm leading-5 font-medium text-gray-700 inline-block">See the confidence distribution of your weakly supervised records.</div>
                     <div className={`mt-2 w-full h-full shadow ${style.stats} bg-white grid place-items-center flex-grow`}>
@@ -276,7 +276,7 @@ export default function ProjectOverview() {
                     </div>
                 </div>}
 
-                {(overviewFilters.graphTypeEnum == DisplayGraphs.ALL || overviewFilters.graphTypeEnum == DisplayGraphs.CONFUSION_MATRIX) && <div className="mt-8 grid w-full">
+                {(overviewFilters.graphType.value == DisplayGraphs.ALL || overviewFilters.graphType.value == DisplayGraphs.CONFUSION_MATRIX) && <div className="mt-8 grid w-full">
                     <div className="text-lg leading-6 text-gray-900 font-medium inline-block">Confusion matrix</div>
                     <div className="mt-1 text-sm leading-5 font-medium text-gray-700 inline-block">See how often your manually labeled and weakly supervised records agree or disagree.</div>
                     <div className={`mt-2 w-full h-full shadow ${style.stats} bg-white grid place-items-center flex-grow`}>
@@ -288,7 +288,7 @@ export default function ProjectOverview() {
                     </div>
                 </div>}
 
-                {((overviewFilters.graphTypeEnum == DisplayGraphs.ALL || overviewFilters.graphTypeEnum == DisplayGraphs.INTER_ANNOTATOR) && isManaged) && <div className="mt-8 grid w-full">
+                {((overviewFilters.graphType.value == DisplayGraphs.ALL || overviewFilters.graphType.value == DisplayGraphs.INTER_ANNOTATOR) && isManaged) && <div className="mt-8 grid w-full">
                     <div className="text-lg leading-6 text-gray-900 font-medium inline-block">Inter annotator agreement</div>
                     <div className="mt-1 text-sm leading-5 font-medium text-gray-700 inline-block">See how users agree or disagree on redundantely labeled records.</div>
                     {interAnnotatorMatrix && <div>

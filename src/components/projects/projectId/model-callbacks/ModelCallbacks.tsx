@@ -21,6 +21,7 @@ import { CurrentPage } from "@/src/types/shared/general";
 import GridCards from "@/src/components/shared/grid-cards/GridCards";
 import { unsubscribeWSOnDestroy } from "@/src/services/base/web-sockets/web-sockets-helper";
 import DeleteModelCallBacksModal from "./DeleteModelCallbacksModal";
+import Dropdown2 from "@/submodules/react-components/components/Dropdown2";
 
 
 export default function ModelCallbacks() {
@@ -148,7 +149,10 @@ export default function ModelCallbacks() {
                 </div>
                 <div className="grid grid-cols-1 gap-4 xs:flex xs:gap-0 flex-row items-center mt-2 xl:mt-0">
                     {modelCallbacks && modelCallbacks.length > 0 ? (
-                        <Dropdown options={ACTIONS_DROPDOWN_OPTIONS} buttonName="Actions" disabledOptions={[false, false, modelCallbacks.every((checked) => !checked)]}
+                        // <Dropdown options={ACTIONS_DROPDOWN_OPTIONS} buttonName="Actions" disabledOptions={[false, false, modelCallbacks.every((checked) => !checked)]}
+                        //     iconsArray={['IconSquareCheck', 'IconSquare', 'IconTrash']}
+                        //     selectedOption={(option: string) => executeOption(option)} dropdownClasses="mr-3" buttonClasses={`${style.actionsHeight} text-xs`} />
+                        <Dropdown2 options={ACTIONS_DROPDOWN_OPTIONS} buttonName="Actions" disabledOptions={[false, false, modelCallbacks.every((checked) => !checked)]}
                             iconsArray={['IconSquareCheck', 'IconSquare', 'IconTrash']}
                             selectedOption={(option: string) => executeOption(option)} dropdownClasses="mr-3" buttonClasses={`${style.actionsHeight} text-xs`} />
                     ) : (

@@ -15,6 +15,7 @@ import { postProcessingModelsDownload } from "@/src/util/components/models-downl
 import { DEFAULT_AZURE_TYPE, GRANULARITY_TYPES_ARRAY, checkIfCreateEmbeddingIsDisabled, platformNamesDict } from "@/src/util/components/projects/projectId/settings/embeddings-helper";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
 import Dropdown from "@/submodules/react-components/components/Dropdown";
+import Dropdown2 from "@/submodules/react-components/components/Dropdown2";
 import { useLazyQuery, useMutation } from "@apollo/client";
 import { Tooltip } from "@nextui-org/react";
 import { IconExternalLink } from "@tabler/icons-react";
@@ -64,7 +65,7 @@ export default function AddNewEmbeddingModal(props: EmbeddingProps) {
 
     useEffect(() => {
         if (useableEmbedableAttributes.length == 0) return;
-        setTargetAttribute(useableEmbedableAttributes[0].name);
+        setTargetAttribute(useableEmbedableAttributes[0]);
         setPlatform(embeddingPlatforms[0]?.name);
         setGranularity(GRANULARITY_TYPES_ARRAY[0].name);
     }, [useableEmbedableAttributes]);
@@ -90,7 +91,7 @@ export default function AddNewEmbeddingModal(props: EmbeddingProps) {
     }
 
     function checkIfAttributeHasToken() {
-        const attribute = useableEmbedableAttributes.find((a) => a.id == targetAttribute);
+        const attribute = useableEmbedableAttributes.find((a) => a.id == targetAttribute.id);
         if (attribute?.dataType == DataTypeEnum.EMBEDDING_LIST) {
             setGranularityArray(GRANULARITY_TYPES_ARRAY.filter((g) => g.value != EmbeddingType.ON_TOKEN));
         } else {
@@ -186,8 +187,8 @@ export default function AddNewEmbeddingModal(props: EmbeddingProps) {
             prepareAzureData();
         }
 
-        const attributeId = useableEmbedableAttributes.find((a) => a.name == targetAttribute).id;
-        createEmbeddingMut({ variables: { projectId: projectId, attributeId: attributeId, config: JSON.stringify(config) } }).then((res) => { });
+        // const attributeId = useableEmbedableAttributes.find((a) => a.name == targetAttribute.name).id;
+        createEmbeddingMut({ variables: { projectId: projectId, attributeId: targetAttribute.id, config: JSON.stringify(config) } }).then((res) => { });
 
     }, [embeddingPlatforms, platform, granularity, model, apiToken, engine, url, version, termsAccepted, modalEmbedding]);
 
@@ -213,14 +214,25 @@ export default function AddNewEmbeddingModal(props: EmbeddingProps) {
                     <Tooltip content={TOOLTIPS_DICT.PROJECT_SETTINGS.EMBEDDINGS.TARGET_ATTRIBUTE} placement="right" color="invert">
                         <span className="card-title mb-0 label-text flex"><span className="cursor-help underline filtersUnderline">Target Attribute</span></span>
                     </Tooltip>
-                    <Dropdown options={useableEmbedableAttributes} buttonName={targetAttribute ?? 'Choose'} selectedOption={(option: string) => {
+                    {/* <Dropdown options={useableEmbedableAttributes} buttonName={targetAttribute ?? 'Choose'} selectedOption={(option: string) => {
+                        setTargetAttribute(option);
+                    }} /> */}
+                    <Dropdown2 options={useableEmbedableAttributes} buttonName={targetAttribute ? targetAttribute.name : 'Choose'} selectedOption={(option: any) => {
                         setTargetAttribute(option);
                     }} />
 
                     <Tooltip content={TOOLTIPS_DICT.PROJECT_SETTINGS.EMBEDDINGS.FILTER_ATTRIBUTES} placement="right" color="invert">
                         <span className="card-title mb-0 label-text flex"><span className="cursor-help underline filtersUnderline">Filter Attributes</span></span>
                     </Tooltip>
-                    <Dropdown options={filteredAttributesArray} buttonName={filteredAttributes.length == 0 ? 'None selected' : filteredAttributes.join(',')} hasCheckboxes={true} hasSelectAll={true}
+                    {/* <Dropdown options={filteredAttributesArray} buttonName={filteredAttributes.length == 0 ? 'None selected' : filteredAttributes.join(',')} hasCheckboxes={true} hasSelectAll={true}
+                        selectedOption={(option: any) => {
+                            const filteredAttributes = [];
+                            option.forEach((a: any) => {
+                                if (a.checked) filteredAttributes.push(a.name);
+                            });
+                            setFilteredAttributes(filteredAttributes);
+                        }} /> */}
+                    <Dropdown2 options={filteredAttributesArray} buttonName={filteredAttributes.length == 0 ? 'None selected' : filteredAttributes.join(',')} hasCheckboxes={true} hasSelectAll={true}
                         selectedOption={(option: any) => {
                             const filteredAttributes = [];
                             option.forEach((a: any) => {
@@ -236,6 +248,10 @@ export default function AddNewEmbeddingModal(props: EmbeddingProps) {
                         setPlatform(option);
                         setSelectedPlatform(embeddingPlatforms.find((p: EmbeddingPlatform) => p.name == option));
                     }} />
+                    {/* <Dropdown2 options={embeddingPlatforms} buttonName={platform ?? 'Choose'} selectedOption={(option: string) => {
+                        setPlatform(option);
+                        setSelectedPlatform(embeddingPlatforms.find((p: EmbeddingPlatform) => p.name == option));
+                    }} /> */}
 
                     <Tooltip content={TOOLTIPS_DICT.PROJECT_SETTINGS.EMBEDDINGS.GRANULARITY} placement="right" color="invert">
                         <span className="card-title mb-0 label-text flex"><span className="cursor-help underline filtersUnderline">Granularity</span></span>

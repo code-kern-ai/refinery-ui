@@ -9,6 +9,7 @@ import { CurrentPage } from "@/src/types/shared/general";
 import { ATTRIBUTES_VISIBILITY_STATES, getTooltipVisibilityState } from "@/src/util/components/projects/projectId/settings/data-schema-helper";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
 import Dropdown from "@/submodules/react-components/components/Dropdown";
+import Dropdown2 from "@/submodules/react-components/components/Dropdown2";
 import { useMutation } from "@apollo/client";
 import { Tooltip } from "@nextui-org/react";
 import { IconArrowRight, IconCheck, IconX } from "@tabler/icons-react";
@@ -47,11 +48,11 @@ export default function DataSchema(props: DataSchemaProps) {
         });
     }
 
-    function updateVisibility(option: string, attribute: Attribute) {
-        const visibility = ATTRIBUTES_VISIBILITY_STATES.find((state) => state.name === option).value;
+    function updateVisibility(option: any, attribute: Attribute) {
+        // const visibility = ATTRIBUTES_VISIBILITY_STATES.find((state) => state.name === option).value;
         const attributeNew = { ...attribute };
-        attributeNew.visibility = visibility;
-        attributeNew.visibilityIndex = ATTRIBUTES_VISIBILITY_STATES.findIndex((state) => state.name === option);
+        attributeNew.visibility = option.value;
+        attributeNew.visibilityIndex = ATTRIBUTES_VISIBILITY_STATES.findIndex((state) => state.name === option.name);
         updateAttributeMut({ variables: { projectId: projectId, attributeId: attribute.id, visibility: attributeNew.visibility } }).then(() => {
             dispatch(updateAttributeById(attributeNew));
         });
@@ -127,8 +128,10 @@ export default function DataSchema(props: DataSchemaProps) {
                                             <Statuses status={attribute.state} page="attributes" initialCaption="Registered" />
                                         </td>
                                         <td className="text-center px-3 py-2 text-sm text-gray-500">
-                                            <Dropdown buttonName={ATTRIBUTES_VISIBILITY_STATES[attribute.visibilityIndex].name} options={ATTRIBUTES_VISIBILITY_STATES} dropdownWidth="w-52"
-                                                selectedOption={(option: string) => updateVisibility(option, attribute)} tooltipsArray={tooltipsArray} />
+                                            {/* <Dropdown buttonName={ATTRIBUTES_VISIBILITY_STATES[attribute.visibilityIndex].name} options={ATTRIBUTES_VISIBILITY_STATES} dropdownWidth="w-52"
+                                                selectedOption={(option: string) => updateVisibility(option, attribute)} tooltipsArray={tooltipsArray} /> */}
+                                            <Dropdown2 buttonName={ATTRIBUTES_VISIBILITY_STATES[attribute.visibilityIndex].name} options={ATTRIBUTES_VISIBILITY_STATES} dropdownWidth="w-52"
+                                                selectedOption={(option: any) => updateVisibility(option, attribute)} tooltipsArray={tooltipsArray} />
                                         </td>
                                         <td className="text-center px-3 py-2 text-sm text-gray-500">
                                             {attribute.userCreated ? <button type="button" className="text-green-800 text-sm font-medium"

@@ -10,6 +10,7 @@ import { DATA_TYPES, findFreeAttributeName } from "@/src/util/components/project
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
 import { toPythonFunctionName } from "@/submodules/javascript-functions/python-functions-parser";
 import Dropdown from "@/submodules/react-components/components/Dropdown";
+import Dropdown2 from "@/submodules/react-components/components/Dropdown2";
 import { useMutation } from "@apollo/client";
 import { Tooltip } from "@nextui-org/react";
 import { useRouter } from "next/router";
@@ -27,14 +28,14 @@ export default function CreateNewAttributeModal() {
     const attributes = useSelector(selectAttributes);
 
     const [attributeName, setAttributeName] = useState('');
-    const [attributeType, setAttributeType] = useState(DATA_TYPES[0].name);
+    const [attributeType, setAttributeType] = useState(DATA_TYPES[0]);
     const [duplicateNameExists, setDuplicateNameExists] = useState(false);
 
     const [createAttributeMut] = useMutation(CREATE_USER_ATTRIBUTE);
 
     const createUserAttribute = useCallback(() => {
-        const attributeTypeFinal = DATA_TYPES.find((type) => type.name === attributeType).value;
-        createAttributeMut({ variables: { projectId: projectId, name: attributeName, dataType: attributeTypeFinal } }).then((res) => {
+        // const attributeTypeFinal = DATA_TYPES.find((type) => type.name === attributeType).value;
+        createAttributeMut({ variables: { projectId: projectId, name: attributeName, dataType: attributeType.value } }).then((res) => {
             const id = res?.data?.createUserAttribute.attributeId;
             if (id) {
                 localStorage.setItem('isNewAttribute', "X");
@@ -77,10 +78,11 @@ export default function CreateNewAttributeModal() {
             <Tooltip content={TOOLTIPS_DICT.PROJECT_SETTINGS.SELECT_ATTRIBUTE_TYPE} color="invert" placement="right">
                 <span className="cursor-help card-title mb-0 label-text font-normal"><span className="underline filtersUnderline">Attribute type</span></span>
             </Tooltip>
-            <Dropdown buttonName={attributeType ?? 'Select type'} options={DATA_TYPES} selectedOption={(option: string) => setAttributeType(option)} />
+            {/* <Dropdown buttonName={attributeType ?? 'Select type'} options={DATA_TYPES} selectedOption={(option: string) => setAttributeType(option)} /> */}
+            <Dropdown2 buttonName={attributeType ? attributeType.name : 'Select type'} options={DATA_TYPES} selectedOption={(option: any) => setAttributeType(option)} />
         </div>
         {duplicateNameExists && <div className="text-red-700 text-xs mt-2">Attribute name exists</div>}
-        {attributeType == 'Embedding List' && <div className="border border-gray-300 text-xs text-gray-500 p-2.5 rounded-lg text-justify mt-2 max-w-2xl">
+        {attributeType.name == 'Embedding List' && <div className="border border-gray-300 text-xs text-gray-500 p-2.5 rounded-lg text-justify mt-2 max-w-2xl">
             <label className="text-gray-700">
                 Embedding lists are special. They can only be used for similarity search. If a list
                 entry is matched, the whole record is considered matched.
