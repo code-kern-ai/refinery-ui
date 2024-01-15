@@ -70,8 +70,8 @@ export function postProcessingRecommendedEncoders(attributes: Attribute[], token
 }
 
 function buildExpectedEmbeddingName(data: any): string {
-    let toReturn = data.targetAttribute;
-    toReturn += "-" + (data.granularity == 'Attribute' ? 'classification' : 'extraction');
+    let toReturn = data.targetAttribute.name;
+    toReturn += "-" + (data.granularity.value == EmbeddingType.ON_ATTRIBUTE ? 'classification' : 'extraction');
     const platform = data.platform;
     if (platform == PlatformType.HUGGING_FACE || platform == PlatformType.PYTHON) {
         toReturn += "-" + platform + "-" + data.model;
@@ -104,24 +104,25 @@ export function checkDuplicates(embeddings: any, data: any): boolean {
 export function checkIfCreateEmbeddingIsDisabled(props: EmbeddingCreationEnabledProps) {
     let checkFormFields: boolean = false;
     const platform = props.platform;
+    if (!platform) return true;
     const model = props.model;
     const apiToken = props.apiToken;
     const termsAccepted = props.termsAccepted;
     const engine = props.engine;
     const version = props.version;
     const url = props.url;
-    if (platform == platformNamesDict[PlatformType.HUGGING_FACE] || platform == platformNamesDict[PlatformType.PYTHON]) {
+    if (platform.name == platformNamesDict[PlatformType.HUGGING_FACE] || platform.name == platformNamesDict[PlatformType.PYTHON]) {
         checkFormFields = model == null || model == "";
-    } else if (platform == platformNamesDict[PlatformType.OPEN_AI]) {
+    } else if (platform.name == platformNamesDict[PlatformType.OPEN_AI]) {
         checkFormFields = model == null || apiToken == null || apiToken == "" || !termsAccepted;
-    } else if (platform == platformNamesDict[PlatformType.COHERE]) {
+    } else if (platform.name == platformNamesDict[PlatformType.COHERE]) {
         checkFormFields = apiToken == null || apiToken == "" || !termsAccepted;
-    } else if (platform == platformNamesDict[PlatformType.AZURE]) {
+    } else if (platform.name == platformNamesDict[PlatformType.AZURE]) {
         checkFormFields = apiToken == null || apiToken == "" || url == null || url == "" || version == null || version == "" || !termsAccepted || !engine;
     }
     const data = {
         targetAttribute: props.targetAttribute,
-        platform: props.embeddingPlatforms.find((p: EmbeddingPlatform) => p.name == platform)?.platform,
+        platform: props.embeddingPlatforms.find((p: EmbeddingPlatform) => p.name == platform.name)?.platform,
         granularity: props.granularity,
         model: model,
         apiToken: apiToken,

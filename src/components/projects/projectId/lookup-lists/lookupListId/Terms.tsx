@@ -4,7 +4,6 @@ import { Term, TermsProps } from "@/src/types/components/projects/projectId/look
 import { BLACKLISTED_TERMS_DROPDOWN_OPTIONS, TERMS_DROPDOWN_OPTIONS, isTermUnique } from "@/src/util/components/projects/projectId/lookup-lists-helper";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
 import { jsonCopy } from "@/submodules/javascript-functions/general";
-import Dropdown from "@/submodules/react-components/components/Dropdown";
 import Dropdown2 from "@/submodules/react-components/components/Dropdown2";
 import { useMutation } from "@apollo/client";
 import { Tooltip } from "@nextui-org/react";
@@ -119,9 +118,6 @@ export default function Terms(props: TermsProps) {
                         <div className="w-full relative rounded-lg border border-gray-300 bg-white px-4 py-3 shadow-sm items-center text-sm hover:border-gray-400 focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-indigo-500">
                             <div className="flex items-center">
                                 <div className="text-gray-900 font-medium float-left w-full">{term.value}</div>
-                                {/* <Dropdown dropdownClasses="flex justify-end" options={TERMS_DROPDOWN_OPTIONS} hasButtonDots={true}
-                                    iconsArray={['IconEdit', 'IconTrash', 'IconShieldFilled']}
-                                    selectedOption={(option) => executeOption(option, term)} /> */}
                                 <Dropdown2 dropdownClasses="flex justify-end" options={TERMS_DROPDOWN_OPTIONS} hasButtonDots={true}
                                     iconsArray={['IconEdit', 'IconTrash', 'IconShieldFilled']}
                                     selectedOption={(option) => executeOption(option, term)} />
@@ -162,9 +158,6 @@ export default function Terms(props: TermsProps) {
                             <div className="w-full relative rounded-lg border border-gray-300 bg-white px-4 py-3 shadow-sm items-center text-sm hover:border-gray-400 focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-indigo-500">
                                 <div className="flex items-center">
                                     <div className="text-gray-900 font-medium float-left">{term.value}</div>
-                                    {/* <Dropdown dropdownClasses="flex justify-end" options={TERMS_DROPDOWN_OPTIONS} hasButtonDots={true}
-                                        iconsArray={['IconEdit', 'IconTrash', 'IconShieldFilled']}
-                                        selectedOption={(option) => executeOption(option, term)} /> */}
                                     <Dropdown2 dropdownClasses="flex justify-end" options={TERMS_DROPDOWN_OPTIONS} hasButtonDots={true}
                                         iconsArray={['IconEdit', 'IconTrash', 'IconShieldFilled']}
                                         selectedOption={(option) => executeOption(option, term)} />
@@ -188,9 +181,6 @@ export default function Terms(props: TermsProps) {
                         <div className="w-full relative rounded-lg border border-gray-300 bg-white px-4 py-3 shadow-sm items-center text-sm hover:border-gray-400 focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-indigo-500">
                             <div className="flex items-center">
                                 <div className="text-gray-900 font-medium float-left w-full">{term.value}</div>
-                                {/* <Dropdown dropdownClasses="flex justify-end" options={BLACKLISTED_TERMS_DROPDOWN_OPTIONS} hasButtonDots={true}
-                                    iconsArray={['IconTrash', 'IconShieldCheckFilled']}
-                                    selectedOption={(option) => executeOption(option, term)} /> */}
                                 <Dropdown2 dropdownClasses="flex justify-end" options={BLACKLISTED_TERMS_DROPDOWN_OPTIONS} hasButtonDots={true}
                                     iconsArray={['IconTrash', 'IconShieldCheckFilled']}
                                     selectedOption={(option) => executeOption(option, term)} />

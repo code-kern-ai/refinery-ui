@@ -164,7 +164,7 @@ export default function ProjectOverview() {
     }
 
     function setDisplayNERConfusion() {
-        const labelingTaskTaskType = labelingTasks.find((labelingTask) => labelingTask.name === overviewFilters.labelingTask)?.taskType;
+        const labelingTaskTaskType = overviewFilters.labelingTask?.taskType;
         if (labelingTaskTaskType != LabelingTaskTaskType.INFORMATION_EXTRACTION) {
             setDisplayConfusion(true);
         } else {
@@ -176,8 +176,8 @@ export default function ProjectOverview() {
     }
 
     function getLabelDistributions() {
-        const labelingTaskId = labelingTasks.find((labelingTask) => labelingTask.name === overviewFilters.labelingTask)?.id;
-        const dataSliceFindId = dataSlices.find((dataSlice) => dataSlice.name === overviewFilters.dataSlice)?.id;
+        const labelingTaskId = overviewFilters.labelingTask?.id;
+        const dataSliceFindId = overviewFilters.dataSlice?.id;
         const dataSliceId = dataSliceFindId == "@@NO_SLICE@@" ? null : dataSliceFindId;
         refetchLabelDistribution({ variables: { projectId: projectId, labelingTaskId: labelingTaskId, sliceId: dataSliceId } }).then((res) => {
             setLabelDistribution(postProcessLabelDistribution(res['data']['labelDistribution']));
@@ -185,8 +185,8 @@ export default function ProjectOverview() {
     }
 
     function getConfidenceDistributions() {
-        const labelingTaskId = labelingTasks.find((labelingTask) => labelingTask.name === overviewFilters.labelingTask)?.id;
-        const dataSliceFindId = dataSlices.find((dataSlice) => dataSlice.name === overviewFilters.dataSlice)?.id;
+        const labelingTaskId = overviewFilters.labelingTask?.id;
+        const dataSliceFindId = overviewFilters.dataSlice?.id;
         const dataSliceId = dataSliceFindId == "@@NO_SLICE@@" ? null : dataSliceFindId;
         refetchConfidenceDistribution({ variables: { projectId: projectId, labelingTaskId: labelingTaskId, sliceId: dataSliceId } }).then((res) => {
             setConfidenceDistribution(JSON.parse(res['data']['confidenceDistribution']));
@@ -194,8 +194,8 @@ export default function ProjectOverview() {
     }
 
     function getConfusionMatrix() {
-        const labelingTaskId = labelingTasks.find((labelingTask) => labelingTask.name === overviewFilters.labelingTask)?.id;
-        const dataSliceFindId = dataSlices.find((dataSlice) => dataSlice.name === overviewFilters.dataSlice)?.id;
+        const labelingTaskId = overviewFilters.labelingTask?.id;
+        const dataSliceFindId = overviewFilters.dataSlice?.id;
         const dataSliceId = dataSliceFindId == "@@NO_SLICE@@" ? null : dataSliceFindId;
         refetchConfusionMatrix({ variables: { projectId: projectId, labelingTaskId: labelingTaskId, sliceId: dataSliceId } }).then((res) => {
             if (res['data'] == null) return;
@@ -206,7 +206,7 @@ export default function ProjectOverview() {
     function getInterAnnotatorMatrix() {
         let values = interAnnotatorFormGroup;
         values.dataSlice = values.dataSlice == "@@NO_SLICE@@" ? null : values.dataSlice;
-        const labelingTaskId = labelingTasks.find((labelingTask) => labelingTask.name === overviewFilters.labelingTask)?.id;
+        const labelingTaskId = overviewFilters.labelingTask?.id;
         refetchInterAnnotator({ variables: { projectId: projectId, labelingTaskId: labelingTaskId, includeGoldStar: values.goldUser, includeAllOrgUser: values.allUsers, onlyOnStaticSlice: values.dataSlice } }).then((res) => {
             if (res['data'] == null) return;
             const matrix = res['data']['interAnnotatorMatrix'];
@@ -229,8 +229,8 @@ export default function ProjectOverview() {
         projectStatsCopy.generalLoading = true;
         projectStatsCopy.interAnnotatorLoading = true;
         setProjectStats(projectStatsCopy);
-        const labelingTaskId = labelingTasks.find((labelingTask) => labelingTask.name === overviewFilters.labelingTask)?.id;
-        const dataSliceFindId = dataSlices.find((dataSlice) => dataSlice.name === overviewFilters.dataSlice)?.id;
+        const labelingTaskId = overviewFilters.labelingTask?.id;
+        const dataSliceFindId = overviewFilters.dataSlice?.id;
         const dataSliceId = dataSliceFindId == "@@NO_SLICE@@" ? null : dataSliceFindId;
         refetchProjectStats({ variables: { projectId: projectId, labelingTaskId: labelingTaskId, sliceId: dataSliceId } }).then((res) => {
             if (res['data'] == null) return;

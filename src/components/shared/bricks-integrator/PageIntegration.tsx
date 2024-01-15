@@ -9,12 +9,12 @@ import VariableSelect from "./VariableSelect";
 import { copyToClipboard, jsonCopy } from "@/submodules/javascript-functions/general";
 import style from '@/src/styles/shared/bricks-integrator.module.css';
 import { Fragment } from "react";
-import Dropdown from "@/submodules/react-components/components/Dropdown";
 import { selectLabelingTasksAll } from "@/src/reduxStore/states/pages/settings";
 import { CREATE_LABELS } from "@/src/services/gql/queries/project-setting";
 import { useMutation } from "@apollo/client";
 import { selectProjectId } from "@/src/reduxStore/states/project";
 import { CREATE_TASK_AND_LABELS } from "@/src/services/gql/mutations/project-settings";
+import Dropdown2 from "@/submodules/react-components/components/Dropdown2";
 
 export default function PageIntegration(props: PageIntegrationProps) {
     const dispatch = useDispatch();
@@ -132,11 +132,10 @@ export default function PageIntegration(props: PageIntegrationProps) {
                     </div>
                     {BricksCodeParser.labelingTaskName && <Fragment>
                         <label className="font-bold col-start-1">Labeling Task</label>
-                        <Dropdown options={labelingTasks} buttonName={BricksCodeParser.labelingTaskName}
-                            selectedOption={(option: string) => {
-                                const labelingTaskId = labelingTasks.find(lt => lt.name == option).id;
-                                BricksCodeParser.labelingTaskName = option;
-                                props.selectDifferentTask(labelingTaskId);
+                        <Dropdown2 options={labelingTasks} buttonName={BricksCodeParser.labelingTaskName}
+                            selectedOption={(option: any) => {
+                                BricksCodeParser.labelingTaskName = option.name;
+                                props.selectDifferentTask(option.id);
                             }} />
                         <Tooltip content={TOOLTIPS_DICT.HEURISTICS.SWITCH_LABELING_TASK} color="invert" placement="top" className="cursor-auto">
                             <IconAlertTriangle className="w-6 h-6 text-yellow-700" stroke={1.5} />
@@ -164,9 +163,9 @@ export default function PageIntegration(props: PageIntegrationProps) {
                         <label className="font-bold">Refinery label</label>
                         {BricksCodeParser.expected.expectedTaskLabels.map((l, index) => (<div key={l.label} className="contents">
                             <label className="text-sm col-start-1">{l.label}</label>
-                            <Dropdown options={BricksCodeParser.expected.availableLabels} buttonName={l.mappedLabel ? l.mappedLabel : 'Ignore'}
-                                selectedOption={(option: string) => {
-                                    BricksCodeParser.expected.expectedTaskLabels[index].mappedLabel = option;
+                            <Dropdown2 options={BricksCodeParser.expected.availableLabels} buttonName={l.mappedLabel ? l.mappedLabel : 'Ignore'}
+                                selectedOption={(option: any) => {
+                                    BricksCodeParser.expected.expectedTaskLabels[index].mappedLabel = option.name;
                                     const configCopy = BricksCodeParser.replaceVariables(jsonCopy(config), props.executionTypeFilter, null, props.forIde);
                                     dispatch(setBricksIntegrator(configCopy));
                                 }} />

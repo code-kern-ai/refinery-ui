@@ -13,7 +13,7 @@ import { BricksVariableComment, isCommentTrue } from "@/src/util/classes/bricks-
 import { postProcessingAttributes } from "@/src/util/components/projects/projectId/settings/data-schema-helper";
 import { postProcessLabelingTasks } from "@/src/util/components/projects/projectId/settings/labeling-tasks-helper";
 import { getIsoCodes } from "@/src/util/shared/bricks-integrator-helper";
-import Dropdown from "@/submodules/react-components/components/Dropdown";
+import Dropdown2 from "@/submodules/react-components/components/Dropdown2";
 import { useLazyQuery } from "@apollo/client";
 import { IconPlus, IconTrash } from "@tabler/icons-react";
 import { useRouter } from "next/router";
@@ -204,62 +204,69 @@ export default function VariableSelect(props: VariableSelectProps) {
     return (<>
         {props.variable && props.variable.values.map((v, index) => (<div key={v} className="col-start-2 flex flex-row flex-nowrap items-center gap-x-2">
             {props.variable.type == BricksVariableType.ATTRIBUTE &&
-                <Dropdown options={attributes} buttonName={props.variable.values[index] ? props.variable.values[index] : 'Select attribute'}
+                <Dropdown2 options={attributes} buttonName={props.variable.values[index] ? props.variable.values[index] : 'Select attribute'}
                     selectedOption={(option: any) => {
                         const propsCopy = { ...props };
-                        propsCopy.variable.values[index] = option;
+                        propsCopy.variable.values[index] = option.name;
                         props.sendOption();
                     }}
-                />}
+                />
+            }
             {props.variable.type == BricksVariableType.LANGUAGE &&
-                <Dropdown options={languages} buttonName={props.variable.values[index] ? props.variable.values[index] : 'Select language'}
+                <Dropdown2 options={languages} buttonName={props.variable.values[index] ? props.variable.values[index] : 'Select language'}
                     selectedOption={(option: any) => {
                         const propsCopy = { ...props };
-                        propsCopy.variable.values[index] = option;
+                        propsCopy.variable.values[index] = option.name;
                         props.sendOption();
                     }}
-                />}
+                />
+            }
             {props.variable.type == BricksVariableType.EMBEDDING &&
-                <Dropdown options={embeddings} buttonName={props.variable.values[index] ? props.variable.values[index] : 'Select embedding'}
+                <Dropdown2 options={embeddings} buttonName={props.variable.values[index] ? props.variable.values[index] : 'Select embedding'}
                     selectedOption={(option: any) => {
                         const propsCopy = { ...props };
-                        propsCopy.variable.values[index] = option;
+                        propsCopy.variable.values[index] = option.name;
                         props.sendOption();
                     }}
-                />}
+                />
+            }
             {props.variable.type == BricksVariableType.LOOKUP_LIST &&
-                <Dropdown options={lookupLists ?? []} buttonName={props.variable.values[index] ? props.variable.values[index] : 'Select lookup list'}
+                <Dropdown2 options={lookupLists ?? []} buttonName={props.variable.values[index] ? props.variable.values[index] : 'Select lookup list'}
                     selectedOption={(option: any) => {
                         const propsCopy = { ...props };
-                        propsCopy.variable.values[index] = option;
+                        propsCopy.variable.values[index] = option.name;
                         props.sendOption();
                     }}
-                />}
+                />
+            }
             {props.variable.type == BricksVariableType.LABEL &&
-                <Dropdown options={labels} buttonName={props.variable.values[index] ? props.variable.values[index] : 'Select label'}
+                <Dropdown2 options={labels} buttonName={props.variable.values[index] ? props.variable.values[index] : 'Select label'}
                     selectedOption={(option: any) => {
                         const propsCopy = { ...props };
-                        propsCopy.variable.values[index] = option;
+                        propsCopy.variable.values[index] = option.name;
                         props.sendOption();
                     }}
-                />}
+                />
+            }
             {props.variable.type == BricksVariableType.LABELING_TASK &&
-                <Dropdown options={labelingTasks} buttonName={props.variable.values[index] ? props.variable.values[index] : 'Select task'}
+                <Dropdown2 options={labelingTasks} buttonName={props.variable.values[index] ? props.variable.values[index] : 'Select task'}
                     selectedOption={(option: any) => {
                         const propsCopy = { ...props };
-                        propsCopy.variable.values[index] = option;
+                        propsCopy.variable.values[index] = option.name;
                         props.sendOption();
                     }}
-                />}
+                />
+            }
 
             {props.variable.type == BricksVariableType.GENERIC_CHOICE &&
-                <Dropdown options={props.variable.allowedValues} buttonName={props.variable.values[index] ? props.variable.values[index] : 'Select option'}
+                <Dropdown2 options={props.variable.allowedValues} buttonName={props.variable.values[index] ? props.variable.values[index] : 'Select option'}
                     selectedOption={(option: any) => {
                         const propsCopy = { ...props };
-                        propsCopy.variable.values[index] = option;
+                        propsCopy.variable.values[index] = option.name;
                         props.sendOption();
                     }}
-                />}
+                />
+            }
 
             {props.variable.type == BricksVariableType.REGEX &&
                 <input type="text" value={props.variable.values[index]} id={'REGEX_' + props.index + '_' + index}

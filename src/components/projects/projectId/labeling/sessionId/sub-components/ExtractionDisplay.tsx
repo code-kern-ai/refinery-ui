@@ -20,7 +20,7 @@ export default function ExtractionDisplay(props: ExtractionDisplayProps) {
 
     return (<>
         {props.tokenLookup && <div className="flex flex-row flex-wrap items-start">
-            {props.tokenLookup[props.attributeId] && props.tokenLookup[props.attributeId].token.map((token) => (<div key={token.idx} className={`relative z-10 ${token.countLineBreaks > 0 && settings.main.lineBreaks != LineBreaksType.NORMAL ? 'w-full' : ''}`}
+            {props.tokenLookup[props.attributeId] && props.tokenLookup[props.attributeId].token && props.tokenLookup[props.attributeId].token.map((token) => (<div key={token.idx} className={`relative z-10 ${token.countLineBreaks > 0 && settings.main.lineBreaks != LineBreaksType.NORMAL ? 'w-full' : ''}`}
                 style={{ marginBottom: props.tokenLookup[props.attributeId][token.idx]?.tokenMarginBottom }}
                 data-tokenidx={token.idx} data-attributeid={props.attributeId}>
                 {token.countLineBreaks == 0 ? (<>

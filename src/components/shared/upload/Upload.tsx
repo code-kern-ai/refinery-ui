@@ -2,7 +2,6 @@ import { UploadFileType, UploadProps, UploadState, UploadStates, UploadTask, Upl
 import { useDispatch, useSelector } from "react-redux";
 import UploadField from "./helper-components/UploadField";
 import { useEffect, useState } from "react";
-import Dropdown from "@/submodules/react-components/components/Dropdown";
 import UploadWrapper from "./helper-components/UploadWrapper";
 import { selectUploadData, setImportOptions } from "@/src/reduxStore/states/upload";
 import { useLazyQuery, useMutation } from "@apollo/client";
@@ -22,6 +21,7 @@ import { UploadHelper, ZIP_TYPE } from "@/src/util/classes/upload-helper";
 import CryptedField from "../crypted-field/CryptedField";
 import { closeModal } from "@/src/reduxStore/states/modal";
 import { ModalEnum } from "@/src/types/shared/modal";
+import Dropdown2 from "@/submodules/react-components/components/Dropdown2";
 
 export default function Upload(props: UploadProps) {
     const router = useRouter();
@@ -314,8 +314,8 @@ export default function Upload(props: UploadProps) {
                                 className="underline cursor-pointer">documentation</span></a> for further
                         details.
                     </label>
-                    <Dropdown buttonName={tokenizer} options={prepareTokenizedValues} disabledOptions={prepareTokenizedValues.map((tokenizer: any) => tokenizer.disabled)}
-                        selectedOption={(option) => setTokenizer(option)} dropdownItemsClasses="max-h-80 overflow-y-auto" />
+                    <Dropdown2 buttonName={tokenizer} options={prepareTokenizedValues} disabledOptions={prepareTokenizedValues.map((tokenizer: any) => tokenizer.disabled)}
+                        selectedOption={(option) => setTokenizer(option.name)} dropdownItemsClasses="max-h-80 overflow-y-auto" />
                 </div>
                 <UploadWrapper uploadStarted={uploadStarted} doingSomething={doingSomething} progressState={progressState} submitted={submitted} isFileCleared={selectedFile == null}
                     isModal={props.uploadOptions.isModal} submitUpload={submitUpload} sendSelectedFile={(file) => {

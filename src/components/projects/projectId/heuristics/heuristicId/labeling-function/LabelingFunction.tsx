@@ -7,7 +7,6 @@ import { useLazyQuery, useMutation } from "@apollo/client";
 import { GET_HEURISTICS_BY_ID, GET_LABELING_FUNCTION_ON_10_RECORDS, GET_TASK_BY_TASK_ID } from "@/src/services/gql/queries/heuristics";
 import { selectHeuristic, setActiveHeuristics, updateHeuristicsState } from "@/src/reduxStore/states/pages/heuristics";
 import { postProcessCurrentHeuristic, postProcessLastTaskLogs } from "@/src/util/components/projects/projectId/heuristics/heuristicId/heuristics-details-helper";
-import Dropdown from "@/submodules/react-components/components/Dropdown";
 import { Tooltip } from "@nextui-org/react";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
 import { GET_LABELING_TASKS_BY_PROJECT_ID } from "@/src/services/gql/queries/project-setting";
@@ -221,7 +220,6 @@ export default function LabelingFunction() {
                     <div className="flex items-center flex-wrap mt-3">
                         <div className="text-sm leading-5 font-medium text-gray-700 inline-block mr-2">Editor</div>
                         <Tooltip content={TOOLTIPS_DICT.LABELING_FUNCTION.LABELING_TASK} color="invert" placement="top">
-                            {/* <Dropdown options={labelingTasks.map(a => a.name)} buttonName={currentHeuristic?.labelingTaskName} selectedOption={(option: string) => saveHeuristic(option)} /> */}
                             <Dropdown2 options={labelingTasks} buttonName={currentHeuristic?.labelingTaskName} selectedOption={(option: any) => saveHeuristic(option)} />
 
                         </Tooltip>
@@ -262,8 +260,6 @@ export default function LabelingFunction() {
                 <div className="mt-2 flex flex-grow justify-between items-center float-right">
                     <div className="flex items-center">
                         <div className="flex items-center mr-2">
-                            {/* <Dropdown options={attributes} buttonName={selectedAttribute ?? 'Select display attribute'} buttonClasses="text-xs font-semibold actionsHeight"
-                                selectedOption={(option: string) => setSelectedAttribute(option)} /> */}
                             <Dropdown2 options={attributes} buttonName={selectedAttribute ? selectedAttribute.name : 'Select display attribute'} buttonClasses="text-xs font-semibold actionsHeight"
                                 selectedOption={(option: any) => setSelectedAttribute(option)} />
                         </div>

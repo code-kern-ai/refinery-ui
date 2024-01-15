@@ -2,7 +2,7 @@ import { selectProjectId } from "@/src/reduxStore/states/project";
 import { CommentCreationProps, CommentType } from "@/src/types/shared/comments";
 import { CommentDataManager } from "@/src/util/classes/comments";
 import { convertTypeToKey } from "@/src/util/shared/comments-helper";
-import Dropdown from "@/submodules/react-components/components/Dropdown";
+import Dropdown2 from "@/submodules/react-components/components/Dropdown2";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useSelector } from "react-redux";
 
@@ -20,7 +20,7 @@ export function CommentCreation(props: CommentCreationProps) {
 
     useEffect(() => {
         if (!CommentDataManager.currentCommentTypeOptions) return;
-        setType(CommentDataManager.currentCommentTypeOptions[0].name);
+        setType(CommentDataManager.currentCommentTypeOptions[0]);
     }, [CommentDataManager.currentCommentTypeOptions]);
 
     useEffect(() => {
@@ -32,8 +32,8 @@ export function CommentCreation(props: CommentCreationProps) {
 
     useEffect(() => {
         if (!type) return;
-        setCommentIdOptions(CommentDataManager.getCommentKeyOptions(convertTypeToKey(type), projectId));
-        if (type == CommentType.RECORD) {
+        setCommentIdOptions(CommentDataManager.getCommentKeyOptions(convertTypeToKey(type.name), projectId));
+        if (type.name == CommentType.RECORD) {
             setNewCommentsToLastElement();
         }
     }, [type]);
@@ -44,8 +44,8 @@ export function CommentCreation(props: CommentCreationProps) {
             event.preventDefault();
             commentValue = commentValue.trim();
             if (commentValue.length > 0) {
-                props.saveComment(type, commentId, newComment, isPrivateComment);
-                setType(CommentDataManager.currentCommentTypeOptions[0].name);
+                props.saveComment(type.name, commentId, newComment, isPrivateComment);
+                setType(CommentDataManager.currentCommentTypeOptions[0]);
                 setCommentInstance(null);
                 setCommentId(null);
                 setIsPrivateComment(false);
@@ -55,8 +55,8 @@ export function CommentCreation(props: CommentCreationProps) {
     }
 
     const saveComment = useCallback(() => {
-        props.saveComment(type, commentId, newComment, isPrivateComment);
-        setType(CommentDataManager.currentCommentTypeOptions[0].name);
+        props.saveComment(type.name, commentId, newComment, isPrivateComment);
+        setType(CommentDataManager.currentCommentTypeOptions[0]);
         setCommentInstance(null);
         setCommentId(null);
         setIsPrivateComment(false);
@@ -66,7 +66,7 @@ export function CommentCreation(props: CommentCreationProps) {
     function setNewCommentsToLastElement() {
         const lastElement = CommentDataManager.getLastRecordInfo();
         if (!lastElement) return;
-        setCommentInstance(lastElement.name);
+        setCommentInstance(lastElement);
         setCommentId(lastElement.id);
     }
 
@@ -76,14 +76,14 @@ export function CommentCreation(props: CommentCreationProps) {
                 style={{ gridTemplateColumns: '40% 56%' }}>
                 <div className="font-normal">Type</div>
                 <div className="font-normal">Instance</div>
-                <Dropdown options={CommentDataManager.currentCommentTypeOptions ?? []} buttonName={type ?? 'Select Type'} selectedOption={(option: string) => {
+                <Dropdown2 options={CommentDataManager.currentCommentTypeOptions ?? []} buttonName={type ? type.name : 'Select Type'} selectedOption={(option: any) => {
                     setType(option);
                     setCommentInstance(null);
                     setCommentId(null);
                 }} />
-                <Dropdown options={commentIdOptions} buttonName={commentInstance ?? 'Select Instance'} selectedOption={(option: string) => {
-                    setCommentInstance(option)
-                    setCommentId(commentIdOptions.find((opt: any) => opt.name == option).id);
+                <Dropdown2 options={commentIdOptions} buttonName={commentInstance ? commentInstance.name : 'Select Instance'} selectedOption={(option: any) => {
+                    setCommentInstance(option);
+                    setCommentId(option.id);
                 }} />
             </div>
             <div className="mt-3 px-4">

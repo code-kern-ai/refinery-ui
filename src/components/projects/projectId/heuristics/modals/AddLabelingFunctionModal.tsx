@@ -7,7 +7,6 @@ import { LabelingTask } from "@/src/types/components/projects/projectId/settings
 import { ModalButton, ModalEnum } from "@/src/types/shared/modal";
 import { DEFAULT_DESCRIPTION, getFunctionName, getInformationSourceTemplate, getRouterLinkHeuristic } from "@/src/util/components/projects/projectId/heuristics/heuristics-helper";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
-import Dropdown from "@/submodules/react-components/components/Dropdown";
 import Dropdown2 from "@/submodules/react-components/components/Dropdown2";
 import { useMutation } from "@apollo/client";
 import { Tooltip } from "@nextui-org/react";
@@ -74,7 +73,6 @@ export default function AddLabelingFunctionModal() {
                     <span className="cursor-help card-title mb-0 label-text text-left"><span className="underline filtersUnderline">Labeling task</span></span>
                 </div>
             </Tooltip>
-            {/* <Dropdown options={labelingTasks} buttonName={labelingTask} selectedOption={(option: string) => setLabelingTask(option)} disabled={labelingTasks?.length == 0} /> */}
             <Dropdown2 options={labelingTasks} buttonName={labelingTask?.name} selectedOption={(option: any) => setLabelingTask(option)} disabled={labelingTasks?.length == 0} />
 
             <Tooltip content={TOOLTIPS_DICT.HEURISTICS.ENTER_FUNCTION_NAME} color="invert" placement="right">

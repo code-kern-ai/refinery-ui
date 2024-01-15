@@ -5,7 +5,6 @@ import { ProjectOverviewFilters } from "@/src/types/components/projects/projectI
 import { LabelingTask } from "@/src/types/components/projects/projectId/settings/labeling-tasks";
 import { getDisplayGraphValueArray } from "@/src/util/components/projects/projectId/project-overview/project-overview-helper";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
-import Dropdown from "@/submodules/react-components/components/Dropdown";
 import Dropdown2 from "@/submodules/react-components/components/Dropdown2";
 import { Tooltip } from "@nextui-org/react";
 import { useEffect, useState } from "react";
@@ -28,9 +27,9 @@ export default function ProjectOverviewHeader() {
         const labelingTasksFinal = labelingTasks.find((labelingTask) => labelingTask.targetName === targetAttributes[0].name);
         const overviewFiltersNew: ProjectOverviewFilters = {
             graphType: DISPLAY_GRAPHS_VALUE_ARRAY[0],
-            targetAttribute: targetAttributes[0].name,
-            labelingTask: labelingTasksFinal?.name,
-            dataSlice: dataSlices[0].name,
+            targetAttribute: targetAttributes[0],
+            labelingTask: labelingTasksFinal,
+            dataSlice: dataSlices[0],
         }
         dispatch(setOverviewFilters(overviewFiltersNew));
         setLabelingTasksFiltered(labelingTasks.filter((labelingTask) => labelingTask.targetName === targetAttributes[0].name));
@@ -44,12 +43,6 @@ export default function ProjectOverviewHeader() {
                         <Tooltip placement="bottom" trigger="hover" color="invert" content={TOOLTIPS_DICT.PROJECT_OVERVIEW.VISUALIZATION} className="relative z-10 cursor-auto">
                             <span className={`cursor-help mr-2 underline text-black-800 filtersUnderline`}>Visualizations</span>
                         </Tooltip>
-                        {/* <Dropdown buttonName={overviewFilters?.graphType} options={DISPLAY_GRAPHS_VALUE_ARRAY} dropdownWidth="w-44"
-                            selectedOption={(option: string) => {
-                                dispatch(updateOverFilters('graphType', option));
-                                const graphTypeEnum = DISPLAY_GRAPHS_VALUE_ARRAY.find((graph) => graph.name === option)?.value;
-                                dispatch(updateOverFilters('graphTypeEnum', graphTypeEnum));
-                            }} /> */}
                         <Dropdown2 buttonName={overviewFilters?.graphType?.name} options={DISPLAY_GRAPHS_VALUE_ARRAY} dropdownWidth="w-44"
                             selectedOption={(option: any) => {
                                 dispatch(updateOverFilters('graphType', option));
@@ -66,12 +59,12 @@ export default function ProjectOverviewHeader() {
                             <span className={`cursor-help mr-2 underline text-black-800 filtersUnderline`}>Target</span>
                         </Tooltip>
                         {targetAttributes &&
-                            <Dropdown buttonName={labelingTasks?.length == 0 ? '' : overviewFilters?.targetAttribute} options={labelingTasks?.length == 0 ? [] : targetAttributes} dropdownWidth="w-44"
-                                selectedOption={(option: string) => {
+                            <Dropdown2 buttonName={labelingTasks?.length == 0 ? '' : overviewFilters?.targetAttribute?.name} options={labelingTasks?.length == 0 ? [] : targetAttributes} dropdownWidth="w-44"
+                                selectedOption={(option: any) => {
                                     dispatch(updateOverFilters('targetAttribute', option));
-                                    const labelingTasksFinal = labelingTasks.find((labelingTask) => labelingTask.targetName === option);
+                                    const labelingTasksFinal = labelingTasks.find((labelingTask) => labelingTask.targetName === option.name);
                                     dispatch(updateOverFilters('labelingTask', labelingTasksFinal.name));
-                                    setLabelingTasksFiltered(labelingTasks.filter((labelingTask) => labelingTask.targetName === option));
+                                    setLabelingTasksFiltered(labelingTasks.filter((labelingTask) => labelingTask.targetName === option.name));
                                 }} />}
                     </div>
                 </li>
@@ -85,8 +78,8 @@ export default function ProjectOverviewHeader() {
                         <Tooltip placement="bottom" trigger="hover" color="invert" content={TOOLTIPS_DICT.PROJECT_OVERVIEW.LABELING_TASK} className="relative z-10 cursor-auto">
                             <span className={`cursor-help mr-2 underline text-black-800 filtersUnderline`}>Labeling task</span>
                         </Tooltip>
-                        {labelingTasks && <Dropdown buttonName={overviewFilters?.labelingTask} options={labelingTasksFiltered} dropdownWidth="w-44"
-                            selectedOption={(option: string) => dispatch(updateOverFilters('labelingTask', option))} />}
+                        {labelingTasks && <Dropdown2 buttonName={overviewFilters?.labelingTask?.name} options={labelingTasksFiltered} dropdownWidth="w-44"
+                            selectedOption={(option: any) => dispatch(updateOverFilters('labelingTask', option))} />}
                     </div>
                 </li>
 
@@ -99,8 +92,8 @@ export default function ProjectOverviewHeader() {
                         <Tooltip placement="bottom" color="invert" content={TOOLTIPS_DICT.PROJECT_OVERVIEW.STATIC_DATA_SLICE} className="z-10 relative cursor-auto">
                             <span className={`cursor-help mr-2 underline text-black-800 filtersUnderline`}>Data slice</span>
                         </Tooltip>
-                        {dataSlices && <Dropdown buttonName={overviewFilters?.dataSlice} options={dataSlices} dropdownWidth="w-44"
-                            selectedOption={(option: string) => dispatch(updateOverFilters('dataSlice', option))} />}
+                        {dataSlices && <Dropdown2 buttonName={overviewFilters?.dataSlice?.name} options={dataSlices} dropdownWidth="w-44"
+                            selectedOption={(option: any) => dispatch(updateOverFilters('dataSlice', option))} />}
                     </div>
                 </li>
 

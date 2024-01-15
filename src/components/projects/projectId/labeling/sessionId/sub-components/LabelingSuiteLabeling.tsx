@@ -430,6 +430,7 @@ export default function LabelingSuiteLabeling() {
     function clearSelected() {
         const tokenLookupCopy = { ...tokenLookup };
         for (const attributeId in tokenLookupCopy) {
+            if (!tokenLookupCopy[attributeId].token) continue;
             for (const token of tokenLookupCopy[attributeId].token) {
                 if ('selected' in token) delete token.selected;
             }

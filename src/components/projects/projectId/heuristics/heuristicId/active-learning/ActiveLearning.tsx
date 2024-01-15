@@ -9,7 +9,6 @@ import { selectHeuristic, setActiveHeuristics, updateHeuristicsState } from "@/s
 import { getClassLine, postProcessCurrentHeuristic, postProcessLastTaskLogs } from "@/src/util/components/projects/projectId/heuristics/heuristicId/heuristics-details-helper";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
 import { Tooltip } from "@nextui-org/react";
-import Dropdown from "@/submodules/react-components/components/Dropdown";
 import { selectEmbeddings, selectEmbeddingsFiltered, selectLabelingTasksAll, selectVisibleAttributesHeuristics, setAllEmbeddings, setFilteredEmbeddings, setLabelingTasksAll } from "@/src/reduxStore/states/pages/settings";
 import { UPDATE_INFORMATION_SOURCE } from "@/src/services/gql/mutations/heuristics";
 import { postProcessLabelingTasks, postProcessLabelingTasksSchema } from "@/src/util/components/projects/projectId/settings/labeling-tasks-helper";
@@ -228,7 +227,6 @@ export default function ActiveLearning() {
                     <div className="flex items-center flex-wrap mt-3">
                         <div className="text-sm leading-5 font-medium text-gray-700 inline-block mr-2">Editor</div>
                         <Tooltip content={TOOLTIPS_DICT.LABELING_FUNCTION.LABELING_TASK} color="invert" placement="top">
-                            {/* <Dropdown options={labelingTasks.map(a => a.name)} buttonName={currentHeuristic?.labelingTaskName} selectedOption={(option: string) => saveHeuristic(option)} /> */}
                             <Dropdown2 options={labelingTasks} buttonName={currentHeuristic?.labelingTaskName} selectedOption={(option: any) => saveHeuristic(option)} />
 
                         </Tooltip>

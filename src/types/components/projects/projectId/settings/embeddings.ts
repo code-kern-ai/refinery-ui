@@ -65,7 +65,7 @@ export type EmbeddingProps = {
 }
 
 export type EmbeddingCreationEnabledProps = {
-    platform: string;
+    platform: EmbeddingPlatform;
     model: string;
     apiToken: string;
     termsAccepted: boolean;

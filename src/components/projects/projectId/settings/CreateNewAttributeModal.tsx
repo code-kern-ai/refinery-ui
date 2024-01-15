@@ -9,7 +9,6 @@ import { ModalButton, ModalEnum } from "@/src/types/shared/modal"
 import { DATA_TYPES, findFreeAttributeName } from "@/src/util/components/projects/projectId/settings/data-schema-helper";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
 import { toPythonFunctionName } from "@/submodules/javascript-functions/python-functions-parser";
-import Dropdown from "@/submodules/react-components/components/Dropdown";
 import Dropdown2 from "@/submodules/react-components/components/Dropdown2";
 import { useMutation } from "@apollo/client";
 import { Tooltip } from "@nextui-org/react";
@@ -78,7 +77,6 @@ export default function CreateNewAttributeModal() {
             <Tooltip content={TOOLTIPS_DICT.PROJECT_SETTINGS.SELECT_ATTRIBUTE_TYPE} color="invert" placement="right">
                 <span className="cursor-help card-title mb-0 label-text font-normal"><span className="underline filtersUnderline">Attribute type</span></span>
             </Tooltip>
-            {/* <Dropdown buttonName={attributeType ?? 'Select type'} options={DATA_TYPES} selectedOption={(option: string) => setAttributeType(option)} /> */}
             <Dropdown2 buttonName={attributeType ? attributeType.name : 'Select type'} options={DATA_TYPES} selectedOption={(option: any) => setAttributeType(option)} />
         </div>
         {duplicateNameExists && <div className="text-red-700 text-xs mt-2">Attribute name exists</div>}

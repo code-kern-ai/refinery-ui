@@ -4,7 +4,6 @@ import { ConfigManager } from "@/src/services/base/config";
 import { CHANGE_ORGANIZATION, UPDATE_CONFIG } from "@/src/services/gql/mutations/organizations";
 import { Configuration, LocalConfig } from "@/src/types/components/config/config"
 import { snakeCaseToCamelCase } from "@/submodules/javascript-functions/case-types-parser";
-import Dropdown from "@/submodules/react-components/components/Dropdown";
 import Dropdown2 from "@/submodules/react-components/components/Dropdown2";
 import { useMutation } from "@apollo/client";
 import { IconPlus, IconTrash } from "@tabler/icons-react";
@@ -158,14 +157,6 @@ export default function Config() {
             </div>
             {localConfig.spacyDownloads && <div className="flex flex-col gap-y-2">
                 {localConfig.spacyDownloads.map((myConfig, index) => <div key={myConfig} className="flex flex-row flex-nowrap gap-x-2 items-center">
-                    {/* <Dropdown
-                        options={prepareTokenizedValues}
-                        buttonName={prepareTokenizedValues.find((tokenizer: any) => tokenizer.configString == myConfig)?.name}
-                        disabledOptions={prepareTokenizedValues.map((tokenizer: any) => tokenizer.disabled)}
-                        selectedOption={(option) => changeConfigString(option, index)}
-                        dropdownItemsClasses="max-h-80 overflow-y-auto"
-                        buttonClasses="whitespace-nowrap"
-                        disabled={index > 2} /> */}
                     <Dropdown2
                         options={prepareTokenizedValues}
                         buttonName={prepareTokenizedValues.find((tokenizer: any) => tokenizer.configString == myConfig)?.name}

@@ -14,7 +14,6 @@ import { ModalButton, ModalEnum } from "@/src/types/shared/modal";
 import { postProcessingModelsDownload } from "@/src/util/components/models-downloaded/models-downloaded-helper";
 import { DEFAULT_AZURE_TYPE, GRANULARITY_TYPES_ARRAY, checkIfCreateEmbeddingIsDisabled, platformNamesDict } from "@/src/util/components/projects/projectId/settings/embeddings-helper";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
-import Dropdown from "@/submodules/react-components/components/Dropdown";
 import Dropdown2 from "@/submodules/react-components/components/Dropdown2";
 import { useLazyQuery, useMutation } from "@apollo/client";
 import { Tooltip } from "@nextui-org/react";
@@ -66,8 +65,8 @@ export default function AddNewEmbeddingModal(props: EmbeddingProps) {
     useEffect(() => {
         if (useableEmbedableAttributes.length == 0) return;
         setTargetAttribute(useableEmbedableAttributes[0]);
-        setPlatform(embeddingPlatforms[0]?.name);
-        setGranularity(GRANULARITY_TYPES_ARRAY[0].name);
+        setPlatform(embeddingPlatforms[0]);
+        setGranularity(GRANULARITY_TYPES_ARRAY[0]);
     }, [useableEmbedableAttributes]);
 
     useEffect(() => {
@@ -83,7 +82,7 @@ export default function AddNewEmbeddingModal(props: EmbeddingProps) {
 
     function prepareSuggestions() {
         if (!targetAttribute || !platform) return;
-        const platformVal = embeddingPlatforms.find((p: EmbeddingPlatform) => p.name == platform).platform;
+        const platformVal = platform.platform;
         const suggestionList = embeddingHandlesAll.filter((suggestion: any) => suggestion.platform == platformVal);
         const embeddingHandlesCopy = { ...embeddingHandles };
         embeddingHandlesCopy[targetAttribute] = suggestionList;
@@ -101,9 +100,9 @@ export default function AddNewEmbeddingModal(props: EmbeddingProps) {
 
     function changePlatformOrGranularity() {
         prepareSuggestions();
-        const savePlatform = embeddingPlatforms.find((p: EmbeddingPlatform) => p.name == platform).platform;
+        const savePlatform = platform.platform;
         if (savePlatform == PlatformType.COHERE || savePlatform == PlatformType.OPEN_AI || savePlatform == PlatformType.AZURE) {
-            setGranularity(GRANULARITY_TYPES_ARRAY.find((g) => g.value == EmbeddingType.ON_ATTRIBUTE).name);
+            setGranularity(GRANULARITY_TYPES_ARRAY.find((g) => g.value == EmbeddingType.ON_ATTRIBUTE));
             if (savePlatform == PlatformType.AZURE) {
                 const azureUrls = localStorage.getItem('azureUrls');
                 if (azureUrls) {
@@ -129,7 +128,8 @@ export default function AddNewEmbeddingModal(props: EmbeddingProps) {
     }
 
     function checkIfPlatformHasToken() {
-        if (platform == platformNamesDict[PlatformType.COHERE] || platform == platformNamesDict[PlatformType.OPEN_AI] || platform == platformNamesDict[PlatformType.AZURE]) {
+        if (!platform) return;
+        if (platform.name == platformNamesDict[PlatformType.COHERE] || platform.name == platformNamesDict[PlatformType.OPEN_AI] || platform.name == platformNamesDict[PlatformType.AZURE]) {
             setGranularityArray(GRANULARITY_TYPES_ARRAY.filter((g) => g.value != EmbeddingType.ON_TOKEN));
         } else {
             setGranularityArray(GRANULARITY_TYPES_ARRAY);
@@ -164,21 +164,21 @@ export default function AddNewEmbeddingModal(props: EmbeddingProps) {
 
     const addEmbedding = useCallback(() => {
         const config: any = {
-            platform: embeddingPlatforms.find((p: EmbeddingPlatform) => p.name == platform).platform,
+            platform: platform.platform,
             termsText: gdprText.current != null ? gdprText.current.innerText : null,
             termsAccepted: termsAccepted,
-            embeddingType: GRANULARITY_TYPES_ARRAY.find((g) => g.name == granularity).value == EmbeddingType.ON_TOKEN ? EmbeddingType.ON_TOKEN : EmbeddingType.ON_ATTRIBUTE,
+            embeddingType: granularity.value == EmbeddingType.ON_TOKEN ? EmbeddingType.ON_TOKEN : EmbeddingType.ON_ATTRIBUTE,
             filterAttributes: filteredAttributes
         }
 
-        if (platform == platformNamesDict[PlatformType.HUGGING_FACE] || platform == platformNamesDict[PlatformType.PYTHON]) {
+        if (platform.name == platformNamesDict[PlatformType.HUGGING_FACE] || platform.name == platformNamesDict[PlatformType.PYTHON]) {
             config.model = model;
-        } else if (platform == platformNamesDict[PlatformType.OPEN_AI]) {
+        } else if (platform.name == platformNamesDict[PlatformType.OPEN_AI]) {
             config.model = model;
             config.apiToken = apiToken;
-        } else if (platform == platformNamesDict[PlatformType.COHERE]) {
+        } else if (platform.name == platformNamesDict[PlatformType.COHERE]) {
             config.apiToken = apiToken;
-        } else if (platform == platformNamesDict[PlatformType.AZURE]) {
+        } else if (platform.name == platformNamesDict[PlatformType.AZURE]) {
             config.model = engine; //note that is handled internally as model so we use the model field for the request
             config.apiToken = apiToken;
             config.base = url;
@@ -214,24 +214,11 @@ export default function AddNewEmbeddingModal(props: EmbeddingProps) {
                     <Tooltip content={TOOLTIPS_DICT.PROJECT_SETTINGS.EMBEDDINGS.TARGET_ATTRIBUTE} placement="right" color="invert">
                         <span className="card-title mb-0 label-text flex"><span className="cursor-help underline filtersUnderline">Target Attribute</span></span>
                     </Tooltip>
-                    {/* <Dropdown options={useableEmbedableAttributes} buttonName={targetAttribute ?? 'Choose'} selectedOption={(option: string) => {
-                        setTargetAttribute(option);
-                    }} /> */}
-                    <Dropdown2 options={useableEmbedableAttributes} buttonName={targetAttribute ? targetAttribute.name : 'Choose'} selectedOption={(option: any) => {
-                        setTargetAttribute(option);
-                    }} />
+                    <Dropdown2 options={useableEmbedableAttributes} buttonName={targetAttribute ? targetAttribute.name : 'Choose'} selectedOption={(option: any) => setTargetAttribute(option)} />
 
                     <Tooltip content={TOOLTIPS_DICT.PROJECT_SETTINGS.EMBEDDINGS.FILTER_ATTRIBUTES} placement="right" color="invert">
                         <span className="card-title mb-0 label-text flex"><span className="cursor-help underline filtersUnderline">Filter Attributes</span></span>
                     </Tooltip>
-                    {/* <Dropdown options={filteredAttributesArray} buttonName={filteredAttributes.length == 0 ? 'None selected' : filteredAttributes.join(',')} hasCheckboxes={true} hasSelectAll={true}
-                        selectedOption={(option: any) => {
-                            const filteredAttributes = [];
-                            option.forEach((a: any) => {
-                                if (a.checked) filteredAttributes.push(a.name);
-                            });
-                            setFilteredAttributes(filteredAttributes);
-                        }} /> */}
                     <Dropdown2 options={filteredAttributesArray} buttonName={filteredAttributes.length == 0 ? 'None selected' : filteredAttributes.join(',')} hasCheckboxes={true} hasSelectAll={true}
                         selectedOption={(option: any) => {
                             const filteredAttributes = [];
@@ -244,23 +231,17 @@ export default function AddNewEmbeddingModal(props: EmbeddingProps) {
                     <Tooltip content={TOOLTIPS_DICT.PROJECT_SETTINGS.EMBEDDINGS.PLATFORM} placement="right" color="invert">
                         <span className="card-title mb-0 label-text flex"><span className="cursor-help underline filtersUnderline">Platform</span></span>
                     </Tooltip>
-                    <Dropdown options={embeddingPlatforms} buttonName={platform ?? 'Choose'} selectedOption={(option: string) => {
+                    <Dropdown2 options={embeddingPlatforms} buttonName={platform ? platform.name : 'Choose'} selectedOption={(option: any) => {
                         setPlatform(option);
-                        setSelectedPlatform(embeddingPlatforms.find((p: EmbeddingPlatform) => p.name == option));
+                        setSelectedPlatform(option);
                     }} />
-                    {/* <Dropdown2 options={embeddingPlatforms} buttonName={platform ?? 'Choose'} selectedOption={(option: string) => {
-                        setPlatform(option);
-                        setSelectedPlatform(embeddingPlatforms.find((p: EmbeddingPlatform) => p.name == option));
-                    }} /> */}
 
                     <Tooltip content={TOOLTIPS_DICT.PROJECT_SETTINGS.EMBEDDINGS.GRANULARITY} placement="right" color="invert">
                         <span className="card-title mb-0 label-text flex"><span className="cursor-help underline filtersUnderline">Granularity</span></span>
                     </Tooltip>
-                    <Dropdown options={granularityArray} buttonName={granularity ?? 'Choose'} selectedOption={(option: string) => {
-                        setGranularity(option);
-                    }} />
-                    {platform == platformNamesDict[PlatformType.HUGGING_FACE] && <SuggestionsModel options={embeddingHandles[targetAttribute]} selectedOption={(model: string) => setModel(model)} />}
-                    {platform == platformNamesDict[PlatformType.OPEN_AI] && <>
+                    <Dropdown2 options={granularityArray} buttonName={granularity ? granularity.name : 'Choose'} selectedOption={(option: any) => setGranularity(option)} />
+                    {platform && platform.name == platformNamesDict[PlatformType.HUGGING_FACE] && <SuggestionsModel options={embeddingHandles[targetAttribute]} selectedOption={(model: string) => setModel(model)} />}
+                    {platform && platform.name == platformNamesDict[PlatformType.OPEN_AI] && <>
                         <SuggestionsModel options={embeddingHandles[targetAttribute]} selectedOption={(model: string) => setModel(model)} />
                         <Tooltip content={TOOLTIPS_DICT.PROJECT_SETTINGS.EMBEDDINGS.API_TOKEN} placement="right" color="invert">
                             <span className="card-title mb-0 label-text flex"><span className="cursor-help underline filtersUnderline">API token</span></span>
@@ -268,16 +249,16 @@ export default function AddNewEmbeddingModal(props: EmbeddingProps) {
                         <input placeholder="Enter your API token" onChange={(e) => setApiToken(e.target.value)} value={apiToken}
                             className="h-9 w-full text-sm border-gray-300 rounded-md placeholder-italic border text-gray-900 pl-4 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100" />
                     </>}
-                    {platform == platformNamesDict[PlatformType.COHERE] && <>
+                    {platform && platform.name == platformNamesDict[PlatformType.COHERE] && <>
                         <Tooltip content={TOOLTIPS_DICT.PROJECT_SETTINGS.EMBEDDINGS.API_TOKEN} placement="right" color="invert">
                             <span className="card-title mb-0 label-text flex"><span className="cursor-help underline filtersUnderline">API token</span></span>
                         </Tooltip>
                         <input placeholder="Enter your API token" onChange={(e) => setApiToken(e.target.value)} value={apiToken}
                             className="h-9 w-full text-sm border-gray-300 rounded-md placeholder-italic border text-gray-900 pl-4 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100" />
                     </>}
-                    {platform == platformNamesDict[PlatformType.PYTHON] && <SuggestionsModel options={embeddingHandles[targetAttribute]} selectedOption={(option: string) => setModel(option)} />}
+                    {platform && platform.name == platformNamesDict[PlatformType.PYTHON] && <SuggestionsModel options={embeddingHandles[targetAttribute]} selectedOption={(option: string) => setModel(option)} />}
 
-                    {platform == platformNamesDict[PlatformType.AZURE] && <>
+                    {platform && platform.name == platformNamesDict[PlatformType.AZURE] && <>
                         <Tooltip content={TOOLTIPS_DICT.PROJECT_SETTINGS.EMBEDDINGS.API_TOKEN} placement="right" color="invert">
                             <span className="card-title mb-0 label-text flex"><span className="cursor-help underline filtersUnderline">API token</span></span>
                         </Tooltip>
@@ -319,13 +300,13 @@ export default function AddNewEmbeddingModal(props: EmbeddingProps) {
                         </>}
                     </>}
                 </div>
-                {(platform == platformNamesDict[PlatformType.COHERE] || platform == platformNamesDict[PlatformType.OPEN_AI] || platform == platformNamesDict[PlatformType.AZURE]) && <div className="text-center mt-3">
+                {platform && (platform.name == platformNamesDict[PlatformType.COHERE] || platform.name == platformNamesDict[PlatformType.OPEN_AI] || platform.name == platformNamesDict[PlatformType.AZURE]) && <div className="text-center mt-3">
                     <div className="border border-gray-300 text-xs text-gray-500 p-2.5 rounded-lg text-justify">
                         <label ref={gdprText} className="text-gray-700">
                             {selectedPlatform.splitTerms[0]}
-                            {platform == platformNamesDict[PlatformType.COHERE] && <a href={selectedPlatform.link} target="_blank" className="underline">cohere terms of service.</a>}
-                            {platform == platformNamesDict[PlatformType.OPEN_AI] && <a href={selectedPlatform.link} target="_blank" className="underline">openai terms of service.</a>}
-                            {platform == platformNamesDict[PlatformType.AZURE] && <a href={selectedPlatform.link} target="_blank" className="underline">azure terms of service.</a>}
+                            {platform.name == platformNamesDict[PlatformType.COHERE] && <a href={selectedPlatform.link} target="_blank" className="underline">cohere terms of service.</a>}
+                            {platform.name == platformNamesDict[PlatformType.OPEN_AI] && <a href={selectedPlatform.link} target="_blank" className="underline">openai terms of service.</a>}
+                            {platform.name == platformNamesDict[PlatformType.AZURE] && <a href={selectedPlatform.link} target="_blank" className="underline">azure terms of service.</a>}
                             <div>{selectedPlatform.splitTerms[1]}</div>
                         </label>
                     </div>
@@ -366,8 +347,8 @@ function SuggestionsModel(props: SuggestionsProps) {
     return <><Tooltip content={TOOLTIPS_DICT.PROJECT_SETTINGS.EMBEDDINGS.MODEL} placement="right" color="invert">
         <span className="card-title mb-0 label-text flex"><span className="cursor-help underline filtersUnderline">Model</span></span>
     </Tooltip>
-        <Dropdown options={props.options.map((option: any) => option.configString)} hasSearchBar={true} differentTextColor="green" useDifferentTextColor={colorDownloadedModels}
-            selectedOption={(option: string) => props.selectedOption(option)} optionsHaveHoverBox={true} hoverBoxList={hoverBoxList} />
+        <Dropdown2 options={props.options} hasSearchBar={true} differentTextColor="green" useDifferentTextColor={colorDownloadedModels} valuePropertyPath="configString"
+            selectedOption={(option: any) => props.selectedOption(option.configString)} optionsHaveHoverBox={true} hoverBoxList={hoverBoxList} />
     </>
 }
 
@@ -376,6 +357,6 @@ function SuggestionsAzure(props: SuggestionsProps) {
     return <><Tooltip content={props.tooltip} placement="right" color="invert">
         <span className="card-title mb-0 label-text flex"><span className="cursor-help underline filtersUnderline">{props.name}</span></span>
     </Tooltip>
-        <Dropdown options={props.options} hasSearchBar={true} selectedOption={(option: string) => props.selectedOption(option)} />
+        <Dropdown2 options={props.options} hasSearchBar={true} selectedOption={(option: string) => props.selectedOption(option)} />
     </>
 }

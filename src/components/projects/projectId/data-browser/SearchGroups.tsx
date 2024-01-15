@@ -6,7 +6,6 @@ import { IconArrowDown, IconArrowsRandom, IconFilterOff, IconInfoCircle, IconPlu
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import style from '@/src/styles/components/projects/projectId/data-browser.module.css';
-import Dropdown from "@/submodules/react-components/components/Dropdown";
 import { SearchOperator } from "@/src/types/components/projects/projectId/data-browser/search-operators";
 import { checkDecimalPatterns, getAttributeType, getSearchOperatorTooltip } from "@/src/util/components/projects/projectId/data-browser/search-operators-helper";
 import { DataTypeEnum } from "@/src/types/shared/general";
@@ -533,15 +532,11 @@ export default function SearchGroups() {
                                 <div className="flex-grow mr-2.5 flex flex-col  mt-2 ">
                                     <div className="flex-grow flex flex-row flex-wrap gap-1">
                                         <div style={{ width: groupItem.operator != '' ? '49%' : '100%' }}>
-                                            {/* <Dropdown options={attributesSortOrder} buttonName={groupItem.name} backgroundColors={backgroundColors}
-                                                selectedOption={(option: string) => selectValueDropdown(option, index, 'name', group.key)} fontClass="font-dmMono" buttonClasses="whitespace-nowrap" /> */}
                                             <Dropdown2 options={attributesSortOrder} buttonName={groupItem.name} backgroundColors={backgroundColors}
                                                 selectedOption={(option: any) => selectValueDropdown(option.name, index, 'name', group.key)} fontClass="font-dmMono" buttonClasses="whitespace-nowrap" />
                                         </div>
                                         <div style={{ width: '49%' }}>
                                             {groupItem.operator != '' &&
-                                                // <Dropdown options={operatorsDropdown} buttonName={groupItem.operator} tooltipsArray={tooltipsArray} tooltipArrayPlacement="right"
-                                                //     selectedOption={(option: string) => selectValueDropdown(option, index, 'operator', group.key)} fontClass="font-dmMono" />
                                                 <Dropdown2 options={operatorsDropdown} buttonName={groupItem.operator} tooltipsArray={tooltipsArray} tooltipArrayPlacement="right"
                                                     selectedOption={(option: any) => selectValueDropdown(option.value, index, 'operator', group.key)} fontClass="font-dmMono" />
                                             }
@@ -549,8 +544,6 @@ export default function SearchGroups() {
                                     </div>
                                     {uniqueValuesDict[groupItem['name']] && groupItem['operator'] != '' && groupItem['operator'] != 'BETWEEN' && groupItem['operator'] != 'IN' && groupItem['operator'] != 'IN WC' ? (
                                         <div className="my-2">
-                                            {/* <Dropdown options={uniqueValuesDict[groupItem['name']]} buttonName={groupItem['searchValue'] ? groupItem['searchValue'] : 'Select value'}
-                                                selectedOption={(option) => selectValueDropdown(option, index, 'searchValue', group.key)} fontClass="font-dmMono" /> */}
                                             <Dropdown2 options={uniqueValuesDict[groupItem['name']]} buttonName={groupItem['searchValue'] ? groupItem['searchValue'] : 'Select value'}
                                                 selectedOption={(option: any) => selectValueDropdown(option, index, 'searchValue', group.key)} fontClass="font-dmMono" />
                                         </div>
@@ -608,12 +601,6 @@ export default function SearchGroups() {
                         {fullSearchStore[group.key] && <div className="flex-grow flex flex-col">
                             <div>Manually labeled</div>
                             {fullSearchStore[group.key].groupElements['manualLabels'].length == 0 ? (<ButtonLabelsDisabled />) : (
-                                // <Dropdown options={fullSearchStore[group.key].groupElements['manualLabels']} buttonName={manualLabels.length == 0 ? 'None selected' : manualLabels.join(',')} hasCheckboxesThreeStates={true} keepDrownOpen={true}
-                                //     selectedOption={(option: any) => {
-                                //         const labels = [...manualLabels, option.name]
-                                //         setManualLabels(labels);
-                                //         updateLabelsFullSearch(option, group.key, 'manualLabels');
-                                //     }} />
                                 <Dropdown2 options={fullSearchStore[group.key].groupElements['manualLabels']} buttonName={manualLabels.length == 0 ? 'None selected' : manualLabels.join(',')} hasCheckboxesThreeStates={true} keepDrownOpen={true}
                                     selectedOption={(option: any) => {
                                         const labels = [...manualLabels, option.name]
@@ -624,12 +611,6 @@ export default function SearchGroups() {
 
                             <div className="mt-2">Weakly supervised</div>
                             {fullSearchStore[group.key].groupElements['weakSupervisionLabels'].length == 0 ? (<ButtonLabelsDisabled />) : (
-                                // <Dropdown options={fullSearchStore[group.key].groupElements['weakSupervisionLabels']} buttonName={weakSupervisionLabels.length == 0 ? 'None selected' : weakSupervisionLabels.join(',')} hasCheckboxesThreeStates={true}
-                                //     selectedOption={(option: any) => {
-                                //         const labels = [...weakSupervisionLabels, option.name]
-                                //         setWeakSupervisionLabels(labels);
-                                //         updateLabelsFullSearch(option, group.key, 'weakSupervisionLabels');
-                                //     }} />
                                 <Dropdown2 options={fullSearchStore[group.key].groupElements['weakSupervisionLabels']} buttonName={weakSupervisionLabels.length == 0 ? 'None selected' : weakSupervisionLabels.join(',')} hasCheckboxesThreeStates={true}
                                     selectedOption={(option: any) => {
                                         const labels = [...weakSupervisionLabels, option.name]
@@ -658,12 +639,6 @@ export default function SearchGroups() {
 
                             <div className="mt-2">Model callback</div>
                             {fullSearchStore[group.key].groupElements['modelCallbackLabels'].length == 0 ? (<ButtonLabelsDisabled />) : (
-                                // <Dropdown options={fullSearchStore[group.key].groupElements['modelCallbackLabels']} buttonName={modelCallBacksLabels.length == 0 ? 'None selected' : modelCallBacksLabels.join(',')} hasCheckboxesThreeStates={true}
-                                //     selectedOption={(option: any) => {
-                                //         const labels = [...modelCallBacksLabels, option.name]
-                                //         setModelCallBacksLabels(labels);
-                                //         updateLabelsFullSearch(option, group.key, 'modelCallbackLabels');
-                                //     }} />
                                 <Dropdown2 options={fullSearchStore[group.key].groupElements['modelCallbackLabels']} buttonName={modelCallBacksLabels.length == 0 ? 'None selected' : modelCallBacksLabels.join(',')} hasCheckboxesThreeStates={true}
                                     selectedOption={(option: any) => {
                                         const labels = [...modelCallBacksLabels, option.name]

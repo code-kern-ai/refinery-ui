@@ -6,7 +6,6 @@ import { LabelingTask } from "@/src/types/components/projects/projectId/settings
 import { ACTIONS_DROPDOWN_OPTIONS, postProcessModelCallbacks } from "@/src/util/components/projects/projectId/model-callbacks-helper";
 import { postProcessLabelingTasks, postProcessLabelingTasksSchema } from "@/src/util/components/projects/projectId/settings/labeling-tasks-helper";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
-import Dropdown from "@/submodules/react-components/components/Dropdown";
 import { useLazyQuery } from "@apollo/client";
 import { Tooltip } from "@nextui-org/react";
 import { IconPlus } from "@tabler/icons-react";
@@ -149,9 +148,6 @@ export default function ModelCallbacks() {
                 </div>
                 <div className="grid grid-cols-1 gap-4 xs:flex xs:gap-0 flex-row items-center mt-2 xl:mt-0">
                     {modelCallbacks && modelCallbacks.length > 0 ? (
-                        // <Dropdown options={ACTIONS_DROPDOWN_OPTIONS} buttonName="Actions" disabledOptions={[false, false, modelCallbacks.every((checked) => !checked)]}
-                        //     iconsArray={['IconSquareCheck', 'IconSquare', 'IconTrash']}
-                        //     selectedOption={(option: string) => executeOption(option)} dropdownClasses="mr-3" buttonClasses={`${style.actionsHeight} text-xs`} />
                         <Dropdown2 options={ACTIONS_DROPDOWN_OPTIONS} buttonName="Actions" disabledOptions={[false, false, modelCallbacks.every((checked) => !checked)]}
                             iconsArray={['IconSquareCheck', 'IconSquare', 'IconTrash']}
                             selectedOption={(option: string) => executeOption(option)} dropdownClasses="mr-3" buttonClasses={`${style.actionsHeight} text-xs`} />

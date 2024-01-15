@@ -10,7 +10,6 @@ import { CurrentPage, DataTypeEnum } from "@/src/types/shared/general";
 import { postProcessCurrentAttribute } from "@/src/util/components/projects/projectId/settings/attribute-calculation-helper";
 import { ATTRIBUTES_VISIBILITY_STATES, DATA_TYPES, getTooltipVisibilityState } from "@/src/util/components/projects/projectId/settings/data-schema-helper";
 import { copyToClipboard } from "@/submodules/javascript-functions/general";
-import Dropdown from "@/submodules/react-components/components/Dropdown";
 import { useLazyQuery, useMutation } from "@apollo/client";
 import { Editor } from "@monaco-editor/react";
 import { Tooltip } from "@nextui-org/react";
@@ -279,16 +278,12 @@ export default function AttributeCalculation() {
                 {duplicateNameExists && <div className="text-red-700 text-xs mt-2">Attribute name exists</div>}
                 <div className="grid grid-cols-2 gap-2 items-center mt-8" style={{ gridTemplateColumns: 'max-content auto' }}>
                     <div className="text-sm leading-5 font-medium text-gray-700">Visibility</div>
-                    {/* <Dropdown buttonName={currentAttribute.visibilityName} options={ATTRIBUTES_VISIBILITY_STATES} dropdownWidth="w-52" tooltipArrayPlacement="right" tooltipsArray={tooltipsArray}
-                        selectedOption={(option: string) => updateVisibility(option)} disabled={currentAttribute.state == AttributeState.USABLE} /> */}
                     <Dropdown2 buttonName={currentAttribute.visibilityName} options={ATTRIBUTES_VISIBILITY_STATES} dropdownWidth="w-52" tooltipArrayPlacement="right" tooltipsArray={tooltipsArray}
                         selectedOption={(option: any) => updateVisibility(option)} disabled={currentAttribute.state == AttributeState.USABLE} />
 
                     <div className="text-sm leading-5 font-medium text-gray-700">Data type</div>
                     <div className="flex flex-row items-center">
                         <Tooltip color="invert" placement="right" content={currentAttribute.state == AttributeState.USABLE || currentAttribute.state == AttributeState.RUNNING ? TOOLTIPS_DICT.ATTRIBUTE_CALCULATION.CANNOT_EDIT_DATATYPE : TOOLTIPS_DICT.ATTRIBUTE_CALCULATION.EDIT_DATATYPE}>
-                            {/* <Dropdown buttonName={currentAttribute.dataTypeName} options={DATA_TYPES} dropdownWidth="w-52"
-                                selectedOption={(option: string) => updateDataType(option)} disabled={currentAttribute.state == AttributeState.USABLE} /> */}
                             <Dropdown2 buttonName={currentAttribute.dataTypeName} options={DATA_TYPES} dropdownWidth="w-52"
                                 selectedOption={(option: any) => updateDataType(option)} disabled={currentAttribute.state == AttributeState.USABLE} />
                         </Tooltip>

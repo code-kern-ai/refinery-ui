@@ -5,12 +5,12 @@ import { UserType } from "@/src/types/components/projects/projectId/labeling/lab
 import { UserRole } from "@/src/types/shared/sidebar";
 import { SessionManager } from "@/src/util/classes/labeling/session-manager";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
-import Dropdown from "@/submodules/react-components/components/Dropdown";
 import { Tooltip } from "@nextui-org/react";
 import { IconArrowLeft, IconArrowRight, IconCircle, IconStar } from "@tabler/icons-react";
 import { useRouter } from "next/router";
 import { useDispatch, useSelector } from "react-redux";
 import style from '@/src/styles/components/projects/projectId/labeling.module.css';
+import Dropdown2 from "@/submodules/react-components/components/Dropdown2";
 
 export default function NavigationBarTop() {
     const router = useRouter();
@@ -83,8 +83,8 @@ export default function NavigationBarTop() {
 
                     </>) : (<div className="flex justify-center items-center overflow-visible">
                         <span className="mr-2"> Available Tasks:</span>
-                        <Dropdown options={availableLinks?.length > 0 ? availableLinks : ['No links available']} disabled={availableLinks?.length == 0}
-                            buttonName={selectedLink ? selectedLink.name : 'Select slice'} selectedOption={(option: string) => dispatch(setSelectedLink(option))} />
+                        <Dropdown2 options={availableLinks?.length > 0 ? availableLinks : ['No links available']} disabled={availableLinks?.length == 0}
+                            buttonName={selectedLink ? selectedLink.name : 'Select slice'} selectedOption={(option: any) => dispatch(setSelectedLink(option.name))} />
                     </div>)}
                 </div>
                 <div className="flex flex-row flex-nowrap items-center">

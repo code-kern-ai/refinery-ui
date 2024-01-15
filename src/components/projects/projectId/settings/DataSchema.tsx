@@ -8,7 +8,6 @@ import { Attribute, DataSchemaProps } from "@/src/types/components/projects/proj
 import { CurrentPage } from "@/src/types/shared/general";
 import { ATTRIBUTES_VISIBILITY_STATES, getTooltipVisibilityState } from "@/src/util/components/projects/projectId/settings/data-schema-helper";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
-import Dropdown from "@/submodules/react-components/components/Dropdown";
 import Dropdown2 from "@/submodules/react-components/components/Dropdown2";
 import { useMutation } from "@apollo/client";
 import { Tooltip } from "@nextui-org/react";
@@ -128,8 +127,6 @@ export default function DataSchema(props: DataSchemaProps) {
                                             <Statuses status={attribute.state} page="attributes" initialCaption="Registered" />
                                         </td>
                                         <td className="text-center px-3 py-2 text-sm text-gray-500">
-                                            {/* <Dropdown buttonName={ATTRIBUTES_VISIBILITY_STATES[attribute.visibilityIndex].name} options={ATTRIBUTES_VISIBILITY_STATES} dropdownWidth="w-52"
-                                                selectedOption={(option: string) => updateVisibility(option, attribute)} tooltipsArray={tooltipsArray} /> */}
                                             <Dropdown2 buttonName={ATTRIBUTES_VISIBILITY_STATES[attribute.visibilityIndex].name} options={ATTRIBUTES_VISIBILITY_STATES} dropdownWidth="w-52"
                                                 selectedOption={(option: any) => updateVisibility(option, attribute)} tooltipsArray={tooltipsArray} />
                                         </td>

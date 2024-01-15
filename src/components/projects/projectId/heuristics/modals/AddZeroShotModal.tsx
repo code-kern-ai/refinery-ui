@@ -10,7 +10,7 @@ import { ModalButton, ModalEnum } from "@/src/types/shared/modal";
 import { getRouterLinkHeuristic } from "@/src/util/components/projects/projectId/heuristics/heuristics-helper";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
 import { InformationSourceType } from "@/submodules/javascript-functions/enums/enums";
-import Dropdown from "@/submodules/react-components/components/Dropdown";
+import Dropdown2 from "@/submodules/react-components/components/Dropdown2";
 import { useMutation } from "@apollo/client";
 import { Tooltip } from "@nextui-org/react";
 import { useRouter } from "next/router";
@@ -31,8 +31,8 @@ export default function AddZeroShotModal() {
     const project = useSelector(selectProject);
     const models = useSelector(selectCachedValue(CacheEnum.ZERO_SHOT_RECOMMENDATIONS));
 
-    const [labelingTask, setLabelingTask] = useState('');
-    const [attribute, setAttribute] = useState<string>(null);
+    const [labelingTask, setLabelingTask] = useState(null);
+    const [attribute, setAttribute] = useState(null);
     const [model, setModel] = useState<string>('');
     const [labelingTasksClassification, setLabelingTasksClassification] = useState([]);
     const [showZSAttribute, setShowZSAttribute] = useState<boolean>(false);
@@ -40,7 +40,7 @@ export default function AddZeroShotModal() {
 
     useEffect(() => {
         if (!attributes) return;
-        setAttribute(attributes[0]?.name);
+        setAttribute(attributes[0]);
     }, [attributes]);
 
     useEffect(() => {
@@ -64,7 +64,7 @@ export default function AddZeroShotModal() {
         const parseTask = labelingTask.split(' - ');
         const taskName = parseTask.length > 0 ? parseTask[parseTask.length - 1] : labelingTask;
         const labelingTaskId = labelingTasks.find(lt => lt.name == taskName)?.id;
-        const attributeId = attributes.find(a => a.name == attribute) ? attributes.find(a => a.name == attribute).id : '';
+        const attributeId = attribute.id ?? '';
         createZeroShotMut({ variables: { projectId: projectId, targetConfig: model, labelingTaskId: labelingTaskId, attributeId: attributeId } }).then((res) => {
             let id = res['data']?.['createZeroShotInformationSource']['id'];
             if (id) {
@@ -107,13 +107,15 @@ export default function AddZeroShotModal() {
                     <span className="cursor-help card-title mb-0 label-text text-left"><span className="underline filtersUnderline">Target task</span></span>
                 </div>
             </Tooltip>
-            <Dropdown options={labelingTasksClassification} buttonName={labelingTask} disabled={labelingTasksClassification.length == 0} selectedOption={(option: string) => {
-                let optionCopy = option;
+            <Dropdown2 options={labelingTasksClassification} buttonName={labelingTask} disabled={labelingTasksClassification.length == 0} selectedOption={(option: any) => {
+                let optionCopy = option.name;
                 if (option.indexOf('Full Record - ') == 0) {
                     optionCopy = option.substring('Full Record - '.length);
                 }
                 const findTask = labelingTasks.find(t => t.name == optionCopy);
                 if (findTask && findTask.taskTarget == 'ON_ATTRIBUTE') {
+                    setShowZSAttribute(false);
+                } else {
                     setShowZSAttribute(true);
                 }
                 setLabelingTask(option);
@@ -123,16 +125,16 @@ export default function AddZeroShotModal() {
                     <span className="cursor-help card-title mb-0 label-text text-left"><span className="underline filtersUnderline">Attribute</span></span>
                 </div>
             </Tooltip>
-                <Dropdown options={attributes} buttonName={attribute} selectedOption={(option: string) => setAttribute(option)} disabled={attributes.length == 0} />
+                <Dropdown2 options={attributes} buttonName={attribute ? attribute.name : 'Select attribute'} selectedOption={(option: any) => setAttribute(option)} disabled={attributes.length == 0} />
             </>}
             <Tooltip content={TOOLTIPS_DICT.HEURISTICS.CHOOSE_MODEL} color="invert" placement="right">
                 <div className="justify-self-start">
                     <span className="cursor-help card-title mb-0 label-text text-left"><span className="underline filtersUnderline">Model</span></span>
                 </div>
             </Tooltip>
-            <Dropdown options={models && models.map(model => model.configString)} hasSearchBar={true} optionsHaveLink={true} optionsHaveHoverBox={true}
+            <Dropdown2 options={models} hasSearchBar={true} optionsHaveLink={true} optionsHaveHoverBox={true} valuePropertyPath="configString"
                 linkList={models && models.map(model => model.link)}
-                selectedOption={(option: string) => setModel(option)}
+                selectedOption={(option: any) => setModel(option.configString)}
                 hoverBoxList={hoverBoxList} />
         </div>
     </Modal>)

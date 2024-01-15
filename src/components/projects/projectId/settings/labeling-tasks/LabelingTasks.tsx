@@ -10,7 +10,6 @@ import { ModalEnum } from "@/src/types/shared/modal";
 import { LabelHelper } from "@/src/util/classes/label-helper";
 import { isTaskNameUnique, labelingTaskFromString, labelingTaskToString, postProcessLabelingTasks, postProcessLabelingTasksSchema } from "@/src/util/components/projects/projectId/settings/labeling-tasks-helper";
 import { jsonCopy } from "@/submodules/javascript-functions/general";
-import Dropdown from "@/submodules/react-components/components/Dropdown";
 import { useLazyQuery, useMutation } from "@apollo/client";
 import { Tooltip } from "@nextui-org/react";
 import { IconColorPicker, IconPlus, IconTrash } from "@tabler/icons-react";
@@ -25,6 +24,7 @@ import DeleteLabelingTaskModal from "./DeleteLabelingTaskModal";
 import DeleteLabelModal from "./DeleteLabelModal";
 import AddLabelModal from "./AddLabelModal";
 import ChangeColorModal from "./ChangeColorModal";
+import Dropdown2 from "@/submodules/react-components/components/Dropdown2";
 
 export default function LabelingTasks() {
     const router = useRouter();
@@ -155,9 +155,9 @@ export default function LabelingTasks() {
                                                 className="h-8 w-full text-sm border-gray-300 rounded-md placeholder-italic border text-gray-900 pl-4 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100" />}
                                     </td>
                                     <td className="whitespace-nowrap text-center px-3 py-2 text-sm text-gray-500">
-                                        <Dropdown options={labelingTasksDropdownArray} buttonName={labelingTaskToString(task.taskType)}
+                                        <Dropdown2 options={labelingTasksDropdownArray} buttonName={labelingTaskToString(task.taskType)}
                                             disabledOptions={[false, task.targetName === 'Full Record', false]} dropdownWidth="w-60" dropdownItemsClasses="w-60"
-                                            selectedOption={(option: string) => updateLabelingTaskType(task, index, labelingTaskFromString(option))} />
+                                            selectedOption={(option: any) => updateLabelingTaskType(task, index, labelingTaskFromString(option.name))} />
                                     </td>
                                     <td className="flex flex-wrap justify-center items-center px-3 py-2 text-sm text-gray-500">
                                         {task.labels.map((label: LabelType) => (

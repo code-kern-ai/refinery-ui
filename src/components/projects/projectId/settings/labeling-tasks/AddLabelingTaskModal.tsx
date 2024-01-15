@@ -7,7 +7,7 @@ import { LabelingTaskTaskType, LabelingTasksProps } from "@/src/types/components
 import { ModalButton, ModalEnum } from "@/src/types/shared/modal";
 import { isTaskNameUnique } from "@/src/util/components/projects/projectId/settings/labeling-tasks-helper";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
-import Dropdown from "@/submodules/react-components/components/Dropdown";
+import Dropdown2 from "@/submodules/react-components/components/Dropdown2";
 import { useMutation } from "@apollo/client";
 import { Tooltip } from "@nextui-org/react";
 import { useCallback, useEffect, useState } from "react";
@@ -22,15 +22,19 @@ export default function AddLabelingTaskModal(props: LabelingTasksProps) {
     const labelingTasksSchema = useSelector(selectLabelingTasksAll);
 
     const [acceptButton, setAcceptButton] = useState<ModalButton>(ACCEPT_BUTTON);
-    const [targetAttribute, setTargetAttribute] = useState('Full Record');
+    const [targetAttribute, setTargetAttribute] = useState(null);
     const [taskName, setTaskName] = useState('');
 
     const [createLabelingTaskMut] = useMutation(CREATE_LABELING_TASK);
 
+    useEffect(() => {
+        setTargetAttribute({ name: 'Full Record', id: null });
+    }, [modalAddLabelingTask]);
+
     const addLabelingTask = useCallback(() => {
         let taskTarget = null;
-        if (targetAttribute !== 'Full Record') {
-            taskTarget = usableAttributes.find((attribute) => attribute.name == targetAttribute).id;;
+        if (targetAttribute.name !== 'Full Record') {
+            taskTarget = usableAttributes.find((attribute) => attribute.name == targetAttribute.name).id;
         }
         createLabelingTaskMut({
             variables: {
@@ -44,7 +48,7 @@ export default function AddLabelingTaskModal(props: LabelingTasksProps) {
     }, [addLabelingTask]);
 
     useEffect(() => {
-        setAcceptButton({ ...ACCEPT_BUTTON, emitFunction: addLabelingTask, disabled: (taskName == '' || targetAttribute == '') || !isTaskNameUnique(labelingTasksSchema, taskName) });
+        setAcceptButton({ ...ACCEPT_BUTTON, emitFunction: addLabelingTask, disabled: (taskName == '' || targetAttribute.name == '') || !isTaskNameUnique(labelingTasksSchema, taskName) });
     }, [modalAddLabelingTask, targetAttribute, taskName]);
 
     return (<Modal modalName={ModalEnum.ADD_LABELING_TASK} acceptButton={acceptButton}>
@@ -56,7 +60,7 @@ export default function AddLabelingTaskModal(props: LabelingTasksProps) {
             <Tooltip content={TOOLTIPS_DICT.PROJECT_SETTINGS.LABELING_TASK.TARGET_ATTRIBUTE} placement="right" color="invert">
                 <span className="card-title mb-0 label-text flex"><span className="cursor-help underline filtersUnderline">Target Attribute</span></span>
             </Tooltip>
-            <Dropdown options={usableAttributes} buttonName={targetAttribute ?? 'Choose'} selectedOption={(option: string) => setTargetAttribute(option)} />
+            <Dropdown2 options={usableAttributes} buttonName={targetAttribute ? targetAttribute.name : 'Choose'} selectedOption={(option: any) => setTargetAttribute(option)} />
             <Tooltip content={TOOLTIPS_DICT.PROJECT_SETTINGS.LABELING_TASK.NAME_LABELING_TASK} placement="right" color="invert">
                 <span className="card-title mb-0 label-text flex"><span className="cursor-help underline filtersUnderline">Name</span></span>
             </Tooltip>

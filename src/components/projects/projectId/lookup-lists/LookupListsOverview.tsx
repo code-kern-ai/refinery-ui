@@ -3,7 +3,6 @@ import React, { useCallback, useEffect, useState } from "react"
 import { useDispatch, useSelector } from "react-redux";
 import { extendAllLookupLists, selectAllLookupLists, selectCheckedLookupLists, setAllLookupLists, setCheckedLookupLists } from "@/src/reduxStore/states/pages/lookup-lists";
 import { Tooltip } from "@nextui-org/react";
-import Dropdown from "@/submodules/react-components/components/Dropdown";
 import { useLazyQuery, useMutation } from "@apollo/client";
 import { LOOKUP_LISTS_BY_PROJECT_ID } from "@/src/services/gql/queries/lookup-lists";
 import { CREATE_LOOKUP_LIST } from "@/src/services/gql/mutations/lookup-lists";
@@ -146,9 +145,6 @@ export default function LookupListsOverview() {
                         </div>
                         <div className="grid grid-cols-1 gap-4 xs:flex xs:gap-0 flex-row items-center">
                             {lookupLists && lookupLists.length > 0 ? (
-                                // <Dropdown options={ACTIONS_DROPDOWN_OPTIONS} buttonName="Actions" disabledOptions={[false, false, checkedLookupLists.every((checked) => !checked)]}
-                                //     selectedOption={(option: string) => executeOption(option)} dropdownClasses="mr-3" buttonClasses={`${style.actionsHeight} text-xs`} dropdownItemsWidth='w-40' dropdownWidth='w-32'
-                                //     iconsArray={['IconSquareCheck', 'IconSquare', 'IconTrash']} />
                                 <Dropdown2 options={ACTIONS_DROPDOWN_OPTIONS} buttonName="Actions" disabledOptions={[false, false, checkedLookupLists.every((checked) => !checked)]}
                                     selectedOption={(option: any) => executeOption(option)} dropdownClasses="mr-3" buttonClasses={`${style.actionsHeight} text-xs`} dropdownItemsWidth='w-40' dropdownWidth='w-32'
                                     iconsArray={['IconSquareCheck', 'IconSquare', 'IconTrash']} />

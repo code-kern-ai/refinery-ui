@@ -17,7 +17,6 @@ import { Status } from '@/src/types/shared/statuses';
 import { ACTIONS_DROPDOWN_OPTIONS, NEW_HEURISTICS, checkSelectedHeuristics, postProcessCurrentWeakSupervisionRun } from '@/src/util/components/projects/projectId/heuristics/heuristics-helper';
 import { TOOLTIPS_DICT } from '@/src/util/tooltip-constants';
 import { InformationSourceType } from '@/submodules/javascript-functions/enums/enums';
-import Dropdown from '@/submodules/react-components/components/Dropdown';
 import { useLazyQuery, useMutation } from '@apollo/client';
 import { Tooltip } from '@nextui-org/react';
 import { IconPlus, IconWaveSine } from '@tabler/icons-react';
@@ -193,10 +192,6 @@ export default function HeuristicsHeader(props: HeuristicsHeaderProps) {
             </div>
             <div className="grid grid-cols-1 gap-4 xs:flex xs:gap-0 flex-row items-center mt-2 xl:mt-0">
                 {labelingTasks && labelingTasks.length > 0 ? (<Tooltip content={TOOLTIPS_DICT.HEURISTICS.ENABLED_NEW_HEURISTIC} color="invert" placement="right">
-                    {/* <Dropdown options={NEW_HEURISTICS} buttonName="New heuristic" tooltipsArray={[null, null, null, isManaged ? null : 'Only available for managed projects']}
-                        disabledOptions={[false, false, !(labelingTasks && labelingTasks.length > 0), !isManaged]}
-                        selectedOption={(option: string) => executeOption(option)} buttonClasses={`${style.actionsHeight} text-xs whitespace-nowrap`} dropdownClasses="mr-3" dropdownItemsWidth='w-40' dropdownWidth='w-32'
-                        iconsArray={['IconCode', 'IconBolt', 'IconSparkles', 'IconUsers']} /> */}
                     <Dropdown2 options={NEW_HEURISTICS} buttonName="New heuristic" tooltipsArray={[null, null, null, isManaged ? null : 'Only available for managed projects']}
                         disabledOptions={[false, false, !(labelingTasks && labelingTasks.length > 0), !isManaged]}
                         selectedOption={(option: string) => executeOption(option)} buttonClasses={`${style.actionsHeight} text-xs whitespace-nowrap`} dropdownClasses="mr-3" dropdownItemsWidth='w-40' dropdownWidth='w-32'
@@ -216,9 +211,6 @@ export default function HeuristicsHeader(props: HeuristicsHeaderProps) {
                 </Tooltip>)}
 
                 {heuristics && heuristics.length > 0 ? (
-                    // <Dropdown options={ACTIONS_DROPDOWN_OPTIONS} buttonName="Actions" disabledOptions={[false, false, heuristics.every((checked) => !checked), heuristics.every((checked) => !checked)]}
-                    //     selectedOption={(option: string) => executeOption(option)} dropdownClasses="mr-3" buttonClasses={`${style.actionsHeight} text-xs`} dropdownItemsWidth='w-40' dropdownWidth='w-32'
-                    //     iconsArray={['IconSquareCheck', 'IconSquare', 'IconPlayerPlayFilled', 'IconTrash']} />
                     <Dropdown2 options={ACTIONS_DROPDOWN_OPTIONS} buttonName="Actions" disabledOptions={[false, false, heuristics.every((checked) => !checked), heuristics.every((checked) => !checked)]}
                         selectedOption={(option: string) => executeOption(option)} dropdownClasses="mr-3" buttonClasses={`${style.actionsHeight} text-xs`} dropdownItemsWidth='w-40' dropdownWidth='w-32'
                         iconsArray={['IconSquareCheck', 'IconSquare', 'IconPlayerPlayFilled', 'IconTrash']} />

@@ -16,7 +16,6 @@ import { UPDATE_INFORMATION_SOURCE } from "@/src/services/gql/mutations/heuristi
 import { LabelingTaskTarget } from "@/src/types/components/projects/projectId/settings/labeling-tasks";
 import { Tooltip } from "@nextui-org/react";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
-import Dropdown from "@/submodules/react-components/components/Dropdown";
 import { jsonCopy } from "@/submodules/javascript-functions/general";
 import { ZeroShotSettings } from "@/src/types/components/projects/projectId/heuristics/heuristicId/zero-shot";
 import LoadingIcon from "@/src/components/shared/loading/LoadingIcon";
@@ -188,7 +187,6 @@ export default function ZeroShot() {
                 <div className="relative flex-shrink-0 min-h-16 flex justify-between pb-2">
                     <div className="flex items-center flex-wrap mt-3">
                         <Tooltip content={TOOLTIPS_DICT.ZERO_SHOT.LABELING_TASK} color="invert" placement="top">
-                            {/* <Dropdown options={labelingTasks.map(a => a.name)} buttonName={currentHeuristic?.labelingTaskName} selectedOption={(option: string) => saveHeuristic(option)} /> */}
                             <Dropdown2 options={labelingTasks} buttonName={currentHeuristic?.labelingTaskName} selectedOption={(option: any) => saveHeuristic(option)} />
 
                         </Tooltip>
@@ -219,11 +217,6 @@ export default function ZeroShot() {
                     </div>) : (<div className="font-normal inline-flex items-center">Model Downloading <LoadingIcon /></div>)}
                     <div className="font-normal">Required model confidence</div>
                     <Tooltip content={TOOLTIPS_DICT.ZERO_SHOT.INPUT_ATTRIBUTE} color="invert" placement="top">
-                        {/* <Dropdown options={textAttributes} buttonName={currentHeuristic.zeroShotSettings.attributeName} disabled={currentHeuristic.zeroShotSettings.attributeSelectDisabled}
-                            selectedOption={(option: string) => {
-                                const attributeId = textAttributes.find(a => a.name == option).id;
-                                changeZeroShotSettings('attributeId', attributeId);
-                            }} /> */}
                         <Dropdown2 options={textAttributes} buttonName={currentHeuristic.zeroShotSettings.attributeName} disabled={currentHeuristic.zeroShotSettings.attributeSelectDisabled}
                             selectedOption={(option: any) => {
                                 // const attributeId = textAttributes.find(a => a.name == option).id;
@@ -231,15 +224,10 @@ export default function ZeroShot() {
                             }} />
                     </Tooltip>
                     <Tooltip content={TOOLTIPS_DICT.ZERO_SHOT.MODEL} color="invert" placement="top">
-                        {/* <Dropdown options={models.map(m=>m.configString)} buttonName={currentHeuristic.zeroShotSettings.targetConfig}
-                            selectedOption={(option: any) => changeZeroShotSettings('targetConfig', option)} /> */}
-                        <Dropdown2 options={models} buttonName={currentHeuristic?.zeroShotSettings?.targetConfig?.configString} valuePropertyPath="configString"
-                            selectedOption={(option: any) => changeZeroShotSettings('targetConfig', option)} />
+                        <Dropdown2 options={models} buttonName={currentHeuristic?.zeroShotSettings?.targetConfig} valuePropertyPath="configString"
+                            selectedOption={(option: any) => changeZeroShotSettings('targetConfig', option.configString)} />
                     </Tooltip>
                     <Tooltip content={TOOLTIPS_DICT.ZERO_SHOT.CONFIDENCE} color="invert" placement="top">
-                        {/* <Dropdown options={CONFIDENCE_INTERVALS} buttonName={(currentHeuristic.zeroShotSettings.minConfidence * 100) + '%'} selectedOption={(option: string) => {
-                            changeZeroShotSettings('minConfidence', option);
-                        }} /> */}
                         <Dropdown2 options={CONFIDENCE_INTERVALS} buttonName={(currentHeuristic.zeroShotSettings.minConfidence * 100) + '%'} selectedOption={(option: string) => {
                             changeZeroShotSettings('minConfidence', option);
                         }} />

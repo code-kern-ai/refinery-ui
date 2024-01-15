@@ -3,11 +3,10 @@ import MultilineTooltip from "@/src/components/shared/multilines-tooltip/Multili
 import { selectSettings, updateSettings } from "@/src/reduxStore/states/pages/labeling";
 import { selectProject } from "@/src/reduxStore/states/project";
 import { LineBreaksType } from "@/src/types/components/projects/projectId/data-browser/data-browser";
-import { ComponentType, LabelingSuiteSettings } from "@/src/types/components/projects/projectId/labeling/settings";
+import { ComponentType } from "@/src/types/components/projects/projectId/labeling/settings";
 import { ModalEnum } from "@/src/types/shared/modal";
 import { COLOR_OPTIONS } from "@/src/util/constants";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
-import Dropdown from "@/submodules/react-components/components/Dropdown";
 import Dropdown2 from "@/submodules/react-components/components/Dropdown2";
 import { Tooltip } from "@nextui-org/react";
 import { IconInfoCircle } from "@tabler/icons-react";
@@ -94,9 +93,6 @@ export default function LabelingSettingsModal() {
                     <input className="h-5 w-5 cursor-pointer" type="checkbox" checked={settings?.main.autoNextRecord} onChange={() => changeSetting(ComponentType.MAIN, 'autoNextRecord')} /></span>
                 <Tooltip content={TOOLTIPS_DICT.LABELING.AUTO_NEXT_RECORD} color="invert" placement="top" className="cursor-auto"><IconInfoCircle className="h-5 w-5" /></Tooltip>
                 <span>Hover background</span>
-                {/* <Dropdown options={hoverColorOptions} buttonName={settings?.main.hoverGroupBackgroundColor} backgroundColors={hoverColorClassArray}
-                    dropdownItemsClasses="max-h-80 overflow-y-auto" buttonCaptionBgColor={settings?.main.hoverGroupBackgroundColorClass}
-                    selectedOption={(option: string) => changeSetting(ComponentType.MAIN, 'hoverGroupBackgroundColor', option)} dropdownWidth="w-32" /> */}
                 <Dropdown2 options={hoverColorOptions} buttonName={settings?.main.hoverGroupBackgroundColor} backgroundColors={hoverColorClassArray}
                     dropdownItemsClasses="max-h-80 overflow-y-auto" buttonCaptionBgColor={settings?.main.hoverGroupBackgroundColorClass}
                     selectedOption={(option: any) => changeSetting(ComponentType.MAIN, 'hoverGroupBackgroundColor', option)} dropdownWidth="w-32" />

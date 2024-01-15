@@ -5,7 +5,7 @@ import { selectProjectId } from "@/src/reduxStore/states/project";
 import { UPDATE_EMBEDDING_PAYLOAD } from "@/src/services/gql/mutations/project-settings";
 import { FilterAttributesModalProps } from "@/src/types/components/projects/projectId/settings/embeddings";
 import { ModalEnum } from "@/src/types/shared/modal";
-import Dropdown from "@/submodules/react-components/components/Dropdown";
+import Dropdown2 from "@/submodules/react-components/components/Dropdown2";
 import { useMutation } from "@apollo/client";
 import { Tooltip } from "@nextui-org/react";
 import { useEffect, useState } from "react";
@@ -57,7 +57,7 @@ export default function FilterAttributesModal(props: FilterAttributesModalProps)
         </div>}
         {modalFilteredAttributes.showEditOption && <div className="mt-3">
             <div className="text-xs text-gray-500 text-center italic">Add or remove filter attributes</div>
-            <Dropdown options={usableAttributes.map(a => a.name)} buttonName={props.filterAttributesUpdate.length == 0 ? 'None selected' : props.filterAttributesUpdate.join(',')} hasCheckboxes={true}
+            <Dropdown2 options={usableAttributes} buttonName={props.filterAttributesUpdate.length == 0 ? 'None selected' : props.filterAttributesUpdate.join(',')} hasCheckboxes={true}
                 selectedCheckboxes={checkedAttributes.map(a => a.checked)} hasSelectAll={true}
                 selectedOption={(option: any) => {
                     const attributes = option.filter((o: any) => o.checked).map((o: any) => o.name);
