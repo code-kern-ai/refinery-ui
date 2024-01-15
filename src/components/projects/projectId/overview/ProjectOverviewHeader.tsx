@@ -63,7 +63,7 @@ export default function ProjectOverviewHeader() {
                                 selectedOption={(option: any) => {
                                     dispatch(updateOverFilters('targetAttribute', option));
                                     const labelingTasksFinal = labelingTasks.find((labelingTask) => labelingTask.targetName === option.name);
-                                    dispatch(updateOverFilters('labelingTask', labelingTasksFinal.name));
+                                    dispatch(updateOverFilters('labelingTask', labelingTasksFinal));
                                     setLabelingTasksFiltered(labelingTasks.filter((labelingTask) => labelingTask.targetName === option.name));
                                 }} />}
                     </div>
