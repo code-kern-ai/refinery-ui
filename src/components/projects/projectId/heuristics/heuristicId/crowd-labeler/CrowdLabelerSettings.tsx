@@ -36,12 +36,15 @@ export default function CrowdLabelerSettings() {
     const [changeAccessLinkMut] = useMutation(LOCK_ACCESS_LINK);
 
     useEffect(() => {
-        if (!projectId) return;
+        if (!projectId || !currentHeuristic.crowdLabelerSettings.accessLinkId) return;
         refetchAccessLink({ variables: { projectId: projectId, linkId: currentHeuristic.crowdLabelerSettings.accessLinkId } }).then((res) => {
-            if (!res?.data?.accessLink?.id) return;
+            if (!res?.data?.accessLink?.id) {
+                dispatch(updateHeuristicsState(currentHeuristic.id, { crowdLabelerSettings: { ...currentHeuristic.crowdLabelerSettings, accessLinkId: null, accessLinkParsed: null } }));
+                return;
+            }
             fillLinkData(res.data.accessLink);
         });
-    }, [projectId]);
+    }, [projectId, currentHeuristic.crowdLabelerSettings.accessLinkId]);
 
     function saveHeuristic(labelingTaskParam: any, crowdLabelerSettings: any = null) {
         const labelingTask = labelingTaskParam ? labelingTaskParam.id : currentHeuristic.labelingTaskId;
@@ -65,15 +68,22 @@ export default function CrowdLabelerSettings() {
     function generateAccessLink() {
         createAccessLinkMut({ variables: { projectId: projectId, type: "HEURISTIC", id: currentHeuristic.id } }).then((res) => {
             const link = res.data.generateAccessLink.link;
-            dispatch(updateHeuristicsState(currentHeuristic.id, { crowdLabelerSettings: { ...currentHeuristic.crowdLabelerSettings, accessLinkId: link.id, accessLinkLocked: link.isLocked, accessLinkParsed: buildFullLink(link.link), isHTTPS: window.location.protocol == 'https:' } }));
-            saveHeuristic(null, { ...currentHeuristic.crowdLabelerSettings, accessLinkId: link.id });
+            const labelingTask = currentHeuristic.labelingTaskId;
+            const code = parseToSettingsJson({ ...currentHeuristic.crowdLabelerSettings, accessLinkId: link.id });
+            updateHeuristicMut({ variables: { projectId: projectId, informationSourceId: currentHeuristic.id, labelingTaskId: labelingTask, code: code } }).then((res) => {
+                dispatch(updateHeuristicsState(currentHeuristic.id, { crowdLabelerSettings: { ...currentHeuristic.crowdLabelerSettings, accessLinkId: link.id, accessLinkLocked: link.isLocked, accessLinkParsed: buildFullLink(link.link), isHTTPS: window.location.protocol == 'https:' } }));
+            });
         });
     }
 
     function removeAccessLink() {
         removeAccessLinkMut({ variables: { projectId: projectId, linkId: currentHeuristic.crowdLabelerSettings.accessLinkId } }).then((res) => {
-            dispatch(updateHeuristicsState(currentHeuristic.id, { crowdLabelerSettings: { ...currentHeuristic.crowdLabelerSettings, accessLink: null, accessLinkId: null } }));
-            saveHeuristic(null, { ...currentHeuristic.crowdLabelerSettings, accessLink: null });
+            dispatch(updateHeuristicsState(currentHeuristic.id, { crowdLabelerSettings: { ...currentHeuristic.crowdLabelerSettings, accessLink: null, accessLinkId: null, accessLinkParsed: null } }));
+            const labelingTask = currentHeuristic.labelingTaskId;
+            const code = parseToSettingsJson({ ...currentHeuristic.crowdLabelerSettings, accessLinkId: null });
+            updateHeuristicMut({ variables: { projectId: projectId, informationSourceId: currentHeuristic.id, labelingTaskId: labelingTask, code: code } }).then((res) => {
+                dispatch(updateHeuristicsState(currentHeuristic.id, { crowdLabelerSettings: { ...currentHeuristic.crowdLabelerSettings, accessLink: null, accessLinkId: null, accessLinkParsed: null } }));
+            });
         });
     }
 
