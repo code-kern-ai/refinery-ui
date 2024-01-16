@@ -36,10 +36,10 @@ export default function GridCards(props: GridCardsProps) {
                         <IconCode size={20} strokeWidth={1.5} />
                     </Tooltip>}
                     {heuristic.informationSourceType === InformationSourceType.ACTIVE_LEARNING && <Tooltip content={TOOLTIPS_DICT.HEURISTICS.ACTIVE_LEARNING} color="invert" placement="right" className="cursor-auto">
-                        <IconBolt size={20} strokeWidth={1.5} />
+                        <IconBolt size={20} strokeWidth={1.5} className="fill-gray-800" />
                     </Tooltip>}
                     {heuristic.informationSourceType === InformationSourceType.ZERO_SHOT && <Tooltip content={TOOLTIPS_DICT.HEURISTICS.ZERO_SHOT} color="invert" placement="right" className="cursor-auto">
-                        <IconSparkles size={20} strokeWidth={1.5} />
+                        <IconSparkles size={20} strokeWidth={1.5} className="fill-gray-800" />
                     </Tooltip>}
                     {heuristic.informationSourceType === InformationSourceType.CROWD_LABELER && <Tooltip content={TOOLTIPS_DICT.HEURISTICS.CROWD_LABELING} color="invert" placement="right" className="cursor-auto">
                         <IconUsers size={20} strokeWidth={1.5} />

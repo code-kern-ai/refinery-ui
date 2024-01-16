@@ -222,7 +222,7 @@ export default function VariableSelect(props: VariableSelectProps) {
                 />
             }
             {props.variable.type == BricksVariableType.EMBEDDING &&
-                <Dropdown2 options={embeddings} buttonName={props.variable.values[index] ? props.variable.values[index] : 'Select embedding'}
+                <Dropdown2 options={embeddings} buttonName={props.variable.values[index] ? props.variable.values[index] : 'Select embedding'} dropdownItemsWidth='w-max' dropdownWidth='w-80'
                     selectedOption={(option: any) => {
                         const propsCopy = { ...props };
                         propsCopy.variable.values[index] = option.name;

@@ -41,9 +41,9 @@ export default function Terms(props: TermsProps) {
     function executeOption(option: string, term: Term) {
         switch (option) {
             case "Edit term":
-                openTermEditor(true, term.id, term.value, term.comment);
+                openTermEditor(true, term.id, term.value, term.comment ?? '');
                 setNewTermName(term.value);
-                setNewDescription(term.comment);
+                setNewDescription(term.comment ?? '');
                 break;
             case "Remove term":
                 removeTerm(term);

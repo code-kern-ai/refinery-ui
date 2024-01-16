@@ -25,6 +25,8 @@ export const TOOLTIPS_DICT = {
         'CANNOT_BE_REVERTED': 'This action cannot be reverted',
         'PROJECTS': 'Home page - Projects',
         'USERS': 'Home page - Users',
+        'CONFIG_DISABLED': 'Next tokenizer has disabled value, cannot be added',
+        'ADD_NEW_TOKENIZED': 'Add new tokenizer value'
     },
     ['SIDEBAR']: {
         'OVERVIEW': 'Overview',

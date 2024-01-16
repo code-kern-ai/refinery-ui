@@ -108,7 +108,13 @@ export default function LabelingSuiteOverviewTable() {
         if (labelId && !sourceType) onMouseEvent(true, labelId);
         if (sourceType) {
             const hoverGroupsDictCopy = jsonCopy(hoverGroupsDict);
-            hoverGroupsDictCopy[labelId][sourceType] = true;
+            if (sourceType == LabelSource.MANUAL) {
+                hoverGroupsDictCopy[labelId][LabelSource.MANUAL] = true;
+                hoverGroupsDictCopy[labelId][LabelSource.WEAK_SUPERVISION] = false;
+            } else {
+                hoverGroupsDictCopy[labelId][LabelSource.MANUAL] = false;
+                hoverGroupsDictCopy[labelId][LabelSource.WEAK_SUPERVISION] = true;
+            }
             hoverGroupsDictCopy[labelId][LabelingPageParts.TASK_HEADER] = true;
             dispatch(setHoverGroupDict(hoverGroupsDictCopy));
         }
@@ -119,7 +125,9 @@ export default function LabelingSuiteOverviewTable() {
         if (labelId && !sourceType) onMouseEvent(false, labelId);
         if (sourceType) {
             const hoverGroupsDictCopy = jsonCopy(hoverGroupsDict);
-            hoverGroupsDictCopy[labelId][sourceType] = false;
+            hoverGroupsDictCopy[labelId][LabelSource.MANUAL] = false;
+            hoverGroupsDictCopy[labelId][LabelSource.WEAK_SUPERVISION] = false;
+            hoverGroupsDictCopy[labelId][LabelingPageParts.TASK_HEADER] = false;
             dispatch(setHoverGroupDict(hoverGroupsDictCopy));
         }
     }

@@ -1,6 +1,6 @@
 import Modal from "@/src/components/shared/modal/Modal";
 import { selectModal } from "@/src/reduxStore/states/modal";
-import { removeFromAllDataSlicesById } from "@/src/reduxStore/states/pages/data-browser";
+import { removeFromAllDataSlicesById, setActiveDataSlice, setActiveSearchParams, setIsTextHighlightNeeded, setRecordsInDisplay, setTextHighlight, updateAdditionalDataState } from "@/src/reduxStore/states/pages/data-browser";
 import { selectProjectId } from "@/src/reduxStore/states/project";
 import { DELETE_DATA_SLICE } from "@/src/services/gql/mutations/data-browser";
 import { ModalButton, ModalEnum } from "@/src/types/shared/modal";
@@ -22,6 +22,12 @@ export default function DeleteSliceModal() {
     const deleteDataSlice = useCallback(() => {
         deleteDataSliceMut({ variables: { projectId: projectId, dataSliceId: modalDeleteSlice.sliceId } }).then((res) => {
             dispatch(removeFromAllDataSlicesById(modalDeleteSlice.sliceId));
+            dispatch(updateAdditionalDataState('clearFullSearch', true));
+            dispatch(setActiveSearchParams([]));
+            dispatch(setRecordsInDisplay(false));
+            dispatch(setActiveDataSlice(null));
+            dispatch(setTextHighlight([]));
+            dispatch(setIsTextHighlightNeeded({}));
         });
     }, [modalDeleteSlice.sliceId]);
 

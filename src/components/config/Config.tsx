@@ -3,9 +3,11 @@ import { selectOrganization } from "@/src/reduxStore/states/general";
 import { ConfigManager } from "@/src/services/base/config";
 import { CHANGE_ORGANIZATION, UPDATE_CONFIG } from "@/src/services/gql/mutations/organizations";
 import { Configuration, LocalConfig } from "@/src/types/components/config/config"
+import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
 import { snakeCaseToCamelCase } from "@/submodules/javascript-functions/case-types-parser";
 import Dropdown2 from "@/submodules/react-components/components/Dropdown2";
 import { useMutation } from "@apollo/client";
+import { Tooltip } from "@nextui-org/react";
 import { IconPlus, IconTrash } from "@tabler/icons-react";
 import { useEffect, useState } from "react"
 import { useSelector } from "react-redux";
@@ -164,17 +166,20 @@ export default function Config() {
                         selectedOption={(option) => changeConfigString(option, index)}
                         dropdownItemsClasses="max-h-80 overflow-y-auto"
                         buttonClasses="whitespace-nowrap"
-                        disabled={index > 2} />
+                        disabled={localConfig.spacyDownloads.includes(prepareTokenizedValues.find((tokenizer: any) => tokenizer.configString == myConfig).configString)} />
                     {index > 1 && <button className="px-1 inline-flex items-center">
                         <IconTrash onClick={() => removeSpacyTokenizer(myConfig)} className="h-6 w-6 text-red-700" />
                     </button>}
                 </div>)}
                 <div className="self-center relative" style={{ left: '-1.5rem' }}>
                     {tokenizerValues && localConfig.spacyDownloads.length < tokenizerValues.length &&
-                        <button onClick={addSpacyConfig}
-                            className="self-center inline-flex items-center px-0.5 py-0.5 border border-gray-200 shadow-sm text-xs font-medium rounded text-gray-700 bg-white focus:outline-none cursor-pointer">
-                            <IconPlus className="h-5 w-5 text-gray-500" />
-                        </button>}
+                        <Tooltip content={tokenizerValues[localConfig.spacyDownloads.length].disabled ? TOOLTIPS_DICT.GENERAL.CONFIG_DISABLED : TOOLTIPS_DICT.GENERAL.ADD_NEW_TOKENIZED} color="invert" placeholder="bottom">
+                            <button onClick={addSpacyConfig} disabled={tokenizerValues[localConfig.spacyDownloads.length].disabled}
+                                className="self-center inline-flex items-center px-0.5 py-0.5 border border-gray-200 shadow-sm text-xs font-medium rounded text-gray-700 bg-white focus:outline-none cursor-pointer disabled:cursor-not-allowed disabled:opacity-50">
+                                <IconPlus className="h-5 w-5 text-gray-500" />
+                            </button>
+                        </Tooltip>
+                    }
                 </div>
             </div>}
         </div>}

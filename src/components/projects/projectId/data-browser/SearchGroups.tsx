@@ -153,8 +153,9 @@ export default function SearchGroups() {
     useEffect(() => {
         if (!activeSlice || !labelingTasks || !fullSearchStore || !searchGroupsStore || !dataSlices) return;
         if (activeSlice.sliceType == Slice.STATIC_DEFAULT || activeSlice.sliceType == Slice.STATIC_OUTLIER) return;
-        const filterRaw = dataSlices.find((el) => el.id == activeSlice.id).filterRaw;
-        const activeParams = updateSearchParameters(Object.values(JSON.parse(filterRaw)), attributes, configuration.separator, jsonCopy(fullSearchStore), searchGroupsStore, labelingTasks);
+        const findDataSLice = dataSlices.find((el) => el.id == activeSlice.id);
+        if (!findDataSLice) return;
+        const activeParams = updateSearchParameters(Object.values(JSON.parse(findDataSLice.filterRaw)), attributes, configuration.separator, jsonCopy(fullSearchStore), searchGroupsStore, labelingTasks);
         dispatch(setActiveSearchParams(activeParams));
     }, [activeSlice, labelingTasks, fullSearchStore, searchGroupsStore, dataSlices]);
 
