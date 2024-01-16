@@ -189,6 +189,9 @@ const labelingSlice = createSlice({
         setHoverGroupDict(state, action: PayloadAction<any>) {
             if (action.payload) state.hoverGroupDict = action.payload;
             else state.hoverGroupDict = {};
+        },
+        initOnLabelPageDestruction(state) {
+            for (const key in initialState) state[key] = initialState[key];
         }
     },
 });
@@ -207,7 +210,8 @@ export const selectTmpHighlightIds = (state: any) => state.labeling.tmpHighlight
 export const selectUserDisplayId = (state: any) => state.labeling.displayUserId;
 export const selectHoverGroupDict = (state: any) => state.labeling.hoverGroupDict;
 
-export const { setAvailableLinks, setSelectedLink, updateRecordRequests, updateUsers, setSettings, updateSettings, removeFromRlaById, tmpAddHighlightIds, setUserDisplayId, setHoverGroupDict } = labelingSlice.actions;
+export const { setAvailableLinks, setSelectedLink, updateRecordRequests, updateUsers, setSettings, updateSettings,
+    removeFromRlaById, tmpAddHighlightIds, setUserDisplayId, setHoverGroupDict, initOnLabelPageDestruction } = labelingSlice.actions;
 
 export const labelingReducer = labelingSlice.reducer;
 

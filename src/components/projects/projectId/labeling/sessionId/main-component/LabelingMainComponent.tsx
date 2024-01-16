@@ -1,5 +1,5 @@
 import { selectAllUsers, selectUser, setComments } from "@/src/reduxStore/states/general";
-import { setAvailableLinks, updateRecordRequests, setSelectedLink, selectRecordRequestsRla, updateUsers, setSettings, selectSettings, setUserDisplayId, selectRecordRequestsRecord } from "@/src/reduxStore/states/pages/labeling";
+import { setAvailableLinks, updateRecordRequests, setSelectedLink, selectRecordRequestsRla, updateUsers, setSettings, selectSettings, setUserDisplayId, selectRecordRequestsRecord, initOnLabelPageDestruction } from "@/src/reduxStore/states/pages/labeling";
 import { selectProjectId } from "@/src/reduxStore/states/project"
 import { AVAILABLE_LABELING_LINKS, GET_RECORD_LABEL_ASSOCIATIONS, GET_TOKENIZED_RECORD, REQUEST_HUDDLE_DATA } from "@/src/services/gql/queries/labeling";
 import { LabelingLinkType } from "@/src/types/components/projects/projectId/labeling/labeling-main-component";
@@ -77,25 +77,30 @@ export default function LabelingMainComponent() {
         dispatch(setSettings(settingsCopy));
         refetchAttributesAndProcess();
         refetchLabelingTasksAndProcess();
+        WebSocketsService.subscribeToNotification(CurrentPage.LABELING, {
+            projectId: projectId,
+            whitelist: ['attributes_updated', 'calculate_attribute', 'payload_finished', 'weak_supervision_finished', 'record_deleted', 'rla_created', 'rla_deleted', 'access_link_changed', 'access_link_removed', 'label_created', 'label_deleted', 'labeling_task_deleted', 'labeling_task_updated', 'labeling_task_created'],
+            func: handleWebsocketNotification
+        });
     }, [projectId]);
+
+    //destructor
+    useEffect(() => () => {
+        SessionManager.initMeOnDestruction();
+        dispatch(initOnLabelPageDestruction());
+    }, [])
 
     useEffect(() => {
         if (!projectId) return;
         if (!router.query.sessionId) return;
         SessionManager.labelingLinkData = parseLabelingLink(router);
         const huddleData = (SessionManager.readHuddleDataFromLocal());
-        setHuddleData(huddleData);
-        WebSocketsService.subscribeToNotification(CurrentPage.LABELING, {
-            projectId: projectId,
-            whitelist: ['attributes_updated', 'calculate_attribute', 'payload_finished', 'weak_supervision_finished', 'record_deleted', 'rla_created', 'rla_deleted', 'access_link_changed', 'access_link_removed', 'label_created', 'label_deleted', 'labeling_task_deleted', 'labeling_task_updated', 'labeling_task_created'],
-            func: handleWebsocketNotification
-        });
+        if (!huddleData) requestHuddleData(router.query.sessionId as string); //nothing stored in local storage or outdated
+        else {
+            SessionManager.jumpToPosition(huddleData.linkData.requestedPos);
+            setHuddleData(huddleData);
+        }
     }, [projectId, router.query.sessionId]);
-
-    useEffect(() => {
-        if (!huddleData) return;
-        requestHuddleData(SessionManager.labelingLinkData.huddleId);
-    }, [huddleData]);
 
     useEffect(() => {
         if (!projectId) return;
@@ -117,7 +122,7 @@ export default function LabelingMainComponent() {
         if (!projectId || allUsers.length == 0 || !router.query.sessionId) return;
         if (router.query.sessionId == DUMMY_HUDDLE_ID) return;
         if (!SessionManager.currentRecordId) return;
-        setUpCommentsRequests();
+        setUpCommentsRequestsAndFetch();
     }, [allUsers, projectId, router.query.sessionId, SessionManager.currentRecordId]);
 
     useEffect(() => {
@@ -142,7 +147,7 @@ export default function LabelingMainComponent() {
         dispatch(setUserDisplayId(user.id));
     }, [rlas]);
 
-    function setUpCommentsRequests() {
+    function setUpCommentsRequestsAndFetch() {
         const requests = [];
         requests.push({ commentType: CommentType.LABELING_TASK, projectId: projectId });
         requests.push({ commentType: CommentType.ATTRIBUTE, projectId: projectId });

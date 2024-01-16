@@ -19,7 +19,7 @@ export class SessionManager {
 
     public static readHuddleDataFromLocal() {
         this.huddleData = JSON.parse(localStorage.getItem("huddleData"));
-        if (!this.huddleData) return;
+        if (!this.huddleData) return null;
         if (typeof this.huddleData.checkedAt.db == 'string') {
             this.huddleData.checkedAt.db = new Date(this.huddleData.checkedAt.db);
         }
@@ -39,8 +39,10 @@ export class SessionManager {
 
     private static huddleOutdated(): boolean {
         if (!this.huddleData) return true;
+        if (this.huddleData.linkData.projectId != this.labelingLinkData.projectId) return true;
         for (const key in this.labelingLinkData) {
             if (key == 'linkLocked') continue;
+            if (this.labelingLinkData[key] != this.huddleData.linkData[key]) return true;
         }
         if (this.huddleData.checkedAt?.local) {
             if ((new Date().getTime() - this.huddleData.checkedAt.local.getTime()) > ONE_DAY) return true;
@@ -122,5 +124,16 @@ export class SessionManager {
     public static getAllowedTask(): string {
         return this.huddleData.allowedTask;
     }
-
+    public static initMeOnDestruction() {
+        this.labelingLinkData = null;
+        this.huddleData = null;
+        this.absoluteWarning = null;
+        this.nextDisabled = true;
+        this.prevDisabled = true;
+        this.positionString = "/ records in";
+        this.availableLinks = null;
+        this.availableLinksLookup = null;
+        this.selectedLink = null;
+        this.currentRecordId = null;
+    }
 }
