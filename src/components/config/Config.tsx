@@ -3,11 +3,9 @@ import { selectOrganization } from "@/src/reduxStore/states/general";
 import { ConfigManager } from "@/src/services/base/config";
 import { CHANGE_ORGANIZATION, UPDATE_CONFIG } from "@/src/services/gql/mutations/organizations";
 import { Configuration, LocalConfig } from "@/src/types/components/config/config"
-import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
 import { snakeCaseToCamelCase } from "@/submodules/javascript-functions/case-types-parser";
 import Dropdown2 from "@/submodules/react-components/components/Dropdown2";
 import { useMutation } from "@apollo/client";
-import { Tooltip } from "@nextui-org/react";
 import { IconPlus, IconTrash } from "@tabler/icons-react";
 import { useEffect, useState } from "react"
 import { useSelector } from "react-redux";
@@ -19,6 +17,7 @@ export default function Config() {
     const [localConfig, setLocalConfig] = useState<LocalConfig>(null);
     const [configuration, setConfiguration] = useState<Configuration>(null);
     const [prepareTokenizedValues, setPrepareTokenizedValues] = useState<any[]>([]);
+    const [preparedOptions, setPreparedOptions] = useState<any[]>([]);
 
     const [changeOrganizationMut] = useMutation(CHANGE_ORGANIZATION);
     const [updateConfigMut] = useMutation(UPDATE_CONFIG);
@@ -42,7 +41,7 @@ export default function Config() {
     }, [organization]);
 
     useEffect(() => {
-        if (!tokenizerValues) return;
+        if (!tokenizerValues || !localConfig) return;
         const tokenizerValuesDisplay = [...tokenizerValues];
         tokenizerValuesDisplay.forEach((tokenizer: any, index: number) => {
             const tokenizerNameContainsBrackets = tokenizer.name.includes('(') && tokenizer.name.includes(')');
@@ -50,8 +49,11 @@ export default function Config() {
             tokenizerCopy.name = tokenizer.name + (tokenizer.configString != undefined && !tokenizerNameContainsBrackets ? ` (${tokenizer.configString})` : '');
             tokenizerValuesDisplay[index] = tokenizerCopy;
         });
-        setPrepareTokenizedValues(tokenizerValuesDisplay);
-    }, [tokenizerValues]);
+        const filtered = tokenizerValuesDisplay.filter((tokenizer: any) => tokenizer.configString);
+        setPrepareTokenizedValues(filtered);
+        const removeDuplicates = filtered.filter((tokenizer: any) => !localConfig?.spacyDownloads.includes(tokenizer.configString));
+        setPreparedOptions(removeDuplicates);
+    }, [tokenizerValues, localConfig]);
 
     function checkAndSaveValue(value: any, key: string, subkey: string = null) {
         if (key == "limit_checks") {
@@ -98,10 +100,14 @@ export default function Config() {
 
     function addSpacyConfig() {
         const existingConfigs = localConfig.spacyDownloads;
-        for (const o of tokenizerValues) {
-            if (!existingConfigs.includes(o.configString)) {
-                existingConfigs.push(o.configString);
+        for (const tok of preparedOptions) {
+            if (!existingConfigs.includes(tok.configString)) {
+                existingConfigs.push(tok.configString);
                 checkAndSaveValue(existingConfigs, "spacy_downloads");
+                const preparedOptionsCopy = [...preparedOptions];
+                const index = preparedOptionsCopy.findIndex((tokenizer: any) => tokenizer.configString == tok.configString);
+                preparedOptionsCopy.splice(index, 1);
+                setPreparedOptions(preparedOptionsCopy);
                 break;
             }
         }
@@ -160,25 +166,22 @@ export default function Config() {
             {localConfig.spacyDownloads && <div className="flex flex-col gap-y-2">
                 {localConfig.spacyDownloads.map((myConfig, index) => <div key={myConfig} className="flex flex-row flex-nowrap gap-x-2 items-center">
                     <Dropdown2
-                        options={prepareTokenizedValues}
+                        options={preparedOptions}
                         buttonName={prepareTokenizedValues.find((tokenizer: any) => tokenizer.configString == myConfig)?.name}
-                        disabledOptions={prepareTokenizedValues.map((tokenizer: any) => tokenizer.disabled)}
                         selectedOption={(option) => changeConfigString(option, index)}
                         dropdownItemsClasses="max-h-80 overflow-y-auto"
                         buttonClasses="whitespace-nowrap"
-                        disabled={localConfig.spacyDownloads.includes(prepareTokenizedValues.find((tokenizer: any) => tokenizer.configString == myConfig).configString)} />
+                    />
                     {index > 1 && <button className="px-1 inline-flex items-center">
                         <IconTrash onClick={() => removeSpacyTokenizer(myConfig)} className="h-6 w-6 text-red-700" />
                     </button>}
                 </div>)}
                 <div className="self-center relative" style={{ left: '-1.5rem' }}>
                     {tokenizerValues && localConfig.spacyDownloads.length < tokenizerValues.length &&
-                        <Tooltip content={tokenizerValues[localConfig.spacyDownloads.length].disabled ? TOOLTIPS_DICT.GENERAL.CONFIG_DISABLED : TOOLTIPS_DICT.GENERAL.ADD_NEW_TOKENIZED} color="invert" placeholder="bottom">
-                            <button onClick={addSpacyConfig} disabled={tokenizerValues[localConfig.spacyDownloads.length].disabled}
-                                className="self-center inline-flex items-center px-0.5 py-0.5 border border-gray-200 shadow-sm text-xs font-medium rounded text-gray-700 bg-white focus:outline-none cursor-pointer disabled:cursor-not-allowed disabled:opacity-50">
-                                <IconPlus className="h-5 w-5 text-gray-500" />
-                            </button>
-                        </Tooltip>
+                        <button onClick={addSpacyConfig}
+                            className="self-center inline-flex items-center px-0.5 py-0.5 border border-gray-200 shadow-sm text-xs font-medium rounded text-gray-700 bg-white focus:outline-none cursor-pointer disabled:cursor-not-allowed disabled:opacity-50">
+                            <IconPlus className="h-5 w-5 text-gray-500" />
+                        </button>
                     }
                 </div>
             </div>}
