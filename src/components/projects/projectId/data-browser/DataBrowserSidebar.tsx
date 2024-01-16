@@ -1,7 +1,7 @@
 import { selectAllUsers } from '@/src/reduxStore/states/general';
 import { setModalStates } from '@/src/reduxStore/states/modal';
-import { selectActiveSlice, selectAdditionalData, selectDataSlicesAll, setActiveDataSlice, updateAdditionalDataState } from '@/src/reduxStore/states/pages/data-browser';
-import { selectProjectId } from '@/src/reduxStore/states/project';
+import { selectActiveSlice, selectAdditionalData, selectDataSlicesAll, setActiveDataSlice, setActiveSearchParams, setIsTextHighlightNeeded, setRecordsInDisplay, setTextHighlight, updateAdditionalDataState } from '@/src/reduxStore/states/pages/data-browser';
+import { selectProjectId, setActiveProject } from '@/src/reduxStore/states/project';
 import style from '@/src/styles/components/projects/projectId/data-browser.module.css';
 import { DataSlice } from '@/src/types/components/projects/projectId/data-browser/data-browser';
 import { ModalEnum } from '@/src/types/shared/modal';
@@ -58,7 +58,16 @@ export default function DataBrowserSidebar() {
     }
 
     function toggleSlice(slice) {
-        dispatch(setActiveDataSlice(slice));
+        if (activeSlice) {
+            dispatch(setActiveSearchParams([]));
+            dispatch(setRecordsInDisplay(false));
+            dispatch(setActiveDataSlice(null));
+            dispatch(setTextHighlight([]));
+            dispatch(setIsTextHighlightNeeded({}));
+            dispatch(updateAdditionalDataState('clearFullSearch', true));
+        } else {
+            dispatch(setActiveDataSlice(slice));
+        }
         dispatch(updateAdditionalDataState('displayOutdatedWarning', false));
     }
 

@@ -243,6 +243,7 @@ export default function LabelingMainComponent() {
     }
 
     const handleWebsocketNotification = useCallback((msgParts: string[]) => {
+        if (!record) return;
         if (msgParts[1] == 'attributes_updated' || (msgParts[1] == 'calculate_attribute' && ['created', 'updated'].includes(msgParts[2]))) {
             refetchAttributesAndProcess();
         } else if (msgParts[1] == 'record_deleted') {

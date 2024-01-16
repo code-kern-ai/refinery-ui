@@ -162,19 +162,21 @@ export default function HeuristicsLayout(props: any) {
                         ))}
                     </div>
 
-                    <div className="text-sm leading-5 font-medium text-gray-700 inline-block">
-                        {lookupLists.length == 0 ? 'No lookup lists' : 'Lookup lists'}</div>
-                    <div className="flex flex-row items-center">
-                        {lookupLists.map((lookupList) => (
-                            <Tooltip key={lookupList.id} content={TOOLTIPS_DICT.GENERAL.IMPORT_STATEMENT} color="invert" placement="top">
-                                <span onClick={() => copyToClipboard("from knowledge import " + lookupList.pythonVariable)}>
-                                    <div className="cursor-pointer border items-center px-2 py-0.5 rounded text-xs font-medium text-center mr-2">
-                                        {lookupList.pythonVariable} - {lookupList.termCount}
-                                    </div>
-                                </span>
-                            </Tooltip>
-                        ))}
-                    </div>
+                    {currentHeuristic.informationSourceType == InformationSourceType.LABELING_FUNCTION && <>
+                        <div className="text-sm leading-5 font-medium text-gray-700 inline-block">
+                            {lookupLists.length == 0 ? 'No lookup lists' : 'Lookup lists'}</div>
+                        <div className="flex flex-row items-center">
+                            {lookupLists.map((lookupList) => (
+                                <Tooltip key={lookupList.id} content={TOOLTIPS_DICT.GENERAL.IMPORT_STATEMENT} color="invert" placement="top">
+                                    <span onClick={() => copyToClipboard("from knowledge import " + lookupList.pythonVariable)}>
+                                        <div className="cursor-pointer border items-center px-2 py-0.5 rounded text-xs font-medium text-center mr-2">
+                                            {lookupList.pythonVariable} - {lookupList.termCount}
+                                        </div>
+                                    </span>
+                                </Tooltip>
+                            ))}
+                        </div>
+                    </>}
                 </div>}
                 {props.children}
             </div>

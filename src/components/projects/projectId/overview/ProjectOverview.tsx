@@ -239,12 +239,13 @@ export default function ProjectOverview() {
     }
 
     const handleWebsocketNotification = useCallback((msgParts: string[]) => {
+        if (!projectId) return;
         if (['label_created', 'label_deleted', 'labeling_task_deleted', 'labeling_task_updated', 'labeling_task_created', 'weak_supervision_finished'].includes(msgParts[1])) {
             refetchLabelingTasksAndProcess();
         } else if (['data_slice_created', 'data_slice_updated', 'data_slice_deleted'].includes(msgParts[1])) {
             refetchDataSlicesAndProcess();
         }
-    }, []);
+    }, [projectId]);
 
     useEffect(() => {
         if (!projectId) return;

@@ -24,9 +24,7 @@ export const TOOLTIPS_DICT = {
         'CLEAR': 'Clear',
         'CANNOT_BE_REVERTED': 'This action cannot be reverted',
         'PROJECTS': 'Home page - Projects',
-        'USERS': 'Home page - Users',
-        'CONFIG_DISABLED': 'Next tokenizer has disabled value, cannot be added',
-        'ADD_NEW_TOKENIZED': 'Add new tokenizer value'
+        'USERS': 'Home page - Users'
     },
     ['SIDEBAR']: {
         'OVERVIEW': 'Overview',
