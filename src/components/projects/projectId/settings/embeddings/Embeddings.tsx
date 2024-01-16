@@ -34,8 +34,6 @@ export default function Embeddings(props: EmbeddingProps) {
     const [showEditOption, setShowEditOption] = useState(false);
     const [filterAttributesUpdate, setFilterAttributesUpdate] = useState([]);
 
-    useEffect(unsubscribeWSOnDestroy(router, [CurrentPage.PROJECT_SETTINGS]), []);
-
     useEffect(() => {
         if (!projectId) return;
         setSomethingLoading(false);

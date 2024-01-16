@@ -3,7 +3,7 @@ import { selectModal, setModalStates } from "@/src/reduxStore/states/modal";
 import { selectLabelingTasksAll, setLabelingTasksAll } from "@/src/reduxStore/states/pages/settings";
 import { selectProjectId } from "@/src/reduxStore/states/project";
 import { UPDATE_LABEL_COLOR, UPDATE_LABEL_HOTKEY } from "@/src/services/gql/mutations/project-settings";
-import { LabelColors, LabelType, LabelingTask, LabelingTasksProps } from "@/src/types/components/projects/projectId/settings/labeling-tasks";
+import { LabelColors, LabelType, LabelingTask } from "@/src/types/components/projects/projectId/settings/labeling-tasks";
 import { ModalEnum } from "@/src/types/shared/modal";
 import { LabelHelper } from "@/src/util/classes/label-helper";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
@@ -14,7 +14,7 @@ import { IconPencil } from "@tabler/icons-react";
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
-export default function ChangeColorModal(props: LabelingTasksProps) {
+export default function ChangeColorModal() {
     const dispatch = useDispatch();
 
     const projectId = useSelector(selectProjectId);
@@ -36,7 +36,6 @@ export default function ChangeColorModal(props: LabelingTasksProps) {
                 label.hotkey = changedLabel.hotkey;
                 dispatch(setModalStates(ModalEnum.CHANGE_COLOR, { ...modalChangeColor, label: label }));
                 dispatch(setLabelingTasksAll(labelingTasksSchemaCopy));
-                props.refetchWS();
             });
         }
     }
@@ -61,7 +60,6 @@ export default function ChangeColorModal(props: LabelingTasksProps) {
             label.color.hoverColor = 'hover:bg-' + newColor + '-200';
             dispatch(setModalStates(ModalEnum.CHANGE_COLOR, { ...modalChangeColor, label: label }));
             dispatch(setLabelingTasksAll(labelingTasksSchemaCopy));
-            props.refetchWS();
         });
     }
 

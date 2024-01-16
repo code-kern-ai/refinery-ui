@@ -225,7 +225,7 @@ export default function Upload(props: UploadProps) {
                         setSubmitted(false);
                         if (props.uploadOptions.isModal) {
                             dispatch(closeModal(ModalEnum.MODAL_UPLOAD));
-                            props.closeModalEvent();
+                            if (props.closeModalEvent) props.closeModalEvent();
                         }
                     });
                     if (progress.state === UploadStates.ERROR && props.uploadOptions.deleteProjectOnFail) {

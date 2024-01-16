@@ -1,9 +1,9 @@
 import Modal from "@/src/components/shared/modal/Modal";
-import { selectModal, setModalStates } from "@/src/reduxStore/states/modal";
+import { selectModal } from "@/src/reduxStore/states/modal";
 import { selectLabelingTasksAll, selectUsableAttributes } from "@/src/reduxStore/states/pages/settings";
 import { selectProjectId } from "@/src/reduxStore/states/project";
 import { CREATE_LABELING_TASK } from "@/src/services/gql/mutations/project-settings";
-import { LabelingTaskTaskType, LabelingTasksProps } from "@/src/types/components/projects/projectId/settings/labeling-tasks";
+import { LabelingTaskTaskType } from "@/src/types/components/projects/projectId/settings/labeling-tasks";
 import { ModalButton, ModalEnum } from "@/src/types/shared/modal";
 import { isTaskNameUnique } from "@/src/util/components/projects/projectId/settings/labeling-tasks-helper";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
@@ -15,7 +15,7 @@ import { useSelector } from "react-redux";
 
 const ACCEPT_BUTTON = { buttonCaption: 'Add labeling task', useButton: true };
 
-export default function AddLabelingTaskModal(props: LabelingTasksProps) {
+export default function AddLabelingTaskModal() {
     const projectId = useSelector(selectProjectId);
     const usableAttributes = useSelector(selectUsableAttributes);
     const modalAddLabelingTask = useSelector(selectModal(ModalEnum.ADD_LABELING_TASK));
@@ -42,10 +42,6 @@ export default function AddLabelingTaskModal(props: LabelingTasksProps) {
             }
         }).then((res) => { });
     }, [modalAddLabelingTask, targetAttribute, taskName]);
-
-    useEffect(() => {
-        props.refetchWS();
-    }, [addLabelingTask]);
 
     useEffect(() => {
         setAcceptButton({ ...ACCEPT_BUTTON, emitFunction: addLabelingTask, disabled: (taskName == '' || targetAttribute.name == '') || !isTaskNameUnique(labelingTasksSchema, taskName) });

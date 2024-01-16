@@ -4,7 +4,7 @@ import { selectLabelingTasksAll, setLabelingTasksAll } from "@/src/reduxStore/st
 import { selectProjectId } from "@/src/reduxStore/states/project";
 import { HANDLE_LABEL_RENAME_WARNING, UPDATE_LABEL_NAME } from "@/src/services/gql/mutations/project-settings";
 import { CHECK_RENAME_LABEL } from "@/src/services/gql/queries/project-setting";
-import { LabelType, LabelingTask, LabelingTasksProps } from "@/src/types/components/projects/projectId/settings/labeling-tasks";
+import { LabelType, LabelingTask } from "@/src/types/components/projects/projectId/settings/labeling-tasks";
 import { ModalButton, ModalEnum } from "@/src/types/shared/modal";
 import { LabelHelper } from "@/src/util/classes/label-helper";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
@@ -17,7 +17,7 @@ import { useDispatch, useSelector } from "react-redux";
 
 const ACCEPT_BUTTON = { buttonCaption: 'Rename', useButton: true }
 
-export default function RenameLabelModal(props: LabelingTasksProps) {
+export default function RenameLabelModal() {
     const dispatch = useDispatch();
 
     const projectId = useSelector(selectProjectId);
@@ -41,9 +41,6 @@ export default function RenameLabelModal(props: LabelingTasksProps) {
         });
     }, [modalRenameLabel, newLabelName]);
 
-    useEffect(() => {
-        props.refetchWS();
-    }, [renameLabel]);
 
     useEffect(() => {
         if (!LabelHelper.renameLabelData) return;

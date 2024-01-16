@@ -2,7 +2,6 @@ import Modal from "@/src/components/shared/modal/Modal";
 import { selectModal, setModalStates } from "@/src/reduxStore/states/modal";
 import { selectProjectId } from "@/src/reduxStore/states/project";
 import { CREATE_LABEL } from "@/src/services/gql/mutations/labeling";
-import { LabelingTasksProps } from "@/src/types/components/projects/projectId/settings/labeling-tasks";
 import { ModalButton, ModalEnum } from "@/src/types/shared/modal";
 import { LabelHelper } from "@/src/util/classes/label-helper";
 import { useMutation } from "@apollo/client";
@@ -11,7 +10,7 @@ import { useDispatch, useSelector } from "react-redux";
 
 const ACCEPT_BUTTON = { buttonCaption: 'Add label', useButton: true, closeAfterClick: false };
 
-export default function AddLabelModal(props: LabelingTasksProps) {
+export default function AddLabelModal() {
     const dispatch = useDispatch();
 
     const projectId = useSelector(selectProjectId);
@@ -30,9 +29,6 @@ export default function AddLabelModal(props: LabelingTasksProps) {
         });
     }, [modalAddLabel, labelName, modalAddLabel.taskId]);
 
-    useEffect(() => {
-        props.refetchWS();
-    }, [addLabel]);
 
     useEffect(() => {
         setAcceptButton({ ...ACCEPT_BUTTON, emitFunction: addLabel, disabled: labelName == '' || !LabelHelper.isLabelNameUnique(modalAddLabel.taskId, labelName) });

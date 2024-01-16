@@ -52,7 +52,3 @@ export enum LabelingTaskTaskType {
     NOT_USEABLE = "NOT_USEABLE", //e.g. for annotators who can only use one task
     NOT_SET = "NOT_SET"
 }
-
-export type LabelingTasksProps = {
-    refetchWS(): void;
-}

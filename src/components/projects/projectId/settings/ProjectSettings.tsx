@@ -2,9 +2,9 @@ import { useDispatch, useSelector } from "react-redux";
 import DataSchema from "./DataSchema";
 import { selectProject, setActiveProject } from "@/src/reduxStore/states/project";
 import { useLazyQuery } from "@apollo/client";
-import { CHECK_COMPOSITE_KEY, GET_ATTRIBUTES_BY_PROJECT_ID, GET_EMBEDDING_SCHEMA_BY_PROJECT_ID, GET_GATES_INTEGRATION_DATA, GET_PROJECT_TOKENIZATION, GET_QUEUED_TASKS, GET_RECOMMENDED_ENCODERS_FOR_EMBEDDINGS } from "@/src/services/gql/queries/project-setting";
+import { CHECK_COMPOSITE_KEY, GET_ATTRIBUTES_BY_PROJECT_ID, GET_EMBEDDING_SCHEMA_BY_PROJECT_ID, GET_GATES_INTEGRATION_DATA, GET_LABELING_TASKS_BY_PROJECT_ID, GET_PROJECT_TOKENIZATION, GET_QUEUED_TASKS, GET_RECOMMENDED_ENCODERS_FOR_EMBEDDINGS } from "@/src/services/gql/queries/project-setting";
 import { useEffect, useState } from "react";
-import { selectAttributes, selectEmbeddings, selectGatesIntegration, setAllAttributes, setAllEmbeddings, setAllRecommendedEncodersDict, setGatesIntegration, setRecommendedEncodersAll } from "@/src/reduxStore/states/pages/settings";
+import { selectAttributes, selectEmbeddings, selectGatesIntegration, setAllAttributes, setAllEmbeddings, setAllRecommendedEncodersDict, setGatesIntegration, setLabelingTasksAll, setRecommendedEncodersAll } from "@/src/reduxStore/states/pages/settings";
 import { timer } from "rxjs";
 import { IconCamera, IconCheck, IconDots, IconPlus, IconUpload } from "@tabler/icons-react";
 import { ModalEnum } from "@/src/types/shared/modal";
@@ -31,6 +31,7 @@ import { CommentType } from "@/src/types/shared/comments";
 import { CommentDataManager } from "@/src/util/classes/comments";
 import CreateNewAttributeModal from "./CreateNewAttributeModal";
 import ProjectSnapshotExportModal from "./ProjectSnapshotExportModal";
+import { postProcessLabelingTasks, postProcessLabelingTasksSchema } from "@/src/util/components/projects/projectId/settings/labeling-tasks-helper";
 
 export default function ProjectSettings() {
     const dispatch = useDispatch();
@@ -58,6 +59,8 @@ export default function ProjectSettings() {
     const [refetchRecommendedEncodersForEmbeddings] = useLazyQuery(GET_RECOMMENDED_ENCODERS_FOR_EMBEDDINGS, { fetchPolicy: "no-cache" });
     const [refetchComments] = useLazyQuery(REQUEST_COMMENTS, { fetchPolicy: "no-cache" });
     const [refetchGatesIntegrationData] = useLazyQuery(GET_GATES_INTEGRATION_DATA, { fetchPolicy: 'no-cache' });
+    const [refetchLabelingTasksByProjectId] = useLazyQuery(GET_LABELING_TASKS_BY_PROJECT_ID, { fetchPolicy: "network-only" });
+
 
     useEffect(unsubscribeWSOnDestroy(router, [CurrentPage.PROJECT_SETTINGS]), []);
 
@@ -66,12 +69,9 @@ export default function ProjectSettings() {
         refetchAttributesAndPostProcess();
         refetchEmbeddingsAndPostProcess();
         refetchAndSetGatesIntegrationData();
+        refetchLabelingTasksAndProcess();
         checkProjectTokenization();
-        WebSocketsService.subscribeToNotification(CurrentPage.PROJECT_SETTINGS, {
-            projectId: project.id,
-            whitelist: ['project_update', 'tokenization', 'calculate_attribute', 'embedding', 'attributes_updated', 'gates_integration', 'information_source_deleted', 'information_source_updated', 'embedding_deleted'],
-            func: handleWebsocketNotification
-        });
+        refetchWS();
         const openModal = JSON.parse(localStorage.getItem("openModal"));
         if (openModal) {
             dispatch(setModalStates(ModalEnum.ADD_LABELING_TASK, { open: true }));
@@ -241,6 +241,8 @@ export default function ProjectSettings() {
             if (gatesIntegrationData?.missingEmbeddings?.includes(msgParts[2])) {
                 refetchAndSetGatesIntegrationData();
             }
+        } else if (['label_created', 'label_deleted', 'labeling_task_deleted', 'labeling_task_updated', 'labeling_task_created'].includes(msgParts[1])) {
+            refetchLabelingTasksAndProcess();
         }
     }
 
@@ -253,8 +255,15 @@ export default function ProjectSettings() {
     function refetchWS() {
         WebSocketsService.subscribeToNotification(CurrentPage.PROJECT_SETTINGS, {
             projectId: project.id,
-            whitelist: ['project_update', 'tokenization', 'calculate_attribute', 'embedding', 'attributes_updated', 'gates_integration', 'information_source_deleted', 'information_source_updated', 'embedding_deleted'],
+            whitelist: ['project_update', 'tokenization', 'calculate_attribute', 'embedding', 'attributes_updated', 'gates_integration', 'information_source_deleted', 'information_source_updated', 'embedding_deleted', 'embedding_updated', 'upload_embedding_payload', 'label_created', 'label_deleted', 'labeling_task_deleted', 'labeling_task_updated', 'labeling_task_created'],
             func: handleWebsocketNotification
+        });
+    }
+
+    function refetchLabelingTasksAndProcess() {
+        refetchLabelingTasksByProjectId({ variables: { projectId: project.id } }).then((res) => {
+            const labelingTasks = postProcessLabelingTasks(res['data']['projectByProjectId']['labelingTasks']['edges']);
+            dispatch(setLabelingTasksAll(postProcessLabelingTasksSchema(labelingTasks)));
         });
     }
 

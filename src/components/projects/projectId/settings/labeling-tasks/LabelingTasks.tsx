@@ -35,35 +35,15 @@ export default function LabelingTasks() {
 
     const [labelingTasksDropdownArray, setLabelingTasksDropdownArray] = useState<{ name: string, value: string }[]>([]);
 
-    const [refetchLabelingTasksByProjectId] = useLazyQuery(GET_LABELING_TASKS_BY_PROJECT_ID, { fetchPolicy: "network-only" });
     const [updateLabelingTaskMut] = useMutation(UPDATE_LABELING_TASK);
 
     useEffect(() => {
         LabelHelper.setLabelColorOptions();
-        refetchLabelingTasksAndProcess();
-        refetchWS();
     }, [projectId]);
 
     useEffect(() => {
         setLabelingTasksDropdownArray(labelingTasksDropdownValues());
     }, [labelingTasksSchema]);
-
-    function refetchLabelingTasksAndProcess() {
-        refetchLabelingTasksByProjectId({ variables: { projectId: projectId } }).then((res) => {
-            const labelingTasks = postProcessLabelingTasks(res['data']['projectByProjectId']['labelingTasks']['edges']);
-            dispatch(setLabelingTasksAll(postProcessLabelingTasksSchema(labelingTasks)));
-        });
-    }
-
-    useEffect(unsubscribeWSOnDestroy(router, [CurrentPage.PROJECT_SETTINGS]), []);
-
-    function refetchWS() {
-        WebSocketsService.subscribeToNotification(CurrentPage.PROJECT_SETTINGS, {
-            projectId: projectId,
-            whitelist: ['label_created', 'label_deleted', 'labeling_task_deleted', 'labeling_task_updated', 'labeling_task_created'],
-            func: handleWebsocketNotification
-        });
-    }
 
     function openTaskName(index: number) {
         const labelingTasksSchemaCopy = jsonCopy(labelingTasksSchema);
@@ -103,12 +83,6 @@ export default function LabelingTasks() {
             });
         }
         return prepareNewArray;
-    }
-
-    function handleWebsocketNotification(msgParts: string[]) {
-        if (['label_created', 'label_deleted', 'labeling_task_deleted', 'labeling_task_updated', 'labeling_task_created'].includes(msgParts[1])) {
-            refetchLabelingTasksAndProcess();
-        }
     }
 
     return (<div className="mt-8">
@@ -195,12 +169,12 @@ export default function LabelingTasks() {
             </Tooltip>
         </div>
 
-        <AddLabelingTaskModal refetchWS={refetchWS} />
-        <DeleteLabelingTaskModal refetchWS={refetchWS} />
-        <DeleteLabelModal refetchWS={refetchWS} />
-        <AddLabelModal refetchWS={refetchWS} />
-        <ChangeColorModal refetchWS={refetchWS} />
-        <RenameLabelModal refetchWS={refetchWS} />
+        <AddLabelingTaskModal />
+        <DeleteLabelingTaskModal />
+        <DeleteLabelModal />
+        <AddLabelModal />
+        <ChangeColorModal />
+        <RenameLabelModal />
     </div >
     )
 }

@@ -21,8 +21,6 @@ export default function GatesIntegration(props: { refetchWS: () => void }) {
 
     const [gatesLink, setGatesLink] = useState(null);
 
-    useEffect(unsubscribeWSOnDestroy(router, [CurrentPage.PROJECT_SETTINGS]), []);
-
     useEffect(() => {
         setGatesLink(window.location.origin + '/gates/project/' + projectId + "/prediction");
     }, []);

@@ -3,7 +3,6 @@ import { selectModal } from "@/src/reduxStore/states/modal";
 import { removeFromAllLabelingTasksById } from "@/src/reduxStore/states/pages/settings";
 import { selectProjectId } from "@/src/reduxStore/states/project";
 import { DELETE_LABELING_TASK } from "@/src/services/gql/mutations/project-settings";
-import { LabelingTasksProps } from "@/src/types/components/projects/projectId/settings/labeling-tasks";
 import { ModalButton, ModalEnum } from "@/src/types/shared/modal";
 import { useMutation } from "@apollo/client";
 import { useCallback, useEffect, useState } from "react";
@@ -11,7 +10,7 @@ import { useDispatch, useSelector } from "react-redux";
 
 const ABORT_BUTTON = { buttonCaption: 'Delete labeling task', disabled: false, useButton: true };
 
-export default function DeleteLabelingTaskModal(props: LabelingTasksProps) {
+export default function DeleteLabelingTaskModal() {
     const dispatch = useDispatch();
 
     const projectId = useSelector(selectProjectId);
@@ -27,9 +26,6 @@ export default function DeleteLabelingTaskModal(props: LabelingTasksProps) {
         });
     }, [modalDeleteLabelingTask]);
 
-    useEffect(() => {
-        props.refetchWS();
-    }, [deleteLabelingTask]);
 
     useEffect(() => {
         setAbortButton({ ...ABORT_BUTTON, emitFunction: deleteLabelingTask });

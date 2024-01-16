@@ -105,7 +105,7 @@ export default function Layout({ children }) {
         if (msgParts[1] == 'notification_created') {
             if (msgParts[2] != user?.id) return;
             if (refetchTimer) return;
-            setRefetchTimer(timer(500).subscribe((x) => {
+            setRefetchTimer(timer(1000).subscribe((x) => {
                 refetchNotificationsAndProcess();
                 setRefetchTimer(null);
             }));
