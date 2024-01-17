@@ -24,7 +24,9 @@ export const TOOLTIPS_DICT = {
         'CLEAR': 'Clear',
         'CANNOT_BE_REVERTED': 'This action cannot be reverted',
         'PROJECTS': 'Home page - Projects',
-        'USERS': 'Home page - Users'
+        'USERS': 'Home page - Users',
+        'SHOW_PASSWORD': 'Show password',
+        'HIDE_PASSWORD': 'Hide password',
     },
     ['SIDEBAR']: {
         'OVERVIEW': 'Overview',
