@@ -105,20 +105,24 @@ export default function ModelsDownload() {
                                     <td className="text-center px-3 py-2 text-sm text-gray-500">
                                         <span className="inline-block mr-2">{model.name}</span>
                                     </td>
-                                    <td className="text-center px-3 py-2 text-sm text-gray-500 flex justify-center">
-                                        {model.zeroShotPipeline ? <Tooltip content={TOOLTIPS_DICT.MODELS_DOWNLOAD.USED_ZS} color="invert" placement="top" className="cursor-auto">
-                                            <IconCheckbox className="h-5 w-5"></IconCheckbox>
-                                        </Tooltip> : <Tooltip content={TOOLTIPS_DICT.MODELS_DOWNLOAD.NOT_USED_ZS} color="invert" placement="top" className="cursor-auto">
-                                            <IconBan className="h-5 w-5"></IconBan>
-                                        </Tooltip>}
+                                    <td className="text-center px-3 py-2 text-sm text-gray-500">
+                                        <div className="flex justify-center">
+                                            {model.zeroShotPipeline ? <Tooltip content={TOOLTIPS_DICT.MODELS_DOWNLOAD.USED_ZS} color="invert" placement="top" className="cursor-auto">
+                                                <IconCheckbox className="h-5 w-5"></IconCheckbox>
+                                            </Tooltip> : <Tooltip content={TOOLTIPS_DICT.MODELS_DOWNLOAD.NOT_USED_ZS} color="invert" placement="top" className="cursor-auto">
+                                                <IconBan className="h-5 w-5"></IconBan>
+                                            </Tooltip>}
+                                        </div>
                                     </td>
                                     <td className="text-center px-3 py-2 text-sm text-gray-500">
                                         {model.revision ? model.revision : '-'}
                                     </td>
-                                    <td className="text-center px-3 py-2 text-sm text-gray-500 flex justify-center">
-                                        {model.link && <a href={model.link} target="_blank">
-                                            <IconExternalLink className="h-5 w-5" />
-                                        </a>}
+                                    <td className="text-center px-3 py-2 text-sm text-gray-500">
+                                        <div className="flex justify-center">
+                                            {model.link && <a href={model.link} target="_blank">
+                                                <IconExternalLink className="h-5 w-5" />
+                                            </a>}
+                                        </div>
                                     </td>
                                     <td className="whitespace-nowrap text-center px-3 py-2 text-sm text-gray-500">
                                         {model.date != '0' && (model.status === ModelsDownloadedStatus.FINISHED || model.status === ModelsDownloadedStatus.DOWNLOADING) ? model.parseDate : '-'}
@@ -127,19 +131,21 @@ export default function ModelsDownload() {
                                     <td className="whitespace-nowrap text-center px-3 py-2 text-sm text-gray-500">
                                         {model.status === ModelsDownloadedStatus.FINISHED ? model.sizeFormatted : '-'}
                                     </td>
-                                    <td className="whitespace-nowrap text-center px-3 py-2 text-sm text-gray-500 justify-center flex">
-                                        {model.status === ModelsDownloadedStatus.FINISHED && <Tooltip content={TOOLTIPS_DICT.GENERAL.SUCCESSFULLY_CREATED} color="invert" placement="top" className="cursor-auto">
-                                            <IconCircleCheckFilled className="h-6 w-6 text-green-500" />
-                                        </Tooltip>}
-                                        {model.status === ModelsDownloadedStatus.FAILED && <Tooltip content={TOOLTIPS_DICT.GENERAL.ERROR} color="invert" placement="top" className="cursor-auto">
-                                            <IconAlertTriangleFilled className="h-6 w-6 text-red-500" />
-                                        </Tooltip>}
-                                        {model.status === ModelsDownloadedStatus.DOWNLOADING && <Tooltip content={TOOLTIPS_DICT.GENERAL.DOWNLOADING} color="invert" placement="top" className="cursor-auto">
-                                            <LoadingIcon />
-                                        </Tooltip>}
-                                        {model.status === ModelsDownloadedStatus.INITIALIZING && <Tooltip content={TOOLTIPS_DICT.GENERAL.INITIALIZING} color="invert" placement="top" className="cursor-auto">
-                                            <IconLoader className="h-6 w-6 text-gray-500" />
-                                        </Tooltip>}
+                                    <td className="whitespace-nowrap text-center px-3 py-2 text-sm text-gray-500">
+                                        <div className="flex justify-center">
+                                            {model.status === ModelsDownloadedStatus.FINISHED && <Tooltip content={TOOLTIPS_DICT.GENERAL.SUCCESSFULLY_CREATED} color="invert" placement="top" className="cursor-auto">
+                                                <IconCircleCheckFilled className="h-6 w-6 text-green-500" />
+                                            </Tooltip>}
+                                            {model.status === ModelsDownloadedStatus.FAILED && <Tooltip content={TOOLTIPS_DICT.GENERAL.ERROR} color="invert" placement="top" className="cursor-auto">
+                                                <IconAlertTriangleFilled className="h-6 w-6 text-red-500" />
+                                            </Tooltip>}
+                                            {model.status === ModelsDownloadedStatus.DOWNLOADING && <Tooltip content={TOOLTIPS_DICT.GENERAL.DOWNLOADING} color="invert" placement="top" className="cursor-auto">
+                                                <LoadingIcon />
+                                            </Tooltip>}
+                                            {model.status === ModelsDownloadedStatus.INITIALIZING && <Tooltip content={TOOLTIPS_DICT.GENERAL.INITIALIZING} color="invert" placement="top" className="cursor-auto">
+                                                <IconLoader className="h-6 w-6 text-gray-500" />
+                                            </Tooltip>}
+                                        </div>
                                     </td>
                                     <td className="whitespace-nowrap text-center px-3 py-2 text-sm text-gray-500">
                                         <IconTrash onClick={() => dispatch(setModalStates(ModalEnum.DELETE_MODEL_DOWNLOAD, { modelName: model.name, open: true }))}

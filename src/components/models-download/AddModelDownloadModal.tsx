@@ -77,9 +77,10 @@ export default function AddModelDownloadModal() {
                 </Tooltip>
                 <Dropdown2 options={modelsList && modelsList} useDifferentTextColor={colorDownloadedModels} differentTextColor="green" valuePropertyPath="configString"
                     hasSearchBar={true} dropdownItemsClasses="max-h-96 overflow-y-auto"
-                    selectedOption={(option: string) => {
-                        setModelName(option);
-                    }} optionsHaveHoverBox={true} hoverBoxList={hoverBoxList} lineSeparatorIndex={lineSeparatorIndex} />
+                    selectedOption={(option: any) => {
+                        setModelName(option.configString);
+                    }} optionsHaveHoverBox={true} hoverBoxList={hoverBoxList} lineSeparatorIndex={lineSeparatorIndex}
+                    searchTextTyped={(option: any) => setModelName(option)} />
             </div>
         </form>
     </Modal>)

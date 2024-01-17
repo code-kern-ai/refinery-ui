@@ -304,16 +304,16 @@ export default function ProjectSettings() {
                             <span className="cursor-help underline filtersUnderline">Tokenization</span>
                         </div>
                     </Tooltip>
-                    <div className="ml-2 w-8/12 items-center px-2.5 py-1.5 border border-gray-300 shadow-sm text-xs font-medium rounded text-gray-700 bg-white relative">
+                    <div className="ml-2 w-8/12 items-center px-2.5 py-1.5 border border-gray-300 shadow text-xs font-medium md:rounded-lg text-gray-700 bg-white relative">
                         {tokenizationProgress != 0 && <div className="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700">
                             <div className="bg-green-300 h-2.5 rounded-full" style={{ 'width': (tokenizationProgress * 100) + '%' }}>
                             </div>
                         </div>}
-                        {tokenizationProgress == 1 && <div className="absolute top-0 left-0 right-0 bottom-0 flex flex-row items-center justify-center" style={{ backgroundColor: '#f4f4f5bf' }}>
+                        {tokenizationProgress == 1 && <div className="absolute md:rounded-lg top-0 left-0 right-0 bottom-0 flex flex-row items-center justify-center" style={{ backgroundColor: '#f4f4f5bf' }}>
                             <IconCheck className="h-4 w-4 text-green-700" />
                             <span className="text-sm font-medium text-green-700">Completed</span>
                         </div>}
-                        {tokenizationProgress == -1 && <div className="absolute top-0 left-0 right-0 bottom-0 flex flex-row items-center justify-center" style={{ backgroundColor: '#f4f4f5bf' }}>
+                        {tokenizationProgress == -1 && <div className="absolute md:rounded-lg top-0 left-0 right-0 bottom-0 flex flex-row items-center justify-center" style={{ backgroundColor: '#f4f4f5bf' }}>
                             <IconDots className="h-4 w-4 text-gray-700" />
                             <span className="text-sm font-medium text-gray-700">Queued</span>
                         </div>}

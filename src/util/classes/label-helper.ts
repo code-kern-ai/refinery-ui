@@ -115,7 +115,7 @@ export class LabelHelper {
     }
 
     public static isLabelNameUnique(taskId: string, name: string): boolean {
-        if (name == '') return true;
+        if (name == '' || !taskId) return true;
         const trimmedName = name.trim();
         for (let label of this.labelMap.get(taskId)) {
             if (label['name'] == trimmedName) return false;

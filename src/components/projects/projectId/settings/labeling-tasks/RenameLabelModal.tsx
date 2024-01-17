@@ -41,12 +41,26 @@ export default function RenameLabelModal() {
         });
     }, [modalRenameLabel, newLabelName]);
 
-
     useEffect(() => {
         if (!LabelHelper.renameLabelData) return;
-        setAcceptButtonRename({ ...ACCEPT_BUTTON, emitFunction: renameLabel, disabled: LabelHelper.renameLabelData?.checkResults?.errors.length > 0 });
+        setAcceptButtonRename({
+            ...ACCEPT_BUTTON,
+            emitFunction: renameLabel,
+            disabled: LabelHelper.renameLabelData?.checkResults?.errors.length > 0 || !LabelHelper.renameLabelData?.checkResults
+        });
         if (!modalRenameLabel.changedLabelName) {
-            dispatch(setModalStates(ModalEnum.RENAME_LABEL, { changedLabelName: modalRenameLabel.label.name }));
+            if (modalRenameLabel.open) {
+                dispatch(setModalStates(ModalEnum.RENAME_LABEL, { changedLabelName: modalRenameLabel.label.name }));
+            } else {
+                dispatch(setModalStates(ModalEnum.RENAME_LABEL, { changedLabelName: null, checkResults: null }));
+            }
+            LabelHelper.renameLabelData.canCheck = false;
+        } else {
+            if (modalRenameLabel.open) {
+                dispatch(setModalStates(ModalEnum.RENAME_LABEL, { changedLabelName: modalRenameLabel.changedLabelName }));
+            } else {
+                dispatch(setModalStates(ModalEnum.RENAME_LABEL, { changedLabelName: null, checkResults: null }));
+            }
             LabelHelper.renameLabelData.canCheck = false;
         }
     }, [modalRenameLabel]);
@@ -79,6 +93,9 @@ export default function RenameLabelModal() {
                 <div className="self-center flex flex-row flex-nowrap items-center justify-center">
                     <p className="mr-2 font-bold">Change label name:</p><span
                         className={`border rounded-md py-1 px-2 text-sm font-medium shadow-sm  text-center ${modalRenameLabel.label.color?.backgroundColor} ${modalRenameLabel.label.color?.textColor} ${modalRenameLabel.label.color?.borderColor} ${modalRenameLabel.label.color?.hoverColor}`}>{modalRenameLabel.label.name}</span>
+                    <Tooltip content={TOOLTIPS_DICT.PROJECT_SETTINGS.LABELING_TASK.INFO_RENAME_LABEL} color="invert" placeholder="top" className="ml-2">
+                        <IconInfoCircleFilled className="h-6 w-6 text-blue-500" />
+                    </Tooltip>
                 </div>
                 <div className="flex flex-col gap-y-2" style={{ maxHeight: 'calc(80vh - 100px)' }}>
                     <div className="flex flex-row flex-nowrap items-center">

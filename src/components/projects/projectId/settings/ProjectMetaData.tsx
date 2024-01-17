@@ -1,4 +1,4 @@
-import { removeFromAllProjectsById, selectProject, setActiveProject } from "@/src/reduxStore/states/project";
+import { selectProject, setActiveProject } from "@/src/reduxStore/states/project";
 import { UPDATE_PROJECT_NAME_AND_DESCRIPTION } from "@/src/services/gql/mutations/project-settings";
 import { DELETE_PROJECT } from "@/src/services/gql/mutations/projects";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
@@ -26,17 +26,18 @@ export default function ProjectMetaData() {
         if (projectName === '' && projectDescription === '') return;
         if (projectName === '') setProjectName(project.name);
         if (projectDescription === '') setProjectDescription(project.description);
-        updateProjectNameAndDescMut({ variables: { projectId: project.id, name: projectName, description: projectDescription } }).then((res) => {
+        updateProjectNameAndDescMut({ variables: { projectId: project.id, name: projectName, description: projectDescription != '' ? projectDescription : project.description } }).then((res) => {
             const activeProject = { ...project };
             activeProject.name = projectName;
             activeProject.description = projectDescription;
             dispatch(setActiveProject(activeProject));
+            setProjectName('');
+            setProjectDescription('');
         });
     }
 
     function deleteProject() {
         deleteProjectMut({ variables: { projectId: project.id } }).then(() => {
-            dispatch(removeFromAllProjectsById(project.id));
             router.push('/projects');
         });
     }

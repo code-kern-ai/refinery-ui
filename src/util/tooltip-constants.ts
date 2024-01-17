@@ -81,6 +81,7 @@ export const TOOLTIPS_DICT = {
             'NAME_LABELING_TASK': 'Name of your labeling task',
             'RENAME_LABEL': 'Rename label',
             'OPEN_HEURISTICS': 'Open heuristics in new tab',
+            'INFO_RENAME_LABEL': 'Before renaming a label, check the label occurrences. Renaming a label will not rename the label occurrences automatically. You can change them, or rename the label anyway.',
         }
     },
     [CurrentPage.MODELS_DOWNLOAD]: {
