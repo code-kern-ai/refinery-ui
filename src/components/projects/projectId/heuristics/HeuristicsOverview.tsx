@@ -115,7 +115,7 @@ export function HeuristicsOverview() {
         } else if ('labeling_task_deleted' == msgParts[1]) {
             refetchLabelingTasksAndProcess();
             refetchHeuristicsAndProcess();
-        } else if (['information_source_created', 'information_source_updated', 'information_source_deleted', 'payload_finished', 'payload_failed', 'payload_created', 'payload_update_statistics', 'weak_supervision_started', 'weak_supervision_finished']) {
+        } else if (['information_source_created', 'information_source_updated', 'information_source_deleted', 'payload_finished', 'payload_failed', 'payload_created', 'payload_update_statistics', 'weak_supervision_started', 'weak_supervision_finished'].includes(msgParts[1])) {
             refetchHeuristicsAndProcess();
         } else if (msgParts[1] == 'embedding_deleted' || (msgParts[1] == 'embedding' && msgParts[3] == 'state')) {
             refetchEmbeddingsAndProcess();

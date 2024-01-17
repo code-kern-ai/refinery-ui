@@ -33,7 +33,6 @@ export default function CreateNewAttributeModal() {
     const [createAttributeMut] = useMutation(CREATE_USER_ATTRIBUTE);
 
     const createUserAttribute = useCallback(() => {
-        // const attributeTypeFinal = DATA_TYPES.find((type) => type.name === attributeType).value;
         createAttributeMut({ variables: { projectId: projectId, name: attributeName, dataType: attributeType.value } }).then((res) => {
             const id = res?.data?.createUserAttribute.attributeId;
             if (id) {
@@ -56,11 +55,11 @@ export default function CreateNewAttributeModal() {
     const [acceptButton, setAcceptButton] = useState<ModalButton>(ACCEPT_BUTTON);
 
     function handleAttributeName(value: string) {
-        const checkName = attributes.some(attribute => attribute.name == value);
-        setAttributeName(toPythonFunctionName(value));
+        const valueToSave = toPythonFunctionName(value);
+        const checkName = attributes.some(attribute => attribute.name == valueToSave);
+        setAttributeName(valueToSave);
         setDuplicateNameExists(checkName);
     }
-
 
     return (<Modal modalName={ModalEnum.CREATE_NEW_ATTRIBUTE} acceptButton={acceptButton}>
         <div className="flex flex-grow justify-center text-lg leading-6 text-gray-900 font-medium">
@@ -71,7 +70,7 @@ export default function CreateNewAttributeModal() {
             <Tooltip content={TOOLTIPS_DICT.PROJECT_SETTINGS.ATTRIBUTE_NAME} color="invert" placement="right">
                 <span className="cursor-help  card-title mb-0 label-text font-normal"><span className="underline filtersUnderline">Attribute name</span></span>
             </Tooltip>
-            <input type="text" defaultValue={attributeName} onInput={(e: any) => handleAttributeName(e.target.value)}
+            <input type="text" value={attributeName} onChange={(e: any) => handleAttributeName(e.target.value)}
                 onKeyDown={(e) => { if (e.key == 'Enter') createUserAttribute() }}
                 className="h-9 w-full text-sm border-gray-300 rounded-md placeholder-italic border text-gray-900 pl-4 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100" placeholder="Enter an attribute name..." />
             <Tooltip content={TOOLTIPS_DICT.PROJECT_SETTINGS.SELECT_ATTRIBUTE_TYPE} color="invert" placement="right">

@@ -69,7 +69,7 @@ export default function ActiveLearning() {
 
         WebSocketsService.subscribeToNotification(CurrentPage.ACTIVE_LEARNING, {
             projectId: projectId,
-            whitelist: ['labeling_task_updated', 'labeling_task_created', 'label_created', 'label_deleted', 'labeling_task_deleted', 'information_source_deleted', 'information_source_updated', 'model_callback_update_statistics', 'embedding_deleted', 'embedding', 'payload_finished', 'payload_failed', 'payload_created'],
+            whitelist: ['labeling_task_updated', 'labeling_task_created', 'label_created', 'label_deleted', 'labeling_task_deleted', 'information_source_deleted', 'information_source_updated', 'model_callback_update_statistics', 'embedding_deleted', 'embedding', 'payload_finished', 'payload_failed', 'payload_created', 'payload_update_statistics'],
             func: handleWebsocketNotification
         });
     }, [projectId, router.query.heuristicId]);

@@ -202,7 +202,7 @@ export default function VariableSelect(props: VariableSelectProps) {
     }, [handleWebsocketNotification, projectId]);
 
     return (<>
-        {props.variable && props.variable.values.map((v, index) => (<div key={v} className="col-start-2 flex flex-row flex-nowrap items-center gap-x-2">
+        {props.variable && props.variable.values.map((v, index) => (<div key={index} className="col-start-2 flex flex-row flex-nowrap items-center gap-x-2 my-2">
             {props.variable.type == BricksVariableType.ATTRIBUTE &&
                 <Dropdown2 options={attributes} buttonName={props.variable.values[index] ? props.variable.values[index] : 'Select attribute'}
                     selectedOption={(option: any) => {
@@ -222,7 +222,7 @@ export default function VariableSelect(props: VariableSelectProps) {
                 />
             }
             {props.variable.type == BricksVariableType.EMBEDDING &&
-                <Dropdown2 options={embeddings} buttonName={props.variable.values[index] ? props.variable.values[index] : 'Select embedding'} dropdownItemsWidth='w-max' dropdownWidth='w-80'
+                <Dropdown2 options={embeddings} buttonName={props.variable.values[index] ? props.variable.values[index] : 'Select embedding'} dropdownItemsWidth='w-max' dropdownWidth='w-72'
                     selectedOption={(option: any) => {
                         const propsCopy = { ...props };
                         propsCopy.variable.values[index] = option.name;
@@ -240,7 +240,7 @@ export default function VariableSelect(props: VariableSelectProps) {
                 />
             }
             {props.variable.type == BricksVariableType.LABEL &&
-                <Dropdown2 options={labels} buttonName={props.variable.values[index] ? props.variable.values[index] : 'Select label'}
+                <Dropdown2 options={labels} buttonName={props.variable.values[index] ? props.variable.values[index] : 'Select label'} dropdownWidth="w-max"
                     selectedOption={(option: any) => {
                         const propsCopy = { ...props };
                         propsCopy.variable.values[index] = option.name;

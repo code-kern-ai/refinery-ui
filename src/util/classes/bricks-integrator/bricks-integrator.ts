@@ -141,7 +141,7 @@ export class BricksCodeParser {
 
     private static getFunctionName(executionTypeFilter: string) {
         const parsedName = executionTypeFilter == "activeLearner" ? getPythonClassName(this.baseCode) : getPythonFunctionName(this.baseCode);
-        if (this.integratorInputRef) {
+        if (this.integratorInputRef && this.integratorInputRef.name) {
             const providedName = this.integratorInputRef.name;
             if (parsedName != providedName) {
                 this.errors.push(`Function name in code (${parsedName}) does not match name in integrator input (${providedName})`);
