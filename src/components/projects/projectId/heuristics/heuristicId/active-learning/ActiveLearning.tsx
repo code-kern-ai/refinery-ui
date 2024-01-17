@@ -50,6 +50,7 @@ export default function ActiveLearning() {
     const allUsers = useSelector(selectAllUsers);
 
     const [lastTaskLogs, setLastTaskLogs] = useState<string[]>([]);
+    const [isInitialAL, setIsInitialAL] = useState<boolean>(null);  //null as add state to differentiate between initial, not and unchecked
 
     const [refetchCurrentHeuristic] = useLazyQuery(GET_HEURISTICS_BY_ID, { fetchPolicy: "network-only" });
     const [refetchLabelingTasksByProjectId] = useLazyQuery(GET_LABELING_TASKS_BY_PROJECT_ID, { fetchPolicy: "network-only" });
@@ -84,6 +85,8 @@ export default function ActiveLearning() {
         if (!embeddings) return;
         dispatch(setFilteredEmbeddings(embeddings.filter(e => embeddingRelevant(e, attributes, labelingTasks, currentHeuristic.labelingTaskId))));
         refetchTaskByTaskIdAndProcess();
+        if (isInitialAL == null) setIsInitialAL(InformationSourceCodeLookup.isCodeStillTemplate(currentHeuristic.sourceCode.replace(embeddingsFiltered[0]?.name, '@@EMBEDDING@@')) != null)
+
     }, [currentHeuristic]);
 
     useEffect(() => {
@@ -278,7 +281,10 @@ export default function ActiveLearning() {
                         />
                     </div>
                 </div>
-                <HeuristicsEditor updatedSourceCode={(code: string) => updateSourceCode(code)} embedding={embeddingsFiltered[0]?.name} />
+                <HeuristicsEditor
+                    isInitial={isInitialAL}
+                    updatedSourceCode={(code: string) => updateSourceCode(code)}
+                    setIsInitial={(val) => setIsInitialAL(val)} />
 
                 <div className="mt-2 flex flex-grow justify-between items-center float-right">
                     <div className="flex items-center">

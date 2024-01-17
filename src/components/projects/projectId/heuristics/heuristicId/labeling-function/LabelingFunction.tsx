@@ -2,7 +2,7 @@ import { useRouter } from "next/router";
 import HeuristicsLayout from "../shared/HeuristicsLayout";
 import { useDispatch, useSelector } from "react-redux";
 import { selectProjectId } from "@/src/reduxStore/states/project";
-import { useCallback, useEffect, useState } from "react";
+import { use, useCallback, useEffect, useState } from "react";
 import { useLazyQuery, useMutation } from "@apollo/client";
 import { GET_HEURISTICS_BY_ID, GET_LABELING_FUNCTION_ON_10_RECORDS, GET_TASK_BY_TASK_ID } from "@/src/services/gql/queries/heuristics";
 import { selectHeuristic, setActiveHeuristics, updateHeuristicsState } from "@/src/reduxStore/states/pages/heuristics";
@@ -53,6 +53,7 @@ export default function LabelingFunction() {
     const [selectedAttribute, setSelectedAttribute] = useState<Attribute>(null);
     const [sampleRecords, setSampleRecords] = useState<SampleRecord>(null);
     const [displayLogWarning, setDisplayLogWarning] = useState<boolean>(false);
+    const [isInitialLf, setIsInitialLf] = useState<boolean>(null);  //null as add state to differentiate between initial, not and unchecked
 
     const [refetchCurrentHeuristic] = useLazyQuery(GET_HEURISTICS_BY_ID, { fetchPolicy: "network-only" });
     const [refetchLabelingTasksByProjectId] = useLazyQuery(GET_LABELING_TASKS_BY_PROJECT_ID, { fetchPolicy: "network-only" });
@@ -82,8 +83,9 @@ export default function LabelingFunction() {
 
     useEffect(() => {
         if (!currentHeuristic) return;
+        if (isInitialLf == null) setIsInitialLf(InformationSourceCodeLookup.isCodeStillTemplate(currentHeuristic.sourceCode) != null);
         refetchTaskByTaskIdAndProcess();
-    }, [currentHeuristic]);
+    }, [currentHeuristic, isInitialLf]);
 
     useEffect(() => {
         if (!projectId || allUsers.length == 0) return;
@@ -255,7 +257,10 @@ export default function LabelingFunction() {
                         </div>
                     </div>
                 </div>
-                <HeuristicsEditor updatedSourceCode={(code: string) => updateSourceCode(code)} />
+                <HeuristicsEditor
+                    isInitial={isInitialLf}
+                    updatedSourceCode={(code: string) => updateSourceCode(code)}
+                    setIsInitial={(val: boolean) => setIsInitialLf(val)} />
 
                 <div className="mt-2 flex flex-grow justify-between items-center float-right">
                     <div className="flex items-center">
