@@ -160,7 +160,7 @@ export default function Sidebar() {
                                                 </div>
                                             </Tooltip>
                                         </div>}
-                                        {isAdmin && <div
+                                        {isAdmin && isManaged && <div
                                             className="flex items-center justify-center overflow-visible mt-10 2xl:mt-12">
                                             <Tooltip placement="right" trigger="hover" color="invert" content={TOOLTIPS_DICT.SIDEBAR.ADMIN}>
                                                 <div className={`relative z-50 opacity-100 cursor-pointer`}>

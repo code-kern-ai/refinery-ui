@@ -134,7 +134,7 @@ export default function RecordIDE() {
         if (debounceTimer) debounceTimer.unsubscribe();
         const timerSave = timer(400).subscribe(() => {
             refetchRecordIde({ variables: { projectId: projectId, recordId, code: code } }).then((res) => {
-                if (res.data["runRecordIde"] == null) {
+                if (!res.data || res.data["runRecordIde"] == null) {
                     setOutput("");
                     setLoading(false);
                     return;

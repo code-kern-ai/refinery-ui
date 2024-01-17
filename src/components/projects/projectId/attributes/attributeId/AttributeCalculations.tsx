@@ -55,6 +55,7 @@ export default function AttributeCalculation() {
     const [isInitial, setIsInitial] = useState(null);  //null as add state to differentiate between initial, not and unchecked
     const [editorOptions, setEditorOptions] = useState(EDITOR_OPTIONS);
     const [tokenizationProgress, setTokenizationProgress] = useState(0);
+    const [editorValue, setEditorValue] = useState('');
 
     const [refetchAttributes] = useLazyQuery(GET_ATTRIBUTES_BY_PROJECT_ID, { fetchPolicy: "network-only" });
     const [updateAttributeMut] = useMutation(UPDATE_ATTRIBUTE);
@@ -67,7 +68,7 @@ export default function AttributeCalculation() {
 
     useEffect(() => {
         if (!currentAttribute) return;
-        setIsInitial(AttributeCodeLookup.isCodeStillTemplate(currentAttribute.sourceCode, currentAttribute.dataType))
+        if (isInitial == null) setIsInitial(AttributeCodeLookup.isCodeStillTemplate(currentAttribute.sourceCode, currentAttribute.dataType))
     }, [currentAttribute]);
 
     useEffect(() => {
@@ -98,7 +99,8 @@ export default function AttributeCalculation() {
 
     useEffect(() => {
         if (!currentAttribute) return;
-        if (currentAttribute.state == AttributeState.USABLE) return
+        if (currentAttribute.state == AttributeState.USABLE) return;
+        setEditorValue(currentAttribute.sourceCodeToDisplay);
         if (currentAttribute.saveSourceCode) {
             updateSourceCode(currentAttribute.sourceCode);
         }
@@ -111,6 +113,16 @@ export default function AttributeCalculation() {
         if (!projectId || allUsers.length == 0) return;
         setUpCommentsRequests();
     }, [allUsers, projectId]);
+
+    useEffect(() => {
+        const delayInputTimeoutId = setTimeout(() => {
+            const regMatch: any = getPythonFunctionRegExMatch(editorValue);
+            changeAttributeName(regMatch ? regMatch[2] : '');
+            setCurrentAttribute({ ...currentAttribute, sourceCode: editorValue });
+            updateSourceCode(editorValue);
+        }, 1000);
+        return () => clearTimeout(delayInputTimeoutId);
+    }, [editorValue, 1000]);
 
     function setUpCommentsRequests() {
         const requests = [];
@@ -150,7 +162,6 @@ export default function AttributeCalculation() {
     }
 
     function updateVisibility(option: any) {
-        // const visibility = ATTRIBUTES_VISIBILITY_STATES.find((state) => state.name === option).value;
         const attributeNew = { ...currentAttribute };
         attributeNew.visibility = option.value;
         attributeNew.visibilityIndex = ATTRIBUTES_VISIBILITY_STATES.findIndex((state) => state.name === option);
@@ -163,7 +174,6 @@ export default function AttributeCalculation() {
     }
 
     function updateDataType(option: any) {
-        // const dataType = DATA_TYPES.find((state) => state.name === option).value;
         const attributeNew = { ...currentAttribute };
         attributeNew.dataType = option.value;
         attributeNew.dataTypeName = option.name;
@@ -351,13 +361,10 @@ export default function AttributeCalculation() {
                     <Editor
                         height="400px"
                         defaultLanguage={'python'}
-                        value={currentAttribute.sourceCodeToDisplay}
+                        value={editorValue}
                         options={editorOptions}
                         onChange={(value) => {
-                            const regMatch: any = getPythonFunctionRegExMatch(value);
-                            changeAttributeName(regMatch ? regMatch[2] : '');
-                            setCurrentAttribute({ ...currentAttribute, sourceCode: value });
-                            updateSourceCode(value);
+                            setEditorValue(value);
                         }}
                     />
                 </div>

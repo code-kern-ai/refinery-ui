@@ -47,12 +47,10 @@ export function HeuristicsOverview() {
     useEffect(unsubscribeWSOnDestroy(router, [CurrentPage.HEURISTICS, CurrentPage.LABELING_FUNCTION, CurrentPage.ACTIVE_LEARNING, CurrentPage.CROWD_LABELER, CurrentPage.ZERO_SHOT, CurrentPage.COMMENTS], projectId), []);
 
     useEffect(() => {
-        if (!projectId) return;
+        if (!projectId || !embeddings || !attributes) return;
         refetchLabelingTasksAndProcess();
         refetchHeuristicsAndProcess();
-        if (embeddings.length == 0) {
-            refetchEmbeddingsAndProcess();
-        }
+        refetchEmbeddingsAndProcess();
         if (attributes.length == 0) {
             refetchAttributes({ variables: { projectId: projectId, stateFilter: ['ALL'] } }).then((res) => {
                 dispatch(setAllAttributes(res.data['attributesByProjectId']));
@@ -63,7 +61,7 @@ export function HeuristicsOverview() {
             whitelist: ['labeling_task_updated', 'labeling_task_created', 'labeling_task_deleted', 'information_source_created', 'information_source_updated', 'information_source_deleted', 'payload_finished', 'payload_failed', 'payload_created', 'payload_update_statistics', 'embedding_deleted'],
             func: handleWebsocketNotification
         });
-    }, [projectId, embeddings, attributes]);
+    }, [projectId]);
 
     useEffect(() => {
         if (!projectId || allUsers.length == 0) return;

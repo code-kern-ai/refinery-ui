@@ -121,11 +121,11 @@ export default function Comments() {
     }, [commentsSideBar]);
 
     return (<>
-        <Tooltip content={TOOLTIPS_DICT.GENERAL.COMMENTS} color="invert" placement="left">
-            <button className="cursor-pointer inline-block mr-6" onClick={toggleModal}>
+        <button className="cursor-pointer inline-block mr-6" onClick={toggleModal}>
+            <Tooltip content={TOOLTIPS_DICT.GENERAL.COMMENTS} color="invert" placement="bottom">
                 <IconNotes className="w-6 h-6" />
-            </button>
-        </Tooltip>
+            </Tooltip>
+        </button>
         <CommentsMainSection open={commentsSideBar.open} toggleOpen={(toggleModal)} />
     </>)
 }

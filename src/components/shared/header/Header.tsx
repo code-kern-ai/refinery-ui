@@ -98,30 +98,30 @@ export default function Header() {
                 </div>
                 <div className="flex flex-row flex-nowrap items-center">
                     <div className="flex items-center justify-center">
-                        <Tooltip placement="left" trigger="hover" color="invert" content={TOOLTIPS_DICT.GENERAL.PROJECTS}>
-                            <a className="flex mr-6" onClick={() => router.push('/projects')}>
+                        <a className="flex mr-6" onClick={() => router.push('/projects')}>
+                            <Tooltip placement="bottom" trigger="hover" color="invert" content={TOOLTIPS_DICT.GENERAL.PROJECTS}>
                                 <IconHome className="w-6 h-6" />
-                            </a>
-                        </Tooltip>
+                            </Tooltip>
+                        </a>
                     </div>
                     {(user?.role == UserRole.ENGINEER && isManaged) ? (
                         <div className="flex items-center justify-center">
-                            <Tooltip placement="left" trigger="hover" color="invert" content={TOOLTIPS_DICT.GENERAL.USERS}>
-                                <a className="flex mr-6" onClick={() => router.push('/users')}>
+                            <a className="flex mr-6" onClick={() => router.push('/users')}>
+                                <Tooltip placement="bottom" trigger="hover" color="invert" content={TOOLTIPS_DICT.GENERAL.USERS}>
                                     <IconHexagons className="w-6 h-6" />
-                                </a>
-                            </Tooltip>
+                                </Tooltip>
+                            </a>
                         </div>
                     ) : (<></>)}
                     <div className="flex items-center justify-center">
                         {displayComments && <Comments />}
                     </div>
                     {user?.role == UserRole.ENGINEER && <div className="flex items-center justify-center">
-                        <Tooltip content={TOOLTIPS_DICT.GENERAL.NOTIFICATION_CENTER} placement="left" color="invert">
-                            <button className="flex mr-6 cursor-pointer" onClick={openModalAndRefetchNotifications}>
+                        <button className="flex mr-6 cursor-pointer" onClick={openModalAndRefetchNotifications}>
+                            <Tooltip content={TOOLTIPS_DICT.GENERAL.NOTIFICATION_CENTER} placement="bottom" color="invert">
                                 <IconBell className="w-6 h-6" />
-                            </button>
-                        </Tooltip>
+                            </Tooltip>
+                        </button>
                     </div>}
                     {user?.role == UserRole.ENGINEER ? (
                         <div className="flex items-center justify-center">

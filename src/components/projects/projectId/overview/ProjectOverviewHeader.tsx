@@ -1,3 +1,4 @@
+import { selectIsManaged } from "@/src/reduxStore/states/general";
 import { selectStaticSlices } from "@/src/reduxStore/states/pages/data-browser";
 import { selectLabelingTasksAll, selectUsableAttributesNoFiltered } from "@/src/reduxStore/states/pages/settings";
 import { selectOverviewFilters, setOverviewFilters, updateOverFilters } from "@/src/reduxStore/states/tmp";
@@ -5,12 +6,13 @@ import { ProjectOverviewFilters } from "@/src/types/components/projects/projectI
 import { LabelingTask } from "@/src/types/components/projects/projectId/settings/labeling-tasks";
 import { getDisplayGraphValueArray } from "@/src/util/components/projects/projectId/project-overview/project-overview-helper";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
+import { DisplayGraphs } from "@/submodules/javascript-functions/enums/enums";
 import Dropdown2 from "@/submodules/react-components/components/Dropdown2";
+import { useConsoleLog } from "@/submodules/react-components/hooks/useConsoleLog";
 import { Tooltip } from "@nextui-org/react";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
-const DISPLAY_GRAPHS_VALUE_ARRAY = getDisplayGraphValueArray();
 
 export default function ProjectOverviewHeader() {
     const dispatch = useDispatch();
@@ -19,21 +21,26 @@ export default function ProjectOverviewHeader() {
     const targetAttributes = useSelector(selectUsableAttributesNoFiltered);
     const dataSlices = useSelector(selectStaticSlices);
     const overviewFilters = useSelector(selectOverviewFilters);
+    const isManaged = useSelector(selectIsManaged);
 
     const [labelingTasksFiltered, setLabelingTasksFiltered] = useState<LabelingTask[]>([]);
+    const [graphsValueArray, setGraphsValueArray] = useState<any>(getDisplayGraphValueArray());
 
     useEffect(() => {
         if (!labelingTasks || !targetAttributes || !dataSlices || !targetAttributes[0] || !dataSlices[0]) return;
         const labelingTasksFinal = labelingTasks.find((labelingTask) => labelingTask.targetName === targetAttributes[0].name);
         const overviewFiltersNew: ProjectOverviewFilters = {
-            graphType: DISPLAY_GRAPHS_VALUE_ARRAY[0],
+            graphType: graphsValueArray[0],
             targetAttribute: targetAttributes[0],
             labelingTask: labelingTasksFinal,
             dataSlice: dataSlices[0],
         }
         dispatch(setOverviewFilters(overviewFiltersNew));
         setLabelingTasksFiltered(labelingTasks.filter((labelingTask) => labelingTask.targetName === targetAttributes[0].name));
-    }, [labelingTasks, targetAttributes, dataSlices]);
+        if (!isManaged) {
+            setGraphsValueArray(graphsValueArray.filter((graph: any) => graph.value !== DisplayGraphs.INTER_ANNOTATOR));
+        }
+    }, [labelingTasks, targetAttributes, dataSlices, isManaged]);
 
     return (
         <nav className="flex" aria-label="Breadcrumb">
@@ -43,7 +50,7 @@ export default function ProjectOverviewHeader() {
                         <Tooltip placement="bottom" trigger="hover" color="invert" content={TOOLTIPS_DICT.PROJECT_OVERVIEW.VISUALIZATION} className="relative z-10 cursor-auto">
                             <span className={`cursor-help mr-2 underline text-black-800 filtersUnderline`}>Visualizations</span>
                         </Tooltip>
-                        <Dropdown2 buttonName={overviewFilters?.graphType?.name} options={DISPLAY_GRAPHS_VALUE_ARRAY} dropdownWidth="w-44"
+                        <Dropdown2 buttonName={overviewFilters?.graphType?.name} options={graphsValueArray} dropdownWidth="w-44"
                             selectedOption={(option: any) => {
                                 dispatch(updateOverFilters('graphType', option));
                             }} />
