@@ -54,17 +54,15 @@ export default function NavigationBarBottom() {
                     </div>
                     <div className="flex justify-center overflow-visible items-center cursor-pointer">
                         {record && record.id != "deleted" && <>
-                            <input value={settings.labeling.showNLabelButton} type="number"
+                            <input value={settings.labeling.showNLabelButton} type="number" min="0" step="1"
                                 onChange={(event) => setShowNLabelButtonFunc(event)}
                                 onBlur={(event) => setShowNLabelButtonFunc(event)}
                                 onKeyDown={(event) => {
                                     if (event.key == 'Enter') setShowNLabelButtonFunc(event)
                                 }} className="h-9 w-12 text-sm border-gray-300 rounded-md placeholder-italic border text-gray-900 pl-4 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100" />
                             <span className="flex-grow flex flex-col flex-shrink-0 ml-3">
-                                <span className="text-sm font-medium text-gray-900" id="availability-label">Display of label
-                                    options</span>
-                                <span className="text-sm text-gray-500" id="availability-description">Nr. of options shown
-                                    by default</span>
+                                <span className="text-sm font-medium text-gray-900" id="availability-label">Display of label options</span>
+                                <span className="text-sm text-gray-500" id="availability-description">Nr. of options shown by default</span>
                             </span>
                         </>}
                     </div>

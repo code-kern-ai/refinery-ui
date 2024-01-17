@@ -129,8 +129,8 @@ export default function ActiveLearning() {
     }
 
     function saveHeuristic(labelingTask: any) {
-        // const labelingTask = labelingTasks.find(a => a.name == labelingTaskName);
-        checkTemplateCodeChange(labelingTask);
+        const newCode = checkTemplateCodeChange(labelingTask);
+        if (newCode) updateSourceCode(newCode, labelingTask.id);
         updateHeuristicMut({ variables: { projectId: projectId, informationSourceId: currentHeuristic.id, labelingTaskId: labelingTask.id } }).then((res) => {
             dispatch(updateHeuristicsState(currentHeuristic.id, { labelingTaskId: labelingTask.id, labelingTaskName: labelingTask.name, labels: labelingTask.labels }));
         });
@@ -164,11 +164,10 @@ export default function ActiveLearning() {
         const templateCode = getInformationSourceTemplate(matching, currentHeuristic.informationSourceType, newEmbeddings[0]?.name).code;
         const currentHeuristicCopy = { ...currentHeuristic };
         const regMatch = getPythonClassRegExMatch(currentHeuristicCopy.sourceCode);
-        if (regMatch[2] !== currentHeuristicCopy.name) {
+        if (regMatch[1] !== currentHeuristicCopy.name) {
             currentHeuristicCopy.sourceCodeToDisplay = templateCode.replace(regMatch[0], getClassLine(currentHeuristicCopy.name, labelingTasks, labelingTask.id));
         }
-        updateSourceCode(currentHeuristicCopy.sourceCodeToDisplay, labelingTask.id)
-        dispatch(updateHeuristicsState(currentHeuristic.id, { sourceCodeToDisplay: currentHeuristicCopy.sourceCodeToDisplay }))
+        return currentHeuristicCopy.sourceCodeToDisplay;
     }
 
     function updateSourceCodeToDisplay(value: string) {
@@ -181,8 +180,8 @@ export default function ActiveLearning() {
         if (!regMatch) return value;
         const labelingTaskFinalId = labelingTaskId ?? currentHeuristic.labelingTaskId;
         const finalSourceCode = value.replace(regMatch[0], getClassLine(null, labelingTasks, labelingTaskFinalId));
-        updateHeuristicMut({ variables: { projectId: projectId, informationSourceId: currentHeuristic.id, labelingTaskId: labelingTaskFinalId, code: finalSourceCode, name: regMatch[1] } }).then((res) => {
-            dispatch(updateHeuristicsState(currentHeuristic.id, { sourceCode: finalSourceCode, name: regMatch[1] }))
+        updateHeuristicMut({ variables: { projectId: projectId, informationSourceId: currentHeuristic.id, labelingTaskId: labelingTaskFinalId, code: finalSourceCode } }).then((res) => {
+            dispatch(updateHeuristicsState(currentHeuristic.id, { sourceCode: finalSourceCode }))
         });
     }
 
@@ -230,7 +229,7 @@ export default function ActiveLearning() {
                     <div className="flex items-center flex-wrap mt-3">
                         <div className="text-sm leading-5 font-medium text-gray-700 inline-block mr-2">Editor</div>
                         <Tooltip content={TOOLTIPS_DICT.LABELING_FUNCTION.LABELING_TASK} color="invert" placement="top">
-                            <Dropdown2 options={labelingTasks} buttonName={currentHeuristic?.labelingTaskName} selectedOption={(option: any) => saveHeuristic(option)} dropdownClasses="z-50" />
+                            <Dropdown2 options={labelingTasks} buttonName={currentHeuristic?.labelingTaskName} selectedOption={(option: any) => saveHeuristic(option)} dropdownClasses="z-30" />
 
                         </Tooltip>
                         {currentHeuristic.labels?.length == 0 ? (<div className="text-sm font-normal text-gray-500 ml-3">No labels for target task</div>) : <>

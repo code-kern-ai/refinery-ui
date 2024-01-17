@@ -12,8 +12,6 @@ const EDITOR_OPTIONS = { theme: 'vs-light', language: 'python', readOnly: false 
 
 export default function HeuristicsEditor(props: HeuristicsEditorProps) {
     const currentHeuristic = useSelector(selectHeuristic);
-    const labelingTasks = useSelector(selectLabelingTasksAll);
-
 
     const [editorValue, setEditorValue] = useState('');
     const [checkUnsavedChanges, setCheckUnsavedChanges] = useState(false);
@@ -30,6 +28,7 @@ export default function HeuristicsEditor(props: HeuristicsEditorProps) {
     useEffect(() => {
         const delayInputTimeoutId = setTimeout(() => {
             props.updatedSourceCode(editorValue);
+            setCheckUnsavedChanges(hasUnsavedChanges());
         }, 1000);
         return () => clearTimeout(delayInputTimeoutId);
     }, [editorValue, 1000]);
@@ -41,9 +40,9 @@ export default function HeuristicsEditor(props: HeuristicsEditorProps) {
     function hasUnsavedChanges() {
         if (!currentHeuristic) return false;
         if (currentHeuristic.informationSourceType === InformationSourceType.LABELING_FUNCTION) {
-            if (editorValue != currentHeuristic.sourceCode.replace('def lf(record', 'def ' + currentHeuristic.name + '(record')) return true;
+            if (editorValue != currentHeuristic.sourceCodeToDisplay) return true;
         } else if (currentHeuristic.informationSourceType === InformationSourceType.ACTIVE_LEARNING) {
-            if (editorValue != currentHeuristic.sourceCode.replace(getClassLine(null, labelingTasks, currentHeuristic.labelingTaskId), getClassLine(currentHeuristic.name, labelingTasks, currentHeuristic.labelingTaskId))) return true;
+            if (editorValue != currentHeuristic.sourceCodeToDisplay) return true;
         }
         return false;
     }
@@ -74,7 +73,7 @@ export default function HeuristicsEditor(props: HeuristicsEditorProps) {
                     }}
                 />
             </div>
-            {checkUnsavedChanges && <div className="flex items-center absolute mt-3" style={{ right: currentHeuristic.informationSourceType == InformationSourceType.LABELING_FUNCTION ? '45%' : '20%' }}>
+            {checkUnsavedChanges && <div className="flex items-center absolute mt-2">
                 <div className="text-sm font-normal">Saving...</div>
                 <LoadingIcon color="indigo" />
             </div>}

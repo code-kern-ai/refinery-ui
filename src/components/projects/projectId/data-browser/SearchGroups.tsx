@@ -712,7 +712,7 @@ export default function SearchGroups() {
                                                 <IconArrowsRandom />
                                             </div>
                                         </span>
-                                        <input placeholder={groupItem['seedString']}
+                                        <input value={groupItem['seedString']}
                                             onChange={(e) => setRandomSeedGroup(e.target.value)}
                                             className="h-8 w-36 text-sm border-gray-300 rounded-r-md placeholder-italic border text-gray-900 pl-4 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100" />
                                     </div>

@@ -138,7 +138,7 @@ export default function LabelingSettingsModal() {
         {activeTab == ComponentType.LABELING && <div className="flex flex-col gap-y-2 items-center my-4">
             <div className="grid gap-y-2 gap-x-4 items-center text-left" style={{ gridTemplateColumns: 'max-content auto max-content' }}>
                 <span>Label options</span>
-                <input value={settings?.labeling.showNLabelButton} type="number" onChange={(e) => changeSetting(ComponentType.LABELING, 'showNLabelButton', e.target.value)}
+                <input value={settings?.labeling.showNLabelButton} type="number" min="0" step="1" onChange={(e) => changeSetting(ComponentType.LABELING, 'showNLabelButton', e.target.value)}
                     className="h-9 w-12 text-sm border-gray-300 rounded-md placeholder-italic border text-gray-900 pl-4 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100" />
                 <Tooltip content={<MultilineTooltip tooltipLines={['Amount of label buttons shown before hiding the rest under: \'other \<task\> options\'']} />} color="invert" placement="top" className="cursor-auto"><IconInfoCircle className="h-5 w-5" /></Tooltip>
                 <span>Close label box</span>
