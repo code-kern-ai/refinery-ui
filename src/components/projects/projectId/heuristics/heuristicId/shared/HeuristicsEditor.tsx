@@ -74,7 +74,7 @@ export default function HeuristicsEditor(props: HeuristicsEditorProps) {
                     }}
                 />
             </div>
-            {checkUnsavedChanges && <div className="flex items-center">
+            {checkUnsavedChanges && <div className="flex items-center absolute mt-3" style={{ right: currentHeuristic.informationSourceType == InformationSourceType.LABELING_FUNCTION ? '45%' : '20%' }}>
                 <div className="text-sm font-normal">Saving...</div>
                 <LoadingIcon color="indigo" />
             </div>}

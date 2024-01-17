@@ -172,8 +172,8 @@ export default function LabelingFunction() {
         var regMatch: any = getPythonFunctionRegExMatch(value);
         if (!regMatch) return value;
         const finalSourceCode = value.replace(regMatch[0], 'def lf(record)');
-        updateHeuristicMut({ variables: { projectId: projectId, informationSourceId: currentHeuristic.id, labelingTaskId: labelingTaskId ?? currentHeuristic.labelingTaskId, code: finalSourceCode } }).then((res) => {
-            dispatch(updateHeuristicsState(currentHeuristic.id, { sourceCode: finalSourceCode }))
+        updateHeuristicMut({ variables: { projectId: projectId, informationSourceId: currentHeuristic.id, labelingTaskId: labelingTaskId ?? currentHeuristic.labelingTaskId, code: finalSourceCode, name: regMatch[2] } }).then((res) => {
+            dispatch(updateHeuristicsState(currentHeuristic.id, { sourceCode: finalSourceCode, name: regMatch[2] }))
         });
     }
 

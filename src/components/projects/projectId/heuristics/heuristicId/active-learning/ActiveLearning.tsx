@@ -181,8 +181,8 @@ export default function ActiveLearning() {
         if (!regMatch) return value;
         const labelingTaskFinalId = labelingTaskId ?? currentHeuristic.labelingTaskId;
         const finalSourceCode = value.replace(regMatch[0], getClassLine(null, labelingTasks, labelingTaskFinalId));
-        updateHeuristicMut({ variables: { projectId: projectId, informationSourceId: currentHeuristic.id, labelingTaskId: labelingTaskFinalId, code: finalSourceCode } }).then((res) => {
-            dispatch(updateHeuristicsState(currentHeuristic.id, { sourceCode: finalSourceCode }))
+        updateHeuristicMut({ variables: { projectId: projectId, informationSourceId: currentHeuristic.id, labelingTaskId: labelingTaskFinalId, code: finalSourceCode, name: regMatch[1] } }).then((res) => {
+            dispatch(updateHeuristicsState(currentHeuristic.id, { sourceCode: finalSourceCode, name: regMatch[1] }))
         });
     }
 
