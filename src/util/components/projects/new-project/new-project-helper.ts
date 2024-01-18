@@ -22,7 +22,7 @@ export function checkWhitelistTokenizer(tokenizer: any[], isManaged: boolean) {
     }
 
     if (insertPos != -1) {
-        tokenizer.splice(insertPos, 0, { disabled: true, name: "********************************************" });
+        tokenizer.splice(insertPos, 0, { disabled: true, name: "-----------------------------------------" });
         if (isManaged) {
             tokenizer.splice(insertPos, 0, { disabled: true, name: "if you need the options below feel free to contact us", configString: "email" });
         } else {
