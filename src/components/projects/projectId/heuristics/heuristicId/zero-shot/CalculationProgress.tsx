@@ -24,7 +24,7 @@ export default function CalculationProgress() {
                             {currentHeuristic.lastTask.state === Status.CREATED && <Tooltip content={TOOLTIPS_DICT.LABELING_FUNCTION.CURRENTLY_RUNNING} color="invert" placement="right" className="cursor-auto">
                                 <LoadingIcon />
                             </Tooltip>}
-                            {currentHeuristic.lastTask.state == Status.FINISHED && <Tooltip content={TOOLTIPS_DICT.GENERAL.SUCCESSFULLY_CREATED} color="invert" className="cursor-auto">
+                            {currentHeuristic.lastTask.state == Status.FINISHED && <Tooltip content={TOOLTIPS_DICT.HEURISTICS.SUCCESSFULLY_EXECUTED} color="invert" className="cursor-auto">
                                 <IconCircleCheckFilled className="h-6 w-6 text-green-500" />
                             </Tooltip>}
                             {currentHeuristic.lastTask.state == Status.FAILED && <Tooltip content={TOOLTIPS_DICT.GENERAL.ERROR} color="invert" className="cursor-auto">

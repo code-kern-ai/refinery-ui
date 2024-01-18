@@ -4,7 +4,7 @@ import HeuristicsLayout from "../shared/HeuristicsLayout";
 import { selectProjectId } from "@/src/reduxStore/states/project";
 import { useLazyQuery, useMutation } from "@apollo/client";
 import { GET_HEURISTICS_BY_ID } from "@/src/services/gql/queries/heuristics";
-import { useCallback, useEffect, useState } from "react";
+import { use, useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { GET_LABELING_TASKS_BY_PROJECT_ID, GET_ZERO_SHOT_RECOMMENDATIONS } from "@/src/services/gql/queries/project-setting";
 import { postProcessLabelingTasks, postProcessLabelingTasksSchema } from "@/src/util/components/projects/projectId/settings/labeling-tasks-helper";
@@ -46,6 +46,7 @@ export default function ZeroShot() {
 
     const [isModelDownloading, setIsModelDownloading] = useState(false);
     const [models, setModels] = useState([]);
+    const [confidences, setConfidences] = useState<any[]>(CONFIDENCE_INTERVALS);
 
     const [refetchCurrentHeuristic] = useLazyQuery(GET_HEURISTICS_BY_ID, { fetchPolicy: "network-only" });
     const [refetchLabelingTasksByProjectId] = useLazyQuery(GET_LABELING_TASKS_BY_PROJECT_ID, { fetchPolicy: "network-only" });
@@ -54,6 +55,12 @@ export default function ZeroShot() {
     const [refetchComments] = useLazyQuery(REQUEST_COMMENTS, { fetchPolicy: "no-cache" });
 
     useEffect(unsubscribeWSOnDestroy(router, [CurrentPage.HEURISTICS, CurrentPage.LABELING_FUNCTION, CurrentPage.ACTIVE_LEARNING, CurrentPage.CROWD_LABELER, CurrentPage.ZERO_SHOT, CurrentPage.COMMENTS], projectId), []);
+
+    useEffect(() => {
+        setConfidences(CONFIDENCE_INTERVALS.map((conf) => {
+            return { value: conf, label: conf + '%' };
+        }));
+    }, []);
 
     useEffect(() => {
         if (!projectId) return;
@@ -110,7 +117,6 @@ export default function ZeroShot() {
     }
 
     function saveHeuristic(labelingTaskParam?: any, zeroShotSettings?: ZeroShotSettings) {
-        // const labelingTask = labelingTaskName ? labelingTasks.find(a => a.name == labelingTaskName) : labelingTasks.find(a => a.id == currentHeuristic.zeroShotSettings.taskId);
         const labelingTask = labelingTaskParam ? labelingTaskParam.id : currentHeuristic.zeroShotSettings.taskId;
         const code = parseToSettingsJson(zeroShotSettings ? zeroShotSettings : currentHeuristic.zeroShotSettings);
         updateHeuristicMut({ variables: { projectId: projectId, informationSourceId: currentHeuristic.id, labelingTaskId: labelingTask, code: code } }).then((res) => {
@@ -219,7 +225,6 @@ export default function ZeroShot() {
                     <Tooltip content={TOOLTIPS_DICT.ZERO_SHOT.INPUT_ATTRIBUTE} color="invert" placement="top">
                         <Dropdown2 options={textAttributes} buttonName={currentHeuristic.zeroShotSettings.attributeName} disabled={currentHeuristic.zeroShotSettings.attributeSelectDisabled}
                             selectedOption={(option: any) => {
-                                // const attributeId = textAttributes.find(a => a.name == option).id;
                                 changeZeroShotSettings('attributeId', option.id);
                             }} />
                     </Tooltip>
@@ -228,8 +233,8 @@ export default function ZeroShot() {
                             selectedOption={(option: any) => changeZeroShotSettings('targetConfig', option.configString)} />
                     </Tooltip>
                     <Tooltip content={TOOLTIPS_DICT.ZERO_SHOT.CONFIDENCE} color="invert" placement="top">
-                        <Dropdown2 options={CONFIDENCE_INTERVALS} buttonName={(currentHeuristic.zeroShotSettings.minConfidence * 100) + '%'} selectedOption={(option: string) => {
-                            changeZeroShotSettings('minConfidence', option);
+                        <Dropdown2 options={confidences} buttonName={(currentHeuristic.zeroShotSettings.minConfidence * 100) + '%'} selectedOption={(option: any) => {
+                            changeZeroShotSettings('minConfidence', option.value);
                         }} />
                     </Tooltip>
                 </div>

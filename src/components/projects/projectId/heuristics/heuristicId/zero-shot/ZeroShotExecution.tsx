@@ -16,6 +16,7 @@ import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import ViewDetailsZSModal from "./ViewDetailsZSModal";
 import { useRouter } from "next/router";
+import LoadingIcon from "@/src/components/shared/loading/LoadingIcon";
 
 export default function ZeroShotExecution(props: ZeroShotExecutionProps) {
     const dispatch = useDispatch();
@@ -44,7 +45,7 @@ export default function ZeroShotExecution(props: ZeroShotExecutionProps) {
         if (testerRequestedSomething) return;
         let labels;
         const useTaskLabels = props.customLabels == '';
-        if (!useTaskLabels) labels = JSON.stringify(props.customLabels.split(",").map(l => l.trim()));
+        if (!useTaskLabels) labels = props.customLabels.split(",").map(l => l.trim());
         else labels = labelingTasks.find(task => task.id == currentHeuristic.labelingTaskId).labels
             .filter(l => !currentHeuristic.zeroShotSettings.excludedLabels.includes(l.id))
             .map(l => l.name);
@@ -77,14 +78,15 @@ export default function ZeroShotExecution(props: ZeroShotExecutionProps) {
             <div className="grid items-center" style={{ gridTemplateColumns: 'auto max-content 0px' }} >
                 <div className="text-gray-500 font-normal">You can execute your model on all records, or test-run it on 10 examples (which are sampled randomly). Test results are shown below after computation.</div>
                 <div className="flex">
-                    <Tooltip content={TOOLTIPS_DICT.ZERO_SHOT.EXECUTE_10_RECORDS} color="invert" placement="left">
+                    {testerRequestedSomething && <div className="m-1"> <LoadingIcon color="indigo" /></div>}
+                    <Tooltip content={TOOLTIPS_DICT.ZERO_SHOT.EXECUTE_10_RECORDS} color="invert" placement="top">
                         <button onClick={runZeroShot10RecordTest}
                             className="bg-white text-gray-700 text-xs font-semibold px-4 py-2 rounded-md border border-gray-300 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
                             Run on 10
                         </button>
                     </Tooltip>
 
-                    <Tooltip content={TOOLTIPS_DICT.ZERO_SHOT.EXECUTE_ALL_RECORDS} color="invert" placement="left">
+                    <Tooltip content={TOOLTIPS_DICT.ZERO_SHOT.EXECUTE_ALL_RECORDS} color="invert" placement="top">
                         <button onClick={runZeroShotProject} disabled={!canRunProject}
                             className="bg-indigo-700 text-white text-xs leading-4 font-semibold px-4 py-2 rounded-md cursor-pointer ml-3 hover:bg-indigo-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed">
                             Run
@@ -104,7 +106,7 @@ export default function ZeroShotExecution(props: ZeroShotExecutionProps) {
                                     <div className="flex items-center text-xs leading-5 text-gray-500 font-normal ml-4 my-3 text-left">
                                         {record.checkedText}
                                     </div>
-                                    <div className="flex flex-row flex-nowrap items-center" style={{ gridTemplateColumns: 'auto 40px 40px 80px' }}>
+                                    <div className="grid flex-nowrap items-center" style={{ gridTemplateColumns: 'auto 50px 40px 80px' }}>
                                         {record.labels[0].color ? (<div className="flex items-center justify-center mr-5">
                                             <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium border ${record.labels[0].color.backgroundColor} ${record.labels[0].color.textColor} ${record.labels[0].color.borderColor} ${record.labels[0].color.hoverColor}`}>
                                                 {record.labels[0].labelName}
@@ -117,7 +119,7 @@ export default function ZeroShotExecution(props: ZeroShotExecutionProps) {
                                             </span>
                                         </div>
                                         <div className="flex flex-row items-center">
-                                            {(record.labels[0].confidence * 100) < currentHeuristic.zeroShotSettings.minConfidence ? <Tooltip content={TOOLTIPS_DICT.ZERO_SHOT.CONFIDENCE_TOO_LOW} color="invert" placement="top" className="cursor-auto">
+                                            {record.labels[0].confidence < currentHeuristic.zeroShotSettings.minConfidence ? <Tooltip content={TOOLTIPS_DICT.ZERO_SHOT.CONFIDENCE_TOO_LOW} color="invert" placement="top" className="cursor-auto">
                                                 <IconAlertTriangle className="text-yellow-500 h-5 w-5 ml-1 mr-3" />
                                             </Tooltip> : <div className="w-10"></div>}
                                         </div>

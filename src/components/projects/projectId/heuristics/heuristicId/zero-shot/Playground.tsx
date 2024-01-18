@@ -94,7 +94,7 @@ export default function Playground() {
 
                 {singleLineTesterResult.length > 0 && <div className="mt-2 text-sm leading-5">
                     <span className="text-gray-700 font-semibold">Prediction</span>
-                    <div className="flex gap-x-2 items-center" style={{ gridTemplateColumns: 'max content 16.5rem max-content' }}>
+                    <div className="grid grid-cols-3 gap-x-2 gap-y-2 items-center text-left" style={{ gridTemplateColumns: 'max-content max-content max-content' }}>
                         {singleLineTesterResult.map((result: any) => (<Fragment key={result.labelName}>
                             {result.color ? (<div className={`border items-center px-2 py-0.5 rounded text-xs font-medium text-center m-2 ${result.color.backgroundColor} ${result.color.textColor} ${result.color.borderColor} ${result.color.hoverColor}`}>
                                 {result.labelName}
@@ -110,7 +110,7 @@ export default function Playground() {
                             </div>
                             <div className="flex flex-row items-center">
                                 <span className="text-sm select-none self-start mr-2">{result.confidenceText}</span>
-                                {(result.confidence * 100) < currentHeuristic.zeroShotSettings.minConfidence && <Tooltip content={TOOLTIPS_DICT.ZERO_SHOT.CONFIDENCE_TOO_LOW} color="invert" placement="top" className="cursor-auto">
+                                {result.confidence < currentHeuristic.zeroShotSettings.minConfidence && <Tooltip content={TOOLTIPS_DICT.ZERO_SHOT.CONFIDENCE_TOO_LOW} color="invert" placement="top" className="cursor-auto">
                                     <IconAlertTriangle className="text-yellow-500 h-5 w-5" />
                                 </Tooltip>}
                             </div>

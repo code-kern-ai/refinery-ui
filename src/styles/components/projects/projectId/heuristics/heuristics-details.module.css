@@ -2,3 +2,10 @@
     max-height: calc(100vh - 230px);
     overflow-y: auto;
 }
+
+
+@media screen and (min-width: 980px) {
+    .widthSize {
+        width: calc(100vw - 75px);
+    }
+}

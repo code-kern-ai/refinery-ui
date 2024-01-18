@@ -14,13 +14,14 @@ import { copyToClipboard } from "@/submodules/javascript-functions/general";
 import { useLazyQuery, useMutation } from "@apollo/client";
 import { Tooltip } from "@nextui-org/react";
 import { IconArrowLeft } from "@tabler/icons-react";
-import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux"
+import style from '@/src/styles/components/projects/projectId/heuristics/heuristics-details.module.css';
+import { useRouter } from "next/router";
 
 export default function HeuristicsLayout(props: any) {
-    const dispatch = useDispatch();
     const router = useRouter();
+    const dispatch = useDispatch();
 
     const projectId = useSelector(selectProjectId);
     const currentHeuristic = useSelector(selectHeuristic);
@@ -34,6 +35,9 @@ export default function HeuristicsLayout(props: any) {
     const [refetchAttributes] = useLazyQuery(GET_ATTRIBUTES_BY_PROJECT_ID, { fetchPolicy: "network-only" });
     const [refetchLookupLists] = useLazyQuery(LOOKUP_LISTS_BY_PROJECT_ID, { fetchPolicy: "network-only" });
     const [updateHeuristicMut] = useMutation(UPDATE_INFORMATION_SOURCE);
+
+    const nameRef = useRef<HTMLInputElement>(null);
+    const descriptionRef = useRef<HTMLInputElement>(null);
 
     useEffect(() => {
         if (!projectId) return;
@@ -55,8 +59,22 @@ export default function HeuristicsLayout(props: any) {
     }
 
     function openProperty(open: boolean, property: string) {
-        if (property == HeuristicsProperty.NAME) setIsNameOpen(open);
-        if (property == HeuristicsProperty.DESCRIPTION) setIsDescriptionOpen(open);
+        if (property == HeuristicsProperty.NAME) {
+            setIsNameOpen(open);
+            if (open) {
+                setTimeout(() => {
+                    nameRef.current?.focus();
+                }, 100);
+            }
+        }
+        if (property == HeuristicsProperty.DESCRIPTION) {
+            setIsDescriptionOpen(open);
+            if (open) {
+                setTimeout(() => {
+                    descriptionRef.current?.focus();
+                }, 100);
+            }
+        }
         if (!open) {
             saveHeuristic();
         }
@@ -87,17 +105,18 @@ export default function HeuristicsLayout(props: any) {
         });
     }
 
-    return (projectId && <div className="bg-white p-4 pb-16 overflow-y-auto h-screen" style={{ width: 'calc(100vw - 75px)' }} onScroll={onScrollEvent}>
+    return (projectId && <div className={`bg-white p-4 pb-16 overflow-y-auto h-screen ${style.widthSize}`} onScroll={onScrollEvent}>
         {currentHeuristic && <div>
             <div className={`sticky z-40 h-12 ${isHeaderNormal ? 'top-1' : '-top-5'}`}>
                 <div className={`bg-white flex-grow ${isHeaderNormal ? '' : 'shadow'}`}>
                     <div className={`flex-row justify-start items-center inline-block ${isHeaderNormal ? 'p-0' : 'flex py-2'}`} style={{ transition: 'all .25s ease-in-out' }}>
-                        <a href={`/refinery/projects/${projectId}/heuristics`} onClick={() => {
+                        <button onClick={() => {
+                            router.push(`/projects/${projectId}/heuristics`);
                             dispatch(setActiveHeuristics(null));
                         }} className="text-green-800 text-sm font-medium">
                             <IconArrowLeft className="h-5 w-5 inline-block text-green-800" />
                             <span className="leading-5">Go back</span>
-                        </a>
+                        </button>
                         {!isHeaderNormal && <div className="mx-4 text-sm leading-5 font-medium text-gray-500 inline-block">{currentHeuristic.name}</div>}
                         <Statuses status={currentHeuristic.state} page="heuristics" initialCaption="Initial" />
                         {currentHeuristic.lastTask && <Tooltip content={TOOLTIPS_DICT.HEURISTICS.EXECUTION_TIME} color="invert" placement="right" className="cursor-auto">
@@ -112,7 +131,7 @@ export default function HeuristicsLayout(props: any) {
                     </div>
                 </div>
             </div>
-            <div className="w-full">
+            <div className="w-full overflow-hidden">
                 <div className={`grid gap-4 ${isHeaderNormal ? 'grid-cols-2' : 'grid-cols-1'}`}>
                     {isHeaderNormal && <div className="flex items-center mt-2">
                         <Tooltip color="invert" placement="bottom" content={TOOLTIPS_DICT.HEURISTICS.EDIT_NAME}>
@@ -121,11 +140,11 @@ export default function HeuristicsLayout(props: any) {
                                 Edit name
                             </button>
                         </Tooltip>
-                        <div className="inline-block" onDoubleClick={() => openProperty(true, HeuristicsProperty.NAME)}>
+                        <div className="flex-grow" onDoubleClick={() => openProperty(true, HeuristicsProperty.NAME)}>
                             {isNameOpen
-                                ? (<input type="text" value={currentHeuristic.name} onInput={(e: any) => changeHeuristic(e.target.value, HeuristicsProperty.NAME)}
+                                ? (<input type="text" value={currentHeuristic.name} ref={nameRef} onInput={(e: any) => changeHeuristic(e.target.value, HeuristicsProperty.NAME)}
                                     onBlur={() => openProperty(false, HeuristicsProperty.NAME)} onKeyDown={(e) => { if (e.key == 'Enter') openProperty(false, HeuristicsProperty.NAME) }}
-                                    className="h-8 border-gray-300 rounded-md placeholder-italic border text-gray-700 pl-4 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100" />)
+                                    className="h-8 w-full border-gray-300 rounded-md placeholder-italic border text-gray-700 pl-4 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100" />)
                                 : (<div className="mr-4 text-sm leading-5 font-medium text-gray-500 inline-block">{currentHeuristic.name}</div>)}
                         </div>
                     </div>}
@@ -136,11 +155,11 @@ export default function HeuristicsLayout(props: any) {
                                 Edit description
                             </button>
                         </Tooltip>
-                        <div className="inline-block" onDoubleClick={() => openProperty(true, HeuristicsProperty.DESCRIPTION)}>
+                        <div className="flex-grow" onDoubleClick={() => openProperty(true, HeuristicsProperty.DESCRIPTION)}>
                             {isDescriptionOpen
-                                ? (<input type="text" value={currentHeuristic.description} onInput={(e: any) => changeHeuristic(e.target.value, HeuristicsProperty.DESCRIPTION)}
+                                ? (<input type="text" value={currentHeuristic.description} ref={descriptionRef} onInput={(e: any) => changeHeuristic(e.target.value, HeuristicsProperty.DESCRIPTION)}
                                     onBlur={() => openProperty(false, HeuristicsProperty.DESCRIPTION)} onKeyDown={(e) => { if (e.key == 'Enter') openProperty(false, HeuristicsProperty.DESCRIPTION) }}
-                                    className="h-8 border-gray-300 rounded-md placeholder-italic border text-gray-700 pl-4 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100" />)
+                                    className="h-8 w-full border-gray-300 rounded-md placeholder-italic border text-gray-700 pl-4 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100" />)
                                 : (<div className="mr-4 text-sm leading-5 font-medium text-gray-500 inline-block">{currentHeuristic.description}</div>)}
                         </div>
                     </div>
