@@ -58,7 +58,7 @@ export default function DataBrowserSidebar() {
     }
 
     function toggleSlice(slice) {
-        if (activeSlice) {
+        if (activeSlice && activeSlice.id == slice.id) {
             dispatch(setActiveSearchParams([]));
             dispatch(setRecordsInDisplay(false));
             dispatch(setActiveDataSlice(null));
