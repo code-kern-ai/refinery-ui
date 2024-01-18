@@ -122,6 +122,7 @@ export default function LabelingMainComponent() {
         if (!projectId || allUsers.length == 0 || !router.query.sessionId) return;
         if (router.query.sessionId == DUMMY_HUDDLE_ID) return;
         if (!SessionManager.currentRecordId) return;
+        if (SessionManager.currentRecordId == "deleted") return;
         setUpCommentsRequestsAndFetch();
     }, [allUsers, projectId, router.query.sessionId, SessionManager.currentRecordId]);
 
@@ -289,7 +290,7 @@ export default function LabelingMainComponent() {
         <div className="flex-grow overflow-y-auto" style={{ height: 'calc(100vh - 194px)' }}>
             {settings.task.show && <LabelingSuiteTaskHeader />}
             <LabelingSuiteLabeling />
-            {settings.overviewTable.show && <LabelingSuiteOverviewTable />}
+            {settings.overviewTable.show && SessionManager.currentRecordId !== "deleted" && <LabelingSuiteOverviewTable />}
         </div>
         <NavigationBarBottom />
     </div>)

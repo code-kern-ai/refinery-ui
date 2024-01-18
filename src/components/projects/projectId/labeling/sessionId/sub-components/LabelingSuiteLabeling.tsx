@@ -3,7 +3,7 @@ import { selectUser } from "@/src/reduxStore/states/general"
 import { removeFromRlaById, selectHoverGroupDict, selectRecordRequests, selectRecordRequestsRecord, selectSettings, selectUserDisplayId, setHoverGroupDict } from "@/src/reduxStore/states/pages/labeling"
 import { selectAttributes, selectLabelingTasksAll, selectVisibleAttributesLabeling } from "@/src/reduxStore/states/pages/settings"
 import { selectProjectId } from "@/src/reduxStore/states/project"
-import { LabelingVars, TokenLookup } from "@/src/types/components/projects/projectId/labeling/labeling"
+import { HotkeyLookup, LabelingVars, TokenLookup } from "@/src/types/components/projects/projectId/labeling/labeling"
 import { LabelingTaskTaskType } from "@/src/types/components/projects/projectId/settings/labeling-tasks"
 import { UserRole } from "@/src/types/shared/sidebar"
 import { DEFAULT_LABEL_COLOR, FULL_RECORD_ID, SWIM_LANE_SIZE_PX, buildLabelingRlaData, collectSelectionData, filterRlaDataForLabeling, findOrderPosItem, getDefaultLabelingVars, getFirstFitPos, getGoldInfoForTask, getOrderLookupItem, getOrderLookupSort, getTaskTypeOrder, getTokenData, parseSelectionData } from "@/src/util/components/projects/projectId/labeling/labeling-helper"
@@ -52,6 +52,7 @@ export default function LabelingSuiteLabeling() {
     const [labelAddButtonDisabled, setLabelAddButtonDisabled] = useState<boolean>(false);
     const [activeTasks, setActiveTasks] = useState<any[]>(null);
     const [position, setPosition] = useState({ top: 0, left: 0 });
+    const [labelHotkeys, setLabelHotkeys] = useState<HotkeyLookup>({});
 
     const [deleteRlaByIdMut] = useMutation(DELETE_RECORD_LABEL_ASSOCIATION_BY_ID);
     const [addClassificationLabelToRecordMut] = useMutation(ADD_CLASSIFICATION_LABELS_TO_RECORD);
@@ -71,6 +72,7 @@ export default function LabelingSuiteLabeling() {
         if (!labelingTasks || !lVars) return;
         rebuildLabelLookup();
         rebuildTaskLookup(lVars);
+        rebuildHotkeyLookup();
     }, [labelingTasks, lVars]);
 
     useEffect(() => {
@@ -99,6 +101,14 @@ export default function LabelingSuiteLabeling() {
     }, []);
 
     useEffect(() => {
+        if (!labelHotkeys) return;
+        document.addEventListener('keyup', handleKeyboardEvent);
+        return () => {
+            document.removeEventListener('keyup', handleKeyboardEvent);
+        };
+    }, [labelHotkeys]);
+
+    useEffect(() => {
         if (!tokenLookup) return;
         const handleMouseUp = (e) => {
             const [check, attributeIdStart, tokenStart, tokenEnd, startEl] = parseSelectionData();
@@ -117,7 +127,7 @@ export default function LabelingSuiteLabeling() {
     useEffect(() => {
         if (!settings) return;
         if (settings.labeling.showNLabelButton != 5) rebuildTaskLookup(lVars);
-
+        filterRlaDataForCurrent();
     }, [settings]);
 
     function attributesChanged() {
@@ -203,6 +213,16 @@ export default function LabelingSuiteLabeling() {
                 }
             }
         }
+    }
+
+    function rebuildHotkeyLookup() {
+        const labelHotkeysCopy = { ...labelHotkeys };
+        labelingTasks.forEach(task => {
+            task.labels.forEach(l => {
+                if (l.hotkey) labelHotkeysCopy[l.hotkey] = { taskId: task.id, labelId: l.id };
+            });
+        });
+        setLabelHotkeys(labelHotkeysCopy);
     }
 
     function setActiveTasksFunc(tasks: any | any[]) {
@@ -483,11 +503,24 @@ export default function LabelingSuiteLabeling() {
         dispatch(setHoverGroupDict(hoverGroupsDictCopy));
     }
 
-    return (<div className="bg-white relative p-4">
-        {lVars.loading && <LoadingIcon size="lg" />}
-        {!lVars.loading && !recordRequests.record && <div className="flex items-center justify-center text-red-500">This Record has been deleted</div>}
+    function handleKeyboardEvent(event) {
+        for (const key in labelHotkeys) {
+            if (key == event.key) {
+                const task = labelingTasks.find(t => t.id == labelHotkeys[key].taskId);
+                addRla(task, labelHotkeys[key].labelId);
+                event.preventDefault();
+                event.stopPropagation();
+                return;
+            }
+        }
+    }
 
-        {recordRequests.record && !lVars.loading && lVars.loopAttributes && <div className="grid w-full border md:rounded-lg items-center" style={{ gridTemplateColumns: 'max-content max-content 40px auto' }}>
+
+    return (<div className="bg-white relative p-4">
+        {lVars.loading && SessionManager.currentRecordId !== "deleted" && <LoadingIcon size="lg" />}
+        {(!lVars.loading && !recordRequests.record || SessionManager.currentRecordId == "deleted") && <div className="flex items-center justify-center text-red-500">This Record has been deleted</div>}
+
+        {recordRequests.record && !lVars.loading && lVars.loopAttributes && SessionManager.currentRecordId !== "deleted" && <div className="grid w-full border md:rounded-lg items-center" style={{ gridTemplateColumns: 'max-content max-content 40px auto' }}>
             {lVars.loopAttributes.map((attribute, i) => (<Fragment key={attribute.id}>
                 {lVars.taskLookup[attribute.id].lookup.map((task, j) => (<Fragment key={task.orderKey}>
                     <div className={`font-dmMono text-sm font-bold text-gray-500 py-2 pl-4 pr-3 sm:pl-6 col-start-1 h-full ${i % 2 == 0 ? 'bg-white' : 'bg-gray-50'}`}>
@@ -540,7 +573,7 @@ export default function LabelingSuiteLabeling() {
                                 }
                                 {rlaDataToDisplay[task.task.id] && <div>
                                     <div className={`flex gap-2 ${settings.labeling.compactClassificationLabelDisplay ? 'flex-row flex-wrap items-center' : 'flex-col'}`}>
-                                        {rlaDataToDisplay[task.task.id].map((rlaLabel, index) => (<Tooltip key={rlaLabel.orderPos} content={rlaLabel.dataTip} color="invert" placement="top" className="w-max">
+                                        {rlaDataToDisplay[task.task.id].map((rlaLabel, index) => (<Tooltip key={index} content={rlaLabel.dataTip} color="invert" placement="top" className={`w-max ${rlaLabel.sourceTypeKey == LabelSource.WEAK_SUPERVISION ? 'cursor-pointer' : 'cursor-auto'}`}>
                                             <div onClick={() => rlaLabel.sourceTypeKey == 'WEAK_SUPERVISION' ? addRla(task.task, rlaLabel.labelId) : null}
                                                 onMouseEnter={() => onMouseEvent(true, rlaLabel.labelId, rlaLabel.sourceTypeKey)}
                                                 onMouseLeave={() => onMouseEvent(false, rlaLabel.labelId, rlaLabel.sourceTypeKey)}

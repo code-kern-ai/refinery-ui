@@ -196,7 +196,7 @@ export default function LabelingSuiteOverviewTable() {
                                         <td onMouseEnter={() => onMouseEnter([ovItem.rla.id])} onMouseLeave={() => onMouseLeave()}
                                             className={`${(shouldHighLight(tmpHighlightIds, ovItem.shouldHighlightOn) || hoverGroupsDict[ovItem.label.id][LabelingPageParts.OVERVIEW_TABLE] && hoverGroupsDict[ovItem.label.id][ovItem.sourceTypeKey]) ? settings.main.hoverGroupBackgroundColorClass : ''}`}>
                                             {ovItem.canBeDeleted && <div onClick={() => deleteLabelFromRecord(ovItem.rla.id)}>
-                                                <IconTrash className="w-6 h-6 text-red-700" /></div>}
+                                                <IconTrash className="w-6 h-6 text-red-700 cursor-pointer" /></div>}
                                         </td>
                                     </tr>))}
                                 </tbody>

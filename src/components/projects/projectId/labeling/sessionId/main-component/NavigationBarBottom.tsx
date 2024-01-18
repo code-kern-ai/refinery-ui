@@ -46,7 +46,7 @@ export default function NavigationBarBottom() {
                             <input name='autoNextRecord' className="h-5 w-5 cursor-pointer" type="checkbox" checked={settings.main.autoNextRecord}
                                 onChange={toggleAutoNextRecord} />
                         </label>
-                            <span className="flex-grow flex flex-col ml-3 flex-shrink-0 mr-6">
+                            <span className="flex-grow flex flex-col ml-3 flex-shrink-0 mr-6" onClick={toggleAutoNextRecord}>
                                 <span className="text-sm font-medium text-gray-900">Automatically get next record</span>
                                 <span className="text-sm text-gray-500">Apply this if you
                                     want to load the next record after setting a label</span>
@@ -60,7 +60,7 @@ export default function NavigationBarBottom() {
                                 onKeyDown={(event) => {
                                     if (event.key == 'Enter') setShowNLabelButtonFunc(event)
                                 }} className="h-9 w-12 text-sm border-gray-300 rounded-md placeholder-italic border text-gray-900 pl-4 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100" />
-                            <span className="flex-grow flex flex-col flex-shrink-0 ml-3">
+                            <span className="flex-grow flex flex-col flex-shrink-0 ml-3 cursor-auto">
                                 <span className="text-sm font-medium text-gray-900" id="availability-label">Display of label options</span>
                                 <span className="text-sm text-gray-500" id="availability-description">Nr. of options shown by default</span>
                             </span>

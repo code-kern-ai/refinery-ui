@@ -61,3 +61,10 @@ export type LabelSelectionBoxProps = {
     addNewLabelToTask: (newLabel: string, task) => void;
     checkLabelVisibleInSearch: (newLabel: string, task) => void;
 };
+
+export type HotkeyLookup = {
+    [hotkey: string]: {
+        taskId: string,
+        labelId: string
+    }
+}
