@@ -131,16 +131,19 @@ export default function EditRecords() {
                                 </Tooltip>}
                             </div>
                             <div className="absolute left-1 top-1 p-1 cursor-pointer" onClick={() => {
-                                if (record.id == erdData.editRecordId) return;
                                 const erdDataCopy = { ...erdData };
-                                erdDataCopy.editRecordId = record.id;
+                                if (record.id == erdData.editRecordId) {
+                                    erdDataCopy.editRecordId = null;
+                                } else {
+                                    erdDataCopy.editRecordId = record.id;
+                                }
                                 setErdData(erdDataCopy);
                             }}>
                                 {record.id == erdData.editRecordId ?
-                                    (<Tooltip content={TOOLTIPS_DICT.EDIT_RECORDS.STOP_EDIT} color="invert" placement="right" className="cursor-auto">
+                                    (<Tooltip content={TOOLTIPS_DICT.EDIT_RECORDS.STOP_EDIT} color="invert" placement="right">
                                         <IconBallpenOff size={18} stroke={2} />
                                     </Tooltip>) :
-                                    (<Tooltip content={TOOLTIPS_DICT.EDIT_RECORDS.EDIT_RECORD} color="invert" placement="right" className="cursor-auto">
+                                    (<Tooltip content={TOOLTIPS_DICT.EDIT_RECORDS.EDIT_RECORD} color="invert" placement="right">
                                         <IconBallpen size={18} />
                                     </Tooltip>)}
                             </div>
