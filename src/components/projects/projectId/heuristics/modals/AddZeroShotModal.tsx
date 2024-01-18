@@ -2,16 +2,20 @@ import Modal from "@/src/components/shared/modal/Modal";
 import { CacheEnum, selectCachedValue, setCache } from "@/src/reduxStore/states/cachedValues";
 import { selectModal } from "@/src/reduxStore/states/modal";
 import { selectHeuristicType } from "@/src/reduxStore/states/pages/heuristics";
+import { selectModelsDownloaded, setModelsDownloaded } from "@/src/reduxStore/states/pages/models-downloaded";
 import { selectLabelingTasksAll, selectUseableEmbedableAttributes } from "@/src/reduxStore/states/pages/settings";
 import { selectProject, selectProjectId } from "@/src/reduxStore/states/project";
 import { CREATE_ZERO_SHOT_INFORMATION_SOURCE } from "@/src/services/gql/mutations/heuristics";
+import { GET_MODEL_PROVIDER_INFO } from "@/src/services/gql/queries/projects";
+import { ModelsDownloaded } from "@/src/types/components/models-downloaded/models-downloaded";
 import { LabelingTaskTaskType } from "@/src/types/components/projects/projectId/settings/labeling-tasks";
 import { ModalButton, ModalEnum } from "@/src/types/shared/modal";
+import { postProcessingModelsDownload } from "@/src/util/components/models-downloaded/models-downloaded-helper";
 import { getRouterLinkHeuristic } from "@/src/util/components/projects/projectId/heuristics/heuristics-helper";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
 import { InformationSourceType } from "@/submodules/javascript-functions/enums/enums";
 import Dropdown2 from "@/submodules/react-components/components/Dropdown2";
-import { useMutation } from "@apollo/client";
+import { useLazyQuery, useMutation } from "@apollo/client";
 import { Tooltip } from "@nextui-org/react";
 import { useRouter } from "next/router";
 import { useCallback, useEffect, useState } from "react";
@@ -30,6 +34,7 @@ export default function AddZeroShotModal() {
     const heuristicType = useSelector(selectHeuristicType);
     const project = useSelector(selectProject);
     const models = useSelector(selectCachedValue(CacheEnum.ZERO_SHOT_RECOMMENDATIONS));
+    const modelsDownloaded = useSelector(selectModelsDownloaded);
 
     const [labelingTask, setLabelingTask] = useState(null);
     const [attribute, setAttribute] = useState(null);
@@ -37,6 +42,9 @@ export default function AddZeroShotModal() {
     const [labelingTasksClassification, setLabelingTasksClassification] = useState([]);
     const [showZSAttribute, setShowZSAttribute] = useState<boolean>(false);
     const [hoverBoxList, setHoverBoxList] = useState<any[]>([]);
+    const [colorDownloadedModels, setColorDownloadedModels] = useState<boolean[]>([]);
+
+    const [refetchModelsDownload] = useLazyQuery(GET_MODEL_PROVIDER_INFO, { fetchPolicy: 'network-only', nextFetchPolicy: 'cache-first' });
 
     useEffect(() => {
         if (!attributes) return;
@@ -56,6 +64,15 @@ export default function AddZeroShotModal() {
             }
         });
         setHoverBoxList(hoverBoxList);
+        refetchModelsDownload().then((res) => {
+            const modelsDownloaded = postProcessingModelsDownload(res.data['modelProviderInfo']);
+            dispatch(setModelsDownloaded(res.data['modelProviderInfo']));
+            const colorDownloadedModels = modelsFiltered.map((model: any) => {
+                const checkIfModelExists = modelsDownloaded.find((modelDownloaded: ModelsDownloaded) => modelDownloaded.name === model.configString);
+                return checkIfModelExists !== undefined;
+            });
+            setColorDownloadedModels(colorDownloadedModels);
+        });
     }, [project]);
 
     const [createZeroShotMut] = useMutation(CREATE_ZERO_SHOT_INFORMATION_SOURCE);
@@ -133,6 +150,7 @@ export default function AddZeroShotModal() {
                 </div>
             </Tooltip>
             <Dropdown2 options={models} hasSearchBar={true} optionsHaveLink={true} optionsHaveHoverBox={true} valuePropertyPath="configString"
+                useDifferentTextColor={colorDownloadedModels} differentTextColor="green"
                 linkList={models && models.map(model => model.link)}
                 selectedOption={(option: any) => setModel(option.configString)}
                 hoverBoxList={hoverBoxList}

@@ -83,7 +83,7 @@ export default function Sidebar() {
                         <div className="flex-1 flex flex-col min-h-0 overflow-y-auto bg-kernindigo overflow-initial" style={{ zIndex: 100 }}>
                             <div className="flex-1 flex flex-col">
                                 <div className="flex-shrink-0 bg-kernindigo pt-4 pb-10 flex items-center justify-center">
-                                    <button onClick={() => router.push('/projects')}
+                                    <a href='/refinery/projects'
                                         className="inline-flex items-center p-2 rounded-full hover:bg-kernindigo-dark focus:outline-none">
                                         <Image
                                             width={40}
@@ -92,59 +92,55 @@ export default function Sidebar() {
                                             alt="Kern AI"
                                             priority={true}
                                         />
-                                    </button>
+                                    </a>
                                 </div>
                                 <div>
                                     {(project && project.id && routeColor) ? (<div>
                                         {user.role === UserRole.ENGINEER && <div
                                             className="flex items-center justify-center overflow-visible">
-                                            <Tooltip placement="right" trigger="hover" color="invert" content={TOOLTIPS_DICT.SIDEBAR.OVERVIEW}>
+                                            <Tooltip placement="right" trigger="hover" color="invert" content={TOOLTIPS_DICT.SIDEBAR.OVERVIEW} className={`${project.numDataScaleUploaded == 0 ? 'pointer-events-none cursor-not-allowed' : 'cursor-pointer'}`}>
                                                 <div className={`relative z-50`}>
-                                                    <button onClick={() => router.push(`/projects/${project.id}/overview`)}
-                                                        disabled={project.numDataScaleUploaded == 0}
-                                                        className={`disabled:opacity-50 disabled:cursor-not-allowed circle ${routeColor.overview.active ? 'text-kernpurple' : 'text-white'}`}>
+                                                    <a href={`/refinery/projects/${project.id}/overview`}
+                                                        className={`${project.numDataScaleUploaded == 0 ? 'opacity-50 cursor-not-allowed' : 'opacity-100 cursor-pointer'} circle ${routeColor.overview.active ? 'text-kernpurple' : 'text-white'}`}>
                                                         <IconChartPie className="w-6 h-6" />
-                                                    </button>
+                                                    </a>
                                                 </div>
                                             </Tooltip>
                                         </div>}
                                         {user.role === UserRole.ENGINEER && <div
                                             className="flex items-center justify-center overflow-visible mt-10 2xl:mt-12">
-                                            <Tooltip placement="right" trigger="hover" color="invert" content={TOOLTIPS_DICT.SIDEBAR.DATA_BROWSER}>
+                                            <Tooltip placement="right" trigger="hover" color="invert" content={TOOLTIPS_DICT.SIDEBAR.DATA_BROWSER} className={`${project.numDataScaleUploaded == 0 ? 'pointer-events-none cursor-not-allowed' : 'cursor-pointer'}`}>
                                                 <div className={`relative z-50`}>
-                                                    <button onClick={() => router.push(`/projects/${project.id}/data-browser`)}
-                                                        disabled={project.numDataScaleUploaded == 0}
-                                                        className={`disabled:opacity-50 disabled:cursor-not-allowed circle ${routeColor.data.active ? 'text-kernpurple' : 'text-white'}`}>
+                                                    <a href={`/refinery/projects/${project.id}/data-browser`}
+                                                        className={`${project.numDataScaleUploaded == 0 ? 'opacity-50 cursor-not-allowed' : 'opacity-100 cursor-pointer'} circle ${routeColor.data.active ? 'text-kernpurple' : 'text-white'}`}>
                                                         <IconTriangleSquareCircle className="w-6 h-6" />
-                                                    </button>
+                                                    </a>
                                                 </div>
                                             </Tooltip>
                                         </div>}
                                         <div className={`flex items-center justify-center overflow-visible ${user?.role == 'ENGINEER' ? 'mt-10 2xl:mt-12' : ''}`}>
-                                            <Tooltip placement="right" trigger="hover" color="invert" content={TOOLTIPS_DICT.SIDEBAR.LABELING}>
+                                            <Tooltip placement="right" trigger="hover" color="invert" content={TOOLTIPS_DICT.SIDEBAR.LABELING} className={`${project.numDataScaleUploaded == 0 ? 'pointer-events-none cursor-not-allowed' : 'cursor-pointer'}`}>
                                                 <div className={`relative z-50`}>
-                                                    <button onClick={() => router.push(`/projects/${project.id}/labeling`)}
-                                                        disabled={project.numDataScaleUploaded == 0}
-                                                        className={`disabled:opacity-50 disabled:cursor-not-allowed circle ${routeColor.labeling.active ? 'text-kernpurple' : 'text-white'}`}>
+                                                    <a href={`/refinery/projects/${project.id}/labeling`}
+                                                        className={`${project.numDataScaleUploaded == 0 ? 'opacity-50 cursor-not-allowed' : 'opacity-100 cursor-pointer'} circle ${routeColor.labeling.active ? 'text-kernpurple' : 'text-white'}`}>
                                                         <svg xmlns="http://www.w3.org/2000/svg" className="w-6 h-6" viewBox="0 0 20 20"
                                                             fill="currentColor">
                                                             <path fillRule="evenodd"
                                                                 d="M17.707 9.293a1 1 0 010 1.414l-7 7a1 1 0 01-1.414 0l-7-7A.997.997 0 012 10V5a3 3 0 013-3h5c.256 0 .512.098.707.293l7 7zM5 6a1 1 0 100-2 1 1 0 000 2z"
                                                                 clipRule="evenodd" />
                                                         </svg>
-                                                    </button>
+                                                    </a>
                                                 </div>
                                             </Tooltip>
                                         </div>
                                         {user.role === UserRole.ENGINEER && <div
                                             className="flex items-center justify-center overflow-visible mt-10 2xl:mt-12">
-                                            <Tooltip placement="right" trigger="hover" color="invert" content={TOOLTIPS_DICT.SIDEBAR.HEURISTICS}>
+                                            <Tooltip placement="right" trigger="hover" color="invert" content={TOOLTIPS_DICT.SIDEBAR.HEURISTICS} className={`${project.numDataScaleUploaded == 0 ? 'pointer-events-none cursor-not-allowed' : 'cursor-pointer'}`}>
                                                 <div className={`relative z-50`}>
-                                                    <button onClick={() => router.push(`/projects/${project.id}/heuristics`)}
-                                                        disabled={project.numDataScaleUploaded == 0}
-                                                        className={`disabled:opacity-50 disabled:cursor-not-allowed circle ${routeColor.heuristics.active ? 'text-kernpurple' : 'text-white'}`}>
+                                                    <a href={`/refinery/projects/${project.id}/heuristics`}
+                                                        className={`${project.numDataScaleUploaded == 0 ? 'opacity-50 cursor-not-allowed' : 'opacity-100 cursor-pointer'} circle ${routeColor.heuristics.active ? 'text-kernpurple' : 'text-white'}`}>
                                                         <IconBulb className="w-6 h-6" />
-                                                    </button>
+                                                    </a>
                                                 </div>
                                             </Tooltip>
                                         </div>}
@@ -152,22 +148,21 @@ export default function Sidebar() {
                                             className="flex items-center justify-center overflow-visible mt-10 2xl:mt-12">
                                             <Tooltip placement="right" trigger="hover" color="invert" content={TOOLTIPS_DICT.SIDEBAR.SETTINGS}>
                                                 <div className={`relative z-50`}>
-                                                    <button onClick={() => router.push(`/projects/${project.id}/settings`)}
-                                                        disabled={project.numDataScaleUploaded == 0}
+                                                    <a href={`/refinery/projects/${project.id}/settings`}
                                                         className={`circle ${routeColor.settings.active ? 'text-kernpurple' : 'text-white'}`}>
                                                         <IconSettings className="w-6 h-6" />
-                                                    </button>
+                                                    </a>
                                                 </div>
                                             </Tooltip>
                                         </div>}
                                         {isAdmin && isManaged && <div
                                             className="flex items-center justify-center overflow-visible mt-10 2xl:mt-12">
-                                            <Tooltip placement="right" trigger="hover" color="invert" content={TOOLTIPS_DICT.SIDEBAR.ADMIN}>
+                                            <Tooltip placement="right" trigger="hover" color="invert" content={TOOLTIPS_DICT.SIDEBAR.ADMIN} className={`${project.numDataScaleUploaded == 0 ? 'pointer-events-none cursor-not-allowed' : 'cursor-pointer'}`}>
                                                 <div className={`relative z-50 opacity-100 cursor-pointer`}>
-                                                    <button onClick={() => router.push(`/projects/${project.id}/admin`)}
-                                                        className={`disabled:opacity-50 disabled:cursor-not-allowed circle ${routeColor.admin.active ? 'text-kernpurple' : 'text-white'}`}>
+                                                    <a href={`/refinery/projects/${project.id}/admin`}
+                                                        className={`${project.numDataScaleUploaded == 0 ? 'opacity-50 cursor-not-allowed' : 'opacity-100 cursor-pointer'} circle ${routeColor.admin.active ? 'text-kernpurple' : 'text-white'}`}>
                                                         <IconUserCircle className="w-6 h-6" />
-                                                    </button>
+                                                    </a>
                                                 </div>
                                             </Tooltip>
                                         </div>}

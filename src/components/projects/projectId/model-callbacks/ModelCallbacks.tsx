@@ -169,21 +169,17 @@ export default function ModelCallbacks() {
 
                     <div className="flex justify-center overflow-visible">
                         <Tooltip placement="left" content={TOOLTIPS_DICT.MODEL_CALLBACKS.NAVIGATE_HEURISTICS} color="invert">
-                            <button onClick={() => {
-                                router.push(`/projects/${projectId}/heuristics`)
-                            }} className="bg-white text-gray-700 text-xs font-medium mr-3 px-4 py-2 rounded-md border border-gray-300 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                            <a href={`/refinery/projects/${projectId}/heuristics`} className="bg-white text-gray-700 text-xs font-medium mr-3 px-4 py-2 rounded-md border border-gray-300 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
                                 Heuristics
-                            </button>
+                            </a>
                         </Tooltip>
                     </div>
 
                     <div className="flex justify-center overflow-visible">
                         <Tooltip placement="left" content={TOOLTIPS_DICT.MODEL_CALLBACKS.NAVIGATE_LOOKUP_LISTS} color="invert">
-                            <button onClick={() => {
-                                router.push(`/projects/${projectId}/lookup-lists`)
-                            }} className=" bg-white text-gray-700 text-xs font-medium mr-3 px-4 py-2 rounded-md border border-gray-300 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                            <a href={`/refinery/projects/${projectId}/lookup-lists`} className=" bg-white text-gray-700 text-xs font-medium mr-3 px-4 py-2 rounded-md border border-gray-300 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
                                 Lookup lists
-                            </button>
+                            </a>
                         </Tooltip>
                     </div>
                 </div>
