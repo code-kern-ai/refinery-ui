@@ -48,9 +48,14 @@ export default function ProjectAdmin() {
         });
     }, [projectId]);
 
+    useEffect(() => {
+        if (!accessTokens) return;
+        dispatch(setModalStates(ModalEnum.NEW_PERSONAL_TOKEN, { tokenNames: accessTokens }));
+    }, [accessTokens]);
+
     function refetchAccessTokensAndProcess() {
         refetchAccessTokens({ variables: { projectId: projectId } }).then((res) => {
-            setAccessTokens(postProcessPersonalAccessToken(res.data['allPersonalAccessTokens']))
+            setAccessTokens(postProcessPersonalAccessToken(res.data['allPersonalAccessTokens']));
         });
     }
 
@@ -124,7 +129,7 @@ export default function ProjectAdmin() {
             </div>
             <div className="mt-1">
                 <Tooltip content={TOOLTIPS_DICT.ADMIN_PAGE.NEW_ACCESS_TOKEN} color="invert" placement="right">
-                    <button onClick={() => dispatch(setModalStates(ModalEnum.NEW_PERSONAL_TOKEN, { tokenNames: accessTokens, open: true }))}
+                    <button onClick={() => dispatch(openModal(ModalEnum.NEW_PERSONAL_TOKEN))}
                         className="inline-flex items-center px-2.5 py-1.5 border border-gray-300 shadow-sm text-xs font-semibold rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none cursor-pointer">
                         <IconPlus size={20} />
                         Add token

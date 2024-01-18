@@ -98,7 +98,7 @@ export default function Header() {
                 </div>
                 <div className="flex flex-row flex-nowrap items-center">
                     <div className="flex items-center justify-center">
-                        <a className="flex mr-6" onClick={() => router.push('/projects')}>
+                        <a href="/refinery/projects" className="flex mr-6">
                             <Tooltip placement="bottom" trigger="hover" color="invert" content={TOOLTIPS_DICT.GENERAL.PROJECTS}>
                                 <IconHome className="w-6 h-6" />
                             </Tooltip>
@@ -106,7 +106,7 @@ export default function Header() {
                     </div>
                     {(user?.role == UserRole.ENGINEER && isManaged) ? (
                         <div className="flex items-center justify-center">
-                            <a className="flex mr-6" onClick={() => router.push('/users')}>
+                            <a href="/refinery/users" className="flex mr-6">
                                 <Tooltip placement="bottom" trigger="hover" color="invert" content={TOOLTIPS_DICT.GENERAL.USERS}>
                                     <IconHexagons className="w-6 h-6" />
                                 </Tooltip>

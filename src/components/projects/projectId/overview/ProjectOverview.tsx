@@ -291,7 +291,7 @@ export default function ProjectOverview() {
 
                 {((overviewFilters.graphType.value == DisplayGraphs.ALL || overviewFilters.graphType.value == DisplayGraphs.INTER_ANNOTATOR) && isManaged) && <div className="mt-8 grid w-full">
                     <div className="text-lg leading-6 text-gray-900 font-medium inline-block">Inter annotator agreement</div>
-                    <div className="mt-1 text-sm leading-5 font-medium text-gray-700 inline-block">See how users agree or disagree on redundantely labeled records.</div>
+                    <div className="mt-1 text-sm leading-5 font-medium text-gray-700 inline-block">See how users agree or disagree on redundantly labeled records.</div>
                     {interAnnotatorMatrix && <div>
                         {interAnnotatorMatrix.countNames > (1 + (goldUserRequested ? 1 : 0)) ? (
                             <div className={`mt-2 w-full h-full shadow ${style.stats} bg-white grid place-items-center flex-grow`}>
@@ -326,7 +326,7 @@ export default function ProjectOverview() {
                                 <div className="text-center">
                                     <IconUsers size={48} className="mx-auto text-gray-400" />
                                     <h2 className="mt-2 text-lg font-medium text-gray-900">Label more data</h2>
-                                    <p className="mt-1 text-sm text-gray-500">None of your records are labeled redundantely yet.</p>
+                                    <p className="mt-1 text-sm text-gray-500">None of your records are labeled redundantly yet.</p>
                                 </div>
                             </div>}
                         </div>)}

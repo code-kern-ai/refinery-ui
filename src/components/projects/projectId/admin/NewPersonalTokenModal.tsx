@@ -28,10 +28,10 @@ export default function NewPersonalToken(props: PersonalTokenModalProps) {
     const [createNewTokenMut] = useMutation(CREATE_PERSONAL_ACCESS_TOKEN);
 
     const createNewToken = useCallback(() => {
-        // const expirationValue = EXPIRATION_TIME.find(a => a.name == expirationTime).value;
         createNewTokenMut({ variables: { projectId: projectId, name: tokenName, expiresAt: expirationTime.value, scope: READ_WRITE_SCOPE } }).then((res) => {
             setNewToken(res['data']['createPersonalAccessToken']['token']);
             props.refetchTokens();
+            setTokenName("");
         });
     }, [projectId, tokenName, expirationTime]);
 
@@ -88,6 +88,7 @@ export default function NewPersonalToken(props: PersonalTokenModalProps) {
                 setTokenName('');
                 setExpirationTime(EXPIRATION_TIME[0]);
                 setNewToken(null);
+                copyToClipboard(newToken);
             }} className="bg-white text-gray-700 text-xs font-semibold px-4 py-2 rounded border border-gray-300 cursor-pointer hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
                 Close
             </button>
