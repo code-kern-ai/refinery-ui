@@ -135,7 +135,9 @@ export default function AddZeroShotModal() {
             <Dropdown2 options={models} hasSearchBar={true} optionsHaveLink={true} optionsHaveHoverBox={true} valuePropertyPath="configString"
                 linkList={models && models.map(model => model.link)}
                 selectedOption={(option: any) => setModel(option.configString)}
-                hoverBoxList={hoverBoxList} />
+                hoverBoxList={hoverBoxList}
+                searchTextTyped={(searchText: string) => setModel(searchText)}
+            />
         </div>
     </Modal>)
 }

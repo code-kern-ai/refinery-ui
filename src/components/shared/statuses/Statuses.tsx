@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 
 const DEFAULT_TOOLTIP_POSITION: any = "bottom";
 
-export default function Statuses({ status, tooltipPosition = DEFAULT_TOOLTIP_POSITION, page = "heuristic", initialCaption = "Initial" }) {
+export default function Statuses({ status, tooltipPosition = DEFAULT_TOOLTIP_POSITION, page = "heuristic", initialCaption = "Initial", useMargin = true }) {
     const [dataTip, setDataTip] = useState('');
     const [statusName, setStatusName] = useState('');
     const [color, setColor] = useState('');
@@ -79,7 +79,7 @@ export default function Statuses({ status, tooltipPosition = DEFAULT_TOOLTIP_POS
 
     return (<>
         {statusName && <>
-            {dataTip ? (<Tooltip content={dataTip} placement={tooltipPosition} color="invert" className="ml-2">
+            {dataTip ? (<Tooltip content={dataTip} placement={tooltipPosition} color="invert" className={`${useMargin ? 'ml-2' : 'ml-0'}`}>
                 <StatusBadge color={color} statusName={statusName} />
             </Tooltip>) : (<StatusBadge color={color} statusName={statusName} />)}
         </>}
@@ -89,8 +89,8 @@ export default function Statuses({ status, tooltipPosition = DEFAULT_TOOLTIP_POS
 function StatusBadge({ color, statusName }) {
     return <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${color === 'green'
         ? 'bg-green-300'
-        : 'bg-' + color + '-100'} `}>
-        <svg className={`mr-1.5 h-2 w-2 ${'text-' + color + '-800'} `} fill="currentColor" viewBox="0 0 8 8">
+        : 'bg-' + color + '-100 text-' + color + '-800'} `}>
+        <svg className={`mr-1.5 h-2 w-2 ${'text-' + color + '-400'} `} fill="currentColor" viewBox="0 0 8 8">
             <circle cx="4" cy="4" r="3" />
         </svg>
         <span className={' text-' + color + '-800'}>{statusName}</span>

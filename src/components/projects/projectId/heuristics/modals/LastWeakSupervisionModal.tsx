@@ -4,13 +4,12 @@ import { ModalEnum } from "@/src/types/shared/modal";
 
 export default function LastWeakSupervisionModal(props: { currentWeakSupervisionRun: any }) {
     return (<Modal modalName={ModalEnum.LAST_WEAK_SUPERVISION_RUN}>
-        <h1 className="text-lg text-gray-900 mb-2 text-center">Last Weak
-            Supervision Run</h1>
+        <h1 className="text-lg text-gray-900 mb-2 text-center">Last Weak Supervision Run</h1>
         {props.currentWeakSupervisionRun && <div className=" flex flex-grow justify-center my-4">
             <div className="grid items-center text-left" style={{ gridTemplateColumns: '215px auto' }}>
                 <div className="text-sm font-bold">State</div>
                 <div className="text text-sm">
-                    <Statuses status={props.currentWeakSupervisionRun.state} />
+                    <Statuses status={props.currentWeakSupervisionRun.state} useMargin={false} />
                 </div>
                 <div className="text-sm font-bold">Selected Heuristics</div>
                 <div className="text-sm text-gray-500">{props.currentWeakSupervisionRun.selectedInformationSources}</div>

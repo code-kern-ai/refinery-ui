@@ -354,7 +354,7 @@ export default function BricksIntegrator(_props: BricksIntegratorProps) {
 
     function selectDifferentTask(taskId: string) {
         if (props.labelingTaskId == taskId) {
-            BricksCodeParser.prepareCode(config, props.executionTypeFilter, props.nameLookups, props.labelingTaskId, forIde, labelingTasks);
+            BricksCodeParser.prepareCode(jsonCopy(config), props.executionTypeFilter, props.nameLookups, props.labelingTaskId, forIde, labelingTasks);
             return;
         }
         const currentTaskType = BricksCodeParser.getLabelingTaskAttribute(props.labelingTaskId, "taskType", labelingTasks);
@@ -362,7 +362,7 @@ export default function BricksIntegrator(_props: BricksIntegratorProps) {
         if (currentTaskType != newTaskType) {
             requestSearch();
         } else {
-            const configCopy = BricksCodeParser.prepareCode(config, props.executionTypeFilter, props.nameLookups, props.labelingTaskId, forIde, labelingTasks);
+            const configCopy = BricksCodeParser.prepareCode(jsonCopy(config), props.executionTypeFilter, props.nameLookups, props.labelingTaskId, forIde, labelingTasks);
             dispatch(setBricksIntegrator(configCopy));
         }
         props.newTaskId(taskId)

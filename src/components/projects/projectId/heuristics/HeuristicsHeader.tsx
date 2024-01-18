@@ -256,11 +256,11 @@ export default function HeuristicsHeader(props: HeuristicsHeaderProps) {
                     {currentWeakSupervisionRun ? (<Tooltip content={TOOLTIPS_DICT.HEURISTICS.LAST_WEAK_SUPERVISION_INFO} color="invert" placement="left">
                         <button onClick={() => dispatch(openModal(ModalEnum.LAST_WEAK_SUPERVISION_RUN))}
                             className="bg-white text-gray-700 text-xs font-medium mr-3 px-4 py-1.5 rounded-md border border-gray-300 cursor-pointer inline-block hover:bg-gray-50">
-                            <IconWaveSine size={20} strokeWidth={1.5} className="text-gray-500 mr-2" />
+                            <IconWaveSine size={20} strokeWidth={2} className="text-gray-700" />
                         </button>
                     </Tooltip>) : (<Tooltip content={TOOLTIPS_DICT.HEURISTICS.LAST_WEAK_SUPERVISION_INFO} color="invert" placement="left">
                         <button className="bg-white text-gray-700 text-xs font-medium mr-3 px-4 py-1.5 rounded-md border border-gray-300 cursor-pointer inline-block hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50" disabled={true}>
-                            <IconWaveSine size={20} strokeWidth={1.5} className="text-gray-500 mr-2" />
+                            <IconWaveSine size={20} strokeWidth={2} className="text-gray-500" />
                         </button>
                     </Tooltip>)}
                 </div>

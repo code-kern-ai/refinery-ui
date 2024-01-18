@@ -27,6 +27,8 @@ import { filterRlaDataForUser } from "@/src/util/components/projects/projectId/l
 import { LabelingPageParts } from "@/src/types/components/projects/projectId/labeling/labeling-main-component"
 import style from '@/src/styles/components/projects/projectId/labeling.module.css';
 
+const L_VARS = getDefaultLabelingVars();
+
 export default function LabelingSuiteLabeling() {
     const router = useRouter();
     const dispatch = useDispatch();
@@ -41,7 +43,7 @@ export default function LabelingSuiteLabeling() {
     const displayUserId = useSelector(selectUserDisplayId);
     const hoverGroupsDict = useSelector(selectHoverGroupDict);
 
-    const [lVars, setLVars] = useState<LabelingVars>(getDefaultLabelingVars());
+    const [lVars, setLVars] = useState<LabelingVars>(L_VARS);
     const [tokenLookup, setTokenLookup] = useState<TokenLookup>({});
     const [rlaDataToDisplay, setRlaDataToDisplay] = useState<{ [taskId: string]: any }>(null);
     const [fullRlaData, setFullRlaData] = useState<any[]>([]);
