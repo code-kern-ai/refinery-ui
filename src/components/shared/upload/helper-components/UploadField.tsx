@@ -4,11 +4,24 @@ import { useEffect, useRef, useState } from "react";
 import LoadingIcon from "../../loading/LoadingIcon";
 import { IconDatabase } from "@tabler/icons-react";
 import { UploadHelper } from "@/src/util/classes/upload-helper";
+import { useDropzone } from 'react-dropzone';
 
 export default function UploadField(props: UploadFieldProps) {
     const fileUpload = useRef<HTMLInputElement>(null);
     const [file, setFile] = useState(null);
     const [fileSize, setFileSize] = useState(null);
+
+    function onDrop(acceptedFiles) {
+        if (acceptedFiles && acceptedFiles[0]) {
+            setFileSize(formatBytes(acceptedFiles[0].size));
+            setFile(acceptedFiles[0]);
+            props.sendSelectedFile(acceptedFiles[0]);
+        } else {
+            setFile(null);
+        }
+    }
+
+    const { getRootProps, getInputProps, isDragActive } = useDropzone({ onDrop });
 
     useEffect(() => {
         if (props.isFileCleared) {
@@ -37,10 +50,11 @@ export default function UploadField(props: UploadFieldProps) {
     return (
         <div>
             <input type="file" className="hidden" ref={fileUpload} onChange={(e: any) => onFileInput(e)} />
+            <input {...getInputProps()} />
             <div className="flex flex-col">
                 <div className="flex items-center justify-between">
                     <div className="flex flex-grow items-center overflow-x-hidden">
-                        <div onClick={() => fileUpload.current?.click()}
+                        <div  {...getRootProps()} onClick={() => fileUpload.current?.click()}
                             className={`w-full border-4 border-dashed rounded-lg h-36 my-6 cursor-pointer ${file || props.uploadStarted ? 'bg-white' : 'border-slate-400'}`} style={{ 'pointerEvents': props.uploadStarted ? 'none' : 'auto' }}>
                             <IconDatabase className="h-9 w-8 m-auto block text-gray-500 mt-6" />
                             {file == null && !props.uploadStarted ? (<div className="text-gray-600 text-sm font-medium text-center mb-6">
