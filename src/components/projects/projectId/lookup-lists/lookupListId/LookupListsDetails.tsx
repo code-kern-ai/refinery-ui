@@ -10,7 +10,7 @@ import { useLazyQuery, useMutation } from "@apollo/client";
 import { Tooltip } from "@nextui-org/react";
 import { IconArrowLeft } from "@tabler/icons-react";
 import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
+import { use, useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux"
 import LookupListOperations from "./LookupListOperations";
 import DangerZone from "@/src/components/shared/danger-zone/DangerZone";
@@ -37,11 +37,15 @@ export default function LookupListsDetails() {
     const [isNameOpen, setIsNameOpen] = useState(false);
     const [isDescriptionOpen, setIsDescriptionOpen] = useState(false);
     const [finalSize, setFinalSize] = useState(0);
+    const [description, setDescription] = useState('');
 
     const [refetchCurrentLookupList] = useLazyQuery(LOOKUP_LIST_BY_LOOKUP_LIST_ID, { fetchPolicy: 'network-only', nextFetchPolicy: 'cache-first' });
     const [refetchTermsLookupList] = useLazyQuery(TERMS_BY_KNOWLEDGE_BASE_ID, { fetchPolicy: 'cache-and-network' });
     const [updateLookupListMut] = useMutation(UPDATE_KNOWLEDGE_BASE);
     const [refetchComments] = useLazyQuery(REQUEST_COMMENTS, { fetchPolicy: "no-cache" });
+
+    const nameRef = useRef<HTMLInputElement>(null);
+    const descriptionRef = useRef<HTMLInputElement>(null);
 
     useEffect(unsubscribeWSOnDestroy(router, [CurrentPage.LOOKUP_LISTS_DETAILS, CurrentPage.COMMENTS, CurrentPage.LOOKUP_LISTS_OVERVIEW], projectId), []);
 
@@ -58,6 +62,16 @@ export default function LookupListsDetails() {
         if (!projectId || allUsers.length == 0) return;
         setUpCommentsRequests();
     }, [allUsers, projectId]);
+
+    useEffect(() => {
+        if (!lookupList) return;
+        setDescription(lookupList.description ?? '');
+    }, [lookupList]);
+
+    useEffect(() => {
+        if (!description) return;
+        changeLookupList(description, LookupListProperty.DESCRIPTION);
+    }, [description]);
 
     function setUpCommentsRequests() {
         const requests = [];
@@ -105,8 +119,22 @@ export default function LookupListsDetails() {
     }
 
     function openProperty(open: boolean, property: string) {
-        if (property == LookupListProperty.NAME) setIsNameOpen(open);
-        if (property == LookupListProperty.DESCRIPTION) setIsDescriptionOpen(open);
+        if (property == LookupListProperty.NAME) {
+            setIsNameOpen(open);
+            if (open) {
+                setTimeout(() => {
+                    nameRef.current?.focus();
+                }, 100);
+            }
+        }
+        if (property == LookupListProperty.DESCRIPTION) {
+            setIsDescriptionOpen(open);
+            if (open) {
+                setTimeout(() => {
+                    descriptionRef.current?.focus();
+                }, 100);
+            }
+        }
         if (!open) {
             saveLookupList();
         }
@@ -155,11 +183,11 @@ export default function LookupListsDetails() {
                             Edit name
                         </button>
                     </Tooltip>
-                    <div className="inline-block" onDoubleClick={() => openProperty(true, LookupListProperty.NAME)}>
+                    <div className="flex-grow" onDoubleClick={() => openProperty(true, LookupListProperty.NAME)}>
                         {isNameOpen
-                            ? (<input type="text" value={lookupList.name} onInput={(e: any) => changeLookupList(e.target.value, LookupListProperty.NAME)}
+                            ? (<input type="text" value={lookupList.name} ref={nameRef} onInput={(e: any) => changeLookupList(e.target.value, LookupListProperty.NAME)}
                                 onBlur={() => openProperty(false, LookupListProperty.NAME)} onKeyDown={(e) => { if (e.key == 'Enter') openProperty(false, LookupListProperty.NAME) }}
-                                className="h-8 border-gray-300 rounded-md placeholder-italic border text-gray-700 pl-4 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100" />)
+                                className="h-8 w-full border-gray-300 rounded-md placeholder-italic border text-gray-700 pl-4 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100" />)
                             : (<div className="mr-4 text-sm leading-5 font-medium text-gray-500 inline-block">{lookupList.name}</div>)}
                     </div>
                 </div>}
@@ -170,12 +198,12 @@ export default function LookupListsDetails() {
                             Edit description
                         </button>
                     </Tooltip>
-                    <div className="inline-block" onDoubleClick={() => openProperty(true, LookupListProperty.DESCRIPTION)}>
+                    <div className="flex-grow" onDoubleClick={() => openProperty(true, LookupListProperty.DESCRIPTION)}>
                         {isDescriptionOpen
-                            ? (<input type="text" value={lookupList.description} onInput={(e: any) => changeLookupList(e.target.value, LookupListProperty.DESCRIPTION)}
+                            ? (<input type="text" value={description} ref={descriptionRef} onChange={(e: any) => setDescription(e.target.value)}
                                 onBlur={() => openProperty(false, LookupListProperty.DESCRIPTION)} onKeyDown={(e) => { if (e.key == 'Enter') openProperty(false, LookupListProperty.DESCRIPTION) }}
-                                className="h-8 border-gray-300 rounded-md placeholder-italic border text-gray-700 pl-4 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100" />)
-                            : (<div className="mr-4 text-sm leading-5 font-medium text-gray-500 inline-block">{lookupList.description}</div>)}
+                                className="h-8 w-full border-gray-300 rounded-md placeholder-italic border text-gray-700 pl-4 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100" />)
+                            : (<div className="mr-4 text-sm leading-5 font-medium text-gray-500 inline-block">{description}</div>)}
                     </div>
                 </div>}
             </div>

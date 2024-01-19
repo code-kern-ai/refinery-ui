@@ -28,6 +28,7 @@ function shouldHighLight(tmpHighlightIds: string[], comparedIds: string[], addit
 function convertToInformationSourceType(type: string) {
     if (type == 'Manual') return LabelSource.MANUAL;
     else if (type == 'Weak Supervision') return LabelSource.WEAK_SUPERVISION;
+    else if (type == 'Manual gold ⭐') return LabelSource.MANUAL_GOLD;
     else return LabelSource.INFORMATION_SOURCE;
 }
 
@@ -111,9 +112,15 @@ export default function LabelingSuiteOverviewTable() {
             if (sourceType == LabelSource.MANUAL) {
                 hoverGroupsDictCopy[labelId][LabelSource.MANUAL] = true;
                 hoverGroupsDictCopy[labelId][LabelSource.WEAK_SUPERVISION] = false;
-            } else {
+                hoverGroupsDictCopy[labelId][LabelSource.MANUAL_GOLD] = false;
+            } else if (sourceType == LabelSource.WEAK_SUPERVISION) {
                 hoverGroupsDictCopy[labelId][LabelSource.MANUAL] = false;
                 hoverGroupsDictCopy[labelId][LabelSource.WEAK_SUPERVISION] = true;
+                hoverGroupsDictCopy[labelId][LabelSource.MANUAL_GOLD] = false;
+            } else if (sourceType == LabelSource.MANUAL_GOLD) {
+                hoverGroupsDictCopy[labelId][LabelSource.MANUAL] = true;
+                hoverGroupsDictCopy[labelId][LabelSource.WEAK_SUPERVISION] = false;
+                hoverGroupsDictCopy[labelId][LabelSource.MANUAL_GOLD] = true;
             }
             hoverGroupsDictCopy[labelId][LabelingPageParts.TASK_HEADER] = true;
             dispatch(setHoverGroupDict(hoverGroupsDictCopy));
@@ -128,6 +135,8 @@ export default function LabelingSuiteOverviewTable() {
             hoverGroupsDictCopy[labelId][LabelSource.MANUAL] = false;
             hoverGroupsDictCopy[labelId][LabelSource.WEAK_SUPERVISION] = false;
             hoverGroupsDictCopy[labelId][LabelingPageParts.TASK_HEADER] = false;
+            hoverGroupsDictCopy[labelId][LabelingPageParts.TABLE_MODAL] = false;
+            hoverGroupsDictCopy[labelId][LabelingPageParts.MANUAL_GOLD] = false;
             dispatch(setHoverGroupDict(hoverGroupsDictCopy));
         }
     }
@@ -141,12 +150,14 @@ export default function LabelingSuiteOverviewTable() {
                 hoverGroupsDictCopy[labelIdKey][LabelingPageParts.TABLE_MODAL] = update;
                 hoverGroupsDictCopy[labelIdKey][LabelingPageParts.MANUAL] = update;
                 hoverGroupsDictCopy[labelIdKey][LabelingPageParts.WEAK_SUPERVISION] = update;
+                hoverGroupsDictCopy[labelIdKey][LabelingPageParts.MANUAL_GOLD] = update;
             } else {
                 hoverGroupsDictCopy[labelIdKey][LabelingPageParts.OVERVIEW_TABLE] = false;
                 hoverGroupsDictCopy[labelIdKey][LabelingPageParts.TASK_HEADER] = false;
                 hoverGroupsDictCopy[labelIdKey][LabelingPageParts.TABLE_MODAL] = false;
                 hoverGroupsDictCopy[labelIdKey][LabelingPageParts.MANUAL] = false;
                 hoverGroupsDictCopy[labelIdKey][LabelingPageParts.WEAK_SUPERVISION] = false;
+                hoverGroupsDictCopy[labelIdKey][LabelingPageParts.MANUAL_GOLD] = false;
             }
         }
         dispatch(setHoverGroupDict(hoverGroupsDictCopy));
@@ -185,7 +196,7 @@ export default function LabelingSuiteOverviewTable() {
                                             className={`whitespace-nowrap px-3 py-2 text-sm text-gray-500 ${(shouldHighLight(tmpHighlightIds, ovItem.shouldHighlightOn, headerHover.labelCollection) || hoverGroupsDict[ovItem.label.id][LabelingPageParts.OVERVIEW_TABLE] && hoverGroupsDict[ovItem.label.id][ovItem.sourceTypeKey]) ? settings.main.hoverGroupBackgroundColorClass : ''}`}>
                                             <span className={`inline-flex items-center px-2.5 py-0.5 rounded-md border text-sm font-medium cursor-default relative ${ovItem.label.backgroundColor} ${ovItem.label.textColor} ${ovItem.label.borderColor}`}>
                                                 {ovItem.label.name}
-                                                <div className={`label-overlay-base ${hoverGroupsDict[ovItem.label.id][LabelingPageParts.MANUAL] && ovItem.sourceTypeKey == LabelingPageParts.MANUAL && style.labelOverlayManual} ${hoverGroupsDict[ovItem.label.id][LabelingPageParts.WEAK_SUPERVISION] && ovItem.sourceTypeKey == LabelingPageParts.WEAK_SUPERVISION && style.labelOverlayWeakSupervision}`}></div>
+                                                <div className={`label-overlay-base ${hoverGroupsDict[ovItem.label.id][LabelingPageParts.MANUAL] && ovItem.sourceTypeKey == LabelingPageParts.MANUAL && style.labelOverlayManual} ${hoverGroupsDict[ovItem.label.id][LabelingPageParts.WEAK_SUPERVISION] && ovItem.sourceTypeKey == LabelingPageParts.WEAK_SUPERVISION && style.labelOverlayWeakSupervision} ${hoverGroupsDict[ovItem.label.id][LabelingPageParts.MANUAL_GOLD] && ovItem.sourceTypeKey == LabelingPageParts.MANUAL_GOLD && style.labelOverlayManual}`}></div>
                                             </span>
                                             {ovItem.label.value && <div className="ml-2">{ovItem.label.value}</div>}
                                         </td>

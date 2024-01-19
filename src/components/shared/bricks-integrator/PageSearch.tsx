@@ -7,6 +7,7 @@ import { useState } from "react";
 import style from '@/src/styles/shared/bricks-integrator.module.css';
 import { jsonCopy } from "@/submodules/javascript-functions/general";
 import * as TablerIcons from '@tabler/icons-react';
+import { getIconName } from "@/src/util/shared/bricks-integrator-helper";
 
 export default function PageSearch(props: PageSearchProps) {
     const dispatch = useDispatch();
@@ -94,6 +95,15 @@ function SVGIcon({ icon, size, strokeWidth, color }) {
             />
         )
     } else {
-        return <IconLoader size={size} strokeWidth={strokeWidth} color={color} />
+        const Icon = TablerIcons['Icon' + getIconName(icon)];
+        if (Icon) {
+            return (
+                <Icon
+                    size={size}
+                    strokeWidth={strokeWidth}
+                    color={color}
+                />
+            )
+        }
     }
 }

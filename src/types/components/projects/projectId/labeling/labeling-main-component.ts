@@ -43,4 +43,5 @@ export enum LabelingPageParts {
     TABLE_MODAL = 'TABLE_MODAL',
     MANUAL = 'MANUAL',
     WEAK_SUPERVISION = 'WEAK_SUPERVISION',
+    MANUAL_GOLD = 'MANUAL_GOLD',
 }

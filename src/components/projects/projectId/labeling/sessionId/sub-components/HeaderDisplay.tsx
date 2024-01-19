@@ -106,6 +106,7 @@ export default function HeaderDisplay(props: HeaderDisplayProps) {
         hoverGroupsDictCopy[labelId][LabelingPageParts.TABLE_MODAL] = update;
         hoverGroupsDictCopy[labelId][LabelingPageParts.MANUAL] = update;
         hoverGroupsDictCopy[labelId][LabelingPageParts.WEAK_SUPERVISION] = update;
+        hoverGroupsDictCopy[labelId][LabelingPageParts.MANUAL_GOLD] = update;
         dispatch(setHoverGroupDict(hoverGroupsDictCopy));
     }
 

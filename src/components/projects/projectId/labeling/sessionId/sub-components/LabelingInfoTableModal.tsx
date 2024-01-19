@@ -41,12 +41,14 @@ export default function LabelingInfoTableModal(props: LabelingInfoTableModalProp
                 hoverGroupsDictCopy[labelIdKey][LabelingPageParts.TABLE_MODAL] = update;
                 hoverGroupsDictCopy[labelIdKey][LabelingPageParts.MANUAL] = update;
                 hoverGroupsDictCopy[labelIdKey][LabelingPageParts.WEAK_SUPERVISION] = update;
+                hoverGroupsDictCopy[labelIdKey][LabelingPageParts.MANUAL_GOLD] = update;
             } else {
                 hoverGroupsDictCopy[labelIdKey][LabelingPageParts.OVERVIEW_TABLE] = false;
                 hoverGroupsDictCopy[labelIdKey][LabelingPageParts.TASK_HEADER] = false;
                 hoverGroupsDictCopy[labelIdKey][LabelingPageParts.TABLE_MODAL] = false;
                 hoverGroupsDictCopy[labelIdKey][LabelingPageParts.MANUAL] = false;
                 hoverGroupsDictCopy[labelIdKey][LabelingPageParts.WEAK_SUPERVISION] = false;
+                hoverGroupsDictCopy[labelIdKey][LabelingPageParts.MANUAL_GOLD] = false;
             }
         }
         dispatch(setHoverGroupDict(hoverGroupsDictCopy));
@@ -79,7 +81,7 @@ export default function LabelingInfoTableModal(props: LabelingInfoTableModalProp
                             className={`whitespace-nowrap px-3 py-2 text-sm text-gray-500 ${shouldHighLight(tmpHighlightIds, props.dataToDisplay[0].shouldHighlightOn) || hoverGroupsDict[props.dataToDisplay[0].label.id][LabelingPageParts.OVERVIEW_TABLE] ? settings.main.hoverGroupBackgroundColorClass : ''}`}>
                             <span className={`inline-flex items-center px-2.5 py-0.5 rounded-md border text-sm font-medium cursor-default relative ${props.dataToDisplay[0].label.backgroundColor} ${props.dataToDisplay[0].label.textColor} ${props.dataToDisplay[0].label.borderColor}`}>
                                 {props.dataToDisplay[0].label.name}
-                                <div className={`label-overlay-base ${hoverGroupsDict[props.dataToDisplay[0].label.id][LabelingPageParts.MANUAL] && props.dataToDisplay[0].sourceTypeKey == LabelingPageParts.MANUAL && style.labelOverlayManual} ${hoverGroupsDict[props.dataToDisplay[0].label.id][LabelingPageParts.WEAK_SUPERVISION] && props.dataToDisplay[0].sourceTypeKey == LabelingPageParts.WEAK_SUPERVISION && style.labelOverlayWeakSupervision}`}></div>
+                                <div className={`label-overlay-base ${hoverGroupsDict[props.dataToDisplay[0].label.id][LabelingPageParts.MANUAL] && props.dataToDisplay[0].sourceTypeKey == LabelingPageParts.MANUAL && style.labelOverlayManual} ${hoverGroupsDict[props.dataToDisplay[0].label.id][LabelingPageParts.WEAK_SUPERVISION] && props.dataToDisplay[0].sourceTypeKey == LabelingPageParts.WEAK_SUPERVISION && style.labelOverlayWeakSupervision} ${hoverGroupsDict[props.dataToDisplay[0].label.id][LabelingPageParts.MANUAL_GOLD] && props.dataToDisplay[0].sourceTypeKey == LabelingPageParts.MANUAL_GOLD && style.labelOverlayManual}`}></div>
                             </span>
                             {props.dataToDisplay[0].label.value && <div className="ml-2">{props.dataToDisplay[0].label.value}</div>}
                         </td>

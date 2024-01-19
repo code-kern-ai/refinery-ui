@@ -515,7 +515,6 @@ export default function LabelingSuiteLabeling() {
         }
     }
 
-
     return (<div className="bg-white relative p-4">
         {lVars.loading && SessionManager.currentRecordId !== "deleted" && <LoadingIcon size="lg" />}
         {(!lVars.loading && !recordRequests.record || SessionManager.currentRecordId == "deleted") && <div className="flex items-center justify-center text-red-500">This Record has been deleted</div>}
@@ -532,7 +531,7 @@ export default function LabelingSuiteLabeling() {
                     <div className={`col-start-3 h-full py-1.5 flex ${i % 2 == 0 ? 'bg-white' : 'bg-gray-50'}`}>
                         {task.goldInfo?.can && <Tooltip content={task.goldInfo.is ? TOOLTIPS_DICT.LABELING.REMOVE_LABELS_GOLD_STAR : TOOLTIPS_DICT.LABELING.SET_LABELS_GOLD_STAR} color="invert" placement="top">
                             <div className="mt-0.5" onClick={() => toggleGoldStar(task.task.id, task.goldInfo?.is)}>
-                                {task.goldInfo.is ? <IconStarFilled className="h-5 w-5" /> : <IconStar className="h-5 w-5" />}
+                                <IconStar className={`${task.goldInfo.is ? style.specialUserActive : style.specialUserInActive}`} />
                             </div>
                         </Tooltip>}
                     </div>
@@ -578,7 +577,7 @@ export default function LabelingSuiteLabeling() {
                                                 onMouseEnter={() => onMouseEvent(true, rlaLabel.labelId, rlaLabel.sourceTypeKey)}
                                                 onMouseLeave={() => onMouseEvent(false, rlaLabel.labelId, rlaLabel.sourceTypeKey)}
                                                 className={`text-sm font-medium px-2 py-0.5 rounded-md border focus:outline-none relative flex items-center ${labelLookup[rlaLabel.labelId].color.backgroundColor} ${labelLookup[rlaLabel.labelId].color.textColor} ${labelLookup[rlaLabel.labelId].color.borderColor}`}>
-                                                <div className={`label-overlay-base ${hoverGroupsDict[rlaLabel.labelId][LabelingPageParts.MANUAL] && rlaLabel.sourceTypeKey == LabelingPageParts.MANUAL && style.labelOverlayManual} ${hoverGroupsDict[rlaLabel.labelId][LabelingPageParts.WEAK_SUPERVISION] && rlaLabel.sourceTypeKey == LabelingPageParts.WEAK_SUPERVISION && style.labelOverlayWeakSupervision}`}></div>
+                                                <div className={`label-overlay-base ${hoverGroupsDict[rlaLabel.labelId][LabelingPageParts.MANUAL] && rlaLabel.sourceTypeKey == LabelingPageParts.MANUAL && style.labelOverlayManual} ${hoverGroupsDict[rlaLabel.labelId][LabelingPageParts.WEAK_SUPERVISION] && rlaLabel.sourceTypeKey == LabelingPageParts.WEAK_SUPERVISION && style.labelOverlayWeakSupervision} ${hoverGroupsDict[rlaLabel.labelId][LabelingPageParts.MANUAL_GOLD] && rlaLabel.sourceTypeKey == LabelingPageParts.MANUAL_GOLD && style.labelOverlayManual} `}></div>
                                                 {rlaLabel.icon && <div className="mr-1">
                                                     {rlaLabel.icon == InformationSourceType.LABELING_FUNCTION && <IconCode size={20} strokeWidth={1.5} />}
                                                     {rlaLabel.icon == InformationSourceType.ACTIVE_LEARNING && <IconBolt size={20} strokeWidth={1.5} />}

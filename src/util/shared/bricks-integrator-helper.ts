@@ -208,3 +208,10 @@ export function getGroupName(groupKey: string): string {
 export function getIsoCodes(onlyMostRelevant: boolean = true): { code: string, name: string }[] {
     return isoCodes.filter(e => !onlyMostRelevant || mostRelevant.includes(e.code));
 }
+
+export function getIconName(bricksIconName: string): string {
+    switch (bricksIconName) {
+        case "ThreeDCubeSphere": return "3dCubeSphere";
+        default: bricksIconName;
+    }
+}
