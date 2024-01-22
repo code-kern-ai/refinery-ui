@@ -56,6 +56,7 @@ export default function AttributeCalculation() {
     const [editorOptions, setEditorOptions] = useState(EDITOR_OPTIONS);
     const [tokenizationProgress, setTokenizationProgress] = useState(0);
     const [editorValue, setEditorValue] = useState('');
+    const [attributeName, setAttributeName] = useState('');
 
     const [refetchAttributes] = useLazyQuery(GET_ATTRIBUTES_BY_PROJECT_ID, { fetchPolicy: "network-only" });
     const [updateAttributeMut] = useMutation(UPDATE_ATTRIBUTE);
@@ -107,6 +108,7 @@ export default function AttributeCalculation() {
         if (currentAttribute.state == AttributeState.USABLE) {
             setEditorOptions({ ...EDITOR_OPTIONS, readOnly: true });
         }
+        setAttributeName(currentAttribute.name);
     }, [currentAttribute]);
 
     useEffect(() => {
@@ -141,6 +143,14 @@ export default function AttributeCalculation() {
 
     function openName(open: boolean) {
         setIsNameOpen(open);
+        if (!open && attributeName != currentAttribute.name) {
+            if (attributeName.trim().length == 0) {
+                setAttributeName(currentAttribute.name);
+                return;
+            }
+            changeAttributeName(attributeName);
+        }
+
     }
 
     function changeAttributeName(name: string) {
@@ -149,6 +159,7 @@ export default function AttributeCalculation() {
         const duplicateNameExists = attributes.find((attribute) => attribute.name == name);
         if (duplicateNameExists) {
             setDuplicateNameExists(true);
+            setAttributeName(currentAttribute.name);
             return;
         }
         const attributeNew = { ...currentAttribute };
@@ -278,7 +289,7 @@ export default function AttributeCalculation() {
                         </Tooltip>
                         <div className="inline-block" onDoubleClick={() => openName(true)}>
                             {(isNameOpen && currentAttribute.state != AttributeState.USABLE && currentAttribute.state != AttributeState.RUNNING)
-                                ? (<input type="text" value={currentAttribute.name} onInput={(e: any) => changeAttributeName(e.target.value)}
+                                ? (<input type="text" value={attributeName} onInput={(e: any) => setAttributeName(e.target.value)}
                                     onBlur={() => openName(false)} onKeyDown={(e) => { if (e.key == 'Enter') openName(false) }}
                                     className="h-8 text-sm border-gray-300 rounded-md placeholder-italic border text-gray-700 pl-4 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100" />)
                                 : (<div className="mr-4 text-sm leading-5 font-medium text-gray-500 inline-block">{currentAttribute.name}</div>)}
