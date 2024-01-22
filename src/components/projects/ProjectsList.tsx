@@ -17,6 +17,9 @@ import style from "@/src/styles/components/projects/projects-list.module.css";
 import { useRouter } from "next/router";
 import { unsubscribeWSOnDestroy } from "@/src/services/base/web-sockets/web-sockets-helper";
 import AdminDeleteProjectModal from "./AdminDeleteProjectModal";
+import { setLabelingTasksAll } from "@/src/reduxStore/states/pages/settings";
+import { setOverviewFilters } from "@/src/reduxStore/states/tmp";
+import { setFullSearchStore, setSearchGroupsStore } from "@/src/reduxStore/states/pages/data-browser";
 
 export default function ProjectsList() {
     const router = useRouter();
@@ -45,6 +48,10 @@ export default function ProjectsList() {
             whitelist: ['project_created', 'project_deleted', 'project_update', 'file_upload'],
             func: handleWebsocketNotification
         });
+        dispatch(setLabelingTasksAll(null));
+        dispatch(setOverviewFilters(null));
+        dispatch(setSearchGroupsStore(null));
+        dispatch(setFullSearchStore(null));
     }, []);
 
     useEffect(() => {
