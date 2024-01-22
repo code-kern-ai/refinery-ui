@@ -65,7 +65,9 @@ export default function DataBrowserSidebar() {
             dispatch(setTextHighlight([]));
             dispatch(setIsTextHighlightNeeded({}));
             dispatch(updateAdditionalDataState('clearFullSearch', true));
+            dispatch(updateAdditionalDataState('canUpdateDynamicSlice', false));
         } else {
+            dispatch(updateAdditionalDataState('canUpdateDynamicSlice', false));
             dispatch(setActiveDataSlice(slice));
         }
         dispatch(updateAdditionalDataState('displayOutdatedWarning', false));

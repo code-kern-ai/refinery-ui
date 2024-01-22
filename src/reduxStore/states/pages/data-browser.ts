@@ -14,6 +14,7 @@ type DataBrowserState = {
         staticSliceOrderActive: boolean;
         loading: boolean;
         clearFullSearch: boolean;
+        canUpdateDynamicSlice: boolean;
     },
     usersMapCount: any;
     searchRecordsExtended: SearchRecordsExtended;
@@ -44,7 +45,8 @@ function getInitState(): DataBrowserState {
             staticDataSliceCurrentCount: 0,
             staticSliceOrderActive: false,
             loading: false,
-            clearFullSearch: false
+            clearFullSearch: false,
+            canUpdateDynamicSlice: false
         },
         usersMapCount: {},
         searchRecordsExtended: {

@@ -59,7 +59,7 @@ export default function SaveDataSliceModal(props: { fullSearch: {} }) {
         dataSlices.forEach((slice: DataSlice) => {
             if (slice.name == modalSaveDataSlice.sliceName) {
                 dispatch(setActiveDataSlice(slice));
-                updateSlice(isStatic);
+                updateSlice(isStatic, slice.id);
                 return;
             }
         });
@@ -81,13 +81,13 @@ export default function SaveDataSliceModal(props: { fullSearch: {} }) {
         dispatch(setModalStates(ModalEnum.SAVE_DATA_SLICE, { sliceNameExists: exists }));
     }
 
-    function updateSlice(isStatic = null) {
+    function updateSlice(isStatic = null, sliceId = null) {
         isStatic = isStatic == null ? activeSlice.static : isStatic;
         updateDataSliceMut({
             variables: {
                 projectId: projectId,
                 static: isStatic,
-                dataSliceId: activeSlice.id,
+                dataSliceId: sliceId,
                 filterRaw: getRawFilterForSave(props.fullSearch),
                 filterData: parseFilterToExtended(activeSearchParams, attributes, configuration, labelingTasks, user, props.fullSearch[SearchGroup.DRILL_DOWN].value)
             }

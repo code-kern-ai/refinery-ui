@@ -154,9 +154,10 @@ export default function SearchGroups() {
         if (!activeSlice || !labelingTasks || !fullSearchStore || !searchGroupsStore || !dataSlices) return;
         if (activeSlice.sliceType == Slice.STATIC_DEFAULT || activeSlice.sliceType == Slice.STATIC_OUTLIER) return;
         const findDataSLice = dataSlices.find((el) => el.id == activeSlice.id);
-        if (!findDataSLice) return;
+        if (!findDataSLice || additionalData.canUpdateDynamicSlice) return;
         const activeParams = updateSearchParameters(Object.values(JSON.parse(findDataSLice.filterRaw)), attributes, configuration.separator, jsonCopy(fullSearchStore), searchGroupsStore, labelingTasks);
         dispatch(setActiveSearchParams(activeParams));
+        dispatch(updateAdditionalDataState('canUpdateDynamicSlice', true));
     }, [activeSlice, labelingTasks, fullSearchStore, searchGroupsStore, dataSlices]);
 
     useEffect(() => {

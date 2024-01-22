@@ -45,6 +45,8 @@ export default function DataBrowserRecords(props: DataBrowserRecordsProps) {
         dispatch(setTextHighlight([]));
         dispatch(setIsTextHighlightNeeded({}));
         dispatch(updateAdditionalDataState('clearFullSearch', true));
+        dispatch(updateAdditionalDataState('displayOutdatedWarning', false));
+        dispatch(updateAdditionalDataState('canUpdateDynamicSlice', false));
     }
 
     function storePreliminaryRecordIds(index: number, forEdit: boolean = false) {

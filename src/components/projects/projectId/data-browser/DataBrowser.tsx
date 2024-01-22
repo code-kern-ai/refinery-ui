@@ -4,7 +4,7 @@ import DataBrowserSidebar from "./DataBrowserSidebar";
 import { useLazyQuery } from "@apollo/client";
 import { DATA_SLICES, GET_RECORD_COMMENTS, GET_UNIQUE_VALUES_BY_ATTRIBUTES, SEARCH_RECORDS_EXTENDED } from "@/src/services/gql/queries/data-browser";
 import { useCallback, useEffect, useState } from "react";
-import { expandRecordList, setDataSlices, setRecordComments, setSearchRecordsExtended, setUniqueValuesDict, setUsersMapCount, updateAdditionalDataState } from "@/src/reduxStore/states/pages/data-browser";
+import { expandRecordList, setActiveDataSlice, setDataSlices, setRecordComments, setSearchRecordsExtended, setUniqueValuesDict, setUsersMapCount, updateAdditionalDataState } from "@/src/reduxStore/states/pages/data-browser";
 import { postProcessRecordsExtended, postProcessUniqueValues, postProcessUsersCount } from "@/src/util/components/projects/projectId/data-browser/data-browser-helper";
 import { GET_ATTRIBUTES_BY_PROJECT_ID, GET_EMBEDDING_SCHEMA_BY_PROJECT_ID, GET_LABELING_TASKS_BY_PROJECT_ID } from "@/src/services/gql/queries/project-setting";
 import { selectAttributes, selectLabelingTasksAll, setAllAttributes, setAllEmbeddings, setLabelingTasksAll } from "@/src/reduxStore/states/pages/settings";
@@ -102,9 +102,13 @@ export default function DataBrowser() {
         });
     }
 
-    function refetchDataSlicesAndProcess() {
+    function refetchDataSlicesAndProcess(dataSliceId?: string) {
         refetchDataSlices({ variables: { projectId: projectId } }).then((res) => {
             dispatch(setDataSlices(res.data.dataSlices));
+            if (dataSliceId) {
+                const findSlice = res.data.dataSlices.find((slice) => slice.id == dataSliceId);
+                if (findSlice) dispatch(setActiveDataSlice(findSlice));
+            }
         });
     }
 
@@ -162,7 +166,7 @@ export default function DataBrowser() {
 
     const handleWebsocketNotification = useCallback((msgParts: string[]) => {
         if (['data_slice_created', 'data_slice_updated', 'data_slice_deleted'].includes(msgParts[1])) {
-            refetchDataSlicesAndProcess();
+            refetchDataSlicesAndProcess(msgParts[2]);
             if (msgParts[1] == 'data_slice_deleted') {
                 dispatch(updateAdditionalDataState('displayOutdatedWarning', false));
                 dispatch(updateAdditionalDataState('clearFullSearch', true));
