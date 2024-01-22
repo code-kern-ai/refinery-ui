@@ -561,7 +561,7 @@ export default function LabelingSuiteLabeling() {
                                         </div>
                                     </div>))}
                                     <Tooltip content={TOOLTIPS_DICT.LABELING.CHOOSE_LABELS} color="invert" placement="top">
-                                        <button onClick={() => {
+                                        <button onClick={(event) => {
                                             setActiveTasksFunc(task);
                                             labelBoxPosition(event.target);
                                         }} className="flex flex-row flex-nowrap bg-white text-gray-700 text-sm font-medium mr-3 px-2 py-0.5 rounded-md border border-gray-300 hover:bg-gray-50 focus:outline-none">

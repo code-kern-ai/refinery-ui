@@ -1,16 +1,24 @@
 import { selectUser } from "@/src/reduxStore/states/general";
+import { selectSettings } from "@/src/reduxStore/states/pages/labeling";
 import { LabelSelectionBoxProps } from "@/src/types/components/projects/projectId/labeling/labeling";
 import { UserRole } from "@/src/types/shared/sidebar";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
 import { Tooltip } from "@nextui-org/react";
 import { IconCirclePlus } from "@tabler/icons-react";
-import { Fragment, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 
 export default function LabelSelectionBox(props: LabelSelectionBoxProps) {
     const user = useSelector(selectUser);
+    const settings = useSelector(selectSettings);
 
     const [newLabel, setNewLabel] = useState('');
+    const [tasksFiltered, setTasksFiltered] = useState(props.activeTasks);
+
+    useEffect(() => {
+        if (!props.activeTasks || props.activeTasks.length == 0) return;
+        setTasksFiltered(props.activeTasks[0].task.labels.slice(settings.labeling.showNLabelButton));
+    }, [props.activeTasks, settings.labeling.showNLabelButton]);
 
     function stopPropagation(e) {
         e.preventDefault()
@@ -32,6 +40,7 @@ export default function LabelSelectionBox(props: LabelSelectionBoxProps) {
                         props.checkLabelVisibleInSearch(e.target.value, task.task);
                     }} onKeyDown={(e: any) => {
                         if (e.key == 'Enter') {
+                            if (e.target.value == '') return;
                             props.addNewLabelToTask(e.target.value, task.task);
                             setNewLabel('');
                         }
@@ -48,7 +57,7 @@ export default function LabelSelectionBox(props: LabelSelectionBoxProps) {
                     </Tooltip>}
                 </div>
                 <div className={`flex-grow flex flex-col justify-center ${index == props.activeTasks.length - 1 ? 'p-3' : 'px-3 pt-3'}`}>
-                    {props.activeTasks && task.task.labels && task.task.labels.map((label, index) =>
+                    {props.activeTasks && tasksFiltered && tasksFiltered.map((label, index) =>
                         <button key={label.id} className={`text-sm font-medium px-2 py-0.5 rounded-md border mb-2 focus:outline-none ${props.labelLookup[label.id].color.backgroundColor}  ${props.labelLookup[label.id].color.textColor}  ${props.labelLookup[label.id].color.borderColor}`} role="button"
                             style={{ display: props.labelLookup[label.id].visibleInSearch ? null : 'none' }}
                             onClick={() => props.addRla(task.task, label.id)}>
