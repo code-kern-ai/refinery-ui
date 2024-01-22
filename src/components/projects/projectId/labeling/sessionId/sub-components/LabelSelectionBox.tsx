@@ -19,7 +19,7 @@ export default function LabelSelectionBox(props: LabelSelectionBoxProps) {
 
     return (<div id="label-selection-box" style={{ top: props.position.top, left: props.position.left, minWidth: '270px' }}
         onMouseDown={(e) => stopPropagation(e)} onMouseUp={(e) => stopPropagation(e)}
-        className={`flex flex-col rounded-lg bg-white shadow absolute z-10 border border-gray-300 ${props.activeTasks && props.activeTasks.length > 0 ? null : 'hidden'}`}>
+        className={`flex flex-col rounded-lg bg-white shadow absolute z-50 border border-gray-300 ${props.activeTasks && props.activeTasks.length > 0 ? null : 'hidden'}`}>
         {props.activeTasks && <div className="max-h-80 overflow-y-auto">
             {props.activeTasks && props.activeTasks.map((task, index) => <Fragment key={task.task.id}>
                 <div className={`flex flex-grow flex-row justify-center p-2 ${index != 0 ? 'border-t borders-gray' : null}`}>
@@ -27,7 +27,7 @@ export default function LabelSelectionBox(props: LabelSelectionBoxProps) {
                     <label className="italic font-bold text-sm truncate pr-0.5" style={{ maxWidth: '12rem' }}>{task.task.name}</label>
                 </div>
                 <div className="flex flex-row gap-x-1 flex-nowrap p-2.5 border borders-gray">
-                    <input type="text" value={newLabel} onChange={(e) => {
+                    <input onClick={(e: any) => e.target.focus()} type="text" value={newLabel} onChange={(e) => {
                         setNewLabel(e.target.value);
                         props.checkLabelVisibleInSearch(e.target.value, task.task);
                     }} onKeyDown={(e: any) => {

@@ -504,6 +504,8 @@ export default function LabelingSuiteLabeling() {
     }
 
     function handleKeyboardEvent(event) {
+        const labelSelection = document.getElementById('label-selection-box');
+        if (!labelSelection.classList.contains('hidden')) return;
         for (const key in labelHotkeys) {
             if (key == event.key) {
                 const task = labelingTasks.find(t => t.id == labelHotkeys[key].taskId);
