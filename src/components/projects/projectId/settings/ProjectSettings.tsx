@@ -304,7 +304,7 @@ export default function ProjectSettings() {
                             <span className="cursor-help underline filtersUnderline">Tokenization</span>
                         </div>
                     </Tooltip>
-                    <div className="ml-2 w-8/12 items-center px-2.5 py-1.5 border border-gray-300 shadow text-xs font-medium md:rounded-lg text-gray-700 bg-white relative">
+                    <div className="ml-2 w-8/12 items-center px-2.5 py-1.5 border border-gray-300 shadow text-xs font-medium rounded-md text-gray-700 bg-white relative">
                         {tokenizationProgress != 0 && <div className="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700">
                             <div className="bg-green-300 h-2.5 rounded-full" style={{ 'width': (tokenizationProgress * 100) + '%' }}>
                             </div>
