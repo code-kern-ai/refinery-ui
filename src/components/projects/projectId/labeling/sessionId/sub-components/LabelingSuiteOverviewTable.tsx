@@ -16,6 +16,7 @@ import LabelingInfoTableModal from "./LabelingInfoTableModal";
 import { LabelingPageParts } from "@/src/types/components/projects/projectId/labeling/labeling-main-component";
 import { jsonCopy } from "@/submodules/javascript-functions/general";
 import style from '@/src/styles/components/projects/projectId/labeling.module.css';
+import { LabelSourceHover } from "@/src/types/components/projects/projectId/labeling/labeling";
 
 
 function shouldHighLight(tmpHighlightIds: string[], comparedIds: string[], additionalComparedIds?: string[]) {
@@ -26,10 +27,10 @@ function shouldHighLight(tmpHighlightIds: string[], comparedIds: string[], addit
 }
 
 function convertToInformationSourceType(type: string) {
-    if (type == 'Manual') return LabelSource.MANUAL;
-    else if (type == 'Weak Supervision') return LabelSource.WEAK_SUPERVISION;
-    else if (type == 'Manual gold ⭐') return LabelSource.MANUAL_GOLD;
-    else return LabelSource.INFORMATION_SOURCE;
+    if (type == 'Manual') return LabelSourceHover.MANUAL;
+    else if (type == 'Weak Supervision') return LabelSourceHover.WEAK_SUPERVISION;
+    else if (type == 'Manual gold ⭐') return LabelSourceHover.MANUAL_GOLD;
+    else return LabelSourceHover.INFORMATION_SOURCE;
 }
 
 
@@ -109,18 +110,18 @@ export default function LabelingSuiteOverviewTable() {
         if (labelId && !sourceType) onMouseEvent(true, labelId);
         if (sourceType) {
             const hoverGroupsDictCopy = jsonCopy(hoverGroupsDict);
-            if (sourceType == LabelSource.MANUAL) {
-                hoverGroupsDictCopy[labelId][LabelSource.MANUAL] = true;
-                hoverGroupsDictCopy[labelId][LabelSource.WEAK_SUPERVISION] = false;
-                hoverGroupsDictCopy[labelId][LabelSource.MANUAL_GOLD] = false;
-            } else if (sourceType == LabelSource.WEAK_SUPERVISION) {
-                hoverGroupsDictCopy[labelId][LabelSource.MANUAL] = false;
-                hoverGroupsDictCopy[labelId][LabelSource.WEAK_SUPERVISION] = true;
-                hoverGroupsDictCopy[labelId][LabelSource.MANUAL_GOLD] = false;
-            } else if (sourceType == LabelSource.MANUAL_GOLD) {
-                hoverGroupsDictCopy[labelId][LabelSource.MANUAL] = true;
-                hoverGroupsDictCopy[labelId][LabelSource.WEAK_SUPERVISION] = false;
-                hoverGroupsDictCopy[labelId][LabelSource.MANUAL_GOLD] = true;
+            if (sourceType == LabelSourceHover.MANUAL) {
+                hoverGroupsDictCopy[labelId][LabelSourceHover.MANUAL] = true;
+                hoverGroupsDictCopy[labelId][LabelSourceHover.WEAK_SUPERVISION] = false;
+                hoverGroupsDictCopy[labelId][LabelSourceHover.MANUAL_GOLD] = false;
+            } else if (sourceType == LabelSourceHover.WEAK_SUPERVISION) {
+                hoverGroupsDictCopy[labelId][LabelSourceHover.MANUAL] = false;
+                hoverGroupsDictCopy[labelId][LabelSourceHover.WEAK_SUPERVISION] = true;
+                hoverGroupsDictCopy[labelId][LabelSourceHover.MANUAL_GOLD] = false;
+            } else if (sourceType == LabelSourceHover.MANUAL_GOLD) {
+                hoverGroupsDictCopy[labelId][LabelSourceHover.MANUAL] = true;
+                hoverGroupsDictCopy[labelId][LabelSourceHover.WEAK_SUPERVISION] = false;
+                hoverGroupsDictCopy[labelId][LabelSourceHover.MANUAL_GOLD] = true;
             }
             hoverGroupsDictCopy[labelId][LabelingPageParts.TASK_HEADER] = true;
             dispatch(setHoverGroupDict(hoverGroupsDictCopy));
@@ -132,8 +133,8 @@ export default function LabelingSuiteOverviewTable() {
         if (labelId && !sourceType) onMouseEvent(false, labelId);
         if (sourceType) {
             const hoverGroupsDictCopy = jsonCopy(hoverGroupsDict);
-            hoverGroupsDictCopy[labelId][LabelSource.MANUAL] = false;
-            hoverGroupsDictCopy[labelId][LabelSource.WEAK_SUPERVISION] = false;
+            hoverGroupsDictCopy[labelId][LabelSourceHover.MANUAL] = false;
+            hoverGroupsDictCopy[labelId][LabelSourceHover.WEAK_SUPERVISION] = false;
             hoverGroupsDictCopy[labelId][LabelingPageParts.TASK_HEADER] = false;
             hoverGroupsDictCopy[labelId][LabelingPageParts.TABLE_MODAL] = false;
             hoverGroupsDictCopy[labelId][LabelingPageParts.MANUAL_GOLD] = false;

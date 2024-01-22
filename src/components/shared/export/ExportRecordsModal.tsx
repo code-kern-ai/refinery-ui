@@ -29,6 +29,7 @@ import CryptedField from "../crypted-field/CryptedField";
 import { unsubscribeWSOnDestroy } from "@/src/services/base/web-sockets/web-sockets-helper";
 import { useRouter } from "next/router";
 import { extendArrayElementsByUniqueId } from "@/submodules/javascript-functions/id-prep";
+import { LabelSourceHover } from "@/src/types/components/projects/projectId/labeling/labeling";
 
 export default function ExportRecordsModal(props: ExportProps) {
     const dispatch = useDispatch();

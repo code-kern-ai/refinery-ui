@@ -22,9 +22,13 @@ export default function GroupDisplay(props: GroupDisplayProps) {
             props.setPresetValues(control['value'], formControlCopy);
             return;
         }
-
+        if (control['value']) {
+            formControlCopy[props.type][control['value']] = control;
+        } else {
+            formControlCopy[props.type][control['name']] = control;
+        }
+        formControlCopy[props.type][control['name']] = control;
         props.updateFormGroup(formControlCopy, control['value']);
-        console.log(formControlCopy)
     }
 
     return (<>

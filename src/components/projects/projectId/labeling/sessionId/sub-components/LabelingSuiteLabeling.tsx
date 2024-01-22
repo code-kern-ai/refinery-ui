@@ -3,7 +3,7 @@ import { selectUser } from "@/src/reduxStore/states/general"
 import { removeFromRlaById, selectHoverGroupDict, selectRecordRequests, selectRecordRequestsRecord, selectSettings, selectUserDisplayId, setHoverGroupDict } from "@/src/reduxStore/states/pages/labeling"
 import { selectAttributes, selectLabelingTasksAll, selectVisibleAttributesLabeling } from "@/src/reduxStore/states/pages/settings"
 import { selectProjectId } from "@/src/reduxStore/states/project"
-import { HotkeyLookup, LabelingVars, TokenLookup } from "@/src/types/components/projects/projectId/labeling/labeling"
+import { HotkeyLookup, LabelSourceHover, LabelingVars, TokenLookup } from "@/src/types/components/projects/projectId/labeling/labeling"
 import { LabelingTaskTaskType } from "@/src/types/components/projects/projectId/settings/labeling-tasks"
 import { UserRole } from "@/src/types/shared/sidebar"
 import { DEFAULT_LABEL_COLOR, FULL_RECORD_ID, SWIM_LANE_SIZE_PX, buildLabelingRlaData, collectSelectionData, filterRlaDataForLabeling, findOrderPosItem, getDefaultLabelingVars, getFirstFitPos, getGoldInfoForTask, getOrderLookupItem, getOrderLookupSort, getTaskTypeOrder, getTokenData, parseSelectionData } from "@/src/util/components/projects/projectId/labeling/labeling-helper"
@@ -572,7 +572,7 @@ export default function LabelingSuiteLabeling() {
                                 }
                                 {rlaDataToDisplay[task.task.id] && <div>
                                     <div className={`flex gap-2 ${settings.labeling.compactClassificationLabelDisplay ? 'flex-row flex-wrap items-center' : 'flex-col'}`}>
-                                        {rlaDataToDisplay[task.task.id].map((rlaLabel, index) => (<Tooltip key={index} content={rlaLabel.dataTip} color="invert" placement="top" className={`w-max ${rlaLabel.sourceTypeKey == LabelSource.WEAK_SUPERVISION ? 'cursor-pointer' : 'cursor-auto'}`}>
+                                        {rlaDataToDisplay[task.task.id].map((rlaLabel, index) => (<Tooltip key={index} content={rlaLabel.dataTip} color="invert" placement="top" className={`w-max ${rlaLabel.sourceTypeKey == LabelSourceHover.WEAK_SUPERVISION ? 'cursor-pointer' : 'cursor-auto'}`}>
                                             <div onClick={() => rlaLabel.sourceTypeKey == 'WEAK_SUPERVISION' ? addRla(task.task, rlaLabel.labelId) : null}
                                                 onMouseEnter={() => onMouseEvent(true, rlaLabel.labelId, rlaLabel.sourceTypeKey)}
                                                 onMouseLeave={() => onMouseEvent(false, rlaLabel.labelId, rlaLabel.sourceTypeKey)}
@@ -583,8 +583,8 @@ export default function LabelingSuiteLabeling() {
                                                     {rlaLabel.icon == InformationSourceType.ACTIVE_LEARNING && <IconBolt size={20} strokeWidth={1.5} />}
                                                     {rlaLabel.icon == InformationSourceType.ZERO_SHOT && <IconSparkles size={20} strokeWidth={1.5} />}
                                                     {rlaLabel.icon == InformationSourceType.CROWD_LABELER && <IconUsers size={20} strokeWidth={1.5} />}
-                                                    {rlaLabel.icon == LabelSource.MODEL_CALLBACK && <IconBolt size={20} strokeWidth={1.5} />}
-                                                    {rlaLabel.icon == LabelSource.WEAK_SUPERVISION && <IconAssembly size={20} strokeWidth={1.5} />}
+                                                    {rlaLabel.icon == LabelSourceHover.MODEL_CALLBACK && <IconBolt size={20} strokeWidth={1.5} />}
+                                                    {rlaLabel.icon == LabelSourceHover.WEAK_SUPERVISION && <IconAssembly size={20} strokeWidth={1.5} />}
                                                 </div>}
                                                 <div className="truncate" style={{ maxWidth: '260px' }}>{rlaLabel.labelDisplay}</div>
                                                 {rlaLabel.canBeDeleted && <div className="pl-1 cursor-pointer" onClick={() => deleteRecordLabelAssociation(rlaLabel.rla.id)}>

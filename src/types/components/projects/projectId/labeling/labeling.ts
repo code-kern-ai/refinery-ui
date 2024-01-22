@@ -68,3 +68,11 @@ export type HotkeyLookup = {
         labelId: string
     }
 }
+
+export enum LabelSourceHover {
+    MANUAL = "MANUAL",
+    WEAK_SUPERVISION = "WEAK_SUPERVISION",
+    INFORMATION_SOURCE = "INFORMATION_SOURCE",
+    MODEL_CALLBACK = "MODEL_CALLBACK",
+    MANUAL_GOLD = "MANUAL_GOLD",
+}

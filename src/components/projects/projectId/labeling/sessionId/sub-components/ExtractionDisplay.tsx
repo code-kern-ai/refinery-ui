@@ -1,6 +1,6 @@
 import { selectHoverGroupDict, selectSettings, setHoverGroupDict } from "@/src/reduxStore/states/pages/labeling";
 import { LineBreaksType } from "@/src/types/components/projects/projectId/data-browser/data-browser";
-import { ExtractionDisplayProps } from "@/src/types/components/projects/projectId/labeling/labeling";
+import { ExtractionDisplayProps, LabelSourceHover } from "@/src/types/components/projects/projectId/labeling/labeling";
 import { LabelingPageParts } from "@/src/types/components/projects/projectId/labeling/labeling-main-component";
 import { LabelSource } from "@/submodules/javascript-functions/enums/enums";
 import { Tooltip } from "@nextui-org/react";
@@ -50,7 +50,7 @@ export default function ExtractionDisplay(props: ExtractionDisplayProps) {
                                     borderBottomWidth: '1px',
                                     borderTopWidth: '1px',
                                     left: '-2px',
-                                    borderStyle: rlaItem.rla.sourceType == LabelSource.MANUAL ? 'solid' : 'dashed',
+                                    borderStyle: rlaItem.rla.sourceType == LabelSourceHover.MANUAL ? 'solid' : 'dashed',
                                     borderLeftWidth: rlaItem.isFirst ? '1px' : null,
                                     borderTopLeftRadius: rlaItem.isFirst ? '0.375rem' : null,
                                     borderBottomLeftRadius: rlaItem.isFirst ? '0.375rem' : null,
