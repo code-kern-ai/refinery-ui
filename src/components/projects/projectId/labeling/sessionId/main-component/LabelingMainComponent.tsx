@@ -1,5 +1,5 @@
 import { selectAllUsers, selectUser, setComments } from "@/src/reduxStore/states/general";
-import { setAvailableLinks, updateRecordRequests, setSelectedLink, selectRecordRequestsRla, updateUsers, setSettings, selectSettings, setUserDisplayId, selectRecordRequestsRecord, initOnLabelPageDestruction } from "@/src/reduxStore/states/pages/labeling";
+import { setAvailableLinks, updateRecordRequests, setSelectedLink, selectRecordRequestsRla, updateUsers, setSettings, selectSettings, setUserDisplayId, selectRecordRequestsRecord, initOnLabelPageDestruction, selectUserDisplayId } from "@/src/reduxStore/states/pages/labeling";
 import { selectProjectId } from "@/src/reduxStore/states/project"
 import { AVAILABLE_LABELING_LINKS, GET_RECORD_LABEL_ASSOCIATIONS, GET_TOKENIZED_RECORD, REQUEST_HUDDLE_DATA } from "@/src/services/gql/queries/labeling";
 import { LabelingLinkType } from "@/src/types/components/projects/projectId/labeling/labeling-main-component";
@@ -43,6 +43,7 @@ export default function LabelingMainComponent() {
     const settings = useSelector(selectSettings);
     const record = useSelector(selectRecordRequestsRecord);
     const allUsers = useSelector(selectAllUsers);
+    const userDisplayId = useSelector(selectUserDisplayId);
 
     const [huddleData, setHuddleData] = useState(null);
 
@@ -141,11 +142,13 @@ export default function LabelingMainComponent() {
     }, [SessionManager.currentRecordId]);
 
     useEffect(() => {
-        if (!rlas) return;
+        if (!rlas || !user) return;
         const [usersIcons, showUsersIcons] = UserManager.prepareUserIcons(rlas, user, users);
         dispatch(updateUsers('userIcons', usersIcons));
         dispatch(updateUsers('showUserIcons', showUsersIcons));
-        dispatch(setUserDisplayId(user.id));
+        if (!userDisplayId) {
+            dispatch(setUserDisplayId(user.id));
+        }
     }, [rlas]);
 
     function setUpCommentsRequestsAndFetch() {
