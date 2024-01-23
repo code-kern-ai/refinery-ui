@@ -1,10 +1,9 @@
 import { CommentData, CommentMainSectionProps, CommentPosition } from "@/src/types/shared/comments";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
 import { useLocalStorage } from "@/submodules/react-components/hooks/useLocalStorage";
-import { Dialog, Transition } from "@headlessui/react";
 import { Tooltip } from "@nextui-org/react";
 import { IconArrowLeft, IconArrowRight, IconX } from "@tabler/icons-react";
-import { Fragment, useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import DisplayComments from "./DisplayComments";
 import { useSelector } from "react-redux";
 import { selectAllUsers, selectComments } from "@/src/reduxStore/states/general";
@@ -105,66 +104,52 @@ export default function CommentsMainSection(props: CommentMainSectionProps) {
     }, [commentTextsArray]);
 
     return (
-        <Transition.Root show={props.open} as={Fragment}>
-            <Dialog as="div" className="relative z-50" onClose={props.toggleOpen}>
-                <div className="fixed inset-0" />
+        <div className="relative z-30" role="dialog" aria-modal="true">
+            <div className="inset-0 bg-gray-500 bg-opacity-0 opacity-0"></div>
 
-                <div className="fixed inset-0 overflow-hidden">
-                    <div className="absolute inset-0 overflow-hidden">
-                        <div className={`pointer-events-none fixed inset-y-0 flex max-w-full top-16 ${positionComment == CommentPosition.RIGHT ? 'right-0' : 'left-20'}`}>
-                            <Transition.Child
-                                as={Fragment}
-                                enter="transform transition ease-in-out duration-500 sm:duration-700"
-                                enterFrom={positionComment == CommentPosition.RIGHT ? 'translate-x-full' : '-translate-x-full'}
-                                enterTo="translate-x-0"
-                                leave="transform transition ease-in-out duration-500 sm:duration-700"
-                                leaveFrom="translate-x-0"
-                                leaveTo={positionComment == CommentPosition.RIGHT ? 'translate-x-full' : '-translate-x-full'}
-                            >
-                                <Dialog.Panel className="pointer-events-auto w-screen max-w-md border border-gray-300">
-                                    <div className="flex h-full flex-col overflow-y-auto bg-white shadow-xl">
-                                        <div className="flex flex-row items-center px-4 pt-4">
-                                            {positionComment == CommentPosition.RIGHT ? <Tooltip content={TOOLTIPS_DICT.GENERAL.MOVE_COMMENT_LEFT} color="invert">
-                                                <div className='cursor-pointer' onClick={flipCommentPosition}>
-                                                    <IconArrowLeft size={24}
-                                                        strokeWidth={2}
-                                                        className='text-gray-700 font-bold cursor-pointer' />
-                                                </div>
-                                            </Tooltip> : <Tooltip content={TOOLTIPS_DICT.GENERAL.MOVE_COMMENT_RIGHT} color="invert">
-                                                <div className='cursor-pointer' onClick={flipCommentPosition}>
-                                                    <IconArrowRight size={24}
-                                                        strokeWidth={2}
-                                                        className='text-gray-700 font-bold cursor-pointer' />
-                                                </div>
-                                            </Tooltip>}
-                                            <Dialog.Title className="text-base flex m-auto font-bold leading-6 text-gray-900 cursor-pointer" onClick={() => openAllComments(!allOpen)}>
-                                                <Tooltip content={allOpen ? TOOLTIPS_DICT.GENERAL.CLOSE_ALL : TOOLTIPS_DICT.GENERAL.OPEN_ALL} contentColor="invert" hideArrow={true} placement='bottom'
-                                                    css={{ color: '#6B7280', border: '1px solid #6B7280', backgroundColor: '#F3F4F6', textAlign: 'center' }}>
-                                                    Comments
-                                                </Tooltip>
-                                            </Dialog.Title>
-                                            <button onClick={props.toggleOpen} type="button" className="rounded-md text-gray-400">
-                                                <span className="sr-only">Close panel</span>
-                                                <IconX size={24} strokeWidth={2} className='text-gray-400 cursor-pointer' />
-                                            </button>
-                                        </div>
-                                        <DisplayComments position={positionComment} openComments={openCommentsArray} editComments={editCommentsArray} commentTexts={commentTextsArray}
-                                            handleCommentClick={(index: number) => handleCommentClick(index)}
-                                            handleEditClick={(index: number) => handleEditComment(index)}
-                                            editComment={(event: Event, commentId: string, toChangeKey: string, toChangeValue: any, index: number) => updateComment(event, commentId, toChangeKey, toChangeValue, index)}
-                                            handleCommentTextChange={(value: string, index: number) => handleCommentTextChange(value, index)}
-                                            deleteComment={(id: string) => deleteComment(id)} />
-                                        <hr></hr>
-                                        <CommentCreation
-                                            saveComment={(type: string, commentId: string, comment: string, isPrivate: boolean) => saveComment(type, commentId, comment, isPrivate)}
-                                            closeCommentCreation={props.toggleOpen} isOpen={props.open} />
+            <div className={`absolute inset-0 overflow-hidden ${props.open ? 'block' : 'hidden'}`}>
+                <div className="absolute inset-0 overflow-hidden">
+                    <div className={`pointer-events-auto fixed inset-y-0 flex max-w-full border-x w-96 top-16 ${positionComment == CommentPosition.RIGHT ? 'right-0' : 'left-20'}`}>
+                        <div className="flex h-full flex-col overflow-y-auto bg-white shadow-xl">
+                            <div className="flex flex-row items-center px-4 pt-4">
+                                {positionComment == CommentPosition.RIGHT ? <Tooltip content={TOOLTIPS_DICT.GENERAL.MOVE_COMMENT_LEFT} color="invert">
+                                    <div className='cursor-pointer' onClick={flipCommentPosition}>
+                                        <IconArrowLeft size={24}
+                                            strokeWidth={2}
+                                            className='text-gray-700 font-bold cursor-pointer' />
                                     </div>
-                                </Dialog.Panel>
-                            </Transition.Child>
+                                </Tooltip> : <Tooltip content={TOOLTIPS_DICT.GENERAL.MOVE_COMMENT_RIGHT} color="invert">
+                                    <div className='cursor-pointer' onClick={flipCommentPosition}>
+                                        <IconArrowRight size={24}
+                                            strokeWidth={2}
+                                            className='text-gray-700 font-bold cursor-pointer' />
+                                    </div>
+                                </Tooltip>}
+                                <div className="text-base flex m-auto font-bold leading-6 text-gray-900 cursor-pointer" onClick={() => openAllComments(!allOpen)}>
+                                    <Tooltip content={allOpen ? TOOLTIPS_DICT.GENERAL.CLOSE_ALL : TOOLTIPS_DICT.GENERAL.OPEN_ALL} contentColor="invert" hideArrow={true} placement='bottom'
+                                        css={{ color: '#6B7280', border: '1px solid #6B7280', backgroundColor: '#F3F4F6', textAlign: 'center' }}>
+                                        Comments
+                                    </Tooltip>
+                                </div>
+                                <button onClick={props.toggleOpen} type="button" className="rounded-md text-gray-400">
+                                    <span className="sr-only">Close panel</span>
+                                    <IconX size={24} strokeWidth={2} className='text-gray-400 cursor-pointer' />
+                                </button>
+                            </div>
+                            <DisplayComments position={positionComment} openComments={openCommentsArray} editComments={editCommentsArray} commentTexts={commentTextsArray}
+                                handleCommentClick={(index: number) => handleCommentClick(index)}
+                                handleEditClick={(index: number) => handleEditComment(index)}
+                                editComment={(event: Event, commentId: string, toChangeKey: string, toChangeValue: any, index: number) => updateComment(event, commentId, toChangeKey, toChangeValue, index)}
+                                handleCommentTextChange={(value: string, index: number) => handleCommentTextChange(value, index)}
+                                deleteComment={(id: string) => deleteComment(id)} />
+                            <hr></hr>
+                            <CommentCreation
+                                saveComment={(type: string, commentId: string, comment: string, isPrivate: boolean) => saveComment(type, commentId, comment, isPrivate)}
+                                closeCommentCreation={props.toggleOpen} isOpen={props.open} />
                         </div>
                     </div>
                 </div>
-            </Dialog>
-        </Transition.Root >
+            </div>
+        </div>
     )
 }
