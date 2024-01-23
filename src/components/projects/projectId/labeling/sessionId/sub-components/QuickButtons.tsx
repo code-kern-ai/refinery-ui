@@ -6,7 +6,6 @@ import { getQuickButtonConfig } from "@/src/util/components/projects/projectId/l
 import { jsonCopy } from "@/submodules/javascript-functions/general";
 import { Tooltip } from "@nextui-org/react";
 import { useDispatch, useSelector } from "react-redux";
-import style from "@/src/styles/components/projects/projectId/labeling.module.css";
 
 const QUICK_BUTTONS: QuickButtonConfig = getQuickButtonConfig();
 

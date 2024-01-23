@@ -1,6 +1,6 @@
 import LoadingIcon from "@/src/components/shared/loading/LoadingIcon"
 import { selectUser } from "@/src/reduxStore/states/general"
-import { removeFromRlaById, selectHoverGroupDict, selectRecordRequests, selectRecordRequestsRecord, selectSettings, selectUserDisplayId, setHoverGroupDict } from "@/src/reduxStore/states/pages/labeling"
+import { removeFromRlaById, selectHoverGroupDict, selectRecordRequests, selectRecordRequestsRecord, selectSettings, selectTmpHighlightIds, selectUserDisplayId, setHoverGroupDict, tmpAddHighlightIds } from "@/src/reduxStore/states/pages/labeling"
 import { selectAttributes, selectLabelingTasksAll, selectVisibleAttributesLabeling } from "@/src/reduxStore/states/pages/settings"
 import { selectProjectId } from "@/src/reduxStore/states/project"
 import { HotkeyLookup, LabelSourceHover, LabelingVars, TokenLookup } from "@/src/types/components/projects/projectId/labeling/labeling"
@@ -29,6 +29,10 @@ import style from '@/src/styles/components/projects/projectId/labeling.module.cs
 
 const L_VARS = getDefaultLabelingVars();
 
+export function shouldHighlightOn(tmpHighlightIds: string[], comparedId: string[]) {
+    return tmpHighlightIds.some((id) => comparedId.includes(id));
+}
+
 export default function LabelingSuiteLabeling() {
     const router = useRouter();
     const dispatch = useDispatch();
@@ -42,6 +46,7 @@ export default function LabelingSuiteLabeling() {
     const record = useSelector(selectRecordRequestsRecord);
     const displayUserId = useSelector(selectUserDisplayId);
     const hoverGroupsDict = useSelector(selectHoverGroupDict);
+    const tmpHighlightIds = useSelector(selectTmpHighlightIds);
 
     const [lVars, setLVars] = useState<LabelingVars>(L_VARS);
     const [tokenLookup, setTokenLookup] = useState<TokenLookup>({});
@@ -494,15 +499,6 @@ export default function LabelingSuiteLabeling() {
         });
     }
 
-    function onMouseEvent(update: boolean, labelId: string, sourceTypeKey?: string) {
-        const hoverGroupsDictCopy = jsonCopy(hoverGroupsDict);
-        hoverGroupsDictCopy[labelId][LabelingPageParts.TASK_HEADER] = update;
-        hoverGroupsDictCopy[labelId][sourceTypeKey] = update;
-        hoverGroupsDictCopy[labelId][LabelingPageParts.OVERVIEW_TABLE] = update;
-        hoverGroupsDictCopy[labelId][LabelingPageParts.TABLE_MODAL] = update;
-        dispatch(setHoverGroupDict(hoverGroupsDictCopy));
-    }
-
     function handleKeyboardEvent(event) {
         const labelSelection = document.getElementById('label-selection-box');
         if (!labelSelection.classList.contains('hidden')) return;
@@ -576,10 +572,11 @@ export default function LabelingSuiteLabeling() {
                                     <div className={`flex gap-2 ${settings.labeling.compactClassificationLabelDisplay ? 'flex-row flex-wrap items-center' : 'flex-col'}`}>
                                         {rlaDataToDisplay[task.task.id].map((rlaLabel, index) => (<Tooltip key={index} content={rlaLabel.dataTip} color="invert" placement="top" className={`w-max ${rlaLabel.sourceTypeKey == LabelSourceHover.WEAK_SUPERVISION ? 'cursor-pointer' : 'cursor-auto'}`}>
                                             <div onClick={() => rlaLabel.sourceTypeKey == 'WEAK_SUPERVISION' ? addRla(task.task, rlaLabel.labelId) : null}
-                                                onMouseEnter={() => onMouseEvent(true, rlaLabel.labelId, rlaLabel.sourceTypeKey)}
-                                                onMouseLeave={() => onMouseEvent(false, rlaLabel.labelId, rlaLabel.sourceTypeKey)}
+                                                onMouseEnter={() => dispatch(tmpAddHighlightIds([rlaLabel.rla.id]))}
+                                                onMouseLeave={() => dispatch(tmpAddHighlightIds([]))}
                                                 className={`text-sm font-medium px-2 py-0.5 rounded-md border focus:outline-none relative flex items-center ${labelLookup[rlaLabel.labelId].color.backgroundColor} ${labelLookup[rlaLabel.labelId].color.textColor} ${labelLookup[rlaLabel.labelId].color.borderColor}`}>
-                                                <div className={`label-overlay-base ${hoverGroupsDict[rlaLabel.labelId][LabelingPageParts.MANUAL] && rlaLabel.sourceTypeKey == LabelingPageParts.MANUAL && style.labelOverlayManual} ${hoverGroupsDict[rlaLabel.labelId][LabelingPageParts.WEAK_SUPERVISION] && rlaLabel.sourceTypeKey == LabelingPageParts.WEAK_SUPERVISION && style.labelOverlayWeakSupervision} ${hoverGroupsDict[rlaLabel.labelId][LabelingPageParts.MANUAL_GOLD] && rlaLabel.sourceTypeKey == LabelingPageParts.MANUAL_GOLD && style.labelOverlayManual} `}></div>
+                                                <div className={`label-overlay-base ${((shouldHighlightOn(tmpHighlightIds, [LabelSourceHover.MANUAL, rlaLabel.rla.id, rlaLabel.rla.createdBy, rlaLabel.rla.labelingTaskLabel.labelingTask.id]) && rlaLabel.sourceTypeKey == LabelingPageParts.MANUAL) || (hoverGroupsDict[rlaLabel.labelId] && hoverGroupsDict[rlaLabel.labelId][LabelingPageParts.MANUAL] && rlaLabel.sourceTypeKey == LabelingPageParts.MANUAL)) && style.labelOverlayManual} ${((shouldHighlightOn(tmpHighlightIds, [LabelSourceHover.WEAK_SUPERVISION, rlaLabel.rla.id, rlaLabel.rla.createdBy, rlaLabel.rla.labelingTaskLabel.labelingTask.id]) && rlaLabel.sourceTypeKey == LabelingPageParts.WEAK_SUPERVISION) || (hoverGroupsDict[rlaLabel.labelId] && hoverGroupsDict[rlaLabel.labelId][LabelingPageParts.WEAK_SUPERVISION] && rlaLabel.sourceTypeKey == LabelingPageParts.WEAK_SUPERVISION)) && style.labelOverlayWeakSupervision}`}></div>
+
                                                 {rlaLabel.icon && <div className="mr-1">
                                                     {rlaLabel.icon == InformationSourceType.LABELING_FUNCTION && <IconCode size={20} strokeWidth={1.5} />}
                                                     {rlaLabel.icon == InformationSourceType.ACTIVE_LEARNING && <IconBolt size={20} strokeWidth={1.5} />}

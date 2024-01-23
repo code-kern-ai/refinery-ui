@@ -11,6 +11,7 @@ export type TableDisplayData = {
     sourceType: string,
     sourceTypeKey: string,
     taskName: string,
+    taskId: string,
     createdBy: string,
     label: {
         name: string,
@@ -22,7 +23,10 @@ export type TableDisplayData = {
     },
     rla: any
     canBeDeleted: boolean,
-    shouldHighlightOn: string[]
+    shouldHighlightOn: string[],
+    user: {
+        id: string,
+    }
 }
 
 export type HeaderHover = {

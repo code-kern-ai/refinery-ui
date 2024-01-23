@@ -1,34 +1,57 @@
-import { selectHoverGroupDict, selectSettings, setHoverGroupDict } from "@/src/reduxStore/states/pages/labeling";
+import { selectHoverGroupDict, selectSettings, selectTmpHighlightIds, setHoverGroupDict, tmpAddHighlightIds } from "@/src/reduxStore/states/pages/labeling";
 import { LineBreaksType } from "@/src/types/components/projects/projectId/data-browser/data-browser";
 import { ExtractionDisplayProps, LabelSourceHover } from "@/src/types/components/projects/projectId/labeling/labeling";
 import { LabelingPageParts } from "@/src/types/components/projects/projectId/labeling/labeling-main-component";
-import { LabelSource } from "@/submodules/javascript-functions/enums/enums";
 import { Tooltip } from "@nextui-org/react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import style from '@/src/styles/components/projects/projectId/labeling.module.css';
 import { useState } from "react";
 
+export function shouldHighlightOn(tmpHighlightIds: string[], comparedId: string[]) {
+    return tmpHighlightIds.some((id) => comparedId.includes(id));
+}
+
 export default function ExtractionDisplay(props: ExtractionDisplayProps) {
+    const dispatch = useDispatch();
+
     const settings = useSelector(selectSettings);
     const hoverGroupsDict = useSelector(selectHoverGroupDict);
+    const tmpHighlightIds = useSelector(selectTmpHighlightIds);
 
-    const [hoverBoxDict, setHoverGroupDict] = useState({});
+    const [hoverBoxDict, setHoverGroupDictTmp] = useState({});
 
     function deleteRecordLabelAssociation(rlaId: string) {
         props.deleteRla(rlaId);
     }
 
     function handleMouseEnter(rlaItem: any) {
-        setHoverGroupDict((prevDict) => ({
+        dispatch(tmpAddHighlightIds([rlaItem.rla.id]));
+        onMouseEvent(true, rlaItem.labelId);
+        setHoverGroupDictTmp((prevDict) => ({
             ...Object.fromEntries(Object.keys(prevDict).map((key) => [key, false])),
             [rlaItem.rla.id]: true,
         }));
     }
 
     function handleMouseLeave() {
-        setHoverGroupDict((prevDict) =>
+        dispatch(tmpAddHighlightIds([]));
+        onMouseEvent(false, null);
+        setHoverGroupDictTmp((prevDict) =>
             Object.fromEntries(Object.keys(prevDict).map((key) => [key, false]))
         );
+    }
+
+
+    function onMouseEvent(update: boolean, labelId: string) {
+        let hoverGroupsDictCopy = {};
+        if (!hoverGroupsDictCopy[labelId] && update) {
+            hoverGroupsDictCopy[labelId] = {
+                [LabelingPageParts.TASK_HEADER]: true
+            }
+            dispatch(setHoverGroupDict(hoverGroupsDictCopy));
+        } else {
+            dispatch(setHoverGroupDict(null));
+        }
     }
 
     return (<>
@@ -42,10 +65,10 @@ export default function ExtractionDisplay(props: ExtractionDisplayProps) {
                     </Tooltip>) : (<>
                         <TokenValue token={token} attributeId={props.attributeId} setSelected={(e) => props.setSelected(token.idx, token.idx, e)} /></>)}
                     {props.tokenLookup[props.attributeId][token.idx] && <>
-                        {props.tokenLookup[props.attributeId][token.idx].rlaArray.map((rlaItem) => (<div key={rlaItem.orderPos} className={`absolute left-0 right-0 top-0 flex items-end`} style={{ bottom: rlaItem.bottomPos, zIndex: hoverBoxDict[rlaItem.rla.id] ? 1 : 0 }}
+                        {props.tokenLookup[props.attributeId][token.idx].rlaArray.map((rlaItem: any) => (<div key={rlaItem.orderPos} className={`absolute left-0 right-0 top-0 flex items-end`} style={{ bottom: rlaItem.bottomPos, zIndex: shouldHighlightOn(tmpHighlightIds, [LabelSourceHover.MANUAL, rlaItem.rla.id, rlaItem.rla.createdBy, rlaItem.rla.labelingTaskLabel.labelingTask.id]) || (hoverGroupsDict[rlaItem.labelId] && hoverGroupsDict[rlaItem.labelId][LabelingPageParts.MANUAL]) || (hoverGroupsDict[rlaItem.labelId] && hoverGroupsDict[rlaItem.labelId][LabelingPageParts.WEAK_SUPERVISION]) || hoverBoxDict[rlaItem.rla.id] ? 1 : 0 }}
                             onMouseEnter={() => handleMouseEnter(rlaItem)}
                             onMouseLeave={handleMouseLeave}>
-                            <div className={`h-px flex items-end w-full relative ${props.labelLookup[rlaItem.labelId].color.backgroundColor} ${props.labelLookup[rlaItem.labelId].color.textColor} ${props.labelLookup[rlaItem.labelId].color.borderColor} ${hoverGroupsDict[rlaItem.labelId][LabelingPageParts.MANUAL] || hoverGroupsDict[rlaItem.labelId][LabelingPageParts.WEAK_SUPERVISION] || hoverBoxDict[rlaItem.rla.id] ? 'heightHover' : ''}`}
+                            <div className={`h-px flex items-end w-full relative ${props.labelLookup[rlaItem.labelId].color.backgroundColor} ${props.labelLookup[rlaItem.labelId].color.textColor} ${props.labelLookup[rlaItem.labelId].color.borderColor} ${shouldHighlightOn(tmpHighlightIds, [LabelSourceHover.MANUAL, rlaItem.rla.id, rlaItem.rla.createdBy, rlaItem.rla.labelingTaskLabel.labelingTask.id]) || (hoverGroupsDict[rlaItem.labelId] && hoverGroupsDict[rlaItem.labelId][LabelingPageParts.MANUAL]) || (hoverGroupsDict[rlaItem.labelId] && hoverGroupsDict[rlaItem.labelId][LabelingPageParts.WEAK_SUPERVISION]) || hoverBoxDict[rlaItem.rla.id] ? 'heightHover' : ''}`}
                                 style={{
                                     borderBottomWidth: '1px',
                                     borderTopWidth: '1px',
@@ -64,7 +87,7 @@ export default function ExtractionDisplay(props: ExtractionDisplayProps) {
                                             clipRule="evenodd" />
                                     </svg>
                                 </div>}
-                                <div className={`label-overlay-base ${hoverGroupsDict[rlaItem.labelId][LabelingPageParts.MANUAL] && rlaItem.rla.sourceType == LabelingPageParts.MANUAL && style.labelOverlayManual} ${hoverGroupsDict[rlaItem.labelId][LabelingPageParts.WEAK_SUPERVISION] && rlaItem.rla.sourceType == LabelingPageParts.WEAK_SUPERVISION && style.labelOverlayWeakSupervision} ${hoverBoxDict[rlaItem.rla.id] ? style.labelOverlayManual : ''}`}></div>
+                                <div className={`label-overlay-base ${((shouldHighlightOn(tmpHighlightIds, [LabelSourceHover.MANUAL, rlaItem.rla.id, rlaItem.rla.createdBy, rlaItem.rla.labelingTaskLabel.labelingTask.id]) && rlaItem.rla.sourceType == LabelingPageParts.MANUAL) || (hoverGroupsDict[rlaItem.labelId] && hoverGroupsDict[rlaItem.labelId][LabelingPageParts.MANUAL] && rlaItem.rla.sourceType == LabelingPageParts.MANUAL)) && style.labelOverlayManual} ${hoverGroupsDict[rlaItem.labelId] && hoverGroupsDict[rlaItem.labelId][LabelingPageParts.WEAK_SUPERVISION] && rlaItem.rla.sourceType == LabelingPageParts.WEAK_SUPERVISION && style.labelOverlayWeakSupervision} ${hoverBoxDict[rlaItem.rla.id] ? style.labelOverlayManual : ''}`}></div>
                             </div>
                         </div>
                         ))}

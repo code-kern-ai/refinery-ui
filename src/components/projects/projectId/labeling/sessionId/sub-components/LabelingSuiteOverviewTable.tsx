@@ -14,7 +14,6 @@ import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import LabelingInfoTableModal from "./LabelingInfoTableModal";
 import { LabelingPageParts } from "@/src/types/components/projects/projectId/labeling/labeling-main-component";
-import { jsonCopy } from "@/submodules/javascript-functions/general";
 import style from '@/src/styles/components/projects/projectId/labeling.module.css';
 import { LabelSourceHover } from "@/src/types/components/projects/projectId/labeling/labeling";
 
@@ -25,14 +24,6 @@ function shouldHighLight(tmpHighlightIds: string[], comparedIds: string[], addit
     }
     return tmpHighlightIds.some(id => comparedIds.includes(id));
 }
-
-function convertToInformationSourceType(type: string) {
-    if (type == 'Manual') return LabelSourceHover.MANUAL;
-    else if (type == 'Weak Supervision') return LabelSourceHover.WEAK_SUPERVISION;
-    else if (type == 'Manual gold ⭐') return LabelSourceHover.MANUAL_GOLD;
-    else return LabelSourceHover.INFORMATION_SOURCE;
-}
-
 
 export default function LabelingSuiteOverviewTable() {
     const dispatch = useDispatch();
@@ -107,61 +98,42 @@ export default function LabelingSuiteOverviewTable() {
 
     function onMouseEnter(ids: string[], labelId?: string, sourceType?: string) {
         dispatch(tmpAddHighlightIds(ids));
-        if (labelId && !sourceType) onMouseEvent(true, labelId);
-        if (sourceType) {
-            const hoverGroupsDictCopy = jsonCopy(hoverGroupsDict);
-            if (sourceType == LabelSourceHover.MANUAL) {
-                hoverGroupsDictCopy[labelId][LabelSourceHover.MANUAL] = true;
-                hoverGroupsDictCopy[labelId][LabelSourceHover.WEAK_SUPERVISION] = false;
-                hoverGroupsDictCopy[labelId][LabelSourceHover.MANUAL_GOLD] = false;
-            } else if (sourceType == LabelSourceHover.WEAK_SUPERVISION) {
-                hoverGroupsDictCopy[labelId][LabelSourceHover.MANUAL] = false;
-                hoverGroupsDictCopy[labelId][LabelSourceHover.WEAK_SUPERVISION] = true;
-                hoverGroupsDictCopy[labelId][LabelSourceHover.MANUAL_GOLD] = false;
-            } else if (sourceType == LabelSourceHover.MANUAL_GOLD) {
-                hoverGroupsDictCopy[labelId][LabelSourceHover.MANUAL] = true;
-                hoverGroupsDictCopy[labelId][LabelSourceHover.WEAK_SUPERVISION] = false;
-                hoverGroupsDictCopy[labelId][LabelSourceHover.MANUAL_GOLD] = true;
-            }
-            hoverGroupsDictCopy[labelId][LabelingPageParts.TASK_HEADER] = true;
-            dispatch(setHoverGroupDict(hoverGroupsDictCopy));
-        }
-    }
-
-    function onMouseLeave(labelId?: string, sourceType?: string) {
-        dispatch(tmpAddHighlightIds([]));
-        if (labelId && !sourceType) onMouseEvent(false, labelId);
-        if (sourceType) {
-            const hoverGroupsDictCopy = jsonCopy(hoverGroupsDict);
-            hoverGroupsDictCopy[labelId][LabelSourceHover.MANUAL] = false;
-            hoverGroupsDictCopy[labelId][LabelSourceHover.WEAK_SUPERVISION] = false;
-            hoverGroupsDictCopy[labelId][LabelingPageParts.TASK_HEADER] = false;
-            hoverGroupsDictCopy[labelId][LabelingPageParts.TABLE_MODAL] = false;
-            hoverGroupsDictCopy[labelId][LabelingPageParts.MANUAL_GOLD] = false;
-            dispatch(setHoverGroupDict(hoverGroupsDictCopy));
-        }
-    }
-
-    function onMouseEvent(update: boolean, labelId: string) {
-        const hoverGroupsDictCopy = jsonCopy(hoverGroupsDict);
-        for (const labelIdKey in hoverGroupsDictCopy) {
-            if (labelIdKey == labelId) {
-                hoverGroupsDictCopy[labelIdKey][LabelingPageParts.OVERVIEW_TABLE] = update;
-                hoverGroupsDictCopy[labelIdKey][LabelingPageParts.TASK_HEADER] = update;
-                hoverGroupsDictCopy[labelIdKey][LabelingPageParts.TABLE_MODAL] = update;
-                hoverGroupsDictCopy[labelIdKey][LabelingPageParts.MANUAL] = update;
-                hoverGroupsDictCopy[labelIdKey][LabelingPageParts.WEAK_SUPERVISION] = update;
-                hoverGroupsDictCopy[labelIdKey][LabelingPageParts.MANUAL_GOLD] = update;
+        if (labelId && sourceType) onMouseEvent(true, labelId, sourceType);
+        else if (labelId && !sourceType) {
+            let hoverGroupsDictCopy = {};
+            if (!hoverGroupsDictCopy[labelId]) {
+                hoverGroupsDictCopy[labelId] = {
+                    [LabelingPageParts.TASK_HEADER]: true,
+                    [LabelingPageParts.OVERVIEW_TABLE]: true,
+                    [LabelingPageParts.TABLE_MODAL]: true,
+                    [LabelSourceHover.MANUAL]: true,
+                    [LabelSourceHover.WEAK_SUPERVISION]: true,
+                }
+                dispatch(setHoverGroupDict(hoverGroupsDictCopy));
             } else {
-                hoverGroupsDictCopy[labelIdKey][LabelingPageParts.OVERVIEW_TABLE] = false;
-                hoverGroupsDictCopy[labelIdKey][LabelingPageParts.TASK_HEADER] = false;
-                hoverGroupsDictCopy[labelIdKey][LabelingPageParts.TABLE_MODAL] = false;
-                hoverGroupsDictCopy[labelIdKey][LabelingPageParts.MANUAL] = false;
-                hoverGroupsDictCopy[labelIdKey][LabelingPageParts.WEAK_SUPERVISION] = false;
-                hoverGroupsDictCopy[labelIdKey][LabelingPageParts.MANUAL_GOLD] = false;
+                dispatch(setHoverGroupDict(null));
             }
         }
-        dispatch(setHoverGroupDict(hoverGroupsDictCopy));
+    }
+
+    function onMouseLeave() {
+        dispatch(tmpAddHighlightIds([]));
+        dispatch(setHoverGroupDict(null));
+    }
+
+    function onMouseEvent(update: boolean, labelId: string, sourceTypeKey?: string) {
+        let hoverGroupsDictCopy = {};
+        if (!hoverGroupsDictCopy[labelId] && update) {
+            hoverGroupsDictCopy[labelId] = {
+                [LabelingPageParts.TASK_HEADER]: true,
+                [LabelingPageParts.OVERVIEW_TABLE]: true,
+                [LabelingPageParts.TABLE_MODAL]: true,
+                [sourceTypeKey]: true,
+            }
+            dispatch(setHoverGroupDict(hoverGroupsDictCopy));
+        } else {
+            dispatch(setHoverGroupDict(null));
+        }
     }
 
     return (<>
@@ -173,13 +145,13 @@ export default function LabelingSuiteOverviewTable() {
                             <table className="min-w-full border divide-y divide-gray-300">
                                 <thead className="bg-gray-50">
                                     <tr>
-                                        <th scope="col" onMouseEnter={() => onMouseEnter(headerHover.typeCollection)} onMouseLeave={() => onMouseLeave()}
+                                        <th scope="col" onMouseEnter={() => onMouseEnter(headerHover.typeCollection)} onMouseLeave={onMouseLeave}
                                             className={`py-2 pl-4 pr-3 text-left text-xs font-medium uppercase tracking-wide text-gray-500 sm:pl-6 ${shouldHighLight(tmpHighlightIds, headerHover.typeCollection, headerHover.typeCollection) ? headerHover.class : ''}`}>Type</th>
-                                        <th scope="col" onMouseEnter={() => onMouseEnter(headerHover.taskCollection)} onMouseLeave={() => onMouseLeave()}
+                                        <th scope="col" onMouseEnter={() => onMouseEnter(headerHover.taskCollection)} onMouseLeave={onMouseLeave}
                                             className={`px-3 py-2 text-left text-xs font-medium uppercase tracking-wide text-gray-500 ${shouldHighLight(tmpHighlightIds, headerHover.taskCollection, headerHover.taskCollection) ? headerHover.class : ''}`}>Task</th>
-                                        <th scope="col" onMouseEnter={() => onMouseEnter(headerHover.createdByCollection)} onMouseLeave={() => onMouseLeave()}
+                                        <th scope="col" onMouseEnter={() => onMouseEnter(headerHover.createdByCollection)} onMouseLeave={onMouseLeave}
                                             className={`px-3 py-2 text-left text-xs font-medium uppercase tracking-wide text-gray-500 ${shouldHighLight(tmpHighlightIds, headerHover.createdByCollection, headerHover.createdByCollection) ? headerHover.class : ''}`}>Created by</th>
-                                        <th scope="col" onMouseEnter={() => onMouseEnter(headerHover.labelCollection)} onMouseLeave={() => onMouseLeave()}
+                                        <th scope="col" onMouseEnter={() => onMouseEnter(headerHover.labelCollection)} onMouseLeave={onMouseLeave}
                                             className={`px-3 py-2 text-left text-xs font-medium uppercase tracking-wide text-gray-500 ${shouldHighLight(tmpHighlightIds, headerHover.labelCollection, headerHover.labelCollection) ? headerHover.class : ''}`}>Label</th>
                                         <th scope="col"></th>
                                         <th scope="col"></th>
@@ -187,26 +159,26 @@ export default function LabelingSuiteOverviewTable() {
                                 </thead>
                                 <tbody className="divide-y divide-gray-200 bg-white">
                                     {dataToDisplay.map((ovItem, index) => (<tr key={ovItem.rla.id} className={`${index % 2 == 0 ? 'bg-white' : 'bg-gray-50'}`}>
-                                        <td onMouseEnter={() => onMouseEnter([ovItem.sourceTypeKey], ovItem.label.id, convertToInformationSourceType(ovItem.sourceType))} onMouseLeave={() => onMouseLeave(ovItem.label.id, convertToInformationSourceType(ovItem.sourceType))}
-                                            className={`whitespace-nowrap py-2 pl-4 pr-3 text-sm font-medium text-gray-500 sm:pl-6 ${(shouldHighLight(tmpHighlightIds, ovItem.shouldHighlightOn, headerHover.typeCollection) || hoverGroupsDict[ovItem.label.id][LabelingPageParts.OVERVIEW_TABLE] && hoverGroupsDict[ovItem.label.id][ovItem.sourceTypeKey]) ? settings.main.hoverGroupBackgroundColorClass : ''}`}> {ovItem.sourceType}</td>
-                                        <td onMouseEnter={() => onMouseEnter([ovItem.taskName])} onMouseLeave={() => onMouseLeave()}
-                                            className={`whitespace-nowrap px-3 py-2 text-sm text-gray-500 ${(shouldHighLight(tmpHighlightIds, ovItem.shouldHighlightOn, headerHover.taskCollection) || hoverGroupsDict[ovItem.label.id][LabelingPageParts.OVERVIEW_TABLE] && hoverGroupsDict[ovItem.label.id][ovItem.sourceTypeKey]) ? settings.main.hoverGroupBackgroundColorClass : ''}`}>{ovItem.taskName}</td>
-                                        <td onMouseEnter={() => onMouseEnter([ovItem.createdBy])} onMouseLeave={() => onMouseLeave()}
-                                            className={`whitespace-nowrap px-3 py-2 text-sm text-gray-500 ${(shouldHighLight(tmpHighlightIds, ovItem.shouldHighlightOn, headerHover.createdByCollection) || hoverGroupsDict[ovItem.label.id][LabelingPageParts.OVERVIEW_TABLE] && hoverGroupsDict[ovItem.label.id][ovItem.sourceTypeKey]) ? settings.main.hoverGroupBackgroundColorClass : ''}`}>{ovItem.createdBy}</td>
-                                        <td onMouseEnter={() => onMouseEnter([ovItem.label.id], ovItem.label.id)} onMouseLeave={() => onMouseLeave(ovItem.label.id)}
-                                            className={`whitespace-nowrap px-3 py-2 text-sm text-gray-500 ${(shouldHighLight(tmpHighlightIds, ovItem.shouldHighlightOn, headerHover.labelCollection) || hoverGroupsDict[ovItem.label.id][LabelingPageParts.OVERVIEW_TABLE] && hoverGroupsDict[ovItem.label.id][ovItem.sourceTypeKey]) ? settings.main.hoverGroupBackgroundColorClass : ''}`}>
+                                        <td onMouseEnter={() => onMouseEnter([ovItem.sourceTypeKey])} onMouseLeave={onMouseLeave}
+                                            className={`whitespace-nowrap py-2 pl-4 pr-3 text-sm font-medium text-gray-500 sm:pl-6 ${(shouldHighLight(tmpHighlightIds, ovItem.shouldHighlightOn, headerHover.typeCollection) || hoverGroupsDict[ovItem.label.id] && hoverGroupsDict[ovItem.label.id][LabelingPageParts.OVERVIEW_TABLE] && hoverGroupsDict[ovItem.label.id][ovItem.sourceTypeKey]) ? settings.main.hoverGroupBackgroundColorClass : ''}`}> {ovItem.sourceType}</td>
+                                        <td onMouseEnter={() => onMouseEnter([ovItem.taskId])} onMouseLeave={onMouseLeave}
+                                            className={`whitespace-nowrap px-3 py-2 text-sm text-gray-500 ${(shouldHighLight(tmpHighlightIds, ovItem.shouldHighlightOn, headerHover.taskCollection) || hoverGroupsDict[ovItem.label.id] && hoverGroupsDict[ovItem.label.id][LabelingPageParts.OVERVIEW_TABLE] && hoverGroupsDict[ovItem.label.id][ovItem.sourceTypeKey]) ? settings.main.hoverGroupBackgroundColorClass : ''}`}>{ovItem.taskName}</td>
+                                        <td onMouseEnter={() => onMouseEnter([ovItem.user.id])} onMouseLeave={onMouseLeave}
+                                            className={`whitespace-nowrap px-3 py-2 text-sm text-gray-500 ${(shouldHighLight(tmpHighlightIds, ovItem.shouldHighlightOn, headerHover.createdByCollection) || hoverGroupsDict[ovItem.label.id] && hoverGroupsDict[ovItem.label.id][LabelingPageParts.OVERVIEW_TABLE] && hoverGroupsDict[ovItem.label.id][ovItem.sourceTypeKey]) ? settings.main.hoverGroupBackgroundColorClass : ''}`}>{ovItem.createdBy}</td>
+                                        <td onMouseEnter={() => onMouseEnter([ovItem.label.id], ovItem.label.id)} onMouseLeave={onMouseLeave}
+                                            className={`whitespace-nowrap px-3 py-2 text-sm text-gray-500 ${(shouldHighLight(tmpHighlightIds, ovItem.shouldHighlightOn, headerHover.labelCollection) || hoverGroupsDict[ovItem.label.id] && hoverGroupsDict[ovItem.label.id][LabelingPageParts.OVERVIEW_TABLE] && hoverGroupsDict[ovItem.label.id][ovItem.sourceTypeKey]) ? settings.main.hoverGroupBackgroundColorClass : ''}`}>
                                             <span className={`inline-flex items-center px-2.5 py-0.5 rounded-md border text-sm font-medium cursor-default relative ${ovItem.label.backgroundColor} ${ovItem.label.textColor} ${ovItem.label.borderColor}`}>
                                                 {ovItem.label.name}
-                                                <div className={`label-overlay-base ${hoverGroupsDict[ovItem.label.id][LabelingPageParts.MANUAL] && ovItem.sourceTypeKey == LabelingPageParts.MANUAL && style.labelOverlayManual} ${hoverGroupsDict[ovItem.label.id][LabelingPageParts.WEAK_SUPERVISION] && ovItem.sourceTypeKey == LabelingPageParts.WEAK_SUPERVISION && style.labelOverlayWeakSupervision} ${hoverGroupsDict[ovItem.label.id][LabelingPageParts.MANUAL_GOLD] && ovItem.sourceTypeKey == LabelingPageParts.MANUAL_GOLD && style.labelOverlayManual}`}></div>
+                                                <div className={`label-overlay-base ${((shouldHighLight(tmpHighlightIds, [LabelSourceHover.MANUAL, ovItem.rla.id, ovItem.rla.createdBy, ovItem.rla.labelingTaskLabel.labelingTask.id]) && ovItem.sourceTypeKey == LabelingPageParts.MANUAL) || (hoverGroupsDict[ovItem.label.id] && hoverGroupsDict[ovItem.label.id][LabelingPageParts.MANUAL] && ovItem.sourceTypeKey == LabelingPageParts.MANUAL)) && style.labelOverlayManual} ${((shouldHighLight(tmpHighlightIds, [LabelSourceHover.WEAK_SUPERVISION, ovItem.rla.id, ovItem.rla.createdBy, ovItem.rla.labelingTaskLabel.labelingTask.id]) && ovItem.sourceTypeKey == LabelingPageParts.WEAK_SUPERVISION) || (hoverGroupsDict[ovItem.label.id] && hoverGroupsDict[ovItem.label.id][LabelingPageParts.WEAK_SUPERVISION] && ovItem.sourceTypeKey == LabelingPageParts.WEAK_SUPERVISION)) && style.labelOverlayWeakSupervision}`}></div>
                                             </span>
                                             {ovItem.label.value && <div className="ml-2">{ovItem.label.value}</div>}
                                         </td>
-                                        <td onMouseEnter={() => onMouseEnter([ovItem.rla.id], ovItem.label.id, convertToInformationSourceType(ovItem.sourceType))} onMouseLeave={() => onMouseLeave(ovItem.label.id, convertToInformationSourceType(ovItem.sourceType))}
-                                            className={`${(shouldHighLight(tmpHighlightIds, ovItem.shouldHighlightOn) || hoverGroupsDict[ovItem.label.id][LabelingPageParts.OVERVIEW_TABLE] && hoverGroupsDict[ovItem.label.id][ovItem.sourceTypeKey]) ? settings.main.hoverGroupBackgroundColorClass : ''}`}>
+                                        <td onMouseEnter={() => onMouseEnter([ovItem.rla.id])} onMouseLeave={onMouseLeave}
+                                            className={`${(shouldHighLight(tmpHighlightIds, ovItem.shouldHighlightOn) || hoverGroupsDict[ovItem.label.id] && hoverGroupsDict[ovItem.label.id][LabelingPageParts.OVERVIEW_TABLE] && hoverGroupsDict[ovItem.label.id][ovItem.sourceTypeKey]) ? settings.main.hoverGroupBackgroundColorClass : ''}`}>
                                             <IconSearch className="w-6 h-6 text-gray-700" />
                                         </td>
-                                        <td onMouseEnter={() => onMouseEnter([ovItem.rla.id])} onMouseLeave={() => onMouseLeave()}
-                                            className={`${(shouldHighLight(tmpHighlightIds, ovItem.shouldHighlightOn) || hoverGroupsDict[ovItem.label.id][LabelingPageParts.OVERVIEW_TABLE] && hoverGroupsDict[ovItem.label.id][ovItem.sourceTypeKey]) ? settings.main.hoverGroupBackgroundColorClass : ''}`}>
+                                        <td onMouseEnter={() => onMouseEnter([ovItem.rla.id])} onMouseLeave={onMouseLeave}
+                                            className={`${(shouldHighLight(tmpHighlightIds, ovItem.shouldHighlightOn) || hoverGroupsDict[ovItem.label.id] && hoverGroupsDict[ovItem.label.id][LabelingPageParts.OVERVIEW_TABLE] && hoverGroupsDict[ovItem.label.id][ovItem.sourceTypeKey]) ? settings.main.hoverGroupBackgroundColorClass : ''}`}>
                                             {ovItem.canBeDeleted && <div onClick={() => deleteLabelFromRecord(ovItem.rla.id)}>
                                                 <IconTrash className="w-6 h-6 text-red-700 cursor-pointer" /></div>}
                                         </td>

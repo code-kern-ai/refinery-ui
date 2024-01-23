@@ -1,6 +1,7 @@
 import { selectUser } from "@/src/reduxStore/states/general";
 import { selectSettings } from "@/src/reduxStore/states/pages/labeling";
 import { LabelSelectionBoxProps } from "@/src/types/components/projects/projectId/labeling/labeling";
+import { LabelingTaskTaskType } from "@/src/types/components/projects/projectId/settings/labeling-tasks";
 import { UserRole } from "@/src/types/shared/sidebar";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
 import { Tooltip } from "@nextui-org/react";
@@ -17,7 +18,11 @@ export default function LabelSelectionBox(props: LabelSelectionBoxProps) {
 
     useEffect(() => {
         if (!props.activeTasks || props.activeTasks.length == 0) return;
-        setTasksFiltered(props.activeTasks[0].task.labels.slice(settings.labeling.showNLabelButton));
+        if (props.activeTasks[0].task.taskType == LabelingTaskTaskType.MULTICLASS_CLASSIFICATION) {
+            setTasksFiltered(props.activeTasks[0].task.labels.slice(settings.labeling.showNLabelButton));
+        } else {
+            setTasksFiltered(props.activeTasks[0].task.labels);
+        }
     }, [props.activeTasks, settings.labeling.showNLabelButton]);
 
     function stopPropagation(e) {

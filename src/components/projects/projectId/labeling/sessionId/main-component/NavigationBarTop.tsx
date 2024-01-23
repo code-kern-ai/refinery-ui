@@ -1,7 +1,7 @@
 import { selectUser } from "@/src/reduxStore/states/general";
-import { selectAvailableLinks, selectHoverGroupDict, selectSelectedLink, selectUserDisplayId, selectUserIconsData, setHoverGroupDict, setSelectedLink, setUserDisplayId } from "@/src/reduxStore/states/pages/labeling";
+import { selectAvailableLinks, selectSelectedLink, selectUserDisplayId, selectUserIconsData, setHoverGroupDict, setSelectedLink, setUserDisplayId } from "@/src/reduxStore/states/pages/labeling";
 import { selectProjectId } from "@/src/reduxStore/states/project";
-import { LabelingPageParts, UserType } from "@/src/types/components/projects/projectId/labeling/labeling-main-component";
+import { UserType } from "@/src/types/components/projects/projectId/labeling/labeling-main-component";
 import { UserRole } from "@/src/types/shared/sidebar";
 import { SessionManager } from "@/src/util/classes/labeling/session-manager";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
@@ -11,7 +11,6 @@ import { useRouter } from "next/router";
 import { useDispatch, useSelector } from "react-redux";
 import style from '@/src/styles/components/projects/projectId/labeling.module.css';
 import Dropdown2 from "@/submodules/react-components/components/Dropdown2";
-import { jsonCopy } from "@/submodules/javascript-functions/general";
 
 export default function NavigationBarTop() {
     const router = useRouter();
@@ -23,7 +22,6 @@ export default function NavigationBarTop() {
     const selectedLink = useSelector(selectSelectedLink);
     const userIconsData = useSelector(selectUserIconsData);
     const displayId = useSelector(selectUserDisplayId);
-    const hoverGroupsDict = useSelector(selectHoverGroupDict);
 
     function goToRecordIde() {
         const sessionId = router.query.sessionId as string;
@@ -34,28 +32,11 @@ export default function NavigationBarTop() {
     function previousRecord() {
         SessionManager.previousRecord();
         router.push(`/projects/${projectId}/labeling/${SessionManager.labelingLinkData.huddleId}?pos=${SessionManager.huddleData.linkData.requestedPos}&type=${SessionManager.huddleData.linkData.linkType}`);
-        resetHoverGroups();
     }
 
     function nextRecord() {
         SessionManager.nextRecord();
         router.push(`/projects/${projectId}/labeling/${SessionManager.labelingLinkData.huddleId}?pos=${SessionManager.huddleData.linkData.requestedPos}&type=${SessionManager.huddleData.linkData.linkType}`);
-        resetHoverGroups();
-    }
-
-    function resetHoverGroups() {
-        const hoverGroupsDictCopy = jsonCopy(hoverGroupsDict);
-        for (const key in hoverGroupsDictCopy) {
-            hoverGroupsDictCopy[key] = {
-                [LabelingPageParts.TASK_HEADER]: false,
-                [LabelingPageParts.OVERVIEW_TABLE]: false,
-                [LabelingPageParts.TABLE_MODAL]: false,
-                [LabelingPageParts.MANUAL]: false,
-                [LabelingPageParts.WEAK_SUPERVISION]: false,
-                [LabelingPageParts.MANUAL_GOLD]: false,
-            }
-        }
-        dispatch(setHoverGroupDict(hoverGroupsDictCopy));
     }
 
     return (<>

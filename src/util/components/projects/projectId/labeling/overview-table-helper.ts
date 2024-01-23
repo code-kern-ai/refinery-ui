@@ -28,10 +28,12 @@ export function buildOverviewTableDisplayArray(rlas, user: User): TableDisplayDa
             sourceType: getSourceTypeText(e),
             sourceTypeKey: e.sourceType,
             taskName: e.labelingTaskLabel.labelingTask.name,
+            taskId: e.labelingTaskLabel.labelingTask.id,
             createdBy: getCreatedByName(e),
             label: getLabelData(e),
             canBeDeleted: canDeleteRla(e, user),
             rla: e,
+            user: e.user,
             shouldHighlightOn: getShouldHighlightOn(e),
         };
     }
@@ -198,6 +200,5 @@ export function filterRlaLabelCondition(rla: any, settings, projectId): boolean 
 }
 
 export function getShouldHighlightOn(rla: any): string[] {
-    const fullName = rla.user.firstName + ' ' + rla.user.lastName;
-    return [rla.id, rla.labelingTaskLabel.id, rla.sourceType, rla.labelingTaskLabel.labelingTask.name, fullName]
+    return [rla.id, rla.labelingTaskLabel.id, rla.sourceType, rla.labelingTaskLabel.labelingTask.id, rla.user.id]
 }
