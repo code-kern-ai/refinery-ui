@@ -7,7 +7,6 @@ import LabelSettingsBox from "./LabelSettingsBox";
 import { selectHoverGroupDict, selectSettings, selectTmpHighlightIds, setHoverGroupDict, setSettings } from "@/src/reduxStore/states/pages/labeling";
 import { jsonCopy } from "@/submodules/javascript-functions/general";
 import { LabelingPageParts } from "@/src/types/components/projects/projectId/labeling/labeling-main-component";
-import { useConsoleLog } from "@/submodules/react-components/hooks/useConsoleLog";
 
 export function shouldHighlightOn(tmpHighlightIds: string[], comparedId: string[]) {
     return tmpHighlightIds.some((id) => comparedId.includes(id));

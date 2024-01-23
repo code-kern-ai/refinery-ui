@@ -1,4 +1,4 @@
-import { selectSettings, setSettings } from "@/src/reduxStore/states/pages/labeling";
+import { selectSettings, selectTmpHighlightIds, setSettings, tmpAddHighlightIds } from "@/src/reduxStore/states/pages/labeling";
 import { selectProjectId } from "@/src/reduxStore/states/project";
 import { QuickButtonConfig, QuickButtonProps, QuickButtonsProps } from "@/src/types/components/projects/projectId/labeling/task-header";
 import { getDefaultTaskOverviewLabelSettings } from "@/src/util/components/projects/projectId/labeling/labeling-main-component-helper";
@@ -9,12 +9,15 @@ import { useDispatch, useSelector } from "react-redux";
 
 const QUICK_BUTTONS: QuickButtonConfig = getQuickButtonConfig();
 
+export function shouldHighlightOn(tmpHighlightIds: string[], comparedId: string) {
+    return tmpHighlightIds.includes(comparedId)
+}
+
 export default function QuickButtons(props: QuickButtonsProps) {
     const dispatch = useDispatch();
 
     const projectId = useSelector(selectProjectId);
     const settings = useSelector(selectSettings);
-
 
     function setAllLabelDisplaySettingDefault() {
         const settingsCopy = jsonCopy(settings);
@@ -70,16 +73,16 @@ export default function QuickButtons(props: QuickButtonsProps) {
 }
 
 function QuickButton(props: QuickButtonProps) {
+    const dispatch = useDispatch();
+
     const settings = useSelector(selectSettings);
+    const tmpHighlightIds = useSelector(selectTmpHighlightIds);
 
     return (<Tooltip content={'Activate ' + props.dataTipCaption + ' labels in labeling view'} color="invert" placement={settings.task.isCollapsed && props.caption == 'Manual' ? 'right' : 'bottom'}>
         <button onClick={props.setAllLabelDisplaySetting}
-            className={`text-sm font-medium px-2 py-0.5 rounded-md border focus:outline-none cursor-pointer flex flex-row flex-no-wrap gap-x-1 items-center`}
-            onMouseEnter={(e: any) => {
-                e.target.classList.add(props.hoverClass);
-            }} onMouseLeave={(e: any) => {
-                e.target.classList.remove(props.hoverClass);
-            }}>
+            className={`text-sm font-medium px-2 py-0.5 rounded-md border focus:outline-none cursor-pointer flex flex-row flex-no-wrap gap-x-1 items-center ${shouldHighlightOn(tmpHighlightIds, props.hoverClass) ? props.hoverClass : ''}`}
+            onMouseEnter={() => dispatch(tmpAddHighlightIds([props.hoverClass]))}
+            onMouseLeave={(e: any) => dispatch(tmpAddHighlightIds([]))}>
             {QUICK_BUTTONS[props.attributeName] && <div className="grid grid-cols-2 gap-0.5">
                 <div className={`w-2.5 h-2.5 border rounded-full ${QUICK_BUTTONS[props.attributeName][0]}`}></div>
                 <div className={`w-2.5 h-2.5 border rounded-full ${QUICK_BUTTONS[props.attributeName][1]}`}></div>
