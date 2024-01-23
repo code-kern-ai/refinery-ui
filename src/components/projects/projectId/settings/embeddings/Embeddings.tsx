@@ -86,7 +86,7 @@ export default function Embeddings(props: EmbeddingProps) {
                     with
                     embeddings, e.g. to use them for vector search or active transfer learning.</div>
                 <div className="inline-block min-w-full align-middle">
-                    <div className="overflow-hidden shadow ring-1 ring-black ring-opacity-5 md:rounded-lg">
+                    <div className="overflow-hidden shadow ring-1 ring-black ring-opacity-5 md:rounded-lg" style={{ padding: '3px' }}>
                         <table className="min-w-full divide-y divide-gray-300">
                             <thead className="bg-gray-50">
                                 <tr>

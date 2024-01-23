@@ -1,19 +1,14 @@
 import { openModal, setModalStates } from "@/src/reduxStore/states/modal";
 import { selectLabelingTasksAll, setLabelingTasksAll } from "@/src/reduxStore/states/pages/settings";
 import { selectProjectId } from "@/src/reduxStore/states/project";
-import { WebSocketsService } from "@/src/services/base/web-sockets/WebSocketsService";
-import { unsubscribeWSOnDestroy } from "@/src/services/base/web-sockets/web-sockets-helper";
-import { GET_LABELING_TASKS_BY_PROJECT_ID } from "@/src/services/gql/queries/project-setting";
 import { LabelType, LabelingTask, LabelingTaskTaskType } from "@/src/types/components/projects/projectId/settings/labeling-tasks";
-import { CurrentPage } from "@/src/types/shared/general";
 import { ModalEnum } from "@/src/types/shared/modal";
 import { LabelHelper } from "@/src/util/classes/label-helper";
-import { isTaskNameUnique, labelingTaskFromString, labelingTaskToString, postProcessLabelingTasks, postProcessLabelingTasksSchema } from "@/src/util/components/projects/projectId/settings/labeling-tasks-helper";
+import { isTaskNameUnique, labelingTaskFromString, labelingTaskToString } from "@/src/util/components/projects/projectId/settings/labeling-tasks-helper";
 import { jsonCopy } from "@/submodules/javascript-functions/general";
-import { useLazyQuery, useMutation } from "@apollo/client";
+import { useMutation } from "@apollo/client";
 import { Tooltip } from "@nextui-org/react";
 import { IconColorPicker, IconPlus, IconTrash } from "@tabler/icons-react";
-import { useRouter } from "next/router";
 import { useEffect, useState } from "react"
 import { useDispatch, useSelector } from "react-redux";
 import RenameLabelModal from "./RenameLabelModal";
@@ -27,7 +22,6 @@ import ChangeColorModal from "./ChangeColorModal";
 import Dropdown2 from "@/submodules/react-components/components/Dropdown2";
 
 export default function LabelingTasks() {
-    const router = useRouter();
     const dispatch = useDispatch();
 
     const projectId = useSelector(selectProjectId);
@@ -95,7 +89,7 @@ export default function LabelingTasks() {
                 label. We currently support classifications and extractions.</div>
 
             <div className="inline-block min-w-full align-middle">
-                <div className="shadow ring-1 ring-black ring-opacity-5 md:rounded-lg">
+                <div className="shadow ring-1 ring-black ring-opacity-5 md:rounded-lg" style={{ padding: '3px' }}>
                     <table className="min-w-full divide-y divide-gray-300">
                         <thead className="bg-gray-50">
                             <tr>

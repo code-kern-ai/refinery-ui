@@ -68,7 +68,7 @@ export default function DataSchema(props: DataSchemaProps) {
                 It contains the attributes uploaded on project creation and the added calculated attributes.
             </div>
             <div className="inline-block min-w-full align-middle">
-                <div className="shadow ring-1 ring-black ring-opacity-5 md:rounded-lg">
+                <div className="shadow ring-1 ring-black ring-opacity-5 md:rounded-lg" style={{ padding: '3px' }}>
                     <table className="min-w-full divide-y divide-gray-300">
                         <thead className="bg-gray-50">
                             <tr>
