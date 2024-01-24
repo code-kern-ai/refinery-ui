@@ -55,7 +55,10 @@ export default function LabelSelectionBox(props: LabelSelectionBoxProps) {
 
                     {user && user.role == UserRole.ENGINEER && <Tooltip content={TOOLTIPS_DICT.LABELING.CREATE_LABEL} placement="left" color="invert">
                         <div className="flex items-center">
-                            <button onClick={() => props.addNewLabelToTask(newLabel, task.task)}
+                            <button onClick={() => {
+                                props.addNewLabelToTask(newLabel, task.task);
+                                setNewLabel('');
+                            }}
                                 disabled={props.labelAddButtonDisabled || newLabel == ''} className="disabled:cursor-not-allowed disabled:opacity-50">
                                 <IconCirclePlus className={`${props.labelAddButtonDisabled || newLabel == '' ? 'text-gray-300' : 'text-gray-700'}`} />
                             </button>
@@ -66,12 +69,7 @@ export default function LabelSelectionBox(props: LabelSelectionBoxProps) {
                     {props.activeTasks && tasksFiltered && tasksFiltered.map((label, index) =>
                         <button key={label.id} className={`text-sm font-medium px-2 py-0.5 rounded-md border mb-2 focus:outline-none ${props.labelLookup[label.id].color.backgroundColor}  ${props.labelLookup[label.id].color.textColor}  ${props.labelLookup[label.id].color.borderColor}`} role="button"
                             style={{ display: props.labelLookup[label.id].visibleInSearch ? null : 'none' }}
-                            onClick={(e) => {
-                                const selection = window.getSelection();
-                                console.log(selection)
-
-                                props.addRla(task.task, label.id);
-                            }}>
+                            onClick={(e) => props.addRla(task.task, label.id)}>
                             <span className="truncate" style={{ maxWidth: '260px' }}>{label.name}
                                 {label.hotkey && <kbd className="ml-1 uppercase inline-flex items-center border bg-white border-gray-200 rounded px-2 text-sm font-sans font-medium text-gray-400">{label.hotkey}</kbd>}
                             </span>

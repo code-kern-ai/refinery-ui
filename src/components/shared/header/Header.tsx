@@ -106,7 +106,8 @@ export default function Header() {
                     </div>
                     {(user?.role == UserRole.ENGINEER && isManaged) ? (
                         <div className="flex items-center justify-center">
-                            <a href="/refinery/users" className="flex mr-6">
+                            <a href="/refinery/users" onClick={(e: any) => { e.preventDefault(); router.push(`/users`) }}
+                                className="flex mr-6">
                                 <Tooltip placement="bottom" trigger="hover" color="invert" content={TOOLTIPS_DICT.GENERAL.USERS}>
                                     <IconHexagons className="w-6 h-6" />
                                 </Tooltip>

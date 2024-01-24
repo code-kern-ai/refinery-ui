@@ -1,8 +1,5 @@
-import LoadingIcon from "@/src/components/shared/loading/LoadingIcon";
 import { selectHeuristic } from "@/src/reduxStore/states/pages/heuristics";
-import { selectLabelingTasksAll } from "@/src/reduxStore/states/pages/settings";
 import { HeuristicsEditorProps } from "@/src/types/components/projects/projectId/heuristics/heuristicId/heuristics-details";
-import { getClassLine } from "@/src/util/components/projects/projectId/heuristics/heuristicId/heuristics-details-helper";
 import { InformationSourceType } from "@/submodules/javascript-functions/enums/enums";
 import { Editor } from "@monaco-editor/react";
 import { useEffect, useState } from "react";
@@ -14,7 +11,6 @@ export default function HeuristicsEditor(props: HeuristicsEditorProps) {
     const currentHeuristic = useSelector(selectHeuristic);
 
     const [editorValue, setEditorValue] = useState('');
-    const [checkUnsavedChanges, setCheckUnsavedChanges] = useState(false);
 
     useEffect(() => {
         if (!currentHeuristic) return;
@@ -22,13 +18,13 @@ export default function HeuristicsEditor(props: HeuristicsEditorProps) {
     }, [currentHeuristic]);
 
     useEffect(() => {
-        setCheckUnsavedChanges(hasUnsavedChanges());
+        props.setCheckUnsavedChanges(hasUnsavedChanges());
     }, [editorValue]);
 
     useEffect(() => {
         const delayInputTimeoutId = setTimeout(() => {
             props.updatedSourceCode(editorValue);
-            setCheckUnsavedChanges(hasUnsavedChanges());
+            props.setCheckUnsavedChanges(hasUnsavedChanges());
         }, 1000);
         return () => clearTimeout(delayInputTimeoutId);
     }, [editorValue, 1000]);
@@ -73,10 +69,7 @@ export default function HeuristicsEditor(props: HeuristicsEditorProps) {
                     }}
                 />
             </div>
-            {checkUnsavedChanges && <div className="flex items-center absolute mt-2">
-                <div className="text-sm font-normal">Saving...</div>
-                <LoadingIcon color="indigo" />
-            </div>}
+
         </>
 
     )

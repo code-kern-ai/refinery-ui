@@ -9,6 +9,7 @@ export type HeuristicsEditorProps = {
     embedding?: string;
     isInitial: boolean;
     setIsInitial: (val: boolean) => void;
+    setCheckUnsavedChanges: (val: boolean) => void;
 }
 
 export type HeuristicRunButtonsProps = {

@@ -54,9 +54,7 @@ export default function Layout({ children }) {
     }
 
     useEffect(() => {
-        // Add event listener on mount
         window.addEventListener('resize', handleResize);
-        // Remove event listener on unmount
         return () => {
             window.removeEventListener('resize', handleResize);
         };

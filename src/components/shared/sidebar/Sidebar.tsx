@@ -148,7 +148,7 @@ export default function Sidebar() {
                                             className="flex items-center justify-center overflow-visible mt-10 2xl:mt-12">
                                             <Tooltip placement="right" trigger="hover" color="invert" content={TOOLTIPS_DICT.SIDEBAR.SETTINGS}>
                                                 <div className={`relative z-50`}>
-                                                    <a href={`/refinery/projects/${project.id}/settings`}
+                                                    <a href={`/refinery/projects/${project.id}/settings`} onClick={(e: any) => { e.preventDefault(); router.push(`/projects/${project.id}/settings`) }}
                                                         className={`circle ${routeColor.settings.active ? 'text-kernpurple' : 'text-white'}`}>
                                                         <IconSettings className="w-6 h-6" />
                                                     </a>

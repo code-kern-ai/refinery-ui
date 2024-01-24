@@ -207,7 +207,7 @@ export default function RecordIDE() {
                         <button onClick={prevRecord} disabled={position == 1}
                             className={`bg-white text-gray-700 text-xs font-semibold mr-3 px-4 py-2 rounded-md border border-gray-300 whitespace-nowrap hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed`}>Back
                         </button>
-                        <button onClick={nextRecord} disabled={position == huddleData.recordIds.length}
+                        <button onClick={nextRecord} disabled={position == huddleData?.recordIds.length}
                             className={`bg-indigo-700 text-white text-xs font-semibold mr-3 px-4 py-2 rounded-md cursor-pointer whitespace-nowrap hover:bg-indigo-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed`}>Next
                         </button>
                         <Tooltip content={TOOLTIPS_DICT.RECORD_IDE.IDX_SESSION} color="invert" placement="left" className="cursor-auto">

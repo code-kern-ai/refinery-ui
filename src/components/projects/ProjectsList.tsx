@@ -1,4 +1,4 @@
-import { selectInactiveOrganization, selectIsDemo, selectIsManaged, selectUser } from "@/src/reduxStore/states/general"
+import { selectInactiveOrganization, selectIsDemo, selectIsManaged, selectUser, setComments } from "@/src/reduxStore/states/general"
 import { selectAllProjects, setAllProjects } from "@/src/reduxStore/states/project";
 import { WebSocketsService } from "@/src/services/base/web-sockets/WebSocketsService";
 import { GET_OVERVIEW_STATS, GET_PROJECT_LIST } from "@/src/services/gql/queries/projects";
@@ -17,9 +17,12 @@ import style from "@/src/styles/components/projects/projects-list.module.css";
 import { useRouter } from "next/router";
 import { unsubscribeWSOnDestroy } from "@/src/services/base/web-sockets/web-sockets-helper";
 import AdminDeleteProjectModal from "./AdminDeleteProjectModal";
-import { setLabelingTasksAll } from "@/src/reduxStore/states/pages/settings";
+import { setAllAttributes, setAllEmbeddings, setLabelingTasksAll } from "@/src/reduxStore/states/pages/settings";
 import { setOverviewFilters } from "@/src/reduxStore/states/tmp";
-import { setFullSearchStore, setSearchGroupsStore } from "@/src/reduxStore/states/pages/data-browser";
+import { setDataSlices, setFullSearchStore, setSearchGroupsStore } from "@/src/reduxStore/states/pages/data-browser";
+import { closeModal } from "@/src/reduxStore/states/modal";
+import { ModalEnum } from "@/src/types/shared/modal";
+import { SearchGroup } from "@/submodules/javascript-functions/enums/enums";
 
 export default function ProjectsList() {
     const router = useRouter();
@@ -51,7 +54,12 @@ export default function ProjectsList() {
         dispatch(setLabelingTasksAll(null));
         dispatch(setOverviewFilters(null));
         dispatch(setSearchGroupsStore(null));
-        dispatch(setFullSearchStore(null));
+        dispatch(setFullSearchStore({ [SearchGroup.DRILL_DOWN]: false }));
+        dispatch(setAllAttributes([]));
+        dispatch(setAllEmbeddings([]));
+        dispatch(setDataSlices([]));
+        dispatch(setComments(null));
+        dispatch(closeModal(ModalEnum.COMMENTS_SECTION));
     }, []);
 
     useEffect(() => {

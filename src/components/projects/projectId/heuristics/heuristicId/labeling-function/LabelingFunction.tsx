@@ -38,6 +38,7 @@ import { InformationSourceCodeLookup, InformationSourceExamples } from "@/src/ut
 import { getInformationSourceTemplate } from "@/src/util/components/projects/projectId/heuristics/heuristics-helper";
 import Dropdown2 from "@/submodules/react-components/components/Dropdown2";
 import { Attribute } from "@/src/types/components/projects/projectId/settings/data-schema";
+import LoadingIcon from "@/src/components/shared/loading/LoadingIcon";
 
 export default function LabelingFunction() {
     const dispatch = useDispatch();
@@ -54,6 +55,7 @@ export default function LabelingFunction() {
     const [sampleRecords, setSampleRecords] = useState<SampleRecord>(null);
     const [displayLogWarning, setDisplayLogWarning] = useState<boolean>(false);
     const [isInitialLf, setIsInitialLf] = useState<boolean>(null);  //null as add state to differentiate between initial, not and unchecked
+    const [checkUnsavedChanges, setCheckUnsavedChanges] = useState(false);
 
     const [refetchCurrentHeuristic] = useLazyQuery(GET_HEURISTICS_BY_ID, { fetchPolicy: "network-only" });
     const [refetchLabelingTasksByProjectId] = useLazyQuery(GET_LABELING_TASKS_BY_PROJECT_ID, { fetchPolicy: "network-only" });
@@ -259,7 +261,8 @@ export default function LabelingFunction() {
                 <HeuristicsEditor
                     isInitial={isInitialLf}
                     updatedSourceCode={(code: string) => updateSourceCode(code)}
-                    setIsInitial={(val: boolean) => setIsInitialLf(val)} />
+                    setIsInitial={(val: boolean) => setIsInitialLf(val)}
+                    setCheckUnsavedChanges={(val: boolean) => setCheckUnsavedChanges(val)} />
 
                 <div className="mt-2 flex flex-grow justify-between items-center float-right">
                     <div className="flex items-center">
@@ -273,6 +276,10 @@ export default function LabelingFunction() {
                                 Run on 10
                             </button>
                         </Tooltip>
+                        {checkUnsavedChanges && <div className="flex items-center ml-2">
+                            <div className="text-sm font-normal">Saving...</div>
+                            <LoadingIcon color="indigo" />
+                        </div>}
                         <HeuristicRunButtons updateDisplayLogWarning={val => setDisplayLogWarning(val)} />
                     </div>
                 </div>

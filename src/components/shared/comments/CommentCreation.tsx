@@ -1,3 +1,4 @@
+import { selectComments } from "@/src/reduxStore/states/general";
 import { selectProjectId } from "@/src/reduxStore/states/project";
 import { CommentCreationProps, CommentType } from "@/src/types/shared/comments";
 import { CommentDataManager } from "@/src/util/classes/comments";
@@ -8,6 +9,7 @@ import { useSelector } from "react-redux";
 
 export function CommentCreation(props: CommentCreationProps) {
     const projectId = useSelector(selectProjectId);
+    const comments = useSelector(selectComments);
 
     const [type, setType] = useState(null);
     const [commentInstance, setCommentInstance] = useState(null);
@@ -31,12 +33,12 @@ export function CommentCreation(props: CommentCreationProps) {
     }, [props.isOpen]);
 
     useEffect(() => {
-        if (!type) return;
+        if (!type || !projectId || !comments) return;
         setCommentIdOptions(CommentDataManager.getCommentKeyOptions(convertTypeToKey(type.name), projectId));
         if (type.name == CommentType.RECORD) {
             setNewCommentsToLastElement();
         }
-    }, [type]);
+    }, [type, projectId, comments]);
 
     function checkIfKeyShiftEnterSave(event: KeyboardEvent) {
         let commentValue = (event.target as HTMLInputElement).value;

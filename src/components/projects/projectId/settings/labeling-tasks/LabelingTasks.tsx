@@ -138,7 +138,7 @@ export default function LabelingTasks() {
                                         ))}
                                         <button disabled={task.taskType == LabelingTaskTaskType.NOT_SET}
                                             className="bg-gray-100 text-gray-800 cursor-pointer p-1 rounded-md hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed">
-                                            <IconPlus className="cursor-pointer" onClick={() => dispatch(setModalStates(ModalEnum.ADD_LABEL, { taskId: task.id, open: true }))} />
+                                            <IconPlus className={`${task.taskType == LabelingTaskTaskType.NOT_SET ? 'cursor-not-allowed' : 'cursor-pointer'}`} onClick={() => dispatch(setModalStates(ModalEnum.ADD_LABEL, { taskId: task.id, open: true }))} />
                                         </button>
                                     </td>
                                     <td className="whitespace-nowrap text-center px-3 py-2 text-sm text-gray-500">
