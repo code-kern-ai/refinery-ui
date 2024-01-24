@@ -150,6 +150,7 @@ export const selectLabelingTasksDict = createSelector([selectLabelingTasksAll], 
 export const selectUsableAttributesFiltered = createSelector([selectUsableAttributes], (a): any => a ? a.filter((attribute) => attribute.id != '@@NO_ATTRIBUTE@@') : null);
 export const selectUsableAttributesNoFiltered = createSelector([selectUsableAttributes], (a): any => a ? a.filter((attribute) => (attribute.dataType == DataTypeEnum.TEXT || attribute.id == '@@NO_ATTRIBUTE@@')) : null);
 export const selectVisibleAttributesLabeling = createSelector([selectUsableAttributes], (a): any => a ? a.filter((a) => a.visibility == AttributeVisibility.DO_NOT_HIDE || a.visibility == AttributeVisibility.HIDE_ON_DATA_BROWSER) : null);
+export const selectVisibleAttributesDataBrowser = createSelector([selectUsableAttributes], (a): any => a ? a.filter((a) => a.visibility == AttributeVisibility.DO_NOT_HIDE) : null);
 export const selectVisibleAttributeAC = createSelector([selectUsableAttributesFiltered], (a): any => a ? a.filter((a) => a.visibility != AttributeVisibility.HIDE) : null);
 export const selectVisibleAttributesHeuristics = createSelector([selectUsableAttributesFiltered], (a): any => a ? a.filter((a) => a.visibility != AttributeVisibility.HIDE) : null);
 

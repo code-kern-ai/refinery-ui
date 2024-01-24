@@ -10,7 +10,6 @@ import { useSelector } from "react-redux";
 import Highlight from "../highlight/Highlight";
 
 export function RecordDisplay(props: any) {
-    const attributes = useSelector(selectVisibleAttributesHeuristics);
     const attributesDict = useSelector(selectAttributesDict);
     const configuration = useSelector(selectConfiguration);
     const textHighlight = useSelector(selectTextHighlight);
@@ -20,12 +19,11 @@ export function RecordDisplay(props: any) {
     const [preparedAttributes, setPreparedAttributes] = useState<Attribute[]>(null);
 
     useEffect(() => {
-        if (!props.record) return;
-        if (!attributes) return;
+        if (!props.record || !props.attributes) return;
         if (!isTextHighlightNeeded) return;
-        setPreparedRecord(postProcessRecord(props.record, attributes));
-        setPreparedAttributes(postProcessAttributes(attributes));
-    }, [props.record, attributes, isTextHighlightNeeded]);
+        setPreparedRecord(postProcessRecord(props.record, props.attributes));
+        setPreparedAttributes(postProcessAttributes(props.attributes));
+    }, [props.record, props.attributes, isTextHighlightNeeded]);
 
     return (<>
         {preparedAttributes && preparedAttributes.map((attribute, index) => (<div key={attribute.key}>

@@ -1,4 +1,4 @@
-import { selectAttributes, selectAttributesDict, selectLabelingTasksAll } from "@/src/reduxStore/states/pages/settings";
+import { selectAttributes, selectAttributesDict, selectLabelingTasksAll, selectVisibleAttributesHeuristics } from "@/src/reduxStore/states/pages/settings";
 import { selectProjectId } from "@/src/reduxStore/states/project";
 import { attributeCreateSearchGroup, commentsCreateSearchGroup, generateRandomSeed, getBasicGroupItems, getBasicSearchGroup, getBasicSearchItem, labelingTasksCreateSearchGroup, orderByCreateSearchGroup, userCreateSearchGroup } from "@/src/util/components/projects/projectId/data-browser/search-groups-helper";
 import { SearchGroup, Slice, StaticOrderByKeys } from "@/submodules/javascript-functions/enums/enums";
@@ -38,7 +38,7 @@ export default function SearchGroups() {
     const dispatch = useDispatch();
 
     const projectId = useSelector(selectProjectId);
-    const attributes = useSelector(selectAttributes);
+    const attributes = useSelector(selectVisibleAttributesHeuristics);
     const labelingTasks = useSelector(selectLabelingTasksAll);
     const users = useSelector(selectAllUsers);
     const usersMap = useSelector(selectUsersCount);

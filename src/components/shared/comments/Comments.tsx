@@ -6,7 +6,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { ModalEnum } from "@/src/types/shared/modal";
 import { selectModal, setModalStates } from "@/src/reduxStore/states/modal";
 import { useCallback, useEffect } from "react";
-import { selectAllUsers, setComments } from "@/src/reduxStore/states/general";
+import { selectAllUsers, setAllUsers, setComments } from "@/src/reduxStore/states/general";
 import { WebSocketsService } from "@/src/services/base/web-sockets/WebSocketsService";
 import { CurrentPage } from "@/src/types/shared/general";
 import { CommentDataManager } from "@/src/util/classes/comments";
@@ -17,6 +17,7 @@ import { useLazyQuery } from "@apollo/client";
 import { selectProjectId } from "@/src/reduxStore/states/project";
 import { unsubscribeWSOnDestroy } from "@/src/services/base/web-sockets/web-sockets-helper";
 import { useRouter } from "next/router";
+import { GET_ORGANIZATION_USERS } from "@/src/services/gql/queries/organizations";
 
 export default function Comments() {
     const dispatch = useDispatch();
@@ -25,9 +26,25 @@ export default function Comments() {
     const projectId = useSelector(selectProjectId);
     const commentsSideBar = useSelector(selectModal(ModalEnum.COMMENTS_SECTION));
     const allUsers = useSelector(selectAllUsers);
+
     const [refetchComments] = useLazyQuery(REQUEST_COMMENTS, { fetchPolicy: "no-cache" });
+    const [refetchOrganizationUsers] = useLazyQuery(GET_ORGANIZATION_USERS, { fetchPolicy: 'no-cache' });
 
     useEffect(unsubscribeWSOnDestroy(router, [CurrentPage.COMMENTS]), []);
+
+    const reInitWs = useCallback(() => {
+        WebSocketsService.subscribeToNotification(CurrentPage.COMMENTS, {
+            whitelist: ['comment_created', 'comment_updated', 'comment_deleted', 'project_created', 'project_deleted'],
+            func: handleWebsocketNotificationGlobal
+        });
+    }, []);
+
+    useEffect(() => {
+        router.events.on("routeChangeStart", reInitWs);
+        return () => {
+            router.events.off("routeChangeStart", reInitWs);
+        };
+    }, []);
 
     useEffect(() => {
         WebSocketsService.subscribeToNotification(CurrentPage.COMMENTS, {
@@ -70,7 +87,14 @@ export default function Comments() {
             const requestJsonString = CommentDataManager.buildRequestJSON();
             refetchComments({ variables: { requested: requestJsonString } }).then((res) => {
                 CommentDataManager.parseCommentData(JSON.parse(res.data['getAllComments']));
-                CommentDataManager.parseToCurrentData(allUsers);
+                if (allUsers.length == 0) {
+                    refetchOrganizationUsers().then((res) => {
+                        dispatch(setAllUsers(res.data["allUsers"]));
+                        CommentDataManager.parseToCurrentData(res.data["allUsers"]);
+                    });
+                } else {
+                    CommentDataManager.parseToCurrentData(allUsers);
+                }
                 dispatch(setComments(CommentDataManager.currentDataOrder));
             });
         }

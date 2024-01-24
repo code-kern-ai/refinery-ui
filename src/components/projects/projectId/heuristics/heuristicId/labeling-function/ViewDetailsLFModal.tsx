@@ -5,15 +5,19 @@ import { RecordDisplay } from "@/src/components/shared/record-display/RecordDisp
 import { ViewDetailsLFModalProps } from "@/src/types/components/projects/projectId/heuristics/heuristicId/labeling-function";
 import { useSelector } from "react-redux";
 import { selectModal } from "@/src/reduxStore/states/modal";
+import { selectVisibleAttributesHeuristics } from "@/src/reduxStore/states/pages/settings";
 
 export default function ViewDetailsLFModal(props: ViewDetailsLFModalProps) {
     const modalSampleRecord = useSelector(selectModal(ModalEnum.SAMPLE_RECORDS_LABELING_FUNCTION));
+    const attributes = useSelector(selectVisibleAttributesHeuristics);
 
     return (<Modal modalName={ModalEnum.SAMPLE_RECORDS_LABELING_FUNCTION}>
         <h1 className="text-lg text-gray-900 mb-2 text-center">View details</h1>
         {modalSampleRecord.currentRecordIdx != -1 && <div>
             <div className={`text-sm text-gray-500 my-2 overflow-y-auto max-height-modal ${style.scrollableSize}`}>
-                <RecordDisplay record={props.sampleRecords.records[modalSampleRecord.currentRecordIdx]} />
+                <RecordDisplay
+                    attributes={attributes}
+                    record={props.sampleRecords.records[modalSampleRecord.currentRecordIdx]} />
                 <div className="text-sm leading-5 text-left text-gray-900 font-bold">
                     Label data
                     <div className="flex items-center justify-start">

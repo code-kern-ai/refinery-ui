@@ -3,7 +3,7 @@ import RecordTable from "@/src/components/shared/record-table/RecordTable";
 import { selectUser } from "@/src/reduxStore/states/general";
 import { setModalStates } from "@/src/reduxStore/states/modal";
 import { selectConfiguration, selectRecordComments, selectRecords } from "@/src/reduxStore/states/pages/data-browser";
-import { selectEmbeddings } from "@/src/reduxStore/states/pages/settings";
+import { selectEmbeddings, selectVisibleAttributesDataBrowser } from "@/src/reduxStore/states/pages/settings";
 import { RecordListProps } from "@/src/types/components/projects/projectId/data-browser/data-browser";
 import { ModalEnum } from "@/src/types/shared/modal";
 import { UserRole } from "@/src/types/shared/sidebar";
@@ -23,6 +23,7 @@ export default function RecordList(props: RecordListProps) {
     const configuration = useSelector(selectConfiguration);
     const embeddings = useSelector(selectEmbeddings);
     const recordComments = useSelector(selectRecordComments);
+    const attributes = useSelector(selectVisibleAttributesDataBrowser);
 
     return (<>
         {recordList && recordList.map((record, index) => (<div key={record.id} className="bg-white overflow-hidden shadow rounded-lg border mb-4 pb-4 relative">
@@ -34,7 +35,9 @@ export default function RecordList(props: RecordListProps) {
                     </Tooltip>
                 </div>}
 
-                <RecordDisplay record={record} />
+                <RecordDisplay
+                    attributes={attributes}
+                    record={record} />
                 {record.rla_aggregation && <div className="mt-2 flex flex-col">
                     {record.wsHint && configuration.weakSupervisionRelated && <div className="text-gray-800 text-sm font-semibold">{record.wsHint}</div>}
                     <RecordTable columnsData={DATA_BROWSER_TABLE_COLUMN_HEADERS} tableData={record.rla_aggregation} />
