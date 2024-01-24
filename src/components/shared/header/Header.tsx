@@ -76,21 +76,21 @@ export default function Header() {
                     </span>
                 </div>) : (<></>)}
                 <div className="flex items-center">
-                    {currentPage == CurrentPage.PROJECTS || currentPage == CurrentPage.USERS ? (<div className="ml-6 text-gray-500 text-sm font-normal">
+                    {currentPage == CurrentPage.PROJECTS || currentPage == CurrentPage.USERS ? (<div className="ml-4 text-gray-500 text-sm font-normal">
                         {!organizationInactive && <> Welcome, <span className="font-bold text-gray-900">{user?.firstName}</span>! See your projects at <span className="font-bold text-gray-900">{organization?.name}</span>.</>}
                         {organizationInactive && <> Welcome, <span className="font-bold text-gray-900">{user?.firstName}</span>! {!isManaged ? 'Switch to your main account to continue labeling...' : 'You are currently on the waitlist.'}
                         </>}
                     </div>) : (<></>)}
-                    {currentPage == CurrentPage.NEW_PROJECT && <div className="ml-6 text-gray-500 text-sm font-normal">
+                    {currentPage == CurrentPage.NEW_PROJECT && <div className="ml-4 text-gray-500 text-sm font-normal">
                         Add a new project to <span className="font-bold text-gray-900">{organization?.name}</span>.
                     </div>}
-                    {!(currentPage == CurrentPage.PROJECTS || currentPage == CurrentPage.USERS || currentPage == CurrentPage.NEW_PROJECT || currentPage == CurrentPage.MODELS_DOWNLOAD || currentPage == CurrentPage.CONFIG) && <div className="ml-6 text-gray-700 text-sm font-normal">
+                    {!(currentPage == CurrentPage.PROJECTS || currentPage == CurrentPage.USERS || currentPage == CurrentPage.NEW_PROJECT || currentPage == CurrentPage.MODELS_DOWNLOAD || currentPage == CurrentPage.CONFIG) && <div className="ml-4 text-gray-700 text-sm font-normal">
                         {project?.name} - <span className="text-gray-500 font-normal">{project?.numDataScaleUploaded} records</span>
                     </div>}
-                    {currentPage == CurrentPage.MODELS_DOWNLOAD && <div className="ml-6 text-gray-500 text-sm font-normal">
+                    {currentPage == CurrentPage.MODELS_DOWNLOAD && <div className="ml-4 text-gray-500 text-sm font-normal">
                         Welcome <span className="font-bold text-gray-900">{user?.firstName}</span>! See your downloaded models.
                     </div>}
-                    {currentPage == CurrentPage.CONFIG && <div className="ml-6 text-gray-500 text-sm font-normal">
+                    {currentPage == CurrentPage.CONFIG && <div className="ml-4 text-gray-500 text-sm font-normal">
                         {!organizationInactive && user && <>Welcome, <span className="font-bold text-gray-900">{user?.firstName}</span>! Change your app configuration <span className="font-bold text-gray-900">here</span>.</>}
                         {organizationInactive && <>Welcome, <span className="font-bold text-gray-900">{user?.firstName}</span>!
                             {!isManaged ? 'Switch to your main account to continue labeling...' : 'You are currently on the waitlist.'}</>}

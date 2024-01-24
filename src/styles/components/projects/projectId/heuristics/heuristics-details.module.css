@@ -4,7 +4,7 @@
 }
 
 
-@media screen and (min-width: 980px) {
+@media screen and (min-width: 1250px) {
     .widthSize {
         width: calc(100vw - 75px);
     }
