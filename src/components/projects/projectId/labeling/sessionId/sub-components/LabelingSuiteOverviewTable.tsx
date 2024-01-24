@@ -108,6 +108,7 @@ export default function LabelingSuiteOverviewTable() {
                     [LabelingPageParts.TABLE_MODAL]: true,
                     [LabelSourceHover.MANUAL]: true,
                     [LabelSourceHover.WEAK_SUPERVISION]: true,
+                    [LabelSourceHover.INFORMATION_SOURCE]: true,
                 }
                 dispatch(setHoverGroupDict(hoverGroupsDictCopy));
             } else {
@@ -169,7 +170,11 @@ export default function LabelingSuiteOverviewTable() {
                                             className={`whitespace-nowrap px-3 py-2 text-sm text-gray-500 ${(shouldHighLight(tmpHighlightIds, ovItem.shouldHighlightOn, headerHover.labelCollection) || hoverGroupsDict[ovItem.label.id] && hoverGroupsDict[ovItem.label.id][LabelingPageParts.OVERVIEW_TABLE] && hoverGroupsDict[ovItem.label.id][ovItem.sourceTypeKey]) ? settings.main.hoverGroupBackgroundColorClass : ''}`}>
                                             <span className={`inline-flex items-center px-2.5 py-0.5 rounded-md border text-sm font-medium cursor-default relative ${ovItem.label.backgroundColor} ${ovItem.label.textColor} ${ovItem.label.borderColor}`}>
                                                 {ovItem.label.name}
-                                                <div className={`label-overlay-base ${((shouldHighLight(tmpHighlightIds, [LabelSourceHover.MANUAL, ovItem.rla.id, ovItem.rla.createdBy, ovItem.rla.labelingTaskLabel.labelingTask.id]) && ovItem.sourceTypeKey == LabelingPageParts.MANUAL) || (hoverGroupsDict[ovItem.label.id] && hoverGroupsDict[ovItem.label.id][LabelingPageParts.MANUAL] && ovItem.sourceTypeKey == LabelingPageParts.MANUAL)) && style.labelOverlayManual} ${((shouldHighLight(tmpHighlightIds, [LabelSourceHover.WEAK_SUPERVISION, ovItem.rla.id, ovItem.rla.createdBy, ovItem.rla.labelingTaskLabel.labelingTask.id]) && ovItem.sourceTypeKey == LabelingPageParts.WEAK_SUPERVISION) || (hoverGroupsDict[ovItem.label.id] && hoverGroupsDict[ovItem.label.id][LabelingPageParts.WEAK_SUPERVISION] && ovItem.sourceTypeKey == LabelingPageParts.WEAK_SUPERVISION)) && style.labelOverlayWeakSupervision}`}></div>
+                                                <div className={`label-overlay-base 
+                                                    ${((shouldHighLight(tmpHighlightIds, [LabelSourceHover.MANUAL, ovItem.rla.id, ovItem.rla.createdBy, ovItem.rla.labelingTaskLabel.labelingTask.id]) && ovItem.sourceTypeKey == LabelingPageParts.MANUAL) || (hoverGroupsDict[ovItem.label.id] && hoverGroupsDict[ovItem.label.id][LabelingPageParts.MANUAL] && ovItem.sourceTypeKey == LabelingPageParts.MANUAL)) && style.labelOverlayManual} 
+                                                    ${((shouldHighLight(tmpHighlightIds, [LabelSourceHover.WEAK_SUPERVISION, ovItem.rla.id, ovItem.rla.createdBy, ovItem.rla.labelingTaskLabel.labelingTask.id]) && ovItem.sourceTypeKey == LabelingPageParts.WEAK_SUPERVISION) || (hoverGroupsDict[ovItem.label.id] && hoverGroupsDict[ovItem.label.id][LabelingPageParts.WEAK_SUPERVISION] && ovItem.sourceTypeKey == LabelingPageParts.WEAK_SUPERVISION)) && style.labelOverlayWeakSupervision}
+                                                    ${((shouldHighLight(tmpHighlightIds, [LabelSourceHover.INFORMATION_SOURCE, ovItem.rla.id, ovItem.rla.createdBy, ovItem.rla.labelingTaskLabel.labelingTask.id]) && ovItem.sourceTypeKey == LabelingPageParts.INFORMATION_SOURCE) || (hoverGroupsDict[ovItem.label.id] && hoverGroupsDict[ovItem.label.id][LabelingPageParts.INFORMATION_SOURCE] && ovItem.sourceTypeKey == LabelingPageParts.INFORMATION_SOURCE)) && style.labelOverlayHeuristic}
+                                                    `}></div>
                                             </span>
                                             {ovItem.label.value && <div className="ml-2">{ovItem.label.value}</div>}
                                         </td>

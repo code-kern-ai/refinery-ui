@@ -113,6 +113,7 @@ export default function HeaderDisplay(props: HeaderDisplayProps) {
                 [LabelingPageParts.TABLE_MODAL]: true,
                 [LabelingPageParts.MANUAL]: true,
                 [LabelingPageParts.WEAK_SUPERVISION]: true,
+                [LabelingPageParts.INFORMATION_SOURCE]: true,
             }
             dispatch(setHoverGroupDict(hoverGroupsDictCopy));
         } else {

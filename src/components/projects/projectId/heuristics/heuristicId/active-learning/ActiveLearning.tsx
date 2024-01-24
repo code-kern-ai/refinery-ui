@@ -24,7 +24,7 @@ import ContainerLogs from "@/src/components/shared/logs/ContainerLogs";
 import HeuristicStatistics from "../shared/HeuristicStatistics";
 import DangerZone from "@/src/components/shared/danger-zone/DangerZone";
 import { DangerZoneEnum } from "@/src/types/shared/danger-zone";
-import { getPythonClassRegExMatch } from "@/submodules/javascript-functions/python-functions-parser";
+import { getPythonClassName, getPythonClassRegExMatch } from "@/submodules/javascript-functions/python-functions-parser";
 import { WebSocketsService } from "@/src/services/base/web-sockets/WebSocketsService";
 import { CurrentPage } from "@/src/types/shared/general";
 import { unsubscribeWSOnDestroy } from "@/src/services/base/web-sockets/web-sockets-helper";
@@ -165,10 +165,7 @@ export default function ActiveLearning() {
         }
         const templateCode = getInformationSourceTemplate(matching, currentHeuristic.informationSourceType, newEmbeddings[0]?.name).code;
         const currentHeuristicCopy = { ...currentHeuristic };
-        const regMatch = getPythonClassRegExMatch(currentHeuristicCopy.sourceCode);
-        if (regMatch[1] !== currentHeuristicCopy.name) {
-            currentHeuristicCopy.sourceCodeToDisplay = templateCode.replace(regMatch[0], getClassLine(currentHeuristicCopy.name, labelingTasks, labelingTask.id));
-        }
+        currentHeuristicCopy.sourceCodeToDisplay = templateCode.replace(getPythonClassName(templateCode), currentHeuristicCopy.name);
         return currentHeuristicCopy.sourceCodeToDisplay;
     }
 
@@ -182,8 +179,8 @@ export default function ActiveLearning() {
         if (!regMatch) return value;
         const labelingTaskFinalId = labelingTaskId ?? currentHeuristic.labelingTaskId;
         const finalSourceCode = value.replace(regMatch[0], getClassLine(null, labelingTasks, labelingTaskFinalId));
-        updateHeuristicMut({ variables: { projectId: projectId, informationSourceId: currentHeuristic.id, labelingTaskId: labelingTaskFinalId, code: finalSourceCode } }).then((res) => {
-            dispatch(updateHeuristicsState(currentHeuristic.id, { sourceCode: finalSourceCode }))
+        updateHeuristicMut({ variables: { projectId: projectId, informationSourceId: currentHeuristic.id, labelingTaskId: labelingTaskFinalId, code: finalSourceCode, name: regMatch[1] } }).then((res) => {
+            dispatch(updateHeuristicsState(currentHeuristic.id, { sourceCode: finalSourceCode, name: regMatch[1] }))
         });
     }
 

@@ -1,7 +1,5 @@
 import { Attribute, AttributeVisibility } from "@/src/types/components/projects/projectId/settings/data-schema";
-import { AttributeCalculationExamples, AttributeCodeLookup } from "@/src/util/classes/attribute-calculation";
 import { jsonCopy } from "@/submodules/javascript-functions/general";
-import { getPythonFunctionRegExMatch } from "@/submodules/javascript-functions/python-functions-parser";
 
 export const DATA_TYPES = [
     { name: 'Category', value: 'CATEGORY' },

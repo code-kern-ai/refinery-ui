@@ -50,6 +50,11 @@ export default function CrowdLabeler() {
         refetchDataSlicesMut({ variables: { projectId: projectId, sliceType: "STATIC_DEFAULT" } }).then((res) => {
             dispatch(setDataSlices(res.data.dataSlices));
         });
+        WebSocketsService.subscribeToNotification(CurrentPage.CROWD_LABELER, {
+            projectId: projectId,
+            whitelist: ['labeling_task_updated', 'labeling_task_created', 'label_created', 'label_deleted', 'labeling_task_deleted', 'information_source_deleted', 'information_source_updated', 'model_callback_update_statistics'],
+            func: handleWebsocketNotification
+        });
     }, [projectId, router.query.heuristicId]);
 
     useEffect(() => {
@@ -57,15 +62,6 @@ export default function CrowdLabeler() {
         if (!labelingTasks) return;
         refetchCurrentHeuristicAndProcess();
     }, [labelingTasks]);
-
-    useEffect(() => {
-        if (!currentHeuristic) return;
-        WebSocketsService.subscribeToNotification(CurrentPage.CROWD_LABELER, {
-            projectId: projectId,
-            whitelist: ['labeling_task_updated', 'labeling_task_created', 'label_created', 'label_deleted', 'labeling_task_deleted', 'information_source_deleted', 'information_source_updated', 'model_callback_update_statistics'],
-            func: handleWebsocketNotification
-        });
-    }, [currentHeuristic]);
 
     useEffect(() => {
         if (!projectId || allUsers.length == 0) return;
