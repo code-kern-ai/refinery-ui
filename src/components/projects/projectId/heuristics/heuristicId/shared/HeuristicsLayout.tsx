@@ -81,6 +81,8 @@ export default function HeuristicsLayout(props: any) {
     }
 
     function saveHeuristic() {
+        console.log(currentHeuristic.name)
+        if (currentHeuristic.name == "") return;
         updateHeuristicMut({ variables: { projectId: projectId, informationSourceId: currentHeuristic.id, labelingTaskId: currentHeuristic.labelingTaskId, name: currentHeuristic.name, description: currentHeuristic.description } }).then((res) => {
             dispatch(updateHeuristicsState(currentHeuristic.id, { name: currentHeuristic.name, description: currentHeuristic.description }));
             if (currentHeuristic.informationSourceType == InformationSourceType.LABELING_FUNCTION || currentHeuristic.informationSourceType == InformationSourceType.ACTIVE_LEARNING) {
@@ -90,6 +92,7 @@ export default function HeuristicsLayout(props: any) {
     }
 
     function changeHeuristic(value: string, property: string) {
+        if (property == HeuristicsProperty.NAME && value == "") return;
         dispatch(updateHeuristicsState(currentHeuristic.id, { [property]: value }))
     }
 

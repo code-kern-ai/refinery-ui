@@ -23,7 +23,7 @@ import { Status } from "@/src/types/shared/statuses";
 import { postProcessSampleRecords } from "@/src/util/components/projects/projectId/heuristics/heuristicId/labeling-functions-helper";
 import SampleRecords from "./SampleRecords";
 import { SampleRecord } from "@/src/types/components/projects/projectId/heuristics/heuristicId/labeling-function";
-import { getPythonFunctionRegExMatch } from "@/submodules/javascript-functions/python-functions-parser";
+import { getPythonFunctionName, getPythonFunctionRegExMatch } from "@/submodules/javascript-functions/python-functions-parser";
 import CalculationProgress from "./CalculationProgress";
 import { copyToClipboard } from "@/submodules/javascript-functions/general";
 import { WebSocketsService } from "@/src/services/base/web-sockets/WebSocketsService";
@@ -171,7 +171,10 @@ export default function LabelingFunction() {
 
     function updateSourceCode(value: string, labelingTaskId?: string) {
         var regMatch: any = getPythonFunctionRegExMatch(value);
-        if (!regMatch) return value;
+        if (!regMatch) {
+            console.log("Can't find python function name -- seems wrong -- better dont save");
+            return;
+        }
         const finalSourceCode = value.replace(regMatch[0], 'def lf(record)');
         updateHeuristicMut({ variables: { projectId: projectId, informationSourceId: currentHeuristic.id, labelingTaskId: labelingTaskId ?? currentHeuristic.labelingTaskId, code: finalSourceCode, name: regMatch[2] } }).then((res) => {
             dispatch(updateHeuristicsState(currentHeuristic.id, { sourceCode: finalSourceCode, name: regMatch[2] }))
