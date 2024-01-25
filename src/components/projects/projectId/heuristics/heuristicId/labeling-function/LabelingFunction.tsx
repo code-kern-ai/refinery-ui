@@ -269,6 +269,10 @@ export default function LabelingFunction() {
 
                 <div className="mt-2 flex flex-grow justify-between items-center float-right">
                     <div className="flex items-center">
+                        {checkUnsavedChanges && <div className="flex items-center ml-2">
+                            <div className="text-sm font-normal">Saving...</div>
+                            <LoadingIcon color="indigo" />
+                        </div>}
                         <div className="flex items-center mr-2">
                             <Dropdown2 options={attributes} buttonName={selectedAttribute ? selectedAttribute.name : 'Select display attribute'} buttonClasses="text-xs font-semibold actionsHeight"
                                 selectedOption={(option: any) => setSelectedAttribute(option)} />
@@ -279,10 +283,6 @@ export default function LabelingFunction() {
                                 Run on 10
                             </button>
                         </Tooltip>
-                        {checkUnsavedChanges && <div className="flex items-center ml-2">
-                            <div className="text-sm font-normal">Saving...</div>
-                            <LoadingIcon color="indigo" />
-                        </div>}
                         <HeuristicRunButtons updateDisplayLogWarning={val => setDisplayLogWarning(val)} />
                     </div>
                 </div>
