@@ -14,5 +14,5 @@ export type HeuristicsEditorProps = {
 
 export type HeuristicRunButtonsProps = {
     updateDisplayLogWarning?: (val: boolean) => void;
-    runOn10IsRunning: boolean;
+    runOn10IsRunning?: boolean;
 }
