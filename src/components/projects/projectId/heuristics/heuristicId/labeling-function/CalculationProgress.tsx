@@ -16,13 +16,13 @@ export default function CalculationProgress() {
                 <div className="card-body p-6">
                     <div className="flex flex-row justify-between items-center">
                         <div className="flex flex-grow items-center">
-                            {currentHeuristic.lastTask.state === Status.CREATED && <Tooltip content={TOOLTIPS_DICT.LABELING_FUNCTION.CURRENTLY_RUNNING} color="invert" placement="right" className="cursor-auto">
+                            {currentHeuristic.lastTask.state === Status.CREATED && <Tooltip content={TOOLTIPS_DICT.LABELING_FUNCTION.CURRENTLY_RUNNING} color="invert" placement="right" className="cursor-auto mx-2">
                                 <LoadingIcon />
                             </Tooltip>}
-                            {currentHeuristic.lastTask.state == Status.FINISHED && <Tooltip content={TOOLTIPS_DICT.GENERAL.SUCCESSFULLY_CREATED} color="invert" className="cursor-auto">
+                            {currentHeuristic.lastTask.state == Status.FINISHED && <Tooltip content={TOOLTIPS_DICT.GENERAL.SUCCESSFULLY_CREATED} color="invert" className="cursor-auto mx-2">
                                 <IconCircleCheckFilled className="h-6 w-6 text-green-500" />
                             </Tooltip>}
-                            {currentHeuristic.lastTask.state == Status.FAILED && <Tooltip content={TOOLTIPS_DICT.GENERAL.ERROR} color="invert" className="cursor-auto">
+                            {currentHeuristic.lastTask.state == Status.FAILED && <Tooltip content={TOOLTIPS_DICT.GENERAL.ERROR} color="invert" className="cursor-auto mx-2">
                                 <IconAlertTriangleFilled className="h-6 w-6 text-red-500" />
                             </Tooltip>}
                             {currentHeuristic.lastTask.state === Status.CREATED ? (<>

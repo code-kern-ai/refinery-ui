@@ -1,6 +1,5 @@
 import { selectHeuristic } from "@/src/reduxStore/states/pages/heuristics";
 import { HeuristicsEditorProps } from "@/src/types/components/projects/projectId/heuristics/heuristicId/heuristics-details";
-import { InformationSourceType } from "@/submodules/javascript-functions/enums/enums";
 import { Editor } from "@monaco-editor/react";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
@@ -10,16 +9,12 @@ const EDITOR_OPTIONS = { theme: 'vs-light', language: 'python', readOnly: false 
 export default function HeuristicsEditor(props: HeuristicsEditorProps) {
     const currentHeuristic = useSelector(selectHeuristic);
 
-    const [editorValue, setEditorValue] = useState('');
+    const [editorValue, setEditorValue] = useState(currentHeuristic.sourceCodeToDisplay);
 
     useEffect(() => {
         if (!currentHeuristic) return;
-        setEditorValue(currentHeuristic.sourceCodeToDisplay);
-    }, [currentHeuristic]);
-
-    useEffect(() => {
         props.setCheckUnsavedChanges(hasUnsavedChanges());
-    }, [editorValue]);
+    }, [editorValue, currentHeuristic]);
 
     useEffect(() => {
         const delayInputTimeoutId = setTimeout(() => {
@@ -35,12 +30,7 @@ export default function HeuristicsEditor(props: HeuristicsEditorProps) {
 
     function hasUnsavedChanges() {
         if (!currentHeuristic) return false;
-        if (currentHeuristic.informationSourceType === InformationSourceType.LABELING_FUNCTION) {
-            if (editorValue != currentHeuristic.sourceCodeToDisplay) return true;
-        } else if (currentHeuristic.informationSourceType === InformationSourceType.ACTIVE_LEARNING) {
-            if (editorValue != currentHeuristic.sourceCodeToDisplay) return true;
-        }
-        return false;
+        return editorValue != currentHeuristic.sourceCodeToDisplay;
     }
 
     return (
