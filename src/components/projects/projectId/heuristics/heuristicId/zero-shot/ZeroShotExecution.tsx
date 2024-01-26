@@ -102,7 +102,7 @@ export default function ZeroShotExecution(props: ZeroShotExecutionProps) {
                     </Tooltip>
 
                     <Tooltip content={testerRequestedSomething ? TOOLTIPS_DICT.ZERO_SHOT.RUN_ON_10_TEST : TOOLTIPS_DICT.ZERO_SHOT.EXECUTE_ALL_RECORDS} color="invert" placement="top">
-                        <button onClick={runZeroShotProject} disabled={!canRunProject || testerRequestedSomething}
+                        <button onClick={runZeroShotProject} disabled={!canRunProject || testerRequestedSomething || currentHeuristic.state == Status.QUEUED}
                             className="bg-indigo-700 text-white text-xs leading-4 font-semibold px-4 py-2 rounded-md cursor-pointer ml-3 hover:bg-indigo-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed">
                             Run
                         </button>

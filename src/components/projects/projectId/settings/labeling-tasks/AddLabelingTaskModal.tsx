@@ -40,7 +40,9 @@ export default function AddLabelingTaskModal() {
             variables: {
                 projectId: projectId, labelingTaskName: taskName, labelingTaskType: LabelingTaskTaskType.MULTICLASS_CLASSIFICATION, labelingTaskTargetId: taskTarget
             }
-        }).then((res) => { });
+        }).then((res) => {
+            setTaskName('');
+        });
     }, [modalAddLabelingTask, targetAttribute, taskName]);
 
     useEffect(() => {
