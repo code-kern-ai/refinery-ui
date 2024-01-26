@@ -162,6 +162,7 @@ export const TOOLTIPS_DICT = {
         'RUN_WS': 'Run weak supervision on current labeling task',
         'SWITCH_LABELING_TASK': 'Switching a task will reset the integrator progress!',
         'SUCCESSFULLY_EXECUTED': 'Successfully executed',
+        'RUN_ON_10_RUNNING': 'Test run on 10 records is running',
     },
     [CurrentPage.LABELING_FUNCTION]: {
         'LABELING_TASK': 'Pick the labeling task',

@@ -39,6 +39,7 @@ import { getInformationSourceTemplate } from "@/src/util/components/projects/pro
 import Dropdown2 from "@/submodules/react-components/components/Dropdown2";
 import { Attribute } from "@/src/types/components/projects/projectId/settings/data-schema";
 import LoadingIcon from "@/src/components/shared/loading/LoadingIcon";
+import { parseContainerLogsData } from "@/submodules/javascript-functions/logs-parser";
 
 export default function LabelingFunction() {
     const dispatch = useDispatch();
@@ -56,6 +57,7 @@ export default function LabelingFunction() {
     const [displayLogWarning, setDisplayLogWarning] = useState<boolean>(false);
     const [isInitialLf, setIsInitialLf] = useState<boolean>(null);  //null as add state to differentiate between initial, not and unchecked
     const [checkUnsavedChanges, setCheckUnsavedChanges] = useState(false);
+    const [runOn10IsRunning, setRunOn10IsRunning] = useState(false);
 
     const [refetchCurrentHeuristic] = useLazyQuery(GET_HEURISTICS_BY_ID, { fetchPolicy: "network-only" });
     const [refetchLabelingTasksByProjectId] = useLazyQuery(GET_LABELING_TASKS_BY_PROJECT_ID, { fetchPolicy: "network-only" });
@@ -150,8 +152,11 @@ export default function LabelingFunction() {
 
     function getLabelingFunctionOn10Records() {
         setDisplayLogWarning(true);
+        setRunOn10IsRunning(true);
         refetchRunOn10({ variables: { projectId: projectId, informationSourceId: currentHeuristic.id } }).then((res) => {
+            setRunOn10IsRunning(false);
             setSampleRecords(postProcessSampleRecords(res['data']['getLabelingFunctionOn10Records'], labelingTasks, currentHeuristic.labelingTaskId));
+            setLastTaskLogs(parseContainerLogsData(res['data']['getLabelingFunctionOn10Records']['containerLogs']))
         });
     }
 
@@ -269,6 +274,9 @@ export default function LabelingFunction() {
 
                 <div className="mt-2 flex flex-grow justify-between items-center float-right">
                     <div className="flex items-center">
+                        {runOn10IsRunning && <div className="flex items-center ml-2">
+                            <LoadingIcon color="indigo" />
+                        </div>}
                         {checkUnsavedChanges && <div className="flex items-center ml-2">
                             <div className="text-sm font-normal">Saving...</div>
                             <LoadingIcon color="indigo" />
@@ -283,7 +291,7 @@ export default function LabelingFunction() {
                                 Run on 10
                             </button>
                         </Tooltip>
-                        <HeuristicRunButtons updateDisplayLogWarning={val => setDisplayLogWarning(val)} />
+                        <HeuristicRunButtons updateDisplayLogWarning={val => setDisplayLogWarning(val)} runOn10IsRunning={runOn10IsRunning} />
                     </div>
                 </div>
                 {sampleRecords && sampleRecords.records.length > 0 && !sampleRecords.codeHasErrors && <>
