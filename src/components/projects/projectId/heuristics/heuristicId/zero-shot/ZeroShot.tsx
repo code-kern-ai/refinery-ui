@@ -4,7 +4,7 @@ import HeuristicsLayout from "../shared/HeuristicsLayout";
 import { selectProjectId } from "@/src/reduxStore/states/project";
 import { useLazyQuery, useMutation } from "@apollo/client";
 import { GET_HEURISTICS_BY_ID } from "@/src/services/gql/queries/heuristics";
-import { use, useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { GET_LABELING_TASKS_BY_PROJECT_ID, GET_ZERO_SHOT_RECOMMENDATIONS } from "@/src/services/gql/queries/project-setting";
 import { postProcessLabelingTasks, postProcessLabelingTasksSchema } from "@/src/util/components/projects/projectId/settings/labeling-tasks-helper";
@@ -174,7 +174,7 @@ export default function ZeroShot() {
                 if (msgParts[4] == Status.FINISHED) {
                     refetchCurrentHeuristicAndProcess();
                 } else {
-                    dispatch(updateHeuristicsState(currentHeuristic.id, { lastTask: { state: msgParts[4] } }));
+                    dispatch(updateHeuristicsState(currentHeuristic.id, { lastTask: { state: msgParts[4], iteration: currentHeuristic.lastPayload.iteration }, state: msgParts[4] }));
                 }
             }
         }
@@ -239,7 +239,7 @@ export default function ZeroShot() {
                     </Tooltip>
                 </div>
 
-                <Playground />
+                <Playground setIsModelDownloading={(val: boolean) => setIsModelDownloading(val)} />
 
                 <CalculationProgress />
 

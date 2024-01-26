@@ -11,4 +11,9 @@ export type ZeroShotSettings = {
 
 export type ZeroShotExecutionProps = {
     customLabels: string;
+    setIsModelDownloading: (isDownloading: boolean) => void;
+};
+
+export type PlaygroundProps = {
+    setIsModelDownloading: (isDownloading: boolean) => void;
 };

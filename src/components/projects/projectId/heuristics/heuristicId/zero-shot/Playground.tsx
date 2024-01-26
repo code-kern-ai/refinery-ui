@@ -15,8 +15,9 @@ import { Fragment, useState } from "react"
 import { useDispatch, useSelector } from "react-redux";
 import ZeroShotExecution from "./ZeroShotExecution";
 import WhySoLongModal from "./WhySoLongModal";
+import { PlaygroundProps } from "@/src/types/components/projects/projectId/heuristics/heuristicId/zero-shot";
 
-export default function Playground() {
+export default function Playground(props: PlaygroundProps) {
     const dispatch = useDispatch();
 
     const projectId = useSelector(selectProjectId);
@@ -121,7 +122,7 @@ export default function Playground() {
                 <WhySoLongModal />
             </div>
 
-            <ZeroShotExecution customLabels={customLabels} />
+            <ZeroShotExecution customLabels={customLabels} setIsModelDownloading={(val: boolean) => props.setIsModelDownloading(val)} />
         </>
     )
 }

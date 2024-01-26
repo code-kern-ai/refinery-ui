@@ -187,6 +187,7 @@ export const TOOLTIPS_DICT = {
         'EXECUTE_10_RECORDS': 'Execute the zero-shot model on 10 records',
         'EXECUTE_ALL_RECORDS': 'Execute the zero-shot model on all records',
         'CANCEL_EXECUTION': 'Cancel the execution',
+        'RUN_ON_10_TEST': 'Run on 10 records test is running',
     },
     [CurrentPage.CROWD_LABELER]: {
         'SELECT_ANNOTATOR': 'Select an annotator',

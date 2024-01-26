@@ -30,6 +30,8 @@ export default function ZeroShotExecution(props: ZeroShotExecutionProps) {
     const [canRunProject, setCanRunProject] = useState(false);
     const [randomRecordTesterResult, setRandomRecordTesterResult] = useState(null);
     const [testerRequestedSomething, setTesterRequestedSomething] = useState(false);
+    const [modelFailedMessage, setModelFailedMessage] = useState(null);
+    const [noLabelsMessage, setNoLabelsMessage] = useState(null);
 
     const [refetchZeroShot10Records] = useLazyQuery(GET_ZERO_SHOT_10_RANDOM_RECORDS, { fetchPolicy: 'network-only' });
     const [runZeroShotMut] = useMutation(RUN_ZERO_SHOT_PROJECT);
@@ -42,6 +44,8 @@ export default function ZeroShotExecution(props: ZeroShotExecutionProps) {
     }, [currentHeuristic]);
 
     function runZeroShot10RecordTest() {
+        setModelFailedMessage(false);
+        setNoLabelsMessage(false);
         if (testerRequestedSomething) return;
         let labels;
         const useTaskLabels = props.customLabels == '';
@@ -49,18 +53,29 @@ export default function ZeroShotExecution(props: ZeroShotExecutionProps) {
         else labels = labelingTasks.find(task => task.id == currentHeuristic.labelingTaskId).labels
             .filter(l => !currentHeuristic.zeroShotSettings.excludedLabels.includes(l.id))
             .map(l => l.name);
-        if (!labels.length) return;
+        if (!labels.length) {
+            setNoLabelsMessage(true);
+            return;
+        }
         setTesterRequestedSomething(true);
         setRandomRecordTesterResult(null);
-        refetchZeroShot10Records({ variables: { projectId: projectId, informationSourceId: currentHeuristic.id, labels: JSON.stringify(labels) } }).then((res) => {
+        refetchZeroShot10Records({ variables: { projectId: projectId, informationSourceId: currentHeuristic.id, labels: JSON.stringify(labels) } }).then((res: any) => {
+            if (res.errors && res.errors.length > 0) {
+                setModelFailedMessage(true);
+                setTesterRequestedSomething(false);
+                props.setIsModelDownloading(false);
+                return;
+            }
             const labels = labelingTasks.find(task => task.id == currentHeuristic.labelingTaskId).labels
             setRandomRecordTesterResult(postProcessZeroShot10Records(res.data['zeroShot10Records'], labels));
             setTesterRequestedSomething(false);
+            setModelFailedMessage(false);
         });
     }
 
     function runZeroShotProject() {
         if (!canRunProject) return;
+        if (testerRequestedSomething) return;
         setTesterRequestedSomething(true);
         runZeroShotMut({ variables: { projectId: projectId, informationSourceId: currentHeuristic.id } }).then((res) => {
             setTesterRequestedSomething(false);
@@ -86,15 +101,16 @@ export default function ZeroShotExecution(props: ZeroShotExecutionProps) {
                         </button>
                     </Tooltip>
 
-                    <Tooltip content={TOOLTIPS_DICT.ZERO_SHOT.EXECUTE_ALL_RECORDS} color="invert" placement="top">
-                        <button onClick={runZeroShotProject} disabled={!canRunProject}
+                    <Tooltip content={testerRequestedSomething ? TOOLTIPS_DICT.ZERO_SHOT.RUN_ON_10_TEST : TOOLTIPS_DICT.ZERO_SHOT.EXECUTE_ALL_RECORDS} color="invert" placement="top">
+                        <button onClick={runZeroShotProject} disabled={!canRunProject || testerRequestedSomething}
                             className="bg-indigo-700 text-white text-xs leading-4 font-semibold px-4 py-2 rounded-md cursor-pointer ml-3 hover:bg-indigo-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed">
                             Run
                         </button>
                     </Tooltip>
-
                 </div>
             </div>
+            {modelFailedMessage && <div className="mt-2 text-sm leading-5 text-red-700">Error when running test, ensure that you have valid model and labels.</div>}
+            {noLabelsMessage && <div className="mt-2 text-sm leading-5 text-red-700">No labels to run zero-shot.</div>}
         </div>
         {randomRecordTesterResult && <div className="mt-4 flex flex-col">
             <div className="overflow-x-auto">
@@ -110,9 +126,10 @@ export default function ZeroShotExecution(props: ZeroShotExecutionProps) {
                                         {record.labels[0].color ? (<div className="flex items-center justify-center mr-5">
                                             <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium border ${record.labels[0].color.backgroundColor} ${record.labels[0].color.textColor} ${record.labels[0].color.borderColor} ${record.labels[0].color.hoverColor}`}>
                                                 {record.labels[0].labelName}
-                                            </span></div>) : (<div className="border items-center px-2 py-0.5 rounded text-xs font-medium text-center m-2 bg-gray-100 text-gray-700 border-gray-400 hover:bg-gray-200">
-                                                {record.labels[0].labelName}
-                                            </div>)}
+                                            </span></div>) : (<div className="flex items-center justify-center mr-5">
+                                                <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium border bg-gray-100 text-gray-700 border-gray-400 hover:bg-gray-200`}>
+                                                    {record.labels[0].labelName}
+                                                </span></div>)}
                                         <div className="flex items-center justify-center">
                                             <span className="text-xs leading-5 text-gray-500 font-normal text-center">
                                                 {record.labels[0].confidenceText}
