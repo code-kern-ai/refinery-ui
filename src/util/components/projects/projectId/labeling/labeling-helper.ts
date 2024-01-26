@@ -156,6 +156,7 @@ export function collectSelectionData(attributeId: string, tokenLookup: TokenLook
     if (endIdx == -1) endIdx = tokenLookup[attributeId].token.length - 1;
     const tokenData = getTokenData(attributeId, attributes, recordRequests);
     if (!tokenData) return null;
+    if (startIdx == -1 || endIdx == -1) return null;
     const value = tokenData.raw.substring(
         tokenData.token[startIdx].posStart,
         tokenData.token[endIdx].posEnd
