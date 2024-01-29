@@ -45,7 +45,7 @@ export default function BricksIntegratorModal(props: BricksIntegratorModalProps)
     }
 
     return (<Modal modalName={ModalEnum.BRICKS_INTEGRATOR} acceptButton={acceptButton}>
-        {config && <>
+        {config && <div style={{ maxHeight: 'calc(100vh - 200px)', overflow: 'auto' }}>
             <div className="flex flex-row items-center justify-center gap-x-2">
                 <span className="text-lg leading-6 text-gray-900 font-medium" onDoubleClick={() => {
                     const configCopy = { ...config };
@@ -128,7 +128,7 @@ export default function BricksIntegratorModal(props: BricksIntegratorModalProps)
                 nameLookups={props.nameLookups}
                 checkCanAccept={(configCopy) => props.checkCanAccept(configCopy)}
                 selectDifferentTask={(taskId: string) => props.selectDifferentTask(taskId)} />
-        </>}
+        </div>}
     </Modal >
     )
 }

@@ -1,4 +1,4 @@
-import { selectAllUsers, selectUser, setComments } from "@/src/reduxStore/states/general";
+import { selectAllUsers, selectUser, setBricksIntegrator, setComments } from "@/src/reduxStore/states/general";
 import { setAvailableLinks, updateRecordRequests, setSelectedLink, selectRecordRequestsRla, updateUsers, setSettings, selectSettings, setUserDisplayId, selectRecordRequestsRecord, initOnLabelPageDestruction, selectUserDisplayId } from "@/src/reduxStore/states/pages/labeling";
 import { selectProjectId } from "@/src/reduxStore/states/project"
 import { AVAILABLE_LABELING_LINKS, GET_RECORD_LABEL_ASSOCIATIONS, GET_TOKENIZED_RECORD, REQUEST_HUDDLE_DATA } from "@/src/services/gql/queries/labeling";
@@ -29,6 +29,7 @@ import { CommentDataManager } from "@/src/util/classes/comments";
 import { REQUEST_COMMENTS } from "@/src/services/gql/queries/projects";
 import { CommentType } from "@/src/types/shared/comments";
 import { unsubscribeWSOnDestroy } from "@/src/services/base/web-sockets/web-sockets-helper";
+import { getEmptyBricksIntegratorConfig } from "@/src/util/shared/bricks-integrator-helper";
 
 const LOCAL_STORAGE_KEY = 'labelingSuiteSettings';
 
@@ -76,6 +77,7 @@ export default function LabelingMainComponent() {
             if (key != projectId && key != 'show' && key != 'isCollapsed' && key != 'alwaysShowQuickButtons') delete settingsCopy.task[key];
         }
         dispatch(setSettings(settingsCopy));
+        dispatch(setBricksIntegrator(getEmptyBricksIntegratorConfig()));
         refetchAttributesAndProcess();
         refetchLabelingTasksAndProcess();
         WebSocketsService.subscribeToNotification(CurrentPage.LABELING, {

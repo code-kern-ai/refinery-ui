@@ -18,7 +18,7 @@ import { CurrentPage } from "@/src/types/shared/general";
 import { Tooltip } from "@nextui-org/react";
 import ProjectMetaData from "./ProjectMetaData";
 import GatesIntegration from "./GatesIntegration";
-import { selectAllUsers, selectIsManaged, setComments } from "@/src/reduxStore/states/general";
+import { selectAllUsers, selectIsManaged, setBricksIntegrator, setComments } from "@/src/reduxStore/states/general";
 import Embeddings from "./embeddings/Embeddings";
 import { postProcessingEmbeddings, postProcessingRecommendedEncoders } from "@/src/util/components/projects/projectId/settings/embeddings-helper";
 import { AttributeState } from "@/src/types/components/projects/projectId/settings/data-schema";
@@ -32,6 +32,7 @@ import { CommentDataManager } from "@/src/util/classes/comments";
 import CreateNewAttributeModal from "./CreateNewAttributeModal";
 import ProjectSnapshotExportModal from "./ProjectSnapshotExportModal";
 import { postProcessLabelingTasks, postProcessLabelingTasksSchema } from "@/src/util/components/projects/projectId/settings/labeling-tasks-helper";
+import { getEmptyBricksIntegratorConfig } from "@/src/util/shared/bricks-integrator-helper";
 
 export default function ProjectSettings() {
     const dispatch = useDispatch();
@@ -77,6 +78,7 @@ export default function ProjectSettings() {
             dispatch(setModalStates(ModalEnum.ADD_LABELING_TASK, { open: true }));
             localStorage.removeItem("openModal");
         }
+        dispatch(setBricksIntegrator(getEmptyBricksIntegratorConfig()));
     }, [project]);
 
     useEffect(() => {

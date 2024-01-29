@@ -24,7 +24,8 @@ import { unsubscribeWSOnDestroy } from "@/src/services/base/web-sockets/web-sock
 import { CommentType } from "@/src/types/shared/comments";
 import { CommentDataManager } from "@/src/util/classes/comments";
 import { REQUEST_COMMENTS } from "@/src/services/gql/queries/projects";
-import { selectAllUsers, setComments } from "@/src/reduxStore/states/general";
+import { selectAllUsers, setBricksIntegrator, setComments } from "@/src/reduxStore/states/general";
+import { getEmptyBricksIntegratorConfig } from "@/src/util/shared/bricks-integrator-helper";
 
 export function HeuristicsOverview() {
     const dispatch = useDispatch();
@@ -56,6 +57,7 @@ export function HeuristicsOverview() {
                 dispatch(setAllAttributes(res.data['attributesByProjectId']));
             });
         }
+        dispatch(setBricksIntegrator(getEmptyBricksIntegratorConfig()));
         WebSocketsService.subscribeToNotification(CurrentPage.HEURISTICS, {
             projectId: projectId,
             whitelist: ['labeling_task_updated', 'labeling_task_created', 'labeling_task_deleted', 'information_source_created', 'information_source_updated', 'information_source_deleted', 'payload_finished', 'payload_failed', 'payload_created', 'payload_update_statistics', 'embedding_deleted'],

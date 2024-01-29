@@ -349,6 +349,7 @@ export default function AttributeCalculation() {
                             nameLookups={attributes.map(a => a.name)}
                             preparedCode={(code: string) => {
                                 updateSourceCode(code);
+                                setIsInitial(false);
                             }} />
                         <Tooltip content={TOOLTIPS_DICT.ATTRIBUTE_CALCULATION.AVAILABLE_LIBRARIES} placement="left" color="invert">
                             <a href="https://github.com/code-kern-ai/refinery-ac-exec-env/blob/dev/requirements.txt"

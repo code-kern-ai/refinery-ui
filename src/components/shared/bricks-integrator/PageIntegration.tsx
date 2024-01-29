@@ -113,7 +113,7 @@ export default function PageIntegration(props: PageIntegrationProps) {
                             </button>
                         </div>
                     </div>
-                ) : (<div className="bg-blue-100 border border-blue-400 text-blue-700 px-4 py-3 rounded relative flex flex-col gap-y-2">
+                ) : (<div className="bg-blue-100 border border-blue-400 text-blue-700 px-4 py-3 rounded relative flex flex-col gap-y-2 w-4/5">
                     <div className="self-center flex flex-row flex-nowrap items-center -mt-1">
                         <strong className="font-bold">Information</strong>
                         <IconInfoCircle className="ml-1 w-5 h-5 text-blue-400" />
