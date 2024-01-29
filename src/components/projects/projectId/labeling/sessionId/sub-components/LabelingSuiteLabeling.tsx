@@ -10,7 +10,7 @@ import { DEFAULT_LABEL_COLOR, FULL_RECORD_ID, SWIM_LANE_SIZE_PX, buildLabelingRl
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants"
 import { Tooltip } from "@nextui-org/react"
 import { IconAlertCircle, IconAssembly, IconBolt, IconCode, IconSparkles, IconStar, IconStarFilled, IconUsers } from "@tabler/icons-react"
-import { Fragment, useEffect, useState } from "react"
+import { Fragment, use, useEffect, useState } from "react"
 import { useDispatch, useSelector } from "react-redux"
 import ExtractionDisplay from "./ExtractionDisplay"
 import { LineBreaksType } from "@/src/types/components/projects/projectId/data-browser/data-browser"
@@ -304,7 +304,7 @@ export default function LabelingSuiteLabeling() {
             let taskList = lVars.taskLookup[attribute.id].lookup;
             taskList = taskList.filter(t => t.task.taskType == LabelingTaskTaskType.INFORMATION_EXTRACTION);
             if (taskList.length == 0) continue;
-            tokenLookupCopy[attribute.id] = { token: recordRequests.token.attributes.find((a) => a.attributeId == attribute.id)?.token };
+            tokenLookupCopy[attribute.id] = { token: recordRequests.token?.attributes.find((a) => a.attributeId == attribute.id)?.token };
             for (const task of taskList) {
                 const rlas = rlaDataToDisplay[task.task.id];
                 if (!rlas) continue;
@@ -504,6 +504,7 @@ export default function LabelingSuiteLabeling() {
 
     function handleKeyboardEvent(event) {
         const labelSelection = document.getElementById('label-selection-box');
+        if (!labelSelection) return;
         if (!labelSelection.classList.contains('hidden')) return;
         for (const key in labelHotkeys) {
             if (key == event.key) {
@@ -518,7 +519,7 @@ export default function LabelingSuiteLabeling() {
 
     return (<div className="bg-white relative p-4">
         {lVars.loading && SessionManager.currentRecordId !== "deleted" && <LoadingIcon size="lg" />}
-        {(!lVars.loading && !recordRequests.record || SessionManager.currentRecordId == "deleted") && <div className="flex items-center justify-center text-red-500">This Record has been deleted</div>}
+        {(!lVars.loading && tokenLookup && !recordRequests.record || SessionManager.currentRecordId == "deleted") && <div className="flex items-center justify-center text-red-500">This Record has been deleted</div>}
 
         {recordRequests.record && !lVars.loading && lVars.loopAttributes && SessionManager.currentRecordId !== "deleted" && <div className="grid w-full border md:rounded-lg items-center" style={{ gridTemplateColumns: 'max-content max-content 40px auto' }}>
             {lVars.loopAttributes.map((attribute, i) => (<Fragment key={attribute.id}>
@@ -573,7 +574,7 @@ export default function LabelingSuiteLabeling() {
                                 }
                                 {rlaDataToDisplay[task.task.id] && <div>
                                     <div className={`flex gap-2 ${settings.labeling.compactClassificationLabelDisplay ? 'flex-row flex-wrap items-center' : 'flex-col'}`}>
-                                        {rlaDataToDisplay[task.task.id].map((rlaLabel, index) => (<Tooltip key={index} content={rlaLabel.dataTip} color="invert" placement="top" className={`w-max ${rlaLabel.sourceTypeKey == LabelSourceHover.WEAK_SUPERVISION ? 'cursor-pointer' : 'cursor-auto'}`}>
+                                        {rlaDataToDisplay[task.task.id].map((rlaLabel, index) => (<Tooltip key={index} content={rlaLabel.dataTip} color="invert" placement="top" className={`w-max ${rlaLabel.sourceTypeKey == LabelSourceHover.WEAK_SUPERVISION ? 'cursor-pointer' : 'cursor-default'}`}>
                                             <div onClick={() => rlaLabel.sourceTypeKey == 'WEAK_SUPERVISION' ? addRla(task.task, rlaLabel.labelId) : null}
                                                 onMouseEnter={() => dispatch(tmpAddHighlightIds([rlaLabel.rla.id]))}
                                                 onMouseLeave={() => dispatch(tmpAddHighlightIds([]))}
