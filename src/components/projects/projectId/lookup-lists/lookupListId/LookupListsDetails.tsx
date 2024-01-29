@@ -69,7 +69,6 @@ export default function LookupListsDetails() {
     }, [lookupList]);
 
     useEffect(() => {
-        if (!description) return;
         changeLookupList(description, LookupListProperty.DESCRIPTION);
     }, [description]);
 
