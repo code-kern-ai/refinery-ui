@@ -171,6 +171,7 @@ export default function Config() {
                         selectedOption={(option) => changeConfigString(option, index)}
                         dropdownItemsClasses="max-h-80 overflow-y-auto"
                         buttonClasses="whitespace-nowrap"
+                        dropdownWidth="w-72"
                     />
                     {index > 1 && <button className="px-1 inline-flex items-center">
                         <IconTrash onClick={() => removeSpacyTokenizer(myConfig)} className="h-6 w-6 text-red-700" />
