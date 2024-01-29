@@ -8,7 +8,7 @@ import { useEffect, useState } from "react";
 import { BricksIntegratorConfig, BricksIntegratorProps, BricksSearchData, IntegratorPage } from "@/src/types/shared/bricks-integrator";
 import { useDefaults } from "@/submodules/react-components/hooks/useDefaults";
 import { selectProjectId } from "@/src/reduxStore/states/project";
-import { selectBricksIntegrator, selectIsAdmin, selectUser, setBricksIntegrator } from "@/src/reduxStore/states/general";
+import { selectBricksIntegrator, selectIsAdmin, selectUser, setAttributesBricksIntegrator, setBricksIntegrator, setLabelingTasksBricksIntegrator, setLabelsBricksIntegrator } from "@/src/reduxStore/states/general";
 import { buildSearchUrl, filterMinVersion, getEmptyBricksIntegratorConfig, getGroupName, getHttpBaseLink, getHttpBaseLinkExample } from "@/src/util/shared/bricks-integrator-helper";
 import { PASS_ME, caesarCipher } from "@/src/util/components/projects/projectId/record-ide/record-ide-helper";
 import { isStringTrue, jsonCopy, removeArrayFromArray } from "@/submodules/javascript-functions/general";
@@ -36,7 +36,7 @@ export default function BricksIntegrator(_props: BricksIntegratorProps) {
         if (!projectId || !user) return;
         if (typeof props.forIde === 'string') setForIde(isStringTrue(props.forIde));
         initConfig();
-    }, [projectId, user, props.forIde, bricksModal]);
+    }, [projectId, user, props.forIde]);
 
     useEffect(() => {
         if (!config) return;
@@ -256,19 +256,24 @@ export default function BricksIntegrator(_props: BricksIntegratorProps) {
                 case IntegratorPage.SEARCH:
                     configCopy.page = IntegratorPage.OVERVIEW;
                     requestDataFromApi(configCopy);
+                    checkCanAccept(jsonCopy(configCopy));
                     break;
                 case IntegratorPage.OVERVIEW:
                 case IntegratorPage.INPUT_EXAMPLE:
                     // jump to integration
                     configCopy.page = IntegratorPage.INTEGRATION;
                     if (configCopy.api.moduleId < 0) configCopy = BricksCodeParser.prepareCode(configCopy, props.executionTypeFilter, props.nameLookups, props.labelingTaskId, forIde, labelingTasks);
+                    checkCanAccept(jsonCopy(configCopy));
+
                     break;
                 case IntegratorPage.INTEGRATION:
                     //transfer code to editor
                     finishUpIntegration();
+                    dispatch(setLabelingTasksBricksIntegrator([]));
+                    dispatch(setAttributesBricksIntegrator([]));
+                    dispatch(setLabelsBricksIntegrator([]));
                     break;
             }
-            checkCanAccept(jsonCopy(configCopy));
         }
     }
 
@@ -326,6 +331,7 @@ export default function BricksIntegrator(_props: BricksIntegratorProps) {
     function finishUpIntegration() {
         if (config.codeFullyPrepared) {
             dispatch(closeModal(ModalEnum.BRICKS_INTEGRATOR));
+            dispatch(setBricksIntegrator(getEmptyBricksIntegratorConfig()));
             props.preparedCode(config.preparedCode);
         } else {
             console.log("code not fully prepared")

@@ -42,7 +42,7 @@ export class BricksCodeParser {
         return config;
     }
 
-    private static checkVariableLines(config: BricksIntegratorConfig, executionTypeFilter: string, labelingTaskId: string, forIde: string | boolean = false, labelingTasks: any[] = null) {
+    public static checkVariableLines(config: BricksIntegratorConfig, executionTypeFilter: string, labelingTaskId: string, forIde: string | boolean = false, labelingTasks: any[] = null) {
         const variableLines = this.collectVariableLinesFromCode(config);
 
         if (variableLines.length == 0) {
@@ -76,15 +76,15 @@ export class BricksCodeParser {
                     this.expected.expectedTaskLabels.push({
                         label: label,
                         exists: !!existingLabel,
-                        backgroundColor: 'bg-' + (existingLabel ? existingLabel.color : 'gray') + '-100',
-                        textColor: 'text-' + (existingLabel ? existingLabel.color : 'gray') + '-700',
-                        borderColor: 'border-' + (existingLabel ? existingLabel.color : 'gray') + '-400'
+                        backgroundColor: (existingLabel && existingLabel.color.backgroundColor) ? existingLabel.color.backgroundColor : 'bg-' + (existingLabel ? existingLabel.color : 'gray') + '-100',
+                        textColor: (existingLabel && existingLabel.color.textColor) ? existingLabel.color.textColor : 'text-' + (existingLabel ? existingLabel.color : 'gray') + '-700',
+                        borderColor: (existingLabel && existingLabel.color.borderColor) ? existingLabel.color.borderColor : 'border-' + (existingLabel ? existingLabel.color : 'gray') + '-400',
                     });
                 }
                 this.expected.expectedTaskLabels.sort((a, b) => (-a.exists) - (-b.exists) || a.label.localeCompare(b.label));
                 this.expected.labelsToBeCreated = this.expected.expectedTaskLabels.filter(x => !x.exists).length;
                 this.expected.labelWarning = !this.expected.expectedTaskLabels[this.expected.expectedTaskLabels.length - 1].exists;
-                this.expected.canCreateTask = BricksCodeParser.getLabelingTaskAttribute(labelingTaskId, 'taskType') == 'MULTICLASS_CLASSIFICATION';
+                this.expected.canCreateTask = BricksCodeParser.getLabelingTaskAttribute(labelingTaskId, 'taskType', labelingTasks) == 'MULTICLASS_CLASSIFICATION';
             } else {
                 if (!this.globalComments.some(x => x.startsWith("Will return"))) {
                     this.globalComments.push("Will return: [\"" + this.integratorInputRef.outputs.join("\", \"") + "\"]");
@@ -244,15 +244,15 @@ export class BricksCodeParser {
                         this.expected.expectedTaskLabels.push({
                             label: label,
                             exists: !!existingLabel,
-                            backgroundColor: 'bg-' + (existingLabel ? existingLabel.color : 'gray') + '-100',
-                            textColor: 'text-' + (existingLabel ? existingLabel.color : 'gray') + '-700',
-                            borderColor: 'border-' + (existingLabel ? existingLabel.color : 'gray') + '-400'
+                            backgroundColor: (existingLabel && existingLabel.color.backgroundColor) ? existingLabel.color.backgroundColor : 'bg-' + (existingLabel ? existingLabel.color : 'gray') + '-100',
+                            textColor: (existingLabel && existingLabel.color.textColor) ? existingLabel.color.textColor : 'text-' + (existingLabel ? existingLabel.color : 'gray') + '-700',
+                            borderColor: (existingLabel && existingLabel.color.borderColor) ? existingLabel.color.borderColor : 'border-' + (existingLabel ? existingLabel.color : 'gray') + '-400',
                         });
                     }
                     this.expected.expectedTaskLabels.sort((a, b) => (-a.exists) - (-b.exists) || a.label.localeCompare(b.label));
                     this.expected.labelsToBeCreated = this.expected.expectedTaskLabels.filter(x => !x.exists).length;
                     this.expected.labelWarning = !this.expected.expectedTaskLabels[this.expected.expectedTaskLabels.length - 1].exists;
-                    this.expected.canCreateTask = BricksCodeParser.getLabelingTaskAttribute(labelingTaskId, 'taskType') == 'MULTICLASS_CLASSIFICATION';
+                    this.expected.canCreateTask = BricksCodeParser.getLabelingTaskAttribute(labelingTaskId, 'taskType', labelingTasks) == 'MULTICLASS_CLASSIFICATION';
                 }
                 return ""; //task creation logic handled differently
             }

@@ -1,14 +1,14 @@
-import { selectBricksIntegrator, setBricksIntegrator } from "@/src/reduxStore/states/general";
+import { selectBricksIntegrator, selectBricksIntegratorLabelingTasks, setBricksIntegrator } from "@/src/reduxStore/states/general";
 import { IntegratorPage, PageIntegrationProps } from "@/src/types/shared/bricks-integrator";
 import { BricksCodeParser } from "@/src/util/classes/bricks-integrator/bricks-integrator";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
 import { Tooltip } from "@nextui-org/react";
-import { IconAlertTriangle, IconChevronsDown, IconInfoCircle, IconTrash, IconX } from "@tabler/icons-react";
+import { IconAlertTriangle, IconCheck, IconChevronsDown, IconInfoCircle, IconTrash, IconX } from "@tabler/icons-react";
 import { useDispatch, useSelector } from "react-redux";
 import VariableSelect from "./VariableSelect";
 import { copyToClipboard, jsonCopy } from "@/submodules/javascript-functions/general";
 import style from '@/src/styles/shared/bricks-integrator.module.css';
-import { Fragment } from "react";
+import { Fragment, useEffect } from "react";
 import { selectLabelingTasksAll } from "@/src/reduxStore/states/pages/settings";
 import { CREATE_LABELS } from "@/src/services/gql/queries/project-setting";
 import { useMutation } from "@apollo/client";
@@ -22,9 +22,16 @@ export default function PageIntegration(props: PageIntegrationProps) {
     const config = useSelector(selectBricksIntegrator);
     const labelingTasks = useSelector(selectLabelingTasksAll);
     const projectId = useSelector(selectProjectId);
+    const labelingTasksBricks = useSelector(selectBricksIntegratorLabelingTasks);
 
     const [createLabelsMut] = useMutation(CREATE_LABELS);
     const [createTaskAndLabelsMut] = useMutation(CREATE_TASK_AND_LABELS);
+
+    useEffect(() => {
+        if (!labelingTasksBricks || labelingTasksBricks.length == 0 || !props.labelingTaskId) return;
+        const configCopy = BricksCodeParser.checkVariableLines(jsonCopy(config), props.executionTypeFilter, props.labelingTaskId, props.forIde, labelingTasksBricks);
+        dispatch(setBricksIntegrator(configCopy));
+    }, [labelingTasksBricks, props.labelingTaskId]);
 
     function onInputFunctionName(event: Event) {
         if (!(event.target instanceof HTMLInputElement)) return;
@@ -106,7 +113,29 @@ export default function PageIntegration(props: PageIntegrationProps) {
                             </button>
                         </div>
                     </div>
-                ) : (<></>)}
+                ) : (<div className="bg-blue-100 border border-blue-400 text-blue-700 px-4 py-3 rounded relative flex flex-col gap-y-2">
+                    <div className="self-center flex flex-row flex-nowrap items-center -mt-1">
+                        <strong className="font-bold">Information</strong>
+                        <IconInfoCircle className="ml-1 w-5 h-5 text-blue-400" />
+                    </div>
+                    <label className="text-sm -mt-1">All necessary labels found in task:</label>
+                    <div className="flex flex-row flex-wrap gap-2" style={{ maxWidth: '30rem' }}>
+                        {BricksCodeParser.expected.expectedTaskLabels.map((label: any, index: number) => (<span key={index} className="text-sm inline-flex items-center">
+                            <label className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium border ${label.backgroundColor} ${label.textColor} ${label.borderColor}`}>
+                                {label.label}
+                                <IconCheck className="ml-1 w-4 h-4 text-green-400" />
+                            </label>
+                        </span>))}
+                    </div>
+                    <div className="flex flex-row justify-center gap-x-1">
+                        <button onClick={() => {
+                            const configCopy = BricksCodeParser.activeLabelMapping(jsonCopy(config), props.executionTypeFilter, props.labelingTaskId, props.forIde, labelingTasks);
+                            dispatch(setBricksIntegrator(configCopy));
+                        }} className="cursor-pointer bg-white text-gray-700 text-xs font-semibold whitespace-nowrap px-4 py-2 rounded-md border border-gray-300 hover:bg-gray-50 focus:outline-none">
+                            Map labels anyway
+                        </button>
+                    </div>
+                </div>)}
             </>}
 
             {BricksCodeParser.globalComments && BricksCodeParser.globalComments.length > 0 && <div className="bg-blue-100 border border-blue-400 text-blue-700 px-4 py-3 rounded relative flex flex-col">
