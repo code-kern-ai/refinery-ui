@@ -180,9 +180,9 @@ export default function SearchGroups() {
             return;
         }
 
-        const fullSearchCopy = { ...fullSearchStore };
-        const searchGroupsCopy = { ...searchGroupsStore };
-        const searchGroupsOrderCopy = [...searchGroupsOrder];
+        const fullSearchCopy = {};
+        const searchGroupsCopy = {};
+        const searchGroupsOrderCopy = [];
 
         // Category
         fullSearchCopy[SearchGroup.CATEGORY] = "SCALE";
