@@ -256,6 +256,7 @@ export default function LabelingFunction() {
                                 labelingTaskId={currentHeuristic.labelingTaskId}
                                 preparedCode={(code: string) => {
                                     updateSourceCode(code);
+                                    setIsInitialLf(false);
                                 }}
                                 newTaskId={(value) => setValueToLabelingTask(value)}
                             />

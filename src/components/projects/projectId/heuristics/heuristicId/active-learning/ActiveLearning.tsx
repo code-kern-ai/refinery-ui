@@ -280,6 +280,7 @@ export default function ActiveLearning() {
                             labelingTaskId={currentHeuristic.labelingTaskId}
                             preparedCode={(code: string) => {
                                 updateSourceCode(code);
+                                setIsInitialAL(false);
                             }}
                             newTaskId={(value) => setValueToLabelingTask(value)}
                         />

@@ -369,7 +369,7 @@ export default function BricksIntegrator(_props: BricksIntegratorProps) {
         if (currentTaskType != newTaskType) {
             requestSearch();
         } else {
-            const configCopy = BricksCodeParser.prepareCode(jsonCopy(config), props.executionTypeFilter, props.nameLookups, props.labelingTaskId, forIde, labelingTasks);
+            const configCopy = BricksCodeParser.prepareCode(jsonCopy(config), props.executionTypeFilter, props.nameLookups, taskId, forIde, labelingTasks);
             dispatch(setBricksIntegrator(configCopy));
         }
         props.newTaskId(taskId)
