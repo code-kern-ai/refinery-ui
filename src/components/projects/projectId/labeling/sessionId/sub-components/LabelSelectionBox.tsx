@@ -3,7 +3,6 @@ import { selectSettings } from "@/src/reduxStore/states/pages/labeling";
 import { LabelSelectionBoxProps } from "@/src/types/components/projects/projectId/labeling/labeling";
 import { LabelingTaskTaskType } from "@/src/types/components/projects/projectId/settings/labeling-tasks";
 import { UserRole } from "@/src/types/shared/sidebar";
-import { parseSelectionData } from "@/src/util/components/projects/projectId/labeling/labeling-helper";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
 import { Tooltip } from "@nextui-org/react";
 import { IconCirclePlus } from "@tabler/icons-react";
@@ -15,15 +14,19 @@ export default function LabelSelectionBox(props: LabelSelectionBoxProps) {
     const settings = useSelector(selectSettings);
 
     const [newLabel, setNewLabel] = useState('');
-    const [tasksFiltered, setTasksFiltered] = useState(props.activeTasks);
+    const [taskFilteredDict, setTaskFilteredDict] = useState({});
 
     useEffect(() => {
         if (!props.activeTasks || props.activeTasks.length == 0) return;
-        if (props.activeTasks[0].task.taskType == LabelingTaskTaskType.MULTICLASS_CLASSIFICATION) {
-            setTasksFiltered(props.activeTasks[0].task.labels.slice(settings.labeling.showNLabelButton));
-        } else {
-            setTasksFiltered(props.activeTasks[0].task.labels);
-        }
+        const taskFilteredDict = {};
+        props.activeTasks.forEach((task) => {
+            if (task.task.taskType == LabelingTaskTaskType.MULTICLASS_CLASSIFICATION) {
+                taskFilteredDict[task.task.id] = task.task.labels.slice(settings.labeling.showNLabelButton);
+            } else {
+                taskFilteredDict[task.task.id] = task.task.labels;
+            }
+        });
+        setTaskFilteredDict(taskFilteredDict);
     }, [props.activeTasks, settings.labeling.showNLabelButton]);
 
     function stopPropagation(e) {
@@ -66,7 +69,7 @@ export default function LabelSelectionBox(props: LabelSelectionBoxProps) {
                     </Tooltip>}
                 </div>
                 <div className={`flex-grow flex flex-col justify-center ${index == props.activeTasks.length - 1 ? 'p-3' : 'px-3 pt-3'}`}>
-                    {props.activeTasks && tasksFiltered && tasksFiltered.map((label, index) =>
+                    {props.activeTasks && taskFilteredDict && taskFilteredDict[task.task.id] && taskFilteredDict[task.task.id].map((label, index) =>
                         <button key={label.id} className={`text-sm font-medium px-2 py-0.5 rounded-md border mb-2 focus:outline-none ${props.labelLookup[label.id].color.backgroundColor}  ${props.labelLookup[label.id].color.textColor}  ${props.labelLookup[label.id].color.borderColor}`} role="button"
                             style={{ display: props.labelLookup[label.id].visibleInSearch ? null : 'none' }}
                             onClick={(e) => props.addRla(task.task, label.id)}>

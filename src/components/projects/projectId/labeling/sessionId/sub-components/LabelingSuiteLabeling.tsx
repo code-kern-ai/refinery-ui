@@ -133,7 +133,7 @@ export default function LabelingSuiteLabeling() {
 
     useEffect(() => {
         if (!settings) return;
-        if (settings.labeling.showNLabelButton != 5) rebuildTaskLookup(lVars);
+        rebuildTaskLookup(lVars);
         filterRlaDataForCurrent();
     }, [settings]);
 

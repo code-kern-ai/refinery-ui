@@ -93,7 +93,10 @@ export class LabelHelper {
     public static checkAndSetLabelHotkey(event: KeyboardEvent, currentLabel: any) {
         this.labelHotkeyError = null;
         const key = event.key.toLowerCase();
-        if (key == currentLabel.hotkey) return;
+        if (key == currentLabel.hotkey) {
+            this.labelHotkeyError = "Key " + key + " is already in use."
+            return;
+        }
         const usedHotkeys = this.getUsedHotkey();
         if (key == 'ArrowRight' || key == 'ArrowLeft') {
             this.labelHotkeyError = "Key " + key + " is used to navigate between records."

@@ -11,7 +11,7 @@ import { jsonCopy } from "@/submodules/javascript-functions/general";
 import { useMutation } from "@apollo/client";
 import { Tooltip } from "@nextui-org/react";
 import { IconPencil } from "@tabler/icons-react";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
 export default function ChangeColorModal() {
@@ -22,12 +22,15 @@ export default function ChangeColorModal() {
     const modalChangeColor = useSelector(selectModal(ModalEnum.CHANGE_COLOR));
     const modalRenameLabel = useSelector(selectModal(ModalEnum.RENAME_LABEL));
 
+    const [hotKeyError, setHotKeyError] = useState<string>('');
+
     const [updateLabelColorMut] = useMutation(UPDATE_LABEL_COLOR);
     const [updateLabelHotKeyMut] = useMutation(UPDATE_LABEL_HOTKEY);
 
     function handleKeyboardEvent(event: KeyboardEvent) {
         if (!modalChangeColor.open) return;
         const changedLabel = LabelHelper.checkAndSetLabelHotkey(event, modalChangeColor.label);
+        setHotKeyError(LabelHelper.labelHotkeyError);
         if (!LabelHelper.labelHotkeyError) {
             updateLabelHotKeyMut({ variables: { projectId: projectId, labelingTaskLabelId: changedLabel.id, labelHotkey: changedLabel.hotkey } }).then((res) => {
                 const labelingTasksSchemaCopy = jsonCopy(labelingTasksSchema);
@@ -41,6 +44,7 @@ export default function ChangeColorModal() {
     }
 
     useEffect(() => {
+        setHotKeyError('');
         document.addEventListener('keydown', handleKeyboardEvent);
         return () => {
             document.removeEventListener('keydown', handleKeyboardEvent);
@@ -93,7 +97,7 @@ export default function ChangeColorModal() {
                 <div className="flex flex-row flex-nowrap items-center mt-1">
                     <span className="w-10 bg-gray-100 rounded border text-center h-6 uppercase">
                         {modalChangeColor.label.hotkey}</span>
-                    {LabelHelper.labelHotkeyError && <span className="ml-2 text-sm text-rose-700">{LabelHelper.labelHotkeyError}</span>}
+                    {hotKeyError && <span className="ml-2 text-sm text-rose-700">{hotKeyError}</span>}
                 </div>
             </div>
         </div>}
