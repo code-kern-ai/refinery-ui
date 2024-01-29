@@ -27,13 +27,14 @@ import { WebSocketsService } from "@/src/services/base/web-sockets/WebSocketsSer
 import { timer } from "rxjs";
 import { unsubscribeWSOnDestroy } from "@/src/services/base/web-sockets/web-sockets-helper";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
-import { selectAllUsers, setComments } from "@/src/reduxStore/states/general";
+import { selectAllUsers, setBricksIntegrator, setComments } from "@/src/reduxStore/states/general";
 import { REQUEST_COMMENTS } from "@/src/services/gql/queries/projects";
 import { CommentDataManager } from "@/src/util/classes/comments";
 import { CommentType } from "@/src/types/shared/comments";
 import BricksIntegrator from "@/src/components/shared/bricks-integrator/BricksIntegrator";
 import { AttributeCodeLookup } from "@/src/util/classes/attribute-calculation";
 import Dropdown2 from "@/submodules/react-components/components/Dropdown2";
+import { getEmptyBricksIntegratorConfig } from "@/src/util/shared/bricks-integrator-helper";
 
 const EDITOR_OPTIONS = { theme: 'vs-light', language: 'python', readOnly: false };
 
@@ -211,7 +212,9 @@ export default function AttributeCalculation() {
     function updateSourceCode(value: string) {
         var regMatch: any = getPythonFunctionRegExMatch(value);
         const finalSourceCode = value.replace(regMatch[0], 'def ac(record)');
-        updateAttributeMut({ variables: { projectId: projectId, attributeId: currentAttribute.id, sourceCode: finalSourceCode } });
+        updateAttributeMut({ variables: { projectId: projectId, attributeId: currentAttribute.id, sourceCode: finalSourceCode } }).then(() => {
+            dispatch(setBricksIntegrator(getEmptyBricksIntegratorConfig()));
+        });
     }
 
     function checkProjectTokenization() {
@@ -344,7 +347,9 @@ export default function AttributeCalculation() {
                         <BricksIntegrator
                             moduleTypeFilter="generator,classifier" functionType="Attribute"
                             nameLookups={attributes.map(a => a.name)}
-                            preparedCode={(code: string) => updateSourceCode(code)} />
+                            preparedCode={(code: string) => {
+                                updateSourceCode(code);
+                            }} />
                         <Tooltip content={TOOLTIPS_DICT.ATTRIBUTE_CALCULATION.AVAILABLE_LIBRARIES} placement="left" color="invert">
                             <a href="https://github.com/code-kern-ai/refinery-ac-exec-env/blob/dev/requirements.txt"
                                 target="_blank"

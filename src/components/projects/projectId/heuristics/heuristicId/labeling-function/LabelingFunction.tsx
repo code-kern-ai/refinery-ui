@@ -23,13 +23,13 @@ import { Status } from "@/src/types/shared/statuses";
 import { postProcessSampleRecords } from "@/src/util/components/projects/projectId/heuristics/heuristicId/labeling-functions-helper";
 import SampleRecords from "./SampleRecords";
 import { SampleRecord } from "@/src/types/components/projects/projectId/heuristics/heuristicId/labeling-function";
-import { getPythonFunctionName, getPythonFunctionRegExMatch } from "@/submodules/javascript-functions/python-functions-parser";
+import { getPythonFunctionRegExMatch } from "@/submodules/javascript-functions/python-functions-parser";
 import CalculationProgress from "./CalculationProgress";
 import { copyToClipboard } from "@/submodules/javascript-functions/general";
 import { WebSocketsService } from "@/src/services/base/web-sockets/WebSocketsService";
 import { CurrentPage } from "@/src/types/shared/general";
 import { unsubscribeWSOnDestroy } from "@/src/services/base/web-sockets/web-sockets-helper";
-import { selectAllUsers, setComments } from "@/src/reduxStore/states/general";
+import { selectAllUsers, setBricksIntegrator, setComments } from "@/src/reduxStore/states/general";
 import { REQUEST_COMMENTS } from "@/src/services/gql/queries/projects";
 import { CommentType } from "@/src/types/shared/comments";
 import { CommentDataManager } from "@/src/util/classes/comments";
@@ -40,6 +40,7 @@ import Dropdown2 from "@/submodules/react-components/components/Dropdown2";
 import { Attribute } from "@/src/types/components/projects/projectId/settings/data-schema";
 import LoadingIcon from "@/src/components/shared/loading/LoadingIcon";
 import { parseContainerLogsData } from "@/submodules/javascript-functions/logs-parser";
+import { getEmptyBricksIntegratorConfig } from "@/src/util/shared/bricks-integrator-helper";
 
 export default function LabelingFunction() {
     const dispatch = useDispatch();
@@ -136,7 +137,7 @@ export default function LabelingFunction() {
 
     function updateSourceCodeToDisplay(value: string) {
         const finalSourceCode = value.replace('def lf(record)', 'def ' + currentHeuristic.name + '(record)');
-        dispatch(updateHeuristicsState(currentHeuristic.id, { sourceCodeToDisplay: finalSourceCode }))
+        dispatch(updateHeuristicsState(currentHeuristic.id, { sourceCodeToDisplay: finalSourceCode }));
     }
 
     function refetchTaskByTaskIdAndProcess() {
@@ -182,7 +183,8 @@ export default function LabelingFunction() {
         }
         const finalSourceCode = value.replace(regMatch[0], 'def lf(record)');
         updateHeuristicMut({ variables: { projectId: projectId, informationSourceId: currentHeuristic.id, labelingTaskId: labelingTaskId ?? currentHeuristic.labelingTaskId, code: finalSourceCode, name: regMatch[2] } }).then((res) => {
-            dispatch(updateHeuristicsState(currentHeuristic.id, { sourceCode: finalSourceCode, name: regMatch[2] }))
+            dispatch(updateHeuristicsState(currentHeuristic.id, { sourceCode: finalSourceCode, name: regMatch[2] }));
+            updateSourceCodeToDisplay(finalSourceCode);
         });
     }
 
@@ -252,7 +254,9 @@ export default function LabelingFunction() {
                                 executionTypeFilter="pythonFunction,premium"
                                 functionType="Heuristic"
                                 labelingTaskId={currentHeuristic.labelingTaskId}
-                                preparedCode={(code: string) => updateSourceCode(code)}
+                                preparedCode={(code: string) => {
+                                    updateSourceCode(code);
+                                }}
                                 newTaskId={(value) => setValueToLabelingTask(value)}
                             />
 

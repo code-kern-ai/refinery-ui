@@ -1,4 +1,4 @@
-import { closeModal, openModal } from "@/src/reduxStore/states/modal";
+import { closeModal, openModal, selectModal } from "@/src/reduxStore/states/modal";
 import { ModalEnum } from "@/src/types/shared/modal";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
 import { Tooltip } from "@nextui-org/react";
@@ -27,6 +27,7 @@ export default function BricksIntegrator(_props: BricksIntegratorProps) {
     const isAdmin = useSelector(selectIsAdmin);
     const config = useSelector(selectBricksIntegrator);
     const labelingTasks = useSelector(selectLabelingTasksAll);
+    const bricksModal = useSelector(selectModal(ModalEnum.BRICKS_INTEGRATOR));
 
     const [props] = useDefaults<BricksIntegratorProps>(_props, DEFAULTS);
     const [forIde, setForIde] = useState(props.forIde);
@@ -35,7 +36,7 @@ export default function BricksIntegrator(_props: BricksIntegratorProps) {
         if (!projectId || !user) return;
         if (typeof props.forIde === 'string') setForIde(isStringTrue(props.forIde));
         initConfig();
-    }, [projectId, user, props.forIde]);
+    }, [projectId, user, props.forIde, bricksModal]);
 
     useEffect(() => {
         if (!config) return;

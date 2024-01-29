@@ -12,17 +12,22 @@ export default function HeuristicsEditor(props: HeuristicsEditorProps) {
     const [editorValue, setEditorValue] = useState(currentHeuristic.sourceCodeToDisplay);
 
     useEffect(() => {
+        setEditorValue(currentHeuristic.sourceCodeToDisplay);
+    }, [currentHeuristic]);
+
+    useEffect(() => {
         if (!currentHeuristic) return;
         props.setCheckUnsavedChanges(hasUnsavedChanges());
     }, [editorValue, currentHeuristic]);
 
     useEffect(() => {
+        if (!currentHeuristic || currentHeuristic.sourceCodeToDisplay == editorValue) return;
         const delayInputTimeoutId = setTimeout(() => {
             props.updatedSourceCode(editorValue);
             props.setCheckUnsavedChanges(hasUnsavedChanges());
         }, 1000);
         return () => clearTimeout(delayInputTimeoutId);
-    }, [editorValue, 1000]);
+    }, [editorValue, currentHeuristic]);
 
     function openBricksIntegrator() {
         document.getElementById('bricks-integrator-open-button').click();

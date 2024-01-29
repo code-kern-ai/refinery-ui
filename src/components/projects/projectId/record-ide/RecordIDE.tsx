@@ -1,7 +1,7 @@
 import BricksIntegrator from "@/src/components/shared/bricks-integrator/BricksIntegrator";
 import LoadingIcon from "@/src/components/shared/loading/LoadingIcon";
 import MultilineTooltip from "@/src/components/shared/multilines-tooltip/MultilineTooltip";
-import { selectAllUsers, setComments } from "@/src/reduxStore/states/general";
+import { selectAllUsers, setBricksIntegrator, setComments } from "@/src/reduxStore/states/general";
 import { selectProjectId } from "@/src/reduxStore/states/project"
 import { REQUEST_COMMENTS } from "@/src/services/gql/queries/projects";
 import { RUN_RECORD_IDE } from "@/src/services/gql/queries/record-ide";
@@ -9,6 +9,7 @@ import { CommentType } from "@/src/types/shared/comments";
 import { CurrentPage } from "@/src/types/shared/general";
 import { CommentDataManager } from "@/src/util/classes/comments";
 import { DEFAULT_CODE, PASS_ME, caesarCipher } from "@/src/util/components/projects/projectId/record-ide/record-ide-helper";
+import { getEmptyBricksIntegratorConfig } from "@/src/util/shared/bricks-integrator-helper";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
 import { tryParseJSON } from "@/submodules/javascript-functions/general";
 import { useLazyQuery } from "@apollo/client";
@@ -246,7 +247,9 @@ export default function RecordIDE() {
                     <BricksIntegrator
                         functionType="Function"
                         forIde="X"
-                        preparedCode={(code) => setCode(code)}
+                        preparedCode={(code) => {
+                            setCode(code);
+                        }}
                     />
 
                     <a href="https://github.com/code-kern-ai/refinery-record-ide-env/blob/dev/requirements.txt"

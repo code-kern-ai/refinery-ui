@@ -28,7 +28,7 @@ import { getPythonClassName, getPythonClassRegExMatch } from "@/submodules/javas
 import { WebSocketsService } from "@/src/services/base/web-sockets/WebSocketsService";
 import { CurrentPage } from "@/src/types/shared/general";
 import { unsubscribeWSOnDestroy } from "@/src/services/base/web-sockets/web-sockets-helper";
-import { selectAllUsers, setComments } from "@/src/reduxStore/states/general";
+import { selectAllUsers, setBricksIntegrator, setComments } from "@/src/reduxStore/states/general";
 import { CommentType } from "@/src/types/shared/comments";
 import { CommentDataManager } from "@/src/util/classes/comments";
 import { REQUEST_COMMENTS } from "@/src/services/gql/queries/projects";
@@ -37,6 +37,7 @@ import { InformationSourceCodeLookup, InformationSourceExamples } from "@/src/ut
 import { getInformationSourceTemplate } from "@/src/util/components/projects/projectId/heuristics/heuristics-helper";
 import Dropdown2 from "@/submodules/react-components/components/Dropdown2";
 import LoadingIcon from "@/src/components/shared/loading/LoadingIcon";
+import { getEmptyBricksIntegratorConfig } from "@/src/util/shared/bricks-integrator-helper";
 
 export default function ActiveLearning() {
     const dispatch = useDispatch();
@@ -277,7 +278,9 @@ export default function ActiveLearning() {
                             executionTypeFilter="activeLearner"
                             functionType="Heuristic"
                             labelingTaskId={currentHeuristic.labelingTaskId}
-                            preparedCode={(code: string) => updateSourceCode(code)}
+                            preparedCode={(code: string) => {
+                                updateSourceCode(code);
+                            }}
                             newTaskId={(value) => setValueToLabelingTask(value)}
                         />
                     </div>
