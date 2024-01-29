@@ -23,13 +23,14 @@ export default function ChangeColorModal() {
     const modalRenameLabel = useSelector(selectModal(ModalEnum.RENAME_LABEL));
 
     const [hotKeyError, setHotKeyError] = useState<string>('');
+    const [usedHotKeys, setUsedHotKeys] = useState<string[]>([]);
 
     const [updateLabelColorMut] = useMutation(UPDATE_LABEL_COLOR);
     const [updateLabelHotKeyMut] = useMutation(UPDATE_LABEL_HOTKEY);
 
     function handleKeyboardEvent(event: KeyboardEvent) {
         if (!modalChangeColor.open) return;
-        const changedLabel = LabelHelper.checkAndSetLabelHotkey(event, modalChangeColor.label);
+        const changedLabel = LabelHelper.checkAndSetLabelHotkey(event, modalChangeColor.label, usedHotKeys);
         setHotKeyError(LabelHelper.labelHotkeyError);
         if (!LabelHelper.labelHotkeyError) {
             updateLabelHotKeyMut({ variables: { projectId: projectId, labelingTaskLabelId: changedLabel.id, labelHotkey: changedLabel.hotkey } }).then((res) => {
@@ -50,6 +51,17 @@ export default function ChangeColorModal() {
             document.removeEventListener('keydown', handleKeyboardEvent);
         };
     }, [modalChangeColor]);
+
+    useEffect(() => {
+        if (!labelingTasksSchema) return;
+        const usedHotkeys = [];
+        labelingTasksSchema.forEach((task: LabelingTask) => {
+            task.labels.forEach((label: LabelType) => {
+                if (label.hotkey) usedHotkeys.push(label.hotkey);
+            })
+        })
+        setUsedHotKeys(usedHotkeys);
+    }, [modalChangeColor, labelingTasksSchema]);
 
     function updateLabelColor(newColor: string) {
         LabelHelper.updateLabelColor(modalChangeColor.taskId, modalChangeColor.label.color.name, newColor);

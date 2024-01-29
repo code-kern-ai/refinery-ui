@@ -90,22 +90,18 @@ export class LabelHelper {
         this.labelingTaskColors.set(labelingTaskId, colorsInTask);
     }
 
-    public static checkAndSetLabelHotkey(event: KeyboardEvent, currentLabel: any) {
+    public static checkAndSetLabelHotkey(event: KeyboardEvent, currentLabel: any, usedHotkeys: string[]) {
         this.labelHotkeyError = null;
         const key = event.key.toLowerCase();
         if (key == currentLabel.hotkey) {
             this.labelHotkeyError = "Key " + key + " is already in use."
             return;
         }
-        const usedHotkeys = this.getUsedHotkey();
-        if (key == 'ArrowRight' || key == 'ArrowLeft') {
+        if (key == 'arrowright' || key == 'arrowleft') {
             this.labelHotkeyError = "Key " + key + " is used to navigate between records."
             return;
         } else if (usedHotkeys.includes(key)) {
             this.labelHotkeyError = "Key " + key + " is already in use."
-            return;
-        } else if ('123456789'.includes(key)) {
-            this.labelHotkeyError = "Key " + key + " is used to switch between users."
             return;
         } else if (!this.isValidKey(key)) {
             this.labelHotkeyError = "Key " + key + " not in whitelist."
@@ -145,16 +141,6 @@ export class LabelHelper {
 
     private static isValidKey(key: string): boolean {
         return LabelHelper.ALLOWED_KEYS.includes(key.toLowerCase());
-    }
-
-    private static getUsedHotkey(): string[] {
-        let usedHotkeys = [];
-        this.labelMap.forEach((value, key) => {
-            value.forEach((v: any) => {
-                if (v.hotkey) usedHotkeys.push(v.hotkey);
-            })
-        })
-        return usedHotkeys
     }
 
     private static getBackgroundColor(color: string): string {
