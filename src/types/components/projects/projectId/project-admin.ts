@@ -11,6 +11,7 @@ export type PersonalAccessToken = {
 
 export type PersonalTokenModalProps = {
     refetchTokens: () => void;
+    accessTokens?: PersonalAccessToken[];
 }
 
 export enum ExpirationTime {

@@ -204,7 +204,6 @@ const initialState: Modals = {
     },
     [ModalEnum.NEW_PERSONAL_TOKEN]: {
         open: false,
-        tokenNames: []
     },
     [ModalEnum.DELETE_PERSONAL_TOKEN]: {
         open: false,

@@ -10,8 +10,9 @@ import { copyToClipboard } from "@/submodules/javascript-functions/general";
 import Dropdown2 from "@/submodules/react-components/components/Dropdown2";
 import { useMutation } from "@apollo/client";
 import { Tooltip } from "@nextui-org/react";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { timer } from "rxjs";
 
 export default function NewPersonalToken(props: PersonalTokenModalProps) {
     const dispatch = useDispatch();
@@ -27,17 +28,35 @@ export default function NewPersonalToken(props: PersonalTokenModalProps) {
 
     const [createNewTokenMut] = useMutation(CREATE_PERSONAL_ACCESS_TOKEN);
 
+    useEffect(() => {
+        if (!modalNewToken.open) {
+            setTokenName('');
+            setExpirationTime(EXPIRATION_TIME[0]);
+            setNewToken(null);
+            setTokenCopied(false);
+            setDuplicateTokenName(false);
+        }
+    }, [modalNewToken]);
+
     const createNewToken = useCallback(() => {
         createNewTokenMut({ variables: { projectId: projectId, name: tokenName, expiresAt: expirationTime.value, scope: READ_WRITE_SCOPE } }).then((res) => {
             setNewToken(res['data']['createPersonalAccessToken']['token']);
             props.refetchTokens();
             setTokenName("");
+            setDuplicateTokenName(false);
+            setExpirationTime(EXPIRATION_TIME[0]);
         });
-    }, [projectId, tokenName, expirationTime]);
+    }, [projectId, tokenName, expirationTime, tokenCopied]);
 
     function checkIfDuplicateTokenName(tokenName: string) {
-        const duplicate = modalNewToken?.tokenNames?.find((token: any) => token.name == tokenName);
-        setDuplicateTokenName(duplicate);
+        const duplicate = props.accessTokens.find((token: any) => token.name == tokenName);
+        setDuplicateTokenName(duplicate != undefined);
+    }
+
+    function copyToken(newToken) {
+        setTokenCopied(true);
+        copyToClipboard(newToken);
+        timer(1000).subscribe(() => setTokenCopied(false));
     }
 
     return (<Modal modalName={ModalEnum.NEW_PERSONAL_TOKEN} hasOwnButtons={true}>
@@ -67,7 +86,7 @@ export default function NewPersonalToken(props: PersonalTokenModalProps) {
 
                 <Tooltip content={tokenCopied ? TOOLTIPS_DICT.ADMIN_PAGE.TOKEN_COPIED : ''} color="invert" placement="right">
                     <div className="flex items-center">
-                        <button disabled={!newToken} onClick={() => { newToken ? copyToClipboard(newToken) : null; setTokenCopied(true); }}
+                        <button disabled={!newToken} onClick={() => { newToken ? copyToken(newToken) : null; }}
                             className="bg-white text-gray-700 text-xs font-semibold px-4 py-2 rounded border border-gray-300 hover:bg-gray-50 inline-block disabled:opacity-50 disabled:cursor-not-allowed">Copy to clipboard</button>
                     </div>
                 </Tooltip>

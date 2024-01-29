@@ -48,11 +48,6 @@ export default function ProjectAdmin() {
         });
     }, [projectId]);
 
-    useEffect(() => {
-        if (!accessTokens) return;
-        dispatch(setModalStates(ModalEnum.NEW_PERSONAL_TOKEN, { tokenNames: accessTokens }));
-    }, [accessTokens]);
-
     function refetchAccessTokensAndProcess() {
         refetchAccessTokens({ variables: { projectId: projectId } }).then((res) => {
             setAccessTokens(postProcessPersonalAccessToken(res.data['allPersonalAccessTokens']));
@@ -136,7 +131,7 @@ export default function ProjectAdmin() {
                     </button>
                 </Tooltip>
             </div>
-            <NewPersonalToken refetchTokens={refetchAccessTokensAndProcess} />
+            <NewPersonalToken refetchTokens={refetchAccessTokensAndProcess} accessTokens={accessTokens} />
             <DeletePersonalToken refetchTokens={refetchAccessTokensAndProcess} />
         </div>}
     </>)
