@@ -1,6 +1,5 @@
-import { CurrentLabel, LabelColors, RenameLabelData } from "@/src/types/components/projects/projectId/settings/labeling-tasks";
+import { LabelColors } from "@/src/types/components/projects/projectId/settings/labeling-tasks";
 import { jsonCopy } from "@/submodules/javascript-functions/general";
-import { timer } from "rxjs";
 import { COLOR_OPTIONS } from "../constants";
 
 export class LabelHelper {
@@ -10,8 +9,6 @@ export class LabelHelper {
     public static labelingTaskColors: Map<string, string[]> = new Map<string, string[]>(); //still needed?
     public static labelHotkeyError: string;
     public static labelMap: Map<string, string[]> = new Map<string, string[]>();
-
-    public static renameLabelData: RenameLabelData;
 
     public static setLabelColorOptions() {
         if (LabelHelper.labelColorOptions.length > 0) return;
@@ -54,27 +51,7 @@ export class LabelHelper {
         }
     }
 
-    public static openRenameLabel() {
-        if (!LabelHelper.renameLabelData) {
-            LabelHelper.renameLabelData = {
-                checkResults: null,
-                newLabelName: '',
-                canCheck: false
-            };
-        }
-    }
-
-    public static checkInputRenameLabel(event: InputEvent, currentLabel: any) {
-        const input = event.target as HTMLInputElement;
-        this.renameLabelData.checkResults = null;
-        this.renameLabelData.canCheck = this.isValidNewName(input.value);
-        if (this.renameLabelData.canCheck && !this.isLabelNameUnique(currentLabel.taskId, input.value)) {
-            this.renameLabelData.canCheck = false;
-            this.renameLabelData.checkResults = { "errors": [{ "msg": "Label with name already exists" }], "warnings": [], "infos": [] };
-        }
-        this.renameLabelData.newLabelName = input.value;
-    }
-    private static isValidNewName(name: string): boolean {
+    public static isValidNewName(name: string): boolean {
         if (!name) return false;
         if (name.trim() == '') return false;
         return true;

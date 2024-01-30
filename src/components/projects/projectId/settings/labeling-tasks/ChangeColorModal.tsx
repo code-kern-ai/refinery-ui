@@ -85,7 +85,6 @@ export default function ChangeColorModal() {
                 <p className="mr-2 font-bold">Label:</p>
                 <Tooltip content={TOOLTIPS_DICT.PROJECT_SETTINGS.LABELING_TASK.RENAME_LABEL} color="invert" placement="bottom">
                     <span onClick={() => {
-                        LabelHelper.openRenameLabel();
                         dispatch(setModalStates(ModalEnum.CHANGE_COLOR, { ...modalChangeColor, open: false }));
                         dispatch(setModalStates(ModalEnum.RENAME_LABEL, { ...modalRenameLabel, label: modalChangeColor.label, taskId: modalChangeColor.taskId, open: true }));
                     }}
