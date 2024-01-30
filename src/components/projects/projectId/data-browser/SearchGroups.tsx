@@ -503,7 +503,7 @@ export default function SearchGroups() {
             for (let searchElement of activeSearchParams) {
                 if (searchElement.values.group == SearchGroup.ATTRIBUTES) {
                     if (searchElement.values.name == 'Any Attribute' || searchElement.values.name == attributesDict[attributeKey].name) {
-                        if (searchElement.values.negate) isTextHighlightNeededCopy[attributeKey] = false;
+                        if (searchElement.values.negate || searchElement.values.searchValue == '') isTextHighlightNeededCopy[attributeKey] = false;
                         else isTextHighlightNeededCopy[attributeKey] = true;
                     }
                 } else {
