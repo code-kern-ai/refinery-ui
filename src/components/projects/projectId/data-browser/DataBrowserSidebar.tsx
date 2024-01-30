@@ -1,6 +1,6 @@
 import { selectAllUsers } from '@/src/reduxStore/states/general';
 import { setModalStates } from '@/src/reduxStore/states/modal';
-import { selectActiveSlice, selectAdditionalData, selectDataSlicesAll, setActiveDataSlice, setActiveSearchParams, setIsTextHighlightNeeded, setRecordsInDisplay, setTextHighlight, updateAdditionalDataState } from '@/src/reduxStore/states/pages/data-browser';
+import { selectActiveSlice, selectAdditionalData, selectDataSlicesAll, setActiveDataSlice, setActiveSearchParams, setFullSearchStore, setIsTextHighlightNeeded, setRecordsInDisplay, setTextHighlight, updateAdditionalDataState } from '@/src/reduxStore/states/pages/data-browser';
 import { selectProjectId, setActiveProject } from '@/src/reduxStore/states/project';
 import style from '@/src/styles/components/projects/projectId/data-browser.module.css';
 import { DataSlice } from '@/src/types/components/projects/projectId/data-browser/data-browser';
@@ -97,12 +97,15 @@ export default function DataBrowserSidebar() {
                         {filteredSlices.map((slice: DataSlice, index: number) => (<Tooltip content={!slice.static ? slice.name : ''} color="invert" placement={index % 2 == 0 ? 'right' : 'left'} key={slice.id}>
                             <button onClick={() => toggleSlice(slice)} style={{ width: '170px' }}
                                 className={`cursor-pointer inline-flex border items-center justify-between px-2.5 py-1.5 shadow-sm text-sm font-medium rounded text-gray-700 bg-white hover:bg-gray-50 focus:outline-none ${activeSlice?.id == slice.id ? 'ring-blue-500 ring-2' : ' border-gray-200'}`}>
-                                <label className="cursor-pointer mr-2" onClick={() => { updateSliceInfo(slice) }}>
+                                <label className="cursor-pointer mr-2" onClick={(e) => { updateSliceInfo(slice); e.stopPropagation(); }}>
                                     <IconInfoCircle className={`w-6 h-6 ${slice.color.textColor} ${slice.color.fillColor}`} />
                                 </label>
                                 <label className={`text-gray-700 truncate label-max-width cursor-pointer ${slice.sliceType == Slice.STATIC_OUTLIER ? 'text-xs whitespace-pre' : 'text-sm'}`}>
                                     {slice.displayName}</label>
-                                <IconTrash className="text-red-700 h-6 w-6 ml-2 cursor-pointer" onClick={() => dispatch(setModalStates(ModalEnum.DELETE_SLICE, { sliceId: slice.id, open: true }))} />
+                                <IconTrash className="text-red-700 h-6 w-6 ml-2 cursor-pointer" onClick={(e) => {
+                                    dispatch(setModalStates(ModalEnum.DELETE_SLICE, { sliceId: slice.id, open: true }));
+                                    e.stopPropagation();
+                                }} />
                             </button>
                         </Tooltip>))}
                     </div>}

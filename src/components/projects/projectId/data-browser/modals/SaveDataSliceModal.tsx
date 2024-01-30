@@ -59,11 +59,11 @@ export default function SaveDataSliceModal(props: { fullSearch: {} }) {
         dataSlices.forEach((slice: DataSlice) => {
             if (slice.name == modalSaveDataSlice.sliceName) {
                 dispatch(setActiveDataSlice(slice));
-                updateSlice(isStatic, slice.id);
+                updateSlice(slice.id);
                 return;
             }
         });
-    }, [modalSaveDataSlice]);
+    }, [modalSaveDataSlice, activeSlice, dataSlices]);
 
     useEffect(() => {
         setAcceptButton({
@@ -81,18 +81,18 @@ export default function SaveDataSliceModal(props: { fullSearch: {} }) {
         dispatch(setModalStates(ModalEnum.SAVE_DATA_SLICE, { sliceNameExists: exists }));
     }
 
-    function updateSlice(isStatic = null, sliceId = null) {
-        isStatic = isStatic == null ? activeSlice.static : isStatic;
+    const updateSlice = useCallback((sliceId: string) => {
+        const finalStatic = isStatic == null ? activeSlice.static : isStatic;
         updateDataSliceMut({
             variables: {
                 projectId: projectId,
-                static: isStatic,
+                static: finalStatic,
                 dataSliceId: sliceId,
                 filterRaw: getRawFilterForSave(props.fullSearch),
                 filterData: parseFilterToExtended(activeSearchParams, attributes, configuration, labelingTasks, user, props.fullSearch[SearchGroup.DRILL_DOWN].value)
             }
         }).then((res) => { });
-    }
+    }, [activeSlice, isStatic, props.fullSearch]);
 
     return (<Modal modalName={ModalEnum.SAVE_DATA_SLICE} acceptButton={acceptButton}>
         <div className="flex flex-grow justify-center text-lg leading-6 text-gray-900 font-medium">Data slice creation</div>

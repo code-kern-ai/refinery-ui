@@ -4,6 +4,7 @@ import { SearchGroup, StaticOrderByKeys } from "@/submodules/javascript-function
 import { getOrderByDisplayName } from "@/submodules/javascript-functions/enums/enum-functions";
 import { HighlightSearch } from "@/src/types/shared/highlight";
 import { jsonCopy } from "@/submodules/javascript-functions/general";
+import { addGroupToSearchElement } from "./prefill-values-helper";
 
 export function updateSearchParameters(searchElement, attributes, separator, fullSearch, searchGroup, labelingTasks?) {
     const activeParams = [];
@@ -40,7 +41,7 @@ export function updateSearchParameters(searchElement, attributes, separator, ful
             }
         } else if (p.groupElements.group == SearchGroup.LABELING_TASKS) {
             if (!(p.groupElements.active || (p.groupElements['weakSupervisionConfidence'] && p.groupElements['weakSupervisionConfidence'].active) || (p.groupElements['modelCallbackConfidence'] && p.groupElements['modelCallbackConfidence'].active) || p.groupElements['isWithDifferentResults'])) return;
-            param = createSplittedText(updateSearchParamText(p, attributes, separator, fullSearch[SearchGroup.DRILL_DOWN], searchGroup[p.groupElements.groupKey].nameAdd), fullSearch, p);
+            param = createSplittedText(updateSearchParamText(p, attributes, separator, fullSearch[SearchGroup.DRILL_DOWN], searchGroup[p.groupElements.groupKey]?.nameAdd), fullSearch, p);
             if (!param) return;
             activeParams.push({ splittedText: param, values: { group: p.groupElements.group, values: p.groupElements } });
         }
@@ -240,63 +241,4 @@ export function getRegexFromFilter(searchElement): HighlightSearch {
             return { searchFor: searchValue, matchCase: searchElement.values.caseSensitive };
     }
     return null;
-}
-
-
-export function addGroupToSearchElement(searchElement, labelingTasks) {
-    if (searchElement.groupElements[0].hasOwnProperty('operator')) {
-        searchElement.groupElements.forEach(element => {
-            element.group = SearchGroup.ATTRIBUTES;
-        });
-    } else if (searchElement.groupElements[0].hasOwnProperty('users')) {
-        const saveEl = searchElement.groupElements[0];
-        const newElement = {
-            id: saveEl.id,
-            group: SearchGroup.USER_FILTER,
-            users: saveEl.users,
-            active: saveEl.active,
-            negate: saveEl.negate,
-            name: saveEl.name,
-            nameAdd: ''
-        };
-        searchElement.groupElements = newElement;
-    } else if (searchElement.groupElements[0].hasOwnProperty('manualLabels')) {
-        const saveEl = searchElement.groupElements[0];
-        const newElement = {
-            id: saveEl.id,
-            group: SearchGroup.LABELING_TASKS,
-            groupKey: SearchGroup.LABELING_TASKS + '_' + saveEl.taskId,
-            type: saveEl.type,
-            taskTarget: saveEl.taskTarget,
-            taskId: saveEl.taskId,
-            active: saveEl.active,
-            manualLabels: saveEl.manualLabels,
-            weakSupervisionLabels: saveEl.weakSupervisionLabels,
-            modelCallbackLabels: saveEl.modelCallbackLabels,
-            sortByWeakSupervisionConfidence: saveEl.sortByWeakSupervisionConfidence,
-            sortByModelCallbackConfidence: saveEl.sortByModelCallbackConfidence,
-            weakSupervisionConfidence: saveEl.weakSupervisionConfidence,
-            modelCallbackConfidence: saveEl.modelCallbackConfidence,
-            heuristics: saveEl.informationSources,
-            isWithDifferentResults: saveEl.isWithDifferentResults,
-        }
-        searchElement.groupElements = newElement;
-    } else if (searchElement.groupElements[0].hasOwnProperty('orderBy')) {
-        const saveEl = searchElement.groupElements[0];
-        const newElement = {
-            id: saveEl.id,
-            group: SearchGroup.ORDER_STATEMENTS,
-            orderBy: saveEl.orderBy,
-        }
-        searchElement.groupElements = newElement;
-    } else if (searchElement.groupElements[0].hasOwnProperty('hasComments')) {
-        const saveEl = searchElement.groupElements[0];
-        const newElement = {
-            id: saveEl.id,
-            group: SearchGroup.COMMENTS,
-            hasComments: saveEl.hasComments,
-        }
-        searchElement.groupElements = newElement;
-    }
-    return searchElement;
 }

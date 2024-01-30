@@ -10,7 +10,7 @@ import { SearchOperator } from "@/src/types/components/projects/projectId/data-b
 import { checkDecimalPatterns, getAttributeType, getSearchOperatorTooltip } from "@/src/util/components/projects/projectId/data-browser/search-operators-helper";
 import { DataTypeEnum } from "@/src/types/shared/general";
 import { selectAllUsers, selectUser } from "@/src/reduxStore/states/general";
-import { selectActiveSearchParams, selectActiveSlice, selectAdditionalData, selectConfiguration, selectDataSlicesAll, selectFullSearchStore, selectIsTextHighlightNeeded, selectRecords, selectSearchGroupsStore, selectTextHighlight, selectUniqueValuesDict, selectUsersCount, setActiveSearchParams, setFullSearchStore, setIsTextHighlightNeeded, setRecordsInDisplay, setSearchGroupsStore, setSearchRecordsExtended, setTextHighlight, updateAdditionalDataState } from "@/src/reduxStore/states/pages/data-browser";
+import { selectActiveSearchParams, selectActiveSlice, selectAdditionalData, selectConfiguration, selectDataSlicesAll, selectFullSearchStore, selectIsTextHighlightNeeded, selectRecords, selectSearchGroupsStore, selectTextHighlight, selectUniqueValuesDict, selectUsersCount, setActiveDataSlice, setActiveSearchParams, setFullSearchStore, setIsTextHighlightNeeded, setRecordsInDisplay, setSearchGroupsStore, setSearchRecordsExtended, setTextHighlight, updateAdditionalDataState } from "@/src/reduxStore/states/pages/data-browser";
 import { Tooltip } from "@nextui-org/react";
 import { setModalStates } from "@/src/reduxStore/states/modal";
 import { ModalEnum } from "@/src/types/shared/modal";
@@ -30,6 +30,7 @@ import { postProcessCurrentWeakSupervisionRun } from "@/src/util/components/proj
 import { AttributeVisibility } from "@/src/types/components/projects/projectId/settings/data-schema";
 import { ChevronDownIcon } from "@heroicons/react/20/solid";
 import Dropdown2 from "@/submodules/react-components/components/Dropdown2";
+import { checkActiveGroups, prefillActiveValues } from "@/src/util/components/projects/projectId/data-browser/prefill-values-helper";
 
 const GROUP_SORT_ORDER = 0;
 let GLOBAL_SEARCH_GROUP_COUNT = 0;
@@ -158,7 +159,13 @@ export default function SearchGroups() {
         const activeParams = updateSearchParameters(Object.values(JSON.parse(findDataSLice.filterRaw)), attributes, configuration.separator, jsonCopy(fullSearchStore), searchGroupsStore, labelingTasks);
         dispatch(setActiveSearchParams(activeParams));
         dispatch(updateAdditionalDataState('canUpdateDynamicSlice', true));
-    }, [activeSlice, labelingTasks, fullSearchStore, searchGroupsStore, dataSlices]);
+    }, [activeSlice, labelingTasks, searchGroupsStore, dataSlices]);
+
+    useEffect(() => {
+        if (!activeSlice || !usersMap) return;
+        if (activeSlice.sliceType == Slice.STATIC_OUTLIER) return;
+        prepareNewFormGroups(activeSlice.filterRaw, usersMap);
+    }, [activeSlice, usersMap]);
 
     useEffect(() => {
         if (!additionalData.clearFullSearch) return;
@@ -245,6 +252,22 @@ export default function SearchGroups() {
         }
         searchGroupsOrderCopy.sort((a, b) => a.order - b.order);
         setSearchGroupsOrder(searchGroupsOrderCopy);
+    }
+
+    function prepareNewFormGroups(filterRaw: any, usersMap: any) {
+        const parse = JSON.parse(filterRaw);
+        const searchGroupsCopy = jsonCopy(searchGroupsStore);
+        if (parse.hasOwnProperty(SearchGroup.CATEGORY)) {
+            dispatch(setFullSearchStore(parse));
+            const openGroups = checkActiveGroups(parse, searchGroupsCopy);
+            dispatch(setSearchGroupsStore(openGroups));
+        } else {
+            const fullSearchStoreCopy = jsonCopy(fullSearchStore);
+            const prefilledValues = prefillActiveValues(parse, fullSearchStoreCopy, usersMap);
+            dispatch(setFullSearchStore(prefilledValues));
+            const openGroups = checkActiveGroups(fullSearchStoreCopy, searchGroupsCopy);
+            dispatch(setSearchGroupsStore(openGroups));
+        }
     }
 
     function toggleGroupMenu(groupKey: any, forceValue: boolean = null) {
@@ -581,7 +604,7 @@ export default function SearchGroups() {
                     {searchGroupsStore[group.key].group == SearchGroup.USER_FILTER && <div className="flex flex-row items-center mt-4">
                         <div className="flex flex-grow">
                             <div className="flex flex-col">
-                                {fullSearchStore[group.key].groupElements['users'].map((groupItem, index) => (<div key={groupItem.id} className="my-1">
+                                {fullSearchStore[group.key].groupElements['users'] && fullSearchStore[group.key].groupElements['users'].map((groupItem, index) => (<div key={groupItem.id} className="my-1">
                                     <div className="form-control flex flex-row flex-nowrap items-center">
                                         <span className="flex flex-row items-center cursor-pointer" onClick={() => setActiveNegateGroup(groupItem, index, group)}>
                                             <div style={{ backgroundColor: groupItem.color, borderColor: groupItem.color }}
@@ -602,8 +625,8 @@ export default function SearchGroups() {
                     {searchGroupsStore[group.key].group == SearchGroup.LABELING_TASKS && <div className="flex flex-row items-center mt-4">
                         {fullSearchStore[group.key] && <div className="flex-grow flex flex-col">
                             <div>Manually labeled</div>
-                            {fullSearchStore[group.key].groupElements['manualLabels'].length == 0 ? (<ButtonLabelsDisabled />) : (
-                                <Dropdown2 options={fullSearchStore[group.key].groupElements['manualLabels']} buttonName={manualLabels.length == 0 ? 'None selected' : manualLabels.join(',')} hasCheckboxesThreeStates={true} keepDrownOpen={true}
+                            {fullSearchStore[group.key].groupElements['manualLabels'] && fullSearchStore[group.key].groupElements['manualLabels'].length == 0 ? (<ButtonLabelsDisabled />) : (
+                                <Dropdown2 options={fullSearchStore[group.key].groupElements['manualLabels'] ?? []} buttonName={manualLabels.length == 0 ? 'None selected' : manualLabels.join(',')} hasCheckboxesThreeStates={true} keepDrownOpen={true}
                                     selectedOption={(option: any) => {
                                         const labels = [...manualLabels, option.name]
                                         setManualLabels(labels);
@@ -612,8 +635,8 @@ export default function SearchGroups() {
                             )}
 
                             <div className="mt-2">Weakly supervised</div>
-                            {fullSearchStore[group.key].groupElements['weakSupervisionLabels'].length == 0 ? (<ButtonLabelsDisabled />) : (
-                                <Dropdown2 options={fullSearchStore[group.key].groupElements['weakSupervisionLabels']} buttonName={weakSupervisionLabels.length == 0 ? 'None selected' : weakSupervisionLabels.join(',')} hasCheckboxesThreeStates={true}
+                            {fullSearchStore[group.key].groupElements['weakSupervisionLabels'] && fullSearchStore[group.key].groupElements['weakSupervisionLabels'].length == 0 ? (<ButtonLabelsDisabled />) : (
+                                <Dropdown2 options={fullSearchStore[group.key].groupElements['weakSupervisionLabels'] ?? []} buttonName={weakSupervisionLabels.length == 0 ? 'None selected' : weakSupervisionLabels.join(',')} hasCheckboxesThreeStates={true}
                                     selectedOption={(option: any) => {
                                         const labels = [...weakSupervisionLabels, option.name]
                                         setWeakSupervisionLabels(labels);
@@ -625,23 +648,23 @@ export default function SearchGroups() {
                                     <span className="text-sm mr-0.5 font-dmMono">CONFIDENCE BETWEEN</span>
                                     <input
                                         onChange={(e) => changeConfidence(e, 'lower', group.key, 'weakSupervisionConfidence')}
-                                        value={fullSearchStore[group.key].groupElements['weakSupervisionConfidence']['lower']}
+                                        value={fullSearchStore[group.key].groupElements['weakSupervisionConfidence'] ? fullSearchStore[group.key].groupElements['weakSupervisionConfidence']['lower'] : 0}
                                         className="h-8 w-11 text-sm border-gray-300 rounded-md placeholder-italic border text-gray-900 pl-2 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100" />
                                     <span className="text-sm mx-0.5 font-dmMono">% AND</span>
                                     <input
                                         onChange={(e) => changeConfidence(e, 'upper', group.key, 'weakSupervisionConfidence')}
-                                        value={fullSearchStore[group.key].groupElements['weakSupervisionConfidence']['upper']}
+                                        value={fullSearchStore[group.key].groupElements['weakSupervisionConfidence'] ? fullSearchStore[group.key].groupElements['weakSupervisionConfidence']['upper'] : 100}
                                         className="h-8 w-11 text-sm border-gray-300 rounded-md placeholder-italic border text-gray-900 pl-2 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100" />
                                     <span className="text-sm mx-0.5 font-dmMono">%</span>
-                                    {fullSearchStore[group.key].groupElements['weakSupervisionConfidence']['active'] && <Tooltip content={TOOLTIPS_DICT.DATA_BROWSER.CLEAR_WS_CONFIDENCE} color="invert">
+                                    {fullSearchStore[group.key].groupElements['weakSupervisionConfidence'] && fullSearchStore[group.key].groupElements['weakSupervisionConfidence']['active'] && <Tooltip content={TOOLTIPS_DICT.DATA_BROWSER.CLEAR_WS_CONFIDENCE} color="invert">
                                         <IconFilterOff className="text-red-700 cursor-pointer" onClick={() => clearConfidence(group.key, 'weakSupervisionConfidence')} />
                                     </Tooltip>}
                                 </div>
                             </div>
 
                             <div className="mt-2">Model callback</div>
-                            {fullSearchStore[group.key].groupElements['modelCallbackLabels'].length == 0 ? (<ButtonLabelsDisabled />) : (
-                                <Dropdown2 options={fullSearchStore[group.key].groupElements['modelCallbackLabels']} buttonName={modelCallBacksLabels.length == 0 ? 'None selected' : modelCallBacksLabels.join(',')} hasCheckboxesThreeStates={true}
+                            {fullSearchStore[group.key].groupElements['modelCallbackLabels'] && fullSearchStore[group.key].groupElements['modelCallbackLabels'].length == 0 ? (<ButtonLabelsDisabled />) : (
+                                <Dropdown2 options={fullSearchStore[group.key].groupElements['modelCallbackLabels'] ?? []} buttonName={modelCallBacksLabels.length == 0 ? 'None selected' : modelCallBacksLabels.join(',')} hasCheckboxesThreeStates={true}
                                     selectedOption={(option: any) => {
                                         const labels = [...modelCallBacksLabels, option.name]
                                         setModelCallBacksLabels(labels);
@@ -653,29 +676,29 @@ export default function SearchGroups() {
                                     <span className="text-sm mr-0.5 font-dmMono">CONFIDENCE BETWEEN</span>
                                     <input
                                         onChange={(e) => changeConfidence(e, 'lower', group.key, 'modelCallbackConfidence')}
-                                        value={fullSearchStore[group.key].groupElements['modelCallbackConfidence']['lower']}
+                                        value={fullSearchStore[group.key].groupElements['modelCallbackConfidence'] ? fullSearchStore[group.key].groupElements['modelCallbackConfidence']['lower'] : 0}
                                         className="h-8 w-11 text-sm border-gray-300 rounded-md placeholder-italic border text-gray-900 pl-2 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100" />
                                     <span className="text-sm mx-0.5 font-dmMono">% AND</span>
                                     <input
                                         onChange={(e) => changeConfidence(e, 'upper', group.key, 'modelCallbackConfidence')}
-                                        value={fullSearchStore[group.key].groupElements['modelCallbackConfidence']['upper']}
+                                        value={fullSearchStore[group.key].groupElements['modelCallbackConfidence'] ? fullSearchStore[group.key].groupElements['modelCallbackConfidence']['upper'] : 0}
                                         className="h-8 w-11 text-sm border-gray-300 rounded-md placeholder-italic border text-gray-900 pl-2 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100" />
                                     <span className="text-sm mx-0.5 font-dmMono">%</span>
-                                    {fullSearchStore[group.key].groupElements['modelCallbackConfidence']['active'] && <Tooltip content={TOOLTIPS_DICT.DATA_BROWSER.CLEAR_MC_CONFIDENCE} color="invert">
+                                    {fullSearchStore[group.key].groupElements['modelCallbackConfidence'] && fullSearchStore[group.key].groupElements['modelCallbackConfidence']['active'] && <Tooltip content={TOOLTIPS_DICT.DATA_BROWSER.CLEAR_MC_CONFIDENCE} color="invert">
                                         <IconFilterOff className="text-red-700 cursor-pointer" onClick={() => clearConfidence(group.key, 'modelCallbackConfidence')} />
                                     </Tooltip>}
                                 </div>
                             </div>
 
                             <div className="mt-2 font-bold">Heuristics</div>
-                            {fullSearchStore[group.key].groupElements['heuristics'].length == 0 ? (<div className="text-sm text-gray-400">No heuristics associated with this task</div>) : (<div className="flex flex-col">
+                            {fullSearchStore[group.key].groupElements['heuristics'] && fullSearchStore[group.key].groupElements['heuristics'].length == 0 ? (<div className="text-sm text-gray-400">No heuristics associated with this task</div>) : (<div className="flex flex-col">
                                 <div className="flex items-center cursor-pointer border-t border-t-gray-300 border-b border-b-gray-300" onClick={() => updateIsDifferent(group.key, fullSearchStore[group.key].groupElements['isWithDifferentResults'])}>
-                                    <div style={{ backgroundColor: fullSearchStore[group.key].groupElements['isWithDifferentResults'].color, borderColor: fullSearchStore[group.key].groupElements['isWithDifferentResults'].color }}
+                                    <div style={{ backgroundColor: fullSearchStore[group.key].groupElements['isWithDifferentResults']?.color, borderColor: fullSearchStore[group.key].groupElements['isWithDifferentResults']?.color }}
                                         className="ml-2 mr-2 h-4 w-4 border-gray-300 border rounded cursor-pointer hover:bg-gray-200">
                                     </div>
                                     <span className="text-sm truncate w-full pl-2">Only with different results</span>
                                 </div>
-                                {fullSearchStore[group.key].groupElements['heuristics'].map((groupItem, index) => (<div key={groupItem.id} className="my-1" >
+                                {fullSearchStore[group.key].groupElements['heuristics'] && fullSearchStore[group.key].groupElements['heuristics'].map((groupItem, index) => (<div key={groupItem.id} className="my-1" >
                                     <div className="flex flex-row items-center cursor-pointer" onClick={() => setActiveNegateGroup(groupItem, index, group, true)}>
                                         <div style={{ backgroundColor: groupItem.color, borderColor: groupItem.color }}
                                             className="ml-2 mr-2 h-4 w-4 border-gray-300 border rounded cursor-pointer hover:bg-gray-200">
@@ -687,7 +710,7 @@ export default function SearchGroups() {
                         </div>}
                     </div>}
                     {searchGroupsStore[group.key].group == SearchGroup.ORDER_STATEMENTS && <div className="mt-4">
-                        {fullSearchStore[group.key].groupElements['orderBy'].map((groupItem, index) => (<div key={groupItem.id}>
+                        {fullSearchStore[group.key].groupElements['orderBy'] && fullSearchStore[group.key].groupElements['orderBy'].map((groupItem, index) => (<div key={groupItem.id}>
                             <div className="form-control class mb-2">
                                 {groupItem['orderByKey'] != StaticOrderByKeys.RANDOM ? (<div className="mb-2 flex items-center">
                                     <div className="flex items-center cursor-pointer" onClick={() => setSortFormControl(index, group)}>
@@ -721,7 +744,7 @@ export default function SearchGroups() {
                             </div>
                         </div>))}
                     </div>}
-                    {searchGroupsStore[group.key].group == SearchGroup.COMMENTS && <div className="flex flex-row items-center mt-4">
+                    {fullSearchStore[group.key] && searchGroupsStore[group.key].group == SearchGroup.COMMENTS && <div className="flex flex-row items-center mt-4">
                         <div className="flex-grow flex items-center">
                             <div className="flex flex-col">
                                 <div className="my-1">
