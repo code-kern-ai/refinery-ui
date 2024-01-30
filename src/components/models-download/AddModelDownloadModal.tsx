@@ -26,15 +26,21 @@ export default function AddModelDownloadModal() {
     const [colorDownloadedModels, setColorDownloadedModels] = useState<boolean[]>([]);
     const [hoverBoxList, setHoverBoxList] = useState<any[]>([]);
     const [lineSeparatorIndex, setLineSeparatorIndex] = useState(-1);
+    const [filteredList, setFilteredList] = useState<any[]>(null);
 
     useEffect(() => {
-        if (!modelsDownloaded || !modelsList) return;
-        const colorDownloadedModels = modelsList.map((model: any) => {
+        if (!modelsList) return;
+        setFilteredList(modelsList);
+    }, [modelsList]);
+
+    useEffect(() => {
+        if (!modelsDownloaded || !filteredList) return;
+        const colorDownloadedModels = filteredList.map((model: any) => {
             const checkIfModelExists = modelsDownloaded.find((modelDownloaded: ModelsDownloaded) => modelDownloaded.name === model.configString);
             return checkIfModelExists !== undefined;
         });
         setColorDownloadedModels(colorDownloadedModels);
-        const hoverBoxList = modelsList.map((model: any, index: number) => {
+        const hoverBoxList = filteredList.map((model: any, index: number) => {
             if (model.description) return model.description;
             else return {
                 avgTime: model.avgTime,
@@ -43,8 +49,8 @@ export default function AddModelDownloadModal() {
             }
         });
         setHoverBoxList(hoverBoxList);
-        setLineSeparatorIndex(modelsList.findIndex((model: any) => !model.description));
-    }, [modelsDownloaded, modelsList]);
+        setLineSeparatorIndex(filteredList.findIndex((model: any) => !model.description));
+    }, [modelsDownloaded, filteredList, modalAddModel, modelsList, modelName]);
 
     const [downloadModelMut] = useMutation(MODEL_PROVIDER_DOWNLOAD_MODEL);
 
@@ -75,12 +81,15 @@ export default function AddModelDownloadModal() {
                 <Tooltip content={TOOLTIPS_DICT.MODELS_DOWNLOAD.MODEL} placement="right" color="invert">
                     <span className="card-title mb-0 label-text flex"><span className="cursor-help underline filtersUnderline">Name</span></span>
                 </Tooltip>
-                <Dropdown2 options={modelsList && modelsList} useDifferentTextColor={colorDownloadedModels} differentTextColor="green" valuePropertyPath="configString"
+                <Dropdown2 options={filteredList && filteredList} useDifferentTextColor={colorDownloadedModels} differentTextColor="green" valuePropertyPath="configString"
                     hasSearchBar={true} dropdownItemsClasses="max-h-96 overflow-y-auto"
                     selectedOption={(option: any) => {
                         setModelName(option.configString);
                     }} optionsHaveHoverBox={true} hoverBoxList={hoverBoxList} lineSeparatorIndex={lineSeparatorIndex}
-                    searchTextTyped={(option: any) => setModelName(option)} />
+                    searchTextTyped={(option: any) => setModelName(option)}
+                    filteredOptions={(option) => {
+                        setFilteredList(modelsList.filter((model: any) => model.configString.includes(option)));
+                    }} />
             </div>
         </form>
     </Modal>)

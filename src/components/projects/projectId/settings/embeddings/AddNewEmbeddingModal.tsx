@@ -327,37 +327,55 @@ function SuggestionsModel(props: SuggestionsProps) {
 
     const [colorDownloadedModels, setColorDownloadedModels] = useState<boolean[]>([]);
     const [hoverBoxList, setHoverBoxList] = useState<any[]>([]);
+    const [filteredList, setFilteredList] = useState<any[]>([]);
 
     const [refetchModelsDownload] = useLazyQuery(GET_MODEL_PROVIDER_INFO, { fetchPolicy: 'network-only', nextFetchPolicy: 'cache-first' });
 
     useEffect(() => {
         if (!props.options) return;
+        setFilteredList(props.options);
+    }, [props.options]);
+
+    useEffect(() => {
+        if (!filteredList) return;
         refetchModelsDownload().then((res) => {
             const modelsDownloaded = postProcessingModelsDownload(res.data['modelProviderInfo']);
             dispatch(setModelsDownloaded(res.data['modelProviderInfo']));
-            const colorDownloadedModels = props.options.map((model: any) => {
+            const colorDownloadedModels = filteredList.map((model: any) => {
                 const checkIfModelExists = modelsDownloaded.find((modelDownloaded: ModelsDownloaded) => modelDownloaded.name === model.configString);
                 return checkIfModelExists !== undefined;
             });
             setColorDownloadedModels(colorDownloadedModels);
         });
-        setHoverBoxList(props.options.map((model: any) => model.description));
-    }, [props.options]);
+        setHoverBoxList(filteredList.map((model: any) => model.description));
+    }, [filteredList, props.options, props.selectedOption]);
 
     return <><Tooltip content={TOOLTIPS_DICT.PROJECT_SETTINGS.EMBEDDINGS.MODEL} placement="right" color="invert">
         <span className="card-title mb-0 label-text flex"><span className="cursor-help underline filtersUnderline">Model</span></span>
     </Tooltip>
-        <Dropdown2 options={props.options} hasSearchBar={true} differentTextColor="green" useDifferentTextColor={colorDownloadedModels} valuePropertyPath="configString"
+        <Dropdown2 options={filteredList && filteredList} hasSearchBar={true} differentTextColor="green" useDifferentTextColor={colorDownloadedModels} valuePropertyPath="configString"
             selectedOption={(option: any) => props.selectedOption(option.configString)} optionsHaveHoverBox={true} hoverBoxList={hoverBoxList}
-            searchTextTyped={(option: string) => props.selectedOption(option)} />
+            searchTextTyped={(option: string) => props.selectedOption(option)}
+            filteredOptions={(option: string) => setFilteredList(props.options.filter((val: any) => val.configString.includes(option)))} />
     </>
 }
 
 
 function SuggestionsAzure(props: SuggestionsProps) {
+    const [filteredList, setFilteredList] = useState<any[]>([]);
+
+    useEffect(() => {
+        if (!props.options) return;
+        setFilteredList(props.options);
+    }, [props.options]);
+
+
     return <><Tooltip content={props.tooltip} placement="right" color="invert">
         <span className="card-title mb-0 label-text flex"><span className="cursor-help underline filtersUnderline">{props.name}</span></span>
     </Tooltip>
-        <Dropdown2 options={props.options} hasSearchBar={true} selectedOption={(option: string) => props.selectedOption(option)} searchTextTyped={(option: string) => props.selectedOption(option)} />
+        <Dropdown2 options={filteredList && filteredList} hasSearchBar={true}
+            selectedOption={(option: string) => props.selectedOption(option)}
+            searchTextTyped={(option: string) => props.selectedOption(option)}
+            filteredOptions={(option: string) => setFilteredList(props.options.filter((val: any) => val.includes(option)))} />
     </>
 }

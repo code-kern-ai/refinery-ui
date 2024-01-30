@@ -18,7 +18,7 @@ import Dropdown2 from "@/submodules/react-components/components/Dropdown2";
 import { useLazyQuery, useMutation } from "@apollo/client";
 import { Tooltip } from "@nextui-org/react";
 import { useRouter } from "next/router";
-import { useCallback, useEffect, useState } from "react";
+import { use, useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
 const ACCEPT_BUTTON = { buttonCaption: 'Create', useButton: true, disabled: true };
@@ -34,7 +34,6 @@ export default function AddZeroShotModal() {
     const heuristicType = useSelector(selectHeuristicType);
     const project = useSelector(selectProject);
     const models = useSelector(selectCachedValue(CacheEnum.ZERO_SHOT_RECOMMENDATIONS));
-    const modelsDownloaded = useSelector(selectModelsDownloaded);
 
     const [labelingTask, setLabelingTask] = useState(null);
     const [attribute, setAttribute] = useState(null);
@@ -43,6 +42,7 @@ export default function AddZeroShotModal() {
     const [showZSAttribute, setShowZSAttribute] = useState<boolean>(false);
     const [hoverBoxList, setHoverBoxList] = useState<any[]>([]);
     const [colorDownloadedModels, setColorDownloadedModels] = useState<boolean[]>([]);
+    const [filteredList, setFilteredList] = useState<any[]>([]);
 
     const [refetchModelsDownload] = useLazyQuery(GET_MODEL_PROVIDER_INFO, { fetchPolicy: 'network-only', nextFetchPolicy: 'cache-first' });
 
@@ -56,7 +56,17 @@ export default function AddZeroShotModal() {
         const language = project.tokenizer.split("_")[0];
         const modelsFiltered = models.filter(model => model.language == language).sort((a, b) => a.prio - b.prio);
         dispatch(setCache(CacheEnum.ZERO_SHOT_RECOMMENDATIONS, modelsFiltered));
-        const hoverBoxList = modelsFiltered.map(model => {
+    }, [project]);
+
+
+    useEffect(() => {
+        if (!models || models.length == 0) return;
+        setFilteredList(models);
+    }, [models]);
+
+    useEffect(() => {
+        if (!filteredList || filteredList.length == 0) return;
+        const hoverBoxList = filteredList.map(model => {
             return {
                 avgTime: model.avgTime,
                 base: model.base,
@@ -67,13 +77,13 @@ export default function AddZeroShotModal() {
         refetchModelsDownload().then((res) => {
             const modelsDownloaded = postProcessingModelsDownload(res.data['modelProviderInfo']);
             dispatch(setModelsDownloaded(res.data['modelProviderInfo']));
-            const colorDownloadedModels = modelsFiltered.map((model: any) => {
+            const colorDownloadedModels = filteredList.map((model: any) => {
                 const checkIfModelExists = modelsDownloaded.find((modelDownloaded: ModelsDownloaded) => modelDownloaded.name === model.configString);
                 return checkIfModelExists !== undefined;
             });
             setColorDownloadedModels(colorDownloadedModels);
         });
-    }, [project]);
+    }, [filteredList, model]);
 
     const [createZeroShotMut] = useMutation(CREATE_ZERO_SHOT_INFORMATION_SOURCE);
 
@@ -149,12 +159,13 @@ export default function AddZeroShotModal() {
                     <span className="cursor-help card-title mb-0 label-text text-left"><span className="underline filtersUnderline">Model</span></span>
                 </div>
             </Tooltip>
-            <Dropdown2 options={models} hasSearchBar={true} optionsHaveLink={true} optionsHaveHoverBox={true} valuePropertyPath="configString"
+            <Dropdown2 options={filteredList && filteredList} hasSearchBar={true} optionsHaveLink={true} optionsHaveHoverBox={true} valuePropertyPath="configString"
                 useDifferentTextColor={colorDownloadedModels} differentTextColor="green"
-                linkList={models && models.map(model => model.link)}
+                linkList={filteredList && filteredList.map(model => model.link)}
                 selectedOption={(option: any) => setModel(option.configString)}
                 hoverBoxList={hoverBoxList}
                 searchTextTyped={(searchText: string) => setModel(searchText)}
+                filteredOptions={(option: any) => setFilteredList(models.filter(model => model.configString.includes(option)))}
             />
         </div>
     </Modal>)
