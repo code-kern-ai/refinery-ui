@@ -44,6 +44,7 @@ export function addGroupToSearchElement(searchElement, labelingTasks) {
             isWithDifferentResults: saveEl.isWithDifferentResults,
         }
         searchElement.groupElements = newElement;
+        searchElement.nameAdd = labelingTasks.find((item: any) => item.id == saveEl.taskId).name;
     } else if (searchElement.groupElements[0].hasOwnProperty('orderBy')) {
         const saveEl = searchElement.groupElements[0];
         const newElement = {
@@ -71,7 +72,6 @@ export function prefillActiveValues(parse: any, fullSearchStoreCopy: any, usersM
         } else {
             if (!el.hasOwnProperty('groupElements')) return;
             el.groupElements.forEach((groupItem: any, index: number) => {
-                console.log(groupItem)
                 if (groupItem.hasOwnProperty('operator')) {
                     if (groupItem.active) {
                         fullSearchStoreCopy[SearchGroup.ATTRIBUTES].groupElements[index].active = true;
@@ -184,9 +184,6 @@ export function checkActiveGroups(group: any, searchGroup: any) {
     for (let [key, value] of Object.entries(group)) {
         const val2 = value as any;
         if (!value.hasOwnProperty('groupElements')) continue;
-        console.log((val2.groupElements.weakSupervisionConfidence && val2.groupElements.weakSupervisionConfidence.active) ||
-            (val2.groupElements.modelCallbackConfidence && val2.groupElements.modelCallbackConfidence.active) ||
-            (val2.groupElements.isWithDifferentResults && val2.groupElements.isWithDifferentResults.active))
         if (Array.isArray(val2.groupElements)) {
             const findActive = val2.groupElements.filter((item: any) => item.active);
             if (findActive.length > 0) searchGroup[key].isOpen = true;

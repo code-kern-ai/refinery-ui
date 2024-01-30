@@ -173,6 +173,7 @@ export default function SearchGroups() {
         dispatch(setFullSearchStore({}));
         dispatch(setSearchGroupsStore({}));
         prepareSearchGroups();
+        dispatch(updateAdditionalDataState('clearFullSearch', false));
     }, [additionalData.clearFullSearch, attributesSortOrder]);
 
     useEffect(() => {
@@ -435,6 +436,8 @@ export default function SearchGroups() {
     function setSortFormControl(index, group) {
         const fullSearchCopy = jsonCopy(fullSearchStore);
         const formControlsIdx = fullSearchCopy[group.key].groupElements['orderBy'][index];
+        const findActive = fullSearchCopy[group.key].groupElements['orderBy'].find((el) => el['active'] == true);
+        if (findActive && findActive != formControlsIdx) findActive['active'] = false;
         if (formControlsIdx['active'] && formControlsIdx['direction'] == -1) {
             formControlsIdx['direction'] = 1;
         } else if (formControlsIdx['active'] && formControlsIdx['direction'] == 1) {

@@ -41,7 +41,7 @@ export function updateSearchParameters(searchElement, attributes, separator, ful
             }
         } else if (p.groupElements.group == SearchGroup.LABELING_TASKS) {
             if (!(p.groupElements.active || (p.groupElements['weakSupervisionConfidence'] && p.groupElements['weakSupervisionConfidence'].active) || (p.groupElements['modelCallbackConfidence'] && p.groupElements['modelCallbackConfidence'].active) || p.groupElements['isWithDifferentResults'])) return;
-            param = createSplittedText(updateSearchParamText(p, attributes, separator, fullSearch[SearchGroup.DRILL_DOWN], searchGroup[p.groupElements.groupKey]?.nameAdd), fullSearch, p);
+            param = createSplittedText(updateSearchParamText(p, attributes, separator, fullSearch[SearchGroup.DRILL_DOWN]), fullSearch, p);
             if (!param) return;
             activeParams.push({ splittedText: param, values: { group: p.groupElements.group, values: p.groupElements } });
         }
@@ -63,7 +63,7 @@ function createSplittedText(i, searchGroup, p) {
 }
 
 
-function updateSearchParamText(searchElement, attributes, separator, drillDownVal, nameAdd?) {
+function updateSearchParamText(searchElement, attributes, separator, drillDownVal) {
     const searchElementCopy = jsonCopy(searchElement);
     if (searchElementCopy.group == SearchGroup.ATTRIBUTES) {
         const attributeType = getAttributeType(attributes, searchElementCopy.name);
