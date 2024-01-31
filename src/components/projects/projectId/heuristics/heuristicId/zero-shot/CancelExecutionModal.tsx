@@ -1,16 +1,18 @@
 import Modal from "@/src/components/shared/modal/Modal";
 import { selectModal } from "@/src/reduxStore/states/modal";
-import { selectHeuristic } from "@/src/reduxStore/states/pages/heuristics";
+import { selectHeuristic, updateHeuristicsState } from "@/src/reduxStore/states/pages/heuristics";
 import { selectProjectId } from "@/src/reduxStore/states/project";
 import { CANCEL_ZERO_SHOT_RUN } from "@/src/services/gql/mutations/heuristics";
 import { ModalButton, ModalEnum } from "@/src/types/shared/modal";
+import { Status } from "@/src/types/shared/statuses";
 import { useMutation } from "@apollo/client";
 import { useCallback, useEffect, useState } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 
 const ABORT_BUTTON = { buttonCaption: 'Cancel', useButton: true, disabled: false };
 
 export default function CancelExecutionModal() {
+    const dispatch = useDispatch();
     const projectId = useSelector(selectProjectId);
     const currentHeuristic = useSelector(selectHeuristic);
     const modalCancel = useSelector(selectModal(ModalEnum.CANCEL_EXECUTION));
@@ -20,7 +22,9 @@ export default function CancelExecutionModal() {
     const [cancelExecutionMut] = useMutation(CANCEL_ZERO_SHOT_RUN);
 
     const cancelExecution = useCallback(() => {
-        cancelExecutionMut({ variables: { projectId: projectId, informationSourceId: currentHeuristic.id, payloadId: currentHeuristic.lastTask.id } }).then(() => { });
+        cancelExecutionMut({ variables: { projectId: projectId, informationSourceId: currentHeuristic.id, payloadId: currentHeuristic.lastTask.id } }).then(() => {
+            dispatch(updateHeuristicsState(currentHeuristic.id, { lastTask: { state: Status.FAILED, iteration: currentHeuristic.lastPayload.iteration }, state: Status.FAILED }));
+        });
     }, [modalCancel, projectId, currentHeuristic]);
 
     useEffect(() => {

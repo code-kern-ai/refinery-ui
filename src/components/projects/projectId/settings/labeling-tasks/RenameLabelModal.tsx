@@ -51,7 +51,7 @@ export default function RenameLabelModal() {
     }, [modalRenameLabel, renameLabelData]);
 
     useEffect(() => {
-        if (!renameLabelData || !renameLabelData.checkResults) return;
+        if (!renameLabelData) return;
         setAcceptButtonRename({
             ...ACCEPT_BUTTON,
             emitFunction: renameLabel,
@@ -98,7 +98,7 @@ export default function RenameLabelModal() {
     }
 
     return (
-        <Modal modalName={ModalEnum.RENAME_LABEL} acceptButton={acceptButtonRename} doNotFullyInit={true}>
+        <Modal modalName={ModalEnum.RENAME_LABEL} acceptButton={acceptButtonRename}>
             {renameLabelData && modalRenameLabel.label && <div className="flex flex-col gap-y-2">
                 <div className="self-center flex flex-row flex-nowrap items-center justify-center">
                     <p className="mr-2 font-bold">Change label name:</p><span

@@ -304,7 +304,7 @@ export default function LabelingSuiteLabeling() {
             let taskList = lVars.taskLookup[attribute.id].lookup;
             taskList = taskList.filter(t => t.task.taskType == LabelingTaskTaskType.INFORMATION_EXTRACTION);
             if (taskList.length == 0) continue;
-            tokenLookupCopy[attribute.id] = { token: recordRequests.token?.attributes.find((a) => a.attributeId == attribute.id)?.token };
+            tokenLookupCopy[attribute.id] = { token: recordRequests.token.attributes?.find((a) => a.attributeId == attribute.id)?.token };
             for (const task of taskList) {
                 const rlas = rlaDataToDisplay[task.task.id];
                 if (!rlas) continue;
