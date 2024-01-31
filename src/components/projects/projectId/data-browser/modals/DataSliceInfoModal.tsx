@@ -19,7 +19,7 @@ export default function DataSliceInfoModal() {
 
     function testLink(link) {
         const linkData = parseLinkFromText(link);
-        router.push(linkData.route, { query: linkData.queryParams });
+        router.push(linkData.fullUrl);
     }
 
     return (<Modal modalName={ModalEnum.DATA_SLICE_INFO}>

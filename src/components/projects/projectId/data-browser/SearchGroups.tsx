@@ -163,7 +163,10 @@ export default function SearchGroups() {
 
     useEffect(() => {
         if (!activeSlice || !usersMap) return;
-        if (activeSlice.sliceType == Slice.STATIC_OUTLIER) return;
+        if (activeSlice.sliceType == Slice.STATIC_OUTLIER) {
+            dispatch(updateAdditionalDataState('clearFullSearch', true));
+            return;
+        }
         prepareNewFormGroups(activeSlice.filterRaw, usersMap);
     }, [activeSlice, usersMap]);
 

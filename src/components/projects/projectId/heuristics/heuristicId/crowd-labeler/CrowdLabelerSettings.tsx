@@ -94,7 +94,7 @@ export default function CrowdLabelerSettings() {
 
     function testLink() {
         const linkData = parseLinkFromText(currentHeuristic.crowdLabelerSettings.accessLink);
-        router.push(linkData.route, { query: linkData.queryParams });
+        router.push(linkData.fullUrl);
     }
 
     function changeAccessLinkLock() {
