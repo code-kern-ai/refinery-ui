@@ -57,7 +57,7 @@ export default function GridCards(props: GridCardsProps) {
                         </a>
                     </div>
                     <div className="flow-root font-normal">
-                        <div className="text-gray-500 float-left truncate" style={{ maxWidth: '250px' }}>
+                        <div className="text-gray-500 float-left" style={{ maxWidth: '250px' }}>
                             {heuristic.description}
                         </div>
                         <div className="float-right">

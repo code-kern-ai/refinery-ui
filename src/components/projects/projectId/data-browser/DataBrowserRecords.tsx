@@ -59,6 +59,12 @@ export default function DataBrowserRecords(props: DataBrowserRecordsProps) {
             dispatch(setSessionData(sessionData));
             router.push(`/projects/${projectId}/edit-records`);
         } else {
+            const getSession = JSON.parse(localStorage.getItem('huddleData'));
+            if (getSession && getSession.recordIds.length > 0) {
+                router.push(`/projects/${projectId}/labeling/${extendedRecords.sessionId}?pos=${index + 1}&type=${LabelingLinkType.SESSION}`);
+                return;
+            }
+
             const huddleData: any = {
                 recordIds: extendedRecords.recordList.map((record) => record.id),
                 partial: true,

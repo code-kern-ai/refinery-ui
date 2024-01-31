@@ -167,7 +167,11 @@ export default function SearchGroups() {
             dispatch(updateAdditionalDataState('clearFullSearch', true));
             return;
         }
-        prepareNewFormGroups(activeSlice.filterRaw, usersMap);
+        const searchGroupsCopy = jsonCopy(searchGroupsStore);
+        Object.keys(searchGroupsCopy).forEach((key) => {
+            searchGroupsCopy[key].isOpen = false;
+        });
+        prepareNewFormGroups(activeSlice.filterRaw, usersMap, searchGroupsCopy);
     }, [activeSlice, usersMap]);
 
     useEffect(() => {
@@ -258,9 +262,8 @@ export default function SearchGroups() {
         setSearchGroupsOrder(searchGroupsOrderCopy);
     }
 
-    function prepareNewFormGroups(filterRaw: any, usersMap: any) {
+    function prepareNewFormGroups(filterRaw: any, usersMap: any, searchGroupsCopy) {
         const parse = JSON.parse(filterRaw);
-        const searchGroupsCopy = jsonCopy(searchGroupsStore);
         if (parse.hasOwnProperty(SearchGroup.CATEGORY)) {
             dispatch(setFullSearchStore(parse));
             const openGroups = checkActiveGroups(parse, searchGroupsCopy);
