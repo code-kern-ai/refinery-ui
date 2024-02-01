@@ -63,7 +63,7 @@ export default function ConfigurationModal() {
                         }} checked={configuration.highlightText}
                             className="focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300 rounded cursor-pointer" />
                     </div>
-                    <div className="ml-3 text-sm cursor-pointer">
+                    <div className="ml-3 text-sm cursor-pointer" onClick={() => toggleConfigurationOption('highlightText')}>
                         <label className="font-medium text-gray-700 cursor-pointer">Highlight text</label>
                         <p id="comments-description" className="text-gray-500">During search, you can remove the text highlighting. This makes the search a bit faster.</p>
                     </div>
@@ -73,7 +73,7 @@ export default function ConfigurationModal() {
                         <input id="comments" type="checkbox" onChange={() => toggleConfigurationOption('weakSupervisionRelated')} checked={configuration.weakSupervisionRelated}
                             className="focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300 rounded cursor-pointer" />
                     </div>
-                    <div className="ml-3 text-sm cursor-pointer" >
+                    <div className="ml-3 text-sm cursor-pointer" onClick={() => toggleConfigurationOption('weakSupervisionRelated')} >
                         <label className="font-medium text-gray-700 cursor-pointer">Only show weakly supervised-related</label>
                         <p id="comments-description" className="text-gray-500">If checked, the data-browser will only show you heuristics that affect the weak supervision.</p>
                     </div>
@@ -83,7 +83,7 @@ export default function ConfigurationModal() {
                         <input id="comments" type="checkbox" onChange={toggleLineBreaks} checked={configuration.lineBreaks != LineBreaksType.NORMAL}
                             className="focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300 rounded cursor-pointer" />
                     </div>
-                    <div className="ml-3 text-sm cursor-pointer">
+                    <div className="ml-3 text-sm cursor-pointer" onClick={toggleLineBreaks}>
                         <label className="font-medium text-gray-700 cursor-pointer">Visible line breaks</label>
                         <p className="text-gray-500">If checked, the attributes in the data-browser and labeling page will be shown with line breaks</p>
                     </div>
