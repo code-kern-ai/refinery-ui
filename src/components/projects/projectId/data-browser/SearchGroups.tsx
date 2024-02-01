@@ -264,12 +264,23 @@ export default function SearchGroups() {
 
     function prepareNewFormGroups(filterRaw: any, usersMap: any, searchGroupsCopy) {
         const parse = JSON.parse(filterRaw);
+        const labelingTasksInSlice = Object.keys(parse).filter((el) => el.includes(SearchGroup.LABELING_TASKS));
+        const tasksIds = labelingTasksInSlice.map((el) => el.split('_')[2]);
+        const fullSearchStoreCopy = parse.hasOwnProperty(SearchGroup.CATEGORY) ? parse : jsonCopy(fullSearchStore);
+        labelingTasks.forEach((task, index) => {
+            const searchGroupLabelingTasks = getBasicSearchGroup(SearchGroup.LABELING_TASKS, GROUP_SORT_ORDER + 300 + index, task.name, task.id);
+            if (!tasksIds.includes(task.id)) {
+                fullSearchStoreCopy[SearchGroup.LABELING_TASKS + '_' + task.id] = { groupElements: [] };
+                for (let baseItem of getBasicGroupItems(searchGroupLabelingTasks.group, searchGroupLabelingTasks.key)) {
+                    fullSearchStoreCopy[SearchGroup.LABELING_TASKS + '_' + task.id].groupElements = labelingTasksCreateSearchGroup(baseItem, task, ++GLOBAL_SEARCH_GROUP_COUNT);
+                }
+            }
+        });
         if (parse.hasOwnProperty(SearchGroup.CATEGORY)) {
-            dispatch(setFullSearchStore(parse));
+            dispatch(setFullSearchStore(fullSearchStoreCopy));
             const openGroups = checkActiveGroups(parse, searchGroupsCopy);
             dispatch(setSearchGroupsStore(openGroups));
         } else {
-            const fullSearchStoreCopy = jsonCopy(fullSearchStore);
             const prefilledValues = prefillActiveValues(parse, fullSearchStoreCopy, usersMap);
             dispatch(setFullSearchStore(prefilledValues));
             const openGroups = checkActiveGroups(fullSearchStoreCopy, searchGroupsCopy);
