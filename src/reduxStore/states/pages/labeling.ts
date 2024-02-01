@@ -31,7 +31,7 @@ type LabelingSuiteState = {
 function getInitState(): LabelingSuiteState {
     return {
         links: {
-            availableLinks: [],
+            availableLinks: null,
             selectedLink: null,
         },
         recordRequests: {

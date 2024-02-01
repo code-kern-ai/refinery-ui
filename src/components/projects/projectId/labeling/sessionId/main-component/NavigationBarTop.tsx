@@ -1,7 +1,7 @@
 import { selectUser } from "@/src/reduxStore/states/general";
-import { selectAvailableLinks, selectSelectedLink, selectUserDisplayId, selectUserIconsData, setHoverGroupDict, setSelectedLink, setUserDisplayId } from "@/src/reduxStore/states/pages/labeling";
+import { selectAvailableLinks, selectSelectedLink, selectUserDisplayId, selectUserIconsData, setAvailableLinks, setHoverGroupDict, setSelectedLink, setUserDisplayId } from "@/src/reduxStore/states/pages/labeling";
 import { selectProjectId } from "@/src/reduxStore/states/project";
-import { UserType } from "@/src/types/components/projects/projectId/labeling/labeling-main-component";
+import { LabelingLinkType, UserType } from "@/src/types/components/projects/projectId/labeling/labeling-main-component";
 import { UserRole } from "@/src/types/shared/sidebar";
 import { SessionManager } from "@/src/util/classes/labeling/session-manager";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
@@ -11,6 +11,9 @@ import { useRouter } from "next/router";
 import { useDispatch, useSelector } from "react-redux";
 import style from '@/src/styles/components/projects/projectId/labeling.module.css';
 import Dropdown2 from "@/submodules/react-components/components/Dropdown2";
+import { useEffect } from "react";
+import { useLazyQuery } from "@apollo/client";
+import { AVAILABLE_LABELING_LINKS } from "@/src/services/gql/queries/labeling";
 
 export default function NavigationBarTop() {
     const router = useRouter();
@@ -22,6 +25,19 @@ export default function NavigationBarTop() {
     const selectedLink = useSelector(selectSelectedLink);
     const userIconsData = useSelector(selectUserIconsData);
     const displayId = useSelector(selectUserDisplayId);
+
+    const [refetchAvailableLinks] = useLazyQuery(AVAILABLE_LABELING_LINKS, { fetchPolicy: 'no-cache' });
+
+    useEffect(() => {
+        if (user?.role == UserRole.ENGINEER || !SessionManager.labelingLinkData) return;
+        const heuristicId = SessionManager.labelingLinkData.linkType == LabelingLinkType.HEURISTIC ? SessionManager.labelingLinkData.huddleId : null;
+        refetchAvailableLinks({ variables: { projectId: projectId, assumedRole: user?.role, assumedHeuristicId: heuristicId } }).then((result) => {
+            const availableLinks = result['data']['availableLinks'];
+            dispatch(setAvailableLinks(availableLinks));
+            const linkRoute = router.asPath.split("?")[0];
+            dispatch(setSelectedLink(availableLinks.find(link => link.link.split("?")[0] == linkRoute)));
+        });
+    }, [SessionManager.labelingLinkData]);
 
     function goToRecordIde() {
         const sessionId = router.query.sessionId as string;
@@ -83,8 +99,8 @@ export default function NavigationBarTop() {
 
                     </>) : (<div className="flex justify-center items-center overflow-visible">
                         <span className="mr-2"> Available Tasks:</span>
-                        <Dropdown2 options={availableLinks?.length > 0 ? availableLinks : ['No links available']} disabled={availableLinks?.length == 0}
-                            buttonName={selectedLink ? selectedLink.name : 'Select slice'} selectedOption={(option: any) => dispatch(setSelectedLink(option.name))} />
+                        <Dropdown2 options={availableLinks && availableLinks.length > 0 ? availableLinks : ['No links available']} disabled={availableLinks?.length == 0}
+                            buttonName={selectedLink ? selectedLink.name : 'Select slice'} selectedOption={(option: any) => dispatch(setSelectedLink(option))} />
                     </div>)}
                 </div>
                 <div className="flex flex-row flex-nowrap items-center">
