@@ -3,6 +3,7 @@ import { HeuristicsEditorProps } from "@/src/types/components/projects/projectId
 import { Editor } from "@monaco-editor/react";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
+import { debounceTime, distinctUntilChanged, fromEvent } from "rxjs";
 
 const EDITOR_OPTIONS = { theme: 'vs-light', language: 'python', readOnly: false };
 
@@ -22,11 +23,15 @@ export default function HeuristicsEditor(props: HeuristicsEditorProps) {
 
     useEffect(() => {
         if (!currentHeuristic || currentHeuristic.sourceCodeToDisplay == editorValue) return;
-        const delayInputTimeoutId = setTimeout(() => {
+        const observer = fromEvent(document, 'keyup');
+        const subscription = observer.pipe(
+            debounceTime(2000),
+            distinctUntilChanged()
+        ).subscribe(() => {
             props.updatedSourceCode(editorValue);
             props.setCheckUnsavedChanges(hasUnsavedChanges());
-        }, 1000);
-        return () => clearTimeout(delayInputTimeoutId);
+        });
+        return () => subscription.unsubscribe();
     }, [editorValue, currentHeuristic]);
 
     function openBricksIntegrator() {

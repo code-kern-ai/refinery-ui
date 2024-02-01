@@ -37,7 +37,6 @@ import { InformationSourceCodeLookup, InformationSourceExamples } from "@/src/ut
 import { getInformationSourceTemplate } from "@/src/util/components/projects/projectId/heuristics/heuristics-helper";
 import Dropdown2 from "@/submodules/react-components/components/Dropdown2";
 import LoadingIcon from "@/src/components/shared/loading/LoadingIcon";
-import { getEmptyBricksIntegratorConfig } from "@/src/util/shared/bricks-integrator-helper";
 
 export default function ActiveLearning() {
     const dispatch = useDispatch();
@@ -184,7 +183,8 @@ export default function ActiveLearning() {
         const labelingTaskFinalId = labelingTaskId ?? currentHeuristic.labelingTaskId;
         const finalSourceCode = value.replace(regMatch[0], getClassLine(null, labelingTasks, labelingTaskFinalId));
         updateHeuristicMut({ variables: { projectId: projectId, informationSourceId: currentHeuristic.id, labelingTaskId: labelingTaskFinalId, code: finalSourceCode, name: regMatch[1] } }).then((res) => {
-            dispatch(updateHeuristicsState(currentHeuristic.id, { sourceCode: finalSourceCode, name: regMatch[1] }))
+            dispatch(updateHeuristicsState(currentHeuristic.id, { sourceCode: finalSourceCode, name: regMatch[1] }));
+            updateSourceCodeToDisplay(finalSourceCode);
         });
     }
 
