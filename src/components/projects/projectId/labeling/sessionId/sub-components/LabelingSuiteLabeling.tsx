@@ -68,11 +68,11 @@ export default function LabelingSuiteLabeling() {
     const [removeGoldStarMut] = useMutation(REMOVE_GOLD_STAR_ANNOTATION_FOR_TASK);
 
     useEffect(() => {
-        if (!projectId || !attributes || !recordRequests || !user) return;
+        if (!projectId || !attributes || !recordRequests || !user || !settings) return;
         attributesChanged();
         prepareRlaData();
         rebuildGoldInfo();
-    }, [projectId, attributes, recordRequests, user]);
+    }, [projectId, attributes, recordRequests, user, settings]);
 
     useEffect(() => {
         if (!labelingTasks || !lVars) return;
