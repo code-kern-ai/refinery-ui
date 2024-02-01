@@ -16,6 +16,7 @@ import LabelingInfoTableModal from "./LabelingInfoTableModal";
 import { LabelingPageParts } from "@/src/types/components/projects/projectId/labeling/labeling-main-component";
 import style from '@/src/styles/components/projects/projectId/labeling.module.css';
 import { LabelSourceHover } from "@/src/types/components/projects/projectId/labeling/labeling";
+import { UserRole } from "@/src/types/shared/sidebar";
 
 
 function shouldHighLight(tmpHighlightIds: string[], comparedIds: string[], additionalComparedIds?: string[]) {
@@ -200,7 +201,7 @@ export default function LabelingSuiteOverviewTable() {
             </div>
             <LabelingInfoTableModal dataToDisplay={dataToDisplay} />
         </>) : (<>
-            {!settings.showHeuristics && dataHasHeuristics && <p className="text-gray-500 p-5">Heuristics display is currently disabled</p>}
+            {!settings.showHeuristics && dataHasHeuristics && user?.role == UserRole.ENGINEER && <p className="text-gray-500 p-5">Heuristics display is currently disabled</p>}
         </>)
         }
     </>)

@@ -488,10 +488,11 @@ export default function LabelingSuiteLabeling() {
         const labelSelection = document.getElementById('label-selection-box');
         if (!labelSelection) return;
         const baseBom = document.getElementById('base-dom-task-header');
-        const baseBox = baseBom.getBoundingClientRect();
+        const baseBox = baseBom?.getBoundingClientRect();
+        if (!baseBox) return;
         const { top, left, height } = e.getBoundingClientRect();
         const heightLabelSelectionBox = 180;
-        const posTop = (top + height - baseBox.top - heightLabelSelectionBox)
+        const posTop = (top + height - baseBox.top - heightLabelSelectionBox);
         const posLeft = (left - baseBox.left);
         setPosition({ top: posTop, left: posLeft });
     }

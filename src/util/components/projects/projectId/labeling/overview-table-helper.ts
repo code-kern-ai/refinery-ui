@@ -141,7 +141,6 @@ export function getLabelData(e: any): any {
 
 export function canDeleteRla(rla, user): boolean {
     if (rla.sourceType != LabelSource.MANUAL) return false;
-    if (user.role != UserRole.ENGINEER) return false;
     if (rla.isGoldStar) return true;
     return rla.createdBy == user.id;
 }

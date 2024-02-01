@@ -30,6 +30,7 @@ import { REQUEST_COMMENTS } from "@/src/services/gql/queries/projects";
 import { CommentType } from "@/src/types/shared/comments";
 import { unsubscribeWSOnDestroy } from "@/src/services/base/web-sockets/web-sockets-helper";
 import { getEmptyBricksIntegratorConfig } from "@/src/util/shared/bricks-integrator-helper";
+import { LabelingTask } from "@/src/types/components/projects/projectId/settings/labeling-tasks";
 
 const LOCAL_STORAGE_KEY = 'labelingSuiteSettings';
 
@@ -251,8 +252,16 @@ export default function LabelingMainComponent() {
     function refetchLabelingTasksAndProcess() {
         refetchLabelingTasksByProjectId({ variables: { projectId: projectId } }).then((res) => {
             const labelingTasks = postProcessLabelingTasks(res['data']['projectByProjectId']['labelingTasks']['edges']);
-            dispatch(setLabelingTasksAll(postProcessLabelingTasksSchema(labelingTasks)));
+            const labelingTasksProcessed = postProcessLabelingTasksSchema(labelingTasks);
+            dispatch(setLabelingTasksAll(prepareTasksForRole(labelingTasksProcessed)));
         });
+    }
+
+    function prepareTasksForRole(taskData: LabelingTask[]): LabelingTask[] {
+        if (user?.role != UserRole.ANNOTATOR) return taskData;
+        const taskId = JSON.parse(localStorage.getItem('huddleData')).allowedTask;
+        if (!taskId) return null;
+        else return taskData.filter(t => t.id == taskId);
     }
 
     const handleWebsocketNotification = useCallback((msgParts: string[]) => {
@@ -268,7 +277,7 @@ export default function LabelingMainComponent() {
                 dispatch(updateRecordRequests('rla', null));
             }
         } else if (['payload_finished', 'weak_supervision_finished', 'rla_created', 'rla_deleted'].includes(msgParts[1])) {
-            refetchRla({ variables: { projectId, recordId: SessionManager.currentRecordId } }).then((result) => {
+            refetchRla({ variables: { projectId, recordId: record.id } }).then((result) => {
                 dispatch(updateRecordRequests('rla', result?.data?.recordByRecordId?.recordLabelAssociations));
             });
         } else if (['access_link_changed', 'access_link_removed'].includes(msgParts[1])) {
@@ -295,7 +304,7 @@ export default function LabelingMainComponent() {
         </div>}
         <NavigationBarTop />
         <div className="flex-grow overflow-y-auto" style={{ height: 'calc(100vh - 194px)' }}>
-            {settings.task.show && <LabelingSuiteTaskHeader />}
+            {settings.task.show && user?.role != UserRole.ANNOTATOR && <LabelingSuiteTaskHeader />}
             <LabelingSuiteLabeling />
             {settings.overviewTable.show && SessionManager.currentRecordId !== "deleted" && <LabelingSuiteOverviewTable />}
         </div>
