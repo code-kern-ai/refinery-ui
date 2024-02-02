@@ -35,12 +35,13 @@ export function LookupListCard(props: LookupListCardProps) {
                 <div className="text-gray-900 float-left italic">
                     {props.lookupList.name}
                 </div>
-                <div onClick={() => {
+                <a href={`/refinery/projects/${projectId}/lookup-lists/${props.lookupList.id}`} onClick={(e) => {
+                    e.preventDefault();
                     router.push(`/projects/${projectId}/lookup-lists/${props.lookupList.id}`);
                 }} className="text-green-800 float-right cursor-pointer">
                     Details
                     <IconArrowRight className="h-5 w-5 inline-block text-green-800" />
-                </div>
+                </a>
             </div>
             <div className={`flex-row gap-16 font-normal text-gray-500 ${props.lookupList.description ? 'flex' : 'block'}`}>
                 <div className="line-clamp-wrapper">
