@@ -32,7 +32,7 @@ export default function CrowdLabelerSettings() {
     const [updateHeuristicMut] = useMutation(UPDATE_INFORMATION_SOURCE);
     const [createAccessLinkMut] = useMutation(CREATE_ACCESS_LINK);
     const [removeAccessLinkMut] = useMutation(REMOVE_ACCESS_LINK);
-    const [refetchAccessLink] = useLazyQuery(GET_ACCESS_LINK, { fetchPolicy: 'cache-first' });
+    const [refetchAccessLink] = useLazyQuery(GET_ACCESS_LINK, { fetchPolicy: 'network-only' });
     const [changeAccessLinkMut] = useMutation(LOCK_ACCESS_LINK);
 
     useEffect(() => {
