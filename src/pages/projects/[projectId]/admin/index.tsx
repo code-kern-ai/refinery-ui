@@ -7,6 +7,7 @@ import { useDispatch } from "react-redux";
 export default function ProjectAdminPage() {
 
     const dispatch = useDispatch();
+
     useEffect(() => {
         dispatch(setCurrentPage(CurrentPage.ADMIN_PAGE));
         dispatch(setDisplayIconComments(true));
