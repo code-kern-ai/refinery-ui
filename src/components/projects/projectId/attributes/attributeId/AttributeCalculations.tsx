@@ -271,11 +271,13 @@ export default function AttributeCalculation() {
             <div className={`sticky z-40 h-12 ${isHeaderNormal ? 'top-1' : '-top-5'}`}>
                 <div className={`bg-white flex-grow ${isHeaderNormal ? '' : 'shadow'}`}>
                     <div className={`flex-row justify-start items-center inline-block ${isHeaderNormal ? 'p-0' : 'flex py-2'}`} style={{ transition: 'all .25s ease-in-out' }}>
-                        <button onClick={() => router.push(`/projects/${projectId}/settings`)}
-                            className="text-green-800 text-sm font-medium">
+                        <a href={`/refinery/projects/${projectId}/settings`} onClick={(e) => {
+                            e.preventDefault();
+                            router.push(`/projects/${projectId}/settings`);
+                        }} className="text-green-800 text-sm font-medium">
                             <IconArrowLeft className="h-5 w-5 inline-block text-green-800" />
                             <span className="leading-5">Go back</span>
-                        </button>
+                        </a>
                         {!isHeaderNormal && <div className="mx-4 text-sm leading-5 font-medium text-gray-500 inline-block">{currentAttribute.name}</div>}
                         <Statuses status={currentAttribute.state} page="attributes" initialCaption="Registered" />
                     </div>
