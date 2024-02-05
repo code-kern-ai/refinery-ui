@@ -10,7 +10,7 @@ import { GET_ATTRIBUTES_BY_PROJECT_ID, GET_EMBEDDING_SCHEMA_BY_PROJECT_ID, GET_L
 import { selectAttributes, selectLabelingTasksAll, setAllAttributes, setAllEmbeddings, setLabelingTasksAll } from "@/src/reduxStore/states/pages/settings";
 import { postProcessLabelingTasks, postProcessLabelingTasksSchema } from "@/src/util/components/projects/projectId/settings/labeling-tasks-helper";
 import { GET_ORGANIZATION_USERS_WITH_COUNT } from "@/src/services/gql/queries/organizations";
-import { selectAllUsers, setComments } from "@/src/reduxStore/states/general";
+import { selectAllUsers, selectUser, setComments } from "@/src/reduxStore/states/general";
 import DataBrowserRecords from "./DataBrowserRecords";
 import { postProcessingEmbeddings } from "@/src/util/components/projects/projectId/settings/embeddings-helper";
 import { WebSocketsService } from "@/src/services/base/web-sockets/WebSocketsService";
@@ -31,6 +31,7 @@ export default function DataBrowser() {
     const users = useSelector(selectAllUsers);
     const labelingTasks = useSelector(selectLabelingTasksAll);
     const attributes = useSelector(selectAttributes);
+    const user = useSelector(selectUser);
 
     const [searchRequest, setSearchRequest] = useState(SEARCH_REQUEST);
 
@@ -48,7 +49,7 @@ export default function DataBrowser() {
 
     useEffect(() => {
         if (!projectId) return;
-        if (!users) return;
+        if (!users || !user) return;
         refetchDataSlicesAndProcess();
         refetchAttributesAndProcess();
         refetchLabelingTasksAndProcess();
@@ -60,7 +61,7 @@ export default function DataBrowser() {
             whitelist: ['data_slice_created', 'data_slice_updated', 'data_slice_deleted', 'label_created', 'label_deleted', 'labeling_task_deleted', 'labeling_task_updated', 'labeling_task_created', 'information_source_created', 'information_source_updated', 'information_source_deleted', 'attributes_updated', 'calculate_attribute', 'embedding', 'embedding_deleted'],
             func: handleWebsocketNotification
         });
-    }, [projectId, users]);
+    }, [projectId, users, user]);
 
     useEffect(() => {
         if (!projectId) return;
@@ -127,7 +128,7 @@ export default function DataBrowser() {
 
     function refetchUsersCountAndProcess() {
         refetchUsersCount({ variables: { projectId: projectId } }).then((res) => {
-            dispatch(setUsersMapCount(postProcessUsersCount(res.data['allUsersWithRecordCount'], users)));
+            dispatch(setUsersMapCount(postProcessUsersCount(res.data['allUsersWithRecordCount'], users, user)));
         });
     }
 

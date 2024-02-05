@@ -48,7 +48,7 @@ function getInitState(): DataBrowserState {
             clearFullSearch: false,
             canUpdateDynamicSlice: false
         },
-        usersMapCount: {},
+        usersMapCount: null,
         searchRecordsExtended: {
             fullCount: 0,
             queryLimit: 0,

@@ -75,10 +75,10 @@ export default function SearchGroups() {
     const [refetchStaticSliceCurrentCount] = useLazyQuery(GET_STATIC_DATA_SLICE_CURRENT_COUNT, { fetchPolicy: "network-only" });
 
     useEffect(() => {
-        if (!projectId || !users || !labelingTasks || !attributesSortOrder) return;
+        if (!projectId || !users || !labelingTasks || !attributesSortOrder || !usersMap) return;
         prepareSearchGroups();
         refetchCurrentWeakSupervisionAndProcess();
-    }, [projectId, users, labelingTasks, attributesSortOrder]);
+    }, [projectId, users, labelingTasks, attributesSortOrder, usersMap]);
 
     useEffect(() => {
         if (!attributes) return;
@@ -220,7 +220,7 @@ export default function SearchGroups() {
         fullSearchCopy[SearchGroup.USER_FILTER] = { groupElements: [] };
         searchGroupsCopy[SearchGroup.USER_FILTER] = searchGroupUserFilter;
         for (let baseItem of getBasicGroupItems(searchGroupUserFilter.group, searchGroupUserFilter.key)) {
-            fullSearchCopy[SearchGroup.USER_FILTER].groupElements = userCreateSearchGroup(baseItem, ++GLOBAL_SEARCH_GROUP_COUNT, users);
+            fullSearchCopy[SearchGroup.USER_FILTER].groupElements = userCreateSearchGroup(baseItem, ++GLOBAL_SEARCH_GROUP_COUNT, usersMap);
         }
 
         // Labeling Tasks
@@ -561,7 +561,7 @@ export default function SearchGroups() {
                     </div>
                 </div>
             </div>
-            <div className={`${style.transitionAll} ml-4`} style={{ maxHeight: searchGroupsStore[group.key].isOpen ? '500px' : '0px', display: searchGroupsStore[group.key].isOpen ? 'block' : 'none' }}>
+            <div className={`${style.transitionAll} ml-4`} style={{ maxHeight: searchGroupsStore[group.key].isOpen ? '1200px' : '0px', display: searchGroupsStore[group.key].isOpen ? 'block' : 'none' }}>
                 <form>
                     {searchGroupsStore[group.key].group == SearchGroup.ATTRIBUTES && <div className="contents mx-2">
                         {fullSearchStore[group.key].groupElements.map((groupItem, index) => (<div key={groupItem.id}>
