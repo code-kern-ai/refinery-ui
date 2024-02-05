@@ -24,7 +24,7 @@ import { DangerZoneEnum } from "@/src/types/shared/danger-zone";
 import ContainerLogs from "@/src/components/shared/logs/ContainerLogs";
 import LoadingIcon from "@/src/components/shared/loading/LoadingIcon";
 import { WebSocketsService } from "@/src/services/base/web-sockets/WebSocketsService";
-import { timer } from "rxjs";
+import { debounceTime, distinctUntilChanged, fromEvent, timer } from "rxjs";
 import { unsubscribeWSOnDestroy } from "@/src/services/base/web-sockets/web-sockets-helper";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
 import { selectAllUsers, setBricksIntegrator, setComments } from "@/src/reduxStore/states/general";
@@ -78,7 +78,9 @@ export default function AttributeCalculation() {
         if (!currentAttribute || attributes.length == 0) {
             refetchAttributes({ variables: { projectId: projectId, stateFilter: ['ALL'] } }).then((res) => {
                 dispatch(setAllAttributes(res.data['attributesByProjectId']));
-                setCurrentAttribute(postProcessCurrentAttribute(attributes.find((attribute) => attribute.id === router.query.attributeId)));
+                const currentAttribute = postProcessCurrentAttribute(attributes.find((attribute) => attribute.id === router.query.attributeId));
+                setCurrentAttribute(currentAttribute);
+                setEditorValue(currentAttribute.sourceCodeToDisplay);
             });
         }
         if (lookupLists.length == 0) {
@@ -101,8 +103,6 @@ export default function AttributeCalculation() {
 
     useEffect(() => {
         if (!currentAttribute) return;
-        if (currentAttribute.state == AttributeState.USABLE) return;
-        setEditorValue(currentAttribute.sourceCodeToDisplay);
         if (currentAttribute.saveSourceCode) {
             updateSourceCode(currentAttribute.sourceCode);
         }
@@ -118,14 +118,19 @@ export default function AttributeCalculation() {
     }, [allUsers, projectId]);
 
     useEffect(() => {
-        const delayInputTimeoutId = setTimeout(() => {
+        if (!currentAttribute) return;
+        const observer = fromEvent(document, 'keyup');
+        const subscription = observer.pipe(
+            debounceTime(2000),
+            distinctUntilChanged()
+        ).subscribe(() => {
             const regMatch: any = getPythonFunctionRegExMatch(editorValue);
             changeAttributeName(regMatch ? regMatch[2] : '');
             setCurrentAttribute({ ...currentAttribute, sourceCode: editorValue });
             updateSourceCode(editorValue);
-        }, 1000);
-        return () => clearTimeout(delayInputTimeoutId);
-    }, [editorValue, 1000]);
+        });
+        return () => subscription.unsubscribe();
+    }, [editorValue, currentAttribute]);
 
     function setUpCommentsRequests() {
         const requests = [];
@@ -213,7 +218,6 @@ export default function AttributeCalculation() {
         var regMatch: any = getPythonFunctionRegExMatch(value);
         const finalSourceCode = value.replace(regMatch[0], 'def ac(record)');
         updateAttributeMut({ variables: { projectId: projectId, attributeId: currentAttribute.id, sourceCode: finalSourceCode } }).then(() => {
-            dispatch(setBricksIntegrator(getEmptyBricksIntegratorConfig()));
         });
     }
 
@@ -350,7 +354,7 @@ export default function AttributeCalculation() {
                             moduleTypeFilter="generator,classifier" functionType="Attribute"
                             nameLookups={attributes.map(a => a.name)}
                             preparedCode={(code: string) => {
-                                updateSourceCode(code);
+                                setEditorValue(code);
                                 setIsInitial(false);
                             }} />
                         <Tooltip content={TOOLTIPS_DICT.ATTRIBUTE_CALCULATION.AVAILABLE_LIBRARIES} placement="left" color="invert">
