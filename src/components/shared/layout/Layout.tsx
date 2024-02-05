@@ -78,7 +78,7 @@ export default function Layout({ children }) {
 
     function initializeNotificationDeletion() {
         if (deletionTimer != null) return;
-        const saveDelTimer = interval(3000).subscribe((x) => {
+        const saveDelTimer = interval(6000).subscribe((x) => {
             if (notifications.length > 0) {
                 const notificationsCopy = [...notifications];
                 notificationsCopy.shift();
@@ -103,7 +103,7 @@ export default function Layout({ children }) {
         if (msgParts[1] == 'notification_created') {
             if (msgParts[2] != user?.id) return;
             if (refetchTimer) return;
-            setRefetchTimer(timer(1000).subscribe((x) => {
+            setRefetchTimer(timer(3000).subscribe((x) => {
                 refetchNotificationsAndProcess();
                 setRefetchTimer(null);
             }));
