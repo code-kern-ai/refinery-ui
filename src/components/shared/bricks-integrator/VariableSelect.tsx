@@ -14,6 +14,7 @@ import { postProcessingAttributes } from "@/src/util/components/projects/project
 import { postProcessLabelingTasks } from "@/src/util/components/projects/projectId/settings/labeling-tasks-helper";
 import { getIsoCodes } from "@/src/util/shared/bricks-integrator-helper";
 import Dropdown2 from "@/submodules/react-components/components/Dropdown2";
+import { useConsoleLog } from "@/submodules/react-components/hooks/useConsoleLog";
 import { useLazyQuery } from "@apollo/client";
 import { IconPlus, IconTrash } from "@tabler/icons-react";
 import { useRouter } from "next/router";
@@ -201,6 +202,8 @@ export default function VariableSelect(props: VariableSelectProps) {
         WebSocketsService.updateFunctionPointer(projectId, CurrentPage.BRICKS_INTEGRATOR, handleWebsocketNotification)
     }, [handleWebsocketNotification, projectId]);
 
+    useConsoleLog(props.variable, 'props.variable')
+
     return (<>
         {props.variable && props.variable.values.map((v, index) => (<div key={index} className="col-start-2 flex flex-row flex-nowrap items-center gap-x-2 my-2">
             {props.variable.type == BricksVariableType.ATTRIBUTE &&
@@ -262,7 +265,7 @@ export default function VariableSelect(props: VariableSelectProps) {
                 <Dropdown2 options={props.variable.allowedValues} buttonName={props.variable.values[index] ? props.variable.values[index] : 'Select option'}
                     selectedOption={(option: any) => {
                         const propsCopy = { ...props };
-                        propsCopy.variable.values[index] = option.name;
+                        propsCopy.variable.values[index] = option;
                         props.sendOption();
                     }}
                 />
