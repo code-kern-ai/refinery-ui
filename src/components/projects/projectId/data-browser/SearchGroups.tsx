@@ -10,7 +10,7 @@ import { SearchOperator } from "@/src/types/components/projects/projectId/data-b
 import { checkDecimalPatterns, getAttributeType, getSearchOperatorTooltip } from "@/src/util/components/projects/projectId/data-browser/search-operators-helper";
 import { DataTypeEnum } from "@/src/types/shared/general";
 import { selectAllUsers, selectUser } from "@/src/reduxStore/states/general";
-import { selectActiveSearchParams, selectActiveSlice, selectAdditionalData, selectConfiguration, selectDataSlicesAll, selectFullSearchStore, selectIsTextHighlightNeeded, selectRecords, selectSearchGroupsStore, selectTextHighlight, selectUniqueValuesDict, selectUsersCount, setActiveDataSlice, setActiveSearchParams, setFullSearchStore, setIsTextHighlightNeeded, setRecordsInDisplay, setSearchGroupsStore, setSearchRecordsExtended, setTextHighlight, updateAdditionalDataState } from "@/src/reduxStore/states/pages/data-browser";
+import { selectActiveSearchParams, selectActiveSlice, selectAdditionalData, selectConfiguration, selectDataSlicesAll, selectFullSearchStore, selectIsTextHighlightNeeded, selectRecords, selectSearchGroupsStore, selectSimilaritySearch, selectTextHighlight, selectUniqueValuesDict, selectUsersCount, setActiveDataSlice, setActiveSearchParams, setFullSearchStore, setIsTextHighlightNeeded, setRecordsInDisplay, setSearchGroupsStore, setSearchRecordsExtended, setTextHighlight, updateAdditionalDataState } from "@/src/reduxStore/states/pages/data-browser";
 import { Tooltip } from "@nextui-org/react";
 import { setModalStates } from "@/src/reduxStore/states/modal";
 import { ModalEnum } from "@/src/types/shared/modal";
@@ -56,6 +56,7 @@ export default function SearchGroups() {
     const fullSearchStore = useSelector(selectFullSearchStore);
     const searchGroupsStore = useSelector(selectSearchGroupsStore);
     const recordList = useSelector(selectRecords).recordList;
+    const recordsInDisplay = useSelector(selectSimilaritySearch).recordsInDisplay;
 
     const [searchGroupsOrder, setSearchGroupsOrder] = useState<{ order: number; key: string }[]>([]);
     const [attributesSortOrder, setAttributeSortOrder] = useState([]);
@@ -160,6 +161,7 @@ export default function SearchGroups() {
         if (!findDataSLice || additionalData.canUpdateDynamicSlice) return;
         const activeParams = updateSearchParameters(Object.values(JSON.parse(findDataSLice.filterRaw)), attributes, configuration.separator, jsonCopy(fullSearchStore), searchGroupsStore, labelingTasks);
         dispatch(setActiveSearchParams(activeParams));
+        dispatch(setRecordsInDisplay(false));
         dispatch(updateAdditionalDataState('canUpdateDynamicSlice', true));
     }, [activeSlice, labelingTasks, searchGroupsStore, dataSlices]);
 
@@ -174,7 +176,14 @@ export default function SearchGroups() {
             searchGroupsCopy[key].isOpen = false;
         });
         prepareNewFormGroups(activeSlice.filterRaw, usersMap, searchGroupsCopy);
-    }, [activeSlice, usersMap]);
+    }, [activeSlice, usersMap, recordsInDisplay]);
+
+    useEffect(() => {
+        if (recordsInDisplay) {
+            dispatch(updateAdditionalDataState('clearFullSearch', true));
+            dispatch(setActiveSearchParams([]));
+        }
+    }, [recordsInDisplay]);
 
     useEffect(() => {
         if (!additionalData.clearFullSearch) return;
@@ -490,6 +499,7 @@ export default function SearchGroups() {
         const activeParams = updateSearchParameters(Object.values(fullSearchCopy), attributes, configuration.separator, jsonCopy(fullSearchCopy), searchGroupsStore);
         dispatch(setActiveSearchParams(activeParams));
         dispatch(updateAdditionalDataState('clearFullSearch', false));
+        dispatch(setRecordsInDisplay(false));
         if (activeSlice && activeSlice.static) dispatch(updateAdditionalDataState('displayOutdatedWarning', true));
     }
 
