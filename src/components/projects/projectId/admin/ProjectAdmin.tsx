@@ -75,8 +75,8 @@ export default function ProjectAdmin() {
                 <label>Personal Access Tokens</label>
             </div>
             <div className="mt-1">
-                <div className="text-sm leading-5 font-medium text-gray-700 inline-block">Manage project-based personal access tokens used to interact with refineries commercial proxy.</div>
-                <div className="inline-block min-w-full align-middle">
+                <div className="text-sm leading-5 font-medium text-gray-700 inline-block">Manage project-based personal access tokens used to interact with Refinery’s commercial proxy.</div>
+                <div className="mt-2 inline-block min-w-full align-middle">
                     <div className="overflow-hidden shadow ring-1 ring-black ring-opacity-5 md:rounded-lg">
                         <table className="min-w-full divide-y divide-gray-300">
                             <thead className="bg-gray-50">
@@ -108,7 +108,7 @@ export default function ProjectAdmin() {
                                 {accessTokens.map((token: PersonalAccessToken, index: number) => (<tr key={token.id} className={`${index % 2 != 0 ? 'bg-gray-50' : 'bg-white'}`}>
                                     <td className="whitespace-nowrap text-center px-3 py-2 text-sm text-gray-500">{token.name}</td>
                                     <td className="whitespace-nowrap text-center px-3 py-2 text-sm text-gray-500">{token.scope}</td>
-                                    <td className="whitespace-nowrap text-center px-3 py-2 text-sm text-gray-500">{token.createdAt}</td>
+                                    <td className="whitespace-nowrap text-center px-3 py-2 text-sm text-gray-500">{token.createdBy}</td>
                                     <td className="whitespace-nowrap text-center px-3 py-2 text-sm text-gray-500">{token.createdAt}</td>
                                     <td className="whitespace-nowrap text-center px-3 py-2 text-sm text-gray-500">{token.expiresAt}</td>
                                     <td className="whitespace-nowrap text-center px-3 py-2 text-sm text-gray-500">{token.lastUsed}</td>
@@ -126,7 +126,7 @@ export default function ProjectAdmin() {
                 <Tooltip content={TOOLTIPS_DICT.ADMIN_PAGE.NEW_ACCESS_TOKEN} color="invert" placement="right">
                     <button onClick={() => dispatch(openModal(ModalEnum.NEW_PERSONAL_TOKEN))}
                         className="inline-flex items-center px-2.5 py-1.5 border border-gray-300 shadow-sm text-xs font-semibold rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none cursor-pointer">
-                        <IconPlus size={20} />
+                        <IconPlus className="mr-1" size={20} />
                         Add token
                     </button>
                 </Tooltip>
