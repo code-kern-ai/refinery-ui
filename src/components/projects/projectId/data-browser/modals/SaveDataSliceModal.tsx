@@ -1,6 +1,6 @@
 import Modal from "@/src/components/shared/modal/Modal"
 import { selectUser } from "@/src/reduxStore/states/general";
-import { selectModal, setModalStates } from "@/src/reduxStore/states/modal";
+import { closeModal, selectModal, setModalStates } from "@/src/reduxStore/states/modal";
 import { extendAllDataSlices, selectActiveSearchParams, selectActiveSlice, selectAdditionalData, selectConfiguration, selectDataSlicesAll, setActiveDataSlice, updateAdditionalDataState } from "@/src/reduxStore/states/pages/data-browser";
 import { selectAttributes, selectLabelingTasksAll } from "@/src/reduxStore/states/pages/settings";
 import { selectProjectId } from "@/src/reduxStore/states/project";
@@ -129,7 +129,8 @@ export default function SaveDataSliceModal(props: { fullSearch: {} }) {
                     onKeyUp={(e: any) => checkIfNameExists(e.target.value)}
                     onKeyDown={(e: any) => {
                         if (e.key == 'Enter') {
-                            modalSaveDataSlice.sliceNameExists ? updateDataSliceByName() : saveDataSlice()
+                            modalSaveDataSlice.sliceNameExists ? updateDataSliceByName() : saveDataSlice();
+                            dispatch(setModalStates(ModalEnum.SAVE_DATA_SLICE, { sliceName: '', sliceNameExists: false, open: false }));
                         }
                     }} className="h-9 w-full text-sm border-gray-300 rounded-md placeholder-italic border text-gray-900 pl-4 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100" placeholder="Enter name..." />
             </div>
