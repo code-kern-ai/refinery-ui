@@ -67,7 +67,7 @@ export default function ModelsDownload() {
         <div className="mt-4 text-lg leading-6 text-gray-900 font-medium inline-block">
             Downloaded models
         </div>
-        <div className="mt-1">
+        <div className="mt-1 overflow-y-auto" style={{ maxHeight: 'calc(100vh - 200px)', padding: '3px' }}>
             <div className="inline-block min-w-full align-middle">
                 <div className="overflow-hidden shadow ring-1 ring-black ring-opacity-5 md:rounded-lg">
                     <table className="min-w-full divide-y divide-gray-300">
@@ -157,15 +157,15 @@ export default function ModelsDownload() {
                     </table>
                 </div>
             </div>
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-2 mt-1 align-top">
-                <div>
-                    <button onClick={() => dispatch(openModal(ModalEnum.ADD_MODEL_DOWNLOAD))}
-                        disabled={!isManaged}
-                        className={`mr-1 inline-flex items-center px-2.5 py-2 border border-gray-300 shadow-sm text-xs font-semibold rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none cursor-pointer disabled:cursor-not-allowed disabled:opacity-50`}>
-                        <IconPlus className="h-4 w-4 mr-1" />
-                        Add new model
-                    </button>
-                </div>
+        </div>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-2 mt-1 align-top">
+            <div>
+                <button onClick={() => dispatch(openModal(ModalEnum.ADD_MODEL_DOWNLOAD))}
+                    disabled={!isManaged}
+                    className={`mr-1 inline-flex items-center px-2.5 py-2 border border-gray-300 shadow-sm text-xs font-semibold rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none cursor-pointer disabled:cursor-not-allowed disabled:opacity-50`}>
+                    <IconPlus className="h-4 w-4 mr-1" />
+                    Add new model
+                </button>
             </div>
         </div>
         <AddModelDownloadModal />
