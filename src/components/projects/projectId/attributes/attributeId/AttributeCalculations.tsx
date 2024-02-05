@@ -80,7 +80,7 @@ export default function AttributeCalculation() {
                 dispatch(setAllAttributes(res.data['attributesByProjectId']));
                 const currentAttribute = postProcessCurrentAttribute(attributes.find((attribute) => attribute.id === router.query.attributeId));
                 setCurrentAttribute(currentAttribute);
-                setEditorValue(currentAttribute.sourceCodeToDisplay);
+                setEditorValue(currentAttribute?.sourceCodeToDisplay);
             });
         }
         if (lookupLists.length == 0) {

@@ -70,7 +70,8 @@ export default function ExecutionContainer(props: ExecutionContainerProps) {
                 </div>}
 
                 <Tooltip content={TOOLTIPS_DICT.ATTRIBUTE_CALCULATION.EXECUTE_10_RECORDS} color="invert" placement="left" className="ml-auto">
-                    <button onClick={calculateUserAttributeSampleRecords} disabled={props.currentAttribute.state == AttributeState.USABLE || props.currentAttribute.state == AttributeState.RUNNING || requestedSomething}
+                    <button onClick={calculateUserAttributeSampleRecords}
+                        disabled={props.currentAttribute.state == AttributeState.USABLE || props.currentAttribute.state == AttributeState.RUNNING || requestedSomething || props.tokenizationProgress < 1}
                         className={`bg-white text-gray-700 text-xs font-semibold px-4 py-2 rounded-md border border-gray-300 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed`}>
                         Run on 10
                     </button>
