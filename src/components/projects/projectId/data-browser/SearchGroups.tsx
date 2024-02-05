@@ -130,6 +130,7 @@ export default function SearchGroups() {
                 });
             });
         } else {
+            dispatch(updateAdditionalDataState('loading', true));
             const refetchTimer = setTimeout(() => {
                 refetchExtendedRecord({
                     variables: {
@@ -139,6 +140,7 @@ export default function SearchGroups() {
                     }
                 }).then((res) => {
                     dispatch(setSearchRecordsExtended(postProcessRecordsExtended(res.data['searchRecordsExtended'], labelingTasks)));
+                    dispatch(updateAdditionalDataState('loading', false));
                 });
             }, 500);
             return () => clearTimeout(refetchTimer);
