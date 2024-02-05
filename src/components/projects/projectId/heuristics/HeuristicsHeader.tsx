@@ -44,6 +44,7 @@ export default function HeuristicsHeader(props: HeuristicsHeaderProps) {
     const [areHeuristicsSelected, setAreHeuristicsSelected] = useState(false);
     const [areValidHeuristicsSelected, setAreValidHeuristicsSelected] = useState(false);
     const [currentWeakSupervisionRun, setCurrentWeakSupervisionRun] = useState(null);
+    const [loadingIconWS, setLoadingIconWS] = useState(false);
 
     const [setHeuristicsMut] = useMutation(SET_ALL_HEURISTICS);
     const [startWeakSupervisionMut] = useMutation(START_WEAK_SUPERVISIONS);
@@ -159,7 +160,10 @@ export default function HeuristicsHeader(props: HeuristicsHeaderProps) {
     }
 
     function startWeakSupervision() {
-        startWeakSupervisionMut({ variables: { projectId: projectId } }).then(() => { });
+        setLoadingIconWS(true);
+        startWeakSupervisionMut({ variables: { projectId: projectId } }).then(() => {
+            setLoadingIconWS(false);
+        });
     }
 
     const handleWebsocketNotification = useCallback((msgParts: string[]) => {
@@ -235,8 +239,9 @@ export default function HeuristicsHeader(props: HeuristicsHeaderProps) {
                         {areValidHeuristicsSelected ? (
                             <Tooltip content={TOOLTIPS_DICT.HEURISTICS.WEAK_SUPERVISION} color="invert" placement="right">
                                 <button onClick={startWeakSupervision}
-                                    className="bg-indigo-700 text-white text-xs font-semibold mr-3 px-4 py-2 rounded-md border hover:bg-indigo-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                                    className="bg-indigo-700 flex items-center text-white text-xs font-semibold mr-3 px-4 py-2 rounded-md border hover:bg-indigo-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
                                     Weak supervision
+                                    {loadingIconWS && <LoadingIcon color="indigo" size="xs" />}
                                 </button>
                             </Tooltip>
                         ) : (<Tooltip content={TOOLTIPS_DICT.HEURISTICS.SELECT_AT_LEAST_ONE_VALID_HEURISTIC} color="invert" placement="left">

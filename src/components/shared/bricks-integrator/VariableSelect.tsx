@@ -201,6 +201,7 @@ export default function VariableSelect(props: VariableSelectProps) {
         WebSocketsService.updateFunctionPointer(projectId, CurrentPage.BRICKS_INTEGRATOR, handleWebsocketNotification)
     }, [handleWebsocketNotification, projectId]);
 
+
     return (<>
         {props.variable && props.variable.values.map((v, index) => (<div key={index} className="col-start-2 flex flex-row flex-nowrap items-center gap-x-2 my-2">
             {props.variable.type == BricksVariableType.ATTRIBUTE &&
@@ -262,7 +263,7 @@ export default function VariableSelect(props: VariableSelectProps) {
                 <Dropdown2 options={props.variable.allowedValues} buttonName={props.variable.values[index] ? props.variable.values[index] : 'Select option'}
                     selectedOption={(option: any) => {
                         const propsCopy = { ...props };
-                        propsCopy.variable.values[index] = option.name;
+                        propsCopy.variable.values[index] = option;
                         props.sendOption();
                     }}
                 />
