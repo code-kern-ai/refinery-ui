@@ -22,10 +22,10 @@ export default function DisplayComments(props: DisplayCommentsProps) {
     return (<div className="overflow-auto p-4" style={{ height: "calc(50vh - 50px)" }}>
         {comments && comments.length > 0 ? <ul role="list" className="flex-1 overflow-y-auto h-full">
             {comments.map((comment: CommentData, index: number) => (
-                <div key={comment.id}>
+                <div className="mr-1" key={comment.id}>
                     <li>
                         <div className="group relative flex items-center py-4">
-                            <a className="-m-1 block flex-1 p-1 cursor-pointer" onClick={() => {
+                            <a className="w-full pr-8 block flex-1 p-1 cursor-pointer" onClick={() => {
                                 props.handleCommentClick(index);
                             }}>
                                 <div className="absolute inset-0 group-hover:bg-gray-50" aria-hidden="true" />
@@ -45,7 +45,7 @@ export default function DisplayComments(props: DisplayCommentsProps) {
                                 </div>
                             </a>
 
-                            <Menu as="div" className="relative ml-2 inline-block flex-shrink-0 text-left">
+                            <Menu as="div" className="absolute right-0 inline-block flex-shrink-0 text-left">
                                 <Menu.Button className="group relative inline-flex h-8 w-8 items-center justify-center rounded-full">
                                     <span className="flex h-full w-full items-center justify-center rounded-full">
                                         <IconDotsVertical
@@ -133,7 +133,7 @@ export default function DisplayComments(props: DisplayCommentsProps) {
                         className={`rounded-md placeholder-italic w-full max-h-28 h-16 p-2 line-height-textarea focus:outline-none border border-gray-300 text-sm ${props.openComments[index] ? '' : 'hidden'} disabled:cursor-not-allowed disabled:opacity-50`}
                         onChange={(event: any) => {
                             const target = event.target as HTMLTextAreaElement;
-                            const finalHeight = target.scrollHeight + 2; // +2 for border
+                            const finalHeight = target.scrollHeight + 1;
                             const maxHeight = parseInt(window.getComputedStyle(target).getPropertyValue("max-height"));
                             target.style.height = `${finalHeight}px`;
                             target.style.overflowY = finalHeight < maxHeight ? 'hidden' : 'auto';
