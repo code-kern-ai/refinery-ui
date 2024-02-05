@@ -234,8 +234,10 @@ export function getRegexFromFilter(searchElement): HighlightSearch {
         case SearchOperator.EQUAL:
             return { searchFor: '^' + searchValue + '$', matchCase: searchElement.values.caseSensitive };
         case SearchOperator.BEGINS_WITH:
+        case 'BEGINS WITH':
             return { searchFor: '^' + searchValue, matchCase: searchElement.values.caseSensitive }
         case SearchOperator.ENDS_WITH:
+        case 'ENDS WITH':
             return { searchFor: searchValue + '$', matchCase: searchElement.values.caseSensitive };
         case SearchOperator.CONTAINS:
             return { searchFor: searchValue, matchCase: searchElement.values.caseSensitive };

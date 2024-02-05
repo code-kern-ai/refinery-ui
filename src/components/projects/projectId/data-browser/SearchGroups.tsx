@@ -390,6 +390,8 @@ export default function SearchGroups() {
         dispatch(setFullSearchStore(fullSearchCopy));
         getOperatorDropdownValues(i, value, fullSearchCopy);
         updateSearchParams(fullSearchCopy);
+        refreshTextHighlightNeeded();
+        setHighlightingToRecords();
     }
 
     function checkIfDecimals(event: any, i: number, key: string) {
@@ -521,9 +523,16 @@ export default function SearchGroups() {
             const attributeKey = attributesSortOrder[i].key;
             for (let searchElement of activeSearchParams) {
                 if (searchElement.values.group == SearchGroup.ATTRIBUTES) {
-                    if (searchElement.values.name == 'Any Attribute' || searchElement.values.name == attributesDict[attributeKey].name) {
-                        if (searchElement.values.negate || searchElement.values.searchValue == '') isTextHighlightNeededCopy[attributeKey] = false;
-                        else isTextHighlightNeededCopy[attributeKey] = true;
+                    if (getRegexFromFilter(searchElement) == null) {
+                        isTextHighlightNeededCopy[attributeKey] = false;
+
+                    } else {
+                        if (searchElement.values.name == 'Any Attribute' || searchElement.values.name == attributesDict[attributeKey].name) {
+                            if ((searchElement.values.negate || searchElement.values.searchValue == '')) {
+                                isTextHighlightNeededCopy[attributeKey] = false;
+                            }
+                            else isTextHighlightNeededCopy[attributeKey] = true;
+                        }
                     }
                 } else {
                     isTextHighlightNeededCopy[attributeKey] = false;
