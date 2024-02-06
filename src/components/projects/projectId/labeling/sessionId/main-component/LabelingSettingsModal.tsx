@@ -30,6 +30,10 @@ export default function LabelingSettingsModal() {
 
     function changeSetting(page: ComponentType, setting: string, value?: any) {
         dispatch(updateSettings(page, setting, value));
+        const getSettings = localStorage.getItem('labelingSettings');
+        let settings = getSettings ? JSON.parse(getSettings) : {};
+        settings[page][setting] = value ?? !settings[page][setting];
+        localStorage.setItem('labelingSettings', JSON.stringify(settings));
     }
 
     function prepareColorOptions() {

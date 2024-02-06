@@ -19,12 +19,20 @@ export default function NavigationBarBottom() {
     const record = useSelector(selectRecordRequestsRecord);
 
     function toggleAutoNextRecord() {
-        dispatch(updateSettings(ComponentType.MAIN, 'autoNextRecord'))
+        dispatch(updateSettings(ComponentType.MAIN, 'autoNextRecord'));
+        const getSettings = localStorage.getItem('labelingSettings');
+        let settings = getSettings ? JSON.parse(getSettings) : {};
+        settings.main.autoNextRecord = !settings.main.autoNextRecord;
+        localStorage.setItem('labelingSettings', JSON.stringify(settings));
     }
 
     function setShowNLabelButtonFunc(event: any) {
         const valueInt = event.target.value;
-        dispatch(updateSettings(ComponentType.LABELING, 'showNLabelButton', valueInt))
+        dispatch(updateSettings(ComponentType.LABELING, 'showNLabelButton', valueInt));
+        const getSettings = localStorage.getItem('labelingSettings');
+        let settings = getSettings ? JSON.parse(getSettings) : {};
+        settings.labeling.showNLabelButton = valueInt;
+        localStorage.setItem('labelingSettings', JSON.stringify(settings));
     }
 
     return (<>
