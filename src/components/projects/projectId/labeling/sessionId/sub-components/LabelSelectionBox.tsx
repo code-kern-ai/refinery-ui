@@ -17,6 +17,30 @@ export default function LabelSelectionBox(props: LabelSelectionBoxProps) {
     const [taskFilteredDict, setTaskFilteredDict] = useState({});
 
     useEffect(() => {
+        if (!props.labelHotkeys) return;
+        document.addEventListener('keyup', handleKeyboardEvent);
+        return () => {
+            document.removeEventListener('keyup', handleKeyboardEvent);
+        };
+    }, [props.labelHotkeys, props.activeTasks]);
+
+    function handleKeyboardEvent(event) {
+        const labelSelection = document.getElementById('label-selection-box');
+        if (!labelSelection || labelSelection.classList.contains('hidden') ) return;
+        for (const key in props.labelHotkeys) {
+            if (key == event.key) {
+                const activeTasks = props.activeTasks.map(x => x.task);
+                const task = activeTasks.find(t => t.id == props.labelHotkeys[key].taskId);
+                props.addRla(task, props.labelHotkeys[key].labelId);
+                event.preventDefault();
+                event.stopPropagation();
+                return;
+            }
+        }
+    }
+
+    
+    useEffect(() => {
         if (!props.activeTasks || props.activeTasks.length == 0) return;
         const taskFilteredDict = {};
         props.activeTasks.forEach((task) => {

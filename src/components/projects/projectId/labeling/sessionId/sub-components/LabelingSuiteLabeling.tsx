@@ -617,7 +617,8 @@ export default function LabelingSuiteLabeling() {
                                 addRla(task, labelId, tokenLookupCopy);
                             }}
                             addNewLabelToTask={(newLabel, task) => addNewLabelToTask(newLabel, task)}
-                            checkLabelVisibleInSearch={(newLabel, task) => checkLabelVisibleInSearch(labelLookup, newLabel, task)} />
+                            checkLabelVisibleInSearch={(newLabel, task) => checkLabelVisibleInSearch(labelLookup, newLabel, task)}
+                            labelHotkeys={labelHotkeys} />
                     </div>}
                 </Fragment>))}
             </Fragment>))}

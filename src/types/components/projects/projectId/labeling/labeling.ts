@@ -56,6 +56,7 @@ export type LabelSelectionBoxProps = {
     },
     activeTasks: any,
     labelLookup: any,
+    labelHotkeys: HotkeyLookup,
     addRla: (task, labelId: string) => void;
     labelAddButtonDisabled: boolean;
     addNewLabelToTask: (newLabel: string, task) => void;
