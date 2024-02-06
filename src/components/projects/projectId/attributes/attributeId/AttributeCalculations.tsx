@@ -123,7 +123,7 @@ export default function AttributeCalculation() {
         const subscription = observer.pipe(
             debounceTime(2000),
             distinctUntilChanged()
-        ).subscribe(() => {
+        ).subscribe(() => { 
             const regMatch: any = getPythonFunctionRegExMatch(editorValue);
             changeAttributeName(regMatch ? regMatch[2] : '');
             setCurrentAttribute({ ...currentAttribute, sourceCode: editorValue });
@@ -355,6 +355,7 @@ export default function AttributeCalculation() {
                             nameLookups={attributes.map(a => a.name)}
                             preparedCode={(code: string) => {
                                 setEditorValue(code);
+                                updateSourceCode(code);
                                 setIsInitial(false);
                             }} />
                         <Tooltip content={TOOLTIPS_DICT.ATTRIBUTE_CALCULATION.AVAILABLE_LIBRARIES} placement="left" color="invert">
