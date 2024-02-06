@@ -35,13 +35,13 @@ export default function GatesIntegration(props: { refetchWS: () => void }) {
         <div className="mt-1">
             <div className="text-sm leading-5 font-medium text-gray-700 inline-block">
                 Gates is the inference API for refinery.
-                {gatesIntegrationData?.status === GatesIntegratorStatus.READY && <span>This project is ready to be used with Gates. You can switch to the <a href={gatesLink}><span
+                {gatesIntegrationData?.status === GatesIntegratorStatus.READY && <span> This project is ready to be used with Gates. You can switch to the <a href={gatesLink}><span
                     className="underline cursor-pointer">Gates App</span></a> to configure and run
                     it.</span>}
 
-                {gatesIntegrationData?.status === GatesIntegratorStatus.UPDATING && <span>This project is currently updated to be used with Gates.</span>}
+                {gatesIntegrationData?.status === GatesIntegratorStatus.UPDATING && <span> This project is currently updated to be used with Gates.</span>}
                 {gatesIntegrationData?.status === GatesIntegratorStatus.NOT_READY && <span> This project is not ready to be used with Gates. You can update the project to make it ready.
-                    This will rerun the project&apos;s embeddings and heuristics to create the necessary data for Gates.
+                    <span> This will rerun the project&apos;s embeddings and heuristics to create the necessary data for Gates.</span>
                     <button type="button" onClick={() => dispatch(openModal(ModalEnum.GATES_INTEGRATION_WARNING))}
                         className="mr-1 mt-2 flex items-center px-2.5 py-1.5 border border-gray-300 shadow-sm text-xs font-semibold rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none cursor-pointer">
                         <IconReload className="h-4 w-4" />
