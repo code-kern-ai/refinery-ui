@@ -112,23 +112,19 @@ export default function NavigationBarTop() {
                                     {user.role == UserRole.ENGINEER ? ' current session' : ' current slice'}
                                 </span>
                             </Tooltip>
-                        </div>
-                        <Tooltip content={TOOLTIPS_DICT.LABELING.ARROW_LEFT} color="invert" placement="left">
+                        </div>   
                             <button onClick={previousRecord} disabled={SessionManager.prevDisabled}
                                 className="bg-white text-gray-700 text-xs font-semibold mr-3 px-4 py-1.5 rounded-md border border-gray-300 whitespace-nowrap inline-flex items-center hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:cursor-not-allowed disabled:opacity-50">Prev
                                 <kbd className="relative ml-1 inline-flex items-center border bg-white border-gray-200 rounded px-0.5 py-0.5 text-sm font-sans font-medium text-gray-400">
                                     <IconArrowLeft className="w-4 h-4" />
                                 </kbd>
-                            </button>
-                        </Tooltip>
-                        <Tooltip content={TOOLTIPS_DICT.LABELING.ARROW_RIGHT} color="invert" placement="left">
+                            </button>   
                             <button onClick={nextRecord} disabled={SessionManager.nextDisabled}
                                 className="bg-indigo-700 text-white text-xs font-semibold px-4 py-1.5 rounded-md cursor-pointer whitespace-nowrap inline-flex items-center hover:bg-indigo-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:cursor-not-allowed disabled:opacity-50">Next
                                 <kbd className="relative ml-1 inline-flex items-center border bg-white border-gray-200 rounded px-0.5 py-0.5 text-sm font-sans font-medium text-gray-400">
                                     <IconArrowRight className="w-4 h-4" />
                                 </kbd>
                             </button>
-                        </Tooltip>
                     </div>
                 </div>
             </div>
