@@ -502,6 +502,9 @@ export default function LabelingSuiteLabeling() {
     function handleKeyboardEvent(event) {
         const labelSelection = document.getElementById('label-selection-box');
         if (!labelSelection) return;
+        if (event.key == 'ArrowRight' || event.key == 'ArrowLeft') {
+            setActiveTasksFunc([]);
+        }
         if (!labelSelection.classList.contains('hidden')) return;
         for (const key in labelHotkeys) {
             if (key == event.key) {
