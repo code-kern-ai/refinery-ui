@@ -58,7 +58,8 @@ export default function HeaderDisplay(props: HeaderDisplayProps) {
     }
 
     function setAllLabelDisplaySetting(value: boolean, labelSettingsLabel?: any, attribute?: string, deactivateOthers?: boolean) {
-        const settingsCopy = jsonCopy(settings);
+        const getSettings = localStorage.getItem('labelingSettings');
+        const settingsCopy = getSettings ? JSON.parse(getSettings) : jsonCopy(settings);
         const tasks = settingsCopy.task[projectId];
         if (deactivateOthers && !attribute) {
             console.error("deactivateOthers needs attribute");
@@ -102,6 +103,7 @@ export default function HeaderDisplay(props: HeaderDisplayProps) {
             }
         }
         dispatch(setSettings(settingsCopy));
+        localStorage.setItem('labelingSettings', JSON.stringify(settingsCopy));
     }
 
     function onMouseEvent(update: boolean, labelId: string, task?) {

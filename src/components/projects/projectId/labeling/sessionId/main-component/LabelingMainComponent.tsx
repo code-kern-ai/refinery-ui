@@ -32,7 +32,7 @@ import { unsubscribeWSOnDestroy } from "@/src/services/base/web-sockets/web-sock
 import { getEmptyBricksIntegratorConfig } from "@/src/util/shared/bricks-integrator-helper";
 import { LabelingTask } from "@/src/types/components/projects/projectId/settings/labeling-tasks";
 
-const LOCAL_STORAGE_KEY = 'labelingSuiteSettings';
+const SETTINGS_KEY = 'labelingSettings';
 
 export default function LabelingMainComponent() {
     const router = useRouter();
@@ -62,22 +62,20 @@ export default function LabelingMainComponent() {
 
     useEffect(() => {
         if (!projectId) return;
-        let settingsCopy = { ...settings };
-        settingsCopy = getDefaultLabelingSuiteSettings();
-        let tmp = localStorage.getItem(LOCAL_STORAGE_KEY);
+        let tmp = localStorage.getItem(SETTINGS_KEY);
         if (tmp) {
-            const tmpSettings = JSON.parse(tmp);
-            //to ensure new setting values exist and old ones are loaded if matching name
-            transferNestedDict(tmpSettings, settingsCopy);
-            if (tmpSettings.task) {
-                transferNestedDict(tmpSettings.task, settingsCopy.task, false);
+            dispatch(setSettings(JSON.parse(tmp)));
+        } else {
+            let settingsCopy = { ...settings };
+            settingsCopy = getDefaultLabelingSuiteSettings();
+            if (!settingsCopy.task[projectId]) settingsCopy.task[projectId] = {};
+            for (let key in settingsCopy.task) {
+                if (key != projectId && key != 'show' && key != 'isCollapsed' && key != 'alwaysShowQuickButtons') delete settingsCopy.task[key];
             }
+            dispatch(setSettings(settingsCopy));
+            localStorage.setItem(SETTINGS_KEY, JSON.stringify(settingsCopy));
         }
-        if (!settingsCopy.task[projectId]) settingsCopy.task[projectId] = {};
-        for (let key in settingsCopy.task) {
-            if (key != projectId && key != 'show' && key != 'isCollapsed' && key != 'alwaysShowQuickButtons') delete settingsCopy.task[key];
-        }
-        dispatch(setSettings(settingsCopy));
+
         dispatch(setBricksIntegrator(getEmptyBricksIntegratorConfig()));
         refetchAttributesAndProcess();
         refetchLabelingTasksAndProcess();

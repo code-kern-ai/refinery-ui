@@ -55,8 +55,8 @@ export type LabelingSuiteTaskHeaderLabelSettings = {
 
 export enum ComponentType {
     ALL = "ALL",
-    MAIN = "MAIN",
-    OVERVIEW_TABLE = "OVERVIEW_TABLE",
-    LABELING = "LABELING",
-    TASK_HEADER = "TASK_HEADER",
+    MAIN = "main",
+    OVERVIEW_TABLE = "overviewTable",
+    LABELING = "labeling",
+    TASK_HEADER = "task",
 }
