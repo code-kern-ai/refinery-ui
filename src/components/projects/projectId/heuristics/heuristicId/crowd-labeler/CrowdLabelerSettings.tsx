@@ -4,17 +4,15 @@ import { selectHeuristic, updateHeuristicsState } from "@/src/reduxStore/states/
 import { selectLabelingTasksAll } from "@/src/reduxStore/states/pages/settings";
 import { selectProjectId } from "@/src/reduxStore/states/project";
 import { CREATE_ACCESS_LINK, LOCK_ACCESS_LINK, REMOVE_ACCESS_LINK, UPDATE_INFORMATION_SOURCE } from "@/src/services/gql/mutations/heuristics";
-import { GET_ACCESS_LINK } from "@/src/services/gql/queries/heuristics";
 import { parseToSettingsJson } from "@/src/util/components/projects/projectId/heuristics/heuristicId/crowd-labeler-helper";
 import { buildFullLink, parseLinkFromText } from "@/src/util/shared/link-parser-helper";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
 import { copyToClipboard } from "@/submodules/javascript-functions/general";
 import Dropdown2 from "@/submodules/react-components/components/Dropdown2";
-import { useLazyQuery, useMutation } from "@apollo/client";
+import { useMutation } from "@apollo/client";
 import { Tooltip } from "@nextui-org/react";
 import { IconLock, IconLockOpen, IconTrash } from "@tabler/icons-react";
 import { useRouter } from "next/router";
-import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
 export default function CrowdLabelerSettings() {
@@ -32,25 +30,13 @@ export default function CrowdLabelerSettings() {
     const [updateHeuristicMut] = useMutation(UPDATE_INFORMATION_SOURCE);
     const [createAccessLinkMut] = useMutation(CREATE_ACCESS_LINK);
     const [removeAccessLinkMut] = useMutation(REMOVE_ACCESS_LINK);
-    const [refetchAccessLink] = useLazyQuery(GET_ACCESS_LINK, { fetchPolicy: 'network-only' });
     const [changeAccessLinkMut] = useMutation(LOCK_ACCESS_LINK);
-
-    useEffect(() => {
-        if (!projectId || !currentHeuristic.crowdLabelerSettings.accessLinkId) return;
-        refetchAccessLink({ variables: { projectId: projectId, linkId: currentHeuristic.crowdLabelerSettings.accessLinkId } }).then((res) => {
-            if (!res?.data?.accessLink?.id) {
-                dispatch(updateHeuristicsState(currentHeuristic.id, { crowdLabelerSettings: { ...currentHeuristic.crowdLabelerSettings, accessLinkId: null, accessLinkParsed: null } }));
-                return;
-            }
-            fillLinkData(res.data.accessLink);
-        });
-    }, [projectId, currentHeuristic.crowdLabelerSettings.accessLinkId]);
 
     function saveHeuristic(labelingTaskParam: any, crowdLabelerSettings: any = null) {
         const labelingTask = labelingTaskParam ? labelingTaskParam.id : currentHeuristic.labelingTaskId;
         const code = parseToSettingsJson(crowdLabelerSettings ? crowdLabelerSettings : currentHeuristic.crowdLabelerSettings);
         updateHeuristicMut({ variables: { projectId: projectId, informationSourceId: currentHeuristic.id, labelingTaskId: labelingTask, code: code } }).then((res) => {
-            dispatch(updateHeuristicsState(currentHeuristic.id, { labelingTaskId: labelingTask.id, labelingTaskName: labelingTask.name, labels: labelingTask.labels }));
+            dispatch(updateHeuristicsState(currentHeuristic.id, { labelingTaskId: labelingTask.id, labelingTaskName: labelingTask.name, labels: labelingTask.labels, crowdLabelerSettings: crowdLabelerSettings }));
         });
     }
 
@@ -61,7 +47,6 @@ export default function CrowdLabelerSettings() {
         } else if (attributeName == 'dataSliceId') {
             crowdLabelerSettingsCopy[attributeName] = dataSlices.find(a => a.name == newValue)?.id ?? newValue;
         }
-        dispatch(updateHeuristicsState(currentHeuristic.id, { crowdLabelerSettings: crowdLabelerSettingsCopy }));
         if (saveToDb) saveHeuristic(null, crowdLabelerSettingsCopy);
     }
 
@@ -87,10 +72,6 @@ export default function CrowdLabelerSettings() {
         });
     }
 
-    function fillLinkData(linkObj: any) {
-        const link = linkObj.link;
-        dispatch(updateHeuristicsState(currentHeuristic.id, { crowdLabelerSettings: { ...currentHeuristic.crowdLabelerSettings, accessLink: link, accessLinkParsed: buildFullLink(link), accessLinkLocked: linkObj.isLocked, isHTTPS: window.location.protocol == 'https:' } }));
-    }
 
     function testLink() {
         const linkData = parseLinkFromText(currentHeuristic.crowdLabelerSettings.accessLink);
@@ -143,7 +124,7 @@ export default function CrowdLabelerSettings() {
                 </Tooltip>
             </div>
             <div className="mt-4">
-                <button onClick={generateAccessLink} disabled={!currentHeuristic.labelingTaskId || !currentHeuristic.crowdLabelerSettings.annotatorId || !currentHeuristic.crowdLabelerSettings.dataSliceId}
+                <button onClick={generateAccessLink} disabled={!currentHeuristic.labelingTaskId || !currentHeuristic.crowdLabelerSettings.annotatorId || !currentHeuristic.crowdLabelerSettings.dataSliceId || currentHeuristic.crowdLabelerSettings.accessLinkId}
                     className="w-40 bg-indigo-700 text-white text-xs leading-4 font-semibold px-4 py-2 rounded-md cursor-pointer hover:bg-indigo-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed">
                     Generate link</button>
                 {currentHeuristic.crowdLabelerSettings.accessLinkParsed && <div className="mt-2">
