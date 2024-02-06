@@ -29,7 +29,6 @@ import CryptedField from "../crypted-field/CryptedField";
 import { unsubscribeWSOnDestroy } from "@/src/services/base/web-sockets/web-sockets-helper";
 import { useRouter } from "next/router";
 import { extendArrayElementsByUniqueId } from "@/submodules/javascript-functions/id-prep";
-import { LabelSourceHover } from "@/src/types/components/projects/projectId/labeling/labeling";
 
 export default function ExportRecordsModal(props: ExportProps) {
     const dispatch = useDispatch();
@@ -44,6 +43,7 @@ export default function ExportRecordsModal(props: ExportProps) {
     const [formGroup, setFormGroup] = useState(null);
     const [downloadState, setDownloadState] = useState<DownloadState>(DownloadState.NONE);
     const [key, setKey] = useState('');
+    const [prepareErrors, setPrepareErrors] = useState<string[]>([]);
 
     const [refetchLastRecordsExportCredentials] = useLazyQuery(LAST_RECORD_EXPORT_CREDENTIALS, { fetchPolicy: "no-cache" });
     const [refetchRecordExportFromData] = useLazyQuery(GET_RECORD_EXPORT_FORM_DATA, { fetchPolicy: "no-cache" });
@@ -211,6 +211,7 @@ export default function ExportRecordsModal(props: ExportProps) {
 
     function prepareDownload() {
         const jsonString = ExportHelper.buildExportData(props.sessionId, formGroup);
+        setPrepareErrors(ExportHelper.error);
         if (ExportHelper.error.length > 0) return;
         setDownloadState(DownloadState.PREPARATION);
         let keyToSend = key;
@@ -219,6 +220,7 @@ export default function ExportRecordsModal(props: ExportProps) {
             if (res.data['prepareRecordExport'] != "") {
                 ExportHelper.error.push("Something went wrong in the backend:");
                 ExportHelper.error.push(res.data['prepareRecordExport']);
+                setPrepareErrors(ExportHelper.error);   
             }
             setDownloadState(DownloadState.DOWNLOAD);
         });
@@ -310,9 +312,9 @@ export default function ExportRecordsModal(props: ExportProps) {
                     setFormGroup(control);
                 }} />
         </div>}
-        {ExportHelper.error.length > 0 && <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mt-2">
+        {prepareErrors.length > 0 && <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mt-2">
             <strong className="font-bold">Errors Detected!</strong>
-            <pre className="text-sm">{ExportHelper.error.join("\n")}</pre>
+            <pre className="text-sm">{prepareErrors.join("\n")}</pre>
         </div>}
         <CryptedField label="Encrypt zip file with password" keyChange={(key: string) => setKey(key)} />
         <div className="flex mt-6 justify-end">
