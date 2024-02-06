@@ -206,6 +206,7 @@ export default function LabelingSuiteLabeling() {
 
                     lVarsCopy.taskLookup[key].lookup[0].showGridLabelPart = true;
                     lVarsCopy.taskLookup[key].lookup[0].gridRowSpan = "span " + extractionTasks.length;
+                    lVarsCopy.taskLookup[key].lookup = extractionTasks;
                 }
             }
         }

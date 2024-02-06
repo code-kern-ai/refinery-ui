@@ -26,7 +26,7 @@ export default function LabelSelectionBox(props: LabelSelectionBoxProps) {
 
     function handleKeyboardEvent(event) {
         const labelSelection = document.getElementById('label-selection-box');
-        if (!labelSelection || labelSelection.classList.contains('hidden') ) return;
+        if (!labelSelection || labelSelection.classList.contains('hidden')) return;
         for (const key in props.labelHotkeys) {
             if (key == event.key) {
                 const activeTasks = props.activeTasks.map(x => x.task);
@@ -39,7 +39,6 @@ export default function LabelSelectionBox(props: LabelSelectionBoxProps) {
         }
     }
 
-    
     useEffect(() => {
         if (!props.activeTasks || props.activeTasks.length == 0) return;
         const taskFilteredDict = {};
