@@ -71,7 +71,9 @@ export default function LabelSelectionBox(props: LabelSelectionBoxProps) {
                     <input onClick={(e: any) => e.target.focus()} type="text" value={newLabel} onChange={(e) => {
                         setNewLabel(e.target.value);
                         props.checkLabelVisibleInSearch(e.target.value, task.task);
-                    }} onKeyDown={(e: any) => {
+                    }} 
+                    onKeyUp={(e: any) => e.stopPropagation()}
+                    onKeyDown={(e: any) => {
                         if (e.key == 'Enter') {
                             if (e.target.value == '') return;
                             props.addNewLabelToTask(e.target.value, task.task);
