@@ -555,8 +555,9 @@ export default function LabelingSuiteLabeling() {
                             </>}
                             {task.task.taskType == LabelingTaskTaskType.MULTICLASS_CLASSIFICATION && <>
                                 {(canEditLabels || user.role == UserRole.ANNOTATOR || user.role == UserRole.EXPERT) && <div className="flex flex-row flex-wrap gap-2">
-                                    {task.task.displayLabels.map((label, index) => (<div key={index} className={`text-sm font-medium px-2 py-0.5 rounded-md border focus:outline-none cursor-pointer  ${labelLookup[label.id]?.color.backgroundColor} ${labelLookup[label.id]?.color.textColor} ${labelLookup[label.id]?.color.borderColor}`}>
-                                        <div className="truncate" style={{ maxWidth: '260px' }} onClick={() => addRla(task.task, label.id)}>{label.name}
+                                    {task.task.displayLabels.map((label, index) => (<div key={index} onClick={() => addRla(task.task, label.id)}
+                                        className={`text-sm font-medium px-2 py-0.5 rounded-md border focus:outline-none cursor-pointer  ${labelLookup[label.id]?.color.backgroundColor} ${labelLookup[label.id]?.color.textColor} ${labelLookup[label.id]?.color.borderColor}`}>
+                                        <div className="truncate" style={{ maxWidth: '260px' }}>{label.name}
                                             {label.hotkey && <kbd className="ml-1 uppercase inline-flex items-center border bg-white border-gray-200 rounded px-2 text-sm font-sans font-medium text-gray-400">{label.hotkey}</kbd>}
                                         </div>
                                     </div>))}
@@ -584,7 +585,6 @@ export default function LabelingSuiteLabeling() {
                                                     ${((shouldHighlightOn(tmpHighlightIds, [LabelSourceHover.WEAK_SUPERVISION, rlaLabel.rla.id, rlaLabel.rla.createdBy, rlaLabel.rla.labelingTaskLabel.labelingTask.id]) && rlaLabel.sourceTypeKey == LabelingPageParts.WEAK_SUPERVISION) || (hoverGroupsDict[rlaLabel.labelId] && hoverGroupsDict[rlaLabel.labelId][LabelingPageParts.WEAK_SUPERVISION] && rlaLabel.sourceTypeKey == LabelingPageParts.WEAK_SUPERVISION)) && style.labelOverlayWeakSupervision}
                                                     ${((shouldHighlightOn(tmpHighlightIds, [LabelSourceHover.INFORMATION_SOURCE, rlaLabel.rla.id, rlaLabel.rla.createdBy, rlaLabel.rla.labelingTaskLabel.labelingTask.id]) && rlaLabel.sourceTypeKey == LabelingPageParts.INFORMATION_SOURCE) || (hoverGroupsDict[rlaLabel.labelId] && hoverGroupsDict[rlaLabel.labelId][LabelingPageParts.INFORMATION_SOURCE] && rlaLabel.sourceTypeKey == LabelingPageParts.INFORMATION_SOURCE)) && style.labelOverlayHeuristic}
                                                     `}></div>
-
                                                 {rlaLabel.icon && <div className="mr-1">
                                                     {rlaLabel.icon == InformationSourceType.LABELING_FUNCTION && <IconCode size={20} strokeWidth={1.5} />}
                                                     {rlaLabel.icon == InformationSourceType.ACTIVE_LEARNING && <IconBolt size={20} strokeWidth={1.5} />}
