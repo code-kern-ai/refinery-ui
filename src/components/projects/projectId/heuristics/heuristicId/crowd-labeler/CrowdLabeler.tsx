@@ -1,8 +1,8 @@
-import { selectHeuristic, setActiveHeuristics } from "@/src/reduxStore/states/pages/heuristics";
+import { selectHeuristic, setActiveHeuristics, updateHeuristicsState } from "@/src/reduxStore/states/pages/heuristics";
 import { selectLabelingTasksAll, setLabelingTasksAll } from "@/src/reduxStore/states/pages/settings";
 import { selectProjectId } from "@/src/reduxStore/states/project";
 import { WebSocketsService } from "@/src/services/base/web-sockets/WebSocketsService";
-import { GET_HEURISTICS_BY_ID } from "@/src/services/gql/queries/heuristics";
+import { GET_ACCESS_LINK, GET_HEURISTICS_BY_ID } from "@/src/services/gql/queries/heuristics";
 import { GET_LABELING_TASKS_BY_PROJECT_ID } from "@/src/services/gql/queries/project-setting";
 import { CurrentPage } from "@/src/types/shared/general";
 import { postProcessLabelingTasks, postProcessLabelingTasksSchema } from "@/src/util/components/projects/projectId/settings/labeling-tasks-helper";
@@ -23,6 +23,7 @@ import { unsubscribeWSOnDestroy } from "@/src/services/base/web-sockets/web-sock
 import { REQUEST_COMMENTS } from "@/src/services/gql/queries/projects";
 import { CommentDataManager } from "@/src/util/classes/comments";
 import { CommentType } from "@/src/types/shared/comments";
+import { buildFullLink } from "@/src/util/shared/link-parser-helper";
 
 
 export default function CrowdLabeler() {
@@ -40,6 +41,7 @@ export default function CrowdLabeler() {
     const [refetchLabelingTasksByProjectId] = useLazyQuery(GET_LABELING_TASKS_BY_PROJECT_ID, { fetchPolicy: "network-only" });
     const [refetchDataSlicesMut] = useLazyQuery(DATA_SLICES, { fetchPolicy: 'network-only' });
     const [refetchComments] = useLazyQuery(REQUEST_COMMENTS, { fetchPolicy: "no-cache" });
+    const [refetchAccessLink] = useLazyQuery(GET_ACCESS_LINK, { fetchPolicy: 'network-only' });
 
     useEffect(unsubscribeWSOnDestroy(router, [CurrentPage.HEURISTICS, CurrentPage.LABELING_FUNCTION, CurrentPage.ACTIVE_LEARNING, CurrentPage.CROWD_LABELER, CurrentPage.ZERO_SHOT, CurrentPage.COMMENTS], projectId), []);
 
@@ -87,7 +89,9 @@ export default function CrowdLabeler() {
 
     function refetchCurrentHeuristicAndProcess() {
         refetchCurrentHeuristic({ variables: { projectId: projectId, informationSourceId: router.query.heuristicId } }).then((res) => {
+            const currentHeuristic = postProcessCrowdLabeler(res['data']['informationSourceBySourceId'], labelingTasks);
             dispatch(setActiveHeuristics(postProcessCrowdLabeler(res['data']['informationSourceBySourceId'], labelingTasks)));
+            refetchAccessLinkAndProcess(currentHeuristic);
         });
     }
 
@@ -95,6 +99,14 @@ export default function CrowdLabeler() {
         refetchLabelingTasksByProjectId({ variables: { projectId: projectId } }).then((res) => {
             const labelingTasks = postProcessLabelingTasks(res['data']['projectByProjectId']['labelingTasks']['edges']);
             dispatch(setLabelingTasksAll(postProcessLabelingTasksSchema(labelingTasks)));
+        });
+    }
+
+    function refetchAccessLinkAndProcess(currentHeuristic: any) {
+        if (!currentHeuristic.crowdLabelerSettings.accessLinkId) return;
+        refetchAccessLink({ variables: { projectId: projectId, linkId: currentHeuristic.crowdLabelerSettings.accessLinkId } }).then((res) => {
+            const link = res.data.accessLink;
+            dispatch(updateHeuristicsState(currentHeuristic.id, { crowdLabelerSettings: { ...currentHeuristic.crowdLabelerSettings, accessLink: link.link, accessLinkParsed: buildFullLink(link.link), accessLinkLocked: link.isLocked, isHTTPS: window.location.protocol == 'https:' } }));
         });
     }
 
@@ -113,7 +125,7 @@ export default function CrowdLabeler() {
                 refetchCurrentHeuristicAndProcess();
             }
         }
-    }, [currentHeuristic]);
+    }, [currentHeuristic, projectId]);
 
     useEffect(() => {
         if (!projectId) return;
