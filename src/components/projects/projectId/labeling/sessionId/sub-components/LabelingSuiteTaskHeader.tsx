@@ -75,7 +75,7 @@ export default function LabelingSuiteTaskHeader() {
         localStorage.setItem('labelingSettings', JSON.stringify(settings));
     }
 
-    return (<div id="base-dom-task-header" className="relative bg-white p-4">
+    return (<div className="relative bg-white p-4">
         {displayData && displayData.length > 0 ? (<>
             <div className={`absolute top-4 right-4 p-2 cursor-pointer ${settings.task.isCollapsed ? style.rotateTransform : null}`} onClick={toggleIsCollapsed}>
                 <IconLayoutNavbarCollapse size={24} stroke={2} />

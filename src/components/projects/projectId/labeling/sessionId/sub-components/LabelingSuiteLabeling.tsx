@@ -480,20 +480,16 @@ export default function LabelingSuiteLabeling() {
         }
         setActiveTasksFunc(lVars.taskLookup[attributeId].lookup);
         setTokenLookup(tokenLookupCopy);
-        labelBoxPosition(e.target);
+        labelBoxPosition(e);
     }
 
     function labelBoxPosition(e) {
-        if (!e) return;
-        const labelSelection = document.getElementById('label-selection-box');
-        if (!labelSelection) return;
-        const baseBom = document.getElementById('base-dom-task-header');
-        const baseBox = baseBom?.getBoundingClientRect();
+        const labelBox: DOMRect = e.target?.getBoundingClientRect();
+        if (!labelBox) return;
+        const baseBox: DOMRect = document.getElementById('base-dom-element')?.getBoundingClientRect();
         if (!baseBox) return;
-        const { top, left, height } = e.getBoundingClientRect();
-        const heightLabelSelectionBox = 180;
-        const posTop = (top + height - baseBox.top - heightLabelSelectionBox);
-        const posLeft = (left - baseBox.left);
+        const posTop = (labelBox.top + labelBox.height - baseBox.top + 10);
+        const posLeft = (labelBox.left - baseBox.left);
         setPosition({ top: posTop, left: posLeft });
     }
 
@@ -518,7 +514,7 @@ export default function LabelingSuiteLabeling() {
         }
     }
 
-    return (<div className="bg-white relative p-4">
+    return (<div id="base-dom-element" className="bg-white relative p-4">
         {lVars.loading && SessionManager.currentRecordId !== "deleted" && <LoadingIcon size="lg" />}
         {(!lVars.loading && tokenLookup && !recordRequests.record || SessionManager.currentRecordId == "deleted") && <div className="flex items-center justify-center text-red-500">This Record has been deleted</div>}
 
@@ -564,7 +560,7 @@ export default function LabelingSuiteLabeling() {
                                     <Tooltip content={TOOLTIPS_DICT.LABELING.CHOOSE_LABELS} color="invert" placement="top">
                                         <button onClick={(event) => {
                                             setActiveTasksFunc(task);
-                                            labelBoxPosition(event.target);
+                                            labelBoxPosition(event);
                                         }} className="flex flex-row flex-nowrap bg-white text-gray-700 text-sm font-medium mr-3 px-2 py-0.5 rounded-md border border-gray-300 hover:bg-gray-50 focus:outline-none">
                                             <span>other</span>
                                             <span className="truncate mx-1" style={{ maxWidth: '9rem' }}>{task.task.name}</span>
