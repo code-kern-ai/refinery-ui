@@ -22,6 +22,7 @@ export default function LabelingSettingsModal() {
     const [activeTab, setActiveTab] = useState<ComponentType>(ComponentType.MAIN);
     const [hoverColorOptions, setHoverColorOptions] = useState<string[]>([]);
     const [hoverColorClassArray, setHoverColorClassArray] = useState<string[]>([]);
+    const [showTaskLegendTicked, setShowTaskLegendTicked] = useState<boolean>(true);
 
     useEffect(() => {
         if (!projectId) return;
@@ -122,15 +123,18 @@ export default function LabelingSettingsModal() {
             <div className="grid gap-y-2 gap-x-4 items-center text-left" style={{ gridTemplateColumns: 'max-content auto max-content' }}>
                 <span>Show task legend</span>
                 <span className="cursor-pointer flex items-center">
-                    <input className="h-5 w-5 cursor-pointer" type="checkbox" checked={settings?.task.show} onChange={() => changeSetting(ComponentType.TASK_HEADER, 'show')} /></span>
+                    <input className="h-5 w-5 cursor-pointer" type="checkbox" checked={settings?.task.show} onChange={() => {
+                        changeSetting(ComponentType.TASK_HEADER, 'show');
+                        setShowTaskLegendTicked(!showTaskLegendTicked);
+                    }} /></span>
                 <Tooltip content={<MultilineTooltip tooltipLines={['Completely hide/show the feature.', 'Active settings are preserved']} />} color="invert" placement="top" className="cursor-auto"><IconInfoCircle className="h-5 w-5" /></Tooltip>
                 <span>Collapse</span>
                 <span className="cursor-pointer flex items-center">
-                    <input className="h-5 w-5 cursor-pointer" type="checkbox" checked={settings?.task.isCollapsed} onChange={() => changeSetting(ComponentType.TASK_HEADER, 'isCollapsed')} /></span>
+                    <input disabled={!showTaskLegendTicked} className="h-5 w-5 cursor-pointer" type="checkbox" checked={settings?.task.isCollapsed} onChange={() => changeSetting(ComponentType.TASK_HEADER, 'isCollapsed')} /></span>
                 <Tooltip content={TOOLTIPS_DICT.LABELING.IS_COLLAPSED} color="invert" placement="top" className="cursor-auto"><IconInfoCircle className="h-5 w-5" /></Tooltip>
                 <span>Always show quick buttons</span>
                 <span className="cursor-pointer flex items-center">
-                    <input className="h-5 w-5 cursor-pointer" type="checkbox" checked={settings?.task.alwaysShowQuickButtons} onChange={() => changeSetting(ComponentType.TASK_HEADER, 'alwaysShowQuickButtons')} /></span>
+                    <input disabled={!showTaskLegendTicked} className="h-5 w-5 cursor-pointer" type="checkbox" checked={settings?.task.alwaysShowQuickButtons} onChange={() => changeSetting(ComponentType.TASK_HEADER, 'alwaysShowQuickButtons')} /></span>
                 <Tooltip content={TOOLTIPS_DICT.LABELING.QUICK_BUTTON} color="invert" placement="top" className="cursor-auto"><IconInfoCircle className="h-5 w-5" /></Tooltip>
             </div>
         </div>}
