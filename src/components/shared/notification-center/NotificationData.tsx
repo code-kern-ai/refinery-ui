@@ -20,7 +20,7 @@ export default function NotificationData(props: NotificationDataProps) {
     return (<div className="ml-3 w-full">
         <div className="flex">
             <h3 className={`text-sm font-medium text-${props.textColor}-800`}>
-                <a className="underline" href={props.notification[0].docs} target="_blank" >{props.notification[0].title}</a>
+                <a className="underline mr-1" href={props.notification[0].docs} target="_blank" >{props.notification[0].title}</a>
                 ({props.notification[0].date}
                 {props.notification[0].projectId && <span>&nbsp;in&nbsp;
                     <button className="underline" onClick={() => router.push(`/projects/${props.notification[0].projectId}/${props.notification[0].page}`)}>
