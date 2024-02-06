@@ -100,6 +100,7 @@ export function CommentCreation(props: CommentCreationProps) {
                         }}
                         value={newComment}
                         onKeyDown={(event: any) => checkIfKeyShiftEnterSave(event)}
+                        onKeyUp={(event: any) => event.stopPropagation()}
                     ></textarea>
                 </div>
                 <div className="my-1 text-xs text-gray-500 font-normal text-justify">
