@@ -253,7 +253,7 @@ export default function ProjectOverview() {
     }, [handleWebsocketNotification, projectId]);
 
     return (<div>
-        {projectId != null && <div className="pt-4 px-4 pb-20 bg-gray-100 flex-1 flex flex-col min-h-full h-screen overflow-y-auto">
+        {projectId != null && <div className="pt-4 px-4 pb-10 bg-gray-100 flex-1 flex flex-col min-h-full h-[calc(100vh-4rem)] overflow-y-auto">
             <ProjectOverviewHeader />
             <ProjectOverviewCards projectStats={projectStats} />
             {graphsHaveValues ? (<div>
