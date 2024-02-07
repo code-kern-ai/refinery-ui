@@ -138,9 +138,6 @@ export default function DisplayComments(props: DisplayCommentsProps) {
                             target.style.height = `${finalHeight}px`;
                             target.style.overflowY = finalHeight < maxHeight ? 'hidden' : 'auto';
                             props.handleCommentTextChange(event.target.value, index)
-
-                            console.log(finalHeight);
-                            console.log(maxHeight);
                         }}
                         onBlur={(event: any) => {
                             if (props.editComments[index]) props.editComment(event, comment.id, 'comment', event.target.value, index);
