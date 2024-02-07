@@ -130,10 +130,10 @@ export default function DisplayComments(props: DisplayCommentsProps) {
                     </li>
                     <textarea
                         disabled={props.editComments[index] ? false : true}
-                        className={`rounded-md placeholder-italic w-full max-h-28 h-16 p-2 line-height-textarea focus:outline-none border border-gray-300 text-sm ${props.openComments[index] ? '' : 'hidden'} disabled:cursor-not-allowed disabled:opacity-50`}
+                        className={`rounded-md placeholder-italic w-full max-h-28 h-28 p-2 line-height-textarea focus:outline-none border border-gray-300 text-sm ${props.openComments[index] ? '' : 'hidden'} disabled:cursor-not-allowed disabled:opacity-50`}
                         onChange={(event: any) => {
                             const target = event.target as HTMLTextAreaElement;
-                            const finalHeight = target.scrollHeight + 1;
+                            const finalHeight = target.scrollHeight + 2;
                             const maxHeight = parseInt(window.getComputedStyle(target).getPropertyValue("max-height"));
                             target.style.height = `${finalHeight}px`;
                             target.style.overflowY = finalHeight < maxHeight ? 'hidden' : 'auto';
