@@ -31,6 +31,17 @@ export default function LabelingSettingsModal() {
 
     function changeSetting(page: ComponentType, setting: string, value?: any) {
         dispatch(updateSettings(page, setting, value));
+        const getSettings = localStorage.getItem('labelingSettings');
+        let settings = getSettings ? JSON.parse(getSettings) : {};
+        settings[page][setting] = value ?? !settings[page][setting];
+        if (page == ComponentType.MAIN) {
+            const color = settings.main.hoverGroupBackgroundColor;
+            if (color == "None") settings.main.hoverGroupBackgroundColorClass = "";
+            else if (color == "light gray") settings.main.hoverGroupBackgroundColorClass = "bg-gray-100";
+            else if (color == "gray") settings.main.hoverGroupBackgroundColorClass = "bg-gray-200";
+            else settings.main.hoverGroupBackgroundColorClass = "bg-" + color + "-200";
+        }
+        localStorage.setItem('labelingSettings', JSON.stringify(settings));
     }
 
     function prepareColorOptions() {

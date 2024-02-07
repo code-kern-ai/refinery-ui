@@ -54,7 +54,7 @@ export default function LabelingSuiteLabeling() {
     const [fullRlaData, setFullRlaData] = useState<any[]>([]);
     const [canEditLabels, setCanEditLabels] = useState<boolean>(true);
     const [labelLookup, setLabelLookup] = useState<any>({});
-    const [labelAddButtonDisabled, setLabelAddButtonDisabled] = useState<boolean>(false);
+    const [labelAddButtonDisabledDict, setLabelAddButtonDisabledDict] = useState<{ [taskId: string]: boolean }>({});
     const [activeTasks, setActiveTasks] = useState<any[]>(null);
     const [position, setPosition] = useState({ top: 0, left: 0 });
     const [labelHotkeys, setLabelHotkeys] = useState<HotkeyLookup>({});
@@ -401,15 +401,22 @@ export default function LabelingSuiteLabeling() {
     }
 
     function checkDisableLabelAddButton(labelName: string, activeTask: any) {
-        if (!labelName || !activeTask) setLabelAddButtonDisabled(true);
+        const labelAddButtonDisabledDictCopy = { ...labelAddButtonDisabledDict };
+        if (!labelName || !activeTask) {
+            labelingTasks?.forEach(task => labelAddButtonDisabledDictCopy[task.id] = true);
+            setLabelAddButtonDisabledDict(labelAddButtonDisabledDictCopy);
+        }
         else {
             for (const [key, value] of activeTask.labels.entries()) {
                 if (value.name.toLowerCase() == labelName) {
-                    setLabelAddButtonDisabled(true);
+
+                    labelAddButtonDisabledDictCopy[activeTask.id] = true;
+                    setLabelAddButtonDisabledDict(labelAddButtonDisabledDictCopy);
                     return;
                 }
             }
-            setLabelAddButtonDisabled(false);
+            labelAddButtonDisabledDictCopy[activeTask.id] = false;
+            setLabelAddButtonDisabledDict(labelAddButtonDisabledDictCopy);
         }
     }
 
@@ -480,22 +487,23 @@ export default function LabelingSuiteLabeling() {
         for (const token of tokenLookupCopy[attributeId]?.token) {
             token.selected = token.idx >= tokenStart && token.idx <= tokenEnd;
         }
-        setActiveTasksFunc(lVars.taskLookup[attributeId].lookup);
+        if (lVars.taskLookup[attributeId].lookup[0].task.taskType == LabelingTaskTaskType.INFORMATION_EXTRACTION) {
+            const extractionTasks = lVars.taskLookup[attributeId].lookup.filter(t => t.task.taskType == LabelingTaskTaskType.INFORMATION_EXTRACTION);
+            setActiveTasksFunc(extractionTasks);
+        } else {
+            setActiveTasksFunc(lVars.taskLookup[attributeId].lookup);
+        }
         setTokenLookup(tokenLookupCopy);
-        labelBoxPosition(e.target);
+        labelBoxPosition(e);
     }
 
     function labelBoxPosition(e) {
-        if (!e) return;
-        const labelSelection = document.getElementById('label-selection-box');
-        if (!labelSelection) return;
-        const baseBom = document.getElementById('base-dom-task-header');
-        const baseBox = baseBom?.getBoundingClientRect();
+        const labelBox: DOMRect = e.target?.getBoundingClientRect();
+        if (!labelBox) return;
+        const baseBox: DOMRect = document.getElementById('base-dom-element')?.getBoundingClientRect();
         if (!baseBox) return;
-        const { top, left, height } = e.getBoundingClientRect();
-        const heightLabelSelectionBox = 180;
-        const posTop = (top + height - baseBox.top - heightLabelSelectionBox);
-        const posLeft = (left - baseBox.left);
+        const posTop = (labelBox.top + labelBox.height - baseBox.top + 10);
+        const posLeft = (labelBox.left - baseBox.left);
         setPosition({ top: posTop, left: posLeft });
     }
 
@@ -508,6 +516,9 @@ export default function LabelingSuiteLabeling() {
     function handleKeyboardEvent(event) {
         const labelSelection = document.getElementById('label-selection-box');
         if (!labelSelection) return;
+        if (event.key == 'ArrowRight' || event.key == 'ArrowLeft') {
+            setActiveTasksFunc([]);
+        }
         if (!labelSelection.classList.contains('hidden')) return;
         for (const key in labelHotkeys) {
             if (key == event.key) {
@@ -520,7 +531,7 @@ export default function LabelingSuiteLabeling() {
         }
     }
 
-    return (<div className="bg-white relative p-4">
+    return (<div id="base-dom-element" className="bg-white relative p-4">
         {lVars.loading && SessionManager.currentRecordId !== "deleted" && <LoadingIcon size="lg" />}
         {(!lVars.loading && tokenLookup && !recordRequests.record || SessionManager.currentRecordId == "deleted") && <div className="flex items-center justify-center text-red-500">This Record has been deleted</div>}
 
@@ -558,15 +569,16 @@ export default function LabelingSuiteLabeling() {
                             </>}
                             {task.task.taskType == LabelingTaskTaskType.MULTICLASS_CLASSIFICATION && <>
                                 {(canEditLabels || user.role == UserRole.ANNOTATOR || user.role == UserRole.EXPERT) && <div className="flex flex-row flex-wrap gap-2">
-                                    {task.task.displayLabels.map((label, index) => (<div key={index} className={`text-sm font-medium px-2 py-0.5 rounded-md border focus:outline-none cursor-pointer  ${labelLookup[label.id]?.color.backgroundColor} ${labelLookup[label.id]?.color.textColor} ${labelLookup[label.id]?.color.borderColor}`}>
-                                        <div className="truncate" style={{ maxWidth: '260px' }} onClick={() => addRla(task.task, label.id)}>{label.name}
+                                    {task.task.displayLabels.map((label, index) => (<div key={index} onClick={() => addRla(task.task, label.id)}
+                                        className={`text-sm font-medium px-2 py-0.5 rounded-md border focus:outline-none cursor-pointer  ${labelLookup[label.id]?.color.backgroundColor} ${labelLookup[label.id]?.color.textColor} ${labelLookup[label.id]?.color.borderColor}`}>
+                                        <div className="truncate" style={{ maxWidth: '260px' }}>{label.name}
                                             {label.hotkey && <kbd className="ml-1 uppercase inline-flex items-center border bg-white border-gray-200 rounded px-2 text-sm font-sans font-medium text-gray-400">{label.hotkey}</kbd>}
                                         </div>
                                     </div>))}
                                     <Tooltip content={TOOLTIPS_DICT.LABELING.CHOOSE_LABELS} color="invert" placement="top">
                                         <button onClick={(event) => {
                                             setActiveTasksFunc(task);
-                                            labelBoxPosition(event.target);
+                                            labelBoxPosition(event);
                                         }} className="flex flex-row flex-nowrap bg-white text-gray-700 text-sm font-medium mr-3 px-2 py-0.5 rounded-md border border-gray-300 hover:bg-gray-50 focus:outline-none">
                                             <span>other</span>
                                             <span className="truncate mx-1" style={{ maxWidth: '9rem' }}>{task.task.name}</span>
@@ -587,7 +599,6 @@ export default function LabelingSuiteLabeling() {
                                                     ${((shouldHighlightOn(tmpHighlightIds, [LabelSourceHover.WEAK_SUPERVISION, rlaLabel.rla.id, rlaLabel.rla.createdBy, rlaLabel.rla.labelingTaskLabel.labelingTask.id]) && rlaLabel.sourceTypeKey == LabelingPageParts.WEAK_SUPERVISION) || (hoverGroupsDict[rlaLabel.labelId] && hoverGroupsDict[rlaLabel.labelId][LabelingPageParts.WEAK_SUPERVISION] && rlaLabel.sourceTypeKey == LabelingPageParts.WEAK_SUPERVISION)) && style.labelOverlayWeakSupervision}
                                                     ${((shouldHighlightOn(tmpHighlightIds, [LabelSourceHover.INFORMATION_SOURCE, rlaLabel.rla.id, rlaLabel.rla.createdBy, rlaLabel.rla.labelingTaskLabel.labelingTask.id]) && rlaLabel.sourceTypeKey == LabelingPageParts.INFORMATION_SOURCE) || (hoverGroupsDict[rlaLabel.labelId] && hoverGroupsDict[rlaLabel.labelId][LabelingPageParts.INFORMATION_SOURCE] && rlaLabel.sourceTypeKey == LabelingPageParts.INFORMATION_SOURCE)) && style.labelOverlayHeuristic}
                                                     `}></div>
-
                                                 {rlaLabel.icon && <div className="mr-1">
                                                     {rlaLabel.icon == InformationSourceType.LABELING_FUNCTION && <IconCode size={20} strokeWidth={1.5} />}
                                                     {rlaLabel.icon == InformationSourceType.ACTIVE_LEARNING && <IconBolt size={20} strokeWidth={1.5} />}
@@ -608,7 +619,7 @@ export default function LabelingSuiteLabeling() {
                                 </div>}
                             </>}
                         </div>
-                        <LabelSelectionBox activeTasks={activeTasks} position={position} labelLookup={labelLookup} labelAddButtonDisabled={labelAddButtonDisabled}
+                        <LabelSelectionBox activeTasks={activeTasks} position={position} labelLookup={labelLookup} labelAddButtonDisabledDict={labelAddButtonDisabledDict}
                             addRla={(task, labelId) => {
                                 const tokenLookupCopy = jsonCopy(tokenLookup);
                                 if (saveTokenData && tokenLookupCopy[saveTokenData.attributeIdStart]) {
@@ -619,7 +630,8 @@ export default function LabelingSuiteLabeling() {
                                 addRla(task, labelId, tokenLookupCopy);
                             }}
                             addNewLabelToTask={(newLabel, task) => addNewLabelToTask(newLabel, task)}
-                            checkLabelVisibleInSearch={(newLabel, task) => checkLabelVisibleInSearch(labelLookup, newLabel, task)} />
+                            checkLabelVisibleInSearch={(newLabel, task) => checkLabelVisibleInSearch(labelLookup, newLabel, task)}
+                            labelHotkeys={labelHotkeys} />
                     </div>}
                 </Fragment>))}
             </Fragment>))}

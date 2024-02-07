@@ -13,8 +13,31 @@ export default function LabelSelectionBox(props: LabelSelectionBoxProps) {
     const user = useSelector(selectUser);
     const settings = useSelector(selectSettings);
 
-    const [newLabel, setNewLabel] = useState('');
+    const [newLabelDict, setNewLabelDict] = useState({});
     const [taskFilteredDict, setTaskFilteredDict] = useState({});
+
+    useEffect(() => {
+        if (!props.labelHotkeys) return;
+        document.addEventListener('keyup', handleKeyboardEvent);
+        return () => {
+            document.removeEventListener('keyup', handleKeyboardEvent);
+        };
+    }, [props.labelHotkeys, props.activeTasks]);
+
+    function handleKeyboardEvent(event) {
+        const labelSelection = document.getElementById('label-selection-box');
+        if (!labelSelection || labelSelection.classList.contains('hidden')) return;
+        for (const key in props.labelHotkeys) {
+            if (key == event.key) {
+                const activeTasks = props.activeTasks.map(x => x.task);
+                const task = activeTasks.find(t => t.id == props.labelHotkeys[key].taskId);
+                props.addRla(task, props.labelHotkeys[key].labelId);
+                event.preventDefault();
+                event.stopPropagation();
+                return;
+            }
+        }
+    }
 
     useEffect(() => {
         if (!props.activeTasks || props.activeTasks.length == 0) return;
@@ -34,6 +57,12 @@ export default function LabelSelectionBox(props: LabelSelectionBoxProps) {
         e.stopPropagation();
     }
 
+    function updateNewLabelDict(taskId: string, value: string) {
+        const newLabelDictCopy = { ...newLabelDict };
+        newLabelDictCopy[taskId] = value;
+        setNewLabelDict(newLabelDictCopy);
+    }
+
     return (<div id="label-selection-box" style={{ top: props.position.top, left: props.position.left, minWidth: '270px' }}
         onMouseDown={(e) => stopPropagation(e)} onMouseUp={(e) => stopPropagation(e)}
         className={`flex flex-col rounded-lg bg-white shadow absolute z-50 border border-gray-300 ${props.activeTasks && props.activeTasks.length > 0 ? null : 'hidden'}`}>
@@ -44,26 +73,28 @@ export default function LabelSelectionBox(props: LabelSelectionBoxProps) {
                     <label className="italic font-bold text-sm truncate pr-0.5" style={{ maxWidth: '12rem' }}>{task.task.name}</label>
                 </div>
                 <div className="flex flex-row gap-x-1 flex-nowrap p-2.5 border borders-gray">
-                    <input onClick={(e: any) => e.target.focus()} type="text" value={newLabel} onChange={(e) => {
-                        setNewLabel(e.target.value);
+                    <input onClick={(e: any) => e.target.focus()} type="text" value={newLabelDict[task.task.id] ?? ''} onChange={(e) => {
+                        updateNewLabelDict(task.task.id, e.target.value);
                         props.checkLabelVisibleInSearch(e.target.value, task.task);
-                    }} onKeyDown={(e: any) => {
-                        if (e.key == 'Enter') {
-                            if (e.target.value == '') return;
-                            props.addNewLabelToTask(e.target.value, task.task);
-                            setNewLabel('');
-                        }
-                    }} style={{ outline: 'none', boxShadow: 'none' }} placeholder="Search label name..."
+                    }}
+                        onKeyUp={(e: any) => e.stopPropagation()}
+                        onKeyDown={(e: any) => {
+                            if (e.key == 'Enter') {
+                                if (e.target.value == '' || props.labelAddButtonDisabledDict[task.task.id]) return;
+                                props.addNewLabelToTask(e.target.value, task.task);
+                                updateNewLabelDict(task.task.id, '');
+                            }
+                        }} style={{ outline: 'none', boxShadow: 'none' }} placeholder="Search label name..."
                         className="h-8 w-full text-sm border-gray-300 rounded-md placeholder-italic border text-gray-900 pl-4 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100" />
 
                     {user && user.role == UserRole.ENGINEER && <Tooltip content={TOOLTIPS_DICT.LABELING.CREATE_LABEL} placement="left" color="invert">
                         <div className="flex items-center">
                             <button onClick={() => {
-                                props.addNewLabelToTask(newLabel, task.task);
-                                setNewLabel('');
+                                props.addNewLabelToTask(newLabelDict[task.task.id], task.task);
+                                updateNewLabelDict(task.task.id, '');
                             }}
-                                disabled={props.labelAddButtonDisabled || newLabel == ''} className="disabled:cursor-not-allowed disabled:opacity-50">
-                                <IconCirclePlus className={`${props.labelAddButtonDisabled || newLabel == '' ? 'text-gray-300' : 'text-gray-700'}`} />
+                                disabled={props.labelAddButtonDisabledDict[task.task.id] || newLabelDict[task.task.id] == ''} className="disabled:cursor-not-allowed disabled:opacity-50">
+                                <IconCirclePlus className={`${props.labelAddButtonDisabledDict[task.task.id] || newLabelDict[task.task.id] == '' ? 'text-gray-300' : 'text-gray-700'}`} />
                             </button>
                         </div>
                     </Tooltip>}
