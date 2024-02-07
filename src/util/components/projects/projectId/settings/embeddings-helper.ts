@@ -5,10 +5,10 @@ import { jsonCopy } from "@/submodules/javascript-functions/general";
 
 export const DEFAULT_AZURE_TYPE = 'azure';
 
-export function postProcessingEmbeddings(embeddings: Embedding[], queuedEmbeddings: any[]): Embedding[] {
-    const preparedEmbeddings: Embedding[] = jsonCopy(embeddings);
-    queuedEmbeddings.forEach((task) => {
-        queuedEmbeddings.push({
+export function postProcessingEmbeddings(embeddings: Embedding[], queuedEmbeddings: any[]): any[] {
+    const preparedEmbeddings: any[] = jsonCopy(embeddings);
+    queuedEmbeddings.forEach((task: any) => {
+        preparedEmbeddings.push({
             id: task.id,
             name: task.taskInfo["embedding_name"],
             custom: false,

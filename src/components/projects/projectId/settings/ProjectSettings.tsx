@@ -3,7 +3,7 @@ import DataSchema from "./DataSchema";
 import { selectProject, setActiveProject } from "@/src/reduxStore/states/project";
 import { useLazyQuery } from "@apollo/client";
 import { CHECK_COMPOSITE_KEY, GET_ATTRIBUTES_BY_PROJECT_ID, GET_EMBEDDING_SCHEMA_BY_PROJECT_ID, GET_GATES_INTEGRATION_DATA, GET_LABELING_TASKS_BY_PROJECT_ID, GET_PROJECT_TOKENIZATION, GET_QUEUED_TASKS, GET_RECOMMENDED_ENCODERS_FOR_EMBEDDINGS } from "@/src/services/gql/queries/project-setting";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { selectAttributes, selectEmbeddings, selectGatesIntegration, setAllAttributes, setAllEmbeddings, setAllRecommendedEncodersDict, setGatesIntegration, setLabelingTasksAll, setRecommendedEncodersAll } from "@/src/reduxStore/states/pages/settings";
 import { timer } from "rxjs";
 import { IconCamera, IconCheck, IconDots, IconPlus, IconUpload } from "@tabler/icons-react";
@@ -164,7 +164,7 @@ export default function ProjectSettings() {
         return attributes.some(a => a.state == AttributeState.RUNNING) || checkIfAcUploadedRecords;
     }
 
-    function handleWebsocketNotification(msgParts: string[]) {
+    const handleWebsocketNotification = useCallback((msgParts: string[]) => {
         if (msgParts[1] == 'embedding') {
             if (!embeddings) return;
             if (["queued", "dequeued"].includes(msgParts[2])) {
@@ -174,28 +174,41 @@ export default function ProjectSettings() {
             }
             if (msgParts[4] == "INITIALIZING" || msgParts[4] == "WAITING") {
                 timer(100).subscribe(() => refetchEmbeddingsAndPostProcess());
+                return;
             }
-            for (let e of embeddings) {
-                if (e.id == msgParts[2]) {
-                    if (msgParts[3] == "state") {
-                        if (msgParts[4] == "FINISHED") {
-                            refetchEmbeddingsAndPostProcess();
-                        }
-                        else {
-                            const embedding = { ...e };
-                            embedding.state = msgParts[4];
-                            dispatch(setAllEmbeddings(embeddings.map((e) => e.id == embedding.id ? embedding : e)));
+
+            refetchEmbeddings({ variables: { projectId: project.id } }).then((res) => {
+                refetchQueuedTasks({ variables: { projectId: project.id, taskType: "EMBEDDING" } }).then((queuedTasks) => {
+                    const queuedEmbeddings = queuedTasks.data['queuedTasks'].map((task) => {
+                        const copy = { ...task };
+                        copy.taskInfo = JSON.parse(task.taskInfo);
+                        return copy;
+                    })
+                    const newEMbeddings = postProcessingEmbeddings(res.data['projectByProjectId']['embeddings']['edges'].map((e) => e['node']), queuedEmbeddings);
+                    for (let e of newEMbeddings) {
+                        if (e.id == msgParts[2]) {
+                            if (msgParts[3] == "state") {
+                                if (msgParts[4] == "FINISHED") {
+                                    refetchEmbeddingsAndPostProcess();
+                                }
+                                else {
+                                    const embedding = { ...e };
+                                    embedding.state = msgParts[4];
+                                    dispatch(setAllEmbeddings(newEMbeddings.map((e) => e.id == embedding.id ? embedding : e)));
+                                }
+                            }
+                            else if (msgParts[3] == "progress") {
+                                const embedding = { ...e };
+                                embedding.progress = Number(msgParts[4]);
+                                dispatch(setAllEmbeddings(newEMbeddings.map((e) => e.id == embedding.id ? embedding : e)));
+                            }
+                            else console.log("unknown websocket message in part 3:" + msgParts[3], "full message:", msgParts)
+                            return;
                         }
                     }
-                    else if (msgParts[3] == "progress") {
-                        const embedding = { ...e };
-                        embedding.progress = Number(msgParts[4]);
-                        dispatch(setAllEmbeddings(embeddings.map((e) => e.id == embedding.id ? embedding : e)));
-                    }
-                    else console.log("unknown websocket message in part 3:" + msgParts[3], "full message:", msgParts)
-                    return;
-                }
-            }
+                });
+            });
+
         } else if (msgParts[1] == 'tokenization' && msgParts[2] == 'docbin') {
             if (msgParts[3] == 'progress') {
                 setTokenizationProgress(Number(msgParts[4]));
@@ -247,7 +260,7 @@ export default function ProjectSettings() {
         } else if (['label_created', 'label_deleted', 'labeling_task_deleted', 'labeling_task_updated', 'labeling_task_created'].includes(msgParts[1])) {
             refetchLabelingTasksAndProcess();
         }
-    }
+    }, [project, embeddings, gatesIntegrationData, isAcRunning, tokenizationProgress]);
 
     function refetchAndSetGatesIntegrationData() {
         refetchGatesIntegrationData({ variables: { projectId: project.id } }).then((res) => {

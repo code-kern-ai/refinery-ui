@@ -21,6 +21,7 @@ export type Embedding = {
     dimension?: number;
     count?: number;
     attributeId?: string;
+    custom?: boolean;
 };
 
 export enum EmbeddingType {
