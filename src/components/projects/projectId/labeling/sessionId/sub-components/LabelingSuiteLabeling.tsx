@@ -119,8 +119,9 @@ export default function LabelingSuiteLabeling() {
         const handleMouseUp = (e) => {
             const [check, attributeIdStart, tokenStart, tokenEnd, startEl] = parseSelectionData();
             setSaveTokenData({ attributeIdStart, tokenStart, tokenEnd, startEl });
-            if (!check) clearSelected();
-            else {
+            if (!check) {
+                clearSelected();
+            } else {
                 window.getSelection().empty();
                 setSelected(attributeIdStart, tokenStart, tokenEnd, startEl);
             }
@@ -430,6 +431,7 @@ export default function LabelingSuiteLabeling() {
             setActiveTasksFunc([]);
             clearSelected();
         }
+        clearSelected();
     }
 
     function deleteRecordLabelAssociation(rlaId: string) {
@@ -461,7 +463,7 @@ export default function LabelingSuiteLabeling() {
         const selectionData = collectSelectionData(attributeId, tokenLookupFinal, attributes, recordRequests);
         if (!selectionData) return;
         const sourceId = SessionManager.getSourceId();
-        addExtractionLabelToRecordMut({ variables: { projectId: projectId, recordId: record.id, labelingTaskId: labelingTaskId, labelId: labelId, tokenStartIndex: selectionData.startIdx, tokenEndIndex: selectionData.endIdx, value: selectionData.value, sourceId: sourceId } }).then((res) => { });
+        addExtractionLabelToRecordMut({ variables: { projectId: projectId, recordId: record.id, labelingTaskId: labelingTaskId, labelId: labelId, tokenStartIndex: selectionData.startIdx, tokenEndIndex: selectionData.endIdx, value: selectionData.value, sourceId: sourceId } }).then((res) => {});
     }
 
     function clearSelected() {
