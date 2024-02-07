@@ -292,8 +292,6 @@ export default function LabelingMainComponent() {
             }
         } else if (['label_created', 'label_deleted', 'labeling_task_deleted', 'labeling_task_updated', 'labeling_task_created'].includes(msgParts[1])) {
             refetchLabelingTasksAndProcess();
-        } else {
-            console.log("unknown message in labeling suite task manager" + msgParts);
         }
     }, [record]);
 
