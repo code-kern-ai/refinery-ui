@@ -199,5 +199,6 @@ export function filterRlaLabelCondition(rla: any, settings, projectId): boolean 
 }
 
 export function getShouldHighlightOn(rla: any): string[] {
-    return [rla.id, rla.labelingTaskLabel.id, rla.sourceType, rla.labelingTaskLabel.labelingTask.id, rla.user.id]
+    const createdBy = rla.sourceType == LabelSource.INFORMATION_SOURCE ? rla.informationSource.name : rla.user.firstName + ' ' + rla.user.lastName;
+    return [rla.id, rla.labelingTaskLabel.id, rla.sourceType, rla.labelingTaskLabel.labelingTask.id, createdBy]
 }
