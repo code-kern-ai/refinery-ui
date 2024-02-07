@@ -223,7 +223,7 @@ function rlaIsEqual(rlaA: any, rlaB: any): boolean {
 
 export function parseSelectionData(): any[] {
     let selection = window.getSelection();
-    if (selection.type != 'Range') return [false];
+    if (selection.type !== 'Range' && selection.type !== 'Caret') return [false];
 
     const startElement = getSelectionElement(selection, true);
     const endElement = getSelectionElement(selection, false);
