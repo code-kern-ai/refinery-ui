@@ -54,7 +54,7 @@ export default function LabelingSuiteLabeling() {
     const [fullRlaData, setFullRlaData] = useState<any[]>([]);
     const [canEditLabels, setCanEditLabels] = useState<boolean>(true);
     const [labelLookup, setLabelLookup] = useState<any>({});
-    const [labelAddButtonDisabled, setLabelAddButtonDisabled] = useState<boolean>(false);
+    const [labelAddButtonDisabledDict, setLabelAddButtonDisabledDict] = useState<{ [taskId: string]: boolean }>({});
     const [activeTasks, setActiveTasks] = useState<any[]>(null);
     const [position, setPosition] = useState({ top: 0, left: 0 });
     const [labelHotkeys, setLabelHotkeys] = useState<HotkeyLookup>({});
@@ -401,15 +401,24 @@ export default function LabelingSuiteLabeling() {
     }
 
     function checkDisableLabelAddButton(labelName: string, activeTask: any) {
-        if (!labelName || !activeTask) setLabelAddButtonDisabled(true);
+        const labelAddButtonDisabledDictCopy = { ...labelAddButtonDisabledDict };
+        if (!labelName || !activeTask) {
+            const extractionTasks = labelingTasks?.filter(t => t.taskType == LabelingTaskTaskType.INFORMATION_EXTRACTION);
+            if (!extractionTasks) return;
+            extractionTasks.forEach(task => labelAddButtonDisabledDictCopy[task.id] = true);
+            setLabelAddButtonDisabledDict(labelAddButtonDisabledDictCopy);
+        }
         else {
             for (const [key, value] of activeTask.labels.entries()) {
                 if (value.name.toLowerCase() == labelName) {
-                    setLabelAddButtonDisabled(true);
+
+                    labelAddButtonDisabledDictCopy[activeTask.id] = true;
+                    setLabelAddButtonDisabledDict(labelAddButtonDisabledDictCopy);
                     return;
                 }
             }
-            setLabelAddButtonDisabled(false);
+            labelAddButtonDisabledDictCopy[activeTask.id] = false;
+            setLabelAddButtonDisabledDict(labelAddButtonDisabledDictCopy);
         }
     }
 
@@ -606,7 +615,7 @@ export default function LabelingSuiteLabeling() {
                                 </div>}
                             </>}
                         </div>
-                        <LabelSelectionBox activeTasks={activeTasks} position={position} labelLookup={labelLookup} labelAddButtonDisabled={labelAddButtonDisabled}
+                        <LabelSelectionBox activeTasks={activeTasks} position={position} labelLookup={labelLookup} labelAddButtonDisabledDict={labelAddButtonDisabledDict}
                             addRla={(task, labelId) => {
                                 const tokenLookupCopy = jsonCopy(tokenLookup);
                                 if (saveTokenData && tokenLookupCopy[saveTokenData.attributeIdStart]) {
