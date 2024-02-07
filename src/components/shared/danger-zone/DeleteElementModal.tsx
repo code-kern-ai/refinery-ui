@@ -38,6 +38,7 @@ export default function DeleteElementModal(props: DangerZoneProps) {
                     dispatch(removeFromAllAttributesById(props.id));
                     router.push(`/projects/${projectId}/settings`);
                 });
+                break;
             case DangerZoneEnum.LOOKUP_LIST:
                 deleteLookupListMut({ variables: { projectId: projectId, knowledgeBaseId: props.id } }).then(() => {
                     setIsDeleting(false);

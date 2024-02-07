@@ -215,9 +215,6 @@ const initialState: Modals = {
     [ModalEnum.EXPORT_RECORDS]: {
         open: false,
     },
-    [ModalEnum.COMMENTS_SECTION]: {
-        open: false
-    },
     [ModalEnum.BRICKS_INTEGRATOR]: {
         open: false
     },

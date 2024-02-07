@@ -59,7 +59,6 @@ export default function ProjectsList() {
         dispatch(setAllEmbeddings([]));
         dispatch(setDataSlices([]));
         dispatch(setComments(null));
-        dispatch(closeModal(ModalEnum.COMMENTS_SECTION));
     }, []);
 
     useEffect(() => {

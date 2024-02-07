@@ -3,9 +3,7 @@ import CommentsMainSection from "./CommentsMainSection";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
 import { IconNotes } from "@tabler/icons-react";
 import { useDispatch, useSelector } from "react-redux";
-import { ModalEnum } from "@/src/types/shared/modal";
-import { selectModal, setModalStates } from "@/src/reduxStore/states/modal";
-import { useCallback, useEffect } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { selectAllUsers, setAllUsers, setComments } from "@/src/reduxStore/states/general";
 import { WebSocketsService } from "@/src/services/base/web-sockets/WebSocketsService";
 import { CurrentPage } from "@/src/types/shared/general";
@@ -23,8 +21,8 @@ export default function Comments() {
     const dispatch = useDispatch();
     const router = useRouter();
 
+    const [sidebarOpen, setSidebarOpen] = useState(false);
     const projectId = useSelector(selectProjectId);
-    const commentsSideBar = useSelector(selectModal(ModalEnum.COMMENTS_SECTION));
     const allUsers = useSelector(selectAllUsers);
 
     const [refetchComments] = useLazyQuery(REQUEST_COMMENTS, { fetchPolicy: "no-cache" });
@@ -141,8 +139,8 @@ export default function Comments() {
     }, [handleWebsocketNotification, projectId]);
 
     const toggleModal = useCallback(() => {
-        dispatch(setModalStates(ModalEnum.COMMENTS_SECTION, { open: !commentsSideBar.open }));
-    }, [commentsSideBar]);
+        setSidebarOpen(prev => !prev);
+    }, []);
 
     return (<>
         <button className="cursor-pointer inline-block mr-6" onClick={toggleModal}>
@@ -150,6 +148,6 @@ export default function Comments() {
                 <IconNotes className="w-6 h-6" />
             </Tooltip>
         </button>
-        <CommentsMainSection open={commentsSideBar.open} toggleOpen={(toggleModal)} />
+        <CommentsMainSection open={sidebarOpen} toggleOpen={(toggleModal)} />
     </>)
 }

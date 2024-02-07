@@ -191,9 +191,11 @@ export default function Upload(props: UploadProps) {
     }
 
     function getFileNameBasedOnType() {
+        
         const fileName = selectedFile?.name;
         switch (uploadFileType) {
-            case UploadFileType.RECORDS_NEW || UploadFileType.RECORDS_ADD:
+            case UploadFileType.RECORDS_ADD:
+            case UploadFileType.RECORDS_NEW:
                 return fileName + "_SCALE";
             case UploadFileType.KNOWLEDGE_BASE:
                 return fileName + "_" + props.uploadOptions.knowledgeBaseId;
