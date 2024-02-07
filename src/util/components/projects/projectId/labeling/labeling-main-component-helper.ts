@@ -111,7 +111,7 @@ export function getDefaultLabelingSuiteSettings(): LabelingSuiteSettings {
         main: {
             autoNextRecord: false,
             hoverGroupBackgroundColor: "green",
-            hoverGroupBackgroundColorClass: "bg-green-100",
+            hoverGroupBackgroundColorClass: "bg-green-200",
             lineBreaks: LineBreaksType.NORMAL
         },
         overviewTable: {
