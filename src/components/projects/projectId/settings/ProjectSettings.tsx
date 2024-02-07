@@ -85,7 +85,8 @@ export default function ProjectSettings() {
         if (!project) return;
         requestPKeyCheck();
         refetchRecommendedEncodersForEmbeddings({ variables: { projectId: project.id } }).then((encoder) => {
-            dispatch(setRecommendedEncodersAll(encoder['data']['recommendedEncoders'] as RecommendedEncoder[]));
+            const encoderSuggestions = encoder['data']['recommendedEncoders'].filter(e => e.tokenizers.includes("all") || e.tokenizers.includes(project.tokenizer));
+            dispatch(setRecommendedEncodersAll(encoderSuggestions as RecommendedEncoder[]));
             dispatch(setAllRecommendedEncodersDict(postProcessingRecommendedEncoders(attributes, project.tokenizer, encoder['data']['recommendedEncoders'])));
         });
     }, [attributes]);

@@ -175,7 +175,10 @@ export default function LabelingMainComponent() {
         CommentDataManager.unregisterCommentRequests(CurrentPage.LABELING);
         CommentDataManager.registerCommentRequests(CurrentPage.LABELING, [{ commentType: CommentType.RECORD, projectId: projectId, commentKey: SessionManager.currentRecordId }]);
         const requestJsonString = CommentDataManager.buildRequestJSON();
-        if (SessionManager.currentRecordId == "deleted") return;
+        if (SessionManager.currentRecordId == "deleted") {
+            router.push(`/projects/${projectId}/labeling/${SessionManager.labelingLinkData.huddleId}?pos=${SessionManager.huddleData.linkData.requestedPos}&type=${SessionManager.huddleData.linkData.linkType}`);
+            return;
+        }
         refetchComments({ variables: { requested: requestJsonString } }).then((res) => {
             CommentDataManager.parseCommentData(JSON.parse(res.data['getAllComments']));
             CommentDataManager.parseToCurrentData(allUsers);
@@ -190,7 +193,10 @@ export default function LabelingMainComponent() {
         CommentDataManager.unregisterCommentRequests(CurrentPage.LABELING);
         CommentDataManager.registerCommentRequests(CurrentPage.LABELING, [{ commentType: CommentType.RECORD, projectId: projectId, commentKey: SessionManager.currentRecordId }]);
         const requestJsonString = CommentDataManager.buildRequestJSON();
-        if (SessionManager.currentRecordId == "deleted") return;
+        if (SessionManager.currentRecordId == "deleted") {
+            router.push(`/projects/${projectId}/labeling/${SessionManager.labelingLinkData.huddleId}?pos=${SessionManager.huddleData.linkData.requestedPos}&type=${SessionManager.huddleData.linkData.linkType}`);
+            return;
+        }
         refetchComments({ variables: { requested: requestJsonString } }).then((res) => {
             CommentDataManager.parseCommentData(JSON.parse(res.data['getAllComments']));
             CommentDataManager.parseToCurrentData(allUsers);
