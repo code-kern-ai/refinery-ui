@@ -10,7 +10,7 @@ import { DEFAULT_LABEL_COLOR, FULL_RECORD_ID, SWIM_LANE_SIZE_PX, buildLabelingRl
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants"
 import { Tooltip } from "@nextui-org/react"
 import { IconAlertCircle, IconAssembly, IconBolt, IconCode, IconSparkles, IconStar, IconStarFilled, IconUsers } from "@tabler/icons-react"
-import { Fragment, use, useEffect, useState } from "react"
+import { Fragment, useRef, useEffect, useState } from "react"
 import { useDispatch, useSelector } from "react-redux"
 import ExtractionDisplay from "./ExtractionDisplay"
 import { LineBreaksType } from "@/src/types/components/projects/projectId/data-browser/data-browser"
@@ -59,6 +59,8 @@ export default function LabelingSuiteLabeling() {
     const [position, setPosition] = useState({ top: 0, left: 0 });
     const [labelHotkeys, setLabelHotkeys] = useState<HotkeyLookup>({});
     const [saveTokenData, setSaveTokenData] = useState<any>(null);
+
+    const extractionRef = useRef(null);
 
     const [deleteRlaByIdMut] = useMutation(DELETE_RECORD_LABEL_ASSOCIATION_BY_ID);
     const [addClassificationLabelToRecordMut] = useMutation(ADD_CLASSIFICATION_LABELS_TO_RECORD);
@@ -115,7 +117,7 @@ export default function LabelingSuiteLabeling() {
     }, [labelHotkeys]);
 
     useEffect(() => {
-        if (!tokenLookup) return;
+        if (!tokenLookup || !extractionRef.current) return;
         const handleMouseUp = (e) => {
             const [check, attributeIdStart, tokenStart, tokenEnd, startEl] = parseSelectionData();
             setSaveTokenData({ attributeIdStart, tokenStart, tokenEnd, startEl });
@@ -126,9 +128,9 @@ export default function LabelingSuiteLabeling() {
                 setSelected(attributeIdStart, tokenStart, tokenEnd, startEl);
             }
         };
-        window.addEventListener('mouseup', handleMouseUp);
+        extractionRef.current.addEventListener('mouseup', handleMouseUp);
         return () => {
-            window.removeEventListener('mouseup', handleMouseUp);
+            extractionRef.current.removeEventListener('mouseup', handleMouseUp);
         };
     }, [tokenLookup]);
 
@@ -554,7 +556,7 @@ export default function LabelingSuiteLabeling() {
                     {task.showGridLabelPart && <div className={`col-start-4 h-full py-1 ${i % 2 == 0 ? 'bg-white' : 'bg-gray-50'}`} style={{ gridRow: task.gridRowSpan }}>
                         <div className="flex flex-col gap-y-2">
                             {task.showText && <>
-                                {task.task.taskType == LabelingTaskTaskType.INFORMATION_EXTRACTION ? (<ExtractionDisplay attributeId={attribute.id} tokenLookup={tokenLookup} labelLookup={labelLookup}
+                                {task.task.taskType == LabelingTaskTaskType.INFORMATION_EXTRACTION ? (<ExtractionDisplay ref={extractionRef} attributeId={attribute.id} tokenLookup={tokenLookup} labelLookup={labelLookup}
                                     deleteRla={(rlaId) => deleteRecordLabelAssociation(rlaId)}
                                     setSelected={(start, end, e) => setSelected(attribute.id, start, end, e)} />) : (<>
                                         {(recordRequests.record.data[lVars.taskLookup[attribute.id].attribute.name] != null && recordRequests.record.data[lVars.taskLookup[attribute.id].attribute.name] !== '') ?

@@ -5,13 +5,13 @@ import { LabelingPageParts } from "@/src/types/components/projects/projectId/lab
 import { Tooltip } from "@nextui-org/react";
 import { useDispatch, useSelector } from "react-redux";
 import style from '@/src/styles/components/projects/projectId/labeling.module.css';
-import { useState } from "react";
+import { useState, forwardRef } from "react";
 
 export function shouldHighlightOn(tmpHighlightIds: string[], comparedId: string[]) {
     return tmpHighlightIds.some((id) => comparedId.includes(id));
 }
 
-export default function ExtractionDisplay(props: ExtractionDisplayProps) {
+const ExtractionDisplay = forwardRef<HTMLInputElement, ExtractionDisplayProps>(function ExtractionDisplay(props, ref) {
     const dispatch = useDispatch();
 
     const settings = useSelector(selectSettings);
@@ -55,7 +55,7 @@ export default function ExtractionDisplay(props: ExtractionDisplayProps) {
     }
 
     return (<>
-        {props.tokenLookup && <div className="flex flex-row flex-wrap items-start">
+        {props.tokenLookup && <div ref={ref} className="flex flex-row flex-wrap items-start">
             {props.tokenLookup[props.attributeId] && props.tokenLookup[props.attributeId].token && props.tokenLookup[props.attributeId].token.map((token) => (<div key={token.idx} className={`relative z-10 ${token.countLineBreaks > 0 && settings.main.lineBreaks != LineBreaksType.NORMAL ? 'w-full' : ''}`}
                 style={{ marginBottom: props.tokenLookup[props.attributeId][token.idx]?.tokenMarginBottom }}
                 data-tokenidx={token.idx} data-attributeid={props.attributeId}>
@@ -100,7 +100,7 @@ export default function ExtractionDisplay(props: ExtractionDisplayProps) {
             </div>))}
         </div>}
     </>);
-}
+});
 
 function TokenValue(props: any) {
     return (<>
@@ -112,3 +112,5 @@ function TokenValue(props: any) {
         </label>}
     </>)
 }
+
+export default ExtractionDisplay;
