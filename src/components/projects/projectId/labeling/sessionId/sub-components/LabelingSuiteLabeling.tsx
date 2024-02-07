@@ -402,9 +402,7 @@ export default function LabelingSuiteLabeling() {
     function checkDisableLabelAddButton(labelName: string, activeTask: any) {
         const labelAddButtonDisabledDictCopy = { ...labelAddButtonDisabledDict };
         if (!labelName || !activeTask) {
-            const extractionTasks = labelingTasks?.filter(t => t.taskType == LabelingTaskTaskType.INFORMATION_EXTRACTION);
-            if (!extractionTasks) return;
-            extractionTasks.forEach(task => labelAddButtonDisabledDictCopy[task.id] = true);
+            labelingTasks?.forEach(task => labelAddButtonDisabledDictCopy[task.id] = true);
             setLabelAddButtonDisabledDict(labelAddButtonDisabledDictCopy);
         }
         else {
@@ -487,7 +485,12 @@ export default function LabelingSuiteLabeling() {
         for (const token of tokenLookupCopy[attributeId]?.token) {
             token.selected = token.idx >= tokenStart && token.idx <= tokenEnd;
         }
-        setActiveTasksFunc(lVars.taskLookup[attributeId].lookup);
+        if (lVars.taskLookup[attributeId].lookup[0].task.taskType == LabelingTaskTaskType.INFORMATION_EXTRACTION) {
+            const extractionTasks = lVars.taskLookup[attributeId].lookup.filter(t => t.task.taskType == LabelingTaskTaskType.INFORMATION_EXTRACTION);
+            setActiveTasksFunc(extractionTasks);
+        } else {
+            setActiveTasksFunc(lVars.taskLookup[attributeId].lookup);
+        }
         setTokenLookup(tokenLookupCopy);
         labelBoxPosition(e);
     }
