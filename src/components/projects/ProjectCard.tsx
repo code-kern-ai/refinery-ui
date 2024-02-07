@@ -1,6 +1,6 @@
 import { selectIsAdmin, selectIsDemo, selectUser } from "@/src/reduxStore/states/general";
 import { closeModal, setModalStates } from "@/src/reduxStore/states/modal";
-import { removeFromAllProjectsById, setActiveProject } from "@/src/reduxStore/states/project";
+import { removeFromAllProjectsById } from "@/src/reduxStore/states/project";
 import { Project, ProjectCardProps, ProjectStatus } from "@/src/types/components/projects/projects-list";
 import { ModalEnum } from "@/src/types/shared/modal";
 import { isStringTrue } from "@/submodules/javascript-functions/general";
