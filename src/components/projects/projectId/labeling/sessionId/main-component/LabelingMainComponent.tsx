@@ -18,7 +18,6 @@ import NavigationBarBottom from "./NavigationBarBottom";
 import { GET_ATTRIBUTES_BY_PROJECT_ID, GET_LABELING_TASKS_BY_PROJECT_ID, GET_RECORD_BY_RECORD_ID } from "@/src/services/gql/queries/project-setting";
 import { combineLatest } from "rxjs";
 import LabelingSuiteTaskHeader from "../sub-components/LabelingSuiteTaskHeader";
-import { transferNestedDict } from "@/submodules/javascript-functions/general";
 import LabelingSuiteOverviewTable from "../sub-components/LabelingSuiteOverviewTable";
 import LabelingSuiteLabeling from "../sub-components/LabelingSuiteLabeling";
 import { setAllAttributes, setLabelingTasksAll } from "@/src/reduxStore/states/pages/settings";
@@ -286,7 +285,8 @@ export default function LabelingMainComponent() {
                 dispatch(updateRecordRequests('rla', null));
             }
         } else if (['payload_finished', 'weak_supervision_finished', 'rla_created', 'rla_deleted'].includes(msgParts[1])) {
-            refetchRla({ variables: { projectId, recordId: SessionManager.currentRecordId } }).then((result) => {
+            const recordId = SessionManager.currentRecordId ?? record.id;
+            refetchRla({ variables: { projectId, recordId: recordId } }).then((result) => {
                 dispatch(updateRecordRequests('rla', result?.data?.recordByRecordId?.recordLabelAssociations));
             });
         } else if (['access_link_changed', 'access_link_removed'].includes(msgParts[1])) {
@@ -298,7 +298,7 @@ export default function LabelingMainComponent() {
         } else if (['label_created', 'label_deleted', 'labeling_task_deleted', 'labeling_task_updated', 'labeling_task_created'].includes(msgParts[1])) {
             refetchLabelingTasksAndProcess();
         }
-    }, [record]);
+    }, [record, SessionManager.currentRecordId]);
 
     useEffect(() => {
         if (!projectId) return;
