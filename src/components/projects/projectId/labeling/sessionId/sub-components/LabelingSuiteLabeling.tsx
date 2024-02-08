@@ -556,8 +556,11 @@ export default function LabelingSuiteLabeling() {
                     {task.showGridLabelPart && <div className={`col-start-4 h-full py-1 ${i % 2 == 0 ? 'bg-white' : 'bg-gray-50'}`} style={{ gridRow: task.gridRowSpan }}>
                         <div className="flex flex-col gap-y-2">
                             {task.showText && <>
-                                {task.task.taskType == LabelingTaskTaskType.INFORMATION_EXTRACTION ? (<ExtractionDisplay ref={extractionRef} attributeId={attribute.id} tokenLookup={tokenLookup} labelLookup={labelLookup}
-                                    deleteRla={(rlaId) => deleteRecordLabelAssociation(rlaId)}
+                                {task.task.taskType == LabelingTaskTaskType.INFORMATION_EXTRACTION ? (<ExtractionDisplay  ref={extractionRef} attributeId={attribute.id} tokenLookup={tokenLookup} labelLookup={labelLookup}
+                                    deleteRla={(rlaId) => {
+                                        deleteRecordLabelAssociation(rlaId);
+                                        setActiveTasksFunc([]);
+                                    }}
                                     setSelected={(start, end, e) => setSelected(attribute.id, start, end, e)} />) : (<>
                                         {(recordRequests.record.data[lVars.taskLookup[attribute.id].attribute.name] != null && recordRequests.record.data[lVars.taskLookup[attribute.id].attribute.name] !== '') ?
                                             (<p className={`break-words text-sm leading-5 font-normal text-gray-500 ${settings.main.lineBreaks != LineBreaksType.NORMAL ? (settings.main.lineBreaks == LineBreaksType.IS_PRE_WRAP ? 'whitespace-pre-wrap' : 'whitespace-pre-line') : ''}`}>
