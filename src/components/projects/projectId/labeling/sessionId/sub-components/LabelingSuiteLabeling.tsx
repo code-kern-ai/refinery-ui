@@ -433,7 +433,6 @@ export default function LabelingSuiteLabeling() {
             setActiveTasksFunc([]);
             clearSelected();
         }
-        clearSelected();
     }
 
     function deleteRecordLabelAssociation(rlaId: string) {
