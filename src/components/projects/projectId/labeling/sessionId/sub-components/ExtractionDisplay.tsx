@@ -60,7 +60,10 @@ export default function ExtractionDisplay(props: ExtractionDisplayProps) {
                 style={{ marginBottom: props.tokenLookup[props.attributeId][token.idx]?.tokenMarginBottom }}
                 data-tokenidx={token.idx} data-attributeid={props.attributeId}>
                 {token.countLineBreaks == 0 ? (<>
-                    {token.type ? (<Tooltip content={'spaCy type: ' + token.type} color="invert" placement="top">
+                    {token.type ? (<Tooltip content={'spaCy type: ' + token.type} color="invert" placement="top" onKeyDown={(e: any) => {
+                        e.preventDefault();
+                        e.target.blur();
+                    }}>
                         <TokenValue token={token} attributeId={props.attributeId} setSelected={(e) => props.setSelected(token.idx, token.idx, e)} />
                     </Tooltip>) : (<>
                         <TokenValue token={token} attributeId={props.attributeId} setSelected={(e) => props.setSelected(token.idx, token.idx, e)} /></>)}
