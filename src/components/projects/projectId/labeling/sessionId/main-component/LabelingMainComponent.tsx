@@ -130,7 +130,12 @@ export default function LabelingMainComponent() {
 
     useEffect(() => {
         if (!SessionManager.currentRecordId) return;
-        if (SessionManager.currentRecordId == "deleted") return;
+        if (SessionManager.currentRecordId == "deleted") {
+            dispatch(updateRecordRequests('record', null));
+            dispatch(updateRecordRequests('token', null));
+            dispatch(updateRecordRequests('rla', null));
+            return;
+        }
         combineLatest([
             refetchTokenizedRecord({ variables: { recordId: SessionManager.currentRecordId } }),
             refetchRecordByRecordId({ variables: { projectId, recordId: SessionManager.currentRecordId } }),
@@ -281,7 +286,7 @@ export default function LabelingMainComponent() {
                 dispatch(updateRecordRequests('rla', null));
             }
         } else if (['payload_finished', 'weak_supervision_finished', 'rla_created', 'rla_deleted'].includes(msgParts[1])) {
-            refetchRla({ variables: { projectId, recordId: record.id } }).then((result) => {
+            refetchRla({ variables: { projectId, recordId: SessionManager.currentRecordId } }).then((result) => {
                 dispatch(updateRecordRequests('rla', result?.data?.recordByRecordId?.recordLabelAssociations));
             });
         } else if (['access_link_changed', 'access_link_removed'].includes(msgParts[1])) {
