@@ -22,7 +22,7 @@ export default function ExplainModal(props: ExplainModalProps) {
         </h1>
         <div className="text-sm text-gray-700 flex flex-col gap-y-2 my-2 font-medium">
             <div>Changing records directly should only be done in edge cases! </div>
-            <div>This directly changes your data and cannot be undone.</div>
+            <div>This changes your data and cannot be undone.</div>
         </div>
         <h1 className="text-lg text-gray-900 text-center inline-flex items-center gap-x-1">Info
             <IconInfoCircleFilled className="inline-block text-blue-400" />

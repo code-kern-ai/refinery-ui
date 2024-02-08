@@ -62,3 +62,14 @@ function timeDiffCalc(date: any) {
     }
     return `less than a minute`
 }
+
+export function postProcessNotificationsUser(notifications, notificationsState): any {
+    let final = [];
+    const toBeAddedValues = notifications.map((n) => ({ ...n, savedToStore: new Date().getTime() }));
+    if (notificationsState.length > 0) {
+        final = [...notificationsState, ...toBeAddedValues];
+    } else {
+        final = toBeAddedValues;
+    }
+    return final;
+}
