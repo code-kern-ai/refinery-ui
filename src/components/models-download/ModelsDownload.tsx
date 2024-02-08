@@ -57,7 +57,7 @@ export default function ModelsDownload() {
         WebSocketsService.updateFunctionPointer(null, CurrentPage.MODELS_DOWNLOAD, handleWebsocketNotification)
     }, [handleWebsocketNotification]);
 
-    return (<div className="p-4 bg-gray-100 h-screen overflow-y-auto flex-1 flex flex-col">
+    return (<div className="p-4 bg-gray-100 flex-1 flex flex-col h-[calc(100vh-4rem)] overflow-y-auto">
         <div className="flex flex-row items-center">
             <button onClick={() => router.back()} className="text-green-800 text-sm font-medium">
                 <IconArrowLeft className="h-5 w-5 inline-block text-green-800" />
@@ -67,7 +67,7 @@ export default function ModelsDownload() {
         <div className="mt-4 text-lg leading-6 text-gray-900 font-medium inline-block">
             Downloaded models
         </div>
-        <div className="mt-1 overflow-y-auto" style={{ maxHeight: 'calc(100vh - 200px)', padding: '3px' }}>
+        <div className="mt-1">
             <div className="inline-block min-w-full align-middle">
                 <div className="overflow-hidden shadow ring-1 ring-black ring-opacity-5 md:rounded-lg">
                     <table className="min-w-full divide-y divide-gray-300">
