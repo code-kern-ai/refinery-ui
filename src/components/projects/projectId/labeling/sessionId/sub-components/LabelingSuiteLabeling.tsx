@@ -130,7 +130,7 @@ export default function LabelingSuiteLabeling() {
         };
         extractionRef.current.addEventListener('mouseup', handleMouseUp);
         return () => {
-            extractionRef.current.removeEventListener('mouseup', handleMouseUp);
+            extractionRef.current?.removeEventListener('mouseup', handleMouseUp);
         };
     }, [tokenLookup]);
 
