@@ -109,12 +109,12 @@ export default function LabelingSuiteLabeling() {
     }, []);
 
     useEffect(() => {
-        if (!labelHotkeys) return;
+        if (!labelHotkeys || !tokenLookup) return;
         document.addEventListener('keyup', handleKeyboardEvent);
         return () => {
             document.removeEventListener('keyup', handleKeyboardEvent);
         };
-    }, [labelHotkeys]);
+    }, [labelHotkeys, tokenLookup]);
 
     useEffect(() => {
         if (!tokenLookup || !extractionRef.current) return;
@@ -302,7 +302,7 @@ export default function LabelingSuiteLabeling() {
     function prepareRlaTokenLookup() {
         if (!lVars.loopAttributes || !rlaDataToDisplay || !recordRequests.token) return;
         const orderLookup = {};
-        const tokenLookupCopy = jsonCopy(tokenLookup);
+        const tokenLookupCopy = {};
         for (const attribute of lVars.loopAttributes) {
             let taskList = lVars.taskLookup[attribute.id].lookup;
             taskList = taskList.filter(t => t.task.taskType == LabelingTaskTaskType.INFORMATION_EXTRACTION);
@@ -433,7 +433,6 @@ export default function LabelingSuiteLabeling() {
             setActiveTasksFunc([]);
             clearSelected();
         }
-        clearSelected();
     }
 
     function deleteRecordLabelAssociation(rlaId: string) {
@@ -455,6 +454,7 @@ export default function LabelingSuiteLabeling() {
         addClassificationLabelToRecordMut({ variables: { projectId: projectId, recordId: record.id, labelingTaskId: labelingTaskId, labelId: labelId, asGoldStar: asGoldStar, sourceId: sourceId } }).then((res) => {
             if (settings.main.autoNextRecord) {
                 SessionManager.nextRecord();
+                SessionManager.currentRecordId = SessionManager.huddleData.recordIds[SessionManager.huddleData.linkData.requestedPos - 1];
                 router.push(`/projects/${projectId}/labeling/${SessionManager.labelingLinkData.huddleId}?pos=${SessionManager.huddleData.linkData.requestedPos}&type=${SessionManager.huddleData.linkData.linkType}`);
             }
         });
@@ -556,7 +556,7 @@ export default function LabelingSuiteLabeling() {
                     {task.showGridLabelPart && <div className={`col-start-4 h-full py-1 ${i % 2 == 0 ? 'bg-white' : 'bg-gray-50'}`} style={{ gridRow: task.gridRowSpan }}>
                         <div className="flex flex-col gap-y-2">
                             {task.showText && <>
-                                {task.task.taskType == LabelingTaskTaskType.INFORMATION_EXTRACTION ? (<ExtractionDisplay  ref={extractionRef} attributeId={attribute.id} tokenLookup={tokenLookup} labelLookup={labelLookup}
+                                {task.task.taskType == LabelingTaskTaskType.INFORMATION_EXTRACTION ? (<ExtractionDisplay ref={extractionRef} attributeId={attribute.id} tokenLookup={tokenLookup} labelLookup={labelLookup}
                                     deleteRla={(rlaId) => {
                                         deleteRecordLabelAssociation(rlaId);
                                         setActiveTasksFunc([]);

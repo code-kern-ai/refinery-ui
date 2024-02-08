@@ -52,6 +52,15 @@ export default function LabelSelectionBox(props: LabelSelectionBoxProps) {
         setTaskFilteredDict(taskFilteredDict);
     }, [props.activeTasks, settings.labeling.showNLabelButton]);
 
+    useEffect(() => {
+        if (!props.activeTasks || props.activeTasks.length == 0) return;
+        const newLabelDictCopy = {};
+        props.activeTasks.forEach((task) => {
+            newLabelDictCopy[task.task.id] = '';
+        });
+        setNewLabelDict(newLabelDictCopy);
+    }, [props.activeTasks]);
+
     function stopPropagation(e) {
         e.preventDefault()
         e.stopPropagation();
@@ -61,6 +70,20 @@ export default function LabelSelectionBox(props: LabelSelectionBoxProps) {
         const newLabelDictCopy = { ...newLabelDict };
         newLabelDictCopy[taskId] = value;
         setNewLabelDict(newLabelDictCopy);
+        if (!taskFilteredDict[taskId]) return;
+        if (value == '') {
+            const taskFilteredDictCopy = { ...taskFilteredDict };
+            taskFilteredDictCopy[taskId] = props.activeTasks.find(t => t.task.id == taskId).task.labels.slice(settings.labeling.showNLabelButton);
+            setTaskFilteredDict(taskFilteredDictCopy);
+            return;
+        }
+        const taskFilteredDictCopy = { ...taskFilteredDict };
+        props.activeTasks.forEach((task) => {
+            if (task.task.taskType == LabelingTaskTaskType.MULTICLASS_CLASSIFICATION) {
+                taskFilteredDictCopy[task.task.id] = task.task.labels.filter(label => label.name.toLowerCase().includes(value.toLowerCase()));
+            }
+        });
+        setTaskFilteredDict(taskFilteredDictCopy);
     }
 
     return (<div id="label-selection-box" style={{ top: props.position.top, left: props.position.left, minWidth: '270px' }}
