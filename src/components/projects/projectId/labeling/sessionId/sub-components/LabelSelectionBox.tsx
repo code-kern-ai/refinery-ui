@@ -52,6 +52,15 @@ export default function LabelSelectionBox(props: LabelSelectionBoxProps) {
         setTaskFilteredDict(taskFilteredDict);
     }, [props.activeTasks, settings.labeling.showNLabelButton]);
 
+    useEffect(() => {
+        if (!props.activeTasks || props.activeTasks.length == 0) return;
+        const newLabelDictCopy = {};
+        props.activeTasks.forEach((task) => {
+            newLabelDictCopy[task.task.id] = '';
+        });
+        setNewLabelDict(newLabelDictCopy);
+    }, [props.activeTasks]);
+
     function stopPropagation(e) {
         e.preventDefault()
         e.stopPropagation();
