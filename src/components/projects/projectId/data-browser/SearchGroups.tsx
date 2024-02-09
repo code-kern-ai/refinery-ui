@@ -340,7 +340,11 @@ export default function SearchGroups() {
         const tooltipsCopy = [];
         const fullSearchCopy = fullSearchCopyParam ? jsonCopy(fullSearchCopyParam) : jsonCopy(fullSearchStore);
         const formControlsIdx = fullSearchCopy[SearchGroup.ATTRIBUTES].groupElements[i];
-        const attributeType = getAttributeType(attributesSortOrder, value);
+        let attributeType = getAttributeType(attributesSortOrder, value);
+        if (!attributeType && value) {
+            const attributeName = formControlsIdx['name'];
+            attributeType = getAttributeType(attributesSortOrder, attributeName);
+        }
         if (attributeType !== DataTypeEnum.BOOLEAN) {
             for (let t of Object.values(SearchOperator)) {
                 operatorsCopy.push({
@@ -406,7 +410,7 @@ export default function SearchGroups() {
     function checkIfDecimals(event: any, i: number, key: string) {
         const formControlsIdx = fullSearchStore[key].groupElements[i];
         const attributeType = getAttributeType(attributesSortOrder, formControlsIdx['name']);
-        checkDecimalPatterns(attributeType, event, formControlsIdx['operator'], '-');
+        checkDecimalPatterns(attributeType, event, formControlsIdx['operator'], configuration.separator);
     }
 
     function updateLabelsFullSearch(label: any, groupKey: string, labelsKey: string) {
