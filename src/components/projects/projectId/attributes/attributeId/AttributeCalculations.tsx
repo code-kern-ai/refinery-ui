@@ -58,6 +58,7 @@ export default function AttributeCalculation() {
     const [tokenizationProgress, setTokenizationProgress] = useState(0);
     const [editorValue, setEditorValue] = useState('');
     const [attributeName, setAttributeName] = useState('');
+    const [checkUnsavedChanges, setCheckUnsavedChanges] = useState(false);
 
     const [refetchAttributes] = useLazyQuery(GET_ATTRIBUTES_BY_PROJECT_ID, { fetchPolicy: "network-only" });
     const [updateAttributeMut] = useMutation(UPDATE_ATTRIBUTE);
@@ -120,14 +121,20 @@ export default function AttributeCalculation() {
     useEffect(() => {
         if (!currentAttribute) return;
         const observer = fromEvent(document, 'keyup');
+        const spinner = observer.subscribe(() => {
+            if (currentAttribute.sourceCodeToDisplay == editorValue) return;
+            setCheckUnsavedChanges(true);
+            spinner.unsubscribe();
+        });
         const subscription = observer.pipe(
             debounceTime(2000),
             distinctUntilChanged()
-        ).subscribe(() => { 
+        ).subscribe(() => {
             const regMatch: any = getPythonFunctionRegExMatch(editorValue);
             changeAttributeName(regMatch ? regMatch[2] : '');
             setCurrentAttribute({ ...currentAttribute, sourceCode: editorValue });
             updateSourceCode(editorValue);
+            setCheckUnsavedChanges(false);
         });
         return () => subscription.unsubscribe();
     }, [editorValue, currentAttribute]);
@@ -393,13 +400,22 @@ export default function AttributeCalculation() {
                     />
                 </div>
 
-                <ExecutionContainer currentAttribute={currentAttribute} tokenizationProgress={tokenizationProgress} refetchCurrentAttribute={() => {
-                    refetchAttributeByAttributeId({ variables: { projectId: projectId, attributeId: currentAttribute?.id } }).then((res) => {
-                        const attribute = res.data['attributeByAttributeId'];
-                        if (attribute == null) setCurrentAttribute(null);
-                        else setCurrentAttribute(postProcessCurrentAttribute(attribute));
-                    });
-                }} />
+                <div className="mt-2 flex flex-grow justify-between items-center float-right">
+                    {checkUnsavedChanges && <div className="flex items-center">
+                        <div className="text-sm font-normal">Saving...</div>
+                        <LoadingIcon color="indigo" />
+                    </div>}
+                </div>
+
+
+                <ExecutionContainer currentAttribute={currentAttribute} tokenizationProgress={tokenizationProgress} checkUnsavedChanges={checkUnsavedChanges}
+                    refetchCurrentAttribute={() => {
+                        refetchAttributeByAttributeId({ variables: { projectId: projectId, attributeId: currentAttribute?.id } }).then((res) => {
+                            const attribute = res.data['attributeByAttributeId'];
+                            if (attribute == null) setCurrentAttribute(null);
+                            else setCurrentAttribute(postProcessCurrentAttribute(attribute));
+                        });
+                    }} />
                 <ContainerLogs logs={currentAttribute.logs} type="attribute" />
 
                 <div className="mt-8">
