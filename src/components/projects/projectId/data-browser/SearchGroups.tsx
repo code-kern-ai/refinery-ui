@@ -603,11 +603,11 @@ export default function SearchGroups() {
                                     <div className="flex-grow flex flex-row flex-wrap gap-1">
                                         <div style={{ width: groupItem.operator != '' ? '49%' : '100%' }}>
                                             <Dropdown2 options={attributesSortOrder} buttonName={groupItem.name} backgroundColors={backgroundColors}
-                                                selectedOption={(option: any) => selectValueDropdown(option.name, index, 'name', group.key)} fontClass="font-dmMono" buttonClasses="whitespace-nowrap" />
+                                                selectedOption={(option: any) => selectValueDropdown(option.name, index, 'name', group.key)} fontClass="font-dmMono" buttonClasses="text-xs" />
                                         </div>
                                         <div style={{ width: '49%' }}>
                                             {groupItem.operator != '' &&
-                                                <Dropdown2 options={operatorsDropdown} buttonName={groupItem.operator} tooltipsArray={tooltipsArray} tooltipArrayPlacement="right"
+                                                <Dropdown2 options={operatorsDropdown} buttonName={groupItem.operator} tooltipsArray={tooltipsArray} tooltipArrayPlacement="right" buttonClasses="text-xs"
                                                     selectedOption={(option: any) => selectValueDropdown(option.value, index, 'operator', group.key)} fontClass="font-dmMono" />
                                             }
                                         </div>
