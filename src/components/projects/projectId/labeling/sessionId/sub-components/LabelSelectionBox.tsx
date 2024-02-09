@@ -40,17 +40,9 @@ export default function LabelSelectionBox(props: LabelSelectionBoxProps) {
     }
 
     useEffect(() => {
-        if (!props.activeTasks || props.activeTasks.length == 0) return;
-        const taskFilteredDict = {};
-        props.activeTasks.forEach((task) => {
-            if (task.task.taskType == LabelingTaskTaskType.MULTICLASS_CLASSIFICATION) {
-                taskFilteredDict[task.task.id] = task.task.labels.slice(settings.labeling.showNLabelButton);
-            } else {
-                taskFilteredDict[task.task.id] = task.task.labels;
-            }
-        });
-        setTaskFilteredDict(taskFilteredDict);
-    }, [props.activeTasks, settings.labeling.showNLabelButton]);
+        if (!props.activeTasks || props.activeTasks.length == 0 || !props.labelLookup) return;
+        splitActiveTasksByTaskType();
+    }, [props.activeTasks, settings.labeling.showNLabelButton, props.labelLookup]);
 
     useEffect(() => {
         if (!props.activeTasks || props.activeTasks.length == 0) return;
@@ -72,15 +64,27 @@ export default function LabelSelectionBox(props: LabelSelectionBoxProps) {
         setNewLabelDict(newLabelDictCopy);
         if (!taskFilteredDict[taskId]) return;
         if (value == '') {
-            const taskFilteredDictCopy = { ...taskFilteredDict };
-            taskFilteredDictCopy[taskId] = props.activeTasks.find(t => t.task.id == taskId).task.labels.slice(settings.labeling.showNLabelButton);
-            setTaskFilteredDict(taskFilteredDictCopy);
+            splitActiveTasksByTaskType();
             return;
         }
+        splitActiveTasksByTaskType(value);
+    }
+
+    function splitActiveTasksByTaskType(searchValue?: string) {
         const taskFilteredDictCopy = { ...taskFilteredDict };
         props.activeTasks.forEach((task) => {
-            if (task.task.taskType == LabelingTaskTaskType.MULTICLASS_CLASSIFICATION) {
-                taskFilteredDictCopy[task.task.id] = task.task.labels.filter(label => label.name.toLowerCase().includes(value.toLowerCase()));
+            if (searchValue) {
+                if (task.task.taskType == LabelingTaskTaskType.MULTICLASS_CLASSIFICATION) {
+                    taskFilteredDictCopy[task.task.id] = task.task.labels.filter(label => label.name.toLowerCase().includes(searchValue.toLowerCase()));
+                } else {
+                    taskFilteredDictCopy[task.task.id] = task.task.labels;
+                }
+            } else {
+                if (task.task.taskType == LabelingTaskTaskType.MULTICLASS_CLASSIFICATION) {
+                    taskFilteredDictCopy[task.task.id] = task.task.labels.slice(settings.labeling.showNLabelButton);
+                } else {
+                    taskFilteredDictCopy[task.task.id] = task.task.labels;
+                }
             }
         });
         setTaskFilteredDict(taskFilteredDictCopy);
