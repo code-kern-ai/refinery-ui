@@ -223,6 +223,10 @@ export default function AttributeCalculation() {
 
     function updateSourceCode(value: string) {
         var regMatch: any = getPythonFunctionRegExMatch(value);
+        if (!regMatch) {
+            console.log("Can't find python function name -- seems wrong -- better dont save");
+            return;
+        }
         const finalSourceCode = value.replace(regMatch[0], 'def ac(record)');
         updateAttributeMut({ variables: { projectId: projectId, attributeId: currentAttribute.id, sourceCode: finalSourceCode } }).then(() => {
         });
