@@ -23,6 +23,7 @@ import { setDataSlices, setFullSearchStore, setSearchGroupsStore } from "@/src/r
 import { closeModal } from "@/src/reduxStore/states/modal";
 import { ModalEnum } from "@/src/types/shared/modal";
 import { SearchGroup } from "@/submodules/javascript-functions/enums/enums";
+import { useWebsocket } from "@/src/services/base/web-sockets/useWebsocket";
 
 export default function ProjectsList() {
     const router = useRouter();
@@ -44,13 +45,14 @@ export default function ProjectsList() {
     const [createOrgMut] = useMutation(CREATE_ORGANIZATION);
     const [addUserToOrgMut] = useMutation(ADD_USER_TO_ORGANIZATION);
 
-    useEffect(unsubscribeWSOnDestroy(router, [CurrentPage.PROJECTS]), []);
+
+    // useEffect(unsubscribeWSOnDestroy(router, [CurrentPage.PROJECTS]), []);
 
     useEffect(() => {
-        WebSocketsService.subscribeToNotification(CurrentPage.PROJECTS, {
-            whitelist: ['project_created', 'project_deleted', 'project_update', 'file_upload'],
-            func: handleWebsocketNotification
-        });
+        // WebSocketsService.subscribeToNotification(CurrentPage.PROJECTS, {
+        //     whitelist: ['project_created', 'project_deleted', 'project_update', 'file_upload'],
+        //     func: handleWebsocketNotification
+        // });
         dispatch(setLabelingTasksAll(null));
         dispatch(setOverviewFilters(null));
         dispatch(setSearchGroupsStore(null));
@@ -118,10 +120,11 @@ export default function ProjectsList() {
             refetchStatsAndPostProcess();
         }
     }, []);
+    useWebsocket(CurrentPage.PROJECTS, handleWebsocketNotification);
 
-    useEffect(() => {
-        WebSocketsService.updateFunctionPointer(null, CurrentPage.PROJECTS, handleWebsocketNotification)
-    }, [handleWebsocketNotification]);
+    // useEffect(() => {
+    //     WebSocketsService.updateFunctionPointer(null, CurrentPage.PROJECTS, handleWebsocketNotification)
+    // }, [handleWebsocketNotification]);
 
     return (
         <div>

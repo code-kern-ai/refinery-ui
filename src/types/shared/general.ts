@@ -29,6 +29,10 @@ export enum CurrentPage {
     CONFIG = "CONFIG",
 }
 
+export enum CurrentPageSubKey {
+    EMBEDDING = 'EMBEDDING'
+}
+
 export type User = {
     id: string;
     firstName: string;
