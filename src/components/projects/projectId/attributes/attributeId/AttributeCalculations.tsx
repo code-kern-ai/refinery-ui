@@ -183,6 +183,7 @@ export default function AttributeCalculation() {
         attributeNew.saveSourceCode = false;
         updateAttributeMut({ variables: { projectId: projectId, attributeId: currentAttribute.id, name: attributeNew.name } }).then(() => {
             setCurrentAttribute(postProcessCurrentAttribute(attributeNew));
+            setEditorValue(attributeNew.sourceCode.replace('def ac(record)', 'def ' + attributeNew.name + '(record)'));
             dispatch(updateAttributeById(attributeNew));
             setDuplicateNameExists(false);
         });
@@ -224,14 +225,14 @@ export default function AttributeCalculation() {
         }
     }
 
-    function updateSourceCode(value: string) {
+    function updateSourceCode(value: string, attributeNameParam?: string) {
         var regMatch: any = getPythonFunctionRegExMatch(value);
         if (!regMatch) {
             console.log("Can't find python function name -- seems wrong -- better dont save");
             return;
         }
         const finalSourceCode = value.replace(regMatch[0], 'def ac(record)');
-        updateAttributeMut({ variables: { projectId: projectId, attributeId: currentAttribute.id, sourceCode: finalSourceCode } }).then(() => {
+        updateAttributeMut({ variables: { projectId: projectId, attributeId: currentAttribute.id, sourceCode: finalSourceCode, name: attributeNameParam } }).then(() => {
         });
     }
 
@@ -244,8 +245,7 @@ export default function AttributeCalculation() {
     function updateNameAndCodeBricksIntegrator(code: string) {
         setEditorValue(code);
         const regMatch: any = getPythonFunctionRegExMatch(code);
-        changeAttributeName(regMatch ? regMatch[2] : '');
-        updateSourceCode(code);
+        updateSourceCode(code, regMatch[2]);
         setIsInitial(false);
     }
 
