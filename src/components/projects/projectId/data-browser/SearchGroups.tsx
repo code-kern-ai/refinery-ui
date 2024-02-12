@@ -127,6 +127,11 @@ export default function SearchGroups() {
             }).then((res) => {
                 dispatch(setSearchRecordsExtended(postProcessRecordsExtended(res.data['recordsByStaticSlice'], labelingTasks)));
                 refetchStaticSliceCurrentCount({ variables: { projectId: projectId, sliceId: activeSlice.id } }).then((res) => {
+                    if (!res.data) {
+                        dispatch(updateAdditionalDataState('staticDataSliceCurrentCount', null));
+                        return;
+
+                    }
                     dispatch(updateAdditionalDataState('staticDataSliceCurrentCount', res['data']['staticDataSlicesCurrentCount']));
                 });
             });
