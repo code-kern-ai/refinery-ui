@@ -107,7 +107,7 @@ export default function AttributeCalculation() {
         if (currentAttribute.saveSourceCode) {
             updateSourceCode(currentAttribute.sourceCode);
         }
-        if (currentAttribute.state == AttributeState.USABLE) {
+        if (currentAttribute.state == AttributeState.USABLE || currentAttribute.state == AttributeState.RUNNING) {
             setEditorOptions({ ...EDITOR_OPTIONS, readOnly: true });
             setCheckUnsavedChanges(false);
         }
