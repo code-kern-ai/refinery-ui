@@ -6,8 +6,10 @@ import { UserRole } from "@/src/types/shared/sidebar";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
 import { Tooltip } from "@nextui-org/react";
 import { IconCirclePlus } from "@tabler/icons-react";
-import { Fragment, useEffect, useState } from "react";
+import { Fragment, useEffect, useState, useCallback } from "react";
 import { useSelector } from "react-redux";
+
+const eventListenersMap = new Map();
 
 export default function LabelSelectionBox(props: LabelSelectionBoxProps) {
     const user = useSelector(selectUser);
@@ -15,26 +17,61 @@ export default function LabelSelectionBox(props: LabelSelectionBoxProps) {
 
     const [newLabelDict, setNewLabelDict] = useState({});
     const [taskFilteredDict, setTaskFilteredDict] = useState({});
+    const [currentLabelHotkeys, setCurrentLabelHotkeys] = useState<any>({});
+    const [currentActiveTasks, setCurrentActiveTasks] = useState([]);
 
     useEffect(() => {
-        if (!props.labelHotkeys) return;
-        document.addEventListener('keyup', handleKeyboardEvent);
-        return () => {
-            document.removeEventListener('keyup', handleKeyboardEvent);
-        };
-    }, [props.labelHotkeys, props.activeTasks]);
+        if (props.activeTasks && props.activeTasks.length > 0) {
+            setCurrentActiveTasks(props.activeTasks);
+        }
+    }, [props.activeTasks]);
 
-    function handleKeyboardEvent(event) {
+    useEffect(() => {
+        let missingValues = 0;
+        for (let key in props.labelHotkeys) {
+            if (('taskId' in props.labelHotkeys[key] && 'labelId' in props.labelHotkeys[key]) === false) {
+                missingValues++;
+            }
+        }
+
+        if (missingValues == 0) {
+            setCurrentLabelHotkeys(props.labelHotkeys);
+        }
+    }, [currentActiveTasks]);
+
+    const handleKeyboardEvent = useCallback((event) => {
         const labelSelection = document.getElementById('label-selection-box');
         if (!labelSelection || labelSelection.classList.contains('hidden')) return;
-        for (const key in props.labelHotkeys) {
+        for (const key in currentLabelHotkeys) {
             if (key == event.key) {
-                const activeTasks = props.activeTasks.map(x => x.task);
-                const task = activeTasks.find(t => t.id == props.labelHotkeys[key].taskId);
-                props.addRla(task, props.labelHotkeys[key].labelId);
+                const activeTasks = currentActiveTasks.map(x => x.task);
+                const task = activeTasks.find(t => t.id == currentLabelHotkeys[key].taskId);
+                props.addRla(task, currentLabelHotkeys[key].labelId);
                 event.preventDefault();
                 event.stopPropagation();
                 return;
+            }
+        }
+    }, [currentLabelHotkeys]);
+
+    useEffect(() => {
+        addUniqueEventListener("handleKeyboardEventID", 'keyup', handleKeyboardEvent);
+        return () => {
+            removeAllEventListeners('keyup');
+        };
+    }, [handleKeyboardEvent]);
+
+    function addUniqueEventListener(id, eventType, handler) {
+        removeAllEventListeners('keyup');
+        document.addEventListener(eventType, handler);
+        eventListenersMap.set(id, { eventType, listener: handler });
+    }
+
+    function removeAllEventListeners(eventType) {
+        for (let [id, handler] of eventListenersMap.entries()) {
+            if (handler.eventType === eventType) {
+                document.removeEventListener(eventType, handler.listener);
+                eventListenersMap.delete(id);
             }
         }
     }

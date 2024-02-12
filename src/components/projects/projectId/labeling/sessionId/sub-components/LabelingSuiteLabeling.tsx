@@ -624,19 +624,22 @@ export default function LabelingSuiteLabeling() {
                                 </div>}
                             </>}
                         </div>
-                        <LabelSelectionBox activeTasks={activeTasks} position={position} labelLookup={labelLookup} labelAddButtonDisabledDict={labelAddButtonDisabledDict}
-                            addRla={(task, labelId) => {
-                                const tokenLookupCopy = jsonCopy(tokenLookup);
-                                if (saveTokenData && tokenLookupCopy[saveTokenData.attributeIdStart]) {
-                                    for (const token of tokenLookupCopy[saveTokenData.attributeIdStart]?.token) {
-                                        token.selected = token.idx >= saveTokenData.tokenStart && token.idx <= saveTokenData.tokenEnd;
+                        {activeTasks && activeTasks.length > 0 ? (
+                            <LabelSelectionBox activeTasks={activeTasks} position={position} labelLookup={labelLookup} labelAddButtonDisabledDict={labelAddButtonDisabledDict}
+                                addRla={(task, labelId) => {
+                                    const tokenLookupCopy = jsonCopy(tokenLookup);
+                                    if (saveTokenData && tokenLookupCopy[saveTokenData.attributeIdStart]) {
+                                        for (const token of tokenLookupCopy[saveTokenData.attributeIdStart]?.token) {
+                                            token.selected = token.idx >= saveTokenData.tokenStart && token.idx <= saveTokenData.tokenEnd;
+                                        }
                                     }
-                                }
-                                addRla(task, labelId, tokenLookupCopy);
-                            }}
-                            addNewLabelToTask={(newLabel, task) => addNewLabelToTask(newLabel, task)}
-                            checkLabelVisibleInSearch={(newLabel, task) => checkLabelVisibleInSearch(labelLookup, newLabel, task)}
-                            labelHotkeys={labelHotkeys} />
+                                    addRla(task, labelId, tokenLookupCopy);
+                                }}
+                                addNewLabelToTask={(newLabel, task) => addNewLabelToTask(newLabel, task)}
+                                checkLabelVisibleInSearch={(newLabel, task) => checkLabelVisibleInSearch(labelLookup, newLabel, task)}
+                                labelHotkeys={labelHotkeys}
+                            />)
+                            : null}
                     </div>}
                 </Fragment>))}
             </Fragment>))}
