@@ -1,6 +1,5 @@
 import { selectInactiveOrganization, selectIsDemo, selectIsManaged, selectUser, setComments } from "@/src/reduxStore/states/general"
 import { selectAllProjects, setAllProjects } from "@/src/reduxStore/states/project";
-import { WebSocketsService } from "@/src/services/base/web-sockets/WebSocketsService";
 import { GET_OVERVIEW_STATS, GET_PROJECT_LIST } from "@/src/services/gql/queries/projects";
 import { Project, ProjectStatistics } from "@/src/types/components/projects/projects-list";
 import { CurrentPage } from "@/src/types/shared/general";
@@ -15,13 +14,10 @@ import { GET_CAN_CREATE_LOCAL_ORG } from "@/src/services/gql/queries/organizatio
 import { ADD_USER_TO_ORGANIZATION, CREATE_ORGANIZATION } from "@/src/services/gql/mutations/organizations";
 import style from "@/src/styles/components/projects/projects-list.module.css";
 import { useRouter } from "next/router";
-import { unsubscribeWSOnDestroy } from "@/src/services/base/web-sockets/web-sockets-helper";
 import AdminDeleteProjectModal from "./AdminDeleteProjectModal";
 import { setAllAttributes, setAllEmbeddings, setLabelingTasksAll } from "@/src/reduxStore/states/pages/settings";
 import { setOverviewFilters } from "@/src/reduxStore/states/tmp";
 import { setDataSlices, setFullSearchStore, setSearchGroupsStore } from "@/src/reduxStore/states/pages/data-browser";
-import { closeModal } from "@/src/reduxStore/states/modal";
-import { ModalEnum } from "@/src/types/shared/modal";
 import { SearchGroup } from "@/submodules/javascript-functions/enums/enums";
 import { useWebsocket } from "@/src/services/base/web-sockets/useWebsocket";
 
@@ -45,14 +41,7 @@ export default function ProjectsList() {
     const [createOrgMut] = useMutation(CREATE_ORGANIZATION);
     const [addUserToOrgMut] = useMutation(ADD_USER_TO_ORGANIZATION);
 
-
-    // useEffect(unsubscribeWSOnDestroy(router, [CurrentPage.PROJECTS]), []);
-
     useEffect(() => {
-        // WebSocketsService.subscribeToNotification(CurrentPage.PROJECTS, {
-        //     whitelist: ['project_created', 'project_deleted', 'project_update', 'file_upload'],
-        //     func: handleWebsocketNotification
-        // });
         dispatch(setLabelingTasksAll(null));
         dispatch(setOverviewFilters(null));
         dispatch(setSearchGroupsStore(null));
@@ -120,11 +109,8 @@ export default function ProjectsList() {
             refetchStatsAndPostProcess();
         }
     }, []);
-    useWebsocket(CurrentPage.PROJECTS, handleWebsocketNotification);
 
-    // useEffect(() => {
-    //     WebSocketsService.updateFunctionPointer(null, CurrentPage.PROJECTS, handleWebsocketNotification)
-    // }, [handleWebsocketNotification]);
+    useWebsocket(CurrentPage.PROJECTS, handleWebsocketNotification);
 
     return (
         <div>

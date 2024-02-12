@@ -61,10 +61,6 @@ export type SuggestionsProps = {
     tooltip?: string;
 }
 
-export type EmbeddingProps = {
-    refetchWS(): void;
-}
-
 export type EmbeddingCreationEnabledProps = {
     platform: EmbeddingPlatform;
     model: string;

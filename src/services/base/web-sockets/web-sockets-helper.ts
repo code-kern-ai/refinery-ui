@@ -22,10 +22,6 @@ export function unsubscribeWSOnDestroy(router: NextRouter, pages: CurrentPage[],
     }
 }
 
-export function unsubscribeWSOnDestroy2(pages: CurrentPage, projectId?: string): () => void {
-    return () => WebSocketsService.unsubscribeFromNotification(pages, projectId);
-}
-
 export type NotificationSubscription = {
     projectId?: string;
     whitelist?: string[];

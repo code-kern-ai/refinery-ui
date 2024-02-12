@@ -10,11 +10,10 @@ import { IconAlertCircle, IconAlertTriangle, IconAlertTriangleFilled, IconBallpe
 import { Tooltip } from "@nextui-org/react";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
 import EditField from "./EditField";
-import { WebSocketsService } from "@/src/services/base/web-sockets/WebSocketsService";
 import { useRouter } from "next/router";
-import { unsubscribeWSOnDestroy } from "@/src/services/base/web-sockets/web-sockets-helper";
 import { ModalEnum } from "@/src/types/shared/modal";
 import { openModal } from "@/src/reduxStore/states/modal";
+import { useWebsocket } from "@/src/services/base/web-sockets/useWebsocket";
 
 export default function EditRecords() {
     const dispatch = useDispatch();
@@ -25,8 +24,6 @@ export default function EditRecords() {
 
     const [erdData, setErdData] = useState(createDefaultEditRecordComponentData());
     const [alertLastVisible, setAlertLastVisible] = useState<number>(null);
-
-    useEffect(unsubscribeWSOnDestroy(router, [CurrentPage.EDIT_RECORDS]), []);
 
     useEffect(() => {
         if (!projectId) return;
@@ -44,11 +41,6 @@ export default function EditRecords() {
         if (!erdDataCopy.modals.hideExplainModal) {
             dispatch(openModal(ModalEnum.EXPLAIN_EDIT_RECORDS));
         }
-        WebSocketsService.subscribeToNotification(CurrentPage.EDIT_RECORDS, {
-            projectId: projectId,
-            whitelist: ['calculate_attribute'],
-            func: handleWebsocketNotification
-        });
     }, [sessionData, projectId]);
 
     useEffect(() => {
@@ -77,10 +69,7 @@ export default function EditRecords() {
         setAlertLastVisible(Date.now());
     }, [alertLastVisible]);
 
-    useEffect(() => {
-        if (!projectId) return;
-        WebSocketsService.updateFunctionPointer(projectId, CurrentPage.EDIT_RECORDS, handleWebsocketNotification)
-    }, [handleWebsocketNotification, projectId]);
+    useWebsocket(CurrentPage.EDIT_RECORDS, handleWebsocketNotification, projectId);
 
     return (<>{projectId && <div className="h-screen bg-white flex flex-col">
         <NavBarTopEditRecords erdData={erdData} setErdData={(erdData) => setErdData(erdData)} />

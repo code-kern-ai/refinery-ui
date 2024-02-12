@@ -30,7 +30,12 @@ export enum CurrentPage {
 }
 
 export enum CurrentPageSubKey {
-    EMBEDDING = 'EMBEDDING'
+    EMBEDDINGS = 'EMBEDDING',
+    NONE = 'NONE',
+    BUTTONS_CONTAINER = 'BUTTONS_CONTAINER',
+    VARIABLE_SELECTION = 'VARIABLE_SELECTION',
+    SNAPSHOT_EXPORT = 'SNAPSHOT_EXPORT',
+    GLOBAL = 'GLOBAL'
 }
 
 export type User = {

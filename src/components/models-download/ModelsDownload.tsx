@@ -11,13 +11,12 @@ import LoadingIcon from "../shared/loading/LoadingIcon";
 import { openModal, setModalStates } from "@/src/reduxStore/states/modal";
 import { ModalEnum } from "@/src/types/shared/modal";
 import { selectIsManaged } from "@/src/reduxStore/states/general";
-import { WebSocketsService } from "@/src/services/base/web-sockets/WebSocketsService";
 import { CurrentPage } from "@/src/types/shared/general";
 import { timer } from "rxjs";
-import { unsubscribeWSOnDestroy } from "@/src/services/base/web-sockets/web-sockets-helper";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
 import AddModelDownloadModal from "./AddModelDownloadModal";
 import DeleteModelDownloadModal from "./DeleteModelDownloadModal";
+import { useWebsocket } from "@/src/services/base/web-sockets/useWebsocket";
 
 export default function ModelsDownload() {
     const router = useRouter();
@@ -28,14 +27,8 @@ export default function ModelsDownload() {
 
     const [refetchModelsDownload] = useLazyQuery(GET_MODEL_PROVIDER_INFO, { fetchPolicy: 'network-only', nextFetchPolicy: 'cache-first' });
 
-    useEffect(unsubscribeWSOnDestroy(router, [CurrentPage.MODELS_DOWNLOAD]), []);
-
     useEffect(() => {
         refetchModels();
-        WebSocketsService.subscribeToNotification(CurrentPage.MODELS_DOWNLOAD, {
-            whitelist: ['model_provider_download'],
-            func: handleWebsocketNotification
-        });
     }, []);
 
     function refetchModels() {
@@ -53,9 +46,7 @@ export default function ModelsDownload() {
         }
     }, []);
 
-    useEffect(() => {
-        WebSocketsService.updateFunctionPointer(null, CurrentPage.MODELS_DOWNLOAD, handleWebsocketNotification)
-    }, [handleWebsocketNotification]);
+    useWebsocket(CurrentPage.MODELS_DOWNLOAD, handleWebsocketNotification);
 
     return (<div className="p-4 bg-gray-100 flex-1 flex flex-col h-[calc(100vh-4rem)] overflow-y-auto">
         <div className="flex flex-row items-center">

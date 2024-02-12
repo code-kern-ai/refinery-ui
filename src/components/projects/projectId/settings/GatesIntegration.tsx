@@ -12,7 +12,7 @@ import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import GatesIntegrationWarningModal from "./GatesIntegrationWarningModal";
 
-export default function GatesIntegration(props: { refetchWS: () => void }) {
+export default function GatesIntegration() {
     const router = useRouter();
     const dispatch = useDispatch();
 
@@ -52,7 +52,7 @@ export default function GatesIntegration(props: { refetchWS: () => void }) {
                 </span>}
             </div >
         </div >
-        <GatesIntegrationWarningModal refetchWS={() => props.refetchWS()} />
+        <GatesIntegrationWarningModal />
     </div >
     )
 }

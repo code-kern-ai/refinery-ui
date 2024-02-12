@@ -21,15 +21,14 @@ import LabelingSuiteTaskHeader from "../sub-components/LabelingSuiteTaskHeader";
 import LabelingSuiteOverviewTable from "../sub-components/LabelingSuiteOverviewTable";
 import LabelingSuiteLabeling from "../sub-components/LabelingSuiteLabeling";
 import { setAllAttributes, setLabelingTasksAll } from "@/src/reduxStore/states/pages/settings";
-import { WebSocketsService } from "@/src/services/base/web-sockets/WebSocketsService";
 import { CurrentPage } from "@/src/types/shared/general";
 import { postProcessLabelingTasks, postProcessLabelingTasksSchema } from "@/src/util/components/projects/projectId/settings/labeling-tasks-helper";
 import { CommentDataManager } from "@/src/util/classes/comments";
 import { REQUEST_COMMENTS } from "@/src/services/gql/queries/projects";
 import { CommentType } from "@/src/types/shared/comments";
-import { unsubscribeWSOnDestroy } from "@/src/services/base/web-sockets/web-sockets-helper";
 import { getEmptyBricksIntegratorConfig } from "@/src/util/shared/bricks-integrator-helper";
 import { LabelingTask } from "@/src/types/components/projects/projectId/settings/labeling-tasks";
+import { useWebsocket } from "@/src/services/base/web-sockets/useWebsocket";
 
 const SETTINGS_KEY = 'labelingSettings';
 
@@ -57,8 +56,6 @@ export default function LabelingMainComponent() {
     const [refetchLabelingTasksByProjectId] = useLazyQuery(GET_LABELING_TASKS_BY_PROJECT_ID, { fetchPolicy: "network-only" });
     const [refetchComments] = useLazyQuery(REQUEST_COMMENTS, { fetchPolicy: "no-cache" });
 
-    useEffect(unsubscribeWSOnDestroy(router, [CurrentPage.LABELING]), []);
-
     useEffect(() => {
         if (!projectId) return;
         let tmp = localStorage.getItem(SETTINGS_KEY);
@@ -78,11 +75,6 @@ export default function LabelingMainComponent() {
         dispatch(setBricksIntegrator(getEmptyBricksIntegratorConfig()));
         refetchAttributesAndProcess();
         refetchLabelingTasksAndProcess();
-        WebSocketsService.subscribeToNotification(CurrentPage.LABELING, {
-            projectId: projectId,
-            whitelist: ['attributes_updated', 'calculate_attribute', 'payload_finished', 'weak_supervision_finished', 'record_deleted', 'rla_created', 'rla_deleted', 'access_link_changed', 'access_link_removed', 'label_created', 'label_deleted', 'labeling_task_deleted', 'labeling_task_updated', 'labeling_task_created'],
-            func: handleWebsocketNotification
-        });
     }, [projectId]);
 
     //destructor
@@ -300,10 +292,7 @@ export default function LabelingMainComponent() {
         }
     }, [record, SessionManager.currentRecordId]);
 
-    useEffect(() => {
-        if (!projectId) return;
-        WebSocketsService.updateFunctionPointer(projectId, CurrentPage.LABELING, handleWebsocketNotification)
-    }, [handleWebsocketNotification, projectId]);
+    useWebsocket(CurrentPage.LABELING, handleWebsocketNotification, projectId);
 
     return (<div className={`h-full bg-white flex flex-col ${LabelingSuiteManager.somethingLoading ? style.wait : ''}`}>
         {LabelingSuiteManager.absoluteWarning && <div className="absolute left-0 right-0 flex items-center justify-center pointer-events-none top-4 z-100">
