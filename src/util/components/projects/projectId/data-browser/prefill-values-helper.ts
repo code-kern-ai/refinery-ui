@@ -44,7 +44,7 @@ export function addGroupToSearchElement(searchElement, labelingTasks) {
             isWithDifferentResults: saveEl.isWithDifferentResults,
         }
         searchElement.groupElements = newElement;
-        searchElement.nameAdd = labelingTasks.find((item: any) => item.id == saveEl.taskId).name;
+        searchElement.nameAdd = labelingTasks.find((item: any) => item.id == saveEl.taskId)?.name;
     } else if (searchElement.groupElements[0].hasOwnProperty('orderBy')) {
         const saveEl = searchElement.groupElements[0];
         const newElement = {

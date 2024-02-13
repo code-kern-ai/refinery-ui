@@ -127,6 +127,11 @@ export default function SearchGroups() {
             }).then((res) => {
                 dispatch(setSearchRecordsExtended(postProcessRecordsExtended(res.data['recordsByStaticSlice'], labelingTasks)));
                 refetchStaticSliceCurrentCount({ variables: { projectId: projectId, sliceId: activeSlice.id } }).then((res) => {
+                    if (!res.data) {
+                        dispatch(updateAdditionalDataState('staticDataSliceCurrentCount', null));
+                        return;
+
+                    }
                     dispatch(updateAdditionalDataState('staticDataSliceCurrentCount', res['data']['staticDataSlicesCurrentCount']));
                 });
             });
@@ -631,7 +636,7 @@ export default function SearchGroups() {
                                         </div>
                                     )}
 
-                                    {(groupItem['operator'] == SearchOperator.BEGINS_WITH || groupItem['operator'] == SearchOperator.ENDS_WITH || groupItem['operator'] == SearchOperator.CONTAINS || groupItem['operator'] == SearchOperator.IN_WC) && (saveAttributeType != DataTypeEnum.INTEGER && saveAttributeType != DataTypeEnum.FLOAT) &&
+                                    {(groupItem['operator'] == "BEGINS WITH" || groupItem['operator'] == "ENDS WITH" || groupItem['operator'] == SearchOperator.CONTAINS || groupItem['operator'] == "IN WC") && (saveAttributeType != DataTypeEnum.INTEGER && saveAttributeType != DataTypeEnum.FLOAT) &&
                                         <label htmlFor="caseSensitive" className="text-xs text-gray-500 cursor-pointer flex items-center pb-2">
                                             <input name="caseSensitive" className="mr-1 cursor-pointer" id="caseSensitive"
                                                 onChange={(e: any) => selectValueDropdown(e.target.checked, index, 'caseSensitive', group.key)} type="checkbox" />Case sensitive</label>}
@@ -657,8 +662,7 @@ export default function SearchGroups() {
                                             </div>
                                             <span className="text-sm truncate">{groupItem['displayName']}</span>
                                         </span>
-
-                                        {usersMap && usersMap[groupItem['id']] && <div><Tooltip content={groupItem['dataTip']} placement="left" color="invert">
+                                        {usersMap && usersMap[groupItem['id']] && <div><Tooltip content={groupItem['dataTip']} placement="right" color="invert">
                                             <IconInfoCircle className="ml-1 text-gray-700 h-5 w-5" onClick={() => dispatch(setModalStates(ModalEnum.USER_INFO, { open: true, userInfo: usersMap[groupItem['id']] }))} />
                                         </Tooltip></div>}
                                     </div>

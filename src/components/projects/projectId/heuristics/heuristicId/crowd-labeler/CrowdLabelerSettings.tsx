@@ -33,10 +33,9 @@ export default function CrowdLabelerSettings() {
     const [changeAccessLinkMut] = useMutation(LOCK_ACCESS_LINK);
 
     function saveHeuristic(labelingTaskParam: any, crowdLabelerSettings: any = null) {
-        const labelingTask = labelingTaskParam ? labelingTaskParam.id : currentHeuristic.labelingTaskId;
+        const labelingTaskId = labelingTaskParam ? labelingTaskParam.id : currentHeuristic.labelingTaskId;
         const code = parseToSettingsJson(crowdLabelerSettings ? crowdLabelerSettings : currentHeuristic.crowdLabelerSettings);
-        updateHeuristicMut({ variables: { projectId: projectId, informationSourceId: currentHeuristic.id, labelingTaskId: labelingTask, code: code } }).then((res) => {
-            dispatch(updateHeuristicsState(currentHeuristic.id, { labelingTaskId: labelingTask.id, labelingTaskName: labelingTask.name, labels: labelingTask.labels, crowdLabelerSettings: crowdLabelerSettings }));
+        updateHeuristicMut({ variables: { projectId: projectId, informationSourceId: currentHeuristic.id, labelingTaskId: labelingTaskId, code: code } }).then((res) => {
         });
     }
 

@@ -1,4 +1,4 @@
-import { selectHeuristic, setActiveHeuristics, updateHeuristicsState } from "@/src/reduxStore/states/pages/heuristics";
+import { selectHeuristic, setActiveHeuristics } from "@/src/reduxStore/states/pages/heuristics";
 import { selectLabelingTasksAll, setLabelingTasksAll } from "@/src/reduxStore/states/pages/settings";
 import { selectProjectId } from "@/src/reduxStore/states/project";
 import { GET_ACCESS_LINK, GET_HEURISTICS_BY_ID } from "@/src/services/gql/queries/heuristics";
@@ -21,7 +21,6 @@ import { DATA_SLICES } from "@/src/services/gql/queries/data-browser";
 import { REQUEST_COMMENTS } from "@/src/services/gql/queries/projects";
 import { CommentDataManager } from "@/src/util/classes/comments";
 import { CommentType } from "@/src/types/shared/comments";
-import { buildFullLink } from "@/src/util/shared/link-parser-helper";
 import { useWebsocket } from "@/src/services/base/web-sockets/useWebsocket";
 
 
@@ -55,7 +54,7 @@ export default function CrowdLabeler() {
         if (!projectId) return;
         if (!labelingTasks) return;
         refetchCurrentHeuristicAndProcess();
-    }, [labelingTasks]);
+    }, [labelingTasks, projectId]);
 
     useEffect(() => {
         if (!projectId || allUsers.length == 0) return;
@@ -81,9 +80,12 @@ export default function CrowdLabeler() {
 
     function refetchCurrentHeuristicAndProcess() {
         refetchCurrentHeuristic({ variables: { projectId: projectId, informationSourceId: router.query.heuristicId } }).then((res) => {
-            const currentHeuristic = postProcessCrowdLabeler(res['data']['informationSourceBySourceId'], labelingTasks);
-            dispatch(setActiveHeuristics(postProcessCrowdLabeler(res['data']['informationSourceBySourceId'], labelingTasks)));
-            refetchAccessLinkAndProcess(currentHeuristic);
+            const currentHeuristic: any = postProcessCrowdLabeler(res['data']['informationSourceBySourceId'], labelingTasks);
+            if (!currentHeuristic.crowdLabelerSettings.accessLinkId) {
+                dispatch(setActiveHeuristics(currentHeuristic));
+            } else {
+                refetchAccessLinkAndProcess(currentHeuristic);
+            }
         });
     }
 
@@ -98,7 +100,8 @@ export default function CrowdLabeler() {
         if (!currentHeuristic.crowdLabelerSettings.accessLinkId) return;
         refetchAccessLink({ variables: { projectId: projectId, linkId: currentHeuristic.crowdLabelerSettings.accessLinkId } }).then((res) => {
             const link = res.data.accessLink;
-            dispatch(updateHeuristicsState(currentHeuristic.id, { crowdLabelerSettings: { ...currentHeuristic.crowdLabelerSettings, accessLink: link.link, accessLinkParsed: buildFullLink(link.link), accessLinkLocked: link.isLocked, isHTTPS: window.location.protocol == 'https:' } }));
+            const currentHeuristicUpdated = postProcessCrowdLabeler(currentHeuristic, labelingTasks, link);
+            dispatch(setActiveHeuristics(currentHeuristicUpdated));
         });
     }
 

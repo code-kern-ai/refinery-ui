@@ -517,11 +517,10 @@ export default function LabelingSuiteLabeling() {
 
     function handleKeyboardEvent(event) {
         const labelSelection = document.getElementById('label-selection-box');
-        if (!labelSelection) return;
         if (event.key == 'ArrowRight' || event.key == 'ArrowLeft') {
             setActiveTasksFunc([]);
         }
-        if (!labelSelection.classList.contains('hidden')) return;
+        if (labelSelection && !labelSelection.classList.contains('hidden')) return;
         for (const key in labelHotkeys) {
             if (key == event.key) {
                 const task = labelingTasks.find(t => t.id == labelHotkeys[key].taskId);
@@ -624,19 +623,22 @@ export default function LabelingSuiteLabeling() {
                                 </div>}
                             </>}
                         </div>
-                        <LabelSelectionBox activeTasks={activeTasks} position={position} labelLookup={labelLookup} labelAddButtonDisabledDict={labelAddButtonDisabledDict}
-                            addRla={(task, labelId) => {
-                                const tokenLookupCopy = jsonCopy(tokenLookup);
-                                if (saveTokenData && tokenLookupCopy[saveTokenData.attributeIdStart]) {
-                                    for (const token of tokenLookupCopy[saveTokenData.attributeIdStart]?.token) {
-                                        token.selected = token.idx >= saveTokenData.tokenStart && token.idx <= saveTokenData.tokenEnd;
+                        {activeTasks && activeTasks.length > 0 ? (
+                            <LabelSelectionBox activeTasks={activeTasks} position={position} labelLookup={labelLookup} labelAddButtonDisabledDict={labelAddButtonDisabledDict}
+                                addRla={(task, labelId) => {
+                                    const tokenLookupCopy = jsonCopy(tokenLookup);
+                                    if (saveTokenData && tokenLookupCopy[saveTokenData.attributeIdStart]) {
+                                        for (const token of tokenLookupCopy[saveTokenData.attributeIdStart]?.token) {
+                                            token.selected = token.idx >= saveTokenData.tokenStart && token.idx <= saveTokenData.tokenEnd;
+                                        }
                                     }
-                                }
-                                addRla(task, labelId, tokenLookupCopy);
-                            }}
-                            addNewLabelToTask={(newLabel, task) => addNewLabelToTask(newLabel, task)}
-                            checkLabelVisibleInSearch={(newLabel, task) => checkLabelVisibleInSearch(labelLookup, newLabel, task)}
-                            labelHotkeys={labelHotkeys} />
+                                    addRla(task, labelId, tokenLookupCopy);
+                                }}
+                                addNewLabelToTask={(newLabel, task) => addNewLabelToTask(newLabel, task)}
+                                checkLabelVisibleInSearch={(newLabel, task) => checkLabelVisibleInSearch(labelLookup, newLabel, task)}
+                                labelHotkeys={labelHotkeys}
+                            />)
+                            : null}
                     </div>}
                 </Fragment>))}
             </Fragment>))}

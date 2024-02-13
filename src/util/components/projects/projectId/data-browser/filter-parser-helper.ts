@@ -105,8 +105,11 @@ function appendBlackAndWhiteListLabelingTask(appendTo, searchElement, labelingTa
     appendTo.push(appendBlackAndWhiteListLabelingTaskForArray(appendTo, searchElement.values.weakSupervisionLabels, LabelSource.WEAK_SUPERVISION, drillDown));
     appendTo.push(appendBlackAndWhiteListLabelingTaskForArray(appendTo, searchElement.values.modelCallbackLabels, LabelSource.MODEL_CALLBACK, drillDown));
     appendTo.push(appendBlackAndWhiteListLabelingTaskForArray(appendTo, searchElement.values.heuristics, LabelSource.INFORMATION_SOURCE, drillDown));
-    appendTo.push(appendBlackAndWhiteListLabelingTaskForConfidence(appendTo, searchElement.values.weakSupervisionConfidence, labelingTask.labels.map(l => l.id), true));
-    appendTo.push(appendBlackAndWhiteListLabelingTaskForConfidence(appendTo, searchElement.values.modelCallbackConfidence, labelingTask.labels.map(l => l.id), false));
+    if (labelingTask) {
+        appendTo.push(appendBlackAndWhiteListLabelingTaskForConfidence(appendTo, searchElement.values.weakSupervisionConfidence, labelingTask.labels.map(l => l.id), true));
+        appendTo.push(appendBlackAndWhiteListLabelingTaskForConfidence(appendTo, searchElement.values.modelCallbackConfidence, labelingTask.labels.map(l => l.id), false));
+    }
+
     if (!appendTo) return;
 
     const isMixed = searchElement.values.isWithDifferentResults
@@ -279,7 +282,7 @@ function appendBlackAndWhiteListUserForArray(
         return JSON.stringify(whitelist);
     if (blacklist.SUBQUERIES.length > 0)
         return JSON.stringify(blacklist);
-    return appendTo;
+    return null;
 }
 
 

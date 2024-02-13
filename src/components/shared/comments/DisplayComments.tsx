@@ -142,6 +142,7 @@ export default function DisplayComments(props: DisplayCommentsProps) {
                         onBlur={(event: any) => {
                             if (props.editComments[index]) props.editComment(event, comment.id, 'comment', event.target.value, index);
                         }}
+                        onKeyUp={(e: any) => e.stopPropagation()}
                         onKeyDown={(event: any) => { checkIfKeyShiftEnterUpdate(event, comment.id, event.target.value, index); }}
                         value={props.commentTexts[index]}
                     ></textarea>

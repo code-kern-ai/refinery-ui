@@ -1,4 +1,4 @@
-import LoadingIcon from '@/src/components/shared/loading/LoadingIcon';
+import { Loading } from "@nextui-org/react";
 import { selectIsManaged } from '@/src/reduxStore/states/general';
 import { openModal, selectModal } from '@/src/reduxStore/states/modal';
 import { selectHeuristicsAll, setHeuristicType } from '@/src/reduxStore/states/pages/heuristics';
@@ -148,9 +148,7 @@ export default function HeuristicsHeader(props: HeuristicsHeaderProps) {
     }
 
     function startWeakSupervision() {
-        setLoadingIconWS(true);
         startWeakSupervisionMut({ variables: { projectId: projectId } }).then(() => {
-            setLoadingIconWS(false);
         });
     }
 
@@ -159,6 +157,8 @@ export default function HeuristicsHeader(props: HeuristicsHeaderProps) {
             setCurrentWeakSupervisionRun(null);
             refetchCurrentWeakSupervisionAndProcess();
         }
+        if (msgParts[1] == 'weak_supervision_started') setLoadingIconWS(true);
+        else if (msgParts[1] == 'weak_supervision_finished') setLoadingIconWS(false);
     }, []);
 
     useWebsocket(CurrentPage.HEURISTICS, handleWebsocketNotification, projectId);
@@ -222,33 +222,33 @@ export default function HeuristicsHeader(props: HeuristicsHeaderProps) {
                 <div className="flex justify-center overflow-visible">
                     {areHeuristicsSelected ? (<>
                         {areValidHeuristicsSelected ? (
-                            <Tooltip content={TOOLTIPS_DICT.HEURISTICS.WEAK_SUPERVISION} color="invert" placement="right">
+                            <Tooltip content={TOOLTIPS_DICT.HEURISTICS.WEAK_SUPERVISION} color="invert" placement="bottom">
                                 <button onClick={startWeakSupervision}
                                     className="bg-indigo-700 flex items-center text-white text-xs font-semibold mr-3 px-4 py-2 rounded-md border hover:bg-indigo-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
                                     Weak supervision
-                                    {loadingIconWS && <LoadingIcon color="indigo" size="xs" />}
                                 </button>
                             </Tooltip>
-                        ) : (<Tooltip content={TOOLTIPS_DICT.HEURISTICS.SELECT_AT_LEAST_ONE_VALID_HEURISTIC} color="invert" placement="left">
+                        ) : (<Tooltip content={TOOLTIPS_DICT.HEURISTICS.SELECT_AT_LEAST_ONE_VALID_HEURISTIC} color="invert" placement="bottom">
                             <button className="bg-indigo-700 text-white text-xs font-semibold mr-3 px-4 py-2 rounded-md border opacity-50 cursor-not-allowed" disabled={true}>
                                 Weak supervision
                             </button>
                         </Tooltip>)}
-                    </>) : (<Tooltip content={TOOLTIPS_DICT.HEURISTICS.SELECT_AT_LEAST_ONE_HEURISTIC} color="invert" placement="left">
+                    </>) : (<Tooltip content={TOOLTIPS_DICT.HEURISTICS.SELECT_AT_LEAST_ONE_HEURISTIC} color="invert" placement="bottom">
                         <button className="bg-indigo-700 text-white text-xs font-semibold mr-3 px-4 py-2 rounded-md border opacity-50 cursor-not-allowed" disabled={true}>
                             Weak supervision
-                            {currentWeakSupervisionRun?.state == 'CREATED' && <LoadingIcon color="indigo" />}
                         </button>
                     </Tooltip>)}
                 </div>
 
                 <div className="flex justify-center overflow-visible">
-                    {currentWeakSupervisionRun ? (<Tooltip content={TOOLTIPS_DICT.HEURISTICS.LAST_WEAK_SUPERVISION_INFO} color="invert" placement="left">
+                    {currentWeakSupervisionRun ? (<Tooltip content={TOOLTIPS_DICT.HEURISTICS.LAST_WEAK_SUPERVISION_INFO} color="invert" placement="bottom">
                         <button onClick={() => dispatch(openModal(ModalEnum.LAST_WEAK_SUPERVISION_RUN))}
                             className="bg-white text-gray-700 text-xs font-medium mr-3 px-4 py-1.5 rounded-md border border-gray-300 cursor-pointer inline-block hover:bg-gray-50">
-                            <IconWaveSine size={20} strokeWidth={2} className="text-gray-700" />
+                            {loadingIconWS ? <div className='flex justify-center items-center h-5 w-5'>
+                                <Loading type="points" size="sm" />
+                            </div> : <IconWaveSine size={20} strokeWidth={2} className="text-gray-700" />}
                         </button>
-                    </Tooltip>) : (<Tooltip content={TOOLTIPS_DICT.HEURISTICS.LAST_WEAK_SUPERVISION_INFO} color="invert" placement="left">
+                    </Tooltip>) : (<Tooltip content={TOOLTIPS_DICT.HEURISTICS.LAST_WEAK_SUPERVISION_INFO} color="invert" placement="bottom">
                         <button className="bg-white text-gray-700 text-xs font-medium mr-3 px-4 py-1.5 rounded-md border border-gray-300 cursor-pointer inline-block hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50" disabled={true}>
                             <IconWaveSine size={20} strokeWidth={2} className="text-gray-500" />
                         </button>
