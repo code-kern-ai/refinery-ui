@@ -112,6 +112,8 @@ export default function AttributeCalculation() {
         if (currentAttribute.state == AttributeState.USABLE || currentAttribute.state == AttributeState.RUNNING) {
             setEditorOptions({ ...EDITOR_OPTIONS, readOnly: true });
             setCheckUnsavedChanges(false);
+        } else {
+            setEditorOptions({ ...EDITOR_OPTIONS, readOnly: false });
         }
         setAttributeName(currentAttribute.name);
     }, [currentAttribute]);
