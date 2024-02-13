@@ -1,4 +1,4 @@
-import LoadingIcon from '@/src/components/shared/loading/LoadingIcon';
+import { Loading } from "@nextui-org/react";
 import { selectIsManaged } from '@/src/reduxStore/states/general';
 import { openModal, selectModal } from '@/src/reduxStore/states/modal';
 import { selectHeuristicsAll, setHeuristicType } from '@/src/reduxStore/states/pages/heuristics';
@@ -259,7 +259,9 @@ export default function HeuristicsHeader(props: HeuristicsHeaderProps) {
                     {currentWeakSupervisionRun ? (<Tooltip content={TOOLTIPS_DICT.HEURISTICS.LAST_WEAK_SUPERVISION_INFO} color="invert" placement="bottom">
                         <button onClick={() => dispatch(openModal(ModalEnum.LAST_WEAK_SUPERVISION_RUN))}
                             className="bg-white text-gray-700 text-xs font-medium mr-3 px-4 py-1.5 rounded-md border border-gray-300 cursor-pointer inline-block hover:bg-gray-50">
-                            {loadingIconWS ? <LoadingIcon color="indigo" size="custom-sm" removeMargin={true} /> : <IconWaveSine size={20} strokeWidth={2} className="text-gray-700" />}
+                            {loadingIconWS ? <div className='flex justify-center items-center h-5 w-5'>
+                                <Loading type="points" size="sm" />
+                            </div> : <IconWaveSine size={20} strokeWidth={2} className="text-gray-700" />}
                         </button>
                     </Tooltip>) : (<Tooltip content={TOOLTIPS_DICT.HEURISTICS.LAST_WEAK_SUPERVISION_INFO} color="invert" placement="bottom">
                         <button className="bg-white text-gray-700 text-xs font-medium mr-3 px-4 py-1.5 rounded-md border border-gray-300 cursor-pointer inline-block hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50" disabled={true}>
