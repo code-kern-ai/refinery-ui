@@ -1,5 +1,5 @@
 import { selectBricksIntegratorAttributes, selectBricksIntegratorEmbeddings, selectBricksIntegratorLabelingTasks, selectBricksIntegratorLabels, selectBricksIntegratorLanguages, selectBricksIntegratorLookupLists, setAttributesBricksIntegrator, setEmbeddingsBricksIntegrator, setLabelingTasksBricksIntegrator, setLabelsBricksIntegrator, setLanguagesBricksIntegrator, setLookupListsBricksIntegrator } from "@/src/reduxStore/states/general";
-import { selectLabelingTasksAll } from "@/src/reduxStore/states/pages/settings";
+import { selectLabelingTasksAll, setLabelingTasksAll } from "@/src/reduxStore/states/pages/settings";
 import { selectProjectId } from "@/src/reduxStore/states/project";
 import { WebSocketsService } from "@/src/services/base/web-sockets/WebSocketsService";
 import { unsubscribeWSOnDestroy } from "@/src/services/base/web-sockets/web-sockets-helper";
@@ -41,7 +41,7 @@ export default function VariableSelect(props: VariableSelectProps) {
 
     useEffect(() => {
         if (!projectId) return;
-
+        refetchLabelingTasksAndProcess(null);
         WebSocketsService.subscribeToNotification(CurrentPage.BRICKS_INTEGRATOR, {
             projectId: projectId,
             whitelist: ['attributes_updated', 'calculate_attribute', 'label_created', 'label_deleted', 'labeling_task_deleted', 'labeling_task_updated', 'labeling_task_created', 'embedding', 'embedding_deleted', 'knowledge_base_deleted', 'knowledge_base_created'],
@@ -146,6 +146,7 @@ export default function VariableSelect(props: VariableSelectProps) {
     function refetchLabelingTasksAndProcess(typeFilter: string) {
         refetchLabelingTasksByProjectId({ variables: { projectId: projectId } }).then((res) => {
             const labelingTasks = postProcessLabelingTasks(res['data']['projectByProjectId']['labelingTasks']['edges']);
+            dispatch(setLabelingTasksAll(labelingTasks));
             if (!labelingTasks) {
                 console.log("labeling Tasks not yet loaded");
                 return null;
