@@ -1,7 +1,7 @@
 import { selectUser } from "@/src/reduxStore/states/general";
 import { selectAvailableLinks, selectDisplayUserRole, selectSelectedLink, selectUserDisplayId, selectUserIconsData, setAvailableLinks, setHoverGroupDict, setSelectedLink, setUserDisplayId } from "@/src/reduxStore/states/pages/labeling";
 import { selectProjectId } from "@/src/reduxStore/states/project";
-import { LabelingLinkType, UserType } from "@/src/types/components/projects/projectId/labeling/labeling-main-component";
+import { LabelingLinkType, NavigationBarTopProps, UserType } from "@/src/types/components/projects/projectId/labeling/labeling-main-component";
 import { UserRole } from "@/src/types/shared/sidebar";
 import { SessionManager } from "@/src/util/classes/labeling/session-manager";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
@@ -14,8 +14,9 @@ import Dropdown2 from "@/submodules/react-components/components/Dropdown2";
 import { useEffect } from "react";
 import { useLazyQuery } from "@apollo/client";
 import { AVAILABLE_LABELING_LINKS } from "@/src/services/gql/queries/labeling";
+import { parseLinkFromText } from "@/src/util/shared/link-parser-helper";
 
-export default function NavigationBarTop(props: { absoluteWarning?: string }) {
+export default function NavigationBarTop(props: NavigationBarTopProps) {
     const router = useRouter();
     const dispatch = useDispatch();
 
@@ -54,6 +55,12 @@ export default function NavigationBarTop(props: { absoluteWarning?: string }) {
     function nextRecord() {
         SessionManager.nextRecord();
         router.push(`/projects/${projectId}/labeling/${SessionManager.labelingLinkData.huddleId}?pos=${SessionManager.huddleData.linkData.requestedPos}&type=${SessionManager.huddleData.linkData.linkType}`);
+    }
+
+    function dropdownSelectLink(option: any) {
+        dispatch(setSelectedLink(option));
+        const linkData = parseLinkFromText(option.link);
+        router.push(`${linkData.route}?pos=${linkData.queryParams.pos}&type=${linkData.queryParams.type}`)
     }
 
     return (<>
@@ -100,8 +107,8 @@ export default function NavigationBarTop(props: { absoluteWarning?: string }) {
 
                     </>) : (<div className="flex justify-center items-center overflow-visible">
                         <span className="mr-2"> Available Tasks:</span>
-                        <Dropdown2 options={availableLinks && availableLinks.length > 0 ? availableLinks : ['No links available']} disabled={availableLinks?.length == 0}
-                            buttonName={selectedLink ? selectedLink.name : 'Select slice'} selectedOption={(option: any) => dispatch(setSelectedLink(option))} />
+                        <Dropdown2 options={availableLinks && availableLinks.length > 0 ? availableLinks : ['No links available']} disabled={availableLinks?.length == 0 || props.lockedLink}
+                            buttonName={selectedLink ? selectedLink.name : 'Select slice'} selectedOption={(option: any) => dropdownSelectLink(option)} />
                     </div>)}
                 </div>
                 {props.absoluteWarning && <div className="left-0 right-0 flex items-center justify-center pointer-events-none top-4 z-100">

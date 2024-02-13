@@ -339,13 +339,13 @@ export default function LabelingMainComponent() {
     }, [handleWebsocketNotification, projectId]);
 
     return (<div className={`h-full bg-white flex flex-col ${LabelingSuiteManager.somethingLoading ? style.wait : ''}`}>
-        <NavigationBarTop absoluteWarning={absoluteWarning} />
+        <NavigationBarTop absoluteWarning={absoluteWarning} lockedLink={lockedLink} />
         <div className="flex-grow overflow-y-auto" style={{ height: 'calc(100vh - 194px)' }}>
             {!lockedLink && <>
                 {settings.task.show && (user?.role != UserRole.ANNOTATOR && userDisplayRole != UserRole.ANNOTATOR) && <LabelingSuiteTaskHeader />}
                 <LabelingSuiteLabeling />
                 {settings.overviewTable.show && SessionManager.currentRecordId !== "deleted" && <LabelingSuiteOverviewTable />}</>}
         </div>
-        <NavigationBarBottom />
+        {!lockedLink ? <NavigationBarBottom /> : <div className="relative flex-shrink-0 bg-white shadow-sm flex justify-between items-center h-16"></div>}
     </div>)
 }
