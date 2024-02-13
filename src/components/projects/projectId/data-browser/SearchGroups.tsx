@@ -636,7 +636,7 @@ export default function SearchGroups() {
                                         </div>
                                     )}
 
-                                    {(groupItem['operator'] == SearchOperator.BEGINS_WITH || groupItem['operator'] == SearchOperator.ENDS_WITH || groupItem['operator'] == SearchOperator.CONTAINS || groupItem['operator'] == SearchOperator.IN_WC) && (saveAttributeType != DataTypeEnum.INTEGER && saveAttributeType != DataTypeEnum.FLOAT) &&
+                                    {(groupItem['operator'] == "BEGINS WITH" || groupItem['operator'] == "ENDS WITH" || groupItem['operator'] == SearchOperator.CONTAINS || groupItem['operator'] == "IN WC") && (saveAttributeType != DataTypeEnum.INTEGER && saveAttributeType != DataTypeEnum.FLOAT) &&
                                         <label htmlFor="caseSensitive" className="text-xs text-gray-500 cursor-pointer flex items-center pb-2">
                                             <input name="caseSensitive" className="mr-1 cursor-pointer" id="caseSensitive"
                                                 onChange={(e: any) => selectValueDropdown(e.target.checked, index, 'caseSensitive', group.key)} type="checkbox" />Case sensitive</label>}
