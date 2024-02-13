@@ -69,7 +69,7 @@ function createSplittedText(i, searchGroup, p) {
 function updateSearchParamText(searchElement, attributes, separator, drillDownVal) {
     const searchElementCopy = jsonCopy(searchElement);
     if (searchElementCopy.group == SearchGroup.ATTRIBUTES) {
-        const attributeType = getAttributeType(attributes, searchElementCopy.name);
+        const attributeType = attributes.find(att => att.name == searchElementCopy.name)?.dataType;
         if (searchElementCopy.operator == SearchOperator.BETWEEN) {
             if (attributeType == "INTEGER" || attributeType == "FLOAT") {
                 searchElementCopy.searchText =
