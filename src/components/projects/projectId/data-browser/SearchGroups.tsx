@@ -662,8 +662,7 @@ export default function SearchGroups() {
                                             </div>
                                             <span className="text-sm truncate">{groupItem['displayName']}</span>
                                         </span>
-
-                                        {usersMap && usersMap[groupItem['id']] && <div><Tooltip content={groupItem['dataTip']} placement="left" color="invert">
+                                        {usersMap && usersMap[groupItem['id']] && <div><Tooltip content={groupItem['dataTip']} placement="right" color="invert">
                                             <IconInfoCircle className="ml-1 text-gray-700 h-5 w-5" onClick={() => dispatch(setModalStates(ModalEnum.USER_INFO, { open: true, userInfo: usersMap[groupItem['id']] }))} />
                                         </Tooltip></div>}
                                     </div>
