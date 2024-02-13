@@ -1,12 +1,12 @@
 import LoadingIcon from "@/src/components/shared/loading/LoadingIcon"
 import { selectUser } from "@/src/reduxStore/states/general"
-import { removeFromRlaById, selectHoverGroupDict, selectRecordRequests, selectRecordRequestsRecord, selectSettings, selectTmpHighlightIds, selectUserDisplayId, setHoverGroupDict, tmpAddHighlightIds } from "@/src/reduxStore/states/pages/labeling"
+import { removeFromRlaById, selectDisplayUserRole, selectHoverGroupDict, selectRecordRequests, selectRecordRequestsRecord, selectSettings, selectTmpHighlightIds, selectUserDisplayId, setHoverGroupDict, tmpAddHighlightIds } from "@/src/reduxStore/states/pages/labeling"
 import { selectAttributes, selectLabelingTasksAll, selectVisibleAttributesLabeling } from "@/src/reduxStore/states/pages/settings"
 import { selectProjectId } from "@/src/reduxStore/states/project"
 import { HotkeyLookup, LabelSourceHover, LabelingVars, TokenLookup } from "@/src/types/components/projects/projectId/labeling/labeling"
 import { LabelingTaskTaskType } from "@/src/types/components/projects/projectId/settings/labeling-tasks"
 import { UserRole } from "@/src/types/shared/sidebar"
-import { DEFAULT_LABEL_COLOR, FULL_RECORD_ID, SWIM_LANE_SIZE_PX, buildLabelingRlaData, collectSelectionData, filterRlaDataForLabeling, findOrderPosItem, getDefaultLabelingVars, getFirstFitPos, getGoldInfoForTask, getOrderLookupItem, getOrderLookupSort, getTaskTypeOrder, getTokenData, parseSelectionData } from "@/src/util/components/projects/projectId/labeling/labeling-helper"
+import { DEFAULT_LABEL_COLOR, FULL_RECORD_ID, SWIM_LANE_SIZE_PX, buildLabelingRlaData, checkCanEditLabels, collectSelectionData, filterRlaDataForLabeling, findOrderPosItem, getDefaultLabelingVars, getFirstFitPos, getGoldInfoForTask, getOrderLookupItem, getOrderLookupSort, getTaskTypeOrder, getTokenData, parseSelectionData } from "@/src/util/components/projects/projectId/labeling/labeling-helper"
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants"
 import { Tooltip } from "@nextui-org/react"
 import { IconAlertCircle, IconAssembly, IconBolt, IconCode, IconSparkles, IconStar, IconStarFilled, IconUsers } from "@tabler/icons-react"
@@ -20,7 +20,7 @@ import { LabelingSuiteManager } from "@/src/util/classes/labeling/manager";
 import { useMutation } from "@apollo/client"
 import { ADD_CLASSIFICATION_LABELS_TO_RECORD, ADD_EXTRACTION_LABEL_TO_RECORD, CREATE_LABEL, DELETE_RECORD_LABEL_ASSOCIATION_BY_ID, REMOVE_GOLD_STAR_ANNOTATION_FOR_TASK, SET_GOLD_STAR_ANNOTATION_FOR_TASK } from "@/src/services/gql/mutations/labeling"
 import { SessionManager } from "@/src/util/classes/labeling/session-manager"
-import { GOLD_STAR_USER_ID } from "@/src/util/components/projects/projectId/labeling/labeling-main-component-helper"
+import { ALL_USERS_USER_ID, GOLD_STAR_USER_ID } from "@/src/util/components/projects/projectId/labeling/labeling-main-component-helper"
 import { useRouter } from "next/router"
 import LabelSelectionBox from "./LabelSelectionBox"
 import { filterRlaDataForUser } from "@/src/util/components/projects/projectId/labeling/overview-table-helper"
@@ -47,12 +47,13 @@ export default function LabelingSuiteLabeling() {
     const displayUserId = useSelector(selectUserDisplayId);
     const hoverGroupsDict = useSelector(selectHoverGroupDict);
     const tmpHighlightIds = useSelector(selectTmpHighlightIds);
+    const userDisplayRole = useSelector(selectDisplayUserRole);
 
     const [lVars, setLVars] = useState<LabelingVars>(L_VARS);
     const [tokenLookup, setTokenLookup] = useState<TokenLookup>({});
     const [rlaDataToDisplay, setRlaDataToDisplay] = useState<{ [taskId: string]: any }>(null);
     const [fullRlaData, setFullRlaData] = useState<any[]>([]);
-    const [canEditLabels, setCanEditLabels] = useState<boolean>(true);
+    const [canEditLabels, setCanEditLabels] = useState<boolean>(false);
     const [labelLookup, setLabelLookup] = useState<any>({});
     const [labelAddButtonDisabledDict, setLabelAddButtonDisabledDict] = useState<{ [taskId: string]: boolean }>({});
     const [activeTasks, setActiveTasks] = useState<any[]>(null);
@@ -70,11 +71,11 @@ export default function LabelingSuiteLabeling() {
     const [removeGoldStarMut] = useMutation(REMOVE_GOLD_STAR_ANNOTATION_FOR_TASK);
 
     useEffect(() => {
-        if (!projectId || !attributes || !recordRequests || !user || !settings) return;
+        if (!projectId || !attributes || !recordRequests || !user || !settings || !userDisplayRole) return;
         attributesChanged();
         prepareRlaData();
         rebuildGoldInfo();
-    }, [projectId, attributes, recordRequests, user, settings]);
+    }, [projectId, attributes, recordRequests, user, settings, userDisplayRole]);
 
     useEffect(() => {
         if (!labelingTasks || !lVars) return;
@@ -84,17 +85,17 @@ export default function LabelingSuiteLabeling() {
     }, [labelingTasks, lVars]);
 
     useEffect(() => {
-        if (!lVars || !fullRlaData || !recordRequests || !rlaDataToDisplay) return;
+        if (!lVars || !fullRlaData || !recordRequests || !rlaDataToDisplay || !userDisplayRole) return;
         prepareRlaTokenLookup();
         rebuildGoldInfo();
-    }, [lVars, fullRlaData, recordRequests, rlaDataToDisplay]);
+    }, [lVars, fullRlaData, recordRequests, rlaDataToDisplay, userDisplayRole]);
 
     useEffect(() => {
         if (!displayUserId) return;
         if (!fullRlaData) return;
         filterRlaDataForCurrent();
         rebuildGoldInfo();
-    }, [displayUserId, fullRlaData]);
+    }, [displayUserId, fullRlaData, userDisplayRole]);
 
     useEffect(() => {
         const handleMouseDown = (event) => {
@@ -139,6 +140,11 @@ export default function LabelingSuiteLabeling() {
         rebuildTaskLookup(lVars);
         filterRlaDataForCurrent();
     }, [settings]);
+
+    useEffect(() => {
+        if (!user || !displayUserId || !userDisplayRole) return;
+        setCanEditLabels(checkCanEditLabels(user, userDisplayRole, displayUserId));
+    }, [user, displayUserId, userDisplayRole]);
 
     function attributesChanged() {
         if (!attributes) return;
@@ -236,7 +242,7 @@ export default function LabelingSuiteLabeling() {
     }
 
     function setActiveTasksFunc(tasks: any | any[]) {
-        if (!canEditLabels && user.role != UserRole.ANNOTATOR) {
+        if (!canEditLabels && user?.role != UserRole.ANNOTATOR && userDisplayRole != UserRole.ANNOTATOR) {
             if (activeTasks) setActiveTasks([]);
             return;
         }
@@ -274,14 +280,14 @@ export default function LabelingSuiteLabeling() {
         if (!lVars?.taskLookup || !fullRlaData) return;
         for (const attributeId in lVars.taskLookup) {
             for (const task of lVars.taskLookup[attributeId].lookup) {
-                task.goldInfo = getGoldInfoForTask(task, user, fullRlaData, displayUserId);
+                task.goldInfo = getGoldInfoForTask(task, user, fullRlaData, displayUserId, userDisplayRole);
             }
         }
     }
 
     function prepareRlaData() {
         if (!recordRequests.rla) return;
-        const fullDataData = buildLabelingRlaData(recordRequests.rla, user, settings.labeling.showHeuristicConfidence);
+        const fullDataData = buildLabelingRlaData(recordRequests.rla, user, settings.labeling.showHeuristicConfidence, userDisplayRole);
         setFullRlaData(fullDataData);
     }
 
@@ -289,7 +295,7 @@ export default function LabelingSuiteLabeling() {
         if (!fullRlaData) return;
 
         let filtered = fullRlaData;
-        filtered = filterRlaDataForUser(filtered, user, displayUserId, 'rla');
+        filtered = filterRlaDataForUser(filtered, user, displayUserId, userDisplayRole, 'rla');
         filtered = filterRlaDataForLabeling(filtered, settings, projectId, 'rla');
         const rlaDataToDisplayCopy = {};
         for (const rla of filtered) {
@@ -480,7 +486,7 @@ export default function LabelingSuiteLabeling() {
     }
 
     function setSelected(attributeId: string, tokenStart: number, tokenEnd: number, e?: any) {
-        if (!canEditLabels && user.role != UserRole.ANNOTATOR) return;
+        if (!canEditLabels && user.role != UserRole.ANNOTATOR && userDisplayRole != UserRole.ANNOTATOR) return;
         const tokenLookupCopy = jsonCopy(tokenLookup);
         if (!tokenLookupCopy[attributeId]) {
             labelBoxPosition(e);
@@ -542,7 +548,7 @@ export default function LabelingSuiteLabeling() {
                     <div className={`font-dmMono text-sm font-bold text-gray-500 py-2 pl-4 pr-3 sm:pl-6 col-start-1 h-full ${i % 2 == 0 ? 'bg-white' : 'bg-gray-50'}`}>
                         {j == 0 ? attribute.name : ''}
                     </div>
-                    {settings.labeling.showTaskNames && user.role != UserRole.ANNOTATOR && <div className={`col-start-2 pr-3 py-1.5 h-full flex ${i % 2 == 0 ? 'bg-white' : 'bg-gray-50'}`}>
+                    {settings.labeling.showTaskNames && user.role != UserRole.ANNOTATOR && userDisplayRole != UserRole.ANNOTATOR && <div className={`col-start-2 pr-3 py-1.5 h-full flex ${i % 2 == 0 ? 'bg-white' : 'bg-gray-50'}`}>
                         {task.task.taskType != LabelingTaskTaskType.NOT_USEABLE ? task.task.name : ''}
                     </div>}
                     <div className={`col-start-3 h-full py-1.5 flex ${i % 2 == 0 ? 'bg-white' : 'bg-gray-50'}`}>
@@ -572,7 +578,7 @@ export default function LabelingSuiteLabeling() {
                                     </>)}
                             </>}
                             {task.task.taskType == LabelingTaskTaskType.MULTICLASS_CLASSIFICATION && <>
-                                {(canEditLabels || user.role == UserRole.ANNOTATOR || user.role == UserRole.EXPERT) && <div className="flex flex-row flex-wrap gap-2">
+                                {(canEditLabels || user.role == UserRole.ANNOTATOR || user.role == UserRole.EXPERT || userDisplayRole == UserRole.ANNOTATOR || userDisplayRole == UserRole.EXPERT) && <div className="flex flex-row flex-wrap gap-2">
                                     {task.task.displayLabels.map((label, index) => (<div key={index} onClick={() => addRla(task.task, label.id)}
                                         className={`text-sm font-medium px-2 py-0.5 rounded-md border focus:outline-none cursor-pointer  ${labelLookup[label.id]?.color.backgroundColor} ${labelLookup[label.id]?.color.textColor} ${labelLookup[label.id]?.color.borderColor}`}>
                                         <div className="truncate" style={{ maxWidth: '260px' }}>{label.name}

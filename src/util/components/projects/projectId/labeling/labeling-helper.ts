@@ -30,7 +30,7 @@ export function getTaskTypeOrder(source: LabelingTaskTaskType): number {
     }
 }
 
-export function buildLabelingRlaData(rlas: any, user: User, showHeuristicConfidence: boolean): any[] {
+export function buildLabelingRlaData(rlas: any, user: User, showHeuristicConfidence: boolean, userDisplayRole: UserRole): any[] {
     if (!rlas) return [];
     let result = Array(rlas.length);
     let i = 0;
@@ -48,7 +48,7 @@ export function buildLabelingRlaData(rlas: any, user: User, showHeuristicConfide
             dataTip: getLabelDataTip(e),
             labelDisplay: getLabelForDisplay(e, showHeuristicConfidence),
             icon: getIcon(e),
-            canBeDeleted: canDeleteRla(e, user),
+            canBeDeleted: canDeleteRla(e, user, userDisplayRole),
             rla: e
         };
     }
@@ -174,11 +174,10 @@ export function getTokenData(attributeId: string, attributes: Attribute[], recor
 }
 
 
-export function getGoldInfoForTask(task: any, user: User, fullRlaData: any, displayUserId: string): { can: boolean, is: boolean } {
-    if (user.role != UserRole.ENGINEER) return { can: false, is: false };
+export function getGoldInfoForTask(task: any, user: User, fullRlaData: any, displayUserId: string, userDisplayRole: UserRole): { can: boolean, is: boolean } {
+    if (user && user.role != UserRole.ENGINEER && userDisplayRole != UserRole.ENGINEER) return { can: false, is: false };
     if (displayUserId == ALL_USERS_USER_ID) return { can: false, is: false };
     if (task.task.taskType == LabelingTaskTaskType.NOT_USEABLE) return { can: false, is: false };
-    // const userId = UserManager.displayUserId;
     const taskRlaData = fullRlaData.filter(x => x.sourceTypeKey == LabelSource.MANUAL && x.taskId == task.task.id);
     const goldRlas = taskRlaData.filter(x => x.rla.isGoldStar);
     if (displayUserId == GOLD_STAR_USER_ID) return { can: goldRlas.length > 0, is: goldRlas.length > 0 };
@@ -255,4 +254,12 @@ function getSelectionElement(selection: Selection, start: boolean, maxSteps: num
         steps++;
     }
     return null;
+}
+
+
+export function checkCanEditLabels(user: User, userDisplayRole: UserRole, displayUserId: string): boolean {
+    if (user.role != userDisplayRole) return false;
+    return (displayUserId == GOLD_STAR_USER_ID && userDisplayRole == UserRole.ENGINEER)
+        || (displayUserId == ALL_USERS_USER_ID && userDisplayRole == UserRole.ENGINEER)
+        || displayUserId == user.id;
 }

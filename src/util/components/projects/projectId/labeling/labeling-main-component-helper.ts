@@ -144,8 +144,8 @@ export function getDefaultTaskOverviewLabelSettings(): LabelingSuiteTaskHeaderLa
     }
 }
 
-export function prepareRLADataForRole(rlaData: any[], user: User, displayUserId: string): any[] {
-    if (user.role != UserRole.ANNOTATOR) return rlaData;
+export function prepareRLADataForRole(rlaData: any[], user: User, displayUserId: string, userDisplayRole: UserRole): any[] {
+    if (user.role != UserRole.ANNOTATOR && userDisplayRole != UserRole.ANNOTATOR) return rlaData;
     const currentSourceId = SessionManager.getSourceId();
     const allowedTask = SessionManager.getAllowedTask();
     rlaData.forEach((rla) => {

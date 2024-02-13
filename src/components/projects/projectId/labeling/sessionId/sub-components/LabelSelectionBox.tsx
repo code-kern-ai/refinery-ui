@@ -1,5 +1,5 @@
 import { selectUser } from "@/src/reduxStore/states/general";
-import { selectSettings } from "@/src/reduxStore/states/pages/labeling";
+import { selectDisplayUserRole, selectSettings } from "@/src/reduxStore/states/pages/labeling";
 import { LabelSelectionBoxProps } from "@/src/types/components/projects/projectId/labeling/labeling";
 import { LabelingTaskTaskType } from "@/src/types/components/projects/projectId/settings/labeling-tasks";
 import { UserRole } from "@/src/types/shared/sidebar";
@@ -14,6 +14,7 @@ const eventListenersMap = new Map();
 export default function LabelSelectionBox(props: LabelSelectionBoxProps) {
     const user = useSelector(selectUser);
     const settings = useSelector(selectSettings);
+    const userDisplayRole = useSelector(selectDisplayUserRole);
 
     const [newLabelDict, setNewLabelDict] = useState({});
     const [taskFilteredDict, setTaskFilteredDict] = useState({});
@@ -151,7 +152,7 @@ export default function LabelSelectionBox(props: LabelSelectionBoxProps) {
                         }} style={{ outline: 'none', boxShadow: 'none' }} placeholder="Search label name..."
                         className="h-8 w-full text-sm border-gray-300 rounded-md placeholder-italic border text-gray-900 pl-4 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100" />
 
-                    {user && user.role == UserRole.ENGINEER && <Tooltip content={TOOLTIPS_DICT.LABELING.CREATE_LABEL} placement="left" color="invert">
+                    {user && user.role == UserRole.ENGINEER && userDisplayRole == UserRole.ENGINEER && <Tooltip content={TOOLTIPS_DICT.LABELING.CREATE_LABEL} placement="left" color="invert">
                         <div className="flex items-center">
                             <button onClick={() => {
                                 props.addNewLabelToTask(newLabelDict[task.task.id], task.task);

@@ -1,5 +1,5 @@
 import { selectAllUsers, selectUser, setBricksIntegrator, setComments } from "@/src/reduxStore/states/general";
-import { setAvailableLinks, updateRecordRequests, setSelectedLink, selectRecordRequestsRla, updateUsers, setSettings, selectSettings, setUserDisplayId, selectRecordRequestsRecord, initOnLabelPageDestruction, selectUserDisplayId } from "@/src/reduxStore/states/pages/labeling";
+import { setAvailableLinks, updateRecordRequests, setSelectedLink, selectRecordRequestsRla, updateUsers, setSettings, selectSettings, setUserDisplayId, selectRecordRequestsRecord, initOnLabelPageDestruction, selectUserDisplayId, selectDisplayUserRole, setDisplayUserRole } from "@/src/reduxStore/states/pages/labeling";
 import { selectProjectId } from "@/src/reduxStore/states/project"
 import { AVAILABLE_LABELING_LINKS, GET_RECORD_LABEL_ASSOCIATIONS, GET_TOKENIZED_RECORD, REQUEST_HUDDLE_DATA } from "@/src/services/gql/queries/labeling";
 import { LabelingLinkType } from "@/src/types/components/projects/projectId/labeling/labeling-main-component";
@@ -45,8 +45,10 @@ export default function LabelingMainComponent() {
     const record = useSelector(selectRecordRequestsRecord);
     const allUsers = useSelector(selectAllUsers);
     const userDisplayId = useSelector(selectUserDisplayId);
+    const userDisplayRole = useSelector(selectDisplayUserRole);
 
     const [huddleData, setHuddleData] = useState(null);
+    const [absoluteWarning, setAbsoluteWarning] = useState(null);
 
     const [refetchHuddleData] = useLazyQuery(REQUEST_HUDDLE_DATA, { fetchPolicy: 'no-cache' });
     const [refetchAvailableLinks] = useLazyQuery(AVAILABLE_LABELING_LINKS, { fetchPolicy: 'no-cache' });
@@ -89,7 +91,20 @@ export default function LabelingMainComponent() {
     useEffect(() => () => {
         SessionManager.initMeOnDestruction();
         dispatch(initOnLabelPageDestruction());
-    }, [])
+    }, []);
+
+    useEffect(() => {
+        if (!router.query.sessionId || !user) return;
+        if (router.query.type == LabelingLinkType.HEURISTIC) {
+            dispatch(setDisplayUserRole(UserRole.ANNOTATOR));
+            setAbsoluteWarning(user?.role == UserRole.ENGINEER ? 'You are viewing this page as ' + UserRole.ANNOTATOR + ' you are not able to edit' : null);
+        } else if (router.query.type == LabelingLinkType.DATA_SLICE) {
+            dispatch(setDisplayUserRole(UserRole.EXPERT));
+            setAbsoluteWarning(user?.role == UserRole.ENGINEER ? 'You are viewing this page as ' + UserRole.EXPERT + ' you are not able to edit' : null);
+        } else {
+            dispatch(setDisplayUserRole(user.role));
+        }
+    }, [router.query, user]);
 
     useEffect(() => {
         if (!projectId) return;
@@ -222,7 +237,10 @@ export default function LabelingMainComponent() {
                 if (SessionManager.labelingLinkData) SessionManager.changeLinkLockState(true);
                 return;
             }
-            if (huddleData.startPos != -1) SessionManager.labelingLinkData.requestedPos = huddleData.startPos;
+            if (huddleData.startPos != -1) {
+                if (userDisplayRole != UserRole.ENGINEER) SessionManager.labelingLinkData.requestedPos = 0;
+                else SessionManager.labelingLinkData.requestedPos = huddleData.startPos;
+            }
             SessionManager.huddleData = {
                 recordIds: huddleData.recordIds ? huddleData.recordIds as string[] : [],
                 partial: false,
@@ -236,12 +254,13 @@ export default function LabelingMainComponent() {
             let pos = SessionManager.labelingLinkData.requestedPos;
             if (huddleData.startPos != -1) pos++; //zero based in backend
             SessionManager.jumpToPosition(pos);
+            dispatch(setDisplayUserRole(user.role));
             router.push(`/projects/${projectId}/labeling/${SessionManager.huddleData.linkData.huddleId}?pos=${SessionManager.huddleData.linkData.requestedPos}&type=${SessionManager.huddleData.linkData.linkType}`);
         });
     }
 
     function collectAvailableLinks() {
-        if (user?.role == UserRole.ENGINEER) return;
+        if (userDisplayRole?.role == UserRole.ENGINEER) return;
         const heuristicId = SessionManager.labelingLinkData.linkType == LabelingLinkType.HEURISTIC ? SessionManager.labelingLinkData.huddleId : null;
         refetchAvailableLinks({ variables: { projectId: projectId, assumedRole: user?.role, assumedHeuristicId: heuristicId } }).then((result) => {
             const availableLinks = result['data']['availableLinks'];
@@ -261,13 +280,13 @@ export default function LabelingMainComponent() {
         refetchLabelingTasksByProjectId({ variables: { projectId: projectId } }).then((res) => {
             const labelingTasks = postProcessLabelingTasks(res['data']['projectByProjectId']['labelingTasks']['edges']);
             const labelingTasksProcessed = postProcessLabelingTasksSchema(labelingTasks);
-            dispatch(setLabelingTasksAll(prepareTasksForRole(labelingTasksProcessed)));
+            dispatch(setLabelingTasksAll(prepareTasksForRole(labelingTasksProcessed, userDisplayRole)));
         });
     }
 
-    function prepareTasksForRole(taskData: LabelingTask[]): LabelingTask[] {
-        if (user?.role != UserRole.ANNOTATOR) return taskData;
-        const taskId = JSON.parse(localStorage.getItem('huddleData')).allowedTask;
+    function prepareTasksForRole(taskData: LabelingTask[], userDisplayRole): LabelingTask[] {
+        if (user?.role != UserRole.ANNOTATOR && userDisplayRole != UserRole.ANNOTATOR) return taskData;
+        const taskId = JSON.parse(localStorage.getItem('huddleData'))?.allowedTask;
         if (!taskId) return null;
         else return taskData.filter(t => t.id == taskId);
     }
@@ -306,12 +325,9 @@ export default function LabelingMainComponent() {
     }, [handleWebsocketNotification, projectId]);
 
     return (<div className={`h-full bg-white flex flex-col ${LabelingSuiteManager.somethingLoading ? style.wait : ''}`}>
-        {LabelingSuiteManager.absoluteWarning && <div className="absolute left-0 right-0 flex items-center justify-center pointer-events-none top-4 z-100">
-            <span className="inline-flex items-center px-2 py-0.5 rounded font-medium bg-red-100 text-red-800">{LabelingSuiteManager.absoluteWarning}</span>
-        </div>}
-        <NavigationBarTop />
+        <NavigationBarTop absoluteWarning={absoluteWarning} />
         <div className="flex-grow overflow-y-auto" style={{ height: 'calc(100vh - 194px)' }}>
-            {settings.task.show && user?.role != UserRole.ANNOTATOR && <LabelingSuiteTaskHeader />}
+            {settings.task.show && (user?.role != UserRole.ANNOTATOR && userDisplayRole != UserRole.ANNOTATOR) && <LabelingSuiteTaskHeader />}
             <LabelingSuiteLabeling />
             {settings.overviewTable.show && SessionManager.currentRecordId !== "deleted" && <LabelingSuiteOverviewTable />}
         </div>

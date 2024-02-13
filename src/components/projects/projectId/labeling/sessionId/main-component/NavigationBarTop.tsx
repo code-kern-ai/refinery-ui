@@ -1,5 +1,5 @@
 import { selectUser } from "@/src/reduxStore/states/general";
-import { selectAvailableLinks, selectSelectedLink, selectUserDisplayId, selectUserIconsData, setAvailableLinks, setHoverGroupDict, setSelectedLink, setUserDisplayId } from "@/src/reduxStore/states/pages/labeling";
+import { selectAvailableLinks, selectDisplayUserRole, selectSelectedLink, selectUserDisplayId, selectUserIconsData, setAvailableLinks, setHoverGroupDict, setSelectedLink, setUserDisplayId } from "@/src/reduxStore/states/pages/labeling";
 import { selectProjectId } from "@/src/reduxStore/states/project";
 import { LabelingLinkType, UserType } from "@/src/types/components/projects/projectId/labeling/labeling-main-component";
 import { UserRole } from "@/src/types/shared/sidebar";
@@ -15,7 +15,7 @@ import { useEffect } from "react";
 import { useLazyQuery } from "@apollo/client";
 import { AVAILABLE_LABELING_LINKS } from "@/src/services/gql/queries/labeling";
 
-export default function NavigationBarTop() {
+export default function NavigationBarTop(props: { absoluteWarning?: string }) {
     const router = useRouter();
     const dispatch = useDispatch();
 
@@ -25,19 +25,20 @@ export default function NavigationBarTop() {
     const selectedLink = useSelector(selectSelectedLink);
     const userIconsData = useSelector(selectUserIconsData);
     const displayId = useSelector(selectUserDisplayId);
+    const userDisplayRole = useSelector(selectDisplayUserRole);
 
     const [refetchAvailableLinks] = useLazyQuery(AVAILABLE_LABELING_LINKS, { fetchPolicy: 'no-cache' });
 
     useEffect(() => {
-        if (user?.role == UserRole.ENGINEER || !SessionManager.labelingLinkData) return;
+        if (userDisplayRole?.role == UserRole.ENGINEER || !SessionManager.labelingLinkData) return;
         const heuristicId = SessionManager.labelingLinkData.linkType == LabelingLinkType.HEURISTIC ? SessionManager.labelingLinkData.huddleId : null;
-        refetchAvailableLinks({ variables: { projectId: projectId, assumedRole: user?.role, assumedHeuristicId: heuristicId } }).then((result) => {
+        refetchAvailableLinks({ variables: { projectId: projectId, assumedRole: userDisplayRole?.role, assumedHeuristicId: heuristicId } }).then((result) => {
             const availableLinks = result['data']['availableLinks'];
             dispatch(setAvailableLinks(availableLinks));
             const linkRoute = router.asPath.split("?")[0];
             dispatch(setSelectedLink(availableLinks.find(link => link.link.split("?")[0] == linkRoute)));
         });
-    }, [SessionManager.labelingLinkData]);
+    }, [SessionManager.labelingLinkData, userDisplayRole]);
 
     function goToRecordIde() {
         const sessionId = router.query.sessionId as string;
@@ -59,7 +60,7 @@ export default function NavigationBarTop() {
         {user && <div className="w-full px-4 border-gray-200 border-b h-16">
             <div className="relative flex-shrink-0 bg-white shadow-sm flex justify-between items-center h-full">
                 <div className="flex flex-row flex-nowrap items-center">
-                    {user.role == UserRole.ENGINEER ? (<>
+                    {user.role == UserRole.ENGINEER && userDisplayRole == UserRole.ENGINEER ? (<>
                         <div className="flex justify-center overflow-visible">
                             <Tooltip content={TOOLTIPS_DICT.LABELING.NAVIGATE_TO_DATA_BROWSER} placement="bottom" color="invert">
                                 <button onClick={() => router.push(`/projects/${projectId}/data-browser`)}
@@ -103,28 +104,31 @@ export default function NavigationBarTop() {
                             buttonName={selectedLink ? selectedLink.name : 'Select slice'} selectedOption={(option: any) => dispatch(setSelectedLink(option))} />
                     </div>)}
                 </div>
+                {props.absoluteWarning && <div className="left-0 right-0 flex items-center justify-center pointer-events-none top-4 z-100">
+                    <span className="inline-flex items-center px-2 py-0.5 rounded font-medium bg-red-100 text-red-800">{props.absoluteWarning}</span>
+                </div>}
                 <div className="flex flex-row flex-nowrap items-center">
                     <div className="flex justify-center overflow-visible items-center">
                         <div className="text-sm leading-5 text-gray-500 flex-shrink-0 mr-3 my-3 inline-flex">
                             {SessionManager.positionString}&nbsp;
-                            <Tooltip content={user.role == UserRole.ENGINEER ? TOOLTIPS_DICT.LABELING.REACH_END : TOOLTIPS_DICT.LABELING.CHANGE_SLICES} color="invert" placement="bottom" className="cursor-auto">
+                            <Tooltip content={user.role == UserRole.ENGINEER && userDisplayRole == UserRole.ENGINEER ? TOOLTIPS_DICT.LABELING.REACH_END : TOOLTIPS_DICT.LABELING.CHANGE_SLICES} color="invert" placement="bottom" className="cursor-auto">
                                 <span className="cursor-help underline filtersUnderline">
                                     {user.role == UserRole.ENGINEER ? ' current session' : ' current slice'}
                                 </span>
                             </Tooltip>
-                        </div>   
-                            <button onClick={previousRecord} disabled={SessionManager.prevDisabled}
-                                className="bg-white text-gray-700 text-xs font-semibold mr-3 px-4 py-1.5 rounded-md border border-gray-300 whitespace-nowrap inline-flex items-center hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:cursor-not-allowed disabled:opacity-50">Prev
-                                <kbd className="relative ml-1 inline-flex items-center border bg-white border-gray-200 rounded px-0.5 py-0.5 text-sm font-sans font-medium text-gray-400">
-                                    <IconArrowLeft className="w-4 h-4" />
-                                </kbd>
-                            </button>   
-                            <button onClick={nextRecord} disabled={SessionManager.nextDisabled}
-                                className="bg-indigo-700 text-white text-xs font-semibold px-4 py-1.5 rounded-md cursor-pointer whitespace-nowrap inline-flex items-center hover:bg-indigo-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:cursor-not-allowed disabled:opacity-50">Next
-                                <kbd className="relative ml-1 inline-flex items-center border bg-white border-gray-200 rounded px-0.5 py-0.5 text-sm font-sans font-medium text-gray-400">
-                                    <IconArrowRight className="w-4 h-4" />
-                                </kbd>
-                            </button>
+                        </div>
+                        <button onClick={previousRecord} disabled={SessionManager.prevDisabled}
+                            className="bg-white text-gray-700 text-xs font-semibold mr-3 px-4 py-1.5 rounded-md border border-gray-300 whitespace-nowrap inline-flex items-center hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:cursor-not-allowed disabled:opacity-50">Prev
+                            <kbd className="relative ml-1 inline-flex items-center border bg-white border-gray-200 rounded px-0.5 py-0.5 text-sm font-sans font-medium text-gray-400">
+                                <IconArrowLeft className="w-4 h-4" />
+                            </kbd>
+                        </button>
+                        <button onClick={nextRecord} disabled={SessionManager.nextDisabled}
+                            className="bg-indigo-700 text-white text-xs font-semibold px-4 py-1.5 rounded-md cursor-pointer whitespace-nowrap inline-flex items-center hover:bg-indigo-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:cursor-not-allowed disabled:opacity-50">Next
+                            <kbd className="relative ml-1 inline-flex items-center border bg-white border-gray-200 rounded px-0.5 py-0.5 text-sm font-sans font-medium text-gray-400">
+                                <IconArrowRight className="w-4 h-4" />
+                            </kbd>
+                        </button>
                     </div>
                 </div>
             </div>
