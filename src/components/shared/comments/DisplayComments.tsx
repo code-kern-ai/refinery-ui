@@ -46,7 +46,7 @@ export default function DisplayComments(props: DisplayCommentsProps) {
                             </a>
 
                             <Menu as="div" className="absolute right-0 inline-block flex-shrink-0 text-left">
-                                <Menu.Button className="group relative inline-flex h-8 w-8 items-center justify-center rounded-full">
+                                <Menu.Button className="group relative inline-flex h-8 w-8 items-center justify-center rounded-full disabled:cursor-not-allowed disabled:opacity-50" disabled={comment.created_by != user.id}>
                                     <span className="flex h-full w-full items-center justify-center rounded-full">
                                         <IconDotsVertical
                                             size={24}
