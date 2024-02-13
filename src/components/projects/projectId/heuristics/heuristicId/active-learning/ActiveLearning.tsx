@@ -28,7 +28,7 @@ import { getPythonClassName, getPythonClassRegExMatch } from "@/submodules/javas
 import { WebSocketsService } from "@/src/services/base/web-sockets/WebSocketsService";
 import { CurrentPage } from "@/src/types/shared/general";
 import { unsubscribeWSOnDestroy } from "@/src/services/base/web-sockets/web-sockets-helper";
-import { selectAllUsers, setBricksIntegrator, setComments } from "@/src/reduxStore/states/general";
+import { selectAllUsers, setBricksIntegrator, setComments, setLabelsBricksIntegrator } from "@/src/reduxStore/states/general";
 import { CommentType } from "@/src/types/shared/comments";
 import { CommentDataManager } from "@/src/util/classes/comments";
 import { REQUEST_COMMENTS } from "@/src/services/gql/queries/projects";
@@ -37,6 +37,7 @@ import { InformationSourceCodeLookup, InformationSourceExamples } from "@/src/ut
 import { getInformationSourceTemplate } from "@/src/util/components/projects/projectId/heuristics/heuristics-helper";
 import Dropdown2 from "@/submodules/react-components/components/Dropdown2";
 import LoadingIcon from "@/src/components/shared/loading/LoadingIcon";
+import { BricksCodeParser } from "@/src/util/classes/bricks-integrator/bricks-integrator";
 
 export default function ActiveLearning() {
     const dispatch = useDispatch();
@@ -221,7 +222,7 @@ export default function ActiveLearning() {
     function setValueToLabelingTask(value: string) {
         const labelingTask = labelingTasks.find(a => a.id == value);
         updateHeuristicMut({ variables: { projectId: projectId, informationSourceId: currentHeuristic.id, labelingTaskId: labelingTask.id } }).then((res) => {
-            dispatch(updateHeuristicsState(currentHeuristic.id, { labelingTaskId: labelingTask.id, labelingTaskName: labelingTask.name, labels: labelingTask.labels }))
+            dispatch(updateHeuristicsState(currentHeuristic.id, { labelingTaskId: labelingTask.id, labelingTaskName: labelingTask.name, labels: labelingTask.labels }));
         });
     }
 

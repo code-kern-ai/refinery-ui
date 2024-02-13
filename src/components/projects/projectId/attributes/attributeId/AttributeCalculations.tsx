@@ -1,10 +1,10 @@
 import Statuses from "@/src/components/shared/statuses/Statuses";
 import { selectAllLookupLists, setAllLookupLists } from "@/src/reduxStore/states/pages/lookup-lists";
-import { selectAttributes, selectVisibleAttributeAC, setAllAttributes, updateAttributeById } from "@/src/reduxStore/states/pages/settings";
+import { selectAttributes, selectVisibleAttributeAC, setAllAttributes, setLabelingTasksAll, updateAttributeById } from "@/src/reduxStore/states/pages/settings";
 import { selectProjectId } from "@/src/reduxStore/states/project"
 import { UPDATE_ATTRIBUTE } from "@/src/services/gql/mutations/project-settings";
 import { LOOKUP_LISTS_BY_PROJECT_ID } from "@/src/services/gql/queries/lookup-lists";
-import { GET_ATTRIBUTES_BY_PROJECT_ID, GET_ATTRIBUTE_BY_ATTRIBUTE_ID, GET_PROJECT_TOKENIZATION } from "@/src/services/gql/queries/project-setting";
+import { GET_ATTRIBUTES_BY_PROJECT_ID, GET_ATTRIBUTE_BY_ATTRIBUTE_ID, GET_LABELING_TASKS_BY_PROJECT_ID, GET_PROJECT_TOKENIZATION } from "@/src/services/gql/queries/project-setting";
 import { Attribute, AttributeState } from "@/src/types/components/projects/projectId/settings/data-schema";
 import { CurrentPage, DataTypeEnum } from "@/src/types/shared/general";
 import { postProcessCurrentAttribute } from "@/src/util/components/projects/projectId/settings/attribute-calculation-helper";
@@ -34,7 +34,7 @@ import { CommentType } from "@/src/types/shared/comments";
 import BricksIntegrator from "@/src/components/shared/bricks-integrator/BricksIntegrator";
 import { AttributeCodeLookup } from "@/src/util/classes/attribute-calculation";
 import Dropdown2 from "@/submodules/react-components/components/Dropdown2";
-import { getEmptyBricksIntegratorConfig } from "@/src/util/shared/bricks-integrator-helper";
+import { postProcessLabelingTasks, postProcessLabelingTasksSchema } from "@/src/util/components/projects/projectId/settings/labeling-tasks-helper";
 
 const EDITOR_OPTIONS = { theme: 'vs-light', language: 'python', readOnly: false };
 
@@ -66,6 +66,7 @@ export default function AttributeCalculation() {
     const [refetchProjectTokenization] = useLazyQuery(GET_PROJECT_TOKENIZATION, { fetchPolicy: "no-cache" });
     const [refetchAttributeByAttributeId] = useLazyQuery(GET_ATTRIBUTE_BY_ATTRIBUTE_ID, { fetchPolicy: "no-cache" });
     const [refetchComments] = useLazyQuery(REQUEST_COMMENTS, { fetchPolicy: "no-cache" });
+    const [refetchLabelingTasksByProjectId] = useLazyQuery(GET_LABELING_TASKS_BY_PROJECT_ID, { fetchPolicy: "network-only" });
 
     useEffect(unsubscribeWSOnDestroy(router, [CurrentPage.ATTRIBUTE_CALCULATION]), []);
 
@@ -89,6 +90,7 @@ export default function AttributeCalculation() {
                 dispatch(setAllLookupLists(res.data['knowledgeBasesByProjectId']));
             });
         }
+        refetchLabelingTasksAndProcess();
         checkProjectTokenization();
         WebSocketsService.subscribeToNotification(CurrentPage.ATTRIBUTE_CALCULATION, {
             projectId: projectId,
@@ -247,6 +249,13 @@ export default function AttributeCalculation() {
         const regMatch: any = getPythonFunctionRegExMatch(code);
         updateSourceCode(code, regMatch[2]);
         setIsInitial(false);
+    }
+
+    function refetchLabelingTasksAndProcess() {
+        refetchLabelingTasksByProjectId({ variables: { projectId: projectId } }).then((res) => {
+            const labelingTasks = postProcessLabelingTasks(res['data']['projectByProjectId']['labelingTasks']['edges']);
+            dispatch(setLabelingTasksAll(postProcessLabelingTasksSchema(labelingTasks)));
+        });
     }
 
     const handleWebsocketNotification = useCallback((msgParts: string[]) => {

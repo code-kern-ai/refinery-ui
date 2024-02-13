@@ -372,7 +372,8 @@ export default function BricksIntegrator(_props: BricksIntegratorProps) {
             const configCopy = BricksCodeParser.prepareCode(jsonCopy(config), props.executionTypeFilter, props.nameLookups, taskId, forIde, labelingTasks);
             dispatch(setBricksIntegrator(configCopy));
         }
-        props.newTaskId(taskId)
+        dispatch(setLabelsBricksIntegrator(BricksCodeParser.getLabels(taskId, labelingTasks)))
+        props.newTaskId(taskId);
     }
 
     return (
