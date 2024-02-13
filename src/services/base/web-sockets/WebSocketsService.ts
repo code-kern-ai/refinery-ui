@@ -22,7 +22,6 @@ export class WebSocketsService {
         if (!projectId) projectId = "GLOBAL";
         const scope = getStableWebsocketPageKey(projectId, page, subKey)
 
-
         if (!WebSocketsService.registeredNotificationListeners.has(scope)) {
             console.warn("Nothing registered for scope: " + scope);
             return;
@@ -103,7 +102,7 @@ export class WebSocketsService {
         for (let scope of scopes) {
             if (scope.projectId != projectId) continue;
             const sub = WebSocketsService.registeredNotificationListeners.get(scope);
-            if (!sub.whitelist && sub.whitelist.includes(msgParts[1])) {
+            if (sub.whitelist.includes(msgParts[1])) {
                 sub.func(msgParts);
             }
         }

@@ -2,18 +2,14 @@ import Statuses from "@/src/components/shared/statuses/Statuses"
 import { openModal } from "@/src/reduxStore/states/modal";
 import { selectGatesIntegration } from "@/src/reduxStore/states/pages/settings";
 import { selectProjectId } from "@/src/reduxStore/states/project";
-import { unsubscribeWSOnDestroy } from "@/src/services/base/web-sockets/web-sockets-helper";
-import { CurrentPage } from "@/src/types/shared/general";
 import { ModalEnum } from "@/src/types/shared/modal";
 import { GatesIntegratorStatus } from "@/src/types/shared/statuses";
 import { IconReload } from "@tabler/icons-react";
-import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import GatesIntegrationWarningModal from "./GatesIntegrationWarningModal";
 
 export default function GatesIntegration() {
-    const router = useRouter();
     const dispatch = useDispatch();
 
     const projectId = useSelector(selectProjectId);

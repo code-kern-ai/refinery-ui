@@ -28,6 +28,7 @@ export default function Comments() {
 
     const handleWebsocketNotificationGlobal = useCallback((msgParts: string[]) => {
         //messages will be GLOBAL:{messageType}:{projectId}:{additionalInfo}
+        console.log("process global comment")
         let somethingToRerequest = false;
         if (msgParts[1] == "comment_deleted") {
             somethingToRerequest = CommentDataManager.removeCommentFromCache(msgParts[3]);
@@ -41,6 +42,7 @@ export default function Comments() {
                 CommentDataManager.addCommentRequests[key] = backRequest;
             }
         } else if (msgParts[1] == "comment_created") {
+            console.log("created comment")
             somethingToRerequest = true;
             //create helper addon
             const backRequest: CommentRequest = { commentType: msgParts[3] as CommentType, projectId: msgParts[2], commentKey: msgParts[4], commentId: msgParts[5] };
@@ -65,6 +67,7 @@ export default function Comments() {
     }, [allUsers]);
 
     const handleWebsocketNotification = useCallback((msgParts: string[]) => {
+        console.log("process local comment")
         let somethingToRerequest = false;
         if (['label_created', 'label_deleted'].includes(msgParts[1])) {
             somethingToRerequest = CommentDataManager.modifyCacheFor(CommentType.LABEL, msgParts[0], msgParts[2], msgParts[1] == 'label_created');
@@ -99,7 +102,7 @@ export default function Comments() {
         setSidebarOpen(prev => !prev);
     }, []);
 
-    useWebsocket(CurrentPage.COMMENTS, handleWebsocketNotificationGlobal, CurrentPageSubKey.GLOBAL);
+    useWebsocket(CurrentPage.COMMENTS, handleWebsocketNotificationGlobal, null, CurrentPageSubKey.GLOBAL);
     useWebsocket(CurrentPage.COMMENTS, handleWebsocketNotification, projectId);
 
     return (<>

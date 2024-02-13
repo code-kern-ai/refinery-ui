@@ -5,19 +5,18 @@ import { NotificationSubscription } from './web-sockets-helper';
 
 export function useWebsocket(currentPage: CurrentPage, handleFunction: (msgParts: string[]) => void, projectId?: string, subKey?: CurrentPageSubKey) {
 
-    const _projectId = useMemo(() => projectId || "GLOBAL", []);
-    const _subKey = useMemo(() => subKey || CurrentPageSubKey.NONE, []);
-
+    const _projectId = useMemo(() => projectId || "GLOBAL", [projectId]);
+    const _subKey = useMemo(() => subKey || CurrentPageSubKey.NONE, [subKey]);
     useEffect(() => {
-        console.log('subscribing to', currentPage, _projectId, _subKey)
         const nos: NotificationSubscription = {
             whitelist: WHITELIST_LOOKUP[currentPage][_subKey],
-            func: handleFunction
+            func: handleFunction,
+            projectId: _projectId
         }
 
         if (projectId) nos.projectId = projectId;
 
-        WebSocketsService.subscribeToNotification(currentPage, nos);
+        WebSocketsService.subscribeToNotification(currentPage, nos, _subKey);
 
         return () => WebSocketsService.unsubscribeFromNotification(currentPage, projectId);
     }, [_projectId, _subKey]);
@@ -25,6 +24,7 @@ export function useWebsocket(currentPage: CurrentPage, handleFunction: (msgParts
     useEffect(() => {
         WebSocketsService.updateFunctionPointer(projectId, currentPage, handleFunction, subKey)
     }, [handleFunction]);
+
 
 }
 
