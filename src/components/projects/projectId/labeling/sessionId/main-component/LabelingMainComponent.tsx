@@ -1,7 +1,7 @@
 import { selectAllUsers, selectUser, setBricksIntegrator, setComments } from "@/src/reduxStore/states/general";
 import { setAvailableLinks, updateRecordRequests, setSelectedLink, selectRecordRequestsRla, updateUsers, setSettings, selectSettings, setUserDisplayId, selectRecordRequestsRecord, initOnLabelPageDestruction, selectUserDisplayId, selectDisplayUserRole, setDisplayUserRole } from "@/src/reduxStore/states/pages/labeling";
 import { selectProjectId } from "@/src/reduxStore/states/project"
-import { AVAILABLE_LABELING_LINKS, GET_RECORD_LABEL_ASSOCIATIONS, GET_TOKENIZED_RECORD, REQUEST_HUDDLE_DATA } from "@/src/services/gql/queries/labeling";
+import { AVAILABLE_LABELING_LINKS, GET_RECORD_LABEL_ASSOCIATIONS, GET_TOKENIZED_RECORD, LINK_LOCKED, REQUEST_HUDDLE_DATA } from "@/src/services/gql/queries/labeling";
 import { LabelingLinkType } from "@/src/types/components/projects/projectId/labeling/labeling-main-component";
 import { UserRole } from "@/src/types/shared/sidebar";
 import { LabelingSuiteManager } from "@/src/util/classes/labeling/manager";
@@ -49,6 +49,7 @@ export default function LabelingMainComponent() {
 
     const [huddleData, setHuddleData] = useState(null);
     const [absoluteWarning, setAbsoluteWarning] = useState(null);
+    const [lockedLink, setLockedLink] = useState(false);
 
     const [refetchHuddleData] = useLazyQuery(REQUEST_HUDDLE_DATA, { fetchPolicy: 'no-cache' });
     const [refetchAvailableLinks] = useLazyQuery(AVAILABLE_LABELING_LINKS, { fetchPolicy: 'no-cache' });
@@ -58,6 +59,7 @@ export default function LabelingMainComponent() {
     const [refetchAttributes] = useLazyQuery(GET_ATTRIBUTES_BY_PROJECT_ID, { fetchPolicy: "network-only" });
     const [refetchLabelingTasksByProjectId] = useLazyQuery(GET_LABELING_TASKS_BY_PROJECT_ID, { fetchPolicy: "network-only" });
     const [refetchComments] = useLazyQuery(REQUEST_COMMENTS, { fetchPolicy: "no-cache" });
+    const [refetchLinkLocked] = useLazyQuery(LINK_LOCKED, { fetchPolicy: "no-cache" });
 
     useEffect(unsubscribeWSOnDestroy(router, [CurrentPage.LABELING]), []);
 
@@ -94,17 +96,29 @@ export default function LabelingMainComponent() {
     }, []);
 
     useEffect(() => {
-        if (!router.query.sessionId || !user) return;
-        if (router.query.type == LabelingLinkType.HEURISTIC) {
-            dispatch(setDisplayUserRole(UserRole.ANNOTATOR));
-            setAbsoluteWarning(user?.role == UserRole.ENGINEER ? 'You are viewing this page as ' + UserRole.ANNOTATOR + ' you are not able to edit' : null);
-        } else if (router.query.type == LabelingLinkType.DATA_SLICE) {
-            dispatch(setDisplayUserRole(UserRole.EXPERT));
-            setAbsoluteWarning(user?.role == UserRole.ENGINEER ? 'You are viewing this page as ' + UserRole.EXPERT + ' you are not able to edit' : null);
-        } else {
+        if (!router.query.sessionId || !user || !projectId) return;
+        if (router.query.type == LabelingLinkType.SESSION) {
             dispatch(setDisplayUserRole(user.role));
+            return;
         }
-    }, [router.query, user]);
+        refetchLinkLocked({ variables: { projectId: projectId, linkRoute: router.asPath } }).then((result) => {
+            const lockedLink = result['data']['linkLocked'];
+            if (lockedLink) {
+                setAbsoluteWarning(user?.role !== UserRole.ENGINEER ? 'This link is locked, contact your supervisor to request access' : null)
+            } else {
+                if (router.query.type == LabelingLinkType.HEURISTIC) {
+                    dispatch(setDisplayUserRole(UserRole.ANNOTATOR));
+                    setAbsoluteWarning(user?.role == UserRole.ENGINEER ? 'You are viewing this page as ' + UserRole.ANNOTATOR + ' you are not able to edit' : null);
+                } else if (router.query.type == LabelingLinkType.DATA_SLICE) {
+                    dispatch(setDisplayUserRole(UserRole.EXPERT));
+                    setAbsoluteWarning(user?.role == UserRole.ENGINEER ? 'You are viewing this page as ' + UserRole.EXPERT + ' you are not able to edit' : null);
+                } else {
+                    dispatch(setDisplayUserRole(user.role));
+                }
+            }
+            setLockedLink(lockedLink);
+        });
+    }, [router.query, user, projectId]);
 
     useEffect(() => {
         if (!projectId) return;
@@ -327,9 +341,10 @@ export default function LabelingMainComponent() {
     return (<div className={`h-full bg-white flex flex-col ${LabelingSuiteManager.somethingLoading ? style.wait : ''}`}>
         <NavigationBarTop absoluteWarning={absoluteWarning} />
         <div className="flex-grow overflow-y-auto" style={{ height: 'calc(100vh - 194px)' }}>
-            {settings.task.show && (user?.role != UserRole.ANNOTATOR && userDisplayRole != UserRole.ANNOTATOR) && <LabelingSuiteTaskHeader />}
-            <LabelingSuiteLabeling />
-            {settings.overviewTable.show && SessionManager.currentRecordId !== "deleted" && <LabelingSuiteOverviewTable />}
+            {!lockedLink && <>
+                {settings.task.show && (user?.role != UserRole.ANNOTATOR && userDisplayRole != UserRole.ANNOTATOR) && <LabelingSuiteTaskHeader />}
+                <LabelingSuiteLabeling />
+                {settings.overviewTable.show && SessionManager.currentRecordId !== "deleted" && <LabelingSuiteOverviewTable />}</>}
         </div>
         <NavigationBarBottom />
     </div>)

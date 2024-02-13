@@ -101,3 +101,8 @@ query ($projectId: ID!, $recordId: ID!) {
   }
 }
 `;
+
+export const LINK_LOCKED = gql`
+query ($projectId: ID!, $linkRoute: String!) {
+  linkLocked(projectId: $projectId, linkRoute: $linkRoute)
+}`;
