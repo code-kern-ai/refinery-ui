@@ -100,6 +100,7 @@ export default function AttributeCalculation() {
         }
         if (currentAttribute.state == AttributeState.USABLE) {
             setEditorOptions({ ...EDITOR_OPTIONS, readOnly: true });
+            setCheckUnsavedChanges(false);
         }
         setAttributeName(currentAttribute.name);
     }, [currentAttribute]);
@@ -111,11 +112,10 @@ export default function AttributeCalculation() {
 
     useEffect(() => {
         if (!currentAttribute) return;
+        if (currentAttribute.sourceCodeToDisplay == editorValue || currentAttribute.state == AttributeState.USABLE) return;
         const observer = fromEvent(document, 'keyup');
         const spinner = observer.subscribe(() => {
-            if (currentAttribute.sourceCodeToDisplay == editorValue) return;
             setCheckUnsavedChanges(true);
-            spinner.unsubscribe();
         });
         const subscription = observer.pipe(
             debounceTime(2000),
@@ -127,7 +127,10 @@ export default function AttributeCalculation() {
             updateSourceCode(editorValue);
             setCheckUnsavedChanges(false);
         });
-        return () => subscription.unsubscribe();
+        return () => {
+            spinner.unsubscribe();
+            subscription.unsubscribe();
+        }
     }, [editorValue, currentAttribute]);
 
     function setUpCommentsRequests() {
@@ -171,6 +174,7 @@ export default function AttributeCalculation() {
         attributeNew.saveSourceCode = false;
         updateAttributeMut({ variables: { projectId: projectId, attributeId: currentAttribute.id, name: attributeNew.name } }).then(() => {
             setCurrentAttribute(postProcessCurrentAttribute(attributeNew));
+            setEditorValue(attributeNew.sourceCode.replace('def ac(record)', 'def ' + attributeNew.name + '(record)'));
             dispatch(updateAttributeById(attributeNew));
             setDuplicateNameExists(false);
         });
@@ -212,10 +216,14 @@ export default function AttributeCalculation() {
         }
     }
 
-    function updateSourceCode(value: string) {
+    function updateSourceCode(value: string, attributeNameParam?: string) {
         var regMatch: any = getPythonFunctionRegExMatch(value);
+        if (!regMatch) {
+            console.log("Can't find python function name -- seems wrong -- better dont save");
+            return;
+        }
         const finalSourceCode = value.replace(regMatch[0], 'def ac(record)');
-        updateAttributeMut({ variables: { projectId: projectId, attributeId: currentAttribute.id, sourceCode: finalSourceCode } }).then(() => {
+        updateAttributeMut({ variables: { projectId: projectId, attributeId: currentAttribute.id, sourceCode: finalSourceCode, name: attributeNameParam } }).then(() => {
         });
     }
 
@@ -223,6 +231,13 @@ export default function AttributeCalculation() {
         refetchProjectTokenization({ variables: { projectId: projectId } }).then((res) => {
             setTokenizationProgress(res.data['projectTokenization']?.progress);
         });
+    }
+
+    function updateNameAndCodeBricksIntegrator(code: string) {
+        setEditorValue(code);
+        const regMatch: any = getPythonFunctionRegExMatch(code);
+        updateSourceCode(code, regMatch[2]);
+        setIsInitial(false);
     }
 
     const handleWebsocketNotification = useCallback((msgParts: string[]) => {
@@ -349,9 +364,8 @@ export default function AttributeCalculation() {
                             moduleTypeFilter="generator,classifier" functionType="Attribute"
                             nameLookups={attributes.map(a => a.name)}
                             preparedCode={(code: string) => {
-                                setEditorValue(code);
-                                updateSourceCode(code);
-                                setIsInitial(false);
+                                if (currentAttribute.state == AttributeState.USABLE) return;
+                                updateNameAndCodeBricksIntegrator(code);
                             }} />
                         <Tooltip content={TOOLTIPS_DICT.ATTRIBUTE_CALCULATION.AVAILABLE_LIBRARIES} placement="left" color="invert">
                             <a href="https://github.com/code-kern-ai/refinery-ac-exec-env/blob/dev/requirements.txt"
