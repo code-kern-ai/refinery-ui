@@ -161,6 +161,7 @@ export default function ProjectSettings() {
     }
 
     const handleWebsocketNotification = useCallback((msgParts: string[]) => {
+        console.log(msgParts)
         if (msgParts[1] == 'embedding') {
             if (!embeddings) return;
             if (["queued", "dequeued"].includes(msgParts[2])) {
@@ -250,9 +251,12 @@ export default function ProjectSettings() {
                 refetchAndSetGatesIntegrationData();
             }
         } else if (msgParts[1] == 'embedding_deleted') {
+            console.log("msg emb del")
+            console.log(gatesIntegrationData, msgParts[2])
             if (gatesIntegrationData?.missingEmbeddings?.includes(msgParts[2])) {
                 refetchAndSetGatesIntegrationData();
             }
+            refetchEmbeddingsAndPostProcess();
         } else if (['label_created', 'label_deleted', 'labeling_task_deleted', 'labeling_task_updated', 'labeling_task_created'].includes(msgParts[1])) {
             refetchLabelingTasksAndProcess();
         }

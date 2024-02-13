@@ -278,9 +278,11 @@ export default function LabelingMainComponent() {
             }
         } else if (['payload_finished', 'weak_supervision_finished', 'rla_created', 'rla_deleted'].includes(msgParts[1])) {
             const recordId = SessionManager.currentRecordId ?? record.id;
-            refetchRla({ variables: { projectId, recordId: recordId } }).then((result) => {
-                dispatch(updateRecordRequests('rla', result?.data?.recordByRecordId?.recordLabelAssociations));
-            });
+            if (msgParts[2] == recordId) {
+                refetchRla({ variables: { projectId, recordId: recordId } }).then((result) => {
+                    dispatch(updateRecordRequests('rla', result?.data?.recordByRecordId?.recordLabelAssociations));
+                });
+        }
         } else if (['access_link_changed', 'access_link_removed'].includes(msgParts[1])) {
             if (router.pathname.includes(msgParts[3]) && SessionManager.labelingLinkData) {
                 //python "True" string

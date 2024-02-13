@@ -93,7 +93,6 @@ export class WebSocketsService {
             msg.split("\n").forEach(element => WebSocketsService.handleWebsocketNotificationMessage(element));
             return;
         }
-
         const scopes = WebSocketsService.registeredNotificationListeners.keys();
 
         const msgParts = msg.split(":");
@@ -113,6 +112,7 @@ export class WebSocketsService {
 
         const scope = getStableWebsocketPageKey(params.projectId, key, subKey)
 
+        console.log("subscribe", scope)
         WebSocketsService.registeredNotificationListeners.set(scope, params);
     }
 
@@ -120,6 +120,7 @@ export class WebSocketsService {
         if (!projectId) projectId = "GLOBAL";
         const scope = getStableWebsocketPageKey(projectId, key, subKey)
 
+        console.log("unsubscribe", scope)
         if (WebSocketsService.registeredNotificationListeners.has(scope)) {
             WebSocketsService.registeredNotificationListeners.delete(scope);
         }
