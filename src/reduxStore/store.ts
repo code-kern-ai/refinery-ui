@@ -31,3 +31,13 @@ const store = configureStore({
 });
 
 export default store;
+
+export function getStoreSnapshotValue(access: string[]): any {
+    // access via getState (current snapshot) when we don't need to subscribe to future updates
+    const currentState = store.getState();
+    let value = currentState;
+    for (let i = 0; i < access.length; i++) {
+        value = value[access[i]];
+    }
+    return value;
+}

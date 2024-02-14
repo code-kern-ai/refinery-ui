@@ -1,11 +1,11 @@
-import { selectHoverGroupDict, selectSettings, selectTmpHighlightIds, setHoverGroupDict, tmpAddHighlightIds } from "@/src/reduxStore/states/pages/labeling";
+import { selectActiveTokenSelection, selectHoverGroupDict, selectSettings, selectTmpHighlightIds, setHoverGroupDict, tmpAddHighlightIds } from "@/src/reduxStore/states/pages/labeling";
 import { LineBreaksType } from "@/src/types/components/projects/projectId/data-browser/data-browser";
 import { ExtractionDisplayProps, LabelSourceHover } from "@/src/types/components/projects/projectId/labeling/labeling";
 import { LabelingPageParts } from "@/src/types/components/projects/projectId/labeling/labeling-main-component";
 import { Tooltip } from "@nextui-org/react";
 import { useDispatch, useSelector } from "react-redux";
 import style from '@/src/styles/components/projects/projectId/labeling.module.css';
-import { useState, forwardRef } from "react";
+import { useState, forwardRef, useEffect, useMemo } from "react";
 
 export function shouldHighlightOn(tmpHighlightIds: string[], comparedId: string[]) {
     return tmpHighlightIds.some((id) => comparedId.includes(id));
@@ -106,11 +106,19 @@ const ExtractionDisplay = forwardRef<HTMLInputElement, ExtractionDisplayProps>(f
 });
 
 function TokenValue(props: any) {
+    const activeTokenSelection = useSelector(selectActiveTokenSelection);
+
+    const isSelected = useMemo(() => {
+        if (!activeTokenSelection || !props.attributeId) return false;
+        if (activeTokenSelection.attributeId != props.attributeId) return false;
+        return props.token.idx >= activeTokenSelection.tokenStart && props.token.idx <= activeTokenSelection.tokenEnd;
+    }, [activeTokenSelection, props.attributeId]);
+
     return (<>
         {props.token && props.token.value != '\n' && <label onClick={(e) => props.setSelected(e)}
             className={`rounded-lg hover:bg-gray-200 text-sm text-gray-500 leading-5 relative font-normal ${!props.token.nextCloser ? 'pr-1' : ''}`}
             data-tokenidx={props.token.idx} data-attributeid={props.attributeId}
-            style={{ backgroundColor: props.token.selected ? '#3399FF' : null, borderRadius: props.token.selected ? '0' : null, color: props.token.selected ? 'white' : null, zIndex: '100' }}>
+            style={{ backgroundColor: isSelected ? '#3399FF' : null, borderRadius: isSelected ? '0' : null, color: isSelected ? 'white' : null, zIndex: '100' }}>
             {props.token.value}
         </label>}
     </>)

@@ -8,6 +8,12 @@ import { RecordManager } from "@/src/util/classes/labeling/record-manager";
 import { ComponentType, LabelingSuiteSettings } from "@/src/types/components/projects/projectId/labeling/settings";
 import { UserRole } from "@/src/types/shared/sidebar";
 
+export type CurrentSelection = {
+    attributeId: string,
+    tokenStart: number,
+    tokenEnd: number
+}
+
 
 type LabelingSuiteState = {
     links: {
@@ -28,6 +34,7 @@ type LabelingSuiteState = {
     displayUserId: string;
     displayUserRole: UserRole;
     hoverGroupDict: { [key: string]: any };
+    activeTokenSelection: CurrentSelection;
 }
 
 function getInitState(): LabelingSuiteState {
@@ -50,6 +57,7 @@ function getInitState(): LabelingSuiteState {
         displayUserId: null,
         displayUserRole: null,
         hoverGroupDict: {},
+        activeTokenSelection: null,
     };
 }
 
@@ -199,7 +207,12 @@ const labelingSlice = createSlice({
         setDisplayUserRole(state, action: PayloadAction<UserRole>) {
             if (action.payload) state.displayUserRole = action.payload;
             else state.displayUserRole = null;
+        },
+        setActiveTokenSelection(state, action: PayloadAction<CurrentSelection>) {
+            if (action.payload) state.activeTokenSelection = action.payload;
+            else state.activeTokenSelection = null;
         }
+
     },
 });
 
@@ -217,9 +230,11 @@ export const selectTmpHighlightIds = (state: any) => state.labeling.tmpHighlight
 export const selectUserDisplayId = (state: any) => state.labeling.displayUserId;
 export const selectHoverGroupDict = (state: any) => state.labeling.hoverGroupDict;
 export const selectDisplayUserRole = (state: any) => state.labeling.displayUserRole;
+export const selectActiveTokenSelection = (state: any) => state.labeling.activeTokenSelection;
 
 export const { setAvailableLinks, setSelectedLink, updateRecordRequests, updateUsers, setSettings, updateSettings,
-    removeFromRlaById, tmpAddHighlightIds, setUserDisplayId, setHoverGroupDict, initOnLabelPageDestruction, setDisplayUserRole } = labelingSlice.actions;
+    removeFromRlaById, tmpAddHighlightIds, setUserDisplayId, setHoverGroupDict, initOnLabelPageDestruction, setDisplayUserRole,
+    setActiveTokenSelection } = labelingSlice.actions;
 
 export const labelingReducer = labelingSlice.reducer;
 

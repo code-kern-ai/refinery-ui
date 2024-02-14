@@ -61,6 +61,7 @@ export type LabelSelectionBoxProps = {
     labelAddButtonDisabledDict: { [taskId: string]: boolean };
     addNewLabelToTask: (newLabel: string, task) => void;
     checkLabelVisibleInSearch: (newLabel: string, task) => void;
+    clearSelected: () => void;
 };
 
 export type HotkeyLookup = {

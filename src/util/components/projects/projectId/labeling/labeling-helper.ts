@@ -8,6 +8,7 @@ import { User } from "@/src/types/shared/general";
 import { Attribute } from "@/src/types/components/projects/projectId/settings/data-schema";
 import { UserRole } from "@/src/types/shared/sidebar";
 import { UserManager } from "@/src/util/classes/labeling/user-manager";
+import { CurrentSelection } from "@/src/reduxStore/states/pages/labeling";
 
 export const FULL_RECORD_ID = "FULL_RECORD";
 export const SWIM_LANE_SIZE_PX = 12;
@@ -140,20 +141,20 @@ export function findOrderPosItem(orderPosElement: any, compareItem: any): boolea
     return true;
 }
 
-export function collectSelectionData(attributeId: string, tokenLookup: TokenLookup, attributes: Attribute[], recordRequests: any): any {
-    let startIdx = -1;
-    let endIdx = -1;
-    for (const token of tokenLookup[attributeId].token) {
-        if (token.selected) {
-            if (startIdx == -1) startIdx = token.idx;
-        } else {
-            if (startIdx != -1) {
-                endIdx = token.idx - 1;
-                break;
-            }
-        }
-    }
-    if (endIdx == -1) endIdx = tokenLookup[attributeId].token.length - 1;
+export function collectSelectionData(attributeId: string, currentSelection: CurrentSelection, attributes: Attribute[], recordRequests: any): any {
+    let startIdx = currentSelection.tokenStart;
+    let endIdx = currentSelection.tokenEnd;
+    // for (const token of tokenLookup[attributeId].token) {
+    //     if (token.selected) {
+    //         if (startIdx == -1) startIdx = token.idx;
+    //     } else {
+    //         if (startIdx != -1) {
+    //             endIdx = token.idx - 1;
+    //             break;
+    //         }
+    //     }
+    // }
+    // if (endIdx == -1) endIdx = tokenLookup[attributeId].token.length - 1;
     const tokenData = getTokenData(attributeId, attributes, recordRequests);
     if (!tokenData) return null;
     if (startIdx == -1 || endIdx == -1) return null;
