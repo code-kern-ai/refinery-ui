@@ -14,8 +14,6 @@ export function useWebsocket(currentPage: CurrentPage, handleFunction: (msgParts
             projectId: _projectId
         }
 
-        if (projectId) nos.projectId = projectId; // delete
-
         WebSocketsService.subscribeToNotification(currentPage, nos, _subKey);
 
         return () => WebSocketsService.unsubscribeFromNotification(currentPage, projectId, _subKey);

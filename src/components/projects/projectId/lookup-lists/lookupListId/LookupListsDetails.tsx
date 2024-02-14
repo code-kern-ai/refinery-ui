@@ -211,7 +211,7 @@ export default function LookupListsDetails() {
                         className="font-dmMono px-4 py-2 rounded-none rounded-r-md border border-gray-300 text-gray-500 sm:text-sm bg-gray-100 cursor-pointer">
                         {lookupList.pythonVariable}</span>
                 </Tooltip>
-                <LookupListOperations  />
+                <LookupListOperations  refetchTerms={refetchTerms}/>
             </div>
             <Terms terms={terms} finalSize={finalSize} refetchTerms={refetchTerms} setTerms={(terms: Term[]) => setTerms(terms)} />
             <DangerZone elementType={DangerZoneEnum.LOOKUP_LIST} name={lookupList.name} id={lookupList.id} />
