@@ -24,26 +24,15 @@ export default function LabelSelectionBox(props: LabelSelectionBoxProps) {
     const clearSelectedRef = useRef(props.clearSelected);
 
     useEffect(() => {
-        console.log("active tasks changed", props.activeTasks)
         if (props.activeTasks && props.activeTasks.length > 0) {
             setCurrentActiveTasks(props.activeTasks);
         } else {
             clearSelectedRef.current();
-            console.log("called current ref")
-
         }
     }, [props.activeTasks]);
 
     useEffect(() => {
-        return () => {
-            clearSelectedRef.current();
-            console.log("destruction evennt")
-        }
-    }, []);
-
-    useEffect(() => {
         clearSelectedRef.current = props.clearSelected;
-        console.log("updated current ref")
     }, [props.clearSelected]);
 
     useEffect(() => {
