@@ -1,13 +1,13 @@
 import { selectAllUsers, selectUser, setBricksIntegrator, setComments } from "@/src/reduxStore/states/general";
-import { setAvailableLinks, updateRecordRequests, setSelectedLink, selectRecordRequestsRla, updateUsers, setSettings, selectSettings, setUserDisplayId, selectRecordRequestsRecord, initOnLabelPageDestruction, selectUserDisplayId } from "@/src/reduxStore/states/pages/labeling";
+import { setAvailableLinks, updateRecordRequests, setSelectedLink, selectRecordRequestsRla, updateUsers, setSettings, selectSettings, setUserDisplayId, selectRecordRequestsRecord, initOnLabelPageDestruction, selectUserDisplayId, selectDisplayUserRole, setDisplayUserRole } from "@/src/reduxStore/states/pages/labeling";
 import { selectProjectId } from "@/src/reduxStore/states/project"
-import { AVAILABLE_LABELING_LINKS, GET_RECORD_LABEL_ASSOCIATIONS, GET_TOKENIZED_RECORD, REQUEST_HUDDLE_DATA } from "@/src/services/gql/queries/labeling";
+import { AVAILABLE_LABELING_LINKS, GET_RECORD_LABEL_ASSOCIATIONS, GET_TOKENIZED_RECORD, LINK_LOCKED, REQUEST_HUDDLE_DATA } from "@/src/services/gql/queries/labeling";
 import { LabelingLinkType } from "@/src/types/components/projects/projectId/labeling/labeling-main-component";
 import { UserRole } from "@/src/types/shared/sidebar";
 import { LabelingSuiteManager } from "@/src/util/classes/labeling/manager";
 import { SessionManager } from "@/src/util/classes/labeling/session-manager";
 import { UserManager } from "@/src/util/classes/labeling/user-manager";
-import { DUMMY_HUDDLE_ID, getDefaultLabelingSuiteSettings, parseLabelingLink } from "@/src/util/components/projects/projectId/labeling/labeling-main-component-helper";
+import { DUMMY_HUDDLE_ID, getDefaultLabelingSuiteSettings, parseLabelingLink, prepareRLADataForRole } from "@/src/util/components/projects/projectId/labeling/labeling-main-component-helper";
 import { useLazyQuery } from "@apollo/client";
 import { useRouter } from "next/router";
 import { useCallback, useEffect, useState } from "react";
@@ -44,8 +44,11 @@ export default function LabelingMainComponent() {
     const record = useSelector(selectRecordRequestsRecord);
     const allUsers = useSelector(selectAllUsers);
     const userDisplayId = useSelector(selectUserDisplayId);
+    const userDisplayRole = useSelector(selectDisplayUserRole);
 
     const [huddleData, setHuddleData] = useState(null);
+    const [absoluteWarning, setAbsoluteWarning] = useState(null);
+    const [lockedLink, setLockedLink] = useState(false);
 
     const [refetchHuddleData] = useLazyQuery(REQUEST_HUDDLE_DATA, { fetchPolicy: 'no-cache' });
     const [refetchAvailableLinks] = useLazyQuery(AVAILABLE_LABELING_LINKS, { fetchPolicy: 'no-cache' });
@@ -55,9 +58,10 @@ export default function LabelingMainComponent() {
     const [refetchAttributes] = useLazyQuery(GET_ATTRIBUTES_BY_PROJECT_ID, { fetchPolicy: "network-only" });
     const [refetchLabelingTasksByProjectId] = useLazyQuery(GET_LABELING_TASKS_BY_PROJECT_ID, { fetchPolicy: "network-only" });
     const [refetchComments] = useLazyQuery(REQUEST_COMMENTS, { fetchPolicy: "no-cache" });
+    const [refetchLinkLocked] = useLazyQuery(LINK_LOCKED, { fetchPolicy: "no-cache" });
 
     useEffect(() => {
-        if (!projectId) return;
+        if (!projectId || !router.query) return;
         let tmp = localStorage.getItem(SETTINGS_KEY);
         if (tmp) {
             dispatch(setSettings(JSON.parse(tmp)));
@@ -75,13 +79,41 @@ export default function LabelingMainComponent() {
         dispatch(setBricksIntegrator(getEmptyBricksIntegratorConfig()));
         refetchAttributesAndProcess();
         refetchLabelingTasksAndProcess();
-    }, [projectId]);
+    }, [projectId, router.query]);
 
     //destructor
     useEffect(() => () => {
         SessionManager.initMeOnDestruction();
         dispatch(initOnLabelPageDestruction());
-    }, [])
+    }, []);
+
+    useEffect(() => {
+        if (!router.query.sessionId || !user || !projectId) return;
+        if (router.query.type == LabelingLinkType.SESSION) {
+            dispatch(setDisplayUserRole(user.role));
+            return;
+        }
+        refetchLinkLocked({ variables: { projectId: projectId, linkRoute: router.asPath } }).then((result) => {
+            const lockedLink = result['data']['linkLocked'];
+            if (lockedLink) {
+                setAbsoluteWarning('This link is locked, contact your supervisor to request access');
+                if (router.query.type == LabelingLinkType.HEURISTIC) {
+                    dispatch(setDisplayUserRole(UserRole.ANNOTATOR));
+                }
+            } else {
+                if (router.query.type == LabelingLinkType.HEURISTIC) {
+                    dispatch(setDisplayUserRole(UserRole.ANNOTATOR));
+                    setAbsoluteWarning(user?.role == UserRole.ENGINEER ? 'You are viewing this page as ' + UserRole.ANNOTATOR + ' you are not able to edit' : null);
+                } else if (router.query.type == LabelingLinkType.DATA_SLICE) {
+                    dispatch(setDisplayUserRole(UserRole.EXPERT));
+                    setAbsoluteWarning(user?.role == UserRole.ENGINEER ? 'You are viewing this page as ' + UserRole.EXPERT + ' you are not able to edit' : null);
+                } else {
+                    dispatch(setDisplayUserRole(user.role));
+                }
+            }
+            setLockedLink(lockedLink);
+        });
+    }, [router.query, user, projectId]);
 
     useEffect(() => {
         if (!projectId) return;
@@ -112,7 +144,7 @@ export default function LabelingMainComponent() {
     }, [projectId]);
 
     useEffect(() => {
-        if (!projectId || allUsers.length == 0 || !router.query.sessionId) return;
+        if (!projectId || allUsers.length == 0 || !router.query.sessionId || !user) return;
         if (router.query.sessionId == DUMMY_HUDDLE_ID) return;
         if (!SessionManager.currentRecordId) return;
         if (SessionManager.currentRecordId == "deleted") return;
@@ -134,9 +166,10 @@ export default function LabelingMainComponent() {
         ]).subscribe(([tokenized, record, rla]) => {
             dispatch(updateRecordRequests('token', tokenized.data.tokenizeRecord));
             dispatch(updateRecordRequests('record', record.data.recordByRecordId));
-            dispatch(updateRecordRequests('rla', rla?.data?.recordByRecordId?.recordLabelAssociations));
+            const rlas = rla['data']?.['recordByRecordId']?.['recordLabelAssociations']['edges'].map(e => e.node);;
+            dispatch(updateRecordRequests('rla', prepareRLADataForRole(rlas, user, userDisplayId, userDisplayRole)));
         });
-    }, [SessionManager.currentRecordId]);
+    }, [SessionManager.currentRecordId, user]);
 
     useEffect(() => {
         if (!rlas || !user) return;
@@ -214,7 +247,10 @@ export default function LabelingMainComponent() {
                 if (SessionManager.labelingLinkData) SessionManager.changeLinkLockState(true);
                 return;
             }
-            if (huddleData.startPos != -1) SessionManager.labelingLinkData.requestedPos = huddleData.startPos;
+            if (huddleData.startPos != -1) {
+                if (userDisplayRole != UserRole.ENGINEER) SessionManager.labelingLinkData.requestedPos = 0;
+                else SessionManager.labelingLinkData.requestedPos = huddleData.startPos;
+            }
             SessionManager.huddleData = {
                 recordIds: huddleData.recordIds ? huddleData.recordIds as string[] : [],
                 partial: false,
@@ -228,12 +264,13 @@ export default function LabelingMainComponent() {
             let pos = SessionManager.labelingLinkData.requestedPos;
             if (huddleData.startPos != -1) pos++; //zero based in backend
             SessionManager.jumpToPosition(pos);
+            dispatch(setDisplayUserRole(user.role));
             router.push(`/projects/${projectId}/labeling/${SessionManager.huddleData.linkData.huddleId}?pos=${SessionManager.huddleData.linkData.requestedPos}&type=${SessionManager.huddleData.linkData.linkType}`);
         });
     }
 
     function collectAvailableLinks() {
-        if (user?.role == UserRole.ENGINEER) return;
+        if (userDisplayRole?.role == UserRole.ENGINEER) return;
         const heuristicId = SessionManager.labelingLinkData.linkType == LabelingLinkType.HEURISTIC ? SessionManager.labelingLinkData.huddleId : null;
         refetchAvailableLinks({ variables: { projectId: projectId, assumedRole: user?.role, assumedHeuristicId: heuristicId } }).then((result) => {
             const availableLinks = result['data']['availableLinks'];
@@ -253,13 +290,18 @@ export default function LabelingMainComponent() {
         refetchLabelingTasksByProjectId({ variables: { projectId: projectId } }).then((res) => {
             const labelingTasks = postProcessLabelingTasks(res['data']['projectByProjectId']['labelingTasks']['edges']);
             const labelingTasksProcessed = postProcessLabelingTasksSchema(labelingTasks);
-            dispatch(setLabelingTasksAll(prepareTasksForRole(labelingTasksProcessed)));
+            dispatch(setLabelingTasksAll(prepareTasksForRole(labelingTasksProcessed, userDisplayRole)));
         });
     }
 
-    function prepareTasksForRole(taskData: LabelingTask[]): LabelingTask[] {
-        if (user?.role != UserRole.ANNOTATOR) return taskData;
-        const taskId = JSON.parse(localStorage.getItem('huddleData')).allowedTask;
+    function prepareTasksForRole(taskData: LabelingTask[], userDisplayRole): LabelingTask[] {
+        if (user?.role != UserRole.ANNOTATOR && userDisplayRole != UserRole.ANNOTATOR) return taskData;
+        let taskId;
+        if (userDisplayRole != UserRole.ENGINEER) {
+            taskId = JSON.parse(localStorage.getItem('huddleData'))?.allowedTask;
+        } else {
+            taskId = JSON.parse(localStorage.getItem('huddleData')).allowedTask;
+        }
         if (!taskId) return null;
         else return taskData.filter(t => t.id == taskId);
     }
@@ -278,10 +320,11 @@ export default function LabelingMainComponent() {
             }
         } else if (['payload_finished', 'weak_supervision_finished', 'rla_created', 'rla_deleted'].includes(msgParts[1])) {
             const recordId = SessionManager.currentRecordId ?? record.id;
-            if (msgParts[2] == recordId) {
-                refetchRla({ variables: { projectId, recordId: recordId } }).then((result) => {
-                    dispatch(updateRecordRequests('rla', result?.data?.recordByRecordId?.recordLabelAssociations));
-                });
+            if (msgParts[2] == recordId) {    
+            refetchRla({ variables: { projectId, recordId: recordId } }).then((result) => {
+                const rlas = result['data']?.['recordByRecordId']?.['recordLabelAssociations']['edges'].map(e => e.node);;
+                dispatch(updateRecordRequests('rla', prepareRLADataForRole(rlas, user, userDisplayId, userDisplayRole)));
+            });
         }
         } else if (['access_link_changed', 'access_link_removed'].includes(msgParts[1])) {
             if (router.pathname.includes(msgParts[3]) && SessionManager.labelingLinkData) {
@@ -297,15 +340,13 @@ export default function LabelingMainComponent() {
     useWebsocket(CurrentPage.LABELING, handleWebsocketNotification, projectId);
 
     return (<div className={`h-full bg-white flex flex-col ${LabelingSuiteManager.somethingLoading ? style.wait : ''}`}>
-        {LabelingSuiteManager.absoluteWarning && <div className="absolute left-0 right-0 flex items-center justify-center pointer-events-none top-4 z-100">
-            <span className="inline-flex items-center px-2 py-0.5 rounded font-medium bg-red-100 text-red-800">{LabelingSuiteManager.absoluteWarning}</span>
-        </div>}
-        <NavigationBarTop />
+        <NavigationBarTop absoluteWarning={absoluteWarning} lockedLink={lockedLink} />
         <div className="flex-grow overflow-y-auto" style={{ height: 'calc(100vh - 194px)' }}>
-            {settings.task.show && user?.role != UserRole.ANNOTATOR && <LabelingSuiteTaskHeader />}
-            <LabelingSuiteLabeling />
-            {settings.overviewTable.show && SessionManager.currentRecordId !== "deleted" && <LabelingSuiteOverviewTable />}
+            {!lockedLink && <>
+                {settings.task.show && (user?.role != UserRole.ANNOTATOR && userDisplayRole != UserRole.ANNOTATOR) && <LabelingSuiteTaskHeader />}
+                <LabelingSuiteLabeling />
+                {settings.overviewTable.show && SessionManager.currentRecordId !== "deleted" && <LabelingSuiteOverviewTable />}</>}
         </div>
-        <NavigationBarBottom />
+        {!lockedLink ? <NavigationBarBottom /> : <div className="relative flex-shrink-0 bg-white shadow-sm flex justify-between items-center h-16"></div>}
     </div>)
 }

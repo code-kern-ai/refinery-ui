@@ -166,7 +166,6 @@ export default function Upload(props: UploadProps) {
     }
 
     function getFileNameBasedOnType() {
-        
         const fileName = selectedFile?.name;
         switch (uploadFileType) {
             case UploadFileType.RECORDS_ADD:

@@ -1,4 +1,4 @@
-import { selectBricksIntegratorAttributes, selectBricksIntegratorEmbeddings, selectBricksIntegratorLabelingTasks, selectBricksIntegratorLabels, selectBricksIntegratorLanguages, selectBricksIntegratorLookupLists, setAttributesBricksIntegrator, setEmbeddingsBricksIntegrator, setLabelingTasksBricksIntegrator, setLabelsBricksIntegrator, setLanguagesBricksIntegrator, setLookupListsBricksIntegrator } from "@/src/reduxStore/states/general";
+import { selectBricksIntegratorAttributes, selectBricksIntegratorEmbeddings, selectBricksIntegratorLabels, selectBricksIntegratorLanguages, selectBricksIntegratorLookupLists, setAttributesBricksIntegrator, setEmbeddingsBricksIntegrator, setLabelingTasksBricksIntegrator, setLabelsBricksIntegrator, setLanguagesBricksIntegrator, setLookupListsBricksIntegrator } from "@/src/reduxStore/states/general";
 import { selectLabelingTasksAll } from "@/src/reduxStore/states/pages/settings";
 import { selectProjectId } from "@/src/reduxStore/states/project";
 import { useWebsocket } from "@/src/services/base/web-sockets/useWebsocket";

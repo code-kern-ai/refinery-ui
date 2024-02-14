@@ -1,6 +1,6 @@
 import { selectUser } from "@/src/reduxStore/states/general";
 import { openModal } from "@/src/reduxStore/states/modal";
-import { removeFromRlaById, selectHoverGroupDict, selectRecordRequestsRecord, selectRecordRequestsRla, selectSettings, selectTmpHighlightIds, selectUserDisplayId, setHoverGroupDict, tmpAddHighlightIds } from "@/src/reduxStore/states/pages/labeling";
+import { removeFromRlaById, selectDisplayUserRole, selectHoverGroupDict, selectRecordRequestsRecord, selectRecordRequestsRla, selectSettings, selectTmpHighlightIds, selectUserDisplayId, setHoverGroupDict, tmpAddHighlightIds } from "@/src/reduxStore/states/pages/labeling";
 import { selectProjectId } from "@/src/reduxStore/states/project";
 import { DELETE_RECORD_LABEL_ASSOCIATION_BY_ID } from "@/src/services/gql/mutations/labeling";
 import { HeaderHover, TableDisplayData } from "@/src/types/components/projects/projectId/labeling/overview-table";
@@ -37,6 +37,7 @@ export default function LabelingSuiteOverviewTable() {
     const displayUserId = useSelector(selectUserDisplayId);
     const hoverGroupsDict = useSelector(selectHoverGroupDict);
     const tmpHighlightIds = useSelector(selectTmpHighlightIds);
+    const userDisplayRole = useSelector(selectDisplayUserRole);
 
     const [dataToDisplay, setDataToDisplay] = useState<TableDisplayData[]>(null);
     const [fullData, setFullData] = useState<TableDisplayData[]>([]);
@@ -46,13 +47,14 @@ export default function LabelingSuiteOverviewTable() {
     const [deleteRlaByIdMut] = useMutation(DELETE_RECORD_LABEL_ASSOCIATION_BY_ID);
 
     useEffect(() => {
+        if (!user || !userDisplayRole) return;
         if (!rlas) {
             setDataToDisplay(null);
             setFullData(null);
         }
-        setFullData(buildOverviewTableDisplayArray(rlas, user));
+        setFullData(buildOverviewTableDisplayArray(rlas, user, userDisplayRole));
         setDataHasHeuristics(rlasHaveHeuristicData(rlas));
-    }, [rlas]);
+    }, [rlas, user, userDisplayRole]);
 
     useEffect(() => {
         if (!fullData) return;
@@ -69,7 +71,7 @@ export default function LabelingSuiteOverviewTable() {
     function rebuildDataForDisplay() {
         if (fullData) {
             let filtered = fullData;
-            filtered = filterRlaDataForUser(filtered, user, displayUserId, 'rla');
+            filtered = filterRlaDataForUser(filtered, user, displayUserId, userDisplayRole, 'rla');
             filtered = filterRlaDataForOverviewTable(filtered, 'rla');
             setDataToDisplay(filtered);
         } else {
@@ -201,7 +203,7 @@ export default function LabelingSuiteOverviewTable() {
             </div>
             <LabelingInfoTableModal dataToDisplay={dataToDisplay} />
         </>) : (<>
-            {!settings.showHeuristics && dataHasHeuristics && user?.role == UserRole.ENGINEER && <p className="text-gray-500 p-5">Heuristics display is currently disabled</p>}
+            {!settings.showHeuristics && dataHasHeuristics && user?.role == UserRole.ENGINEER && userDisplayRole == UserRole.ENGINEER && <p className="text-gray-500 p-5">Heuristics display is currently disabled</p>}
         </>)
         }
     </>)

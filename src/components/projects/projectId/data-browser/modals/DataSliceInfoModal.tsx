@@ -1,25 +1,29 @@
 import Modal from "@/src/components/shared/modal/Modal";
 import { selectIsManaged } from "@/src/reduxStore/states/general";
-import { selectModal } from "@/src/reduxStore/states/modal";
+import { closeModal, selectModal } from "@/src/reduxStore/states/modal";
+import { setDisplayUserRole } from "@/src/reduxStore/states/pages/labeling";
 import { ModalEnum } from "@/src/types/shared/modal";
+import { UserRole } from "@/src/types/shared/sidebar";
 import { parseLinkFromText } from "@/src/util/shared/link-parser-helper";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
 import { copyToClipboard } from "@/submodules/javascript-functions/general";
 import { Tooltip } from "@nextui-org/react";
 import { useRouter } from "next/router";
 import { Fragment } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 
 export default function DataSliceInfoModal() {
     const router = useRouter();
-
+    const dispatch = useDispatch();
 
     const isManaged = useSelector(selectIsManaged);
     const modalSliceInfo = useSelector(selectModal(ModalEnum.DATA_SLICE_INFO));
 
     function testLink(link) {
+        dispatch(setDisplayUserRole(UserRole.EXPERT));
         const linkData = parseLinkFromText(link);
         router.push(linkData.fullUrl);
+        dispatch(closeModal(ModalEnum.DATA_SLICE_INFO));
     }
 
     return (<Modal modalName={ModalEnum.DATA_SLICE_INFO}>

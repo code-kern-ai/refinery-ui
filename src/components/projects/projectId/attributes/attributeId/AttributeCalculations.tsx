@@ -1,10 +1,10 @@
 import Statuses from "@/src/components/shared/statuses/Statuses";
 import { selectAllLookupLists, setAllLookupLists } from "@/src/reduxStore/states/pages/lookup-lists";
-import { selectAttributes, selectVisibleAttributeAC, setAllAttributes, updateAttributeById } from "@/src/reduxStore/states/pages/settings";
+import { selectAttributes, selectVisibleAttributeAC, setAllAttributes, setLabelingTasksAll, updateAttributeById } from "@/src/reduxStore/states/pages/settings";
 import { selectProjectId } from "@/src/reduxStore/states/project"
 import { UPDATE_ATTRIBUTE } from "@/src/services/gql/mutations/project-settings";
 import { LOOKUP_LISTS_BY_PROJECT_ID } from "@/src/services/gql/queries/lookup-lists";
-import { GET_ATTRIBUTES_BY_PROJECT_ID, GET_ATTRIBUTE_BY_ATTRIBUTE_ID, GET_PROJECT_TOKENIZATION } from "@/src/services/gql/queries/project-setting";
+import { GET_ATTRIBUTES_BY_PROJECT_ID, GET_ATTRIBUTE_BY_ATTRIBUTE_ID, GET_LABELING_TASKS_BY_PROJECT_ID, GET_PROJECT_TOKENIZATION } from "@/src/services/gql/queries/project-setting";
 import { Attribute, AttributeState } from "@/src/types/components/projects/projectId/settings/data-schema";
 import { CurrentPage, DataTypeEnum } from "@/src/types/shared/general";
 import { postProcessCurrentAttribute } from "@/src/util/components/projects/projectId/settings/attribute-calculation-helper";
@@ -33,6 +33,7 @@ import BricksIntegrator from "@/src/components/shared/bricks-integrator/BricksIn
 import { AttributeCodeLookup } from "@/src/util/classes/attribute-calculation";
 import Dropdown2 from "@/submodules/react-components/components/Dropdown2";
 import { useWebsocket } from "@/src/services/base/web-sockets/useWebsocket";
+import { postProcessLabelingTasks, postProcessLabelingTasksSchema } from "@/src/util/components/projects/projectId/settings/labeling-tasks-helper";
 
 const EDITOR_OPTIONS = { theme: 'vs-light', language: 'python', readOnly: false };
 
@@ -64,6 +65,7 @@ export default function AttributeCalculation() {
     const [refetchProjectTokenization] = useLazyQuery(GET_PROJECT_TOKENIZATION, { fetchPolicy: "no-cache" });
     const [refetchAttributeByAttributeId] = useLazyQuery(GET_ATTRIBUTE_BY_ATTRIBUTE_ID, { fetchPolicy: "no-cache" });
     const [refetchComments] = useLazyQuery(REQUEST_COMMENTS, { fetchPolicy: "no-cache" });
+    const [refetchLabelingTasksByProjectId] = useLazyQuery(GET_LABELING_TASKS_BY_PROJECT_ID, { fetchPolicy: "network-only" });
 
     useEffect(() => {
         if (!currentAttribute) return;
@@ -85,6 +87,7 @@ export default function AttributeCalculation() {
                 dispatch(setAllLookupLists(res.data['knowledgeBasesByProjectId']));
             });
         }
+        refetchLabelingTasksAndProcess();
         checkProjectTokenization();
     }, [projectId, attributes, currentAttribute]);
 
@@ -101,6 +104,8 @@ export default function AttributeCalculation() {
         if (currentAttribute.state == AttributeState.USABLE || currentAttribute.state == AttributeState.RUNNING) {
             setEditorOptions({ ...EDITOR_OPTIONS, readOnly: true });
             setCheckUnsavedChanges(false);
+        } else {
+            setEditorOptions({ ...EDITOR_OPTIONS, readOnly: false });
         }
         setAttributeName(currentAttribute.name);
     }, [currentAttribute]);
@@ -240,6 +245,13 @@ export default function AttributeCalculation() {
         setIsInitial(false);
     }
 
+    function refetchLabelingTasksAndProcess() {
+        refetchLabelingTasksByProjectId({ variables: { projectId: projectId } }).then((res) => {
+            const labelingTasks = postProcessLabelingTasks(res['data']['projectByProjectId']['labelingTasks']['edges']);
+            dispatch(setLabelingTasksAll(postProcessLabelingTasksSchema(labelingTasks)));
+        });
+    }
+
     const handleWebsocketNotification = useCallback((msgParts: string[]) => {
         if (!currentAttribute) return;
         if (!projectId) return;
@@ -325,7 +337,7 @@ export default function AttributeCalculation() {
                     <div className="flex flex-row items-center">
                         <Tooltip color="invert" placement="right" content={currentAttribute.state == AttributeState.USABLE || currentAttribute.state == AttributeState.RUNNING ? TOOLTIPS_DICT.ATTRIBUTE_CALCULATION.CANNOT_EDIT_DATATYPE : TOOLTIPS_DICT.ATTRIBUTE_CALCULATION.EDIT_DATATYPE}>
                             <Dropdown2 buttonName={currentAttribute.dataTypeName} options={DATA_TYPES} dropdownWidth="w-52"
-                                selectedOption={(option: any) => updateDataType(option)} disabled={currentAttribute.state == AttributeState.USABLE} />
+                                selectedOption={(option: any) => updateDataType(option)} disabled={currentAttribute.state == AttributeState.USABLE} dropdownClasses="z-30" />
                         </Tooltip>
                         {currentAttribute.dataType == DataTypeEnum.EMBEDDING_LIST && <div className="text-gray-700 text-sm ml-3">Only useable for similarity search</div>}
                     </div>
