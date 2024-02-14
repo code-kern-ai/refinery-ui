@@ -7,7 +7,7 @@ import { UserRole } from "@/src/types/shared/sidebar";
 import { LabelingSuiteManager } from "@/src/util/classes/labeling/manager";
 import { SessionManager } from "@/src/util/classes/labeling/session-manager";
 import { UserManager } from "@/src/util/classes/labeling/user-manager";
-import { DUMMY_HUDDLE_ID, getDefaultLabelingSuiteSettings, parseLabelingLink } from "@/src/util/components/projects/projectId/labeling/labeling-main-component-helper";
+import { DUMMY_HUDDLE_ID, getDefaultLabelingSuiteSettings, parseLabelingLink, prepareRLADataForRole } from "@/src/util/components/projects/projectId/labeling/labeling-main-component-helper";
 import { useLazyQuery } from "@apollo/client";
 import { useRouter } from "next/router";
 import { useCallback, useEffect, useState } from "react";
@@ -152,7 +152,7 @@ export default function LabelingMainComponent() {
     }, [projectId]);
 
     useEffect(() => {
-        if (!projectId || allUsers.length == 0 || !router.query.sessionId) return;
+        if (!projectId || allUsers.length == 0 || !router.query.sessionId || !user) return;
         if (router.query.sessionId == DUMMY_HUDDLE_ID) return;
         if (!SessionManager.currentRecordId) return;
         if (SessionManager.currentRecordId == "deleted") return;
@@ -174,9 +174,10 @@ export default function LabelingMainComponent() {
         ]).subscribe(([tokenized, record, rla]) => {
             dispatch(updateRecordRequests('token', tokenized.data.tokenizeRecord));
             dispatch(updateRecordRequests('record', record.data.recordByRecordId));
-            dispatch(updateRecordRequests('rla', rla?.data?.recordByRecordId?.recordLabelAssociations));
+            const rlas = rla['data']?.['recordByRecordId']?.['recordLabelAssociations']['edges'].map(e => e.node);;
+            dispatch(updateRecordRequests('rla', prepareRLADataForRole(rlas, user, userDisplayId, userDisplayRole)));
         });
-    }, [SessionManager.currentRecordId]);
+    }, [SessionManager.currentRecordId, user]);
 
     useEffect(() => {
         if (!rlas || !user) return;
@@ -303,8 +304,12 @@ export default function LabelingMainComponent() {
 
     function prepareTasksForRole(taskData: LabelingTask[], userDisplayRole): LabelingTask[] {
         if (user?.role != UserRole.ANNOTATOR && userDisplayRole != UserRole.ANNOTATOR) return taskData;
-        if (!JSON.parse(localStorage.getItem('huddleData'))) return null;
-        const taskId = JSON.parse(localStorage.getItem('huddleData')).allowedTask;
+        let taskId;
+        if (userDisplayRole != UserRole.ENGINEER) {
+            taskId = JSON.parse(localStorage.getItem('huddleData'))?.allowedTask;
+        } else {
+            taskId = JSON.parse(localStorage.getItem('huddleData')).allowedTask;
+        }
         if (!taskId) return null;
         else return taskData.filter(t => t.id == taskId);
     }
@@ -324,7 +329,8 @@ export default function LabelingMainComponent() {
         } else if (['payload_finished', 'weak_supervision_finished', 'rla_created', 'rla_deleted'].includes(msgParts[1])) {
             const recordId = SessionManager.currentRecordId ?? record.id;
             refetchRla({ variables: { projectId, recordId: recordId } }).then((result) => {
-                dispatch(updateRecordRequests('rla', result?.data?.recordByRecordId?.recordLabelAssociations));
+                const rlas = result['data']?.['recordByRecordId']?.['recordLabelAssociations']['edges'].map(e => e.node);;
+                dispatch(updateRecordRequests('rla', prepareRLADataForRole(rlas, user, userDisplayId, userDisplayRole)));
             });
         } else if (['access_link_changed', 'access_link_removed'].includes(msgParts[1])) {
             if (router.pathname.includes(msgParts[3]) && SessionManager.labelingLinkData) {

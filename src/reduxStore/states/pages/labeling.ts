@@ -80,7 +80,7 @@ const labelingSlice = createSlice({
                             state.recordRequests.record = postProcessRecordByRecordId(data);
                             break;
                         case 'rla':
-                            state.recordRequests.rla = postProcessRla(data);
+                            state.recordRequests.rla = data;
                             if (RecordManager.ignoreRlas(state.recordRequests.rla)) return;
                             LabelingSuiteManager.somethingLoading = false;
                             break;

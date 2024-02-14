@@ -5,7 +5,7 @@ import { User } from "@/src/types/shared/general";
 import { UserRole } from "@/src/types/shared/sidebar";
 import { SessionManager } from "@/src/util/classes/labeling/session-manager";
 import { LabelSource } from "@/submodules/javascript-functions/enums/enums";
-import { countOccurrences } from "@/submodules/javascript-functions/general";
+import { countOccurrences, jsonCopy } from "@/submodules/javascript-functions/general";
 
 export const ONE_DAY = 86400000; // 24 * 60 * 60 * 1000;
 export const DUMMY_HUDDLE_ID = "00000000-0000-0000-0000-000000000000";
@@ -148,7 +148,8 @@ export function prepareRLADataForRole(rlaData: any[], user: User, displayUserId:
     if (user.role != UserRole.ANNOTATOR && userDisplayRole != UserRole.ANNOTATOR) return rlaData;
     const currentSourceId = SessionManager.getSourceId();
     const allowedTask = SessionManager.getAllowedTask();
-    rlaData.forEach((rla) => {
+    const rlaDataCopy = jsonCopy(rlaData);
+    rlaDataCopy.forEach((rla) => {
         if ((rla.sourceId && rla.sourceId == currentSourceId)) {
             rla.sourceType = LabelSource.MANUAL;
             rla.sourceId = null;
@@ -158,5 +159,5 @@ export function prepareRLADataForRole(rlaData: any[], user: User, displayUserId:
             rla.id = "x";
         }
     });
-    return rlaData.filter(rla => rla.id != "x");
+    return rlaDataCopy.filter(rla => rla.id != "x");
 }

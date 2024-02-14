@@ -122,7 +122,7 @@ export class SessionManager {
     }
 
     public static getAllowedTask(): string {
-        return this.huddleData.allowedTask;
+        return this.huddleData?.allowedTask;
     }
     public static initMeOnDestruction() {
         this.labelingLinkData = null;
