@@ -137,7 +137,7 @@ export default function HeuristicsLayout(props: any) {
             </div>
             <div className="w-full overflow-hidden">
                 <div className={`grid gap-4 ${isHeaderNormal ? 'grid-cols-2' : 'grid-cols-1'}`}>
-                    {isHeaderNormal && <div className="flex items-center mt-2">
+                    {isHeaderNormal && <div className="flex items-start mt-2">
                         <Tooltip color="invert" placement="bottom" content={TOOLTIPS_DICT.HEURISTICS.EDIT_NAME}>
                             <button onClick={() => openProperty(true, HeuristicsProperty.NAME)}
                                 className="flex-shrink-0 bg-white text-gray-700 text-xs font-semibold mr-3 px-4 py-2 rounded-md border border-gray-300 block float-left hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
@@ -149,22 +149,20 @@ export default function HeuristicsLayout(props: any) {
                                 ? (<input type="text" value={currentHeuristic.name} ref={nameRef} onInput={(e: any) => changeHeuristic(e.target.value, HeuristicsProperty.NAME)}
                                     onBlur={() => openProperty(false, HeuristicsProperty.NAME)} onKeyDown={(e) => { if (e.key == 'Enter') openProperty(false, HeuristicsProperty.NAME) }}
                                     className="h-8 w-full border-gray-300 rounded-md placeholder-italic border text-gray-700 pl-4 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100" />)
-                                : (<div className="mr-4 text-sm leading-5 font-medium text-gray-500 inline-block">{currentHeuristic.name}</div>)}
+                                : (<div className="mr-4 text-sm leading-5 font-medium text-gray-500 inline-block " style={{ marginTop: '6px' }}>{currentHeuristic.name}</div>)}
                         </div>
                     </div>}
-                    <div className="flex items-center mt-2">
-                        <Tooltip color="invert" placement="bottom" content={TOOLTIPS_DICT.HEURISTICS.EDIT_DESCRIPTION}>
-                            <button onClick={() => openProperty(true, HeuristicsProperty.DESCRIPTION)}
-                                className="flex-shrink-0 bg-white text-gray-700 text-xs font-semibold mr-3 px-4 py-2 rounded-md border border-gray-300 block float-left hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-                                Edit description
-                            </button>
-                        </Tooltip>
+                    <div className="flex items-start mt-2">
+                        <button onClick={() => openProperty(true, HeuristicsProperty.DESCRIPTION)}
+                            className="flex-shrink-0 bg-white text-gray-700 text-xs font-semibold mr-3 px-4 py-2 rounded-md border border-gray-300 block float-left hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                            Edit description
+                        </button>
                         <div className="flex-grow" onDoubleClick={() => openProperty(true, HeuristicsProperty.DESCRIPTION)}>
                             {isDescriptionOpen
                                 ? (<input type="text" value={currentHeuristic.description} ref={descriptionRef} onInput={(e: any) => changeHeuristic(e.target.value, HeuristicsProperty.DESCRIPTION)}
                                     onBlur={() => openProperty(false, HeuristicsProperty.DESCRIPTION)} onKeyDown={(e) => { if (e.key == 'Enter') openProperty(false, HeuristicsProperty.DESCRIPTION) }}
                                     className="h-8 w-full border-gray-300 rounded-md placeholder-italic border text-gray-700 pl-4 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100" />)
-                                : (<div className="mr-4 text-sm leading-5 font-medium text-gray-500 inline-block">{currentHeuristic.description}</div>)}
+                                : (<div className="mr-4 text-sm leading-5 font-medium text-gray-500 inline-block " style={{ marginTop: '6px' }}>{currentHeuristic.description}</div>)}
                         </div>
                     </div>
                 </div>
