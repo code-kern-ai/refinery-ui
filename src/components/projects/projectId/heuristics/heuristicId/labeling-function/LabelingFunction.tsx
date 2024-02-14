@@ -183,10 +183,10 @@ export default function LabelingFunction() {
         if (!currentHeuristic) return;
         if (['labeling_task_updated', 'labeling_task_created', 'label_created', 'label_deleted'].includes(msgParts[1])) {
             refetchLabelingTasksAndProcess();
-        } else if ('labeling_task_deleted' == msgParts[1]) {
+        } else if ('labeling_task_deleted' == msgParts[1] && currentHeuristic.labelingTaskId == msgParts[2]) {
             alert('Parent labeling task was deleted!');
             router.push(`/projects/${projectId}/heuristics`);
-        } else if ('information_source_deleted' == msgParts[1]) {
+        } else if ('information_source_deleted' == msgParts[1] && currentHeuristic.id == msgParts[2]) {
             alert('Information source was deleted!');
             router.push(`/projects/${projectId}/heuristics`);
         } else if (['information_source_updated', 'model_callback_update_statistics'].includes(msgParts[1])) {
