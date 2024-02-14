@@ -28,6 +28,7 @@ type LabelingSuiteState = {
     displayUserId: string;
     displayUserRole: UserRole;
     hoverGroupDict: { [key: string]: any };
+    tokenLookupSelected: any;
 }
 
 function getInitState(): LabelingSuiteState {
@@ -50,6 +51,7 @@ function getInitState(): LabelingSuiteState {
         displayUserId: null,
         displayUserRole: null,
         hoverGroupDict: {},
+        tokenLookupSelected: null
     };
 }
 
@@ -199,7 +201,13 @@ const labelingSlice = createSlice({
         setDisplayUserRole(state, action: PayloadAction<UserRole>) {
             if (action.payload) state.displayUserRole = action.payload;
             else state.displayUserRole = null;
+        },
+        setTokenLookupSelected(state, action: PayloadAction<any>) {
+            console.log("setTokenLookupSelected", action.payload)
+            if (action.payload) state.tokenLookupSelected = action.payload;
+            else state.tokenLookupSelected = null;
         }
+
     },
 });
 
@@ -217,9 +225,10 @@ export const selectTmpHighlightIds = (state: any) => state.labeling.tmpHighlight
 export const selectUserDisplayId = (state: any) => state.labeling.displayUserId;
 export const selectHoverGroupDict = (state: any) => state.labeling.hoverGroupDict;
 export const selectDisplayUserRole = (state: any) => state.labeling.displayUserRole;
+export const selectTokenLookupSelected = (state: any) => state.labeling.tokenLookupSelected;
 
 export const { setAvailableLinks, setSelectedLink, updateRecordRequests, updateUsers, setSettings, updateSettings,
-    removeFromRlaById, tmpAddHighlightIds, setUserDisplayId, setHoverGroupDict, initOnLabelPageDestruction, setDisplayUserRole } = labelingSlice.actions;
+    removeFromRlaById, tmpAddHighlightIds, setUserDisplayId, setHoverGroupDict, initOnLabelPageDestruction, setDisplayUserRole, setTokenLookupSelected } = labelingSlice.actions;
 
 export const labelingReducer = labelingSlice.reducer;
 

@@ -1,11 +1,12 @@
-import { selectHoverGroupDict, selectSettings, selectTmpHighlightIds, setHoverGroupDict, tmpAddHighlightIds } from "@/src/reduxStore/states/pages/labeling";
+import { selectHoverGroupDict, selectSettings, selectTmpHighlightIds, selectTokenLookupSelected, setHoverGroupDict, tmpAddHighlightIds } from "@/src/reduxStore/states/pages/labeling";
 import { LineBreaksType } from "@/src/types/components/projects/projectId/data-browser/data-browser";
 import { ExtractionDisplayProps, LabelSourceHover } from "@/src/types/components/projects/projectId/labeling/labeling";
 import { LabelingPageParts } from "@/src/types/components/projects/projectId/labeling/labeling-main-component";
 import { Tooltip } from "@nextui-org/react";
 import { useDispatch, useSelector } from "react-redux";
 import style from '@/src/styles/components/projects/projectId/labeling.module.css';
-import { useState, forwardRef } from "react";
+import { useState, forwardRef, useEffect, useMemo } from "react";
+import { useConsoleLog } from "@/submodules/react-components/hooks/useConsoleLog";
 
 export function shouldHighlightOn(tmpHighlightIds: string[], comparedId: string[]) {
     return tmpHighlightIds.some((id) => comparedId.includes(id));
@@ -19,6 +20,8 @@ const ExtractionDisplay = forwardRef<HTMLInputElement, ExtractionDisplayProps>(f
     const tmpHighlightIds = useSelector(selectTmpHighlightIds);
 
     const [hoverBoxDict, setHoverGroupDictTmp] = useState({});
+
+    // useConsoleLog(tokenLookupSelected)
 
     function deleteRecordLabelAssociation(rlaId: string) {
         props.deleteRla(rlaId);
@@ -106,11 +109,30 @@ const ExtractionDisplay = forwardRef<HTMLInputElement, ExtractionDisplayProps>(f
 });
 
 function TokenValue(props: any) {
+    const tokenLookupSelected = useSelector(selectTokenLookupSelected);
+    // const saveTokenData = useSelector(selectTokenData)
+
+    useConsoleLog(tokenLookupSelected, 'tokenLookupSelected in tkoen value')
+
+    const [findToken, setFindToken] = useState(null);
+    const isSelected = useMemo(() => {
+        if (!tokenLookupSelected || !props.attributeId) return false;
+        // return props.token.idx >= tokenLookupSelected[props.attributeId].tokenStart && token.idx <= saveTokenData.tokenEnd;
+        // const findToken = tokenLookupSelected[props.attributeId].token.find((token) => token.value == props.token.value && token.idx == props.token.idx);
+        return false;
+    }, [tokenLookupSelected, props.attributeId]);
+
+    // useEffect(() => {
+    //     if (!tokenLookupSelected || !props.attributeId) return;
+    //     const findToken = tokenLookupSelected[props.attributeId].token.find((token) => token.value == props.token.value && token.idx == props.token.idx);
+    //     setFindToken(findToken);
+    // }, [tokenLookupSelected, props.attributeId]);
+
     return (<>
         {props.token && props.token.value != '\n' && <label onClick={(e) => props.setSelected(e)}
             className={`rounded-lg hover:bg-gray-200 text-sm text-gray-500 leading-5 relative font-normal ${!props.token.nextCloser ? 'pr-1' : ''}`}
             data-tokenidx={props.token.idx} data-attributeid={props.attributeId}
-            style={{ backgroundColor: props.token.selected ? '#3399FF' : null, borderRadius: props.token.selected ? '0' : null, color: props.token.selected ? 'white' : null, zIndex: '100' }}>
+            style={{ backgroundColor: (findToken && findToken.selected) ? '#3399FF' : null, borderRadius: (findToken && findToken.selected) ? '0' : null, color: (findToken && findToken.selected) ? 'white' : null, zIndex: '100' }}>
             {props.token.value}
         </label>}
     </>)

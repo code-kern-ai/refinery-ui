@@ -6,7 +6,7 @@ import { UserRole } from "@/src/types/shared/sidebar";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
 import { Tooltip } from "@nextui-org/react";
 import { IconCirclePlus } from "@tabler/icons-react";
-import { Fragment, useEffect, useState, useCallback } from "react";
+import { Fragment, useEffect, useState, useCallback, useRef } from "react";
 import { useSelector } from "react-redux";
 
 const eventListenersMap = new Map();
@@ -21,11 +21,30 @@ export default function LabelSelectionBox(props: LabelSelectionBoxProps) {
     const [currentLabelHotkeys, setCurrentLabelHotkeys] = useState<any>({});
     const [currentActiveTasks, setCurrentActiveTasks] = useState([]);
 
+    const clearSelectedRef = useRef(props.clearSelected);
+
     useEffect(() => {
+        console.log("active tasks changed", props.activeTasks)
         if (props.activeTasks && props.activeTasks.length > 0) {
             setCurrentActiveTasks(props.activeTasks);
+        } else {
+            clearSelectedRef.current();
+            console.log("called current ref")
+
         }
     }, [props.activeTasks]);
+
+    useEffect(() => {
+        return () => {
+            clearSelectedRef.current();
+            console.log("destruction evennt")
+        }
+    }, []);
+
+    useEffect(() => {
+        clearSelectedRef.current = props.clearSelected;
+        console.log("updated current ref")
+    }, [props.clearSelected]);
 
     useEffect(() => {
         let missingValues = 0;

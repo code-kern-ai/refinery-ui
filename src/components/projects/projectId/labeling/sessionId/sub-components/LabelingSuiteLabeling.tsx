@@ -1,6 +1,6 @@
 import LoadingIcon from "@/src/components/shared/loading/LoadingIcon"
 import { selectUser } from "@/src/reduxStore/states/general"
-import { removeFromRlaById, selectDisplayUserRole, selectHoverGroupDict, selectRecordRequests, selectRecordRequestsRecord, selectSettings, selectTmpHighlightIds, selectUserDisplayId, setHoverGroupDict, tmpAddHighlightIds } from "@/src/reduxStore/states/pages/labeling"
+import { removeFromRlaById, selectDisplayUserRole, selectHoverGroupDict, selectRecordRequests, selectRecordRequestsRecord, selectSettings, selectTmpHighlightIds, selectTokenLookupSelected, selectUserDisplayId, setHoverGroupDict, setTokenLookupSelected, tmpAddHighlightIds } from "@/src/reduxStore/states/pages/labeling"
 import { selectLabelingTasksAll, selectVisibleAttributesLabeling } from "@/src/reduxStore/states/pages/settings"
 import { selectProjectId } from "@/src/reduxStore/states/project"
 import { HotkeyLookup, LabelSourceHover, LabelingVars, TokenLookup } from "@/src/types/components/projects/projectId/labeling/labeling"
@@ -10,7 +10,7 @@ import { DEFAULT_LABEL_COLOR, FULL_RECORD_ID, SWIM_LANE_SIZE_PX, buildLabelingRl
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants"
 import { Tooltip } from "@nextui-org/react"
 import { IconAlertCircle, IconAssembly, IconBolt, IconCode, IconSparkles, IconStar, IconUsers } from "@tabler/icons-react"
-import { Fragment, useRef, useEffect, useState } from "react"
+import { Fragment, useRef, useEffect, useState, useCallback } from "react"
 import { useDispatch, useSelector } from "react-redux"
 import ExtractionDisplay from "./ExtractionDisplay"
 import { LineBreaksType } from "@/src/types/components/projects/projectId/data-browser/data-browser"
@@ -26,6 +26,7 @@ import LabelSelectionBox from "./LabelSelectionBox"
 import { filterRlaDataForUser } from "@/src/util/components/projects/projectId/labeling/overview-table-helper"
 import { LabelingPageParts } from "@/src/types/components/projects/projectId/labeling/labeling-main-component"
 import style from '@/src/styles/components/projects/projectId/labeling.module.css';
+import { useConsoleLog } from "@/submodules/react-components/hooks/useConsoleLog"
 
 const L_VARS = getDefaultLabelingVars();
 
@@ -99,6 +100,7 @@ export default function LabelingSuiteLabeling() {
 
     useEffect(() => {
         const handleMouseDown = (event) => {
+            console.log("closing the box?")
             if (!event.target.closest('.label-selection-box')) {
                 setActiveTasksFunc([]);
             }
@@ -122,6 +124,7 @@ export default function LabelingSuiteLabeling() {
         const handleMouseUp = (e) => {
             const [check, attributeIdStart, tokenStart, tokenEnd, startEl] = parseSelectionData();
             setSaveTokenData({ attributeIdStart, tokenStart, tokenEnd, startEl });
+
             if (!check) {
                 clearSelected();
             } else {
@@ -145,6 +148,19 @@ export default function LabelingSuiteLabeling() {
         if (!user || !displayUserId || !userDisplayRole) return;
         setCanEditLabels(checkCanEditLabels(user, userDisplayRole, displayUserId));
     }, [user, displayUserId, userDisplayRole]);
+
+    // useEffect(() => {
+    //     if (!saveTokenData) return;
+    //     if (!settings.labeling.closeLabelBoxAfterLabel) {
+    //         const tokenLookupCopy = {};
+    //         for (const token of tokenLookupCopy[saveTokenData.attributeIdStart]?.token) {
+    //             token.selected = token.idx >= saveTokenData.tokenStart && token.idx <= saveTokenData.tokenEnd;
+    //         }
+    //         dispatch(setTokenLookupSelected(tokenLookupCopy));
+    //     } else {
+    //         dispatch(setTokenLookupSelected(null))
+    //     }
+    // }, [saveTokenData, settings.labeling.closeLabelBoxAfterLabel]);
 
     function attributesChanged() {
         if (!attributes) return;
@@ -474,16 +490,18 @@ export default function LabelingSuiteLabeling() {
         addExtractionLabelToRecordMut({ variables: { projectId: projectId, recordId: record.id, labelingTaskId: labelingTaskId, labelId: labelId, tokenStartIndex: selectionData.startIdx, tokenEndIndex: selectionData.endIdx, value: selectionData.value, sourceId: sourceId } }).then((res) => { });
     }
 
-    function clearSelected() {
-        const tokenLookupCopy = { ...tokenLookup };
-        for (const attributeId in tokenLookupCopy) {
-            if (!tokenLookupCopy[attributeId].token) continue;
-            for (const token of tokenLookupCopy[attributeId].token) {
-                if ('selected' in token) delete token.selected;
-            }
-        }
-        setTokenLookup(tokenLookupCopy);
-    }
+    const clearSelected = useCallback(() => {
+        console.log("clearSelected called")
+        // const tokenLookupCopy = jsonCopy(tokenLookup);
+        // for (const attributeId in tokenLookupCopy) {
+        //     if (!tokenLookupCopy[attributeId].token) continue;
+        //     for (const token of tokenLookupCopy[attributeId].token) {
+        //         if ('selected' in token) delete token.selected;
+        //     }
+        // }
+        // setTokenLookup(tokenLookupCopy);
+        dispatch(setTokenLookupSelected(null));
+    }, [tokenLookup]);
 
     function setSelected(attributeId: string, tokenStart: number, tokenEnd: number, e?: any) {
         if (!canEditLabels && user.role != UserRole.ANNOTATOR && userDisplayRole != UserRole.ANNOTATOR) return;
@@ -492,9 +510,9 @@ export default function LabelingSuiteLabeling() {
             labelBoxPosition(e);
             return;
         }
-        for (const token of tokenLookupCopy[attributeId]?.token) {
-            token.selected = token.idx >= tokenStart && token.idx <= tokenEnd;
-        }
+        // for (const token of tokenLookupCopy[attributeId]?.token) {
+        //     token.selected = token.idx >= tokenStart && token.idx <= tokenEnd;
+        // }
         if (lVars.taskLookup[attributeId].lookup[0].task.taskType == LabelingTaskTaskType.INFORMATION_EXTRACTION) {
             const extractionTasks = lVars.taskLookup[attributeId].lookup.filter(t => t.task.taskType == LabelingTaskTaskType.INFORMATION_EXTRACTION);
             setActiveTasksFunc(extractionTasks);
@@ -631,14 +649,15 @@ export default function LabelingSuiteLabeling() {
                         </div>
                         {activeTasks && activeTasks.length > 0 ? (
                             <LabelSelectionBox activeTasks={activeTasks} position={position} labelLookup={labelLookup} labelAddButtonDisabledDict={labelAddButtonDisabledDict}
+                                clearSelected={clearSelected}
                                 addRla={(task, labelId) => {
-                                    const tokenLookupCopy = jsonCopy(tokenLookup);
-                                    if (saveTokenData && tokenLookupCopy[saveTokenData.attributeIdStart]) {
-                                        for (const token of tokenLookupCopy[saveTokenData.attributeIdStart]?.token) {
-                                            token.selected = token.idx >= saveTokenData.tokenStart && token.idx <= saveTokenData.tokenEnd;
-                                        }
-                                    }
-                                    addRla(task, labelId, tokenLookupCopy);
+                                    // const tokenLookupCopy = jsonCopy(tokenLookup);
+                                    // if (saveTokenData && tokenLookupCopy[saveTokenData.attributeIdStart]) {
+                                    //     for (const token of tokenLookupCopy[saveTokenData.attributeIdStart]?.token) {
+                                    //         token.selected = token.idx >= saveTokenData.tokenStart && token.idx <= saveTokenData.tokenEnd;
+                                    //     }
+                                    // }
+                                    addRla(task, labelId, tokenLookup);
                                 }}
                                 addNewLabelToTask={(newLabel, task) => addNewLabelToTask(newLabel, task)}
                                 checkLabelVisibleInSearch={(newLabel, task) => checkLabelVisibleInSearch(labelLookup, newLabel, task)}
