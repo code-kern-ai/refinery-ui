@@ -1,7 +1,6 @@
 import Modal from "@/src/components/shared/modal/Modal";
 import { selectProjectId } from "@/src/reduxStore/states/project";
 import { PASTE_TERM } from "@/src/services/gql/mutations/lookup-lists";
-import { LookupListOperationsProps } from "@/src/types/components/projects/projectId/lookup-lists";
 import { ModalButton, ModalEnum } from "@/src/types/shared/modal";
 import { useMutation } from "@apollo/client";
 import { useRouter } from "next/router";
@@ -10,7 +9,7 @@ import { useSelector } from "react-redux";
 
 const ACCEPT_BUTTON = { buttonCaption: 'Add', useButton: true, disabled: false };
 
-export default function PasteLookupListModal(props: LookupListOperationsProps) {
+export default function PasteLookupListModal() {
     const router = useRouter();
     const projectId = useSelector(selectProjectId);
 
@@ -29,10 +28,6 @@ export default function PasteLookupListModal(props: LookupListOperationsProps) {
     useEffect(() => {
         setAcceptButton({ ...ACCEPT_BUTTON, emitFunction: pasteLookupList });
     }, [inputArea, inputSplit]);
-
-    useEffect(() => {
-        props.refetchWS();
-    }, [pasteLookupList]);
 
     return (<Modal modalName={ModalEnum.PASTE_LOOKUP_LIST} acceptButton={acceptButton}>
         <h1 className="text-lg text-gray-900 mb-2 font-bold text-center">Paste your terms</h1>

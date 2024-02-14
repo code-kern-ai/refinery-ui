@@ -1,10 +1,10 @@
 import Statuses from "@/src/components/shared/statuses/Statuses";
 import { selectAllLookupLists, setAllLookupLists } from "@/src/reduxStore/states/pages/lookup-lists";
-import { selectAttributes, selectVisibleAttributeAC, setAllAttributes, updateAttributeById } from "@/src/reduxStore/states/pages/settings";
+import { selectAttributes, selectVisibleAttributeAC, setAllAttributes, setLabelingTasksAll, updateAttributeById } from "@/src/reduxStore/states/pages/settings";
 import { selectProjectId } from "@/src/reduxStore/states/project"
 import { UPDATE_ATTRIBUTE } from "@/src/services/gql/mutations/project-settings";
 import { LOOKUP_LISTS_BY_PROJECT_ID } from "@/src/services/gql/queries/lookup-lists";
-import { GET_ATTRIBUTES_BY_PROJECT_ID, GET_ATTRIBUTE_BY_ATTRIBUTE_ID, GET_PROJECT_TOKENIZATION } from "@/src/services/gql/queries/project-setting";
+import { GET_ATTRIBUTES_BY_PROJECT_ID, GET_ATTRIBUTE_BY_ATTRIBUTE_ID, GET_LABELING_TASKS_BY_PROJECT_ID, GET_PROJECT_TOKENIZATION } from "@/src/services/gql/queries/project-setting";
 import { Attribute, AttributeState } from "@/src/types/components/projects/projectId/settings/data-schema";
 import { CurrentPage, DataTypeEnum } from "@/src/types/shared/general";
 import { postProcessCurrentAttribute } from "@/src/util/components/projects/projectId/settings/attribute-calculation-helper";
@@ -23,18 +23,17 @@ import DangerZone from "@/src/components/shared/danger-zone/DangerZone";
 import { DangerZoneEnum } from "@/src/types/shared/danger-zone";
 import ContainerLogs from "@/src/components/shared/logs/ContainerLogs";
 import LoadingIcon from "@/src/components/shared/loading/LoadingIcon";
-import { WebSocketsService } from "@/src/services/base/web-sockets/WebSocketsService";
-import { timer } from "rxjs";
-import { unsubscribeWSOnDestroy } from "@/src/services/base/web-sockets/web-sockets-helper";
+import { debounceTime, distinctUntilChanged, fromEvent, timer } from "rxjs";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
-import { selectAllUsers, setBricksIntegrator, setComments } from "@/src/reduxStore/states/general";
+import { selectAllUsers, setComments } from "@/src/reduxStore/states/general";
 import { REQUEST_COMMENTS } from "@/src/services/gql/queries/projects";
 import { CommentDataManager } from "@/src/util/classes/comments";
 import { CommentType } from "@/src/types/shared/comments";
 import BricksIntegrator from "@/src/components/shared/bricks-integrator/BricksIntegrator";
 import { AttributeCodeLookup } from "@/src/util/classes/attribute-calculation";
 import Dropdown2 from "@/submodules/react-components/components/Dropdown2";
-import { getEmptyBricksIntegratorConfig } from "@/src/util/shared/bricks-integrator-helper";
+import { useWebsocket } from "@/src/services/base/web-sockets/useWebsocket";
+import { postProcessLabelingTasks, postProcessLabelingTasksSchema } from "@/src/util/components/projects/projectId/settings/labeling-tasks-helper";
 
 const EDITOR_OPTIONS = { theme: 'vs-light', language: 'python', readOnly: false };
 
@@ -58,6 +57,7 @@ export default function AttributeCalculation() {
     const [tokenizationProgress, setTokenizationProgress] = useState(0);
     const [editorValue, setEditorValue] = useState('');
     const [attributeName, setAttributeName] = useState('');
+    const [checkUnsavedChanges, setCheckUnsavedChanges] = useState(false);
 
     const [refetchAttributes] = useLazyQuery(GET_ATTRIBUTES_BY_PROJECT_ID, { fetchPolicy: "network-only" });
     const [updateAttributeMut] = useMutation(UPDATE_ATTRIBUTE);
@@ -65,8 +65,7 @@ export default function AttributeCalculation() {
     const [refetchProjectTokenization] = useLazyQuery(GET_PROJECT_TOKENIZATION, { fetchPolicy: "no-cache" });
     const [refetchAttributeByAttributeId] = useLazyQuery(GET_ATTRIBUTE_BY_ATTRIBUTE_ID, { fetchPolicy: "no-cache" });
     const [refetchComments] = useLazyQuery(REQUEST_COMMENTS, { fetchPolicy: "no-cache" });
-
-    useEffect(unsubscribeWSOnDestroy(router, [CurrentPage.ATTRIBUTE_CALCULATION]), []);
+    const [refetchLabelingTasksByProjectId] = useLazyQuery(GET_LABELING_TASKS_BY_PROJECT_ID, { fetchPolicy: "network-only" });
 
     useEffect(() => {
         if (!currentAttribute) return;
@@ -78,7 +77,9 @@ export default function AttributeCalculation() {
         if (!currentAttribute || attributes.length == 0) {
             refetchAttributes({ variables: { projectId: projectId, stateFilter: ['ALL'] } }).then((res) => {
                 dispatch(setAllAttributes(res.data['attributesByProjectId']));
-                setCurrentAttribute(postProcessCurrentAttribute(attributes.find((attribute) => attribute.id === router.query.attributeId)));
+                const currentAttribute = postProcessCurrentAttribute(attributes.find((attribute) => attribute.id === router.query.attributeId));
+                setCurrentAttribute(currentAttribute);
+                setEditorValue(currentAttribute?.sourceCodeToDisplay);
             });
         }
         if (lookupLists.length == 0) {
@@ -86,12 +87,8 @@ export default function AttributeCalculation() {
                 dispatch(setAllLookupLists(res.data['knowledgeBasesByProjectId']));
             });
         }
+        refetchLabelingTasksAndProcess();
         checkProjectTokenization();
-        WebSocketsService.subscribeToNotification(CurrentPage.ATTRIBUTE_CALCULATION, {
-            projectId: projectId,
-            whitelist: ['attributes_updated', 'calculate_attribute', 'tokenization', 'knowledge_base_updated', 'knowledge_base_deleted', 'knowledge_base_created'],
-            func: handleWebsocketNotification
-        });
     }, [projectId, attributes, currentAttribute]);
 
     useEffect(() => {
@@ -101,13 +98,14 @@ export default function AttributeCalculation() {
 
     useEffect(() => {
         if (!currentAttribute) return;
-        if (currentAttribute.state == AttributeState.USABLE) return;
-        setEditorValue(currentAttribute.sourceCodeToDisplay);
         if (currentAttribute.saveSourceCode) {
             updateSourceCode(currentAttribute.sourceCode);
         }
-        if (currentAttribute.state == AttributeState.USABLE) {
+        if (currentAttribute.state == AttributeState.USABLE || currentAttribute.state == AttributeState.RUNNING) {
             setEditorOptions({ ...EDITOR_OPTIONS, readOnly: true });
+            setCheckUnsavedChanges(false);
+        } else {
+            setEditorOptions({ ...EDITOR_OPTIONS, readOnly: false });
         }
         setAttributeName(currentAttribute.name);
     }, [currentAttribute]);
@@ -118,14 +116,27 @@ export default function AttributeCalculation() {
     }, [allUsers, projectId]);
 
     useEffect(() => {
-        const delayInputTimeoutId = setTimeout(() => {
+        if (!currentAttribute) return;
+        if (currentAttribute.sourceCodeToDisplay == editorValue || currentAttribute.state == AttributeState.USABLE) return;
+        const observer = fromEvent(document, 'keyup');
+        const spinner = observer.subscribe(() => {
+            setCheckUnsavedChanges(true);
+        });
+        const subscription = observer.pipe(
+            debounceTime(2000),
+            distinctUntilChanged()
+        ).subscribe(() => {
             const regMatch: any = getPythonFunctionRegExMatch(editorValue);
             changeAttributeName(regMatch ? regMatch[2] : '');
             setCurrentAttribute({ ...currentAttribute, sourceCode: editorValue });
             updateSourceCode(editorValue);
-        }, 1000);
-        return () => clearTimeout(delayInputTimeoutId);
-    }, [editorValue, 1000]);
+            setCheckUnsavedChanges(false);
+        });
+        return () => {
+            spinner.unsubscribe();
+            subscription.unsubscribe();
+        }
+    }, [editorValue, currentAttribute]);
 
     function setUpCommentsRequests() {
         const requests = [];
@@ -168,6 +179,7 @@ export default function AttributeCalculation() {
         attributeNew.saveSourceCode = false;
         updateAttributeMut({ variables: { projectId: projectId, attributeId: currentAttribute.id, name: attributeNew.name } }).then(() => {
             setCurrentAttribute(postProcessCurrentAttribute(attributeNew));
+            setEditorValue(attributeNew.sourceCode.replace('def ac(record)', 'def ' + attributeNew.name + '(record)'));
             dispatch(updateAttributeById(attributeNew));
             setDuplicateNameExists(false);
         });
@@ -209,17 +221,34 @@ export default function AttributeCalculation() {
         }
     }
 
-    function updateSourceCode(value: string) {
+    function updateSourceCode(value: string, attributeNameParam?: string) {
         var regMatch: any = getPythonFunctionRegExMatch(value);
+        if (!regMatch) {
+            console.log("Can't find python function name -- seems wrong -- better dont save");
+            return;
+        }
         const finalSourceCode = value.replace(regMatch[0], 'def ac(record)');
-        updateAttributeMut({ variables: { projectId: projectId, attributeId: currentAttribute.id, sourceCode: finalSourceCode } }).then(() => {
-            dispatch(setBricksIntegrator(getEmptyBricksIntegratorConfig()));
+        updateAttributeMut({ variables: { projectId: projectId, attributeId: currentAttribute.id, sourceCode: finalSourceCode, name: attributeNameParam } }).then(() => {
         });
     }
 
     function checkProjectTokenization() {
         refetchProjectTokenization({ variables: { projectId: projectId } }).then((res) => {
             setTokenizationProgress(res.data['projectTokenization']?.progress);
+        });
+    }
+
+    function updateNameAndCodeBricksIntegrator(code: string) {
+        setEditorValue(code);
+        const regMatch: any = getPythonFunctionRegExMatch(code);
+        updateSourceCode(code, regMatch[2]);
+        setIsInitial(false);
+    }
+
+    function refetchLabelingTasksAndProcess() {
+        refetchLabelingTasksByProjectId({ variables: { projectId: projectId } }).then((res) => {
+            const labelingTasks = postProcessLabelingTasks(res['data']['projectByProjectId']['labelingTasks']['edges']);
+            dispatch(setLabelingTasksAll(postProcessLabelingTasksSchema(labelingTasks)));
         });
     }
 
@@ -261,10 +290,7 @@ export default function AttributeCalculation() {
         }
     }, [projectId, currentAttribute]);
 
-    useEffect(() => {
-        if (!projectId) return;
-        WebSocketsService.updateFunctionPointer(projectId, CurrentPage.ATTRIBUTE_CALCULATION, handleWebsocketNotification)
-    }, [handleWebsocketNotification, projectId]);
+    useWebsocket(CurrentPage.ATTRIBUTE_CALCULATION, handleWebsocketNotification, projectId);
 
     return (projectId && <div className="bg-white p-4 pb-16 overflow-y-auto h-screen" style={{ width: 'calc(100vw - 75px)' }} onScroll={(e: any) => onScrollEvent(e)}>
         {currentAttribute && <div>
@@ -311,7 +337,7 @@ export default function AttributeCalculation() {
                     <div className="flex flex-row items-center">
                         <Tooltip color="invert" placement="right" content={currentAttribute.state == AttributeState.USABLE || currentAttribute.state == AttributeState.RUNNING ? TOOLTIPS_DICT.ATTRIBUTE_CALCULATION.CANNOT_EDIT_DATATYPE : TOOLTIPS_DICT.ATTRIBUTE_CALCULATION.EDIT_DATATYPE}>
                             <Dropdown2 buttonName={currentAttribute.dataTypeName} options={DATA_TYPES} dropdownWidth="w-52"
-                                selectedOption={(option: any) => updateDataType(option)} disabled={currentAttribute.state == AttributeState.USABLE} />
+                                selectedOption={(option: any) => updateDataType(option)} disabled={currentAttribute.state == AttributeState.USABLE} dropdownClasses="z-30" />
                         </Tooltip>
                         {currentAttribute.dataType == DataTypeEnum.EMBEDDING_LIST && <div className="text-gray-700 text-sm ml-3">Only useable for similarity search</div>}
                     </div>
@@ -350,8 +376,8 @@ export default function AttributeCalculation() {
                             moduleTypeFilter="generator,classifier" functionType="Attribute"
                             nameLookups={attributes.map(a => a.name)}
                             preparedCode={(code: string) => {
-                                updateSourceCode(code);
-                                setIsInitial(false);
+                                if (currentAttribute.state == AttributeState.USABLE) return;
+                                updateNameAndCodeBricksIntegrator(code);
                             }} />
                         <Tooltip content={TOOLTIPS_DICT.ATTRIBUTE_CALCULATION.AVAILABLE_LIBRARIES} placement="left" color="invert">
                             <a href="https://github.com/code-kern-ai/refinery-ac-exec-env/blob/dev/requirements.txt"
@@ -388,13 +414,22 @@ export default function AttributeCalculation() {
                     />
                 </div>
 
-                <ExecutionContainer currentAttribute={currentAttribute} tokenizationProgress={tokenizationProgress} refetchCurrentAttribute={() => {
-                    refetchAttributeByAttributeId({ variables: { projectId: projectId, attributeId: currentAttribute?.id } }).then((res) => {
-                        const attribute = res.data['attributeByAttributeId'];
-                        if (attribute == null) setCurrentAttribute(null);
-                        else setCurrentAttribute(postProcessCurrentAttribute(attribute));
-                    });
-                }} />
+                <div className="mt-2 flex flex-grow justify-between items-center float-right">
+                    {checkUnsavedChanges && <div className="flex items-center">
+                        <div className="text-sm font-normal">Saving...</div>
+                        <LoadingIcon color="indigo" />
+                    </div>}
+                </div>
+
+
+                <ExecutionContainer currentAttribute={currentAttribute} tokenizationProgress={tokenizationProgress} checkUnsavedChanges={checkUnsavedChanges}
+                    refetchCurrentAttribute={() => {
+                        refetchAttributeByAttributeId({ variables: { projectId: projectId, attributeId: currentAttribute?.id } }).then((res) => {
+                            const attribute = res.data['attributeByAttributeId'];
+                            if (attribute == null) setCurrentAttribute(null);
+                            else setCurrentAttribute(postProcessCurrentAttribute(attribute));
+                        });
+                    }} />
                 <ContainerLogs logs={currentAttribute.logs} type="attribute" />
 
                 <div className="mt-8">

@@ -22,7 +22,7 @@ export default function ExplainModal(props: ExplainModalProps) {
         </h1>
         <div className="text-sm text-gray-700 flex flex-col gap-y-2 my-2 font-medium">
             <div>Changing records directly should only be done in edge cases! </div>
-            <div>This changes your data without the change being reproducible.</div>
+            <div>This changes your data and cannot be undone.</div>
         </div>
         <h1 className="text-lg text-gray-900 text-center inline-flex items-center gap-x-1">Info
             <IconInfoCircleFilled className="inline-block text-blue-400" />
@@ -32,7 +32,7 @@ export default function ExplainModal(props: ExplainModalProps) {
             <div>To persist the changes you need to <b>Synchronize with DB</b>. </div>
             <div>Note that this will rerun tokenization & embedding calculation for changed records.</div>
             <div>Further, already set labels for information extraction will be removed.</div>
-            <div>Attribute calculation, Weak Supervision and Heuristics are <b>NOT</b> rerun.</div>
+            <div>Attribute calculation, Weak Supervision and Heuristics are <b>NOT</b> rerun automatically.</div>
         </div>
         <div className="flex mt-6 justify-end">
             <button onClick={closeModalAndNeverShowAgain}

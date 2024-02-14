@@ -4,6 +4,7 @@ export type ExecutionContainerProps = {
     currentAttribute: Attribute;
     tokenizationProgress: number;
     refetchCurrentAttribute: () => void;
+    checkUnsavedChanges: boolean;
 }
 
 export type SampleRecord = {

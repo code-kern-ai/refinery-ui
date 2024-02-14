@@ -8,7 +8,7 @@ import { CREATE_EMBEDDING } from "@/src/services/gql/mutations/project-settings"
 import { GET_MODEL_PROVIDER_INFO } from "@/src/services/gql/queries/projects";
 import { ModelsDownloaded } from "@/src/types/components/models-downloaded/models-downloaded";
 import { Attribute } from "@/src/types/components/projects/projectId/settings/data-schema";
-import { EmbeddingPlatform, EmbeddingProps, EmbeddingType, PlatformType, SuggestionsProps } from "@/src/types/components/projects/projectId/settings/embeddings";
+import { EmbeddingPlatform, EmbeddingType, PlatformType, SuggestionsProps } from "@/src/types/components/projects/projectId/settings/embeddings";
 import { DataTypeEnum } from "@/src/types/shared/general";
 import { ModalButton, ModalEnum } from "@/src/types/shared/modal";
 import { postProcessingModelsDownload } from "@/src/util/components/models-downloaded/models-downloaded-helper";
@@ -23,7 +23,7 @@ import { useDispatch, useSelector } from "react-redux";
 
 const ACCEPT_BUTTON = { buttonCaption: 'Add embedding', disabled: false, useButton: true };
 
-export default function AddNewEmbeddingModal(props: EmbeddingProps) {
+export default function AddNewEmbeddingModal() {
     const dispatch = useDispatch();
 
     const useableEmbedableAttributes = useSelector(selectUseableEmbedableAttributes);
@@ -70,11 +70,11 @@ export default function AddNewEmbeddingModal(props: EmbeddingProps) {
     }, [useableEmbedableAttributes]);
 
     useEffect(() => {
-        if (!platform) return;
+        if (!platform || !granularity) return;
         if (embeddingHandlesAll.length == 0) return;
         prepareSuggestions();
         changePlatformOrGranularity();
-    }, [platform, embeddingHandlesAll]);
+    }, [platform, embeddingHandlesAll, granularity]);
 
     useEffect(() => {
         setFilteredAttributesArray(useableNonTextAttributes.map((a) => a.name));
@@ -83,7 +83,18 @@ export default function AddNewEmbeddingModal(props: EmbeddingProps) {
     function prepareSuggestions() {
         if (!targetAttribute || !platform) return;
         const platformVal = platform.platform;
-        const suggestionList = embeddingHandlesAll.filter((suggestion: any) => suggestion.platform == platformVal);
+        let suggestionList = embeddingHandlesAll.filter((suggestion: any) => suggestion.platform == platformVal);
+        const suggestionListFiltered = suggestionList.map((suggestion: any) => {
+            const suggestionCopy = { ...suggestion };
+            const applicability = JSON.parse(suggestionCopy.applicability);
+            if ((granularity.value == EmbeddingType.ON_ATTRIBUTE && applicability.attribute) || (granularity.value == EmbeddingType.ON_TOKEN && applicability.token)) {
+                suggestionCopy.forceHidden = false;
+            } else {
+                suggestionCopy.forceHidden = true;
+            }
+            return suggestionCopy;
+        });
+        suggestionList = suggestionListFiltered.filter((suggestion: any) => !suggestion.forceHidden);
         const embeddingHandlesCopy = { ...embeddingHandles };
         embeddingHandlesCopy[targetAttribute] = suggestionList;
         dispatch(setAllRecommendedEncodersDict(embeddingHandlesCopy));
@@ -186,15 +197,9 @@ export default function AddNewEmbeddingModal(props: EmbeddingProps) {
             config.version = version;
             prepareAzureData();
         }
-
-        // const attributeId = useableEmbedableAttributes.find((a) => a.name == targetAttribute.name).id;
         createEmbeddingMut({ variables: { projectId: projectId, attributeId: targetAttribute.id, config: JSON.stringify(config) } }).then((res) => { });
 
     }, [embeddingPlatforms, platform, granularity, model, apiToken, engine, url, version, termsAccepted, modalEmbedding]);
-
-    useEffect(() => {
-        props.refetchWS();
-    }, [addEmbedding]);
 
     const [acceptButton, setAcceptButton] = useState<ModalButton>(ACCEPT_BUTTON);
 

@@ -1,11 +1,15 @@
+import { selectProjectId, setActiveProject } from "@/src/reduxStore/states/project";
 import { NotificationDataProps } from "@/src/types/shared/notification-center";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
 import { Tooltip } from "@nextui-org/react";
 import { useRouter } from "next/router";
 import { Fragment, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 
 export default function NotificationData(props: NotificationDataProps) {
     const router = useRouter();
+    const dispatch = useDispatch();
+    const projectId = useSelector(selectProjectId);
 
     const [expandedNotifications, setExpandedNotifications] = useState({});
 
@@ -20,10 +24,15 @@ export default function NotificationData(props: NotificationDataProps) {
     return (<div className="ml-3 w-full">
         <div className="flex">
             <h3 className={`text-sm font-medium text-${props.textColor}-800`}>
-                <a className="underline" href={props.notification[0].docs} target="_blank" >{props.notification[0].title}</a>
+                <a className="underline mr-1" href={props.notification[0].docs} target="_blank" >{props.notification[0].title}</a>
                 ({props.notification[0].date}
                 {props.notification[0].projectId && <span>&nbsp;in&nbsp;
-                    <button className="underline" onClick={() => router.push(`/projects/${props.notification[0].projectId}/${props.notification[0].page}`)}>
+                    <button className="underline" onClick={() => {
+                        if (projectId !== props.notification[0].projectId) {
+                            dispatch(setActiveProject(null));
+                        }
+                        router.push(`/projects/${props.notification[0].projectId}/${props.notification[0].page}`);
+                    }}>
                         {props.notification[0].projectName}
                     </button></span>})<div className="mt-1 text-left">{props.notification[0].timePassed} ago</div>
             </h3>

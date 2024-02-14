@@ -3,7 +3,6 @@ import { Embedding, RecommendedEncoder } from '@/src/types/components/projects/p
 import { LabelingTask } from '@/src/types/components/projects/projectId/settings/labeling-tasks';
 import { DataTypeEnum } from '@/src/types/shared/general';
 import { postProcessingAttributes } from '@/src/util/components/projects/projectId/settings/data-schema-helper';
-import { postProcessLabelingTasksSchema } from '@/src/util/components/projects/projectId/settings/labeling-tasks-helper';
 import { arrayToDict } from '@/submodules/javascript-functions/general';
 import { createSelector, createSlice } from '@reduxjs/toolkit'
 import type { PayloadAction } from '@reduxjs/toolkit'

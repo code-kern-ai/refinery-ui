@@ -62,12 +62,14 @@ export function updateSliceInfoHelper(slice: DataSlice, projectId: string, users
     return sliceInfo;
 }
 
-export function postProcessUsersCount(usersCount: any, users: User[]) {
+export function postProcessUsersCount(usersCount: any, users: User[], currentUser: User) {
     const usersMapCount = {}
-    const prepareUsersCount = { ...usersCount[0] };
-    prepareUsersCount.counts = JSON.parse(prepareUsersCount.counts);
-    users.forEach(user => {
+    users.forEach((user, index) => {
         let sum = 0;
+        const userCountFind = usersCount.find(e => e.user.id == user.id);
+        if (!userCountFind) return;
+        const prepareUsersCount = { ...userCountFind };
+        prepareUsersCount.counts = JSON.parse(prepareUsersCount.counts);
         const userCopy = { ...user };
         if (prepareUsersCount.counts) prepareUsersCount.counts.forEach(e => {
             sum += e.count;
@@ -75,7 +77,9 @@ export function postProcessUsersCount(usersCount: any, users: User[]) {
         });
         userCopy.countSum = sum;
         userCopy.counts = prepareUsersCount.counts;
-        usersMapCount[userCopy.id] = userCopy;
+        if (userCopy.countSum > 0 || userCopy.id == currentUser.id) {
+            usersMapCount[userCopy.id] = userCopy;
+        }
     });
     return usersMapCount;
 }

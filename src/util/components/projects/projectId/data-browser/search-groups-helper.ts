@@ -137,23 +137,21 @@ export function userCreateSearchGroup(item, globalSearchGroupCount, users) {
 
 function buildUserArray(users) {
     let array = [];
-    for (const u of users) {
-        if (u.countSum == 0) continue;
-        const user = u.user ? u.user : u;
+    for (const [key, value] of Object.entries(users)) {
+        const value2 = value as any;
         let name = "Unknown";
         let shortName = "Unknown";
-        if (user.firstName) {
-            name = user.firstName + ' ' + user.lastName;
-            shortName = user.firstName[0] + '. ' + user.lastName;
+        if (value2.firstName) {
+            name = value2.firstName + ' ' + value2.lastName;
+            shortName = value2.firstName[0] + '. ' + value2.lastName;
         }
-
         array.push({
-            id: user.id,
+            id: value2.id,
             active: false,
             negate: false,
             displayName: name,
             name: shortName,
-            dataTip: user.mail ? user.mail : "Unknown user ID"
+            dataTip: value2.mail ? value2.mail : "Unknown user ID"
         });
     }
     return array;

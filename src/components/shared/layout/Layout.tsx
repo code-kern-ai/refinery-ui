@@ -5,19 +5,19 @@ import { GET_ALL_ACTIVE_ADMIN_MESSAGES, NOTIFICATIONS_BY_USER } from "@/src/serv
 import { Fragment, useCallback, useEffect, useState } from "react";
 import { NotificationLevel } from "@/src/types/shared/notification-center";
 import { IconAlertTriangleFilled, IconCircleCheckFilled, IconInfoCircleFilled } from "@tabler/icons-react";
-import { WebSocketsService } from "@/src/services/base/web-sockets/WebSocketsService";
 import { CurrentPage } from "@/src/types/shared/general";
 import { useDispatch, useSelector } from "react-redux";
 import { selectUser } from "@/src/reduxStore/states/general";
-import { interval, timer } from "rxjs";
-import { selectNotificationsUser, setNotificationId, setNotificationsUser } from "@/src/reduxStore/states/tmp";
-import { useRouter } from "next/router";
+import { interval } from "rxjs";
+import { setNotificationId } from "@/src/reduxStore/states/tmp";
 import AdminMessages from "../admin-messages/AdminMessages";
 import { AdminMessage } from "@/src/types/shared/admin-messages";
 import { postProcessAdminMessages } from "@/src/util/shared/admin-messages-helper";
 import SizeWarningModal from "./SizeWarningModal";
 import { closeModal, openModal } from "@/src/reduxStore/states/modal";
 import { ModalEnum } from "@/src/types/shared/modal";
+import { postProcessNotificationsUser } from "@/src/util/shared/notification-center-helper";
+import { useWebsocket } from "@/src/services/base/web-sockets/useWebsocket";
 
 const MIN_WIDTH = 1250;
 
@@ -25,12 +25,11 @@ export default function Layout({ children }) {
     const dispatch = useDispatch();
 
     const user = useSelector(selectUser);
-    const notifications = useSelector(selectNotificationsUser);
 
-    const [refetchTimer, setRefetchTimer] = useState(null);
     const [deletionTimer, setDeletionTimer] = useState(null);
     const [activeAdminMessages, setActiveAdminMessages] = useState<AdminMessage[]>([]);
     const [windowWidth, setWindowWidth] = useState(window.innerWidth);
+    const [notificationsState, setNotificationsState] = useState([]);
 
     const [refetchNotificationsByUser] = useLazyQuery(NOTIFICATIONS_BY_USER, { fetchPolicy: 'network-only' });
     const [refetchAdminMessages] = useLazyQuery(GET_ALL_ACTIVE_ADMIN_MESSAGES, { fetchPolicy: 'network-only' });
@@ -38,10 +37,6 @@ export default function Layout({ children }) {
     useEffect(() => {
         refetchNotificationsAndProcess();
         refetchAdminMessagesAndProcess();
-        WebSocketsService.subscribeToNotification(CurrentPage.NOTIFICATION_CENTER, {
-            whitelist: ['notification_created', 'project_deleted', 'config_updated', 'admin_message'],
-            func: handleWebsocketNotification
-        });
     }, []);
 
     function handleResize() {
@@ -61,12 +56,27 @@ export default function Layout({ children }) {
     }, []);
 
     useEffect(() => {
-        initializeNotificationDeletion();
-    }, [notifications]);
+        if (deletionTimer != null) return;
+        const saveDelTimer = interval(500).subscribe((x) => {
+            if (notificationsState.length > 0) {
+                setNotificationsState(notificationsState.filter((notification) => new Date().getTime() - notification.savedToStore < 5000));
+
+            } else {
+                unsubscribeDeletionTimer(deletionTimer);
+                setDeletionTimer(null);
+
+            }
+        });
+        return () => {
+            saveDelTimer.unsubscribe();
+        };
+    }, [notificationsState, deletionTimer]);
+
+
 
     function refetchNotificationsAndProcess() {
         refetchNotificationsByUser().then((res) => {
-            dispatch(setNotificationsUser(res['data']['notificationsByUserId']));
+            setNotificationsState(postProcessNotificationsUser(res['data']['notificationsByUserId'], notificationsState));
         });
     }
 
@@ -74,22 +84,6 @@ export default function Layout({ children }) {
         refetchAdminMessages().then((res) => {
             setActiveAdminMessages(postProcessAdminMessages(res['data']['allActiveAdminMessages']));
         });
-    }
-
-    function initializeNotificationDeletion() {
-        if (deletionTimer != null) return;
-        const saveDelTimer = interval(3000).subscribe((x) => {
-            if (notifications.length > 0) {
-                const notificationsCopy = [...notifications];
-                notificationsCopy.shift();
-                dispatch(setNotificationsUser(notificationsCopy));
-                if (notificationsCopy.length == 0)
-                    unsubscribeDeletionTimer(deletionTimer);
-            } else {
-                unsubscribeDeletionTimer(deletionTimer);
-            }
-        });
-        setDeletionTimer(saveDelTimer);
     }
 
     function unsubscribeDeletionTimer(deletionTimer) {
@@ -102,22 +96,15 @@ export default function Layout({ children }) {
     const handleWebsocketNotification = useCallback((msgParts: string[]) => {
         if (msgParts[1] == 'notification_created') {
             if (msgParts[2] != user?.id) return;
-            if (refetchTimer) return;
-            setRefetchTimer(timer(1000).subscribe((x) => {
-                refetchNotificationsAndProcess();
-                setRefetchTimer(null);
-            }));
             refetchNotificationsAndProcess();
         } else if (msgParts[1] == 'admin_message') {
             refetchAdminMessagesAndProcess();
         }
-    }, [user?.id]);
+    }, [user?.id, notificationsState]);
+    
+    useWebsocket(CurrentPage.NOTIFICATION_CENTER, handleWebsocketNotification);
 
-    useEffect(() => {
-        WebSocketsService.updateFunctionPointer(null, CurrentPage.NOTIFICATION_CENTER, handleWebsocketNotification)
-    }, [handleWebsocketNotification]);
-
-    return (
+    return (    
         <>
             <div className="h-screen bg-gray-100 flex overflow-hidden"
                 style={{ width: windowWidth < MIN_WIDTH ? MIN_WIDTH + 'px' : '100%', overflowX: windowWidth < MIN_WIDTH ? 'auto' : 'hidden' }}>
@@ -130,7 +117,7 @@ export default function Layout({ children }) {
                 </div>
             </div>
             <div className="absolute flex flex-col z-50 bottom-0 left-24 mb-7 cursor-pointer content-start" id="notifications">
-                {notifications.map((notification) => (<Fragment key={notification.id}>
+                {notificationsState.map((notification, index) => (<Fragment key={index}>
                     {notification.level === NotificationLevel.INFO && <div onClick={() => dispatch(setNotificationId(notification.id))}>
                         <div className="bg-blue-50 border-l-4 border-blue-400 p-4">
                             <div className="flex">

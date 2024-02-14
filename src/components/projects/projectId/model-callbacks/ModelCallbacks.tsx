@@ -15,12 +15,11 @@ import { useDispatch, useSelector } from "react-redux";
 import style from '@/src/styles/components/projects/projectId/model-callbacks.module.css';
 import { ModalEnum } from "@/src/types/shared/modal";
 import { openModal, selectModal } from "@/src/reduxStore/states/modal";
-import { WebSocketsService } from "@/src/services/base/web-sockets/WebSocketsService";
 import { CurrentPage } from "@/src/types/shared/general";
 import GridCards from "@/src/components/shared/grid-cards/GridCards";
-import { unsubscribeWSOnDestroy } from "@/src/services/base/web-sockets/web-sockets-helper";
 import DeleteModelCallBacksModal from "./DeleteModelCallbacksModal";
 import Dropdown2 from "@/submodules/react-components/components/Dropdown2";
+import { useWebsocket } from "@/src/services/base/web-sockets/useWebsocket";
 
 
 export default function ModelCallbacks() {
@@ -45,17 +44,10 @@ export default function ModelCallbacks() {
         prepareSelectionList();
     }, [modalDelete]);
 
-    useEffect(unsubscribeWSOnDestroy(router, [CurrentPage.MODEL_CALLBACKS]), []);
-
     useEffect(() => {
         if (!projectId) return;
         refetchLabelingTasksAndProcess();
         refetchModelCallbacksAndProcess();
-        WebSocketsService.subscribeToNotification(CurrentPage.MODEL_CALLBACKS, {
-            projectId: projectId,
-            whitelist: ['information_source_created', 'information_source_updated', 'information_source_deleted', 'labeling_task_deleted', 'labeling_task_updated', 'labeling_task_created', 'model_callback_update_statistics'],
-            func: handleWebsocketNotification
-        });
     }, [projectId]);
 
     function toggleTabs(index: number, labelingTask: LabelingTask | null) {
@@ -124,10 +116,7 @@ export default function ModelCallbacks() {
         }
     }, []);
 
-    useEffect(() => {
-        if (!projectId) return;
-        WebSocketsService.updateFunctionPointer(projectId, CurrentPage.MODEL_CALLBACKS, handleWebsocketNotification)
-    }, [handleWebsocketNotification, projectId]);
+    useWebsocket(CurrentPage.MODEL_CALLBACKS, handleWebsocketNotification, projectId);
 
     return (projectId && <div className="p-4 bg-gray-100 h-full flex-1 flex flex-col">
         <div className="w-full h-full">

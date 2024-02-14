@@ -2,12 +2,13 @@ import { ModalButton, ModalEnum } from "@/src/types/shared/modal";
 import Modal from "../modal/Modal";
 import { UploadFileType, UploadOptions, UploadProps } from "@/src/types/shared/upload";
 import { getSubtitle, getTitle } from "@/src/util/shared/modal-upload-helper";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { selectAllProjects } from "@/src/reduxStore/states/project";
 import Upload from "./Upload";
 import { selectUploadData } from "@/src/reduxStore/states/upload";
 import { IconAlertTriangle } from "@tabler/icons-react";
+import { timer } from "rxjs";
 
 const ACCEPT_BUTTON = { buttonCaption: "Upload", closeAfterClick: false, useButton: true, disabled: true };
 
@@ -22,22 +23,32 @@ export default function ModalUpload(props: UploadProps) {
     const submitUpload = useCallback(() => {
         if (isProjectTitleDuplicate) return;
         setStartUpload(true);
+        timer(3000).subscribe(() => {
+            setProjectName("");
+            setStartUpload(false);
+        });
     }, []);
 
     const [acceptButton, setAcceptButton] = useState<ModalButton>({ ...ACCEPT_BUTTON, emitFunction: submitUpload });
+    const [uploadOptions, setUploadOptions] = useState<UploadOptions>(null);
 
     const title = getTitle(uploadFileType);
     const subTitle = getSubtitle(uploadFileType);
 
-    const uploadOptions: UploadOptions = {
-        deleteProjectOnFail: props.uploadOptions.deleteProjectOnFail,
-        reloadOnFinish: props.uploadOptions.reloadOnFinish,
-        knowledgeBaseId: uploadFileType == UploadFileType.KNOWLEDGE_BASE ? props.uploadOptions.knowledgeBaseId : null,
-        isModal: props.uploadOptions.isModal,
-        tokenizer: props.uploadOptions.tokenizer,
-        showBadPasswordMsg: props.uploadOptions.showBadPasswordMsg,
-        projectName: projectName,
-    }
+
+    useEffect(() => {
+        if (!props.uploadOptions) return;
+        setUploadOptions({
+            deleteProjectOnFail: props.uploadOptions.deleteProjectOnFail,
+            reloadOnFinish: props.uploadOptions.reloadOnFinish,
+            knowledgeBaseId: uploadFileType == UploadFileType.KNOWLEDGE_BASE ? props.uploadOptions.knowledgeBaseId : null,
+            isModal: props.uploadOptions.isModal,
+            tokenizer: props.uploadOptions.tokenizer,
+            showBadPasswordMsg: props.uploadOptions.showBadPasswordMsg,
+            projectName: projectName,
+        });
+    }, [projectName, props.uploadOptions, uploadFileType]);
+
 
     function checkIfProjectNameDuplicate(value: string) {
         setProjectTitleDuplicate(projects.some(project => project.name == value));

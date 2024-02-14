@@ -1,17 +1,17 @@
-import { selectHoverGroupDict, selectSettings, selectTmpHighlightIds, setHoverGroupDict, tmpAddHighlightIds } from "@/src/reduxStore/states/pages/labeling";
+import { selectActiveTokenSelection, selectHoverGroupDict, selectSettings, selectTmpHighlightIds, setHoverGroupDict, tmpAddHighlightIds } from "@/src/reduxStore/states/pages/labeling";
 import { LineBreaksType } from "@/src/types/components/projects/projectId/data-browser/data-browser";
 import { ExtractionDisplayProps, LabelSourceHover } from "@/src/types/components/projects/projectId/labeling/labeling";
 import { LabelingPageParts } from "@/src/types/components/projects/projectId/labeling/labeling-main-component";
 import { Tooltip } from "@nextui-org/react";
 import { useDispatch, useSelector } from "react-redux";
 import style from '@/src/styles/components/projects/projectId/labeling.module.css';
-import { useState } from "react";
+import { useState, forwardRef, useEffect, useMemo } from "react";
 
 export function shouldHighlightOn(tmpHighlightIds: string[], comparedId: string[]) {
     return tmpHighlightIds.some((id) => comparedId.includes(id));
 }
 
-export default function ExtractionDisplay(props: ExtractionDisplayProps) {
+const ExtractionDisplay = forwardRef<HTMLInputElement, ExtractionDisplayProps>(function ExtractionDisplay(props, ref) {
     const dispatch = useDispatch();
 
     const settings = useSelector(selectSettings);
@@ -55,12 +55,15 @@ export default function ExtractionDisplay(props: ExtractionDisplayProps) {
     }
 
     return (<>
-        {props.tokenLookup && <div className="flex flex-row flex-wrap items-start">
+        {props.tokenLookup && <div ref={ref} className="flex flex-row flex-wrap items-start">
             {props.tokenLookup[props.attributeId] && props.tokenLookup[props.attributeId].token && props.tokenLookup[props.attributeId].token.map((token) => (<div key={token.idx} className={`relative z-10 ${token.countLineBreaks > 0 && settings.main.lineBreaks != LineBreaksType.NORMAL ? 'w-full' : ''}`}
                 style={{ marginBottom: props.tokenLookup[props.attributeId][token.idx]?.tokenMarginBottom }}
                 data-tokenidx={token.idx} data-attributeid={props.attributeId}>
                 {token.countLineBreaks == 0 ? (<>
-                    {token.type ? (<Tooltip content={'spaCy type: ' + token.type} color="invert" placement="top">
+                    {token.type ? (<Tooltip content={'spaCy type: ' + token.type} color="invert" placement="top" onKeyDown={(e: any) => {
+                        e.preventDefault();
+                        e.target.blur();
+                    }}>
                         <TokenValue token={token} attributeId={props.attributeId} setSelected={(e) => props.setSelected(token.idx, token.idx, e)} />
                     </Tooltip>) : (<>
                         <TokenValue token={token} attributeId={props.attributeId} setSelected={(e) => props.setSelected(token.idx, token.idx, e)} /></>)}
@@ -100,15 +103,25 @@ export default function ExtractionDisplay(props: ExtractionDisplayProps) {
             </div>))}
         </div>}
     </>);
-}
+});
 
 function TokenValue(props: any) {
+    const activeTokenSelection = useSelector(selectActiveTokenSelection);
+
+    const isSelected = useMemo(() => {
+        if (!activeTokenSelection || !props.attributeId) return false;
+        if (activeTokenSelection.attributeId != props.attributeId) return false;
+        return props.token.idx >= activeTokenSelection.tokenStart && props.token.idx <= activeTokenSelection.tokenEnd;
+    }, [activeTokenSelection, props.attributeId]);
+
     return (<>
         {props.token && props.token.value != '\n' && <label onClick={(e) => props.setSelected(e)}
             className={`rounded-lg hover:bg-gray-200 text-sm text-gray-500 leading-5 relative font-normal ${!props.token.nextCloser ? 'pr-1' : ''}`}
             data-tokenidx={props.token.idx} data-attributeid={props.attributeId}
-            style={{ backgroundColor: props.token.selected ? '#3399FF' : null, borderRadius: props.token.selected ? '0' : null, color: props.token.selected ? 'white' : null, zIndex: '100' }}>
+            style={{ backgroundColor: isSelected ? '#3399FF' : null, borderRadius: isSelected ? '0' : null, color: isSelected ? 'white' : null, zIndex: '100' }}>
             {props.token.value}
         </label>}
     </>)
 }
+
+export default ExtractionDisplay;

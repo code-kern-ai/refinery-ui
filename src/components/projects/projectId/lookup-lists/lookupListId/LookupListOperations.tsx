@@ -1,14 +1,12 @@
 import LoadingIcon from "@/src/components/shared/loading/LoadingIcon";
-import Modal from "@/src/components/shared/modal/Modal";
 import ModalUpload from "@/src/components/shared/upload/ModalUpload";
 import { openModal } from "@/src/reduxStore/states/modal";
 import { selectProjectId } from "@/src/reduxStore/states/project";
 import { setUploadFileType } from "@/src/reduxStore/states/upload";
-import { PASTE_TERM } from "@/src/services/gql/mutations/lookup-lists";
 import { EXPORT_LIST } from "@/src/services/gql/queries/lookup-lists";
 import { LookupListOperationsProps } from "@/src/types/components/projects/projectId/lookup-lists";
 import { DownloadState } from "@/src/types/components/projects/projectId/settings/project-export";
-import { ModalButton, ModalEnum } from "@/src/types/shared/modal";
+import { ModalEnum } from "@/src/types/shared/modal";
 import { UploadFileType } from "@/src/types/shared/upload";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
 import { downloadByteData } from "@/submodules/javascript-functions/export";
@@ -16,7 +14,7 @@ import { useLazyQuery, useMutation } from "@apollo/client";
 import { Tooltip } from "@nextui-org/react";
 import { IconClipboard, IconClipboardOff, IconDownload, IconUpload } from "@tabler/icons-react";
 import { useRouter } from "next/router";
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { timer } from "rxjs";
 import PasteLookupListModal from "./PasteLookupListModal";
@@ -96,7 +94,7 @@ export default function LookupListOperations(props: LookupListOperationsProps) {
         </div>
 
         <ModalUpload uploadOptions={uploadOptions} closeModalEvent={props.refetchTerms} />
-        <PasteLookupListModal refetchWS={props.refetchWS} />
-        <RemoveLookupListModal refetchWS={props.refetchWS} />
+        <PasteLookupListModal />
+        <RemoveLookupListModal />
     </div>)
 }

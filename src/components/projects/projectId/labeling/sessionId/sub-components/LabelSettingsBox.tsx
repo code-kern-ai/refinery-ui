@@ -17,12 +17,14 @@ export default function LabelSettingsBox(props: LabelSettingsBoxProps) {
     const settings = useSelector(selectSettings);
 
     function toggleLabelDisplaySetting(attribute: string) {
+        const getSettings = localStorage.getItem('labelingSettings');
         if (!props.labelSettingsLabel) return;
         const labelId = props.labelSettingsLabel.id;
         const taskId = props.labelSettingsLabel.taskId;
-        const settingsCopy = jsonCopy(settings);
+        const settingsCopy = getSettings ? JSON.parse(getSettings) : jsonCopy(settings);
         settingsCopy.task[projectId][taskId][labelId][attribute] = !settingsCopy.task[projectId][taskId][labelId][attribute];
         dispatch(setSettings(settingsCopy));
+        localStorage.setItem('labelingSettings', JSON.stringify(settingsCopy));
     }
 
     function stopPropagation(e) {

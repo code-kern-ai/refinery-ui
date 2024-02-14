@@ -79,7 +79,7 @@ export const TOOLTIPS_DICT = {
         },
         'LABELING_TASK': {
             'NEW_LABELING_TASK': 'Currently supporting classifications and extractions',
-            'TARGET_ATTRIBUTE': '',
+            'TARGET_ATTRIBUTE': 'Choose attribute to be labeled',
             'NAME_LABELING_TASK': 'Name of your labeling task',
             'RENAME_LABEL': 'Rename label',
             'OPEN_HEURISTICS': 'Open heuristics in new tab',

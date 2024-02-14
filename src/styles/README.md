@@ -6,4 +6,3 @@ The classes in the file should be declared using the camel case rule. In order t
 Example how to use the class 'scrollableSize' from the 'project-list.module.css':  `<div className={style.scrollableSize}></div>`
 
 Note: We can only do this for classes, not for IDs or other attributes.
-

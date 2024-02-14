@@ -28,9 +28,12 @@ export function updateSearchParameters(searchElement, attributes, separator, ful
             param = createSplittedText(updateSearchParamText(p, attributes, separator, fullSearch[SearchGroup.DRILL_DOWN]), fullSearch, p);
             activeParams.push({ splittedText: param, values: p.groupElements });
         } else if (p.groupElements.group == SearchGroup.USER_FILTER) {
+            const isOneActive = p.groupElements.users.some(i => i.active);
             for (let i of p.groupElements.users) {
-                if (!i.active) return;
+                if (!i.active) continue;
                 param = createSplittedText(updateSearchParamText(p, attributes, separator, fullSearch[SearchGroup.DRILL_DOWN]), fullSearch, p);
+            }
+            if (isOneActive) {
                 activeParams.push({ splittedText: param, values: { group: p.groupElements.group }, users: p.groupElements.users });
             }
         } else if (p.groupElements.group == SearchGroup.ORDER_STATEMENTS) {
@@ -66,7 +69,7 @@ function createSplittedText(i, searchGroup, p) {
 function updateSearchParamText(searchElement, attributes, separator, drillDownVal) {
     const searchElementCopy = jsonCopy(searchElement);
     if (searchElementCopy.group == SearchGroup.ATTRIBUTES) {
-        const attributeType = getAttributeType(attributes, searchElementCopy.name);
+        const attributeType = attributes.find(att => att.name == searchElementCopy.name)?.dataType;
         if (searchElementCopy.operator == SearchOperator.BETWEEN) {
             if (attributeType == "INTEGER" || attributeType == "FLOAT") {
                 searchElementCopy.searchText =
@@ -234,8 +237,10 @@ export function getRegexFromFilter(searchElement): HighlightSearch {
         case SearchOperator.EQUAL:
             return { searchFor: '^' + searchValue + '$', matchCase: searchElement.values.caseSensitive };
         case SearchOperator.BEGINS_WITH:
+        case 'BEGINS WITH':
             return { searchFor: '^' + searchValue, matchCase: searchElement.values.caseSensitive }
         case SearchOperator.ENDS_WITH:
+        case 'ENDS WITH':
             return { searchFor: searchValue + '$', matchCase: searchElement.values.caseSensitive };
         case SearchOperator.CONTAINS:
             return { searchFor: searchValue, matchCase: searchElement.values.caseSensitive };

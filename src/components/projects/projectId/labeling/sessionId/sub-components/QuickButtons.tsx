@@ -20,7 +20,8 @@ export default function QuickButtons(props: QuickButtonsProps) {
     const settings = useSelector(selectSettings);
 
     function setAllLabelDisplaySettingDefault() {
-        const settingsCopy = jsonCopy(settings);
+        const getSettings = localStorage.getItem('labelingSettings');
+        const settingsCopy = getSettings ? JSON.parse(getSettings) : jsonCopy(settings);
         const tasks = settingsCopy.task[projectId];
         for (let taskId in tasks) {
             for (let labelId in tasks[taskId]) {
@@ -28,6 +29,7 @@ export default function QuickButtons(props: QuickButtonsProps) {
             }
         }
         dispatch(setSettings(settingsCopy));
+        localStorage.setItem('labelingSettings', JSON.stringify(settingsCopy));
     }
 
     function setAllLabelDisplaySetting(value: boolean, attribute?: string) {

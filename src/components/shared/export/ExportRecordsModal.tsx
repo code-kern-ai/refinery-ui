@@ -22,18 +22,14 @@ import { ExportHelper } from "@/src/util/classes/export";
 import { downloadFile } from "@/src/services/base/s3-service";
 import { downloadByteDataNoStringify } from "@/submodules/javascript-functions/export";
 import { timer } from "rxjs";
-import { WebSocketsService } from "@/src/services/base/web-sockets/WebSocketsService";
 import { CurrentPage } from "@/src/types/shared/general";
 import { selectUser } from "@/src/reduxStore/states/general";
 import CryptedField from "../crypted-field/CryptedField";
-import { unsubscribeWSOnDestroy } from "@/src/services/base/web-sockets/web-sockets-helper";
-import { useRouter } from "next/router";
 import { extendArrayElementsByUniqueId } from "@/submodules/javascript-functions/id-prep";
-import { LabelSourceHover } from "@/src/types/components/projects/projectId/labeling/labeling";
+import { useWebsocket } from "@/src/services/base/web-sockets/useWebsocket";
 
 export default function ExportRecordsModal(props: ExportProps) {
     const dispatch = useDispatch();
-    const router = useRouter();
 
     const projectId = useSelector(selectProjectId);
     const user = useSelector(selectUser)
@@ -44,23 +40,17 @@ export default function ExportRecordsModal(props: ExportProps) {
     const [formGroup, setFormGroup] = useState(null);
     const [downloadState, setDownloadState] = useState<DownloadState>(DownloadState.NONE);
     const [key, setKey] = useState('');
+    const [prepareErrors, setPrepareErrors] = useState<string[]>([]);
 
     const [refetchLastRecordsExportCredentials] = useLazyQuery(LAST_RECORD_EXPORT_CREDENTIALS, { fetchPolicy: "no-cache" });
     const [refetchRecordExportFromData] = useLazyQuery(GET_RECORD_EXPORT_FORM_DATA, { fetchPolicy: "no-cache" });
     const [refetchPrepareRecordExport] = useLazyQuery(PREPARE_RECORD_EXPORT, { fetchPolicy: "no-cache" });
-
-    useEffect(unsubscribeWSOnDestroy(router, [CurrentPage.EXPORT]), []);
 
     useEffect(() => {
         if (!modal || !modal.open) return;
         if (!projectId) return;
         requestRecordsExportCredentials();
         fetchSetupData();
-        WebSocketsService.subscribeToNotification(CurrentPage.EXPORT, {
-            projectId: projectId,
-            whitelist: ['record_export', 'calculate_attribute', 'labeling_task_deleted', 'labeling_task_created', 'data_slice_created', 'data_slice_deleted', 'information_source_created', 'information_source_deleted'],
-            func: handleWebsocketNotification
-        });
     }, [modal, projectId]);
 
     useEffect(() => {
@@ -211,6 +201,7 @@ export default function ExportRecordsModal(props: ExportProps) {
 
     function prepareDownload() {
         const jsonString = ExportHelper.buildExportData(props.sessionId, formGroup);
+        setPrepareErrors(ExportHelper.error);
         if (ExportHelper.error.length > 0) return;
         setDownloadState(DownloadState.PREPARATION);
         let keyToSend = key;
@@ -219,6 +210,7 @@ export default function ExportRecordsModal(props: ExportProps) {
             if (res.data['prepareRecordExport'] != "") {
                 ExportHelper.error.push("Something went wrong in the backend:");
                 ExportHelper.error.push(res.data['prepareRecordExport']);
+                setPrepareErrors(ExportHelper.error);   
             }
             setDownloadState(DownloadState.DOWNLOAD);
         });
@@ -237,11 +229,7 @@ export default function ExportRecordsModal(props: ExportProps) {
         if (somethingToRerequest) fetchSetupData(true);
     }, [user, projectId]);
 
-    useEffect(() => {
-        if (!projectId) return;
-        if (!modal || !modal.open) return;
-        WebSocketsService.updateFunctionPointer(projectId, CurrentPage.EXPORT, handleWebsocketNotification);
-    }, [handleWebsocketNotification, projectId, modal]);
+    useWebsocket(CurrentPage.EXPORT, handleWebsocketNotification, projectId);
 
     return (<Modal modalName={ModalEnum.EXPORT_RECORDS} hasOwnButtons={true}>
         <div className="flex flex-grow justify-center text-lg leading-6 text-gray-900 font-medium mb-2">Export record data </div>
@@ -310,9 +298,9 @@ export default function ExportRecordsModal(props: ExportProps) {
                     setFormGroup(control);
                 }} />
         </div>}
-        {ExportHelper.error.length > 0 && <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mt-2">
+        {prepareErrors.length > 0 && <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mt-2">
             <strong className="font-bold">Errors Detected!</strong>
-            <pre className="text-sm">{ExportHelper.error.join("\n")}</pre>
+            <pre className="text-sm">{prepareErrors.join("\n")}</pre>
         </div>}
         <CryptedField label="Encrypt zip file with password" keyChange={(key: string) => setKey(key)} />
         <div className="flex mt-6 justify-end">

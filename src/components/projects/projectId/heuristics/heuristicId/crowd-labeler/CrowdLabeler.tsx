@@ -1,8 +1,7 @@
 import { selectHeuristic, setActiveHeuristics } from "@/src/reduxStore/states/pages/heuristics";
 import { selectLabelingTasksAll, setLabelingTasksAll } from "@/src/reduxStore/states/pages/settings";
 import { selectProjectId } from "@/src/reduxStore/states/project";
-import { WebSocketsService } from "@/src/services/base/web-sockets/WebSocketsService";
-import { GET_HEURISTICS_BY_ID } from "@/src/services/gql/queries/heuristics";
+import { GET_ACCESS_LINK, GET_HEURISTICS_BY_ID } from "@/src/services/gql/queries/heuristics";
 import { GET_LABELING_TASKS_BY_PROJECT_ID } from "@/src/services/gql/queries/project-setting";
 import { CurrentPage } from "@/src/types/shared/general";
 import { postProcessLabelingTasks, postProcessLabelingTasksSchema } from "@/src/util/components/projects/projectId/settings/labeling-tasks-helper";
@@ -19,10 +18,10 @@ import CrowdLabelerSettings from "./CrowdLabelerSettings";
 import { postProcessCrowdLabeler } from "@/src/util/components/projects/projectId/heuristics/heuristicId/crowd-labeler-helper";
 import { selectDataSlicesAll, setDataSlices } from "@/src/reduxStore/states/pages/data-browser";
 import { DATA_SLICES } from "@/src/services/gql/queries/data-browser";
-import { unsubscribeWSOnDestroy } from "@/src/services/base/web-sockets/web-sockets-helper";
 import { REQUEST_COMMENTS } from "@/src/services/gql/queries/projects";
 import { CommentDataManager } from "@/src/util/classes/comments";
 import { CommentType } from "@/src/types/shared/comments";
+import { useWebsocket } from "@/src/services/base/web-sockets/useWebsocket";
 
 
 export default function CrowdLabeler() {
@@ -40,8 +39,7 @@ export default function CrowdLabeler() {
     const [refetchLabelingTasksByProjectId] = useLazyQuery(GET_LABELING_TASKS_BY_PROJECT_ID, { fetchPolicy: "network-only" });
     const [refetchDataSlicesMut] = useLazyQuery(DATA_SLICES, { fetchPolicy: 'network-only' });
     const [refetchComments] = useLazyQuery(REQUEST_COMMENTS, { fetchPolicy: "no-cache" });
-
-    useEffect(unsubscribeWSOnDestroy(router, [CurrentPage.HEURISTICS, CurrentPage.LABELING_FUNCTION, CurrentPage.ACTIVE_LEARNING, CurrentPage.CROWD_LABELER, CurrentPage.ZERO_SHOT, CurrentPage.COMMENTS], projectId), []);
+    const [refetchAccessLink] = useLazyQuery(GET_ACCESS_LINK, { fetchPolicy: 'network-only' });
 
     useEffect(() => {
         if (!projectId) return;
@@ -50,18 +48,13 @@ export default function CrowdLabeler() {
         refetchDataSlicesMut({ variables: { projectId: projectId, sliceType: "STATIC_DEFAULT" } }).then((res) => {
             dispatch(setDataSlices(res.data.dataSlices));
         });
-        WebSocketsService.subscribeToNotification(CurrentPage.CROWD_LABELER, {
-            projectId: projectId,
-            whitelist: ['labeling_task_updated', 'labeling_task_created', 'label_created', 'label_deleted', 'labeling_task_deleted', 'information_source_deleted', 'information_source_updated', 'model_callback_update_statistics'],
-            func: handleWebsocketNotification
-        });
     }, [projectId, router.query.heuristicId]);
 
     useEffect(() => {
         if (!projectId) return;
         if (!labelingTasks) return;
         refetchCurrentHeuristicAndProcess();
-    }, [labelingTasks]);
+    }, [labelingTasks, projectId]);
 
     useEffect(() => {
         if (!projectId || allUsers.length == 0) return;
@@ -87,7 +80,12 @@ export default function CrowdLabeler() {
 
     function refetchCurrentHeuristicAndProcess() {
         refetchCurrentHeuristic({ variables: { projectId: projectId, informationSourceId: router.query.heuristicId } }).then((res) => {
-            dispatch(setActiveHeuristics(postProcessCrowdLabeler(res['data']['informationSourceBySourceId'], labelingTasks)));
+            const currentHeuristic: any = postProcessCrowdLabeler(res['data']['informationSourceBySourceId'], labelingTasks);
+            if (!currentHeuristic.crowdLabelerSettings.accessLinkId) {
+                dispatch(setActiveHeuristics(currentHeuristic));
+            } else {
+                refetchAccessLinkAndProcess(currentHeuristic);
+            }
         });
     }
 
@@ -95,6 +93,15 @@ export default function CrowdLabeler() {
         refetchLabelingTasksByProjectId({ variables: { projectId: projectId } }).then((res) => {
             const labelingTasks = postProcessLabelingTasks(res['data']['projectByProjectId']['labelingTasks']['edges']);
             dispatch(setLabelingTasksAll(postProcessLabelingTasksSchema(labelingTasks)));
+        });
+    }
+
+    function refetchAccessLinkAndProcess(currentHeuristic: any) {
+        if (!currentHeuristic.crowdLabelerSettings.accessLinkId) return;
+        refetchAccessLink({ variables: { projectId: projectId, linkId: currentHeuristic.crowdLabelerSettings.accessLinkId } }).then((res) => {
+            const link = res.data.accessLink;
+            const currentHeuristicUpdated = postProcessCrowdLabeler(currentHeuristic, labelingTasks, link);
+            dispatch(setActiveHeuristics(currentHeuristicUpdated));
         });
     }
 
@@ -113,12 +120,9 @@ export default function CrowdLabeler() {
                 refetchCurrentHeuristicAndProcess();
             }
         }
-    }, [currentHeuristic]);
+    }, [currentHeuristic, projectId]);
 
-    useEffect(() => {
-        if (!projectId) return;
-        WebSocketsService.updateFunctionPointer(projectId, CurrentPage.CROWD_LABELER, handleWebsocketNotification)
-    }, [handleWebsocketNotification, projectId]);
+    useWebsocket(CurrentPage.CROWD_LABELER, handleWebsocketNotification, projectId);
 
     return (<HeuristicsLayout>
         {currentHeuristic && <div>

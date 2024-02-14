@@ -8,7 +8,6 @@ import { getDisplayGraphValueArray } from "@/src/util/components/projects/projec
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
 import { DisplayGraphs } from "@/submodules/javascript-functions/enums/enums";
 import Dropdown2 from "@/submodules/react-components/components/Dropdown2";
-import { useConsoleLog } from "@/submodules/react-components/hooks/useConsoleLog";
 import { Tooltip } from "@nextui-org/react";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";

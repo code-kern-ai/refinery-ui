@@ -14,6 +14,8 @@ export function prepareSize(size: string | undefined): string {
             return "h-10 w-10";
         case "xl":
             return "h-12 w-12";
+        case "custom-sm":
+            return "h-5 w-5"
     }
 }
 

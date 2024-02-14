@@ -33,11 +33,12 @@ export default function LabelingSuiteTaskHeader() {
         if (!settings) return null;
         const finalData = Array(data.length);
         let i = 0;
-        const settingsCopy = jsonCopy(settings);
+        const getSettings = localStorage.getItem('labelingSettings');
+        const settingsCopy = getSettings ? JSON.parse(getSettings) : jsonCopy(settings);
         for (const task of data) {
             const taskCopy = jsonCopy(task);
             if (!settingsCopy.task[projectId]) settingsCopy.task[projectId] = {};
-            let taskSettings = settingsCopy.task[projectId][taskCopy.id];
+            let taskSettings = settingsCopy.task[projectId];
             if (!taskSettings) {
                 taskSettings = {};
                 settingsCopy.task[projectId][taskCopy.id] = taskSettings;
@@ -57,16 +58,21 @@ export default function LabelingSuiteTaskHeader() {
             };
             settingsCopy.task[projectId][taskCopy.id] = labels;
         }
-        const settingsCopy2 = jsonCopy(settings);
+        const settingsCopy2 = getSettings ? JSON.parse(getSettings) : jsonCopy(settings);
         settingsCopy2.task[projectId] = settingsCopy.task[projectId];
         dispatch(setSettings(settingsCopy2));
+        localStorage.setItem('labelingSettings', JSON.stringify(settingsCopy2));
 
         finalData.sort((a, b) => a.orderPos - b.orderPos || a.name.localeCompare(b.name));
         return finalData;
     }
 
     function toggleIsCollapsed() {
-        dispatch(updateSettings(ComponentType.TASK_HEADER, 'isCollapsed'))
+        dispatch(updateSettings(ComponentType.TASK_HEADER, 'isCollapsed'));
+        const getSettings = localStorage.getItem('labelingSettings');
+        let settings = getSettings ? JSON.parse(getSettings) : {};
+        settings.task.isCollapsed = !settings.task.isCollapsed;
+        localStorage.setItem('labelingSettings', JSON.stringify(settings));
     }
 
     return (<div id="base-dom-task-header" className="relative bg-white p-4">

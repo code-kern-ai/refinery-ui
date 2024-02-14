@@ -1,5 +1,4 @@
 import { selectProjectId } from '@/src/reduxStore/states/project';
-import { WebSocketsService } from '@/src/services/base/web-sockets/WebSocketsService';
 import { CurrentPage } from '@/src/types/shared/general';
 import { useLazyQuery } from '@apollo/client';
 import { useCallback, useEffect, useState } from 'react';
@@ -9,7 +8,6 @@ import { getEmptyProjectStats, postProcessConfusionMatrix, postProcessLabelDistr
 import ProjectOverviewCards from './ProjectOverviewCards';
 import { ProjectStats } from '@/src/types/components/projects/projectId/project-overview/project-overview';
 import style from '@/src/styles/components/projects/projectId/project-overview.module.css';
-import { unsubscribeWSOnDestroy } from '@/src/services/base/web-sockets/web-sockets-helper';
 import { useRouter } from 'next/router';
 import { GET_CONFIDENCE_DISTRIBUTION, GET_CONFUSION_MATRIX, GET_GENERAL_PROJECT_STATS, GET_INTER_ANNOTATOR_BY_PROJECT_ID, GET_LABEL_DISTRIBUTION, IS_RATS_TOKENIZAION_STILL_RUNNING } from '@/src/services/gql/queries/project-overview';
 import { GET_ATTRIBUTES_BY_PROJECT_ID, GET_LABELING_TASKS_BY_PROJECT_ID } from '@/src/services/gql/queries/project-setting';
@@ -32,6 +30,7 @@ import { IconUsers } from '@tabler/icons-react';
 import { CommentType } from '@/src/types/shared/comments';
 import { REQUEST_COMMENTS } from '@/src/services/gql/queries/projects';
 import { CommentDataManager } from '@/src/util/classes/comments';
+import { useWebsocket } from '@/src/services/base/web-sockets/useWebsocket';
 
 const PROJECT_STATS_INITIAL_STATE: ProjectStats = getEmptyProjectStats();
 
@@ -67,7 +66,6 @@ export default function ProjectOverview() {
     const [refetchInterAnnotator] = useLazyQuery(GET_INTER_ANNOTATOR_BY_PROJECT_ID, { fetchPolicy: "no-cache" });
     const [refetchComments] = useLazyQuery(REQUEST_COMMENTS, { fetchPolicy: "no-cache" });
 
-    useEffect(unsubscribeWSOnDestroy(router, [CurrentPage.PROJECT_OVERVIEW]), []);
 
     useEffect(() => {
         if (!projectId) return;
@@ -75,11 +73,6 @@ export default function ProjectOverview() {
         refetchLabelingTasksAndProcess();
         refetchDataSlicesAndProcess();
         prepareInterAnnotator();
-        WebSocketsService.subscribeToNotification(CurrentPage.PROJECT_OVERVIEW, {
-            projectId: projectId,
-            whitelist: ['label_created', 'label_deleted', 'labeling_task_deleted', 'labeling_task_updated', 'labeling_task_created', 'weak_supervision_finished', 'data_slice_created', 'data_slice_updated', 'data_slice_deleted'],
-            func: handleWebsocketNotification
-        });
     }, [projectId]);
 
     useEffect(() => {
@@ -247,13 +240,11 @@ export default function ProjectOverview() {
         }
     }, [projectId]);
 
-    useEffect(() => {
-        if (!projectId) return;
-        WebSocketsService.updateFunctionPointer(projectId, CurrentPage.PROJECT_OVERVIEW, handleWebsocketNotification)
-    }, [handleWebsocketNotification, projectId]);
+
+    useWebsocket(CurrentPage.PROJECT_OVERVIEW, handleWebsocketNotification, projectId);
 
     return (<div>
-        {projectId != null && <div className="pt-4 px-4 pb-20 bg-gray-100 flex-1 flex flex-col min-h-full h-screen overflow-y-auto">
+        {projectId != null && <div className="pt-4 px-4 pb-10 bg-gray-100 flex-1 flex flex-col min-h-full h-[calc(100vh-4rem)] overflow-y-auto">
             <ProjectOverviewHeader />
             <ProjectOverviewCards projectStats={projectStats} />
             {graphsHaveValues ? (<div>

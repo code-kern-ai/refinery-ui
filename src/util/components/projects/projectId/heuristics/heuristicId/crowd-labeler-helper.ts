@@ -4,8 +4,9 @@ import { LabelingTask } from "@/src/types/components/projects/projectId/settings
 import { InformationSourceType, LabelSource } from "@/submodules/javascript-functions/enums/enums";
 import { jsonCopy } from "@/submodules/javascript-functions/general";
 import { getColorStruct, mapInformationSourceStats } from "../shared-helper";
+import { buildFullLink } from "@/src/util/shared/link-parser-helper";
 
-export function postProcessCrowdLabeler(heuristic: Heuristic, labelingTasks: LabelingTask[]): Heuristic {
+export function postProcessCrowdLabeler(heuristic: Heuristic, labelingTasks: LabelingTask[], link?: any): Heuristic {
     const prepareHeuristic = jsonCopy(heuristic);
     prepareHeuristic.labelSource = LabelSource.INFORMATION_SOURCE;
     prepareHeuristic.informationSourceType = InformationSourceType[heuristic['type']];
@@ -13,11 +14,18 @@ export function postProcessCrowdLabeler(heuristic: Heuristic, labelingTasks: Lab
     prepareHeuristic.stats = mapInformationSourceStats(heuristic['sourceStatistics']['edges']);
     const labelingTask = labelingTasks.find(a => a.id == heuristic.labelingTaskId);
     prepareHeuristic.labelingTaskName = labelingTask.name;
+    prepareHeuristic.labels = labelingTask.labels;
     prepareHeuristic.stats.forEach((stat) => {
         stat.color = getColorStruct(stat.color);
     });
     prepareHeuristic.labels = labelingTask.labels;
     prepareHeuristic.crowdLabelerSettings = parseCrowdSettings(prepareHeuristic.sourceCode);
+    if (link) {
+        prepareHeuristic.crowdLabelerSettings.accessLink = link.link;
+        prepareHeuristic.crowdLabelerSettings.accessLinkParsed = buildFullLink(link.link);
+        prepareHeuristic.crowdLabelerSettings.accessLinkLocked = link.isLocked;
+        prepareHeuristic.crowdLabelerSettings.isHTTPS = window.location.protocol == 'https:';
+    }
     return prepareHeuristic;
 }
 

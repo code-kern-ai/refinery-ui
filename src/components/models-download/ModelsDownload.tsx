@@ -11,13 +11,12 @@ import LoadingIcon from "../shared/loading/LoadingIcon";
 import { openModal, setModalStates } from "@/src/reduxStore/states/modal";
 import { ModalEnum } from "@/src/types/shared/modal";
 import { selectIsManaged } from "@/src/reduxStore/states/general";
-import { WebSocketsService } from "@/src/services/base/web-sockets/WebSocketsService";
 import { CurrentPage } from "@/src/types/shared/general";
 import { timer } from "rxjs";
-import { unsubscribeWSOnDestroy } from "@/src/services/base/web-sockets/web-sockets-helper";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
 import AddModelDownloadModal from "./AddModelDownloadModal";
 import DeleteModelDownloadModal from "./DeleteModelDownloadModal";
+import { useWebsocket } from "@/src/services/base/web-sockets/useWebsocket";
 
 export default function ModelsDownload() {
     const router = useRouter();
@@ -28,14 +27,8 @@ export default function ModelsDownload() {
 
     const [refetchModelsDownload] = useLazyQuery(GET_MODEL_PROVIDER_INFO, { fetchPolicy: 'network-only', nextFetchPolicy: 'cache-first' });
 
-    useEffect(unsubscribeWSOnDestroy(router, [CurrentPage.MODELS_DOWNLOAD]), []);
-
     useEffect(() => {
         refetchModels();
-        WebSocketsService.subscribeToNotification(CurrentPage.MODELS_DOWNLOAD, {
-            whitelist: ['model_provider_download'],
-            func: handleWebsocketNotification
-        });
     }, []);
 
     function refetchModels() {
@@ -53,11 +46,9 @@ export default function ModelsDownload() {
         }
     }, []);
 
-    useEffect(() => {
-        WebSocketsService.updateFunctionPointer(null, CurrentPage.MODELS_DOWNLOAD, handleWebsocketNotification)
-    }, [handleWebsocketNotification]);
+    useWebsocket(CurrentPage.MODELS_DOWNLOAD, handleWebsocketNotification);
 
-    return (<div className="p-4 bg-gray-100 h-screen overflow-y-auto flex-1 flex flex-col">
+    return (<div className="p-4 bg-gray-100 flex-1 flex flex-col h-[calc(100vh-4rem)] overflow-y-auto">
         <div className="flex flex-row items-center">
             <button onClick={() => router.back()} className="text-green-800 text-sm font-medium">
                 <IconArrowLeft className="h-5 w-5 inline-block text-green-800" />
@@ -157,15 +148,15 @@ export default function ModelsDownload() {
                     </table>
                 </div>
             </div>
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-2 mt-1 align-top">
-                <div>
-                    <button onClick={() => dispatch(openModal(ModalEnum.ADD_MODEL_DOWNLOAD))}
-                        disabled={!isManaged}
-                        className={`mr-1 inline-flex items-center px-2.5 py-2 border border-gray-300 shadow-sm text-xs font-semibold rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none cursor-pointer disabled:cursor-not-allowed disabled:opacity-50`}>
-                        <IconPlus className="h-4 w-4 mr-1" />
-                        Add new model
-                    </button>
-                </div>
+        </div>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-2 mt-1 align-top">
+            <div>
+                <button onClick={() => dispatch(openModal(ModalEnum.ADD_MODEL_DOWNLOAD))}
+                    disabled={!isManaged}
+                    className={`mr-1 inline-flex items-center px-2.5 py-2 border border-gray-300 shadow-sm text-xs font-semibold rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none cursor-pointer disabled:cursor-not-allowed disabled:opacity-50`}>
+                    <IconPlus className="h-4 w-4 mr-1" />
+                    Add new model
+                </button>
             </div>
         </div>
         <AddModelDownloadModal />

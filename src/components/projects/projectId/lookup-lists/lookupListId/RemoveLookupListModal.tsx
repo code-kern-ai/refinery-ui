@@ -1,7 +1,6 @@
 import Modal from "@/src/components/shared/modal/Modal";
 import { selectProjectId } from "@/src/reduxStore/states/project";
 import { PASTE_TERM } from "@/src/services/gql/mutations/lookup-lists";
-import { LookupListOperationsProps } from "@/src/types/components/projects/projectId/lookup-lists";
 import { ModalButton, ModalEnum } from "@/src/types/shared/modal";
 import { useMutation } from "@apollo/client";
 import { useRouter } from "next/router";
@@ -10,7 +9,7 @@ import { useSelector } from "react-redux";
 
 const ABORT_BUTTON = { buttonCaption: 'Remove', useButton: true, disabled: false };
 
-export default function RemoveLookupListModal(props: LookupListOperationsProps) {
+export default function RemoveLookupListModal() {
     const router = useRouter();
     const projectId = useSelector(selectProjectId);
 
@@ -24,10 +23,6 @@ export default function RemoveLookupListModal(props: LookupListOperationsProps) 
             setInputArea("");
         });
     }, [inputArea, inputSplit]);
-
-    useEffect(() => {
-        props.refetchWS();
-    }, [removeLookupList]);
 
     useEffect(() => {
         setAbortButton({ ...ABORT_BUTTON, emitFunction: removeLookupList });

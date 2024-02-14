@@ -225,7 +225,7 @@ export default function PageIntegration(props: PageIntegrationProps) {
                     <IconChevronsDown className={`w-6 h-6 ${config.integratorCodeOpen ? style.rotateTransform : null}`} />
                 </div>
                 <div className={`flex flex-col mt-1 items-center ${config.integratorCodeOpen ? '' : 'hidden'}`}>
-                    <div className="overflow-y-auto" style={{ maxHeight: '15rem', maxWidth: '35rem' }}>
+                    <div className="overflow-y-auto w-full" style={{ maxHeight: '15rem' }}>
                         <pre className={`${style.editorPre}`} style={{ overflowX: config.integratorCodeOpen ? 'auto' : 'hidden' }}>{config.preparedCode}</pre>
                     </div>
                 </div>

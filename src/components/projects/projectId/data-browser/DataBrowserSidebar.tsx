@@ -1,7 +1,7 @@
 import { selectAllUsers } from '@/src/reduxStore/states/general';
 import { setModalStates } from '@/src/reduxStore/states/modal';
 import { selectActiveSlice, selectAdditionalData, selectDataSlicesAll, setActiveDataSlice, setActiveSearchParams, setFullSearchStore, setIsTextHighlightNeeded, setRecordsInDisplay, setTextHighlight, updateAdditionalDataState } from '@/src/reduxStore/states/pages/data-browser';
-import { selectProjectId, setActiveProject } from '@/src/reduxStore/states/project';
+import { selectProjectId } from '@/src/reduxStore/states/project';
 import style from '@/src/styles/components/projects/projectId/data-browser.module.css';
 import { DataSlice } from '@/src/types/components/projects/projectId/data-browser/data-browser';
 import { ModalEnum } from '@/src/types/shared/modal';

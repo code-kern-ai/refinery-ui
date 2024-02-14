@@ -3,7 +3,7 @@ import DataSchema from "./DataSchema";
 import { selectProject, setActiveProject } from "@/src/reduxStore/states/project";
 import { useLazyQuery } from "@apollo/client";
 import { CHECK_COMPOSITE_KEY, GET_ATTRIBUTES_BY_PROJECT_ID, GET_EMBEDDING_SCHEMA_BY_PROJECT_ID, GET_GATES_INTEGRATION_DATA, GET_LABELING_TASKS_BY_PROJECT_ID, GET_PROJECT_TOKENIZATION, GET_QUEUED_TASKS, GET_RECOMMENDED_ENCODERS_FOR_EMBEDDINGS } from "@/src/services/gql/queries/project-setting";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { selectAttributes, selectEmbeddings, selectGatesIntegration, setAllAttributes, setAllEmbeddings, setAllRecommendedEncodersDict, setGatesIntegration, setLabelingTasksAll, setRecommendedEncodersAll } from "@/src/reduxStore/states/pages/settings";
 import { timer } from "rxjs";
 import { IconCamera, IconCheck, IconDots, IconPlus, IconUpload } from "@tabler/icons-react";
@@ -13,7 +13,6 @@ import { useRouter } from "next/router";
 import { setUploadFileType } from "@/src/reduxStore/states/upload";
 import { UploadFileType } from "@/src/types/shared/upload";
 import { GET_PROJECT_BY_ID, REQUEST_COMMENTS } from "@/src/services/gql/queries/projects";
-import { WebSocketsService } from "@/src/services/base/web-sockets/WebSocketsService";
 import { CurrentPage } from "@/src/types/shared/general";
 import { Tooltip } from "@nextui-org/react";
 import ProjectMetaData from "./ProjectMetaData";
@@ -24,7 +23,6 @@ import { postProcessingEmbeddings, postProcessingRecommendedEncoders } from "@/s
 import { AttributeState } from "@/src/types/components/projects/projectId/settings/data-schema";
 import { RecommendedEncoder } from "@/src/types/components/projects/projectId/settings/embeddings";
 import LabelingTasks from "./labeling-tasks/LabelingTasks";
-import { unsubscribeWSOnDestroy } from "@/src/services/base/web-sockets/web-sockets-helper";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
 import Export from "@/src/components/shared/export/Export";
 import { CommentType } from "@/src/types/shared/comments";
@@ -33,6 +31,7 @@ import CreateNewAttributeModal from "./CreateNewAttributeModal";
 import ProjectSnapshotExportModal from "./ProjectSnapshotExportModal";
 import { postProcessLabelingTasks, postProcessLabelingTasksSchema } from "@/src/util/components/projects/projectId/settings/labeling-tasks-helper";
 import { getEmptyBricksIntegratorConfig } from "@/src/util/shared/bricks-integrator-helper";
+import { useWebsocket } from "@/src/services/base/web-sockets/useWebsocket";
 
 export default function ProjectSettings() {
     const dispatch = useDispatch();
@@ -62,9 +61,6 @@ export default function ProjectSettings() {
     const [refetchGatesIntegrationData] = useLazyQuery(GET_GATES_INTEGRATION_DATA, { fetchPolicy: 'no-cache' });
     const [refetchLabelingTasksByProjectId] = useLazyQuery(GET_LABELING_TASKS_BY_PROJECT_ID, { fetchPolicy: "network-only" });
 
-
-    useEffect(unsubscribeWSOnDestroy(router, [CurrentPage.PROJECT_SETTINGS]), []);
-
     useEffect(() => {
         if (!project) return;
         refetchAttributesAndPostProcess();
@@ -72,7 +68,7 @@ export default function ProjectSettings() {
         refetchAndSetGatesIntegrationData();
         refetchLabelingTasksAndProcess();
         checkProjectTokenization();
-        refetchWS();
+
         const openModal = JSON.parse(localStorage.getItem("openModal"));
         if (openModal) {
             dispatch(setModalStates(ModalEnum.ADD_LABELING_TASK, { open: true }));
@@ -85,7 +81,8 @@ export default function ProjectSettings() {
         if (!project) return;
         requestPKeyCheck();
         refetchRecommendedEncodersForEmbeddings({ variables: { projectId: project.id } }).then((encoder) => {
-            dispatch(setRecommendedEncodersAll(encoder['data']['recommendedEncoders'] as RecommendedEncoder[]));
+            const encoderSuggestions = encoder['data']['recommendedEncoders'].filter(e => e.tokenizers.includes("all") || e.tokenizers.includes(project.tokenizer));
+            dispatch(setRecommendedEncodersAll(encoderSuggestions as RecommendedEncoder[]));
             dispatch(setAllRecommendedEncodersDict(postProcessingRecommendedEncoders(attributes, project.tokenizer, encoder['data']['recommendedEncoders'])));
         });
     }, [attributes]);
@@ -163,7 +160,7 @@ export default function ProjectSettings() {
         return attributes.some(a => a.state == AttributeState.RUNNING) || checkIfAcUploadedRecords;
     }
 
-    function handleWebsocketNotification(msgParts: string[]) {
+    const handleWebsocketNotification = useCallback((msgParts: string[]) => {
         if (msgParts[1] == 'embedding') {
             if (!embeddings) return;
             if (["queued", "dequeued"].includes(msgParts[2])) {
@@ -173,28 +170,41 @@ export default function ProjectSettings() {
             }
             if (msgParts[4] == "INITIALIZING" || msgParts[4] == "WAITING") {
                 timer(100).subscribe(() => refetchEmbeddingsAndPostProcess());
+                return;
             }
-            for (let e of embeddings) {
-                if (e.id == msgParts[2]) {
-                    if (msgParts[3] == "state") {
-                        if (msgParts[4] == "FINISHED") {
-                            refetchEmbeddingsAndPostProcess();
-                        }
-                        else {
-                            const embedding = { ...e };
-                            embedding.state = msgParts[4];
-                            dispatch(setAllEmbeddings(embeddings.map((e) => e.id == embedding.id ? embedding : e)));
+
+            refetchEmbeddings({ variables: { projectId: project.id } }).then((res) => {
+                refetchQueuedTasks({ variables: { projectId: project.id, taskType: "EMBEDDING" } }).then((queuedTasks) => {
+                    const queuedEmbeddings = queuedTasks.data['queuedTasks'].map((task) => {
+                        const copy = { ...task };
+                        copy.taskInfo = JSON.parse(task.taskInfo);
+                        return copy;
+                    })
+                    const newEMbeddings = postProcessingEmbeddings(res.data['projectByProjectId']['embeddings']['edges'].map((e) => e['node']), queuedEmbeddings);
+                    for (let e of newEMbeddings) {
+                        if (e.id == msgParts[2]) {
+                            if (msgParts[3] == "state") {
+                                if (msgParts[4] == "FINISHED") {
+                                    refetchEmbeddingsAndPostProcess();
+                                }
+                                else {
+                                    const embedding = { ...e };
+                                    embedding.state = msgParts[4];
+                                    dispatch(setAllEmbeddings(newEMbeddings.map((e) => e.id == embedding.id ? embedding : e)));
+                                }
+                            }
+                            else if (msgParts[3] == "progress") {
+                                const embedding = { ...e };
+                                embedding.progress = Number(msgParts[4]);
+                                dispatch(setAllEmbeddings(newEMbeddings.map((e) => e.id == embedding.id ? embedding : e)));
+                            }
+                            else console.log("unknown websocket message in part 3:" + msgParts[3], "full message:", msgParts)
+                            return;
                         }
                     }
-                    else if (msgParts[3] == "progress") {
-                        const embedding = { ...e };
-                        embedding.progress = Number(msgParts[4]);
-                        dispatch(setAllEmbeddings(embeddings.map((e) => e.id == embedding.id ? embedding : e)));
-                    }
-                    else console.log("unknown websocket message in part 3:" + msgParts[3], "full message:", msgParts)
-                    return;
-                }
-            }
+                });
+            });
+
         } else if (msgParts[1] == 'tokenization' && msgParts[2] == 'docbin') {
             if (msgParts[3] == 'progress') {
                 setTokenizationProgress(Number(msgParts[4]));
@@ -243,22 +253,15 @@ export default function ProjectSettings() {
             if (gatesIntegrationData?.missingEmbeddings?.includes(msgParts[2])) {
                 refetchAndSetGatesIntegrationData();
             }
+            refetchEmbeddingsAndPostProcess();
         } else if (['label_created', 'label_deleted', 'labeling_task_deleted', 'labeling_task_updated', 'labeling_task_created'].includes(msgParts[1])) {
             refetchLabelingTasksAndProcess();
         }
-    }
+    }, [project, embeddings, gatesIntegrationData, isAcRunning, tokenizationProgress]);
 
     function refetchAndSetGatesIntegrationData() {
         refetchGatesIntegrationData({ variables: { projectId: project.id } }).then((res) => {
             dispatch(setGatesIntegration(res.data['getGatesIntegrationData']));
-        });
-    }
-
-    function refetchWS() {
-        WebSocketsService.subscribeToNotification(CurrentPage.PROJECT_SETTINGS, {
-            projectId: project.id,
-            whitelist: ['project_update', 'tokenization', 'calculate_attribute', 'embedding', 'attributes_updated', 'gates_integration', 'information_source_deleted', 'information_source_updated', 'embedding_deleted', 'embedding_updated', 'upload_embedding_payload', 'label_created', 'label_deleted', 'labeling_task_deleted', 'labeling_task_updated', 'labeling_task_created'],
-            func: handleWebsocketNotification
         });
     }
 
@@ -268,6 +271,8 @@ export default function ProjectSettings() {
             dispatch(setLabelingTasksAll(postProcessLabelingTasksSchema(labelingTasks)));
         });
     }
+
+    useWebsocket(CurrentPage.PROJECT_SETTINGS, handleWebsocketNotification, project?.id);
 
     return (<div>
         {project != null && <div className="p-4 bg-gray-100 pb-10 h-screen overflow-y-auto flex-1 flex flex-col">
@@ -327,9 +332,9 @@ export default function ProjectSettings() {
                 </div>
             </div>
 
-            <Embeddings refetchWS={refetchWS} />
+            <Embeddings  />
             <LabelingTasks />
-            {isManaged && <GatesIntegration refetchWS={refetchWS} />}
+            {isManaged && <GatesIntegration />}
             <ProjectMetaData />
             <CreateNewAttributeModal />
             <ProjectSnapshotExportModal ></ProjectSnapshotExportModal>

@@ -132,7 +132,7 @@ export default function DataBrowserRecords(props: DataBrowserRecordsProps) {
             </div>
         </div>}
         {!(activeSlice?.static) && <div className="flex flex-row flex-wrap mt-4">
-            {activeSearchParams.map((searchParam, i) => (<Fragment key={i}>
+            {!additionalData.loading && activeSearchParams.map((searchParam, i) => (<Fragment key={i}>
                 {searchParam.splittedText.map((searchText, j) => (<div key={j} className="flex flex-row items-center gap-y-1">
                     <div className="whitespace-pre-line break-all rounded-full items-center py-0.5 px-2.5 text-sm font-medium border border-green-700 bg-green-100 text-green-700 grid grid-cols-2 mr-2"
                         style={{ gridTemplateColumns: 'auto max-content' }}>
@@ -149,7 +149,7 @@ export default function DataBrowserRecords(props: DataBrowserRecordsProps) {
         </div>}
 
         <div className="mb-3 mt-4 grow overflow-y-auto" style={{ maxHeight: 'calc(100vh - 160px)' }} onScroll={(e: any) => refetchMoreRecords(e)}>
-            {additionalData.loading && <LoadingIcon size='md' />}
+            {additionalData.loading && <div className="h-full flex justify-center items-center"><LoadingIcon size="lg" /></div>}
             {extendedRecords && attributes && !additionalData.loading && <div className="mr-2">
                 {extendedRecords.fullCount == 0 && <div>Your search criteria didn&apos;t match any record.</div>}
                 <RecordList

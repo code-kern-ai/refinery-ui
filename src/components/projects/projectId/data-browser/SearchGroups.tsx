@@ -10,7 +10,7 @@ import { SearchOperator } from "@/src/types/components/projects/projectId/data-b
 import { checkDecimalPatterns, getAttributeType, getSearchOperatorTooltip } from "@/src/util/components/projects/projectId/data-browser/search-operators-helper";
 import { DataTypeEnum } from "@/src/types/shared/general";
 import { selectAllUsers, selectUser } from "@/src/reduxStore/states/general";
-import { selectActiveSearchParams, selectActiveSlice, selectAdditionalData, selectConfiguration, selectDataSlicesAll, selectFullSearchStore, selectIsTextHighlightNeeded, selectRecords, selectSearchGroupsStore, selectTextHighlight, selectUniqueValuesDict, selectUsersCount, setActiveDataSlice, setActiveSearchParams, setFullSearchStore, setIsTextHighlightNeeded, setRecordsInDisplay, setSearchGroupsStore, setSearchRecordsExtended, setTextHighlight, updateAdditionalDataState } from "@/src/reduxStore/states/pages/data-browser";
+import { selectActiveSearchParams, selectActiveSlice, selectAdditionalData, selectConfiguration, selectDataSlicesAll, selectFullSearchStore, selectIsTextHighlightNeeded, selectRecords, selectSearchGroupsStore, selectSimilaritySearch, selectTextHighlight, selectUniqueValuesDict, selectUsersCount, setActiveDataSlice, setActiveSearchParams, setFullSearchStore, setIsTextHighlightNeeded, setRecordsInDisplay, setSearchGroupsStore, setSearchRecordsExtended, setTextHighlight, updateAdditionalDataState } from "@/src/reduxStore/states/pages/data-browser";
 import { Tooltip } from "@nextui-org/react";
 import { setModalStates } from "@/src/reduxStore/states/modal";
 import { ModalEnum } from "@/src/types/shared/modal";
@@ -56,6 +56,7 @@ export default function SearchGroups() {
     const fullSearchStore = useSelector(selectFullSearchStore);
     const searchGroupsStore = useSelector(selectSearchGroupsStore);
     const recordList = useSelector(selectRecords).recordList;
+    const recordsInDisplay = useSelector(selectSimilaritySearch).recordsInDisplay;
 
     const [searchGroupsOrder, setSearchGroupsOrder] = useState<{ order: number; key: string }[]>([]);
     const [attributesSortOrder, setAttributeSortOrder] = useState([]);
@@ -75,10 +76,10 @@ export default function SearchGroups() {
     const [refetchStaticSliceCurrentCount] = useLazyQuery(GET_STATIC_DATA_SLICE_CURRENT_COUNT, { fetchPolicy: "network-only" });
 
     useEffect(() => {
-        if (!projectId || !users || !labelingTasks || !attributesSortOrder) return;
+        if (!projectId || !users || !labelingTasks || !attributesSortOrder || !usersMap) return;
         prepareSearchGroups();
         refetchCurrentWeakSupervisionAndProcess();
-    }, [projectId, users, labelingTasks, attributesSortOrder]);
+    }, [projectId, users, labelingTasks, attributesSortOrder, usersMap]);
 
     useEffect(() => {
         if (!attributes) return;
@@ -126,10 +127,16 @@ export default function SearchGroups() {
             }).then((res) => {
                 dispatch(setSearchRecordsExtended(postProcessRecordsExtended(res.data['recordsByStaticSlice'], labelingTasks)));
                 refetchStaticSliceCurrentCount({ variables: { projectId: projectId, sliceId: activeSlice.id } }).then((res) => {
+                    if (!res.data) {
+                        dispatch(updateAdditionalDataState('staticDataSliceCurrentCount', null));
+                        return;
+
+                    }
                     dispatch(updateAdditionalDataState('staticDataSliceCurrentCount', res['data']['staticDataSlicesCurrentCount']));
                 });
             });
         } else {
+            dispatch(updateAdditionalDataState('loading', true));
             const refetchTimer = setTimeout(() => {
                 refetchExtendedRecord({
                     variables: {
@@ -139,6 +146,7 @@ export default function SearchGroups() {
                     }
                 }).then((res) => {
                     dispatch(setSearchRecordsExtended(postProcessRecordsExtended(res.data['searchRecordsExtended'], labelingTasks)));
+                    dispatch(updateAdditionalDataState('loading', false));
                 });
             }, 500);
             return () => clearTimeout(refetchTimer);
@@ -158,6 +166,7 @@ export default function SearchGroups() {
         if (!findDataSLice || additionalData.canUpdateDynamicSlice) return;
         const activeParams = updateSearchParameters(Object.values(JSON.parse(findDataSLice.filterRaw)), attributes, configuration.separator, jsonCopy(fullSearchStore), searchGroupsStore, labelingTasks);
         dispatch(setActiveSearchParams(activeParams));
+        dispatch(setRecordsInDisplay(false));
         dispatch(updateAdditionalDataState('canUpdateDynamicSlice', true));
     }, [activeSlice, labelingTasks, searchGroupsStore, dataSlices]);
 
@@ -172,7 +181,14 @@ export default function SearchGroups() {
             searchGroupsCopy[key].isOpen = false;
         });
         prepareNewFormGroups(activeSlice.filterRaw, usersMap, searchGroupsCopy);
-    }, [activeSlice, usersMap]);
+    }, [activeSlice, usersMap, recordsInDisplay]);
+
+    useEffect(() => {
+        if (recordsInDisplay) {
+            dispatch(updateAdditionalDataState('clearFullSearch', true));
+            dispatch(setActiveSearchParams([]));
+        }
+    }, [recordsInDisplay]);
 
     useEffect(() => {
         if (!additionalData.clearFullSearch) return;
@@ -218,7 +234,7 @@ export default function SearchGroups() {
         fullSearchCopy[SearchGroup.USER_FILTER] = { groupElements: [] };
         searchGroupsCopy[SearchGroup.USER_FILTER] = searchGroupUserFilter;
         for (let baseItem of getBasicGroupItems(searchGroupUserFilter.group, searchGroupUserFilter.key)) {
-            fullSearchCopy[SearchGroup.USER_FILTER].groupElements = userCreateSearchGroup(baseItem, ++GLOBAL_SEARCH_GROUP_COUNT, users);
+            fullSearchCopy[SearchGroup.USER_FILTER].groupElements = userCreateSearchGroup(baseItem, ++GLOBAL_SEARCH_GROUP_COUNT, usersMap);
         }
 
         // Labeling Tasks
@@ -329,7 +345,11 @@ export default function SearchGroups() {
         const tooltipsCopy = [];
         const fullSearchCopy = fullSearchCopyParam ? jsonCopy(fullSearchCopyParam) : jsonCopy(fullSearchStore);
         const formControlsIdx = fullSearchCopy[SearchGroup.ATTRIBUTES].groupElements[i];
-        const attributeType = getAttributeType(attributesSortOrder, value);
+        let attributeType = getAttributeType(attributesSortOrder, value);
+        if (!attributeType && value) {
+            const attributeName = formControlsIdx['name'];
+            attributeType = getAttributeType(attributesSortOrder, attributeName);
+        }
         if (attributeType !== DataTypeEnum.BOOLEAN) {
             for (let t of Object.values(SearchOperator)) {
                 operatorsCopy.push({
@@ -388,12 +408,14 @@ export default function SearchGroups() {
         dispatch(setFullSearchStore(fullSearchCopy));
         getOperatorDropdownValues(i, value, fullSearchCopy);
         updateSearchParams(fullSearchCopy);
+        refreshTextHighlightNeeded();
+        setHighlightingToRecords();
     }
 
     function checkIfDecimals(event: any, i: number, key: string) {
         const formControlsIdx = fullSearchStore[key].groupElements[i];
         const attributeType = getAttributeType(attributesSortOrder, formControlsIdx['name']);
-        checkDecimalPatterns(attributeType, event, formControlsIdx['operator'], '-');
+        checkDecimalPatterns(attributeType, event, formControlsIdx['operator'], configuration.separator);
     }
 
     function updateLabelsFullSearch(label: any, groupKey: string, labelsKey: string) {
@@ -486,6 +508,7 @@ export default function SearchGroups() {
         const activeParams = updateSearchParameters(Object.values(fullSearchCopy), attributes, configuration.separator, jsonCopy(fullSearchCopy), searchGroupsStore);
         dispatch(setActiveSearchParams(activeParams));
         dispatch(updateAdditionalDataState('clearFullSearch', false));
+        dispatch(setRecordsInDisplay(false));
         if (activeSlice && activeSlice.static) dispatch(updateAdditionalDataState('displayOutdatedWarning', true));
     }
 
@@ -519,9 +542,16 @@ export default function SearchGroups() {
             const attributeKey = attributesSortOrder[i].key;
             for (let searchElement of activeSearchParams) {
                 if (searchElement.values.group == SearchGroup.ATTRIBUTES) {
-                    if (searchElement.values.name == 'Any Attribute' || searchElement.values.name == attributesDict[attributeKey].name) {
-                        if (searchElement.values.negate || searchElement.values.searchValue == '') isTextHighlightNeededCopy[attributeKey] = false;
-                        else isTextHighlightNeededCopy[attributeKey] = true;
+                    if (getRegexFromFilter(searchElement) == null) {
+                        isTextHighlightNeededCopy[attributeKey] = false;
+
+                    } else {
+                        if (searchElement.values.name == 'Any Attribute' || searchElement.values.name == attributesDict[attributeKey].name) {
+                            if ((searchElement.values.negate || searchElement.values.searchValue == '')) {
+                                isTextHighlightNeededCopy[attributeKey] = false;
+                            }
+                            else isTextHighlightNeededCopy[attributeKey] = true;
+                        }
                     }
                 } else {
                     isTextHighlightNeededCopy[attributeKey] = false;
@@ -559,7 +589,7 @@ export default function SearchGroups() {
                     </div>
                 </div>
             </div>
-            <div className={`${style.transitionAll} ml-4`} style={{ maxHeight: searchGroupsStore[group.key].isOpen ? '500px' : '0px', display: searchGroupsStore[group.key].isOpen ? 'block' : 'none' }}>
+            <div className={`${style.transitionAll} ml-4`} style={{ maxHeight: searchGroupsStore[group.key].isOpen ? '1200px' : '0px', display: searchGroupsStore[group.key].isOpen ? 'block' : 'none' }}>
                 <form>
                     {searchGroupsStore[group.key].group == SearchGroup.ATTRIBUTES && <div className="contents mx-2">
                         {fullSearchStore[group.key].groupElements.map((groupItem, index) => (<div key={groupItem.id}>
@@ -578,11 +608,11 @@ export default function SearchGroups() {
                                     <div className="flex-grow flex flex-row flex-wrap gap-1">
                                         <div style={{ width: groupItem.operator != '' ? '49%' : '100%' }}>
                                             <Dropdown2 options={attributesSortOrder} buttonName={groupItem.name} backgroundColors={backgroundColors}
-                                                selectedOption={(option: any) => selectValueDropdown(option.name, index, 'name', group.key)} fontClass="font-dmMono" buttonClasses="whitespace-nowrap" />
+                                                selectedOption={(option: any) => selectValueDropdown(option.name, index, 'name', group.key)} fontClass="font-dmMono" buttonClasses="text-xs" />
                                         </div>
                                         <div style={{ width: '49%' }}>
                                             {groupItem.operator != '' &&
-                                                <Dropdown2 options={operatorsDropdown} buttonName={groupItem.operator} tooltipsArray={tooltipsArray} tooltipArrayPlacement="right"
+                                                <Dropdown2 options={operatorsDropdown} buttonName={groupItem.operator} tooltipsArray={tooltipsArray} tooltipArrayPlacement="right" buttonClasses="text-xs"
                                                     selectedOption={(option: any) => selectValueDropdown(option.value, index, 'operator', group.key)} fontClass="font-dmMono" />
                                             }
                                         </div>
@@ -606,7 +636,7 @@ export default function SearchGroups() {
                                         </div>
                                     )}
 
-                                    {(groupItem['operator'] == SearchOperator.BEGINS_WITH || groupItem['operator'] == SearchOperator.ENDS_WITH || groupItem['operator'] == SearchOperator.CONTAINS || groupItem['operator'] == SearchOperator.IN_WC) && (saveAttributeType != DataTypeEnum.INTEGER && saveAttributeType != DataTypeEnum.FLOAT) &&
+                                    {(groupItem['operator'] == "BEGINS WITH" || groupItem['operator'] == "ENDS WITH" || groupItem['operator'] == SearchOperator.CONTAINS || groupItem['operator'] == "IN WC") && (saveAttributeType != DataTypeEnum.INTEGER && saveAttributeType != DataTypeEnum.FLOAT) &&
                                         <label htmlFor="caseSensitive" className="text-xs text-gray-500 cursor-pointer flex items-center pb-2">
                                             <input name="caseSensitive" className="mr-1 cursor-pointer" id="caseSensitive"
                                                 onChange={(e: any) => selectValueDropdown(e.target.checked, index, 'caseSensitive', group.key)} type="checkbox" />Case sensitive</label>}
@@ -632,8 +662,7 @@ export default function SearchGroups() {
                                             </div>
                                             <span className="text-sm truncate">{groupItem['displayName']}</span>
                                         </span>
-
-                                        {usersMap && usersMap[groupItem['id']] && <div><Tooltip content={groupItem['dataTip']} placement="left" color="invert">
+                                        {usersMap && usersMap[groupItem['id']] && <div><Tooltip content={groupItem['dataTip']} placement="right" color="invert">
                                             <IconInfoCircle className="ml-1 text-gray-700 h-5 w-5" onClick={() => dispatch(setModalStates(ModalEnum.USER_INFO, { open: true, userInfo: usersMap[groupItem['id']] }))} />
                                         </Tooltip></div>}
                                     </div>

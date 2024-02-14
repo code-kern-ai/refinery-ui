@@ -32,7 +32,6 @@ export type TermsProps = {
 }
 
 export type LookupListOperationsProps = {
-    refetchWS: () => void;
     refetchTerms?: () => void;
 }
 

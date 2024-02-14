@@ -21,6 +21,7 @@ export type Embedding = {
     dimension?: number;
     count?: number;
     attributeId?: string;
+    custom?: boolean;
 };
 
 export enum EmbeddingType {
@@ -58,10 +59,6 @@ export type SuggestionsProps = {
     selectedOption: (value: any) => void;
     name?: string;
     tooltip?: string;
-}
-
-export type EmbeddingProps = {
-    refetchWS(): void;
 }
 
 export type EmbeddingCreationEnabledProps = {

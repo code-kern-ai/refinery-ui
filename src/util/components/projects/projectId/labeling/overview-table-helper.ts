@@ -16,7 +16,7 @@ export function rlasHaveHeuristicData(rlas): boolean {
     return false;
 }
 
-export function buildOverviewTableDisplayArray(rlas, user: User): TableDisplayData[] {
+export function buildOverviewTableDisplayArray(rlas, user: User, userDisplayRole): TableDisplayData[] {
     if (!rlas) return [];
     let result = Array(rlas.length);
     let i = 0;
@@ -31,7 +31,7 @@ export function buildOverviewTableDisplayArray(rlas, user: User): TableDisplayDa
             taskId: e.labelingTaskLabel.labelingTask.id,
             createdBy: getCreatedByName(e),
             label: getLabelData(e),
-            canBeDeleted: canDeleteRla(e, user),
+            canBeDeleted: canDeleteRla(e, user, userDisplayRole),
             rla: e,
             user: e.user,
             shouldHighlightOn: getShouldHighlightOn(e),
@@ -139,8 +139,9 @@ export function getLabelData(e: any): any {
     }
 }
 
-export function canDeleteRla(rla, user): boolean {
+export function canDeleteRla(rla, user, userDisplayRole): boolean {
     if (rla.sourceType != LabelSource.MANUAL) return false;
+    if (user.role != userDisplayRole && userDisplayRole != UserRole.ENGINEER) return false;
     if (rla.isGoldStar) return true;
     return rla.createdBy == user.id;
 }
@@ -157,13 +158,13 @@ export function getEmptyHeaderHover() {
     }
 }
 
-export function filterRlaDataForUser(rlaData: any[], user: User, displayUserId: string, rlaKey?: string,): any[] {
-    if (rlaKey) return rlaData.filter(entry => filterRlaCondition(entry[rlaKey], user, displayUserId));
-    return rlaData.filter(rla => filterRlaCondition(rla, user, displayUserId));
+export function filterRlaDataForUser(rlaData: any[], user: User, displayUserId: string, userDisplayRole: UserRole, rlaKey?: string,): any[] {
+    if (rlaKey) return rlaData.filter(entry => filterRlaCondition(entry[rlaKey], user, displayUserId, userDisplayRole));
+    return rlaData.filter(rla => filterRlaCondition(rla, user, displayUserId, userDisplayRole));
 }
 
-export function filterRlaCondition(rla, user, displayUserId): boolean {
-    if (user.role != UserRole.ENGINEER) return rla.sourceType == LabelSource.MANUAL && rla.createdBy == displayUserId;
+export function filterRlaCondition(rla, user, displayUserId, userDisplayRole): boolean {
+    if (user.role != UserRole.ENGINEER || userDisplayRole != UserRole.ENGINEER) return rla.sourceType == LabelSource.MANUAL && rla.createdBy == displayUserId;
     if (rla.sourceType != LabelSource.MANUAL) return true;
     if (displayUserId == ALL_USERS_USER_ID) return true;
     if (!!rla.isGoldStar) return displayUserId == GOLD_STAR_USER_ID;
@@ -199,5 +200,6 @@ export function filterRlaLabelCondition(rla: any, settings, projectId): boolean 
 }
 
 export function getShouldHighlightOn(rla: any): string[] {
-    return [rla.id, rla.labelingTaskLabel.id, rla.sourceType, rla.labelingTaskLabel.labelingTask.id, rla.user.id]
+    const createdBy = rla.sourceType == LabelSource.INFORMATION_SOURCE ? rla.informationSource.name : rla.user.firstName + ' ' + rla.user.lastName;
+    return [rla.id, rla.labelingTaskLabel.id, rla.sourceType, rla.labelingTaskLabel.labelingTask.id, createdBy]
 }

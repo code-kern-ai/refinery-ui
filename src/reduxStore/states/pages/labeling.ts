@@ -6,6 +6,13 @@ import { Record } from "@/src/types/components/projects/projectId/settings/attri
 import { LabelingSuiteManager } from "@/src/util/classes/labeling/manager";
 import { RecordManager } from "@/src/util/classes/labeling/record-manager";
 import { ComponentType, LabelingSuiteSettings } from "@/src/types/components/projects/projectId/labeling/settings";
+import { UserRole } from "@/src/types/shared/sidebar";
+
+export type CurrentSelection = {
+    attributeId: string,
+    tokenStart: number,
+    tokenEnd: number
+}
 
 
 type LabelingSuiteState = {
@@ -25,7 +32,9 @@ type LabelingSuiteState = {
     settings: LabelingSuiteSettings;
     tmpHighlightIds: string[];
     displayUserId: string;
+    displayUserRole: UserRole;
     hoverGroupDict: { [key: string]: any };
+    activeTokenSelection: CurrentSelection;
 }
 
 function getInitState(): LabelingSuiteState {
@@ -46,7 +55,9 @@ function getInitState(): LabelingSuiteState {
         settings: getDefaultLabelingSuiteSettings(),
         tmpHighlightIds: [],
         displayUserId: null,
+        displayUserRole: null,
         hoverGroupDict: {},
+        activeTokenSelection: null,
     };
 }
 
@@ -77,7 +88,7 @@ const labelingSlice = createSlice({
                             state.recordRequests.record = postProcessRecordByRecordId(data);
                             break;
                         case 'rla':
-                            state.recordRequests.rla = postProcessRla(data);
+                            state.recordRequests.rla = data;
                             if (RecordManager.ignoreRlas(state.recordRequests.rla)) return;
                             LabelingSuiteManager.somethingLoading = false;
                             break;
@@ -192,7 +203,16 @@ const labelingSlice = createSlice({
         },
         initOnLabelPageDestruction(state) {
             for (const key in initialState) state[key] = initialState[key];
+        },
+        setDisplayUserRole(state, action: PayloadAction<UserRole>) {
+            if (action.payload) state.displayUserRole = action.payload;
+            else state.displayUserRole = null;
+        },
+        setActiveTokenSelection(state, action: PayloadAction<CurrentSelection>) {
+            if (action.payload) state.activeTokenSelection = action.payload;
+            else state.activeTokenSelection = null;
         }
+
     },
 });
 
@@ -209,9 +229,12 @@ export const selectSettings = (state: any) => state.labeling.settings;
 export const selectTmpHighlightIds = (state: any) => state.labeling.tmpHighlightIds;
 export const selectUserDisplayId = (state: any) => state.labeling.displayUserId;
 export const selectHoverGroupDict = (state: any) => state.labeling.hoverGroupDict;
+export const selectDisplayUserRole = (state: any) => state.labeling.displayUserRole;
+export const selectActiveTokenSelection = (state: any) => state.labeling.activeTokenSelection;
 
 export const { setAvailableLinks, setSelectedLink, updateRecordRequests, updateUsers, setSettings, updateSettings,
-    removeFromRlaById, tmpAddHighlightIds, setUserDisplayId, setHoverGroupDict, initOnLabelPageDestruction } = labelingSlice.actions;
+    removeFromRlaById, tmpAddHighlightIds, setUserDisplayId, setHoverGroupDict, initOnLabelPageDestruction, setDisplayUserRole,
+    setActiveTokenSelection } = labelingSlice.actions;
 
 export const labelingReducer = labelingSlice.reducer;
 

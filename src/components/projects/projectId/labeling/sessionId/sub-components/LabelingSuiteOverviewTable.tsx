@@ -1,6 +1,6 @@
 import { selectUser } from "@/src/reduxStore/states/general";
 import { openModal } from "@/src/reduxStore/states/modal";
-import { removeFromRlaById, selectHoverGroupDict, selectRecordRequestsRecord, selectRecordRequestsRla, selectSettings, selectTmpHighlightIds, selectUserDisplayId, setHoverGroupDict, tmpAddHighlightIds } from "@/src/reduxStore/states/pages/labeling";
+import { removeFromRlaById, selectDisplayUserRole, selectHoverGroupDict, selectRecordRequestsRecord, selectRecordRequestsRla, selectSettings, selectTmpHighlightIds, selectUserDisplayId, setHoverGroupDict, tmpAddHighlightIds } from "@/src/reduxStore/states/pages/labeling";
 import { selectProjectId } from "@/src/reduxStore/states/project";
 import { DELETE_RECORD_LABEL_ASSOCIATION_BY_ID } from "@/src/services/gql/mutations/labeling";
 import { HeaderHover, TableDisplayData } from "@/src/types/components/projects/projectId/labeling/overview-table";
@@ -37,6 +37,7 @@ export default function LabelingSuiteOverviewTable() {
     const displayUserId = useSelector(selectUserDisplayId);
     const hoverGroupsDict = useSelector(selectHoverGroupDict);
     const tmpHighlightIds = useSelector(selectTmpHighlightIds);
+    const userDisplayRole = useSelector(selectDisplayUserRole);
 
     const [dataToDisplay, setDataToDisplay] = useState<TableDisplayData[]>(null);
     const [fullData, setFullData] = useState<TableDisplayData[]>([]);
@@ -46,13 +47,14 @@ export default function LabelingSuiteOverviewTable() {
     const [deleteRlaByIdMut] = useMutation(DELETE_RECORD_LABEL_ASSOCIATION_BY_ID);
 
     useEffect(() => {
+        if (!user || !userDisplayRole) return;
         if (!rlas) {
             setDataToDisplay(null);
             setFullData(null);
         }
-        setFullData(buildOverviewTableDisplayArray(rlas, user));
+        setFullData(buildOverviewTableDisplayArray(rlas, user, userDisplayRole));
         setDataHasHeuristics(rlasHaveHeuristicData(rlas));
-    }, [rlas]);
+    }, [rlas, user, userDisplayRole]);
 
     useEffect(() => {
         if (!fullData) return;
@@ -69,7 +71,7 @@ export default function LabelingSuiteOverviewTable() {
     function rebuildDataForDisplay() {
         if (fullData) {
             let filtered = fullData;
-            filtered = filterRlaDataForUser(filtered, user, displayUserId, 'rla');
+            filtered = filterRlaDataForUser(filtered, user, displayUserId, userDisplayRole, 'rla');
             filtered = filterRlaDataForOverviewTable(filtered, 'rla');
             setDataToDisplay(filtered);
         } else {
@@ -165,16 +167,16 @@ export default function LabelingSuiteOverviewTable() {
                                             className={`whitespace-nowrap py-2 pl-4 pr-3 text-sm font-medium text-gray-500 sm:pl-6 ${(shouldHighLight(tmpHighlightIds, ovItem.shouldHighlightOn, headerHover.typeCollection) || hoverGroupsDict[ovItem.label.id] && hoverGroupsDict[ovItem.label.id][LabelingPageParts.OVERVIEW_TABLE] && hoverGroupsDict[ovItem.label.id][ovItem.sourceTypeKey]) ? settings.main.hoverGroupBackgroundColorClass : ''}`}> {ovItem.sourceType}</td>
                                         <td onMouseEnter={() => onMouseEnter([ovItem.taskId])} onMouseLeave={onMouseLeave}
                                             className={`whitespace-nowrap px-3 py-2 text-sm text-gray-500 ${(shouldHighLight(tmpHighlightIds, ovItem.shouldHighlightOn, headerHover.taskCollection) || hoverGroupsDict[ovItem.label.id] && hoverGroupsDict[ovItem.label.id][LabelingPageParts.OVERVIEW_TABLE] && hoverGroupsDict[ovItem.label.id][ovItem.sourceTypeKey]) ? settings.main.hoverGroupBackgroundColorClass : ''}`}>{ovItem.taskName}</td>
-                                        <td onMouseEnter={() => onMouseEnter([ovItem.user.id])} onMouseLeave={onMouseLeave}
+                                        <td onMouseEnter={() => onMouseEnter([ovItem.createdBy])} onMouseLeave={onMouseLeave}
                                             className={`whitespace-nowrap px-3 py-2 text-sm text-gray-500 ${(shouldHighLight(tmpHighlightIds, ovItem.shouldHighlightOn, headerHover.createdByCollection) || hoverGroupsDict[ovItem.label.id] && hoverGroupsDict[ovItem.label.id][LabelingPageParts.OVERVIEW_TABLE] && hoverGroupsDict[ovItem.label.id][ovItem.sourceTypeKey]) ? settings.main.hoverGroupBackgroundColorClass : ''}`}>{ovItem.createdBy}</td>
                                         <td onMouseEnter={() => onMouseEnter([ovItem.label.id], ovItem.label.id)} onMouseLeave={onMouseLeave}
                                             className={`whitespace-nowrap px-3 py-2 text-sm text-gray-500 ${(shouldHighLight(tmpHighlightIds, ovItem.shouldHighlightOn, headerHover.labelCollection) || hoverGroupsDict[ovItem.label.id] && hoverGroupsDict[ovItem.label.id][LabelingPageParts.OVERVIEW_TABLE] && hoverGroupsDict[ovItem.label.id][ovItem.sourceTypeKey]) ? settings.main.hoverGroupBackgroundColorClass : ''}`}>
                                             <span className={`inline-flex items-center px-2.5 py-0.5 rounded-md border text-sm font-medium cursor-default relative ${ovItem.label.backgroundColor} ${ovItem.label.textColor} ${ovItem.label.borderColor}`}>
                                                 {ovItem.label.name}
                                                 <div className={`label-overlay-base 
-                                                    ${((shouldHighLight(tmpHighlightIds, [LabelSourceHover.MANUAL, ovItem.rla.id, ovItem.rla.createdBy, ovItem.rla.labelingTaskLabel.labelingTask.id]) && ovItem.sourceTypeKey == LabelingPageParts.MANUAL) || (hoverGroupsDict[ovItem.label.id] && hoverGroupsDict[ovItem.label.id][LabelingPageParts.MANUAL] && ovItem.sourceTypeKey == LabelingPageParts.MANUAL)) && style.labelOverlayManual} 
-                                                    ${((shouldHighLight(tmpHighlightIds, [LabelSourceHover.WEAK_SUPERVISION, ovItem.rla.id, ovItem.rla.createdBy, ovItem.rla.labelingTaskLabel.labelingTask.id]) && ovItem.sourceTypeKey == LabelingPageParts.WEAK_SUPERVISION) || (hoverGroupsDict[ovItem.label.id] && hoverGroupsDict[ovItem.label.id][LabelingPageParts.WEAK_SUPERVISION] && ovItem.sourceTypeKey == LabelingPageParts.WEAK_SUPERVISION)) && style.labelOverlayWeakSupervision}
-                                                    ${((shouldHighLight(tmpHighlightIds, [LabelSourceHover.INFORMATION_SOURCE, ovItem.rla.id, ovItem.rla.createdBy, ovItem.rla.labelingTaskLabel.labelingTask.id]) && ovItem.sourceTypeKey == LabelingPageParts.INFORMATION_SOURCE) || (hoverGroupsDict[ovItem.label.id] && hoverGroupsDict[ovItem.label.id][LabelingPageParts.INFORMATION_SOURCE] && ovItem.sourceTypeKey == LabelingPageParts.INFORMATION_SOURCE)) && style.labelOverlayHeuristic}
+                                                    ${((shouldHighLight(tmpHighlightIds, [LabelSourceHover.MANUAL, ovItem.rla.id, ovItem.createdBy, ovItem.rla.labelingTaskLabel.labelingTask.id]) && ovItem.sourceTypeKey == LabelingPageParts.MANUAL) || (hoverGroupsDict[ovItem.label.id] && hoverGroupsDict[ovItem.label.id][LabelingPageParts.MANUAL] && ovItem.sourceTypeKey == LabelingPageParts.MANUAL)) && style.labelOverlayManual} 
+                                                    ${((shouldHighLight(tmpHighlightIds, [LabelSourceHover.WEAK_SUPERVISION, ovItem.rla.id, ovItem.createdBy, ovItem.rla.labelingTaskLabel.labelingTask.id]) && ovItem.sourceTypeKey == LabelingPageParts.WEAK_SUPERVISION) || (hoverGroupsDict[ovItem.label.id] && hoverGroupsDict[ovItem.label.id][LabelingPageParts.WEAK_SUPERVISION] && ovItem.sourceTypeKey == LabelingPageParts.WEAK_SUPERVISION)) && style.labelOverlayWeakSupervision}
+                                                    ${((shouldHighLight(tmpHighlightIds, [LabelSourceHover.INFORMATION_SOURCE, ovItem.rla.id, ovItem.createdBy, ovItem.rla.labelingTaskLabel.labelingTask.id]) && ovItem.sourceTypeKey == LabelingPageParts.INFORMATION_SOURCE) || (hoverGroupsDict[ovItem.label.id] && hoverGroupsDict[ovItem.label.id][LabelingPageParts.INFORMATION_SOURCE] && ovItem.sourceTypeKey == LabelingPageParts.INFORMATION_SOURCE)) && style.labelOverlayHeuristic}
                                                     `}></div>
                                             </span>
                                             {ovItem.label.value && <div className="ml-2">{ovItem.label.value}</div>}
@@ -201,7 +203,7 @@ export default function LabelingSuiteOverviewTable() {
             </div>
             <LabelingInfoTableModal dataToDisplay={dataToDisplay} />
         </>) : (<>
-            {!settings.showHeuristics && dataHasHeuristics && user?.role == UserRole.ENGINEER && <p className="text-gray-500 p-5">Heuristics display is currently disabled</p>}
+            {!settings.showHeuristics && dataHasHeuristics && user?.role == UserRole.ENGINEER && userDisplayRole == UserRole.ENGINEER && <p className="text-gray-500 p-5">Heuristics display is currently disabled</p>}
         </>)
         }
     </>)

@@ -8,6 +8,7 @@ import { User } from "@/src/types/shared/general";
 import { Attribute } from "@/src/types/components/projects/projectId/settings/data-schema";
 import { UserRole } from "@/src/types/shared/sidebar";
 import { UserManager } from "@/src/util/classes/labeling/user-manager";
+import { CurrentSelection } from "@/src/reduxStore/states/pages/labeling";
 
 export const FULL_RECORD_ID = "FULL_RECORD";
 export const SWIM_LANE_SIZE_PX = 12;
@@ -30,7 +31,7 @@ export function getTaskTypeOrder(source: LabelingTaskTaskType): number {
     }
 }
 
-export function buildLabelingRlaData(rlas: any, user: User, showHeuristicConfidence: boolean): any[] {
+export function buildLabelingRlaData(rlas: any, user: User, showHeuristicConfidence: boolean, userDisplayRole: UserRole): any[] {
     if (!rlas) return [];
     let result = Array(rlas.length);
     let i = 0;
@@ -48,7 +49,7 @@ export function buildLabelingRlaData(rlas: any, user: User, showHeuristicConfide
             dataTip: getLabelDataTip(e),
             labelDisplay: getLabelForDisplay(e, showHeuristicConfidence),
             icon: getIcon(e),
-            canBeDeleted: canDeleteRla(e, user),
+            canBeDeleted: canDeleteRla(e, user, userDisplayRole),
             rla: e
         };
     }
@@ -140,20 +141,20 @@ export function findOrderPosItem(orderPosElement: any, compareItem: any): boolea
     return true;
 }
 
-export function collectSelectionData(attributeId: string, tokenLookup: TokenLookup, attributes: Attribute[], recordRequests: any): any {
-    let startIdx = -1;
-    let endIdx = -1;
-    for (const token of tokenLookup[attributeId].token) {
-        if (token.selected) {
-            if (startIdx == -1) startIdx = token.idx;
-        } else {
-            if (startIdx != -1) {
-                endIdx = token.idx - 1;
-                break;
-            }
-        }
-    }
-    if (endIdx == -1) endIdx = tokenLookup[attributeId].token.length - 1;
+export function collectSelectionData(attributeId: string, currentSelection: CurrentSelection, attributes: Attribute[], recordRequests: any): any {
+    let startIdx = currentSelection.tokenStart;
+    let endIdx = currentSelection.tokenEnd;
+    // for (const token of tokenLookup[attributeId].token) {
+    //     if (token.selected) {
+    //         if (startIdx == -1) startIdx = token.idx;
+    //     } else {
+    //         if (startIdx != -1) {
+    //             endIdx = token.idx - 1;
+    //             break;
+    //         }
+    //     }
+    // }
+    // if (endIdx == -1) endIdx = tokenLookup[attributeId].token.length - 1;
     const tokenData = getTokenData(attributeId, attributes, recordRequests);
     if (!tokenData) return null;
     if (startIdx == -1 || endIdx == -1) return null;
@@ -174,11 +175,10 @@ export function getTokenData(attributeId: string, attributes: Attribute[], recor
 }
 
 
-export function getGoldInfoForTask(task: any, user: User, fullRlaData: any, displayUserId: string): { can: boolean, is: boolean } {
-    if (user.role != UserRole.ENGINEER) return { can: false, is: false };
+export function getGoldInfoForTask(task: any, user: User, fullRlaData: any, displayUserId: string, userDisplayRole: UserRole): { can: boolean, is: boolean } {
+    if (user && user.role != UserRole.ENGINEER && userDisplayRole != UserRole.ENGINEER) return { can: false, is: false };
     if (displayUserId == ALL_USERS_USER_ID) return { can: false, is: false };
     if (task.task.taskType == LabelingTaskTaskType.NOT_USEABLE) return { can: false, is: false };
-    // const userId = UserManager.displayUserId;
     const taskRlaData = fullRlaData.filter(x => x.sourceTypeKey == LabelSource.MANUAL && x.taskId == task.task.id);
     const goldRlas = taskRlaData.filter(x => x.rla.isGoldStar);
     if (displayUserId == GOLD_STAR_USER_ID) return { can: goldRlas.length > 0, is: goldRlas.length > 0 };
@@ -223,7 +223,7 @@ function rlaIsEqual(rlaA: any, rlaB: any): boolean {
 
 export function parseSelectionData(): any[] {
     let selection = window.getSelection();
-    if (selection.type != 'Range') return [false];
+    if (selection.type !== 'Range' && selection.type !== 'Caret') return [false];
 
     const startElement = getSelectionElement(selection, true);
     const endElement = getSelectionElement(selection, false);
@@ -255,4 +255,12 @@ function getSelectionElement(selection: Selection, start: boolean, maxSteps: num
         steps++;
     }
     return null;
+}
+
+
+export function checkCanEditLabels(user: User, userDisplayRole: UserRole, displayUserId: string): boolean {
+    if (user.role != userDisplayRole) return false;
+    return (displayUserId == GOLD_STAR_USER_ID && userDisplayRole == UserRole.ENGINEER)
+        || (displayUserId == ALL_USERS_USER_ID && userDisplayRole == UserRole.ENGINEER)
+        || displayUserId == user.id;
 }

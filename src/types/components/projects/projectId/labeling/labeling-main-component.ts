@@ -45,3 +45,8 @@ export enum LabelingPageParts {
     WEAK_SUPERVISION = 'WEAK_SUPERVISION',
     INFORMATION_SOURCE = 'INFORMATION_SOURCE',
 }
+
+export type NavigationBarTopProps = {
+    absoluteWarning: boolean;
+    lockedLink: boolean;
+}

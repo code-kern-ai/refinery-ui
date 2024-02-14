@@ -10,7 +10,7 @@ export default function UserInfoModal() {
         <h1 className="text-lg text-gray-900 mb-2 text-center">Info</h1>
         {modalUserInfo && modalUserInfo.userInfo && <div className="flex-grow items-center flex flex-col mb-2">
             <div className="mb-4">{modalUserInfo.userInfo.mail}</div>
-            {!modalUserInfo.userInfo.countSum && <div className="text-gray-500 italic"> No labels associated with this user.</div>}
+            {!modalUserInfo.userInfo.countSum && <div className="text-gray-500 italic mb-2"> No labels associated with this user.</div>}
             <div className="grid gap-x-4 gap-y-2" style={{ gridTemplateColumns: 'max-content max-content' }}>
                 {modalUserInfo.userInfo.counts && modalUserInfo.userInfo.counts.map((pair) => (<div key={pair.source} className="contents">
                     <div className="text-base text-gray-900 font-semibold">{pair.source}</div>

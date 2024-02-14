@@ -101,7 +101,7 @@ export function parseFilterElements(searchElement: any, values: any, attributeTy
         for (let i = 1; i < values.length; i++) {
             const isNum = /^(\d+|(\d+\.\d*))$/.test(values[i].trim())
             if (!isNum) return null;
-            else values[i] = parseInt(values[i].trim());
+            else values[i] = parseFloat(values[i].trim());
         }
     } else {
         values.slice(1, values.length).forEach((value, index) => {
