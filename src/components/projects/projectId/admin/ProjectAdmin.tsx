@@ -13,10 +13,9 @@ import { useDispatch, useSelector } from "react-redux";
 import NewPersonalToken from "./NewPersonalTokenModal";
 import DeletePersonalToken from "./DeletePersonalTokenModal";
 import { CurrentPage } from "@/src/types/shared/general";
-import { WebSocketsService } from "@/src/services/base/web-sockets/WebSocketsService";
 import { useRouter } from "next/router";
 import { selectIsAdmin } from "@/src/reduxStore/states/general";
-import { unsubscribeWSOnDestroy } from "@/src/services/base/web-sockets/web-sockets-helper";
+import { useWebsocket } from "@/src/services/base/web-sockets/useWebsocket";
 
 export default function ProjectAdmin() {
     const router = useRouter();
@@ -29,8 +28,6 @@ export default function ProjectAdmin() {
 
     const [refetchAccessTokens] = useLazyQuery(GET_ALL_PERSONAL_ACCESS_TOKENS, { fetchPolicy: "network-only" });
 
-    useEffect(unsubscribeWSOnDestroy(router, [CurrentPage.ADMIN_PAGE]), []);
-
     useEffect(() => {
         if (!projectId) return;
         refetchAccessTokensAndProcess();
@@ -41,11 +38,6 @@ export default function ProjectAdmin() {
             return;
         }
 
-        WebSocketsService.subscribeToNotification(CurrentPage.ADMIN_PAGE, {
-            projectId: projectId,
-            whitelist: ['pat'],
-            func: handleWebsocketNotification
-        });
     }, [projectId]);
 
     function refetchAccessTokensAndProcess() {
@@ -64,10 +56,7 @@ export default function ProjectAdmin() {
         }
     }, [accessTokens]);
 
-    useEffect(() => {
-        if (!projectId) return;
-        WebSocketsService.updateFunctionPointer(projectId, CurrentPage.ADMIN_PAGE, handleWebsocketNotification)
-    }, [handleWebsocketNotification, projectId]);
+    useWebsocket(CurrentPage.ADMIN_PAGE, handleWebsocketNotification, projectId);
 
     return (<>
         {accessTokens && <div className="p-4 bg-gray-100 h-full overflow-y-auto flex-1 flex flex-col">

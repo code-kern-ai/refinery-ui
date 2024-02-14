@@ -16,13 +16,12 @@ import LookupListOperations from "./LookupListOperations";
 import DangerZone from "@/src/components/shared/danger-zone/DangerZone";
 import { DangerZoneEnum } from "@/src/types/shared/danger-zone";
 import Terms from "./Terms";
-import { WebSocketsService } from "@/src/services/base/web-sockets/WebSocketsService";
 import { CurrentPage } from "@/src/types/shared/general";
-import { unsubscribeWSOnDestroy } from "@/src/services/base/web-sockets/web-sockets-helper";
 import { selectAllUsers, setComments } from "@/src/reduxStore/states/general";
 import { REQUEST_COMMENTS } from "@/src/services/gql/queries/projects";
 import { CommentType } from "@/src/types/shared/comments";
 import { CommentDataManager } from "@/src/util/classes/comments";
+import { useWebsocket } from "@/src/services/base/web-sockets/useWebsocket";
 
 export default function LookupListsDetails() {
     const router = useRouter();
@@ -47,15 +46,12 @@ export default function LookupListsDetails() {
     const nameRef = useRef<HTMLInputElement>(null);
     const descriptionRef = useRef<HTMLInputElement>(null);
 
-    useEffect(unsubscribeWSOnDestroy(router, [CurrentPage.LOOKUP_LISTS_DETAILS, CurrentPage.COMMENTS, CurrentPage.LOOKUP_LISTS_OVERVIEW], projectId), []);
-
     useEffect(() => {
         if (!projectId) return;
         refetchCurrentLookupList({ variables: { projectId: projectId, knowledgeBaseId: router.query.lookupListId } }).then((res) => {
             setLookupList(postProcessLookupList(res.data['knowledgeBaseByKnowledgeBaseId']));
         });
         refetchTerms();
-        refetchWS();
     }, [projectId, router.query.lookupListId]);
 
     useEffect(() => {
@@ -82,14 +78,6 @@ export default function LookupListsDetails() {
             CommentDataManager.parseCommentData(JSON.parse(res.data['getAllComments']));
             CommentDataManager.parseToCurrentData(allUsers);
             dispatch(setComments(CommentDataManager.currentDataOrder));
-        });
-    }
-
-    function refetchWS() {
-        WebSocketsService.subscribeToNotification(CurrentPage.LOOKUP_LISTS_DETAILS, {
-            projectId: projectId,
-            whitelist: ['knowledge_base_updated', 'knowledge_base_deleted', 'knowledge_base_term_updated'],
-            func: handleWebsocketNotification
         });
     }
 
@@ -160,6 +148,8 @@ export default function LookupListsDetails() {
         }
     }
 
+    useWebsocket(CurrentPage.LOOKUP_LISTS_DETAILS, handleWebsocketNotification, projectId);
+
     return (projectId && <div className="bg-white p-4 pb-16 overflow-y-auto h-screen" onScroll={(e: any) => onScrollEvent(e)}>
         {lookupList && <div>
             <div className={`sticky z-40 h-12 ${isHeaderNormal ? 'top-1' : '-top-5'}`}>
@@ -221,7 +211,7 @@ export default function LookupListsDetails() {
                         className="font-dmMono px-4 py-2 rounded-none rounded-r-md border border-gray-300 text-gray-500 sm:text-sm bg-gray-100 cursor-pointer">
                         {lookupList.pythonVariable}</span>
                 </Tooltip>
-                <LookupListOperations refetchWS={refetchWS} refetchTerms={refetchTerms} />
+                <LookupListOperations  refetchTerms={refetchTerms}/>
             </div>
             <Terms terms={terms} finalSize={finalSize} refetchTerms={refetchTerms} setTerms={(terms: Term[]) => setTerms(terms)} />
             <DangerZone elementType={DangerZoneEnum.LOOKUP_LIST} name={lookupList.name} id={lookupList.id} />

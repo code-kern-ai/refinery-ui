@@ -8,7 +8,7 @@ import { useSelector } from "react-redux";
 
 const ACCEPT_BUTTON = { buttonCaption: 'Accept', useButton: true, disabled: false };
 
-export default function GatesIntegrationWarningModal(props: { refetchWS: () => void }) {
+export default function GatesIntegrationWarningModal() {
     const projectId = useSelector(selectProjectId);
 
     const [acceptButton, setAcceptButton] = useState<ModalButton>(ACCEPT_BUTTON);
@@ -16,9 +16,7 @@ export default function GatesIntegrationWarningModal(props: { refetchWS: () => v
     const [updateProjectsGatesMut] = useMutation(UPDATE_PROJECT_FOR_GATES);
 
     const updateProjectForGates = useCallback(() => {
-        updateProjectsGatesMut({ variables: { projectId: projectId } }).then(() => {
-            props.refetchWS();
-        });
+        updateProjectsGatesMut({ variables: { projectId: projectId } })
     }, []);
 
     useEffect(() => {

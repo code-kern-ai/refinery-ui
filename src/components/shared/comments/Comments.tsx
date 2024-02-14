@@ -3,23 +3,21 @@ import CommentsMainSection from "./CommentsMainSection";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
 import { IconNotes } from "@tabler/icons-react";
 import { useDispatch, useSelector } from "react-redux";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 import { selectAllUsers, setAllUsers, setComments } from "@/src/reduxStore/states/general";
-import { WebSocketsService } from "@/src/services/base/web-sockets/WebSocketsService";
-import { CurrentPage } from "@/src/types/shared/general";
+import { CurrentPage, CurrentPageSubKey } from "@/src/types/shared/general";
 import { CommentDataManager } from "@/src/util/classes/comments";
 import { CommentRequest, CommentType } from "@/src/types/shared/comments";
 import { commentRequestToKey } from "@/src/util/shared/comments-helper";
 import { REQUEST_COMMENTS } from "@/src/services/gql/queries/projects";
 import { useLazyQuery } from "@apollo/client";
 import { selectProjectId } from "@/src/reduxStore/states/project";
-import { unsubscribeWSOnDestroy } from "@/src/services/base/web-sockets/web-sockets-helper";
 import { useRouter } from "next/router";
 import { GET_ORGANIZATION_USERS } from "@/src/services/gql/queries/organizations";
+import { useWebsocket } from "@/src/services/base/web-sockets/useWebsocket";
 
 export default function Comments() {
     const dispatch = useDispatch();
-    const router = useRouter();
 
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const projectId = useSelector(selectProjectId);
@@ -27,38 +25,6 @@ export default function Comments() {
 
     const [refetchComments] = useLazyQuery(REQUEST_COMMENTS, { fetchPolicy: "no-cache" });
     const [refetchOrganizationUsers] = useLazyQuery(GET_ORGANIZATION_USERS, { fetchPolicy: 'no-cache' });
-
-    useEffect(unsubscribeWSOnDestroy(router, [CurrentPage.COMMENTS]), []);
-
-    const reInitWs = useCallback(() => {
-        WebSocketsService.subscribeToNotification(CurrentPage.COMMENTS, {
-            whitelist: ['comment_created', 'comment_updated', 'comment_deleted', 'project_created', 'project_deleted'],
-            func: handleWebsocketNotificationGlobal
-        });
-    }, []);
-
-    useEffect(() => {
-        router.events.on("routeChangeStart", reInitWs);
-        return () => {
-            router.events.off("routeChangeStart", reInitWs);
-        };
-    }, []);
-
-    useEffect(() => {
-        WebSocketsService.subscribeToNotification(CurrentPage.COMMENTS, {
-            whitelist: ['comment_created', 'comment_updated', 'comment_deleted', 'project_created', 'project_deleted'],
-            func: handleWebsocketNotificationGlobal
-        });
-    }, []);
-
-    useEffect(() => {
-        if (!projectId) return;
-        WebSocketsService.subscribeToNotification(CurrentPage.COMMENTS, {
-            projectId: projectId,
-            whitelist: ['label_created', 'label_deleted', 'attributes_updated', 'calculate_attribute', 'embedding_deleted', 'embedding', 'labeling_task_updated', 'labeling_task_deleted', 'labeling_task_created', 'data_slice_created', 'data_slice_updated', 'data_slice_deleted', 'information_source_created', 'information_source_updated', 'information_source_deleted', 'knowledge_base_created', 'knowledge_base_updated', 'knowledge_base_deleted'],
-            func: handleWebsocketNotification
-        });
-    }, [projectId]);
 
     const handleWebsocketNotificationGlobal = useCallback((msgParts: string[]) => {
         //messages will be GLOBAL:{messageType}:{projectId}:{additionalInfo}
@@ -129,18 +95,12 @@ export default function Comments() {
         }
     }, [projectId, allUsers]);
 
-    useEffect(() => {
-        WebSocketsService.updateFunctionPointer(null, CurrentPage.COMMENTS, handleWebsocketNotificationGlobal)
-    }, [handleWebsocketNotificationGlobal]);
-
-    useEffect(() => {
-        if (!projectId) return;
-        WebSocketsService.updateFunctionPointer(projectId, CurrentPage.COMMENTS, handleWebsocketNotification)
-    }, [handleWebsocketNotification, projectId]);
-
     const toggleModal = useCallback(() => {
         setSidebarOpen(prev => !prev);
     }, []);
+
+    useWebsocket(CurrentPage.COMMENTS, handleWebsocketNotificationGlobal, null, CurrentPageSubKey.GLOBAL);
+    useWebsocket(CurrentPage.COMMENTS, handleWebsocketNotification, projectId);
 
     return (<>
         <button className="cursor-pointer inline-block mr-6" onClick={toggleModal}>

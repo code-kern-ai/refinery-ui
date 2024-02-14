@@ -8,7 +8,7 @@ import { CREATE_EMBEDDING } from "@/src/services/gql/mutations/project-settings"
 import { GET_MODEL_PROVIDER_INFO } from "@/src/services/gql/queries/projects";
 import { ModelsDownloaded } from "@/src/types/components/models-downloaded/models-downloaded";
 import { Attribute } from "@/src/types/components/projects/projectId/settings/data-schema";
-import { EmbeddingPlatform, EmbeddingProps, EmbeddingType, PlatformType, SuggestionsProps } from "@/src/types/components/projects/projectId/settings/embeddings";
+import { EmbeddingPlatform, EmbeddingType, PlatformType, SuggestionsProps } from "@/src/types/components/projects/projectId/settings/embeddings";
 import { DataTypeEnum } from "@/src/types/shared/general";
 import { ModalButton, ModalEnum } from "@/src/types/shared/modal";
 import { postProcessingModelsDownload } from "@/src/util/components/models-downloaded/models-downloaded-helper";
@@ -23,7 +23,7 @@ import { useDispatch, useSelector } from "react-redux";
 
 const ACCEPT_BUTTON = { buttonCaption: 'Add embedding', disabled: false, useButton: true };
 
-export default function AddNewEmbeddingModal(props: EmbeddingProps) {
+export default function AddNewEmbeddingModal() {
     const dispatch = useDispatch();
 
     const useableEmbedableAttributes = useSelector(selectUseableEmbedableAttributes);
@@ -200,10 +200,6 @@ export default function AddNewEmbeddingModal(props: EmbeddingProps) {
         createEmbeddingMut({ variables: { projectId: projectId, attributeId: targetAttribute.id, config: JSON.stringify(config) } }).then((res) => { });
 
     }, [embeddingPlatforms, platform, granularity, model, apiToken, engine, url, version, termsAccepted, modalEmbedding]);
-
-    useEffect(() => {
-        props.refetchWS();
-    }, [addEmbedding]);
 
     const [acceptButton, setAcceptButton] = useState<ModalButton>(ACCEPT_BUTTON);
 

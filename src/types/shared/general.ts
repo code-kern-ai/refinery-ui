@@ -29,6 +29,15 @@ export enum CurrentPage {
     CONFIG = "CONFIG",
 }
 
+export enum CurrentPageSubKey {
+    EMBEDDINGS = 'EMBEDDING',
+    NONE = 'NONE',
+    BUTTONS_CONTAINER = 'BUTTONS_CONTAINER',
+    VARIABLE_SELECTION = 'VARIABLE_SELECTION',
+    SNAPSHOT_EXPORT = 'SNAPSHOT_EXPORT',
+    GLOBAL = 'GLOBAL'
+}
+
 export type User = {
     id: string;
     firstName: string;

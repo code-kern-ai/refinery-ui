@@ -1,7 +1,6 @@
 import { selectHeuristic, setActiveHeuristics } from "@/src/reduxStore/states/pages/heuristics";
 import { selectLabelingTasksAll, setLabelingTasksAll } from "@/src/reduxStore/states/pages/settings";
 import { selectProjectId } from "@/src/reduxStore/states/project";
-import { WebSocketsService } from "@/src/services/base/web-sockets/WebSocketsService";
 import { GET_ACCESS_LINK, GET_HEURISTICS_BY_ID } from "@/src/services/gql/queries/heuristics";
 import { GET_LABELING_TASKS_BY_PROJECT_ID } from "@/src/services/gql/queries/project-setting";
 import { CurrentPage } from "@/src/types/shared/general";
@@ -19,10 +18,11 @@ import CrowdLabelerSettings from "./CrowdLabelerSettings";
 import { postProcessCrowdLabeler } from "@/src/util/components/projects/projectId/heuristics/heuristicId/crowd-labeler-helper";
 import { selectDataSlicesAll, setDataSlices } from "@/src/reduxStore/states/pages/data-browser";
 import { DATA_SLICES } from "@/src/services/gql/queries/data-browser";
-import { unsubscribeWSOnDestroy } from "@/src/services/base/web-sockets/web-sockets-helper";
 import { REQUEST_COMMENTS } from "@/src/services/gql/queries/projects";
 import { CommentDataManager } from "@/src/util/classes/comments";
 import { CommentType } from "@/src/types/shared/comments";
+import { useWebsocket } from "@/src/services/base/web-sockets/useWebsocket";
+
 
 export default function CrowdLabeler() {
     const dispatch = useDispatch();
@@ -41,19 +41,12 @@ export default function CrowdLabeler() {
     const [refetchComments] = useLazyQuery(REQUEST_COMMENTS, { fetchPolicy: "no-cache" });
     const [refetchAccessLink] = useLazyQuery(GET_ACCESS_LINK, { fetchPolicy: 'network-only' });
 
-    useEffect(unsubscribeWSOnDestroy(router, [CurrentPage.HEURISTICS, CurrentPage.LABELING_FUNCTION, CurrentPage.ACTIVE_LEARNING, CurrentPage.CROWD_LABELER, CurrentPage.ZERO_SHOT, CurrentPage.COMMENTS], projectId), []);
-
     useEffect(() => {
         if (!projectId) return;
         if (!router.query.heuristicId) return;
         refetchLabelingTasksAndProcess();
         refetchDataSlicesMut({ variables: { projectId: projectId, sliceType: "STATIC_DEFAULT" } }).then((res) => {
             dispatch(setDataSlices(res.data.dataSlices));
-        });
-        WebSocketsService.subscribeToNotification(CurrentPage.CROWD_LABELER, {
-            projectId: projectId,
-            whitelist: ['labeling_task_updated', 'labeling_task_created', 'label_created', 'label_deleted', 'labeling_task_deleted', 'information_source_deleted', 'information_source_updated', 'model_callback_update_statistics'],
-            func: handleWebsocketNotification
         });
     }, [projectId, router.query.heuristicId]);
 
@@ -129,10 +122,7 @@ export default function CrowdLabeler() {
         }
     }, [currentHeuristic, projectId]);
 
-    useEffect(() => {
-        if (!projectId) return;
-        WebSocketsService.updateFunctionPointer(projectId, CurrentPage.CROWD_LABELER, handleWebsocketNotification)
-    }, [handleWebsocketNotification, projectId]);
+    useWebsocket(CurrentPage.CROWD_LABELER, handleWebsocketNotification, projectId);
 
     return (<HeuristicsLayout>
         {currentHeuristic && <div>

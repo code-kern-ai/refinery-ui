@@ -5,11 +5,10 @@ import { closeModal, selectModal } from "@/src/reduxStore/states/modal";
 import { selectEmbeddings } from "@/src/reduxStore/states/pages/settings";
 import { selectProjectId } from "@/src/reduxStore/states/project";
 import { downloadFile } from "@/src/services/base/s3-service";
-import { WebSocketsService } from "@/src/services/base/web-sockets/WebSocketsService";
-import { unsubscribeWSOnDestroy } from "@/src/services/base/web-sockets/web-sockets-helper";
+import { useWebsocket } from "@/src/services/base/web-sockets/useWebsocket";
 import { GET_PROJECT_SIZE, LAST_PROJECT_EXPORT_CREDENTIALS, PREPARE_PROJECT_EXPORT } from "@/src/services/gql/queries/project-setting";
 import { DownloadState, ProjectSize } from "@/src/types/components/projects/projectId/settings/project-export";
-import { CurrentPage } from "@/src/types/shared/general";
+import { CurrentPage, CurrentPageSubKey } from "@/src/types/shared/general";
 import { ModalEnum } from "@/src/types/shared/modal";
 import { postProcessingFormGroups } from "@/src/util/components/projects/projectId/settings/project-export-helper";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
@@ -42,18 +41,12 @@ export default function ProjectSnapshotExportModal() {
     const [refetchLastProjectExportCredentials] = useLazyQuery(LAST_PROJECT_EXPORT_CREDENTIALS, { fetchPolicy: "no-cache" });
     const [refetchProjectExport] = useLazyQuery(PREPARE_PROJECT_EXPORT, { fetchPolicy: "network-only" });
 
-    useEffect(unsubscribeWSOnDestroy(router, [CurrentPage.PROJECT_SETTINGS]), []);
-
     useEffect(() => {
         if (!modal || !modal.open) return;
         if (!projectId) return;
         requestProjectSize();
         requestProjectExportCredentials();
-        WebSocketsService.subscribeToNotification(CurrentPage.PROJECT_SETTINGS, {
-            projectId: projectId,
-            whitelist: ['project_export'],
-            func: handleWebsocketNotification
-        });
+       
     }, [modal, projectId]);
 
     useEffect(() => {
@@ -124,11 +117,7 @@ export default function ProjectSnapshotExportModal() {
         }
     }, []);
 
-    useEffect(() => {
-        if (!projectId) return;
-        WebSocketsService.updateFunctionPointer(projectId, CurrentPage.PROJECT_SETTINGS, handleWebsocketNotification)
-    }, [handleWebsocketNotification, projectId]);
-
+    useWebsocket(CurrentPage.PROJECT_SETTINGS, handleWebsocketNotification, projectId, CurrentPageSubKey.SNAPSHOT_EXPORT);
 
     return (<Modal modalName={ModalEnum.PROJECT_SNAPSHOT} hasOwnButtons={true}>
         <div className="text-lg leading-6 text-gray-900 font-medium text-center">

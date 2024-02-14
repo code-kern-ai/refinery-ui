@@ -3,9 +3,8 @@ import { selectIsManaged } from "@/src/reduxStore/states/general";
 import { openModal, setModalStates } from "@/src/reduxStore/states/modal";
 import { selectAttributes, selectEmbeddings } from "@/src/reduxStore/states/pages/settings";
 import { selectProjectId } from "@/src/reduxStore/states/project";
-import { WebSocketsService } from "@/src/services/base/web-sockets/WebSocketsService";
-import { Embedding, EmbeddingProps, EmbeddingState } from "@/src/types/components/projects/projectId/settings/embeddings";
-import { CurrentPage } from "@/src/types/shared/general";
+import { Embedding, EmbeddingState } from "@/src/types/components/projects/projectId/settings/embeddings";
+import { CurrentPage, CurrentPageSubKey } from "@/src/types/shared/general";
 import { ModalEnum } from "@/src/types/shared/modal";
 import { DATA_TYPES, getColorForDataType } from "@/src/util/components/projects/projectId/settings/data-schema-helper";
 import { Tooltip } from "@nextui-org/react";
@@ -13,14 +12,14 @@ import { IconAlertTriangleFilled, IconArrowAutofitDown, IconCircleCheckFilled, I
 import { useRouter } from "next/router";
 import { useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { unsubscribeWSOnDestroy } from "@/src/services/base/web-sockets/web-sockets-helper";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
 import AddNewEmbeddingModal from "./AddNewEmbeddingModal";
 import FilterAttributesModal from "./FilterAttributesModal";
 import DeleteEmbeddingModal from "./DeleteEmbeddingModal";
+import { useWebsocket } from "@/src/services/base/web-sockets/useWebsocket";
 
 
-export default function Embeddings(props: EmbeddingProps) {
+export default function Embeddings() {
     const dispatch = useDispatch();
     const router = useRouter();
 
@@ -37,11 +36,6 @@ export default function Embeddings(props: EmbeddingProps) {
     useEffect(() => {
         if (!projectId) return;
         setSomethingLoading(false);
-        WebSocketsService.subscribeToNotification(CurrentPage.PROJECT_SETTINGS, {
-            projectId: projectId,
-            whitelist: ['embedding_updated', 'upload_embedding_payload'],
-            func: handleWebsocketNotification
-        });
     }, []);
 
     function prepareAttributeDataByNames(attributesNames: string[]) {
@@ -73,11 +67,7 @@ export default function Embeddings(props: EmbeddingProps) {
         }
     }, []);
 
-    useEffect(() => {
-        if (!projectId) return;
-        WebSocketsService.updateFunctionPointer(projectId, CurrentPage.PROJECT_SETTINGS, handleWebsocketNotification)
-    }, [handleWebsocketNotification, projectId]);
-
+    useWebsocket(CurrentPage.PROJECT_SETTINGS, handleWebsocketNotification, projectId, CurrentPageSubKey.EMBEDDINGS);
     return (<div className="mt-8">
         <div className="text-lg leading-6 text-gray-900 font-medium inline-block w-full">
             <label>Embeddings</label>
@@ -196,6 +186,6 @@ export default function Embeddings(props: EmbeddingProps) {
             setFilterAttributesUpdate={(value) => setFilterAttributesUpdate(value)} />
 
         <DeleteEmbeddingModal />
-        <AddNewEmbeddingModal refetchWS={props.refetchWS} />
+        <AddNewEmbeddingModal  />
     </div>);
 }

@@ -26,9 +26,7 @@ import { SampleRecord } from "@/src/types/components/projects/projectId/heuristi
 import { getPythonFunctionRegExMatch } from "@/submodules/javascript-functions/python-functions-parser";
 import CalculationProgress from "./CalculationProgress";
 import { copyToClipboard } from "@/submodules/javascript-functions/general";
-import { WebSocketsService } from "@/src/services/base/web-sockets/WebSocketsService";
 import { CurrentPage } from "@/src/types/shared/general";
-import { unsubscribeWSOnDestroy } from "@/src/services/base/web-sockets/web-sockets-helper";
 import { selectAllUsers, setBricksIntegrator, setComments } from "@/src/reduxStore/states/general";
 import { REQUEST_COMMENTS } from "@/src/services/gql/queries/projects";
 import { CommentType } from "@/src/types/shared/comments";
@@ -40,7 +38,7 @@ import Dropdown2 from "@/submodules/react-components/components/Dropdown2";
 import { Attribute } from "@/src/types/components/projects/projectId/settings/data-schema";
 import LoadingIcon from "@/src/components/shared/loading/LoadingIcon";
 import { parseContainerLogsData } from "@/submodules/javascript-functions/logs-parser";
-import { getEmptyBricksIntegratorConfig } from "@/src/util/shared/bricks-integrator-helper";
+import { useWebsocket } from "@/src/services/base/web-sockets/useWebsocket";
 
 export default function LabelingFunction() {
     const dispatch = useDispatch();
@@ -67,17 +65,10 @@ export default function LabelingFunction() {
     const [refetchRunOn10] = useLazyQuery(GET_LABELING_FUNCTION_ON_10_RECORDS, { fetchPolicy: "no-cache" });
     const [refetchComments] = useLazyQuery(REQUEST_COMMENTS, { fetchPolicy: "no-cache" });
 
-    useEffect(unsubscribeWSOnDestroy(router, [CurrentPage.HEURISTICS, CurrentPage.LABELING_FUNCTION, CurrentPage.ACTIVE_LEARNING, CurrentPage.CROWD_LABELER, CurrentPage.ZERO_SHOT, CurrentPage.COMMENTS], projectId), []);
-
     useEffect(() => {
         if (!projectId) return;
         if (!router.query.heuristicId) return;
         refetchLabelingTasksAndProcess();
-        WebSocketsService.subscribeToNotification(CurrentPage.LABELING_FUNCTION, {
-            projectId: projectId,
-            whitelist: ['labeling_task_updated', 'labeling_task_created', 'label_created', 'label_deleted', 'labeling_task_deleted', 'information_source_deleted', 'information_source_updated', 'model_callback_update_statistics', 'payload_progress', 'payload_finished', 'payload_failed', 'payload_created', 'payload_update_statistics'],
-            func: handleWebsocketNotification
-        });
     }, [projectId, router.query.heuristicId]);
 
     useEffect(() => {
@@ -214,17 +205,14 @@ export default function LabelingFunction() {
         }
     }, [currentHeuristic]);
 
-    useEffect(() => {
-        if (!projectId) return;
-        WebSocketsService.updateFunctionPointer(projectId, CurrentPage.LABELING_FUNCTION, handleWebsocketNotification)
-    }, [handleWebsocketNotification, projectId]);
-
     function setValueToLabelingTask(value: string) {
         const labelingTask = labelingTasks.find(a => a.id == value);
         updateHeuristicMut({ variables: { projectId: projectId, informationSourceId: currentHeuristic.id, labelingTaskId: labelingTask.id } }).then((res) => {
             dispatch(updateHeuristicsState(currentHeuristic.id, { labelingTaskId: labelingTask.id, labelingTaskName: labelingTask.name, labels: labelingTask.labels }))
         });
     }
+
+    useWebsocket(CurrentPage.LABELING_FUNCTION, handleWebsocketNotification, projectId);
 
     return (
         <HeuristicsLayout updateSourceCode={(code: string) => updateSourceCodeToDisplay(code)}>

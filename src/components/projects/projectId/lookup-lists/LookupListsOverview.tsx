@@ -13,16 +13,15 @@ import { openModal, selectModal } from "@/src/reduxStore/states/modal";
 import { ModalEnum } from "@/src/types/shared/modal";
 import { useRouter } from "next/router";
 import { ACTIONS_DROPDOWN_OPTIONS } from "@/src/util/components/projects/projectId/lookup-lists-helper";
-import { WebSocketsService } from "@/src/services/base/web-sockets/WebSocketsService";
 import { CurrentPage } from "@/src/types/shared/general";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
-import { unsubscribeWSOnDestroy } from "@/src/services/base/web-sockets/web-sockets-helper";
 import { selectAllUsers, setComments } from "@/src/reduxStore/states/general";
 import { REQUEST_COMMENTS } from "@/src/services/gql/queries/projects";
 import { CommentDataManager } from "@/src/util/classes/comments";
 import { CommentType } from "@/src/types/shared/comments";
 import DeleteLookupListsModal from "./DeleteLookupListsModal";
 import Dropdown2 from "@/submodules/react-components/components/Dropdown2";
+import { useWebsocket } from "@/src/services/base/web-sockets/useWebsocket";
 
 
 export default function LookupListsOverview() {
@@ -42,12 +41,9 @@ export default function LookupListsOverview() {
     const [createLookupListMut] = useMutation(CREATE_LOOKUP_LIST);
     const [refetchComments] = useLazyQuery(REQUEST_COMMENTS, { fetchPolicy: "no-cache" });
 
-
     useEffect(() => {
         prepareSelectionList();
     }, [modalDelete]);
-
-    useEffect(unsubscribeWSOnDestroy(router, [CurrentPage.LOOKUP_LISTS_OVERVIEW, CurrentPage.LOOKUP_LISTS_DETAILS, CurrentPage.COMMENTS], projectId), []);
 
     useEffect(() => {
         if (!projectId || allUsers.length == 0) return;
@@ -71,11 +67,6 @@ export default function LookupListsOverview() {
         if (!projectId) return;
         refetchLookupLists({ variables: { projectId: projectId } }).then((res) => {
             dispatch(setAllLookupLists(res.data["knowledgeBasesByProjectId"]));
-        });
-        WebSocketsService.subscribeToNotification(CurrentPage.LOOKUP_LISTS_OVERVIEW, {
-            projectId: projectId,
-            whitelist: ['knowledge_base_updated', 'knowledge_base_deleted', 'knowledge_base_created'],
-            func: handleWebsocketNotification
         });
     }, [projectId]);
 
@@ -129,11 +120,7 @@ export default function LookupListsOverview() {
         }
     }, [projectId]);
 
-    useEffect(() => {
-        if (!projectId) return;
-        WebSocketsService.updateFunctionPointer(projectId, CurrentPage.LOOKUP_LISTS_OVERVIEW, handleWebsocketNotification)
-    }, [handleWebsocketNotification, projectId]);
-
+    useWebsocket(CurrentPage.LOOKUP_LISTS_OVERVIEW, handleWebsocketNotification, projectId);
 
     return (
         projectId ? (

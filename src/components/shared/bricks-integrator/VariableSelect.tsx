@@ -1,13 +1,12 @@
 import { selectBricksIntegratorAttributes, selectBricksIntegratorEmbeddings, selectBricksIntegratorLabels, selectBricksIntegratorLanguages, selectBricksIntegratorLookupLists, setAttributesBricksIntegrator, setEmbeddingsBricksIntegrator, setLabelingTasksBricksIntegrator, setLabelsBricksIntegrator, setLanguagesBricksIntegrator, setLookupListsBricksIntegrator } from "@/src/reduxStore/states/general";
 import { selectLabelingTasksAll } from "@/src/reduxStore/states/pages/settings";
 import { selectProjectId } from "@/src/reduxStore/states/project";
-import { WebSocketsService } from "@/src/services/base/web-sockets/WebSocketsService";
-import { unsubscribeWSOnDestroy } from "@/src/services/base/web-sockets/web-sockets-helper";
+import { useWebsocket } from "@/src/services/base/web-sockets/useWebsocket";
 import { LOOKUP_LISTS_BY_PROJECT_ID } from "@/src/services/gql/queries/lookup-lists";
 import { GET_ATTRIBUTES_BY_PROJECT_ID, GET_EMBEDDING_SCHEMA_BY_PROJECT_ID, GET_LABELING_TASKS_BY_PROJECT_ID } from "@/src/services/gql/queries/project-setting";
 import { LabelingTaskTarget, LabelingTaskTaskType } from "@/src/types/components/projects/projectId/settings/labeling-tasks";
 import { BricksVariableType, VariableSelectProps } from "@/src/types/shared/bricks-integrator";
-import { CurrentPage } from "@/src/types/shared/general";
+import { CurrentPage, CurrentPageSubKey } from "@/src/types/shared/general";
 import { BricksCodeParser } from "@/src/util/classes/bricks-integrator/bricks-integrator";
 import { BricksVariableComment, isCommentTrue } from "@/src/util/classes/bricks-integrator/comment-lookup";
 import { postProcessingAttributes } from "@/src/util/components/projects/projectId/settings/data-schema-helper";
@@ -16,13 +15,11 @@ import { getIsoCodes } from "@/src/util/shared/bricks-integrator-helper";
 import Dropdown2 from "@/submodules/react-components/components/Dropdown2";
 import { useLazyQuery } from "@apollo/client";
 import { IconPlus, IconTrash } from "@tabler/icons-react";
-import { useRouter } from "next/router";
 import { useCallback, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
 export default function VariableSelect(props: VariableSelectProps) {
     const dispatch = useDispatch();
-    const router = useRouter();
 
     const projectId = useSelector(selectProjectId);
     const attributes = useSelector(selectBricksIntegratorAttributes);
@@ -36,17 +33,6 @@ export default function VariableSelect(props: VariableSelectProps) {
     const [refetchEmbeddings] = useLazyQuery(GET_EMBEDDING_SCHEMA_BY_PROJECT_ID, { fetchPolicy: "no-cache" });
     const [refetchLookupLists] = useLazyQuery(LOOKUP_LISTS_BY_PROJECT_ID);
     const [refetchLabelingTasksByProjectId] = useLazyQuery(GET_LABELING_TASKS_BY_PROJECT_ID, { fetchPolicy: "network-only" });
-
-    useEffect(unsubscribeWSOnDestroy(router, [CurrentPage.BRICKS_INTEGRATOR]), []);
-
-    useEffect(() => {
-        if (!projectId) return;
-        WebSocketsService.subscribeToNotification(CurrentPage.BRICKS_INTEGRATOR, {
-            projectId: projectId,
-            whitelist: ['attributes_updated', 'calculate_attribute', 'label_created', 'label_deleted', 'labeling_task_deleted', 'labeling_task_updated', 'labeling_task_created', 'embedding', 'embedding_deleted', 'knowledge_base_deleted', 'knowledge_base_created'],
-            func: handleWebsocketNotification
-        });
-    }, [projectId]);
 
     useEffect(() => {
         if (!props.variable || !labelingTasks) return;
@@ -195,11 +181,7 @@ export default function VariableSelect(props: VariableSelectProps) {
         }
     }, [projectId]);
 
-    useEffect(() => {
-        if (!projectId) return;
-        WebSocketsService.updateFunctionPointer(projectId, CurrentPage.BRICKS_INTEGRATOR, handleWebsocketNotification)
-    }, [handleWebsocketNotification, projectId]);
-
+    useWebsocket(CurrentPage.BRICKS_INTEGRATOR, handleWebsocketNotification, projectId, CurrentPageSubKey.VARIABLE_SELECTION);
 
     return (<>
         {props.variable && props.variable.values.map((v, index) => (<div key={index} className="col-start-2 flex flex-row flex-nowrap items-center gap-x-2 my-2">

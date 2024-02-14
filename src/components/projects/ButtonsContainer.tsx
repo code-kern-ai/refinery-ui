@@ -9,9 +9,8 @@ import { useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux"
 import ModalUpload from "../shared/upload/ModalUpload";
 import SampleProjectsDropdown from "./SampleProjectsDropdown";
-import { WebSocketsService } from "@/src/services/base/web-sockets/WebSocketsService";
-import { CurrentPage } from "@/src/types/shared/general";
-import { unsubscribeWSOnDestroy } from "@/src/services/base/web-sockets/web-sockets-helper";
+import { CurrentPage, CurrentPageSubKey } from "@/src/types/shared/general";
+import { useWebsocket } from "@/src/services/base/web-sockets/useWebsocket";
 
 const BASE_OPTIONS = { reloadOnFinish: false, deleteProjectOnFail: true, closeModalOnClick: true, isModal: true, navigateToProject: true, showBadPasswordMsg: null };
 
@@ -24,15 +23,6 @@ export default function ButtonsContainer() {
     const [uploadOptions, setUploadOptions] = useState<UploadOptions>(BASE_OPTIONS);
     const [showBadPasswordMsg, setShowBadPasswordMsg] = useState(false);
 
-    useEffect(unsubscribeWSOnDestroy(router, [CurrentPage.PROJECTS]), []);
-
-    useEffect(() => {
-        WebSocketsService.subscribeToNotification(CurrentPage.PROJECTS, {
-            whitelist: ['bad_password'],
-            func: handleWebsocketNotification
-        });
-    }, []);
-
     useEffect(() => {
         setUploadOptions({ ...BASE_OPTIONS, showBadPasswordMsg: showBadPasswordMsg });
     }, [showBadPasswordMsg]);
@@ -43,9 +33,7 @@ export default function ButtonsContainer() {
         }
     }, []);
 
-    useEffect(() => {
-        WebSocketsService.updateFunctionPointer(null, CurrentPage.PROJECTS, handleWebsocketNotification)
-    }, [handleWebsocketNotification]);
+    useWebsocket(CurrentPage.PROJECTS, handleWebsocketNotification, null, CurrentPageSubKey.BUTTONS_CONTAINER);
 
     return (
         user && user.role === UserRole.ENGINEER ? (<div>

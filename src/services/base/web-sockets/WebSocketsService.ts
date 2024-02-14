@@ -1,13 +1,13 @@
 import { timer } from "rxjs";
 import { webSocket } from "rxjs/webSocket";
-import { NotificationSubscription } from "./web-sockets-helper";
-import { CurrentPage } from "@/src/types/shared/general";
+import { NotificationScope, NotificationSubscription, getStableWebsocketPageKey } from "./web-sockets-helper";
+import { CurrentPage, CurrentPageSubKey } from "@/src/types/shared/general";
 
 export class WebSocketsService {
 
     private static wsConnection: any;
     private static timeOutIteration: number = 0;
-    private static registeredNotificationListeners: Map<string, Map<CurrentPage, NotificationSubscription>> = new Map<string, Map<CurrentPage, NotificationSubscription>>()
+    private static registeredNotificationListeners: Map<NotificationScope, NotificationSubscription> = new Map<NotificationScope, NotificationSubscription>();
     private static connectionOpened: boolean = false;
 
     public static getConnectionOpened() {
@@ -18,19 +18,15 @@ export class WebSocketsService {
         WebSocketsService.connectionOpened = value;
     }
 
-    public static updateFunctionPointer(projectId: string, page: CurrentPage, funcPointer: (msg: string[]) => void) {
+    public static updateFunctionPointer(projectId: string, page: CurrentPage, funcPointer: (msg: string[]) => void, subKey?: CurrentPageSubKey) {
         if (!projectId) projectId = "GLOBAL";
-        if (!WebSocketsService.registeredNotificationListeners.has(projectId)) {
-            console.error("Nothing registered for projectId: " + projectId);
+        const scope = getStableWebsocketPageKey(projectId, page, subKey)
+
+        if (!WebSocketsService.registeredNotificationListeners.has(scope)) {
+            console.warn("Nothing registered for scope: " + scope);
             return;
         }
-        const innerMap = WebSocketsService.registeredNotificationListeners.get(projectId);
-        if (!innerMap.has(page)) {
-            console.error("Nothing registered for page: " + page);
-            return;
-        }
-        const params = innerMap.get(page);
-        params.func = funcPointer;
+        WebSocketsService.registeredNotificationListeners.get(scope).func = funcPointer;
     }
 
     public static initWsNotifications() {
@@ -97,31 +93,34 @@ export class WebSocketsService {
             msg.split("\n").forEach(element => WebSocketsService.handleWebsocketNotificationMessage(element));
             return;
         }
+        const scopes = WebSocketsService.registeredNotificationListeners.keys();
 
         const msgParts = msg.split(":");
-        const projectId = msgParts[0];
-        if (!WebSocketsService.registeredNotificationListeners.has(projectId)) return;
+        const projectId = msgParts[0];// uuid | "GLOBAL";
 
-        WebSocketsService.registeredNotificationListeners.get(projectId).forEach((params, key) => {
-            if (!params.whitelist || params.whitelist.includes(msgParts[1])) {
-                params.func.call(key, msgParts);
+        for (let scope of scopes) {
+            if (scope.projectId != projectId) continue;
+            const sub = WebSocketsService.registeredNotificationListeners.get(scope);
+            if (sub.whitelist.includes(msgParts[1])) {
+                sub.func(msgParts);
             }
-        });
-    }
-
-    public static subscribeToNotification(key: CurrentPage, params: NotificationSubscription) {
-        if (!params.projectId) params.projectId = "GLOBAL";
-        if (!WebSocketsService.registeredNotificationListeners.has(params.projectId)) {
-            WebSocketsService.registeredNotificationListeners.set(params.projectId, new Map<CurrentPage, NotificationSubscription>());
         }
-        const innerMap = WebSocketsService.registeredNotificationListeners.get(params.projectId);
-        innerMap.set(key, params);
     }
 
-    public static unsubscribeFromNotification(key: CurrentPage, projectId: string = null) {
-        if (!projectId) projectId = "GLOBAL"
-        if (WebSocketsService.registeredNotificationListeners.has(projectId)) {
-            WebSocketsService.registeredNotificationListeners.get(projectId).delete(key);
+    public static subscribeToNotification(key: CurrentPage, params: NotificationSubscription, subKey?: CurrentPageSubKey) {
+        if (!params.projectId) params.projectId = "GLOBAL";
+
+        const scope = getStableWebsocketPageKey(params.projectId, key, subKey)
+
+        WebSocketsService.registeredNotificationListeners.set(scope, params);
+    }
+
+    public static unsubscribeFromNotification(key: CurrentPage, projectId: string = null, subKey?: CurrentPageSubKey) {
+        if (!projectId) projectId = "GLOBAL";
+        const scope = getStableWebsocketPageKey(projectId, key, subKey)
+
+        if (WebSocketsService.registeredNotificationListeners.has(scope)) {
+            WebSocketsService.registeredNotificationListeners.delete(scope);
         }
     }
 }

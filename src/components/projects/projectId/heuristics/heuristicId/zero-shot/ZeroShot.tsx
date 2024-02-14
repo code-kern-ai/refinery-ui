@@ -10,7 +10,6 @@ import { GET_LABELING_TASKS_BY_PROJECT_ID, GET_ZERO_SHOT_RECOMMENDATIONS } from 
 import { postProcessLabelingTasks, postProcessLabelingTasksSchema } from "@/src/util/components/projects/projectId/settings/labeling-tasks-helper";
 import { selectLabelingTasksAll, selectTextAttributes, setLabelingTasksAll } from "@/src/reduxStore/states/pages/settings";
 import { CurrentPage } from "@/src/types/shared/general";
-import { WebSocketsService } from "@/src/services/base/web-sockets/WebSocketsService";
 import { CONFIDENCE_INTERVALS, parseToSettingsJson, postProcessZeroShot } from "@/src/util/components/projects/projectId/heuristics/heuristicId/zero-shot-helper";
 import { UPDATE_INFORMATION_SOURCE } from "@/src/services/gql/mutations/heuristics";
 import { LabelingTaskTarget } from "@/src/types/components/projects/projectId/settings/labeling-tasks";
@@ -27,11 +26,11 @@ import DangerZone from "@/src/components/shared/danger-zone/DangerZone";
 import { DangerZoneEnum } from "@/src/types/shared/danger-zone";
 import CalculationProgress from "./CalculationProgress";
 import { Status } from "@/src/types/shared/statuses";
-import { unsubscribeWSOnDestroy } from "@/src/services/base/web-sockets/web-sockets-helper";
 import { REQUEST_COMMENTS } from "@/src/services/gql/queries/projects";
 import { CommentType } from "@/src/types/shared/comments";
 import { CommentDataManager } from "@/src/util/classes/comments";
 import Dropdown2 from "@/submodules/react-components/components/Dropdown2";
+import { useWebsocket } from "@/src/services/base/web-sockets/useWebsocket";
 
 export default function ZeroShot() {
     const dispatch = useDispatch();
@@ -54,8 +53,6 @@ export default function ZeroShot() {
     const [refetchZeroShotRecommendations] = useLazyQuery(GET_ZERO_SHOT_RECOMMENDATIONS, { fetchPolicy: 'network-only', nextFetchPolicy: 'cache-first' });
     const [refetchComments] = useLazyQuery(REQUEST_COMMENTS, { fetchPolicy: "no-cache" });
 
-    useEffect(unsubscribeWSOnDestroy(router, [CurrentPage.HEURISTICS, CurrentPage.LABELING_FUNCTION, CurrentPage.ACTIVE_LEARNING, CurrentPage.CROWD_LABELER, CurrentPage.ZERO_SHOT, CurrentPage.COMMENTS], projectId), []);
-
     useEffect(() => {
         setConfidences(CONFIDENCE_INTERVALS.map((conf) => {
             return { value: conf, label: conf + '%' };
@@ -68,11 +65,6 @@ export default function ZeroShot() {
         refetchLabelingTasksAndProcess();
         refetchZeroShotRecommendations({ variables: { projectId: projectId } }).then((res) => {
             setModels(JSON.parse(res.data['zeroShotRecommendations']));
-        });
-        WebSocketsService.subscribeToNotification(CurrentPage.ZERO_SHOT, {
-            projectId: projectId,
-            whitelist: ['labeling_task_updated', 'labeling_task_created', 'label_created', 'label_deleted', 'labeling_task_deleted', 'information_source_deleted', 'information_source_updated', 'payload_update_statistics', 'payload_finished', 'payload_failed', 'payload_created', 'zero-shot', 'zero_shot_download'],
-            func: handleWebsocketNotification
         });
     }, [projectId, router.query.heuristicId]);
 
@@ -180,10 +172,7 @@ export default function ZeroShot() {
         }
     }, [currentHeuristic]);
 
-    useEffect(() => {
-        if (!projectId) return;
-        WebSocketsService.updateFunctionPointer(projectId, CurrentPage.ZERO_SHOT, handleWebsocketNotification)
-    }, [handleWebsocketNotification, projectId]);
+    useWebsocket(CurrentPage.ZERO_SHOT, handleWebsocketNotification, projectId);
 
     return (<HeuristicsLayout>
         {currentHeuristic && <div>

@@ -5,7 +5,6 @@ import { GET_ALL_ACTIVE_ADMIN_MESSAGES, NOTIFICATIONS_BY_USER } from "@/src/serv
 import { Fragment, useCallback, useEffect, useState } from "react";
 import { NotificationLevel } from "@/src/types/shared/notification-center";
 import { IconAlertTriangleFilled, IconCircleCheckFilled, IconInfoCircleFilled } from "@tabler/icons-react";
-import { WebSocketsService } from "@/src/services/base/web-sockets/WebSocketsService";
 import { CurrentPage } from "@/src/types/shared/general";
 import { useDispatch, useSelector } from "react-redux";
 import { selectUser } from "@/src/reduxStore/states/general";
@@ -18,6 +17,7 @@ import SizeWarningModal from "./SizeWarningModal";
 import { closeModal, openModal } from "@/src/reduxStore/states/modal";
 import { ModalEnum } from "@/src/types/shared/modal";
 import { postProcessNotificationsUser } from "@/src/util/shared/notification-center-helper";
+import { useWebsocket } from "@/src/services/base/web-sockets/useWebsocket";
 
 const MIN_WIDTH = 1250;
 
@@ -37,10 +37,6 @@ export default function Layout({ children }) {
     useEffect(() => {
         refetchNotificationsAndProcess();
         refetchAdminMessagesAndProcess();
-        WebSocketsService.subscribeToNotification(CurrentPage.NOTIFICATION_CENTER, {
-            whitelist: ['notification_created', 'project_deleted', 'config_updated', 'admin_message'],
-            func: handleWebsocketNotification
-        });
     }, []);
 
     function handleResize() {
@@ -105,12 +101,10 @@ export default function Layout({ children }) {
             refetchAdminMessagesAndProcess();
         }
     }, [user?.id, notificationsState]);
+    
+    useWebsocket(CurrentPage.NOTIFICATION_CENTER, handleWebsocketNotification);
 
-    useEffect(() => {
-        WebSocketsService.updateFunctionPointer(null, CurrentPage.NOTIFICATION_CENTER, handleWebsocketNotification)
-    }, [handleWebsocketNotification]);
-
-    return (
+    return (    
         <>
             <div className="h-screen bg-gray-100 flex overflow-hidden"
                 style={{ width: windowWidth < MIN_WIDTH ? MIN_WIDTH + 'px' : '100%', overflowX: windowWidth < MIN_WIDTH ? 'auto' : 'hidden' }}>

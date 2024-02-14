@@ -4,8 +4,6 @@ import { openModal, selectModal } from '@/src/reduxStore/states/modal';
 import { selectHeuristicsAll, setHeuristicType } from '@/src/reduxStore/states/pages/heuristics';
 import { selectLabelingTasksAll } from '@/src/reduxStore/states/pages/settings';
 import { selectProjectId } from '@/src/reduxStore/states/project';
-import { WebSocketsService } from '@/src/services/base/web-sockets/WebSocketsService';
-import { unsubscribeWSOnDestroy } from '@/src/services/base/web-sockets/web-sockets-helper';
 import { CREATE_INFORMATION_SOURCE_PAYLOAD, RUN_ZERO_SHOT_PROJECT, SET_ALL_HEURISTICS, START_WEAK_SUPERVISIONS } from '@/src/services/gql/mutations/heuristics';
 import { GET_CURRENT_WEAK_SUPERVISION_RUN } from '@/src/services/gql/queries/heuristics';
 import style from '@/src/styles/components/projects/projectId/heuristics/heuristics.module.css';
@@ -26,6 +24,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import LastWeakSupervisionModal from './modals/LastWeakSupervisionModal';
 import DeleteHeuristicsModal from './DeleteHeuristicsModal';
 import Dropdown2 from '@/submodules/react-components/components/Dropdown2';
+import { useWebsocket } from '@/src/services/base/web-sockets/useWebsocket';
 
 
 export default function HeuristicsHeader(props: HeuristicsHeaderProps) {
@@ -51,17 +50,6 @@ export default function HeuristicsHeader(props: HeuristicsHeaderProps) {
     const [refetchCurrentWeakSupervision] = useLazyQuery(GET_CURRENT_WEAK_SUPERVISION_RUN, { fetchPolicy: "network-only" });
     const [createTaskMut] = useMutation(CREATE_INFORMATION_SOURCE_PAYLOAD);
     const [runZeroShotMut] = useMutation(RUN_ZERO_SHOT_PROJECT);
-
-    useEffect(unsubscribeWSOnDestroy(router, [CurrentPage.HEURISTICS]), []);
-
-    useEffect(() => {
-        if (!projectId) return;
-        WebSocketsService.subscribeToNotification(CurrentPage.HEURISTICS, {
-            projectId: projectId,
-            whitelist: ['weak_supervision_started', 'weak_supervision_finished'],
-            func: handleWebsocketNotification
-        });
-    }, [projectId]);
 
     useEffect(() => {
         if (!heuristics) return;
@@ -173,10 +161,7 @@ export default function HeuristicsHeader(props: HeuristicsHeaderProps) {
         else if (msgParts[1] == 'weak_supervision_finished') setLoadingIconWS(false);
     }, []);
 
-    useEffect(() => {
-        if (!projectId) return;
-        WebSocketsService.updateFunctionPointer(projectId, CurrentPage.HEURISTICS, handleWebsocketNotification)
-    }, [handleWebsocketNotification, projectId]);
+    useWebsocket(CurrentPage.HEURISTICS, handleWebsocketNotification, projectId);
 
     return (
         <div className="flex-shrink-0 block xl:flex justify-between items-center">

@@ -13,7 +13,6 @@ import { useRouter } from "next/router";
 import { setUploadFileType } from "@/src/reduxStore/states/upload";
 import { UploadFileType } from "@/src/types/shared/upload";
 import { GET_PROJECT_BY_ID, REQUEST_COMMENTS } from "@/src/services/gql/queries/projects";
-import { WebSocketsService } from "@/src/services/base/web-sockets/WebSocketsService";
 import { CurrentPage } from "@/src/types/shared/general";
 import { Tooltip } from "@nextui-org/react";
 import ProjectMetaData from "./ProjectMetaData";
@@ -24,7 +23,6 @@ import { postProcessingEmbeddings, postProcessingRecommendedEncoders } from "@/s
 import { AttributeState } from "@/src/types/components/projects/projectId/settings/data-schema";
 import { RecommendedEncoder } from "@/src/types/components/projects/projectId/settings/embeddings";
 import LabelingTasks from "./labeling-tasks/LabelingTasks";
-import { unsubscribeWSOnDestroy } from "@/src/services/base/web-sockets/web-sockets-helper";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
 import Export from "@/src/components/shared/export/Export";
 import { CommentType } from "@/src/types/shared/comments";
@@ -33,6 +31,7 @@ import CreateNewAttributeModal from "./CreateNewAttributeModal";
 import ProjectSnapshotExportModal from "./ProjectSnapshotExportModal";
 import { postProcessLabelingTasks, postProcessLabelingTasksSchema } from "@/src/util/components/projects/projectId/settings/labeling-tasks-helper";
 import { getEmptyBricksIntegratorConfig } from "@/src/util/shared/bricks-integrator-helper";
+import { useWebsocket } from "@/src/services/base/web-sockets/useWebsocket";
 
 export default function ProjectSettings() {
     const dispatch = useDispatch();
@@ -62,9 +61,6 @@ export default function ProjectSettings() {
     const [refetchGatesIntegrationData] = useLazyQuery(GET_GATES_INTEGRATION_DATA, { fetchPolicy: 'no-cache' });
     const [refetchLabelingTasksByProjectId] = useLazyQuery(GET_LABELING_TASKS_BY_PROJECT_ID, { fetchPolicy: "network-only" });
 
-
-    useEffect(unsubscribeWSOnDestroy(router, [CurrentPage.PROJECT_SETTINGS]), []);
-
     useEffect(() => {
         if (!project) return;
         refetchAttributesAndPostProcess();
@@ -72,7 +68,7 @@ export default function ProjectSettings() {
         refetchAndSetGatesIntegrationData();
         refetchLabelingTasksAndProcess();
         checkProjectTokenization();
-        refetchWS();
+
         const openModal = JSON.parse(localStorage.getItem("openModal"));
         if (openModal) {
             dispatch(setModalStates(ModalEnum.ADD_LABELING_TASK, { open: true }));
@@ -257,6 +253,7 @@ export default function ProjectSettings() {
             if (gatesIntegrationData?.missingEmbeddings?.includes(msgParts[2])) {
                 refetchAndSetGatesIntegrationData();
             }
+            refetchEmbeddingsAndPostProcess();
         } else if (['label_created', 'label_deleted', 'labeling_task_deleted', 'labeling_task_updated', 'labeling_task_created'].includes(msgParts[1])) {
             refetchLabelingTasksAndProcess();
         }
@@ -268,20 +265,14 @@ export default function ProjectSettings() {
         });
     }
 
-    function refetchWS() {
-        WebSocketsService.subscribeToNotification(CurrentPage.PROJECT_SETTINGS, {
-            projectId: project.id,
-            whitelist: ['project_update', 'tokenization', 'calculate_attribute', 'embedding', 'attributes_updated', 'gates_integration', 'information_source_deleted', 'information_source_updated', 'embedding_deleted', 'embedding_updated', 'upload_embedding_payload', 'label_created', 'label_deleted', 'labeling_task_deleted', 'labeling_task_updated', 'labeling_task_created'],
-            func: handleWebsocketNotification
-        });
-    }
-
     function refetchLabelingTasksAndProcess() {
         refetchLabelingTasksByProjectId({ variables: { projectId: project.id } }).then((res) => {
             const labelingTasks = postProcessLabelingTasks(res['data']['projectByProjectId']['labelingTasks']['edges']);
             dispatch(setLabelingTasksAll(postProcessLabelingTasksSchema(labelingTasks)));
         });
     }
+
+    useWebsocket(CurrentPage.PROJECT_SETTINGS, handleWebsocketNotification, project?.id);
 
     return (<div>
         {project != null && <div className="p-4 bg-gray-100 pb-10 h-screen overflow-y-auto flex-1 flex flex-col">
@@ -341,9 +332,9 @@ export default function ProjectSettings() {
                 </div>
             </div>
 
-            <Embeddings refetchWS={refetchWS} />
+            <Embeddings  />
             <LabelingTasks />
-            {isManaged && <GatesIntegration refetchWS={refetchWS} />}
+            {isManaged && <GatesIntegration />}
             <ProjectMetaData />
             <CreateNewAttributeModal />
             <ProjectSnapshotExportModal ></ProjectSnapshotExportModal>

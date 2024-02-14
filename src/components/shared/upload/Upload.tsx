@@ -10,11 +10,9 @@ import { ProjectStatus } from "@/src/types/components/projects/projects-list";
 import { timer } from "rxjs";
 import { uploadFile } from "@/src/services/base/s3-service";
 import { CurrentPage } from "@/src/types/shared/general";
-import { WebSocketsService } from "@/src/services/base/web-sockets/WebSocketsService";
 import { jsonCopy } from "@/submodules/javascript-functions/general";
 import { useRouter } from "next/router";
 import { extendAllProjects, removeFromAllProjectsById, selectAllProjects, selectProjectId } from "@/src/reduxStore/states/project";
-import { unsubscribeWSOnDestroy } from "@/src/services/base/web-sockets/web-sockets-helper";
 import { GET_UPLOAD_CREDENTIALS_AND_ID, GET_UPLOAD_TASK_BY_TASK_ID } from "@/src/services/gql/queries/projects";
 import { UPLOAD_TOKENIZERS } from "@/src/util/constants";
 import { UploadHelper, ZIP_TYPE } from "@/src/util/classes/upload-helper";
@@ -22,6 +20,7 @@ import CryptedField from "../crypted-field/CryptedField";
 import { closeModal } from "@/src/reduxStore/states/modal";
 import { ModalEnum } from "@/src/types/shared/modal";
 import Dropdown2 from "@/submodules/react-components/components/Dropdown2";
+import { useWebsocket } from "@/src/services/base/web-sockets/useWebsocket";
 
 export default function Upload(props: UploadProps) {
     const router = useRouter();
@@ -53,8 +52,6 @@ export default function Upload(props: UploadProps) {
     const [uploadCredentialsMut] = useLazyQuery(GET_UPLOAD_CREDENTIALS_AND_ID, { fetchPolicy: 'network-only' });
     const [getUploadTaskId] = useLazyQuery(GET_UPLOAD_TASK_BY_TASK_ID, { fetchPolicy: 'network-only' });
 
-    useEffect(unsubscribeWSOnDestroy(router, [CurrentPage.PROJECTS, CurrentPage.NEW_PROJECT]), []);
-
     useEffect(() => {
         if (!props.uploadOptions.tokenizerValues) return;
         const tokenizerValuesDisplay = [...props.uploadOptions.tokenizerValues];
@@ -77,21 +74,6 @@ export default function Upload(props: UploadProps) {
         if (props.isFileUploaded)
             props.isFileUploaded(selectedFile != null);
     }, [selectedFile]);
-
-    function subscribeToNotifications(): void {
-        if (uploadFileType == UploadFileType.PROJECT) {
-            WebSocketsService.subscribeToNotification(CurrentPage.PROJECTS, {
-                whitelist: ['file_upload'],
-                func: handleWebsocketNotification
-            });
-        } else {
-            WebSocketsService.subscribeToNotification(CurrentPage.NEW_PROJECT, {
-                projectId: UploadHelper.getProjectId(),
-                whitelist: ['file_upload'],
-                func: handleWebsocketNotification
-            });
-        }
-    }
 
     function handleWebsocketNotification(msgParts: string[]) {
         const uploadTask = UploadHelper.getUploadTask();
@@ -166,7 +148,6 @@ export default function Upload(props: UploadProps) {
 
     function executeUploadFile() {
         updateTokenizerAndProjectStatus();
-        reSubscribeToNotifications();
         const finalFinalName = getFileNameBasedOnType();
         const importOptionsPrep = uploadFileType == UploadFileType.RECORDS_NEW ? importOptions : '';
         finishUpUpload(finalFinalName, importOptionsPrep);
@@ -182,12 +163,6 @@ export default function Upload(props: UploadProps) {
         updateProjectTokenizerMut({ variables: { projectId: UploadHelper.getProjectId(), tokenizer: tokenizerPrep } }).then((res) => {
             updateProjectStatusMut({ variables: { projectId: UploadHelper.getProjectId(), newStatus: ProjectStatus.INIT_COMPLETE } })
         });
-    }
-
-    function reSubscribeToNotifications() {
-        WebSocketsService.unsubscribeFromNotification(CurrentPage.PROJECTS);
-        WebSocketsService.unsubscribeFromNotification(CurrentPage.NEW_PROJECT);
-        subscribeToNotifications();
     }
 
     function getFileNameBasedOnType() {
@@ -276,6 +251,8 @@ export default function Upload(props: UploadProps) {
         if (findProjectName) setIsProjectTitleDuplicate(true);
         else setIsProjectTitleDuplicate(false);
     }
+
+    useWebsocket(CurrentPage.UPLOAD_RECORDS, handleWebsocketNotification, UploadHelper.getProjectId());
 
     return (
         <section className={`${!props.uploadOptions.isModal ? 'p-4' : ''}`}>

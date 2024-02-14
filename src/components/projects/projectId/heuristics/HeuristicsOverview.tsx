@@ -4,7 +4,6 @@ import style from '@/src/styles/components/projects/projectId/heuristics/heurist
 import { useCallback, useEffect, useState } from "react";
 import { selectEmbeddings, selectUsableNonTextAttributes, setAllAttributes, setAllEmbeddings, setLabelingTasksAll } from "@/src/reduxStore/states/pages/settings";
 import { CurrentPage } from "@/src/types/shared/general";
-import { WebSocketsService } from "@/src/services/base/web-sockets/WebSocketsService";
 import { LabelingTask } from "@/src/types/components/projects/projectId/settings/labeling-tasks";
 import { GET_ATTRIBUTES_BY_PROJECT_ID, GET_EMBEDDING_SCHEMA_BY_PROJECT_ID, GET_LABELING_TASKS_BY_PROJECT_ID } from "@/src/services/gql/queries/project-setting";
 import { useLazyQuery } from "@apollo/client";
@@ -19,17 +18,15 @@ import AddActiveLeanerModal from "./modals/AddActiveLearnerModal";
 import AddZeroShotModal from "./modals/AddZeroShotModal";
 import AddCrowdLabelerModal from "./modals/AddCrowdLabelerModal";
 import { postProcessingEmbeddings } from "@/src/util/components/projects/projectId/settings/embeddings-helper";
-import { useRouter } from "next/router";
-import { unsubscribeWSOnDestroy } from "@/src/services/base/web-sockets/web-sockets-helper";
 import { CommentType } from "@/src/types/shared/comments";
 import { CommentDataManager } from "@/src/util/classes/comments";
 import { REQUEST_COMMENTS } from "@/src/services/gql/queries/projects";
 import { selectAllUsers, setBricksIntegrator, setComments } from "@/src/reduxStore/states/general";
 import { getEmptyBricksIntegratorConfig } from "@/src/util/shared/bricks-integrator-helper";
+import { useWebsocket } from "@/src/services/base/web-sockets/useWebsocket";
 
 export function HeuristicsOverview() {
     const dispatch = useDispatch();
-    const router = useRouter();
 
     const projectId = useSelector(selectProjectId);
     const heuristics = useSelector(selectHeuristicsAll);
@@ -45,8 +42,6 @@ export function HeuristicsOverview() {
     const [refetchAttributes] = useLazyQuery(GET_ATTRIBUTES_BY_PROJECT_ID, { fetchPolicy: "network-only" });
     const [refetchComments] = useLazyQuery(REQUEST_COMMENTS, { fetchPolicy: "no-cache" });
 
-    useEffect(unsubscribeWSOnDestroy(router, [CurrentPage.HEURISTICS, CurrentPage.LABELING_FUNCTION, CurrentPage.ACTIVE_LEARNING, CurrentPage.CROWD_LABELER, CurrentPage.ZERO_SHOT, CurrentPage.COMMENTS], projectId), []);
-
     useEffect(() => {
         if (!projectId || !embeddings || !attributes) return;
         refetchLabelingTasksAndProcess();
@@ -58,11 +53,6 @@ export function HeuristicsOverview() {
             });
         }
         dispatch(setBricksIntegrator(getEmptyBricksIntegratorConfig()));
-        WebSocketsService.subscribeToNotification(CurrentPage.HEURISTICS, {
-            projectId: projectId,
-            whitelist: ['labeling_task_updated', 'labeling_task_created', 'labeling_task_deleted', 'information_source_created', 'information_source_updated', 'information_source_deleted', 'payload_finished', 'payload_failed', 'payload_created', 'payload_update_statistics', 'embedding_deleted'],
-            func: handleWebsocketNotification
-        });
     }, [projectId]);
 
     useEffect(() => {
@@ -122,10 +112,7 @@ export function HeuristicsOverview() {
         }
     }, [projectId]);
 
-    useEffect(() => {
-        if (!projectId) return;
-        WebSocketsService.updateFunctionPointer(projectId, CurrentPage.HEURISTICS, handleWebsocketNotification)
-    }, [handleWebsocketNotification, projectId]);
+    useWebsocket(CurrentPage.HEURISTICS, handleWebsocketNotification, projectId);
 
     return (projectId && <div className="p-4 bg-gray-100 h-full flex-1 flex flex-col">
         <div className="w-full h-full -mr-4">

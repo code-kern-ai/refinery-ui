@@ -23,17 +23,16 @@ import DangerZone from "@/src/components/shared/danger-zone/DangerZone";
 import { DangerZoneEnum } from "@/src/types/shared/danger-zone";
 import ContainerLogs from "@/src/components/shared/logs/ContainerLogs";
 import LoadingIcon from "@/src/components/shared/loading/LoadingIcon";
-import { WebSocketsService } from "@/src/services/base/web-sockets/WebSocketsService";
 import { debounceTime, distinctUntilChanged, fromEvent, timer } from "rxjs";
-import { unsubscribeWSOnDestroy } from "@/src/services/base/web-sockets/web-sockets-helper";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
-import { selectAllUsers, setBricksIntegrator, setComments } from "@/src/reduxStore/states/general";
+import { selectAllUsers, setComments } from "@/src/reduxStore/states/general";
 import { REQUEST_COMMENTS } from "@/src/services/gql/queries/projects";
 import { CommentDataManager } from "@/src/util/classes/comments";
 import { CommentType } from "@/src/types/shared/comments";
 import BricksIntegrator from "@/src/components/shared/bricks-integrator/BricksIntegrator";
 import { AttributeCodeLookup } from "@/src/util/classes/attribute-calculation";
 import Dropdown2 from "@/submodules/react-components/components/Dropdown2";
+import { useWebsocket } from "@/src/services/base/web-sockets/useWebsocket";
 import { postProcessLabelingTasks, postProcessLabelingTasksSchema } from "@/src/util/components/projects/projectId/settings/labeling-tasks-helper";
 
 const EDITOR_OPTIONS = { theme: 'vs-light', language: 'python', readOnly: false };
@@ -68,8 +67,6 @@ export default function AttributeCalculation() {
     const [refetchComments] = useLazyQuery(REQUEST_COMMENTS, { fetchPolicy: "no-cache" });
     const [refetchLabelingTasksByProjectId] = useLazyQuery(GET_LABELING_TASKS_BY_PROJECT_ID, { fetchPolicy: "network-only" });
 
-    useEffect(unsubscribeWSOnDestroy(router, [CurrentPage.ATTRIBUTE_CALCULATION]), []);
-
     useEffect(() => {
         if (!currentAttribute) return;
         if (isInitial == null) setIsInitial(AttributeCodeLookup.isCodeStillTemplate(currentAttribute.sourceCode, currentAttribute.dataType))
@@ -92,11 +89,6 @@ export default function AttributeCalculation() {
         }
         refetchLabelingTasksAndProcess();
         checkProjectTokenization();
-        WebSocketsService.subscribeToNotification(CurrentPage.ATTRIBUTE_CALCULATION, {
-            projectId: projectId,
-            whitelist: ['attributes_updated', 'calculate_attribute', 'tokenization', 'knowledge_base_updated', 'knowledge_base_deleted', 'knowledge_base_created'],
-            func: handleWebsocketNotification
-        });
     }, [projectId, attributes, currentAttribute]);
 
     useEffect(() => {
@@ -298,10 +290,7 @@ export default function AttributeCalculation() {
         }
     }, [projectId, currentAttribute]);
 
-    useEffect(() => {
-        if (!projectId) return;
-        WebSocketsService.updateFunctionPointer(projectId, CurrentPage.ATTRIBUTE_CALCULATION, handleWebsocketNotification)
-    }, [handleWebsocketNotification, projectId]);
+    useWebsocket(CurrentPage.ATTRIBUTE_CALCULATION, handleWebsocketNotification, projectId);
 
     return (projectId && <div className="bg-white p-4 pb-16 overflow-y-auto h-screen" style={{ width: 'calc(100vw - 75px)' }} onScroll={(e: any) => onScrollEvent(e)}>
         {currentAttribute && <div>
