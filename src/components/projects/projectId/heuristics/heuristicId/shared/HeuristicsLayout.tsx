@@ -81,7 +81,6 @@ export default function HeuristicsLayout(props: any) {
     }
 
     function saveHeuristic() {
-        console.log(currentHeuristic.name)
         if (currentHeuristic.name == "") return;
         updateHeuristicMut({ variables: { projectId: projectId, informationSourceId: currentHeuristic.id, labelingTaskId: currentHeuristic.labelingTaskId, name: currentHeuristic.name, description: currentHeuristic.description } }).then((res) => {
             dispatch(updateHeuristicsState(currentHeuristic.id, { name: currentHeuristic.name, description: currentHeuristic.description }));
