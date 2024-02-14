@@ -1,7 +1,7 @@
 import LoadingIcon from "@/src/components/shared/loading/LoadingIcon"
 import { selectUser } from "@/src/reduxStore/states/general"
 import { removeFromRlaById, selectDisplayUserRole, selectHoverGroupDict, selectRecordRequests, selectRecordRequestsRecord, selectSettings, selectTmpHighlightIds, selectUserDisplayId, setHoverGroupDict, tmpAddHighlightIds } from "@/src/reduxStore/states/pages/labeling"
-import { selectAttributes, selectLabelingTasksAll, selectVisibleAttributesLabeling } from "@/src/reduxStore/states/pages/settings"
+import { selectLabelingTasksAll, selectVisibleAttributesLabeling } from "@/src/reduxStore/states/pages/settings"
 import { selectProjectId } from "@/src/reduxStore/states/project"
 import { HotkeyLookup, LabelSourceHover, LabelingVars, TokenLookup } from "@/src/types/components/projects/projectId/labeling/labeling"
 import { LabelingTaskTaskType } from "@/src/types/components/projects/projectId/settings/labeling-tasks"
@@ -9,7 +9,7 @@ import { UserRole } from "@/src/types/shared/sidebar"
 import { DEFAULT_LABEL_COLOR, FULL_RECORD_ID, SWIM_LANE_SIZE_PX, buildLabelingRlaData, checkCanEditLabels, collectSelectionData, filterRlaDataForLabeling, findOrderPosItem, getDefaultLabelingVars, getFirstFitPos, getGoldInfoForTask, getOrderLookupItem, getOrderLookupSort, getTaskTypeOrder, getTokenData, parseSelectionData } from "@/src/util/components/projects/projectId/labeling/labeling-helper"
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants"
 import { Tooltip } from "@nextui-org/react"
-import { IconAlertCircle, IconAssembly, IconBolt, IconCode, IconSparkles, IconStar, IconStarFilled, IconUsers } from "@tabler/icons-react"
+import { IconAlertCircle, IconAssembly, IconBolt, IconCode, IconSparkles, IconStar, IconUsers } from "@tabler/icons-react"
 import { Fragment, useRef, useEffect, useState } from "react"
 import { useDispatch, useSelector } from "react-redux"
 import ExtractionDisplay from "./ExtractionDisplay"
@@ -20,7 +20,7 @@ import { LabelingSuiteManager } from "@/src/util/classes/labeling/manager";
 import { useMutation } from "@apollo/client"
 import { ADD_CLASSIFICATION_LABELS_TO_RECORD, ADD_EXTRACTION_LABEL_TO_RECORD, CREATE_LABEL, DELETE_RECORD_LABEL_ASSOCIATION_BY_ID, REMOVE_GOLD_STAR_ANNOTATION_FOR_TASK, SET_GOLD_STAR_ANNOTATION_FOR_TASK } from "@/src/services/gql/mutations/labeling"
 import { SessionManager } from "@/src/util/classes/labeling/session-manager"
-import { ALL_USERS_USER_ID, GOLD_STAR_USER_ID } from "@/src/util/components/projects/projectId/labeling/labeling-main-component-helper"
+import { GOLD_STAR_USER_ID } from "@/src/util/components/projects/projectId/labeling/labeling-main-component-helper"
 import { useRouter } from "next/router"
 import LabelSelectionBox from "./LabelSelectionBox"
 import { filterRlaDataForUser } from "@/src/util/components/projects/projectId/labeling/overview-table-helper"
@@ -71,11 +71,11 @@ export default function LabelingSuiteLabeling() {
     const [removeGoldStarMut] = useMutation(REMOVE_GOLD_STAR_ANNOTATION_FOR_TASK);
 
     useEffect(() => {
-        if (!projectId || !attributes || !recordRequests || !user || !settings || !userDisplayRole) return;
+        if (!projectId || !attributes || !recordRequests || !user || !settings || !userDisplayRole || !labelingTasks) return;
         attributesChanged();
         prepareRlaData();
         rebuildGoldInfo();
-    }, [projectId, attributes, recordRequests, user, settings, userDisplayRole]);
+    }, [projectId, attributes, recordRequests, user, settings, userDisplayRole, labelingTasks]);
 
     useEffect(() => {
         if (!labelingTasks || !lVars) return;
@@ -136,10 +136,10 @@ export default function LabelingSuiteLabeling() {
     }, [tokenLookup]);
 
     useEffect(() => {
-        if (!settings) return;
+        if (!settings || !lVars || !labelingTasks) return;
         rebuildTaskLookup(lVars);
         filterRlaDataForCurrent();
-    }, [settings]);
+    }, [settings, lVars, labelingTasks]);
 
     useEffect(() => {
         if (!user || !displayUserId || !userDisplayRole) return;

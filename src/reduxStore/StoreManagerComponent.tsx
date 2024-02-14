@@ -19,6 +19,7 @@ import { checkWhitelistTokenizer } from "../util/components/projects/new-project
 import { ConfigManager } from "../services/base/config";
 import postprocessVersionOverview from "../util/shared/sidebar-helper";
 import { postProcessingEmbeddingPlatforms } from "../util/components/projects/projectId/settings/embeddings-helper";
+import { setDisplayUserRole } from "./states/pages/labeling";
 
 export function GlobalStoreDataComponent(props: React.PropsWithChildren) {
     const router = useRouter();
@@ -56,6 +57,7 @@ export function GlobalStoreDataComponent(props: React.PropsWithChildren) {
             const userInfo = { ...res.data["userInfo"] };
             userInfo.avatarUri = getUserAvatarUri(res.data["userInfo"]);
             dispatch(setUser(userInfo));
+            dispatch(setDisplayUserRole(res.data["userInfo"].role));
         });
         refetchOrganization().then((res) => {
             if (res.data["userOrganization"]) {

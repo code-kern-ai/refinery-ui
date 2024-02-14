@@ -64,7 +64,7 @@ export default function LabelingMainComponent() {
     useEffect(unsubscribeWSOnDestroy(router, [CurrentPage.LABELING]), []);
 
     useEffect(() => {
-        if (!projectId) return;
+        if (!projectId || !router.query) return;
         let tmp = localStorage.getItem(SETTINGS_KEY);
         if (tmp) {
             dispatch(setSettings(JSON.parse(tmp)));
@@ -87,7 +87,7 @@ export default function LabelingMainComponent() {
             whitelist: ['attributes_updated', 'calculate_attribute', 'payload_finished', 'weak_supervision_finished', 'record_deleted', 'rla_created', 'rla_deleted', 'access_link_changed', 'access_link_removed', 'label_created', 'label_deleted', 'labeling_task_deleted', 'labeling_task_updated', 'labeling_task_created'],
             func: handleWebsocketNotification
         });
-    }, [projectId]);
+    }, [projectId, router.query]);
 
     //destructor
     useEffect(() => () => {
@@ -104,7 +104,10 @@ export default function LabelingMainComponent() {
         refetchLinkLocked({ variables: { projectId: projectId, linkRoute: router.asPath } }).then((result) => {
             const lockedLink = result['data']['linkLocked'];
             if (lockedLink) {
-                setAbsoluteWarning(user?.role !== UserRole.ENGINEER ? 'This link is locked, contact your supervisor to request access' : null)
+                setAbsoluteWarning('This link is locked, contact your supervisor to request access');
+                if (router.query.type == LabelingLinkType.HEURISTIC) {
+                    dispatch(setDisplayUserRole(UserRole.ANNOTATOR));
+                }
             } else {
                 if (router.query.type == LabelingLinkType.HEURISTIC) {
                     dispatch(setDisplayUserRole(UserRole.ANNOTATOR));
@@ -300,7 +303,8 @@ export default function LabelingMainComponent() {
 
     function prepareTasksForRole(taskData: LabelingTask[], userDisplayRole): LabelingTask[] {
         if (user?.role != UserRole.ANNOTATOR && userDisplayRole != UserRole.ANNOTATOR) return taskData;
-        const taskId = JSON.parse(localStorage.getItem('huddleData'))?.allowedTask;
+        if (!JSON.parse(localStorage.getItem('huddleData'))) return null;
+        const taskId = JSON.parse(localStorage.getItem('huddleData')).allowedTask;
         if (!taskId) return null;
         else return taskData.filter(t => t.id == taskId);
     }

@@ -67,7 +67,7 @@ export default function NavigationBarTop(props: NavigationBarTopProps) {
         {user && <div className="w-full px-4 border-gray-200 border-b h-16">
             <div className="relative flex-shrink-0 bg-white shadow-sm flex justify-between items-center h-full">
                 <div className="flex flex-row flex-nowrap items-center">
-                    {user.role == UserRole.ENGINEER ? (<>
+                    {user.role == UserRole.ENGINEER && userDisplayRole == UserRole.ENGINEER ? (<>
                         <div className="flex justify-center overflow-visible">
                             <Tooltip content={TOOLTIPS_DICT.LABELING.NAVIGATE_TO_DATA_BROWSER} placement="bottom" color="invert">
                                 <button onClick={() => router.push(`/projects/${projectId}/data-browser`)}
