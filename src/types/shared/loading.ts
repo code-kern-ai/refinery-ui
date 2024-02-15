@@ -1,5 +1,5 @@
 export type LoadingIconProps = {
-    size?: string;
-    color?: string;
-    removeMargin?: boolean;
+  size?: string
+  color?: string
+  removeMargin?: boolean
 }

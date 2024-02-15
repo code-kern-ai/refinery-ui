@@ -1,23 +1,23 @@
-import { UploadTask } from "@/src/types/shared/upload";
+import { UploadTask } from '@/src/types/shared/upload'
 
-export const ZIP_TYPE = 'application/zip';
+export const ZIP_TYPE = 'application/zip'
 
 export class UploadHelper {
-    private static projectId: string | null = null;
-    private static uploadTask: UploadTask | null = null;
-    public static setProjectId(projectId: string) {
-        UploadHelper.projectId = projectId;
-    }
+  private static projectId: string | null = null
+  private static uploadTask: UploadTask | null = null
+  public static setProjectId(projectId: string) {
+    UploadHelper.projectId = projectId
+  }
 
-    public static getProjectId() {
-        return UploadHelper.projectId;
-    }
+  public static getProjectId() {
+    return UploadHelper.projectId
+  }
 
-    public static setUploadTask(uploadTask: UploadTask) {
-        UploadHelper.uploadTask = uploadTask;
-    }
+  public static setUploadTask(uploadTask: UploadTask) {
+    UploadHelper.uploadTask = uploadTask
+  }
 
-    public static getUploadTask() {
-        return UploadHelper.uploadTask;
-    }
+  public static getUploadTask() {
+    return UploadHelper.uploadTask
+  }
 }

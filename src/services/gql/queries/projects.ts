@@ -1,20 +1,20 @@
-import { gql } from "@apollo/client";
+import { gql } from '@apollo/client'
 
 export const GET_PROJECT_BY_ID = gql`
-query ($projectId: ID!) {
-  projectByProjectId(projectId: $projectId) {
-    id
-    name
-    description
-    projectType
-    tokenizer
-    numDataScaleUploaded
+  query ($projectId: ID!) {
+    projectByProjectId(projectId: $projectId) {
+      id
+      name
+      description
+      projectType
+      tokenizer
+      numDataScaleUploaded
+    }
   }
-}
-`;
+`
 
 export const GET_PROJECT_LIST = gql`
-query {
+  query {
     allProjects {
       edges {
         node {
@@ -25,7 +25,7 @@ query {
           projectType
           numDataScaleUploaded
           createdAt
-          user{
+          user {
             firstName
             lastName
             mail
@@ -33,95 +33,112 @@ query {
         }
       }
     }
-  }      
-`;
+  }
+`
 
 export const GET_OVERVIEW_STATS = gql`
-query{
-  overviewStats
-}`;
+  query {
+    overviewStats
+  }
+`
 
 export const GET_ALL_TOKENIZER_OPTIONS = gql`
-query{
-  languageModels{
-    name,
-    configString
+  query {
+    languageModels {
+      name
+      configString
+    }
   }
-}`;
+`
 
 export const GET_UPLOAD_CREDENTIALS_AND_ID = gql`
-query ($projectId: ID!, $fileName: String!, $fileType: String!,$fileImportOptions:String!,$uploadType:String, $key: String) {
-  uploadCredentialsAndId(projectId: $projectId, fileName: $fileName, fileType: $fileType,fileImportOptions:$fileImportOptions,uploadType:$uploadType, key: $key)
-}
-`;
+  query (
+    $projectId: ID!
+    $fileName: String!
+    $fileType: String!
+    $fileImportOptions: String!
+    $uploadType: String
+    $key: String
+  ) {
+    uploadCredentialsAndId(
+      projectId: $projectId
+      fileName: $fileName
+      fileType: $fileType
+      fileImportOptions: $fileImportOptions
+      uploadType: $uploadType
+      key: $key
+    )
+  }
+`
 
 export const GET_UPLOAD_TASK_BY_TASK_ID = gql`
-query ($projectId: ID!, $uploadTaskId: ID!) {
-  uploadTaskById(projectId: $projectId, uploadTaskId: $uploadTaskId) {
-    id
-    userId
-    state
-    progress
-    fileAdditionalInfo
+  query ($projectId: ID!, $uploadTaskId: ID!) {
+    uploadTaskById(projectId: $projectId, uploadTaskId: $uploadTaskId) {
+      id
+      userId
+      state
+      progress
+      fileAdditionalInfo
+    }
   }
-}
-`;
+`
 
 export const GET_MODEL_PROVIDER_INFO = gql`
-query{
-  modelProviderInfo {
-    name
-    revision
-    link
-    date
-    size
-    status
-    zeroShotPipeline
+  query {
+    modelProviderInfo {
+      name
+      revision
+      link
+      date
+      size
+      status
+      zeroShotPipeline
+    }
   }
-}
-`;
+`
 
 export const NOTIFICATIONS = gql`
-query {
-  notifications(userFilter: true){
-    id
-    level
-    title
-    important
-    type
-    message
-    createdAt
-    docs
-    state
-    projectId
-    page
+  query {
+    notifications(userFilter: true) {
+      id
+      level
+      title
+      important
+      type
+      message
+      createdAt
+      docs
+      state
+      projectId
+      page
+    }
   }
-}
-`;
+`
 
 export const NOTIFICATIONS_BY_USER = gql`
-query {
-  notificationsByUserId {
-  message
-  level
-  id
-}
-}
-`;
+  query {
+    notificationsByUserId {
+      message
+      level
+      id
+    }
+  }
+`
 
 export const REQUEST_COMMENTS = gql`
-query ($requested: JSONString!) {
-  getAllComments(requested: $requested)
-}
-`;
+  query ($requested: JSONString!) {
+    getAllComments(requested: $requested)
+  }
+`
 
 export const GET_ALL_ACTIVE_ADMIN_MESSAGES = gql`
-query {
-  allActiveAdminMessages {
-    id
-    text
-    level
-    archiveDate
-    createdAt
+  query {
+    allActiveAdminMessages {
+      id
+      text
+      level
+      archiveDate
+      createdAt
+    }
   }
-}`;
+`

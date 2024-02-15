@@ -1,11 +1,10 @@
 .scrollableSize {
-    max-height: calc(100vh - 230px);
-    overflow-y: auto;
+  max-height: calc(100vh - 230px);
+  overflow-y: auto;
 }
 
-
 @media screen and (min-width: 1250px) {
-    .widthSize {
-        width: calc(100vw - 75px);
-    }
+  .widthSize {
+    width: calc(100vw - 75px);
+  }
 }

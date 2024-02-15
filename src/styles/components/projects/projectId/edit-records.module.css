@@ -1,9 +1,9 @@
 .item {
-    margin-bottom: 20px;
-    min-width: 410px;
-    break-inside: avoid-column;
-    -webkit-column-break-inside: avoid;
-    -moz-column-break-inside: avoid;
-    -moz-page-break-inside: avoid;
-    page-break-inside: avoid;
+  margin-bottom: 20px;
+  min-width: 410px;
+  break-inside: avoid-column;
+  -webkit-column-break-inside: avoid;
+  -moz-column-break-inside: avoid;
+  -moz-page-break-inside: avoid;
+  page-break-inside: avoid;
 }

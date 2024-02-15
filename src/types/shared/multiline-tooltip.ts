@@ -1,8 +1,8 @@
 export type MultilineTooltipProps = {
-    tooltipLines: string[];
-};
+  tooltipLines: string[]
+}
 
 export type MultilineTooltip = {
-    value: string;
-    id: string;
+  value: string
+  id: string
 }

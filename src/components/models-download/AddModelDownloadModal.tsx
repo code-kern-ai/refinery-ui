@@ -1,96 +1,146 @@
-import { ModalButton, ModalEnum } from "@/src/types/shared/modal";
-import Modal from "../shared/modal/Modal";
-import { Tooltip } from "@nextui-org/react";
-import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
-import { selectModal, setModalStates } from "@/src/reduxStore/states/modal";
-import { useDispatch, useSelector } from "react-redux";
-import { useMutation } from "@apollo/client";
-import { MODEL_PROVIDER_DOWNLOAD_MODEL } from "@/src/services/gql/mutations/projects";
-import { useCallback, useEffect, useState } from "react";
-import { dateAsUTCDate } from "@/submodules/javascript-functions/date-parser";
-import { extentModelsDownloaded, selectModelsDownloaded } from "@/src/reduxStore/states/pages/models-downloaded";
-import { ModelsDownloaded, ModelsDownloadedStatus } from "@/src/types/components/models-downloaded/models-downloaded";
-import { CacheEnum, selectCachedValue } from "@/src/reduxStore/states/cachedValues";
-import Dropdown2 from "@/submodules/react-components/components/Dropdown2";
+import { ModalButton, ModalEnum } from '@/src/types/shared/modal'
+import Modal from '../shared/modal/Modal'
+import { Tooltip } from '@nextui-org/react'
+import { TOOLTIPS_DICT } from '@/src/util/tooltip-constants'
+import { selectModal, setModalStates } from '@/src/reduxStore/states/modal'
+import { useDispatch, useSelector } from 'react-redux'
+import { useMutation } from '@apollo/client'
+import { MODEL_PROVIDER_DOWNLOAD_MODEL } from '@/src/services/gql/mutations/projects'
+import { useCallback, useEffect, useState } from 'react'
+import { dateAsUTCDate } from '@/submodules/javascript-functions/date-parser'
+import {
+  extentModelsDownloaded,
+  selectModelsDownloaded,
+} from '@/src/reduxStore/states/pages/models-downloaded'
+import {
+  ModelsDownloaded,
+  ModelsDownloadedStatus,
+} from '@/src/types/components/models-downloaded/models-downloaded'
+import {
+  CacheEnum,
+  selectCachedValue,
+} from '@/src/reduxStore/states/cachedValues'
+import Dropdown2 from '@/submodules/react-components/components/Dropdown2'
 
-const ACCEPT_BUTTON = { buttonCaption: 'Accept', useButton: true };
+const ACCEPT_BUTTON = { buttonCaption: 'Accept', useButton: true }
 
 export default function AddModelDownloadModal() {
-    const dispatch = useDispatch();
+  const dispatch = useDispatch()
 
-    const modalAddModel = useSelector(selectModal(ModalEnum.ADD_MODEL_DOWNLOAD));
-    const modelsDownloaded = useSelector(selectModelsDownloaded);
-    const modelsList = useSelector(selectCachedValue(CacheEnum.MODELS_LIST));
+  const modalAddModel = useSelector(selectModal(ModalEnum.ADD_MODEL_DOWNLOAD))
+  const modelsDownloaded = useSelector(selectModelsDownloaded)
+  const modelsList = useSelector(selectCachedValue(CacheEnum.MODELS_LIST))
 
-    const [modelName, setModelName] = useState('');
-    const [colorDownloadedModels, setColorDownloadedModels] = useState<boolean[]>([]);
-    const [hoverBoxList, setHoverBoxList] = useState<any[]>([]);
-    const [lineSeparatorIndex, setLineSeparatorIndex] = useState(-1);
-    const [filteredList, setFilteredList] = useState<any[]>(null);
+  const [modelName, setModelName] = useState('')
+  const [colorDownloadedModels, setColorDownloadedModels] = useState<boolean[]>(
+    [],
+  )
+  const [hoverBoxList, setHoverBoxList] = useState<any[]>([])
+  const [lineSeparatorIndex, setLineSeparatorIndex] = useState(-1)
+  const [filteredList, setFilteredList] = useState<any[]>(null)
 
-    useEffect(() => {
-        if (!modelsList) return;
-        setFilteredList(modelsList);
-    }, [modelsList]);
+  useEffect(() => {
+    if (!modelsList) return
+    setFilteredList(modelsList)
+  }, [modelsList])
 
-    useEffect(() => {
-        if (!modelsDownloaded || !filteredList) return;
-        const colorDownloadedModels = filteredList.map((model: any) => {
-            const checkIfModelExists = modelsDownloaded.find((modelDownloaded: ModelsDownloaded) => modelDownloaded.name === model.configString);
-            return checkIfModelExists !== undefined;
-        });
-        setColorDownloadedModels(colorDownloadedModels);
-        const hoverBoxList = filteredList.map((model: any, index: number) => {
-            if (model.description) return model.description;
-            else return {
-                avgTime: model.avgTime,
-                base: model.base,
-                size: model.size,
-            }
-        });
-        setHoverBoxList(hoverBoxList);
-        setLineSeparatorIndex(filteredList.findIndex((model: any) => !model.description));
-    }, [modelsDownloaded, filteredList, modalAddModel, modelsList, modelName]);
+  useEffect(() => {
+    if (!modelsDownloaded || !filteredList) return
+    const colorDownloadedModels = filteredList.map((model: any) => {
+      const checkIfModelExists = modelsDownloaded.find(
+        (modelDownloaded: ModelsDownloaded) =>
+          modelDownloaded.name === model.configString,
+      )
+      return checkIfModelExists !== undefined
+    })
+    setColorDownloadedModels(colorDownloadedModels)
+    const hoverBoxList = filteredList.map((model: any, index: number) => {
+      if (model.description) return model.description
+      else
+        return {
+          avgTime: model.avgTime,
+          base: model.base,
+          size: model.size,
+        }
+    })
+    setHoverBoxList(hoverBoxList)
+    setLineSeparatorIndex(
+      filteredList.findIndex((model: any) => !model.description),
+    )
+  }, [modelsDownloaded, filteredList, modalAddModel, modelsList, modelName])
 
-    const [downloadModelMut] = useMutation(MODEL_PROVIDER_DOWNLOAD_MODEL);
+  const [downloadModelMut] = useMutation(MODEL_PROVIDER_DOWNLOAD_MODEL)
 
-    const addModel = useCallback(() => {
-        downloadModelMut({ variables: { modelName: modelName } }).then((res) => {
-            const newModel = {
-                "name": modelName,
-                "date": dateAsUTCDate(new Date()).toLocaleString(),
-                "status": ModelsDownloadedStatus.INITIALIZING
-            };
-            dispatch(extentModelsDownloaded(newModel));
-        });
-    }, [modelName]);
+  const addModel = useCallback(() => {
+    downloadModelMut({ variables: { modelName: modelName } }).then((res) => {
+      const newModel = {
+        name: modelName,
+        date: dateAsUTCDate(new Date()).toLocaleString(),
+        status: ModelsDownloadedStatus.INITIALIZING,
+      }
+      dispatch(extentModelsDownloaded(newModel))
+    })
+  }, [modelName])
 
-    useEffect(() => {
-        if (!modelsDownloaded) return;
-        const checkIfModelExists = modelsDownloaded.find((model: ModelsDownloaded) => model.name === modelName);
-        setAcceptButton({ ...acceptButton, emitFunction: addModel, disabled: modelName === '' || checkIfModelExists !== undefined });
-    }, [modelsDownloaded, addModel, modalAddModel]);
+  useEffect(() => {
+    if (!modelsDownloaded) return
+    const checkIfModelExists = modelsDownloaded.find(
+      (model: ModelsDownloaded) => model.name === modelName,
+    )
+    setAcceptButton({
+      ...acceptButton,
+      emitFunction: addModel,
+      disabled: modelName === '' || checkIfModelExists !== undefined,
+    })
+  }, [modelsDownloaded, addModel, modalAddModel])
 
-    const [acceptButton, setAcceptButton] = useState<ModalButton>(ACCEPT_BUTTON);
+  const [acceptButton, setAcceptButton] = useState<ModalButton>(ACCEPT_BUTTON)
 
-    return (<Modal modalName={ModalEnum.ADD_MODEL_DOWNLOAD} acceptButton={acceptButton}>
-        <div className="flex flex-grow justify-center text-lg leading-6 text-gray-900 font-medium">
-            Add new model</div>
-        <form className="mt-3">
-            <div className="grid grid-cols-2 gap-2 items-center" style={{ gridTemplateColumns: 'max-content auto' }}>
-                <Tooltip content={TOOLTIPS_DICT.MODELS_DOWNLOAD.MODEL} placement="right" color="invert">
-                    <span className="card-title mb-0 label-text flex"><span className="cursor-help underline filtersUnderline">Name</span></span>
-                </Tooltip>
-                <Dropdown2 options={filteredList && filteredList} useDifferentTextColor={colorDownloadedModels} differentTextColor="green" valuePropertyPath="configString"
-                    hasSearchBar={true} dropdownItemsClasses="max-h-96 overflow-y-auto"
-                    selectedOption={(option: any) => {
-                        setModelName(option.configString);
-                    }} optionsHaveHoverBox={true} hoverBoxList={hoverBoxList} lineSeparatorIndex={lineSeparatorIndex}
-                    searchTextTyped={(option: any) => setModelName(option)}
-                    filteredOptions={(option) => {
-                        setFilteredList(modelsList.filter((model: any) => model.configString.includes(option)));
-                    }} />
-            </div>
-        </form>
-    </Modal>)
+  return (
+    <Modal modalName={ModalEnum.ADD_MODEL_DOWNLOAD} acceptButton={acceptButton}>
+      <div className="flex flex-grow justify-center text-lg font-medium leading-6 text-gray-900">
+        Add new model
+      </div>
+      <form className="mt-3">
+        <div
+          className="grid grid-cols-2 items-center gap-2"
+          style={{ gridTemplateColumns: 'max-content auto' }}
+        >
+          <Tooltip
+            content={TOOLTIPS_DICT.MODELS_DOWNLOAD.MODEL}
+            placement="right"
+            color="invert"
+          >
+            <span className="card-title label-text mb-0 flex">
+              <span className="filtersUnderline cursor-help underline">
+                Name
+              </span>
+            </span>
+          </Tooltip>
+          <Dropdown2
+            options={filteredList && filteredList}
+            useDifferentTextColor={colorDownloadedModels}
+            differentTextColor="green"
+            valuePropertyPath="configString"
+            hasSearchBar={true}
+            dropdownItemsClasses="max-h-96 overflow-y-auto"
+            selectedOption={(option: any) => {
+              setModelName(option.configString)
+            }}
+            optionsHaveHoverBox={true}
+            hoverBoxList={hoverBoxList}
+            lineSeparatorIndex={lineSeparatorIndex}
+            searchTextTyped={(option: any) => setModelName(option)}
+            filteredOptions={(option) => {
+              setFilteredList(
+                modelsList.filter((model: any) =>
+                  model.configString.includes(option),
+                ),
+              )
+            }}
+          />
+        </div>
+      </form>
+    </Modal>
+  )
 }

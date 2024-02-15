@@ -1,41 +1,41 @@
 export type LookupListCardProps = {
-    lookupList: LookupList;
-    index: number;
+  lookupList: LookupList
+  index: number
 }
 
 export type LookupList = {
-    id: string;
-    name: string;
-    termCount: number;
-    description: string;
-    pythonVariable: string;
+  id: string
+  name: string
+  termCount: number
+  description: string
+  pythonVariable: string
 }
 
 export type Term = {
-    blacklisted: boolean;
-    comment: string;
-    id: string;
-    value: string;
+  blacklisted: boolean
+  comment: string
+  id: string
+  value: string
 }
 
 // small letters because they are also used as properties
 export enum LookupListProperty {
-    NAME = 'name',
-    DESCRIPTION = 'description',
+  NAME = 'name',
+  DESCRIPTION = 'description',
 }
 
 export type TermsProps = {
-    terms: Term[];
-    finalSize: number;
-    refetchTerms: () => void;
-    setTerms: (terms: Term[]) => void;
+  terms: Term[]
+  finalSize: number
+  refetchTerms: () => void
+  setTerms: (terms: Term[]) => void
 }
 
 export type LookupListOperationsProps = {
-    refetchTerms?: () => void;
+  refetchTerms?: () => void
 }
 
 export type DeleteLookupListsModalProps = {
-    countSelected: number;
-    selectionList: string;
-};
+  countSelected: number
+  selectionList: string
+}

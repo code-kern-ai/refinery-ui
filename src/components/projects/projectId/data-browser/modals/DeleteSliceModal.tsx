@@ -1,46 +1,65 @@
-import Modal from "@/src/components/shared/modal/Modal";
-import { selectModal } from "@/src/reduxStore/states/modal";
-import { removeFromAllDataSlicesById, setActiveDataSlice, setActiveSearchParams, setIsTextHighlightNeeded, setRecordsInDisplay, setTextHighlight, updateAdditionalDataState } from "@/src/reduxStore/states/pages/data-browser";
-import { selectProjectId } from "@/src/reduxStore/states/project";
-import { DELETE_DATA_SLICE } from "@/src/services/gql/mutations/data-browser";
-import { ModalButton, ModalEnum } from "@/src/types/shared/modal";
-import { useMutation } from "@apollo/client";
-import { useCallback, useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import Modal from '@/src/components/shared/modal/Modal'
+import { selectModal } from '@/src/reduxStore/states/modal'
+import {
+  removeFromAllDataSlicesById,
+  setActiveDataSlice,
+  setActiveSearchParams,
+  setIsTextHighlightNeeded,
+  setRecordsInDisplay,
+  setTextHighlight,
+  updateAdditionalDataState,
+} from '@/src/reduxStore/states/pages/data-browser'
+import { selectProjectId } from '@/src/reduxStore/states/project'
+import { DELETE_DATA_SLICE } from '@/src/services/gql/mutations/data-browser'
+import { ModalButton, ModalEnum } from '@/src/types/shared/modal'
+import { useMutation } from '@apollo/client'
+import { useCallback, useEffect, useState } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
 
-const ABORT_BUTTON = { buttonCaption: 'Delete', useButton: true, disabled: false };
+const ABORT_BUTTON = {
+  buttonCaption: 'Delete',
+  useButton: true,
+  disabled: false,
+}
 
 export default function DeleteSliceModal() {
-    const dispatch = useDispatch();
+  const dispatch = useDispatch()
 
-    const projectId = useSelector(selectProjectId);
+  const projectId = useSelector(selectProjectId)
 
-    const modalDeleteSlice = useSelector(selectModal(ModalEnum.DELETE_SLICE));
+  const modalDeleteSlice = useSelector(selectModal(ModalEnum.DELETE_SLICE))
 
-    const [deleteDataSliceMut] = useMutation(DELETE_DATA_SLICE);
+  const [deleteDataSliceMut] = useMutation(DELETE_DATA_SLICE)
 
-    const deleteDataSlice = useCallback(() => {
-        deleteDataSliceMut({ variables: { projectId: projectId, dataSliceId: modalDeleteSlice.sliceId } }).then((res) => {
-            dispatch(removeFromAllDataSlicesById(modalDeleteSlice.sliceId));
-            dispatch(updateAdditionalDataState('clearFullSearch', true));
-            dispatch(setActiveSearchParams([]));
-            dispatch(setRecordsInDisplay(false));
-            dispatch(setActiveDataSlice(null));
-            dispatch(setTextHighlight([]));
-            dispatch(setIsTextHighlightNeeded({}));
-        });
-    }, [modalDeleteSlice.sliceId]);
+  const deleteDataSlice = useCallback(() => {
+    deleteDataSliceMut({
+      variables: {
+        projectId: projectId,
+        dataSliceId: modalDeleteSlice.sliceId,
+      },
+    }).then((res) => {
+      dispatch(removeFromAllDataSlicesById(modalDeleteSlice.sliceId))
+      dispatch(updateAdditionalDataState('clearFullSearch', true))
+      dispatch(setActiveSearchParams([]))
+      dispatch(setRecordsInDisplay(false))
+      dispatch(setActiveDataSlice(null))
+      dispatch(setTextHighlight([]))
+      dispatch(setIsTextHighlightNeeded({}))
+    })
+  }, [modalDeleteSlice.sliceId])
 
-    useEffect(() => {
-        setAbortButton({ ...abortButton, emitFunction: deleteDataSlice });
-    }, [deleteDataSlice]);
+  useEffect(() => {
+    setAbortButton({ ...abortButton, emitFunction: deleteDataSlice })
+  }, [deleteDataSlice])
 
-    const [abortButton, setAbortButton] = useState<ModalButton>(ABORT_BUTTON);
+  const [abortButton, setAbortButton] = useState<ModalButton>(ABORT_BUTTON)
 
-    return (<Modal modalName={ModalEnum.DELETE_SLICE} abortButton={abortButton}>
-        <h1 className="text-lg text-gray-900 mb-2 text-center">Warning</h1>
-        <div className="text-sm text-gray-500 my-2 text-center">
-            Are you sure you want to delete this data slice?
-        </div>
-    </Modal>)
+  return (
+    <Modal modalName={ModalEnum.DELETE_SLICE} abortButton={abortButton}>
+      <h1 className="mb-2 text-center text-lg text-gray-900">Warning</h1>
+      <div className="my-2 text-center text-sm text-gray-500">
+        Are you sure you want to delete this data slice?
+      </div>
+    </Modal>
+  )
 }

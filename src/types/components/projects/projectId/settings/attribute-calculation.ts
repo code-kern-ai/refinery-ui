@@ -1,37 +1,37 @@
-import { Attribute } from "./data-schema";
+import { Attribute } from './data-schema'
 
 export type ExecutionContainerProps = {
-    currentAttribute: Attribute;
-    tokenizationProgress: number;
-    refetchCurrentAttribute: () => void;
-    checkUnsavedChanges: boolean;
+  currentAttribute: Attribute
+  tokenizationProgress: number
+  refetchCurrentAttribute: () => void
+  checkUnsavedChanges: boolean
 }
 
 export type SampleRecord = {
-    calculatedAttributes: any[];
-    recordIds: string[];
-    calculatedAttributesList: any[];
-    calculatedAttributesDisplay: any[];
-    calculatedAttributesListDisplay: any[];
-};
+  calculatedAttributes: any[]
+  recordIds: string[]
+  calculatedAttributesList: any[]
+  calculatedAttributesDisplay: any[]
+  calculatedAttributesListDisplay: any[]
+}
 
 export type ContainerLogsProps = {
-    logs: any;
-    type: string;
+  logs: any
+  type: string
 }
 
 export type Record = {
-    id: string;
-    data: any;
-    category: string;
-    projectId: string;
+  id: string
+  data: any
+  category: string
+  projectId: string
 }
 
 export type ViewRecordDetailsModalProps = {
-    currentAttribute: Attribute;
-    sampleRecords: SampleRecord;
+  currentAttribute: Attribute
+  sampleRecords: SampleRecord
 }
 
 export type ConfirmExecutionModalProps = {
-    currentAttributeId: string;
+  currentAttributeId: string
 }

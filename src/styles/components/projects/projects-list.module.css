@@ -1,11 +1,11 @@
 @media screen and (max-width: 1028px) {
-    .imageVideo {
-        display: block;
-        margin: 10px auto;
-    }
+  .imageVideo {
+    display: block;
+    margin: 10px auto;
+  }
 }
 
 .scrollableSize {
-    max-height: calc(100vh - 150px);
-    overflow-y: auto;
+  max-height: calc(100vh - 150px);
+  overflow-y: auto;
 }

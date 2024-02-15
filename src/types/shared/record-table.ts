@@ -1,4 +1,4 @@
 export type RecordTableProps = {
-    columnsData?: any[];
-    tableData?: any[];
+  columnsData?: any[]
+  tableData?: any[]
 }

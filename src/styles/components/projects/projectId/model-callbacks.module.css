@@ -1,17 +1,17 @@
 .actionsHeight {
-    height: 34px;
+  height: 34px;
 }
 
 .widthLine {
-    width: calc(100vw - 450px);
+  width: calc(100vw - 450px);
 }
 
 .borderBottom {
-    border-bottom: 1px solid #4F46E5;
+  border-bottom: 1px solid #4f46e5;
 }
 
 @media screen and (min-width: 1280px) {
-    .widthLine {
-        width: calc(100vw - 850px);
-    }
+  .widthLine {
+    width: calc(100vw - 850px);
+  }
 }

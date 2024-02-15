@@ -1,58 +1,58 @@
-import { gql } from "@apollo/client";
+import { gql } from '@apollo/client'
 
 export const GET_USER_INFO = gql`
-query {
-  userInfo {
-    id
-    firstName
-    lastName
-    mail
-    role
+  query {
+    userInfo {
+      id
+      firstName
+      lastName
+      mail
+      role
+    }
   }
-}
-`;
+`
 
 export const GET_ORGANIZATION = gql`
-query {
-  userOrganization {
-    id
-    name
-    maxRows
-    maxCols
-    maxCharCount
-    gdprCompliant
+  query {
+    userOrganization {
+      id
+      name
+      maxRows
+      maxCols
+      maxCharCount
+      gdprCompliant
+    }
   }
-}
-`;
+`
 
 export const GET_CAN_CREATE_LOCAL_ORG = gql`
-query{
-  canCreateLocalOrg
-} 
-`;
+  query {
+    canCreateLocalOrg
+  }
+`
 
 export const GET_ORGANIZATION_USERS = gql`
-query($userRole:String){
-  allUsers(userRole:$userRole) {
-    id
-    mail
-    firstName
-    lastName
-    role
-  }
-}
-`;
-
-export const GET_ORGANIZATION_USERS_WITH_COUNT = gql`
-query($projectId:ID!){
-  allUsersWithRecordCount(projectId:$projectId) {
-    user {
+  query ($userRole: String) {
+    allUsers(userRole: $userRole) {
       id
       mail
       firstName
       lastName
+      role
     }
-    counts
   }
-}  
-`;
+`
+
+export const GET_ORGANIZATION_USERS_WITH_COUNT = gql`
+  query ($projectId: ID!) {
+    allUsersWithRecordCount(projectId: $projectId) {
+      user {
+        id
+        mail
+        firstName
+        lastName
+      }
+      counts
+    }
+  }
+`

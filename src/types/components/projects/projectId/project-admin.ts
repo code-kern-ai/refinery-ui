@@ -1,21 +1,21 @@
 export type PersonalAccessToken = {
-    createdAt: string;
-    createdBy: string;
-    expiresAt: string;
-    id: string;
-    lastUsed: string;
-    name: string;
-    projectId: string;
-    scope: string;
-};
+  createdAt: string
+  createdBy: string
+  expiresAt: string
+  id: string
+  lastUsed: string
+  name: string
+  projectId: string
+  scope: string
+}
 
 export type PersonalTokenModalProps = {
-    refetchTokens: () => void;
-    accessTokens?: PersonalAccessToken[];
+  refetchTokens: () => void
+  accessTokens?: PersonalAccessToken[]
 }
 
 export enum ExpirationTime {
-    ONE_MONTH = "ONE_MONTH",
-    THREE_MONTHS = "THREE_MONTHS",
-    NEVER = "NEVER"
+  ONE_MONTH = 'ONE_MONTH',
+  THREE_MONTHS = 'THREE_MONTHS',
+  NEVER = 'NEVER',
 }

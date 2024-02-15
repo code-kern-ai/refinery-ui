@@ -1,4 +1,4 @@
 export type GridCardsProps = {
-    filteredList: any[];
-    refetch: () => void;
-};
+  filteredList: any[]
+  refetch: () => void
+}

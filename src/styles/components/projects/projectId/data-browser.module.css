@@ -1,27 +1,27 @@
 .transitionAll {
-    transition: all 0.25s ease-in-out;
+  transition: all 0.25s ease-in-out;
 }
 
 .sidebarWidth {
-    max-width: 56px;
+  max-width: 56px;
 }
 
 .sidebarWidthOpen {
-    max-width: 400px;
+  max-width: 400px;
 }
 
 .searchMenuWidth {
-    width: 400px;
+  width: 400px;
 }
 
 .rotateTransform {
-    transform: rotate(180deg);
+  transform: rotate(180deg);
 }
 
 .transitionTransform {
-    transition: transform 0.15s ease-in-out;
+  transition: transform 0.15s ease-in-out;
 }
 
 .mainPageWidthOpen {
-    width: calc(100% - 400px);
+  width: calc(100% - 400px);
 }
