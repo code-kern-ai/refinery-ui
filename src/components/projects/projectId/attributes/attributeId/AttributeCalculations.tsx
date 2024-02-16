@@ -444,7 +444,7 @@ export default function AttributeCalculation() {
                                     <Tooltip content={TOOLTIPS_DICT.ATTRIBUTE_CALCULATION.BEING_EXECUTED} color="invert" placement="right" className="relative z-10 cursor-auto"><LoadingIcon /></Tooltip>
                                     <div className="text-sm leading-5 font-normal text-gray-500 w-full">
                                         <div className="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700">
-                                            <div className="bg-green-400 h-2.5 rounded-full" style={{ 'width': currentAttribute.progress + '%' }}>
+                                            <div className="bg-green-400 h-2.5 rounded-full" style={{ 'width': (currentAttribute.progress * 100) + '%' }}>
                                             </div>
                                         </div>
                                     </div>
