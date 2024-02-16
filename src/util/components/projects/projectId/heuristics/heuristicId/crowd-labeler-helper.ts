@@ -26,6 +26,10 @@ export function postProcessCrowdLabeler(heuristic: Heuristic, labelingTasks: Lab
         prepareHeuristic.crowdLabelerSettings.accessLinkLocked = link.isLocked;
         prepareHeuristic.crowdLabelerSettings.isHTTPS = window.location.protocol == 'https:';
     }
+    if (heuristic['lastPayload']) {
+        prepareHeuristic.state = heuristic['lastPayload']['state'];
+        prepareHeuristic.progress = heuristic['lastPayload']['progress'];
+    }
     return prepareHeuristic;
 }
 
