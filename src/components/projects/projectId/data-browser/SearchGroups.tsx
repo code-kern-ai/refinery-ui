@@ -115,6 +115,7 @@ export default function SearchGroups() {
     useEffect(() => {
         if (!user || !activeSearchParams || !labelingTasks || !attributes) return;
         if (!fullSearchStore || fullSearchStore[SearchGroup.DRILL_DOWN] == undefined) return;
+        if (recordsInDisplay) return;
         refreshTextHighlightNeeded();
         setHighlightingToRecords();
         if (activeSlice && activeSlice.static) {

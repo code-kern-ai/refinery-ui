@@ -30,6 +30,7 @@ export default function DataBrowserRecords(props: DataBrowserRecordsProps) {
     const additionalData = useSelector(selectAdditionalData);
     const activeSearchParams = useSelector(selectActiveSearchParams);
     const attributes = useSelector(selectVisibleAttributesHeuristics);
+    const recordsInDisplay = useSelector(selectSimilaritySearch).recordsInDisplay;
 
     useEffect(() => {
         router.events.on("routeChangeStart", clearFilters);
@@ -84,6 +85,7 @@ export default function DataBrowserRecords(props: DataBrowserRecordsProps) {
     }
 
     function refetchMoreRecords(e: any) {
+        if (recordsInDisplay) return;
         if (e.target.offsetHeight + e.target.scrollTop >= e.target.scrollHeight) {
             props.refetchNextRecords();
         }
