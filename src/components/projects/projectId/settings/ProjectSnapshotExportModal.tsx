@@ -23,7 +23,6 @@ import { useDispatch, useSelector } from "react-redux";
 import { timer } from "rxjs";
 
 export default function ProjectSnapshotExportModal() {
-    const router = useRouter();
     const dispatch = useDispatch();
 
     const projectId = useSelector(selectProjectId);
@@ -46,7 +45,7 @@ export default function ProjectSnapshotExportModal() {
         if (!projectId) return;
         requestProjectSize();
         requestProjectExportCredentials();
-       
+
     }, [modal, projectId]);
 
     useEffect(() => {
