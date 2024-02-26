@@ -103,7 +103,7 @@ export default function Layout({ children }) {
             refetchNotificationsAndProcess();
         } else if (msgParts[1] == 'admin_message') {
             refetchAdminMessagesAndProcess();
-        } else if (msgParts[1] == 'project_deleted' && user?.id != msgParts[3]) {
+        } else if (msgParts[1] == 'project_deleted' && msgParts[3] && user?.id != msgParts[3]) {
             alert('Project deleted');
             router.push('/projects');
         }

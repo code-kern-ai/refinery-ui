@@ -32,7 +32,7 @@ export function RecordDisplay(props: any) {
                     <span className="font-dmMono">{attributesDict[attribute.id]?.name}</span>
                 </div>
             </div>
-            {attributesDict[attribute.id] && <div className="text-gray-800 text-sm mb-4 overflow-anywhere flex">
+            {attributesDict[attribute.id] && <div className="text-gray-800 text-sm mb-4 overflow-anywhere flex text-left">
                 {attribute.dataType == DataTypeEnum.EMBEDDING_LIST ? (<div className="flex flex-col gap-y-1 divide-y">
                     {preparedRecord.data[attributesDict[attribute.key].name] && preparedRecord.data[attributesDict[attribute.key].name].map((item, indexJ) => (<div key={indexJ} className="pt-1">
                         {(configuration.highlightText && isTextHighlightNeeded[attribute.key]) ? (<Highlight text={item.toString()}
