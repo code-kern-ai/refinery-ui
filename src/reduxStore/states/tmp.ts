@@ -6,13 +6,16 @@ export type TmpState = {
     sessionData: EditRecordSessionData;
     overviewFilters: ProjectOverviewFilters;
     notificationId: string;
+    projectIdSampleProject: string;
 }
 
 function getInitState(): TmpState {
     return {
         sessionData: null,
         overviewFilters: null,
-        notificationId: null
+        notificationId: null,
+        projectIdSampleProject: null,
+
     };
 }
 
@@ -45,6 +48,10 @@ const tmpSlice = createSlice({
         setNotificationId: (state, action: PayloadAction<string>) => {
             if (action.payload) state.notificationId = action.payload;
             else state.notificationId = null;
+        },
+        setProjectIdSampleProject: (state, action: PayloadAction<string>) => {
+            if (action.payload) state.projectIdSampleProject = action.payload;
+            else state.projectIdSampleProject = null;
         }
     },
 });
@@ -52,7 +59,8 @@ const tmpSlice = createSlice({
 export const selectSessionData = (state) => state.tmp.sessionData;
 export const selectOverviewFilters = (state) => state.tmp.overviewFilters;
 export const selectNotificationId = (state) => state.tmp.notificationId;
+export const selectProjectIdSampleProject = (state) => state.tmp.projectIdSampleProject;
 
-export const { setSessionData, setOverviewFilters, updateOverFilters, setNotificationId } = tmpSlice.actions;
+export const { setSessionData, setOverviewFilters, updateOverFilters, setNotificationId, setProjectIdSampleProject } = tmpSlice.actions;
 
 export const tmpReducer = tmpSlice.reducer;
