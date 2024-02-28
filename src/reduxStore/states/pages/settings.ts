@@ -2,6 +2,7 @@ import { Attribute, AttributeState, AttributeVisibility } from '@/src/types/comp
 import { Embedding, EmbeddingType, RecommendedEncoder } from '@/src/types/components/projects/projectId/settings/embeddings';
 import { LabelingTask } from '@/src/types/components/projects/projectId/settings/labeling-tasks';
 import { DataTypeEnum } from '@/src/types/shared/general';
+import { Status } from '@/src/types/shared/statuses';
 import { postProcessingAttributes } from '@/src/util/components/projects/projectId/settings/data-schema-helper';
 import { arrayToDict } from '@/submodules/javascript-functions/general';
 import { createSelector, createSlice } from '@reduxjs/toolkit'
@@ -152,7 +153,7 @@ export const selectVisibleAttributesLabeling = createSelector([selectUsableAttri
 export const selectVisibleAttributesDataBrowser = createSelector([selectUsableAttributes], (a): any => a ? a.filter((a) => a.visibility == AttributeVisibility.DO_NOT_HIDE) : null);
 export const selectVisibleAttributeAC = createSelector([selectUsableAttributesFiltered], (a): any => a ? a.filter((a) => a.visibility != AttributeVisibility.HIDE) : null);
 export const selectVisibleAttributesHeuristics = createSelector([selectUsableAttributesFiltered], (a): any => a ? a.filter((a) => a.visibility != AttributeVisibility.HIDE) : null);
-export const selectOnAttributeEmbeddings = createSelector([selectEmbeddings], (a): any => a ? a.filter((embedding) => embedding.type == EmbeddingType.ON_ATTRIBUTE) : null);
+export const selectOnAttributeEmbeddings = createSelector([selectEmbeddings], (a): any => a ? a.filter((embedding) => embedding.type == EmbeddingType.ON_ATTRIBUTE && embedding.state == Status.FINISHED) : null);
 
 export const { setAllAttributes, extendAllAttributes, removeFromAllAttributesById, updateAttributeById, setAllEmbeddings, setFilteredEmbeddings, removeFromAllEmbeddingsById, setAllRecommendedEncodersDict, setRecommendedEncodersAll, setLabelingTasksAll, removeFromAllLabelingTasksById, removeLabelFromLabelingTask, setGatesIntegration } = settingsSlice.actions;
 export const settingsReducer = settingsSlice.reducer;
