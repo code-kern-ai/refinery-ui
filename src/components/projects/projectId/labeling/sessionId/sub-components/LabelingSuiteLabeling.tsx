@@ -1,6 +1,6 @@
 import LoadingIcon from "@/src/components/shared/loading/LoadingIcon"
 import { selectUser } from "@/src/reduxStore/states/general"
-import { removeFromRlaById, selectDisplayUserRole, selectHoverGroupDict, selectRecordRequests, selectRecordRequestsRecord, selectSettings, selectTmpHighlightIds, selectUserDisplayId, setActiveTokenSelection, tmpAddHighlightIds } from "@/src/reduxStore/states/pages/labeling"
+import { removeFromRlaById, selectDisplayUserRole, selectHoverGroupDict, selectRecordRequests, selectRecordRequestsRecord, selectSettings, selectTmpHighlightIds, selectUserDisplayId, setActiveTokenSelection, setHoverGroupDict, tmpAddHighlightIds } from "@/src/reduxStore/states/pages/labeling"
 import { selectLabelingTasksAll, selectVisibleAttributesLabeling } from "@/src/reduxStore/states/pages/settings"
 import { selectProjectId } from "@/src/reduxStore/states/project"
 import { HotkeyLookup, LabelSourceHover, LabelingVars, TokenLookup } from "@/src/types/components/projects/projectId/labeling/labeling"
@@ -26,7 +26,6 @@ import LabelSelectionBox from "./LabelSelectionBox"
 import { filterRlaDataForUser } from "@/src/util/components/projects/projectId/labeling/overview-table-helper"
 import { LabelingPageParts } from "@/src/types/components/projects/projectId/labeling/labeling-main-component"
 import style from '@/src/styles/components/projects/projectId/labeling.module.css';
-import { useConsoleLog } from "@/submodules/react-components/hooks/useConsoleLog"
 import { getStoreSnapshotValue } from "@/src/reduxStore/store"
 
 const L_VARS = getDefaultLabelingVars();
@@ -144,19 +143,6 @@ export default function LabelingSuiteLabeling() {
         if (!user || !displayUserId || !userDisplayRole) return;
         setCanEditLabels(checkCanEditLabels(user, userDisplayRole, displayUserId));
     }, [user, displayUserId, userDisplayRole]);
-
-    // useEffect(() => {
-    //     if (!saveTokenData) return;
-    //     if (!settings.labeling.closeLabelBoxAfterLabel) {
-    //         const tokenLookupCopy = {};
-    //         for (const token of tokenLookupCopy[saveTokenData.attributeIdStart]?.token) {
-    //             token.selected = token.idx >= saveTokenData.tokenStart && token.idx <= saveTokenData.tokenEnd;
-    //         }
-    //         dispatch(setTokenLookupSelected(tokenLookupCopy));
-    //     } else {
-    //         dispatch(setTokenLookupSelected(null))
-    //     }
-    // }, [saveTokenData, settings.labeling.closeLabelBoxAfterLabel]);
 
     function attributesChanged() {
         if (!attributes) return;
@@ -547,6 +533,19 @@ export default function LabelingSuiteLabeling() {
         }
     }
 
+
+    function onMouseEvent(update: boolean, labelId: string) {
+        let hoverGroupsDictCopy = {};
+        if (!hoverGroupsDictCopy[labelId] && update) {
+            hoverGroupsDictCopy[labelId] = {
+                [LabelingPageParts.TASK_HEADER]: true
+            }
+            dispatch(setHoverGroupDict(hoverGroupsDictCopy));
+        } else {
+            dispatch(setHoverGroupDict(null));
+        }
+    }
+
     return (<div id="base-dom-element" className="bg-white relative p-4">
         {lVars.loading && SessionManager.currentRecordId !== "deleted" && <LoadingIcon size="lg" />}
         {(!lVars.loading && tokenLookup && !recordRequests.record || SessionManager.currentRecordId == "deleted") && <div className="flex items-center justify-center text-red-500">This Record has been deleted</div>}
@@ -610,8 +609,14 @@ export default function LabelingSuiteLabeling() {
                                     <div className={`flex gap-2 ${settings.labeling.compactClassificationLabelDisplay ? 'flex-row flex-wrap items-center' : 'flex-col'}`}>
                                         {rlaDataToDisplay[task.task.id].map((rlaLabel, index) => (<Tooltip key={index} content={rlaLabel.dataTip} color="invert" placement="top" className={`w-max ${rlaLabel.sourceTypeKey == LabelSourceHover.WEAK_SUPERVISION ? 'cursor-pointer' : 'cursor-default'}`}>
                                             <div onClick={() => rlaLabel.sourceTypeKey == 'WEAK_SUPERVISION' ? addRla(task.task, rlaLabel.labelId) : null}
-                                                onMouseEnter={() => dispatch(tmpAddHighlightIds([rlaLabel.rla.id]))}
-                                                onMouseLeave={() => dispatch(tmpAddHighlightIds([]))}
+                                                onMouseEnter={() => {
+                                                    dispatch(tmpAddHighlightIds([rlaLabel.rla.id]));
+                                                    onMouseEvent(true, rlaLabel.labelId);
+                                                }}
+                                                onMouseLeave={() => {
+                                                    dispatch(tmpAddHighlightIds([]));
+                                                    onMouseEvent(false, rlaLabel.labelId);
+                                                }}
                                                 className={`text-sm font-medium px-2 py-0.5 rounded-md border focus:outline-none relative flex items-center ${labelLookup[rlaLabel.labelId].color.backgroundColor} ${labelLookup[rlaLabel.labelId].color.textColor} ${labelLookup[rlaLabel.labelId].color.borderColor}`}>
                                                 <div className={`label-overlay-base 
                                                     ${((shouldHighlightOn(tmpHighlightIds, [LabelSourceHover.MANUAL, rlaLabel.rla.id, rlaLabel.createdByName, rlaLabel.rla.labelingTaskLabel.labelingTask.id]) && rlaLabel.sourceTypeKey == LabelingPageParts.MANUAL) || (hoverGroupsDict[rlaLabel.labelId] && hoverGroupsDict[rlaLabel.labelId][LabelingPageParts.MANUAL] && rlaLabel.sourceTypeKey == LabelingPageParts.MANUAL)) && style.labelOverlayManual} 
