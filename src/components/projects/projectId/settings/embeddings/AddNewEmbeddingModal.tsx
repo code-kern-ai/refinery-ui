@@ -153,20 +153,20 @@ export default function AddNewEmbeddingModal() {
         const getAzureEngine = localStorage.getItem('azureEngines');
 
         if (getAzureUrl == undefined || !azureUrls.includes(url)) {
-            const azureUrlsCopy = { ...azureUrls };
+            const azureUrlsCopy = getAzureUrl == undefined ? [] : JSON.parse(getAzureUrl);
             azureUrlsCopy.push(url);
             setAzureUrls(azureUrlsCopy);
             localStorage.setItem('azureUrls', JSON.stringify(azureUrlsCopy));
         }
         if (getAzureVersion == undefined || !azureVersions.includes(version)) {
-            const azureVersionsCopy = { ...azureVersions };
+            const azureVersionsCopy = getAzureVersion == undefined ? [] : JSON.parse(getAzureVersion);
             azureVersionsCopy.push(version);
             setAzureUrls(azureVersionsCopy);
             localStorage.setItem('azureVersions', JSON.stringify(azureVersionsCopy));
         }
 
         if (getAzureEngine == undefined || !azureEngines.includes(engine)) {
-            const azureEnginesCopy = { ...azureEngines };
+            const azureEnginesCopy = getAzureEngine == undefined ? [] : JSON.parse(getAzureEngine);
             azureEnginesCopy.push(engine);
             setAzureUrls(azureEnginesCopy);
             localStorage.setItem('azureEngines', JSON.stringify(azureEnginesCopy));
