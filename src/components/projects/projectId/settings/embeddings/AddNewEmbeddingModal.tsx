@@ -171,7 +171,7 @@ export default function AddNewEmbeddingModal() {
             setAzureUrls(azureEnginesCopy);
             localStorage.setItem('azureEngines', JSON.stringify(azureEnginesCopy));
         }
-    }, [url, version, engine]);
+    }, [url, version, engine, azureUrls, azureVersions, azureEngines]);
 
     const addEmbedding = useCallback(() => {
         const config: any = {
