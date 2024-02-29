@@ -18,13 +18,17 @@ import { closeModal, openModal } from "@/src/reduxStore/states/modal";
 import { ModalEnum } from "@/src/types/shared/modal";
 import { postProcessNotificationsUser } from "@/src/util/shared/notification-center-helper";
 import { useWebsocket } from "@/src/services/base/web-sockets/useWebsocket";
+import { useRouter } from "next/router";
+import { selectProjectId } from "@/src/reduxStore/states/project";
 
 const MIN_WIDTH = 1250;
 
 export default function Layout({ children }) {
+    const router = useRouter();
     const dispatch = useDispatch();
 
     const user = useSelector(selectUser);
+    const projectId = useSelector(selectProjectId);
 
     const [deletionTimer, setDeletionTimer] = useState(null);
     const [activeAdminMessages, setActiveAdminMessages] = useState<AdminMessage[]>([]);
@@ -99,12 +103,15 @@ export default function Layout({ children }) {
             refetchNotificationsAndProcess();
         } else if (msgParts[1] == 'admin_message') {
             refetchAdminMessagesAndProcess();
+        } else if (msgParts[1] == 'project_deleted' && msgParts[3] && user?.id != msgParts[3]) {
+            alert('Project deleted');
+            router.push('/projects');
         }
     }, [user?.id, notificationsState]);
-    
+
     useWebsocket(CurrentPage.NOTIFICATION_CENTER, handleWebsocketNotification);
 
-    return (    
+    return (
         <>
             <div className="h-screen bg-gray-100 flex overflow-hidden"
                 style={{ width: windowWidth < MIN_WIDTH ? MIN_WIDTH + 'px' : '100%', overflowX: windowWidth < MIN_WIDTH ? 'auto' : 'hidden' }}>

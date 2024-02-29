@@ -1,17 +1,17 @@
-import { Fragment, useCallback, useEffect, useState } from 'react'
+import { Fragment, useCallback, useEffect, useRef, useState } from 'react'
 import { Menu, Transition } from '@headlessui/react'
 import { ChevronDownIcon } from '@heroicons/react/20/solid'
 import { useMutation } from '@apollo/client';
 import { useRouter } from 'next/router';
 import { useDispatch, useSelector } from 'react-redux';
-import { extendAllProjects, selectAllProjects, updateProjectState } from '@/src/reduxStore/states/project';
+import { selectAllProjects } from '@/src/reduxStore/states/project';
 import { ModalButton, ModalEnum } from '@/src/types/shared/modal';
 import { closeModal, openModal } from '@/src/reduxStore/states/modal';
 import Modal from '../shared/modal/Modal';
 import { IconAlertTriangle, IconFishHook, IconMessageCircle, IconNews } from '@tabler/icons-react';
 import { CREATE_SAMPLE_PROJECT } from '@/src/services/gql/mutations/projects';
-import { ProjectStatus } from '@/src/types/components/projects/projects-list';
 import { setSearchGroupsStore } from '@/src/reduxStore/states/pages/data-browser';
+import { selectProjectIdSampleProject, setProjectIdSampleProject } from '@/src/reduxStore/states/tmp';
 
 const ACCEPT_BUTTON = { buttonCaption: "Create", closeAfterClick: false, useButton: true, disabled: true };
 
@@ -20,10 +20,11 @@ export default function SampleProjectsDropdown() {
     const dispatch = useDispatch();
 
     const projects = useSelector(selectAllProjects);
+    const tmpProjectIdSample = useSelector(selectProjectIdSampleProject);
 
-    const [projectNameInput, setProjectNameInput] = useState<string>("");
-    const [projectTypeInput, setProjectTypeInput] = useState<string>("");
-    const [projectNameExists, setProjectNameExists] = useState<boolean>(false);
+    const [projectNameInput, setProjectNameInput] = useState("");
+    const [projectTypeInput, setProjectTypeInput] = useState("");
+    const [projectNameExists, setProjectNameExists] = useState(false);
 
     const [createSampleProjectMut] = useMutation(CREATE_SAMPLE_PROJECT);
 
@@ -38,23 +39,14 @@ export default function SampleProjectsDropdown() {
         }
         const projectNameFinal = projectName && projectName ? projectName : projectNameInput;
         const projectTypeFinal = projectType ? projectType : projectTypeInput;
-        const projectSample = {
-            name: projectNameFinal,
-            id: "sample",
-            status: ProjectStatus.INIT_SAMPLE_PROJECT
-        }
-        dispatch(extendAllProjects(projectSample));
         dispatch(closeModal(ModalEnum.SAMPLE_PROJECT_TITLE));
         dispatch(setSearchGroupsStore({}));
         createSampleProjectMut({ variables: { name: projectNameFinal, projectType: projectTypeFinal } }).then((res) => {
-            const projectUpdated = res.data.createSampleProject['project'];
-            dispatch(updateProjectState('sample', { ...projectUpdated }));
             dispatch(closeModal(ModalEnum.SAMPLE_PROJECT_TITLE));
-            if (router.pathname.includes("/projects")) {
-                router.push(`/projects/${projectUpdated.id}/overview`);
-            }
+            const projectId = res['data']['createSampleProject']['project'].id;
+            dispatch(setProjectIdSampleProject(projectId));
         });
-    }, []);
+    }, [projects, projectNameInput, projectTypeInput, router]);
 
     const [acceptButton, setAcceptButton] = useState<ModalButton>(ACCEPT_BUTTON);
 
@@ -69,6 +61,18 @@ export default function SampleProjectsDropdown() {
     useEffect(() => {
         setAcceptButton({ ...acceptButton, emitFunction: () => importSampleProject(projectNameInput, projectTypeInput) });
     }, [projectNameInput]);
+
+    useEffect(() => {
+        if (tmpProjectIdSample) {
+            router.push(`/projects/${tmpProjectIdSample}/overview`);
+        }
+    }, [tmpProjectIdSample]);
+
+    useEffect(() => {
+        return () => {
+            dispatch(setProjectIdSampleProject(null));
+        }
+    }, []);
 
     return (
         <Menu as="div" className="relative inline-block text-left">

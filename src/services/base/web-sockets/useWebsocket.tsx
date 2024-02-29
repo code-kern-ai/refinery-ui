@@ -49,7 +49,7 @@ const WHITELIST_LOOKUP = {
     },
     [CurrentPage.PROJECT_SETTINGS]: {
         [CurrentPageSubKey.NONE]: ['project_update', 'tokenization', 'calculate_attribute', 'embedding', 'attributes_updated', 'gates_integration', 'information_source_deleted', 'information_source_updated', 'embedding_deleted', 'embedding_updated', 'upload_embedding_payload', 'label_created', 'label_deleted', 'labeling_task_deleted', 'labeling_task_updated', 'labeling_task_created'],
-        [CurrentPageSubKey.SNAPSHOT_EXPORT]: ['project_updated'],
+        [CurrentPageSubKey.SNAPSHOT_EXPORT]: ['project_updated', 'project_export'],
         [CurrentPageSubKey.EMBEDDINGS]: ['embedding_updated', 'upload_embedding_payload']
 
     },

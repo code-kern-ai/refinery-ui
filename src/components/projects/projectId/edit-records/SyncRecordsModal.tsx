@@ -27,6 +27,7 @@ export default function SyncRecordsModal(props: SyncRecordsModalProps) {
         const erdDataCopy = { ...props.erdData };
         erdDataCopy.syncing = true;
         erdDataCopy.errors = null;
+        props.setErdData(erdDataCopy);
         const changes = jsonCopy(erdDataCopy.cachedRecordChanges);
         for (const key in changes) delete changes[key].display;
         syncChangesMut({ variables: { projectId: projectId, changes: JSON.stringify(changes) } }).then((res) => {

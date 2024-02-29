@@ -1,15 +1,15 @@
 import BricksIntegrator from "@/src/components/shared/bricks-integrator/BricksIntegrator";
 import LoadingIcon from "@/src/components/shared/loading/LoadingIcon";
 import MultilineTooltip from "@/src/components/shared/multilines-tooltip/MultilineTooltip";
-import { selectAllUsers, setBricksIntegrator, setComments } from "@/src/reduxStore/states/general";
+import { selectAllUsers, setComments } from "@/src/reduxStore/states/general";
 import { selectProjectId } from "@/src/reduxStore/states/project"
 import { REQUEST_COMMENTS } from "@/src/services/gql/queries/projects";
 import { RUN_RECORD_IDE } from "@/src/services/gql/queries/record-ide";
+import { LabelingLinkType } from "@/src/types/components/projects/projectId/labeling/labeling-main-component";
 import { CommentType } from "@/src/types/shared/comments";
 import { CurrentPage } from "@/src/types/shared/general";
 import { CommentDataManager } from "@/src/util/classes/comments";
 import { DEFAULT_CODE, PASS_ME, caesarCipher } from "@/src/util/components/projects/projectId/record-ide/record-ide-helper";
-import { getEmptyBricksIntegratorConfig } from "@/src/util/shared/bricks-integrator-helper";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
 import { tryParseJSON } from "@/submodules/javascript-functions/general";
 import { useLazyQuery } from "@apollo/client";
@@ -101,7 +101,7 @@ export default function RecordIDE() {
     function goToLabelingPage() {
         const sessionId = router.query.sessionId as string;
         const pos = router.query.pos as string;
-        router.push(`/projects/${projectId}/labeling/${sessionId}?pos=${pos}`);
+        router.push(`/projects/${projectId}/labeling/${sessionId}?pos=${pos}&type=${LabelingLinkType.SESSION}`);
     }
 
     function loadCodeFromLocalStorage() {
@@ -125,7 +125,7 @@ export default function RecordIDE() {
 
     function switchView() {
         localStorage.setItem("ideHorizontal", JSON.stringify(vertical));
-        location.reload();
+        setVertical(!vertical);
     }
 
     const runRecordIde = useCallback(() => {

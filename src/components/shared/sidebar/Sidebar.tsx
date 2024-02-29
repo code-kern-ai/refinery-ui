@@ -17,6 +17,7 @@ import { TOOLTIPS_DICT } from '@/src/util/tooltip-constants';
 import { CacheEnum, selectCachedValue } from '@/src/reduxStore/states/cachedValues';
 import VersionOverviewModal from './VersionOverviewModal';
 import HowToUpdateModal from './HowToUpdateModal';
+import { setProjectIdSampleProject } from '@/src/reduxStore/states/tmp';
 
 export default function Sidebar() {
     const router = useRouter();
@@ -83,7 +84,7 @@ export default function Sidebar() {
                         <div className="flex-1 flex flex-col min-h-0 overflow-y-auto bg-kernindigo overflow-initial" style={{ zIndex: 100 }}>
                             <div className="flex-1 flex flex-col">
                                 <div className="flex-shrink-0 bg-kernindigo pt-4 pb-10 flex items-center justify-center">
-                                    <a href='/refinery/projects' onClick={(e: any) => { e.preventDefault(); router.push('/projects') }}
+                                    <a href='/refinery/projects' onClick={(e: any) => { e.preventDefault(); dispatch(setProjectIdSampleProject(null)); router.push('/projects') }}
                                         className="inline-flex items-center p-2 rounded-full hover:bg-kernindigo-dark focus:outline-none">
                                         <Image
                                             width={40}

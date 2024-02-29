@@ -185,10 +185,10 @@ export default function ActiveLearning() {
         if (!currentHeuristic) return;
         if (['labeling_task_updated', 'labeling_task_created', 'label_created', 'label_deleted'].includes(msgParts[1])) {
             refetchLabelingTasksAndProcess();
-        } else if ('labeling_task_deleted' == msgParts[1]) {
+        } else if ('labeling_task_deleted' == msgParts[1] && msgParts[2] == currentHeuristic.labelingTaskId) {
             alert('Parent labeling task was deleted!');
             router.push(`/projects/${projectId}/heuristics`);
-        } else if ('information_source_deleted' == msgParts[1]) {
+        } else if ('information_source_deleted' == msgParts[1] && msgParts[2] == currentHeuristic.id) {
             alert('Information source was deleted!');
             router.push(`/projects/${projectId}/heuristics`);
         } else if (['information_source_updated', 'model_callback_update_statistics'].includes(msgParts[1])) {

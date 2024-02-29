@@ -161,6 +161,7 @@ export default function ProjectSettings() {
     }
 
     const handleWebsocketNotification = useCallback((msgParts: string[]) => {
+        if (!project.id) return;
         if (msgParts[1] == 'embedding') {
             if (!embeddings) return;
             if (["queued", "dequeued"].includes(msgParts[2])) {
@@ -332,7 +333,7 @@ export default function ProjectSettings() {
                 </div>
             </div>
 
-            <Embeddings  />
+            <Embeddings />
             <LabelingTasks />
             {isManaged && <GatesIntegration />}
             <ProjectMetaData />

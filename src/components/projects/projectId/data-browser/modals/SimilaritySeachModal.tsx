@@ -1,7 +1,7 @@
 import Modal from "@/src/components/shared/modal/Modal";
 import { selectModal } from "@/src/reduxStore/states/modal";
 import { selectActiveSearchParams, selectSimilaritySearch, selectUniqueValuesDict, setRecordsInDisplay, setSearchRecordsExtended } from "@/src/reduxStore/states/pages/data-browser";
-import { selectEmbeddings, selectLabelingTasksAll, selectUsableAttributes } from "@/src/reduxStore/states/pages/settings";
+import { selectEmbeddings, selectLabelingTasksAll, selectOnAttributeEmbeddings, selectUsableAttributes } from "@/src/reduxStore/states/pages/settings";
 import { selectProjectId } from "@/src/reduxStore/states/project";
 import { SEARCH_SIMILAR_RECORDS } from "@/src/services/gql/queries/data-browser";
 import { FilterIntegrationOperator, SearchOperator } from "@/src/types/components/projects/projectId/data-browser/search-operators";
@@ -33,6 +33,7 @@ export default function SimilaritySearchModal() {
     const projectId = useSelector(selectProjectId);
     const labelingTasks = useSelector(selectLabelingTasksAll);
     const uniqueValuesDict = useSelector(selectUniqueValuesDict);
+    const onAttributeEmbeddings = useSelector(selectOnAttributeEmbeddings);
 
     const [filterAttributesSS, setFilterAttributesSS] = useState<any>(null);
     const [filterAttributesForm, setFilterAttributesForm] = useState<any>([]);
@@ -162,7 +163,7 @@ export default function SimilaritySearchModal() {
         <div className="flex flex-grow justify-center text-lg leading-6 text-gray-900 font-medium">Select embedding for similarity search </div>
         {(activeSearchParams.length > 0 || similaritySearch.recordsInDisplay) && <div className="text-red-500 mb-2 flex flex-grow justify-center text-sm">Warning: your current filter selection will be removed!</div>}
 
-        <Dropdown2 options={embeddings} buttonName={selectedEmbedding ? selectedEmbedding.name : 'Select embedding'} selectedOption={(value) => setSelectedEmbedding(value)} dropdownClasses="my-2" />
+        <Dropdown2 options={onAttributeEmbeddings} buttonName={selectedEmbedding ? selectedEmbedding.name : 'Select embedding'} selectedOption={(value) => setSelectedEmbedding(value)} dropdownClasses="my-2" />
 
         {filterAttributesSS && filterAttributesSS.length > 0 && <div className="flex flex-col justify-start mt-4">
             <div className="pr-2 bg-white text-md font-medium text-gray-900">Filter attributes</div>

@@ -16,7 +16,7 @@ import { ModalEnum } from "@/src/types/shared/modal";
 import { useLazyQuery } from "@apollo/client";
 import { GET_PROJECT_LIST, NOTIFICATIONS } from "@/src/services/gql/queries/projects";
 import { postProcessNotifications } from "@/src/util/shared/notification-center-helper";
-import { selectNotificationId } from "@/src/reduxStore/states/tmp";
+import { selectNotificationId, setProjectIdSampleProject } from "@/src/reduxStore/states/tmp";
 import Comments from "../comments/Comments";
 import { arrayToDict } from "@/submodules/javascript-functions/general";
 
@@ -106,7 +106,7 @@ export default function Header() {
                     </div>
                     {(user?.role == UserRole.ENGINEER && isManaged) ? (
                         <div className="flex items-center justify-center">
-                            <a href="/refinery/users" onClick={(e: any) => { e.preventDefault(); router.push(`/users`) }}
+                            <a href="/refinery/users" onClick={(e: any) => { e.preventDefault(); dispatch(setProjectIdSampleProject(null)); router.push(`/users`) }}
                                 className="flex mr-6">
                                 <Tooltip placement="bottom" trigger="hover" color="invert" content={TOOLTIPS_DICT.GENERAL.USERS}>
                                     <IconHexagons className="w-6 h-6" />
