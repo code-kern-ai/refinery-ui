@@ -158,8 +158,9 @@ export default function Upload(props: UploadProps) {
         if (uploadFileType == UploadFileType.RECORDS_NEW || uploadFileType == UploadFileType.RECORDS_ADD) {
             tokenizerPrep = tokenizer.split('(')[1].split(')')[0];
         } else {
-            tokenizerPrep = '(' + UPLOAD_TOKENIZERS.ENGLISH.TOKENIZER + ')';
+            tokenizerPrep = UPLOAD_TOKENIZERS.ENGLISH.TOKENIZER; // dummy tokenizer, actual value is set during import of project
         }
+
         updateProjectTokenizerMut({ variables: { projectId: UploadHelper.getProjectId(), tokenizer: tokenizerPrep } }).then((res) => {
             updateProjectStatusMut({ variables: { projectId: UploadHelper.getProjectId(), newStatus: ProjectStatus.INIT_COMPLETE } })
         });
