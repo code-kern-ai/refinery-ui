@@ -60,6 +60,16 @@ export default function ExportRecordsModal(props: ExportProps) {
         }
     }, [enumArrays]);
 
+    useEffect(() => {
+        if (!modal || !modal.open) return;
+        setFormGroup(null);
+        setEnumArrays(null);
+        setRecordExportCredentials(null);
+        setPrepareErrors([]);
+        setDownloadState(DownloadState.NONE);
+        setKey('');
+    }, [modal]);
+
     function requestRecordsExportCredentials() {
         refetchLastRecordsExportCredentials({ variables: { projectId: projectId } }).then((res) => {
             const recordExportCredentials = res.data['lastRecordExportCredentials'];
@@ -210,7 +220,7 @@ export default function ExportRecordsModal(props: ExportProps) {
             if (res.data['prepareRecordExport'] != "") {
                 ExportHelper.error.push("Something went wrong in the backend:");
                 ExportHelper.error.push(res.data['prepareRecordExport']);
-                setPrepareErrors(ExportHelper.error);   
+                setPrepareErrors(ExportHelper.error);
             }
             setDownloadState(DownloadState.DOWNLOAD);
         });
@@ -317,7 +327,10 @@ export default function ExportRecordsModal(props: ExportProps) {
                 Prepare download
                 {downloadState == DownloadState.PREPARATION && <span className="ml-2"><LoadingIcon color="green" /></span>}
             </button>
-            <button onClick={() => dispatch(closeModal(ModalEnum.EXPORT_RECORDS))}
+            <button onClick={() => {
+                dispatch(closeModal(ModalEnum.EXPORT_RECORDS));
+
+            }}
                 className="bg-white text-gray-700 text-xs font-semibold px-4 py-2 rounded border border-gray-300 cursor-pointer hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
                 Close
             </button>
