@@ -260,7 +260,9 @@ export default function Upload(props: UploadProps) {
             {uploadFileType == UploadFileType.PROJECT && (<>
                 <UploadField isFileCleared={selectedFile == null} uploadStarted={uploadStarted} doingSomething={doingSomething} progressState={progressState} sendSelectedFile={(file) => {
                     setSelectedFile(file);
-                    setFileEndsWithZip(file.name.endsWith('.zip'));
+                    if (file) {
+                        setFileEndsWithZip(file.name.endsWith('.zip'));
+                    }
                 }} />
                 {selectedFile && (selectedFile.type == ZIP_TYPE || fileEndsWithZip) &&
                     <CryptedField placeholder="Enter password if zip file is protected..." keyChange={(key) => setKey(key)} />}

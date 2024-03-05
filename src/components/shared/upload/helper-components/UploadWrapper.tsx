@@ -28,7 +28,9 @@ export default function UploadWrapper(props: UploadWrapperProps) {
     return (<>
         <UploadField isFileCleared={props.isFileCleared} uploadStarted={props.uploadStarted} doingSomething={props.doingSomething} progressState={props.progressState} sendSelectedFile={(file) => {
             setSelectedFile(file);
-            setFileEndsWithZip(file.name.endsWith('.zip'));
+            if (file) {
+                setFileEndsWithZip(file.name.endsWith('.zip'));
+            }
             props.sendSelectedFile(file)
         }} />
         {props.submitted && !selectedFile && props.uploadTask?.state !== UploadStates.IN_PROGRESS && <div className="rounded-md bg-yellow-50 p-4">
