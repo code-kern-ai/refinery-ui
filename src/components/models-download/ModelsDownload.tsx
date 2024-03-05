@@ -10,7 +10,7 @@ import { useDispatch, useSelector } from "react-redux";
 import LoadingIcon from "../shared/loading/LoadingIcon";
 import { openModal, setModalStates } from "@/src/reduxStore/states/modal";
 import { ModalEnum } from "@/src/types/shared/modal";
-import { selectIsManaged } from "@/src/reduxStore/states/general";
+import { selectIsAdmin, selectIsManaged } from "@/src/reduxStore/states/general";
 import { CurrentPage } from "@/src/types/shared/general";
 import { timer } from "rxjs";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
@@ -23,6 +23,7 @@ export default function ModelsDownload() {
     const dispatch = useDispatch();
 
     const isManaged = useSelector(selectIsManaged);
+    const isAdmin = useSelector(selectIsAdmin);
     const modelsDownloaded = useSelector(selectModelsDownloaded);
 
     const [refetchModelsDownload] = useLazyQuery(GET_MODEL_PROVIDER_INFO, { fetchPolicy: 'network-only', nextFetchPolicy: 'cache-first' });
@@ -139,8 +140,8 @@ export default function ModelsDownload() {
                                         </div>
                                     </td>
                                     <td className="whitespace-nowrap text-center px-3 py-2 text-sm text-gray-500">
-                                        <IconTrash onClick={() => dispatch(setModalStates(ModalEnum.DELETE_MODEL_DOWNLOAD, { modelName: model.name, open: true }))}
-                                            className="h-6 w-6 text-red-700 cursor-pointer" />
+                                        {isAdmin && <IconTrash onClick={() => dispatch(setModalStates(ModalEnum.DELETE_MODEL_DOWNLOAD, { modelName: model.name, open: true }))}
+                                            className="h-6 w-6 text-red-700 cursor-pointer" />}
                                     </td>
                                 </tr>
                             ))}
