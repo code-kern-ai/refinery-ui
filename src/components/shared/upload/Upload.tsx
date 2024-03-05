@@ -200,6 +200,7 @@ export default function Upload(props: UploadProps) {
                     timer(500).subscribe(() => {
                         setSelectedFile(null);
                         setSubmitted(false);
+                        dispatch(setImportOptions(""));
                         if (props.uploadOptions.isModal) {
                             dispatch(closeModal(ModalEnum.MODAL_UPLOAD));
                             if (props.closeModalEvent) props.closeModalEvent();
