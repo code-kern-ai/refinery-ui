@@ -180,7 +180,7 @@ export default function HeuristicsHeader(props: HeuristicsHeaderProps) {
                 </Tooltip>
             </div>
             <div className="grid grid-cols-1 gap-4 xs:flex xs:gap-0 flex-row items-center mt-2 xl:mt-0">
-                {labelingTasks && labelingTasks.length > 0 ? (<Tooltip content={TOOLTIPS_DICT.HEURISTICS.ENABLED_NEW_HEURISTIC} color="invert" placement="right">
+                {labelingTasks && labelingTasks.length > 0 ? (<Tooltip content={TOOLTIPS_DICT.HEURISTICS.ENABLED_NEW_HEURISTIC} color="invert" placement="bottom">
                     <Dropdown2 options={NEW_HEURISTICS} buttonName="New heuristic" tooltipsArray={[null, null, null, isManaged ? null : 'Only available for managed projects']}
                         disabledOptions={[false, false, !(labelingTasks && labelingTasks.length > 0), !isManaged]}
                         selectedOption={(option: string) => executeOption(option)} buttonClasses={`${style.actionsHeight} text-xs whitespace-nowrap`} dropdownClasses="mr-3" dropdownItemsWidth='w-40' dropdownWidth='w-32'
@@ -204,7 +204,7 @@ export default function HeuristicsHeader(props: HeuristicsHeaderProps) {
                         selectedOption={(option: string) => executeOption(option)} dropdownClasses="mr-3" buttonClasses={`${style.actionsHeight} text-xs`} dropdownItemsWidth='w-40' dropdownWidth='w-32'
                         iconsArray={['IconSquareCheck', 'IconSquare', 'IconPlayerPlayFilled', 'IconTrash']} />
                 ) : (
-                    <Tooltip placement="left" content={TOOLTIPS_DICT.HEURISTICS.ENABLE_ACTIONS} color="invert">
+                    <Tooltip placement="bottom" content={TOOLTIPS_DICT.HEURISTICS.ENABLE_ACTIONS} color="invert">
                         <button type="button" disabled={true}
                             className="mr-3 inline-flex items-center justify-center w-full rounded-md border border-gray-300 shadow-sm px-4 py-1.5 bg-white text-xs font-medium text-gray-700 opacity-50 cursor-not-allowed focus:ring-offset-2 focus:ring-offset-gray-400"
                             id="menu-button" aria-expanded="true" aria-haspopup="true">
@@ -256,7 +256,7 @@ export default function HeuristicsHeader(props: HeuristicsHeaderProps) {
                 </div>
 
                 <div className="flex justify-center overflow-visible">
-                    <Tooltip placement="left" content={TOOLTIPS_DICT.HEURISTICS.NAVIGATE_MODEL_CALLBACKS} color="invert">
+                    <Tooltip placement="bottom" content={TOOLTIPS_DICT.HEURISTICS.NAVIGATE_MODEL_CALLBACKS} color="invert">
                         <a href={`/refinery/projects/${projectId}/model-callbacks`} onClick={(e: any) => { e.preventDefault(); router.push(`/projects/${projectId}/model-callbacks`) }}
                             className="bg-white text-gray-700 text-xs font-medium mr-3 px-4 py-2 rounded-md border border-gray-300 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
                             Model callbacks
@@ -265,7 +265,7 @@ export default function HeuristicsHeader(props: HeuristicsHeaderProps) {
                 </div>
 
                 <div className="flex justify-center overflow-visible">
-                    <Tooltip placement="left" content={TOOLTIPS_DICT.HEURISTICS.NAVIGATE_LOOKUP_LISTS} color="invert">
+                    <Tooltip placement="bottom" content={TOOLTIPS_DICT.HEURISTICS.NAVIGATE_LOOKUP_LISTS} color="invert">
                         <a href={`/refinery/projects/${projectId}/lookup-lists`} onClick={(e: any) => { e.preventDefault(); router.push(`/projects/${projectId}/lookup-lists`) }}
                             className=" bg-white text-gray-700 text-xs font-medium mr-3 px-4 py-2 rounded-md border border-gray-300 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
                             Lookup lists
