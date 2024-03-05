@@ -27,7 +27,8 @@ export function getEmptyProjectStats(): ProjectStats {
         generalStats: {},
         interAnnotatorLoading: false,
         interAnnotator: NOT_AVAILABLE,
-        interAnnotatorStat: -1
+        interAnnotatorStat: -1,
+        tooltipsArray: []
     }
 }
 
@@ -37,10 +38,13 @@ export function postProcessingStats(projectStats: ProjectStats[]): ProjectStats 
     if (prepareProjectStats.general == undefined) {
         prepareProjectStats.general = {};
         prepareProjectStats.generalPercent = {};
+        prepareProjectStats.tooltipsArray = [];
     }
     projectStats.forEach((element: any) => {
         if (element.source_type == 'INFORMATION_SOURCE') {
             prepareProjectStats.general[element.source_type] = element.absolut_labeled + " hitting on current slice\n" + element.records_in_slice + " defined in labeling task";
+            const tooltipsArray = [element.absolut_labeled + " hitting on current slice", element.records_in_slice + " defined in labeling task"];
+            prepareProjectStats.tooltipsArray[element.source_type] = tooltipsArray;
             prepareProjectStats.generalPercent[element.source_type] = element.absolut_labeled + " (" + element.records_in_slice + ")";
         } else {
             prepareProjectStats.general[element.source_type] = element.absolut_labeled + " of " + element.records_in_slice;

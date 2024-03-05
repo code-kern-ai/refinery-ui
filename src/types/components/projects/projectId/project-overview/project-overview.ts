@@ -8,6 +8,7 @@ export type ProjectStats = {
     interAnnotatorLoading: boolean;
     interAnnotator: string;
     interAnnotatorStat: number;
+    tooltipsArray?: any;
 };
 
 export type ProjectOverviewCardsProps = {
