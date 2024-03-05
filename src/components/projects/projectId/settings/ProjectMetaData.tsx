@@ -92,7 +92,7 @@ export default function ProjectMetaData() {
                         value={projectNameDelete} type="text" placeholder="Please enter the project name to enable deletion" onChange={(e) => setProjectNameDelete(e.target.value)}
                         onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); (projectNameDelete === project.name) ? deleteProject() : null } }} />
 
-                    <Tooltip content={TOOLTIPS_DICT.PROJECT_SETTINGS.META_DATA.CANNOT_BE_REVERTED} placement="left" color="invert">
+                    <Tooltip content={<div className="w-32">{TOOLTIPS_DICT.PROJECT_SETTINGS.META_DATA.CANNOT_BE_REVERTED}</div>} placement="top" color="invert">
                         <button onClick={deleteProject} disabled={!(projectNameDelete === project.name)} type="button"
                             className={`inline-flex text-xs items-center bg-red-100 border border-red-400 text-red-700 font-semibold px-4 py-2 rounded-md ml-6 hover:bg-red-200 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50 `}>
                             <IconWreckingBall className="h-4 w-4 mr-2" />
