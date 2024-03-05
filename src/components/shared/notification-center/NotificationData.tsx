@@ -1,4 +1,6 @@
+import { closeModal } from "@/src/reduxStore/states/modal";
 import { selectProjectId, setActiveProject } from "@/src/reduxStore/states/project";
+import { ModalEnum } from "@/src/types/shared/modal";
 import { NotificationDataProps } from "@/src/types/shared/notification-center";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
 import { Tooltip } from "@nextui-org/react";
@@ -32,6 +34,7 @@ export default function NotificationData(props: NotificationDataProps) {
                             dispatch(setActiveProject(null));
                         }
                         router.push(`/projects/${props.notification[0].projectId}/${props.notification[0].page}`);
+                        dispatch(closeModal(ModalEnum.NOTIFICATION_CENTER))
                     }}>
                         {props.notification[0].projectName}
                     </button></span>})<div className="mt-1 text-left">{props.notification[0].timePassed} ago</div>
