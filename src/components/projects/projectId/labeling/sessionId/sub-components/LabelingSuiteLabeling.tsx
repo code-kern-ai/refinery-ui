@@ -577,7 +577,7 @@ export default function LabelingSuiteLabeling() {
                                     setSelected={(start, end, e) => setSelected(attribute.id, start, end, e)} />) : (<>
                                         {(recordRequests.record.data[lVars.taskLookup[attribute.id].attribute.name] != null && recordRequests.record.data[lVars.taskLookup[attribute.id].attribute.name] !== '') ?
                                             (<p className={`break-words text-sm leading-5 font-normal text-gray-500 ${settings.main.lineBreaks != LineBreaksType.NORMAL ? (settings.main.lineBreaks == LineBreaksType.IS_PRE_WRAP ? 'whitespace-pre-wrap' : 'whitespace-pre-line') : ''}`}>
-                                                {recordRequests.record.data[lVars.taskLookup[attribute.id].attribute.name]}
+                                                {`${recordRequests.record.data[lVars.taskLookup[attribute.id].attribute.name]}`}
                                             </p>) : (<>
                                                 <IconAlertCircle className="text-yellow-700 inline-block h-5 w-5" />
                                                 <span className="text-gray-500 text-sm font-normal italic">Not present in the
