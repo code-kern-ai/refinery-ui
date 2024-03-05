@@ -102,7 +102,7 @@ export default function EditRecords() {
                                         </div>) : (<>
                                             {(record.id == erdData.editRecordId && !attribute.isPrimaryKey) ? <EditField attribute={attribute} record={record} erdData={erdData} setErdData={(erdData) => setErdData(erdData)} /> : <>
                                                 {record.data[attribute.name] != null && record.data[attribute.name] !== '' ? (<span className="whitespace-pre-wrap relative">
-                                                    <span>{record.data[attribute.name]}</span>
+                                                    <span>{`${record.data[attribute.name]}`}</span>
                                                     {erdData.cachedRecordChanges[buildAccessKey(record.id, attribute.name)] && <div className="absolute -left-5 top-0 text-yellow-500">
                                                         <Tooltip content={TOOLTIPS_DICT.EDIT_RECORDS.CACHED_VALUES} color="invert" placement="right" className="cursor-auto">
                                                             <IconAlertTriangleFilled size={16} stroke={2} />
