@@ -67,7 +67,8 @@ export const TOOLTIPS_DICT = {
             'NO_FILTER_ATTRIBUTES': 'No filter attributes',
             'GENERATE_EMBEDDING': 'Vectorize your attributes. Integration to Hugging Face available',
             'HOSTED_VERSION': 'Check out our hosted version to use this function',
-            'NAVIGATE_MODELS_DOWNLOADED': 'See which models are downloaded'
+            'NAVIGATE_MODELS_DOWNLOADED': 'See which models are downloaded',
+            'NOT_YET_ON_QDRANT': 'Embedding is not yet on Qdrant',
         },
         'DATA_SCHEMA': {
             'UNIQUE_COMBINATION': 'Key combination is unique',

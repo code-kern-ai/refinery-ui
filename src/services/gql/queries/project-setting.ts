@@ -134,6 +134,7 @@ query ($projectId: ID!) {
           model
           filterAttributes
           attributeId
+          onQdrant
         }
       }
     }

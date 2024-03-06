@@ -111,9 +111,13 @@ export default function Embeddings() {
                                         </td>
                                         {!loadingEmbeddingsDict[embedding.id] ?
                                             <td className="whitespace-nowrap text-center px-3 py-2 text-sm text-gray-500 flex justify-center">
-                                                <Tooltip content={embedding.filterAttributes && embedding.filterAttributes.length > 0 ? TOOLTIPS_DICT.PROJECT_SETTINGS.EMBEDDINGS.HAS_FILTER_ATTRIBUTES : TOOLTIPS_DICT.PROJECT_SETTINGS.EMBEDDINGS.NO_FILTER_ATTRIBUTES} color="invert" >
-                                                    <IconNotes onClick={() => dispatch(setModalStates(ModalEnum.FILTERED_ATTRIBUTES, { embeddingId: embedding.id, open: true, attributeNames: prepareAttributeDataByNames(embedding.filterAttributes), showEditOption: showEditOption }))}
-                                                        className={`h-6 w-6 ${embedding.filterAttributes && embedding.filterAttributes.length > 0 ? 'text-gray-700' : 'text-gray-300'}`} />
+                                                <Tooltip content={!embedding.onQdrant ? TOOLTIPS_DICT.PROJECT_SETTINGS.EMBEDDINGS.NOT_YET_ON_QDRANT : (
+                                                    embedding.filterAttributes && embedding.filterAttributes.length > 0 ?
+                                                        TOOLTIPS_DICT.PROJECT_SETTINGS.EMBEDDINGS.HAS_FILTER_ATTRIBUTES :
+                                                        TOOLTIPS_DICT.PROJECT_SETTINGS.EMBEDDINGS.NO_FILTER_ATTRIBUTES)
+                                                } color="invert" >
+                                                    <IconNotes onClick={() => embedding.onQdrant ? dispatch(setModalStates(ModalEnum.FILTERED_ATTRIBUTES, { embeddingId: embedding.id, open: true, attributeNames: prepareAttributeDataByNames(embedding.filterAttributes), showEditOption: showEditOption })) : null}
+                                                        className={`h-6 w-6 ${embedding.filterAttributes && embedding.filterAttributes.length > 0 ? 'text-gray-700' : 'text-gray-300'} ${embedding.onQdrant ? "" : "cursor-not-allowed opacity-50"}`} />
                                                 </Tooltip>
                                             </td> : <td><LoadingIcon /></td>}
                                         <td className="whitespace-nowrap text-center px-3 py-2 text-sm text-gray-500">
@@ -186,6 +190,6 @@ export default function Embeddings() {
             setFilterAttributesUpdate={(value) => setFilterAttributesUpdate(value)} />
 
         <DeleteEmbeddingModal />
-        <AddNewEmbeddingModal  />
+        <AddNewEmbeddingModal />
     </div>);
 }
