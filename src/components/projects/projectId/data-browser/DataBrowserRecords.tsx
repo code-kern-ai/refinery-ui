@@ -150,7 +150,7 @@ export default function DataBrowserRecords(props: DataBrowserRecordsProps) {
             </Fragment>))}
         </div>}
 
-        <div className="mb-3 mt-4 grow overflow-y-auto" style={{ maxHeight: 'calc(100vh - 160px)' }} onScroll={(e: any) => refetchMoreRecords(e)}>
+        <div className={`mb-3 mt-4 grow ${additionalData.loading ? '' : 'overflow-y-auto'}`} style={{ maxHeight: 'calc(100vh - 160px)' }} onScroll={(e: any) => refetchMoreRecords(e)}>
             {additionalData.loading && <div className="h-full flex justify-center items-center"><LoadingIcon size="lg" /></div>}
             {extendedRecords && attributes && !additionalData.loading && <div className="mr-2">
                 {extendedRecords.fullCount == 0 && <div>Your search criteria didn&apos;t match any record.</div>}
