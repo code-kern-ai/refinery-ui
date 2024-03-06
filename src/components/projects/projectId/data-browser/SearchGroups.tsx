@@ -477,6 +477,11 @@ export default function SearchGroups() {
         const fullSearchCopy = jsonCopy(fullSearchStore);
         const formControlsIdx = fullSearchCopy[group.key].groupElements['orderBy'][index];
         const findActive = fullSearchCopy[group.key].groupElements['orderBy'].find((el) => el['active'] == true);
+        const findRandom = fullSearchCopy[group.key].groupElements['orderBy'].find((el) => el['orderByKey'] == StaticOrderByKeys.RANDOM);
+        if (findRandom) {
+            findRandom['active'] = false;
+            findRandom['color'] = getActiveNegateGroupColor(findRandom);
+        }
         if (findActive && findActive != formControlsIdx) findActive['active'] = false;
         if (formControlsIdx['active'] && formControlsIdx['direction'] == -1) {
             formControlsIdx['direction'] = 1;
@@ -486,6 +491,18 @@ export default function SearchGroups() {
         } else {
             formControlsIdx['active'] = true;
         }
+        dispatch(setFullSearchStore(fullSearchCopy));
+        updateSearchParams(fullSearchCopy);
+    }
+
+    function updateRandomSeed() {
+        const fullSearchCopy = jsonCopy(fullSearchStore);
+        const formControlsIdx = fullSearchCopy[SearchGroup.ORDER_STATEMENTS].groupElements['orderBy'].find((el) => el['orderByKey'] == StaticOrderByKeys.RANDOM);
+        fullSearchCopy[SearchGroup.ORDER_STATEMENTS].groupElements['orderBy'].forEach((el) => {
+            if (el['orderByKey'] != StaticOrderByKeys.RANDOM) el['active'] = false;
+        });
+        formControlsIdx['active'] = !formControlsIdx['active'];
+        formControlsIdx['color'] = getActiveNegateGroupColor(formControlsIdx);
         dispatch(setFullSearchStore(fullSearchCopy));
         updateSearchParams(fullSearchCopy);
     }
@@ -772,7 +789,7 @@ export default function SearchGroups() {
                                         <span className="ml-2 text-sm truncate w-full">{groupItem['displayName']}</span>
                                     </div>
                                 </div>) : (<div className="flex flex-row items-center mr-2">
-                                    <div className="flex flex-row items-center cursor-pointer" onClick={() => setActiveNegateGroup(groupItem, index, group)}>
+                                    <div className="flex flex-row items-center cursor-pointer" onClick={updateRandomSeed}>
                                         <div style={{ backgroundColor: groupItem.color, borderColor: groupItem.color }}
                                             className="ml-2 mr-2 h-4 w-4 border-gray-300 border rounded cursor-pointer hover:bg-gray-200">
                                         </div>
