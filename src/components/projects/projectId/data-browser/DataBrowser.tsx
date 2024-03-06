@@ -4,7 +4,7 @@ import DataBrowserSidebar from "./DataBrowserSidebar";
 import { useLazyQuery } from "@apollo/client";
 import { DATA_SLICES, GET_RECORD_COMMENTS, GET_UNIQUE_VALUES_BY_ATTRIBUTES, SEARCH_RECORDS_EXTENDED } from "@/src/services/gql/queries/data-browser";
 import { useCallback, useEffect, useState } from "react";
-import { expandRecordList, setActiveDataSlice, setDataSlices, setRecordComments, setSearchRecordsExtended, setUniqueValuesDict, setUsersMapCount, updateAdditionalDataState } from "@/src/reduxStore/states/pages/data-browser";
+import { expandRecordList, selectRecords, setActiveDataSlice, setDataSlices, setRecordComments, setSearchRecordsExtended, setUniqueValuesDict, setUsersMapCount, updateAdditionalDataState } from "@/src/reduxStore/states/pages/data-browser";
 import { postProcessRecordsExtended, postProcessUniqueValues, postProcessUsersCount } from "@/src/util/components/projects/projectId/data-browser/data-browser-helper";
 import { GET_ATTRIBUTES_BY_PROJECT_ID, GET_EMBEDDING_SCHEMA_BY_PROJECT_ID, GET_LABELING_TASKS_BY_PROJECT_ID } from "@/src/services/gql/queries/project-setting";
 import { selectAttributes, selectLabelingTasksAll, setAllAttributes, setAllEmbeddings, setLabelingTasksAll } from "@/src/reduxStore/states/pages/settings";
@@ -29,6 +29,8 @@ export default function DataBrowser() {
     const labelingTasks = useSelector(selectLabelingTasksAll);
     const attributes = useSelector(selectAttributes);
     const user = useSelector(selectUser);
+    const recordList = useSelector(selectRecords).recordList;
+
 
     const [searchRequest, setSearchRequest] = useState(SEARCH_REQUEST);
 
@@ -54,10 +56,9 @@ export default function DataBrowser() {
     }, [projectId, users, user]);
 
     useEffect(() => {
-        if (!projectId) return;
-        if (!labelingTasks) return;
-        refetchExtendedSearchAndProcess();
-    }, [projectId, labelingTasks]);
+        if (!projectId || !labelingTasks || !recordList) return;
+        refetchRecordCommentsAndProcess(recordList);
+    }, [projectId, labelingTasks, recordList]);
 
     useEffect(() => {
         if (!projectId) return;
@@ -119,14 +120,6 @@ export default function DataBrowser() {
     function refetchUsersCountAndProcess() {
         refetchUsersCount({ variables: { projectId: projectId } }).then((res) => {
             dispatch(setUsersMapCount(postProcessUsersCount(res.data['allUsersWithRecordCount'], users, user)));
-        });
-    }
-
-    function refetchExtendedSearchAndProcess() {
-        refetchExtendedRecord({ variables: { projectId: projectId, filterData: JSON.stringify({}), offset: searchRequest.offset, limit: searchRequest.limit } }).then((res) => {
-            const parsedRecordData = postProcessRecordsExtended(res.data['searchRecordsExtended'], labelingTasks);
-            dispatch(setSearchRecordsExtended(parsedRecordData));
-            refetchRecordCommentsAndProcess(parsedRecordData.recordList);
         });
     }
 
