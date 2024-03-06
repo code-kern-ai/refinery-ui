@@ -96,3 +96,23 @@ export function postProcessConfusionMatrix(data: string): any {
         }
     });
 }
+
+export function calcInterAnnotatorAvg(interAnnotatorMatrix, projectStats: ProjectStats) {
+    const projectStatsCopy = { ...projectStats }
+    let c = 0;
+    let s = 0;
+    interAnnotatorMatrix.elements.forEach(e => {
+        if (e.userIdA != e.userIdB && e.percent != -1) {
+            c++;
+            s += e.percent;
+        }
+    });
+    if (c) {
+        projectStatsCopy.interAnnotator = Number(c / 2) + " with intersections";
+        projectStatsCopy.interAnnotatorStat = s / c;
+    } else {
+        projectStatsCopy.interAnnotator = "No intersections";
+        projectStatsCopy.interAnnotatorStat = -1;
+    }
+    return projectStatsCopy;
+}

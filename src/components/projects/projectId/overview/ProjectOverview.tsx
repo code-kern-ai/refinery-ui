@@ -4,7 +4,7 @@ import { useLazyQuery } from '@apollo/client';
 import { useCallback, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import ProjectOverviewHeader from './ProjectOverviewHeader';
-import { getEmptyProjectStats, postProcessConfusionMatrix, postProcessLabelDistribution, postProcessingStats } from '@/src/util/components/projects/projectId/project-overview/project-overview-helper';
+import { calcInterAnnotatorAvg, getEmptyProjectStats, postProcessConfusionMatrix, postProcessLabelDistribution, postProcessingStats } from '@/src/util/components/projects/projectId/project-overview/project-overview-helper';
 import ProjectOverviewCards from './ProjectOverviewCards';
 import { ProjectStats } from '@/src/types/components/projects/projectId/project-overview/project-overview';
 import style from '@/src/styles/components/projects/projectId/project-overview.module.css';
@@ -52,7 +52,7 @@ export default function ProjectOverview() {
     const [confusionMatrix, setConfusionMatrix] = useState<any[]>([]);
     const [displayConfusion, setDisplayConfusion] = useState<boolean>(false);
     const [interAnnotatorFormGroup, setInterAnnotatorFormGroup] = useState<any>({});
-    const [interAnnotatorMatrix, setInterAnnotatorMatrix] = useState<any>([[]]);
+    const [interAnnotatorMatrix, setInterAnnotatorMatrix] = useState<any>(null);
     const [goldUserRequested, setGoldUserRequested] = useState<boolean>(false);
 
     const [refetchProjectStats] = useLazyQuery(GET_GENERAL_PROJECT_STATS, { fetchPolicy: "no-cache" });
@@ -95,6 +95,16 @@ export default function ProjectOverview() {
         if (!labelDistribution) return;
         setGraphsHaveValues(labelDistribution?.length > 0);
     }, [labelDistribution]);
+
+    useEffect(() => {
+        if (!interAnnotatorMatrix) return;
+        const projectStatsCopy = { ...projectStats }
+        const calcAvg = calcInterAnnotatorAvg(interAnnotatorMatrix, projectStats);
+        projectStatsCopy.interAnnotatorLoading = false;
+        projectStatsCopy.interAnnotator = calcAvg.interAnnotator;
+        projectStatsCopy.interAnnotatorStat = calcAvg.interAnnotatorStat;
+        setProjectStats(projectStatsCopy);
+    }, [interAnnotatorMatrix]);
 
     function setUpCommentsRequests() {
         const requests = [];
