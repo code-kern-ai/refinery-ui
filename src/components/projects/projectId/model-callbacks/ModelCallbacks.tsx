@@ -188,7 +188,7 @@ export default function ModelCallbacks() {
                 <div className="overflow-y-auto" style={{ maxHeight: '93%' }}>
                     <div className={`mt-8 ${filteredList.length > 3 ? style.flexContainer : 'grid gap-6 grid-cols-3'}`}>
                         {filteredList.length == 0 && <span className="text-gray-500 text-base leading-6 font-normal mt-4">No model callbacks for this labeling task</span>}
-                        <GridCards filteredList={filteredList} refetch={refetchModelCallbacksAndProcess} />
+                        <GridCards filteredList={filteredList} refetch={refetchModelCallbacksAndProcess} setFilteredList={setFilteredList} />
                     </div>
                 </div>
 

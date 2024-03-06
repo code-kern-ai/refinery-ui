@@ -20,6 +20,11 @@ export default function GridCards(props: GridCardsProps) {
     const [toggleHeuristicsMut] = useMutation(TOGGLE_HEURISTICS_SELECTED);
 
     function toggleHeuristic(projectId: string, heuristicId: string) {
+        const shallowCopy = [...props.filteredList];
+        const heuristicIndex = shallowCopy.findIndex((heuristic: Heuristic) => heuristic.id === heuristicId);
+        if (heuristicIndex === -1) return;
+        shallowCopy[heuristicIndex] = { ...shallowCopy[heuristicIndex], selected: !shallowCopy[heuristicIndex].selected };
+        props.setFilteredList(shallowCopy);
         toggleHeuristicsMut({ variables: { projectId: projectId, informationSourceId: heuristicId } }).then(() => {
             props.refetch();
         });
