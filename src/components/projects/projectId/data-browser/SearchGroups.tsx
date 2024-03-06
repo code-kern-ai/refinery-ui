@@ -118,6 +118,30 @@ export default function SearchGroups() {
         if (recordsInDisplay) return;
         refreshTextHighlightNeeded();
         setHighlightingToRecords();
+        if (!(activeSlice && activeSlice.static)) {
+            dispatch(updateAdditionalDataState('loading', true));
+            const refetchTimer = setTimeout(() => {
+                refetchExtendedRecord({
+                    variables: {
+                        projectId: projectId,
+                        filterData: parseFilterToExtended(activeSearchParams, attributes, configuration, labelingTasks, user, fullSearchStore[SearchGroup.DRILL_DOWN]),
+                        offset: 0, limit: 20
+                    }
+                }).then((res) => {
+                    dispatch(setSearchRecordsExtended(postProcessRecordsExtended(res.data['searchRecordsExtended'], labelingTasks)));
+                    dispatch(updateAdditionalDataState('loading', false));
+                });
+            }, 500);
+            return () => clearTimeout(refetchTimer);
+        }
+    }, [activeSearchParams, user, projectId, attributes, labelingTasks, configuration]);
+
+    useEffect(() => {
+        if (!user || !activeSearchParams || !labelingTasks || !attributes || !projectId) return;
+        if (!fullSearchStore || fullSearchStore[SearchGroup.DRILL_DOWN] == undefined) return;
+        if (recordsInDisplay) return;
+        refreshTextHighlightNeeded();
+        setHighlightingToRecords();
         if (activeSlice && activeSlice.static) {
             refetchRecordsStatic({
                 variables: {
@@ -136,23 +160,8 @@ export default function SearchGroups() {
                     dispatch(updateAdditionalDataState('staticDataSliceCurrentCount', res['data']['staticDataSlicesCurrentCount']));
                 });
             });
-        } else {
-            dispatch(updateAdditionalDataState('loading', true));
-            const refetchTimer = setTimeout(() => {
-                refetchExtendedRecord({
-                    variables: {
-                        projectId: projectId,
-                        filterData: parseFilterToExtended(activeSearchParams, attributes, configuration, labelingTasks, user, fullSearchStore[SearchGroup.DRILL_DOWN]),
-                        offset: 0, limit: 20
-                    }
-                }).then((res) => {
-                    dispatch(setSearchRecordsExtended(postProcessRecordsExtended(res.data['searchRecordsExtended'], labelingTasks)));
-                    dispatch(updateAdditionalDataState('loading', false));
-                });
-            }, 500);
-            return () => clearTimeout(refetchTimer);
         }
-    }, [activeSearchParams, user, projectId, attributes, labelingTasks, configuration, activeSlice]);
+    }, [activeSlice, activeSearchParams, user, projectId, attributes, labelingTasks,]);
 
     useEffect(() => {
         if (!recordList) return;
