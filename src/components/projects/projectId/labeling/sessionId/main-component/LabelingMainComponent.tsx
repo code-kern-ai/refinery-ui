@@ -159,16 +159,18 @@ export default function LabelingMainComponent() {
             dispatch(updateRecordRequests('rla', null));
             return;
         }
-        combineLatest([
-            refetchTokenizedRecord({ variables: { recordId: SessionManager.currentRecordId } }),
-            refetchRecordByRecordId({ variables: { projectId, recordId: SessionManager.currentRecordId } }),
-            refetchRla({ variables: { projectId, recordId: SessionManager.currentRecordId } })
-        ]).subscribe(([tokenized, record, rla]) => {
-            dispatch(updateRecordRequests('token', tokenized.data.tokenizeRecord));
-            dispatch(updateRecordRequests('record', record.data.recordByRecordId));
-            const rlas = rla['data']?.['recordByRecordId']?.['recordLabelAssociations']['edges'].map(e => e.node);;
-            dispatch(updateRecordRequests('rla', prepareRLADataForRole(rlas, user, userDisplayId, userDisplayRole)));
-        });
+        setTimeout(() => {
+            combineLatest([
+                refetchTokenizedRecord({ variables: { recordId: SessionManager.currentRecordId } }),
+                refetchRecordByRecordId({ variables: { projectId, recordId: SessionManager.currentRecordId } }),
+                refetchRla({ variables: { projectId, recordId: SessionManager.currentRecordId } })
+            ]).subscribe(([tokenized, record, rla]) => {
+                dispatch(updateRecordRequests('token', tokenized.data.tokenizeRecord));
+                dispatch(updateRecordRequests('record', record.data.recordByRecordId));
+                const rlas = rla['data']?.['recordByRecordId']?.['recordLabelAssociations']['edges'].map(e => e.node);
+                dispatch(updateRecordRequests('rla', prepareRLADataForRole(rlas, user, userDisplayId, userDisplayRole)));
+            });
+        }, 100);
     }, [SessionManager.currentRecordId, user]);
 
     useEffect(() => {
@@ -320,12 +322,12 @@ export default function LabelingMainComponent() {
             }
         } else if (['payload_finished', 'weak_supervision_finished', 'rla_created', 'rla_deleted'].includes(msgParts[1])) {
             const recordId = SessionManager.currentRecordId ?? record.id;
-            if (msgParts[2] == recordId) {    
-            refetchRla({ variables: { projectId, recordId: recordId } }).then((result) => {
-                const rlas = result['data']?.['recordByRecordId']?.['recordLabelAssociations']['edges'].map(e => e.node);;
-                dispatch(updateRecordRequests('rla', prepareRLADataForRole(rlas, user, userDisplayId, userDisplayRole)));
-            });
-        }
+            if (msgParts[2] == recordId) {
+                refetchRla({ variables: { projectId, recordId: recordId } }).then((result) => {
+                    const rlas = result['data']?.['recordByRecordId']?.['recordLabelAssociations']['edges'].map(e => e.node);
+                    dispatch(updateRecordRequests('rla', prepareRLADataForRole(rlas, user, userDisplayId, userDisplayRole)));
+                });
+            }
         } else if (['access_link_changed', 'access_link_removed'].includes(msgParts[1])) {
             if (router.pathname.includes(msgParts[3]) && SessionManager.labelingLinkData) {
                 //python "True" string
