@@ -142,19 +142,9 @@ export function findOrderPosItem(orderPosElement: any, compareItem: any): boolea
 }
 
 export function collectSelectionData(attributeId: string, currentSelection: CurrentSelection, attributes: Attribute[], recordRequests: any): any {
+    if (!currentSelection) return null;
     let startIdx = currentSelection.tokenStart;
     let endIdx = currentSelection.tokenEnd;
-    // for (const token of tokenLookup[attributeId].token) {
-    //     if (token.selected) {
-    //         if (startIdx == -1) startIdx = token.idx;
-    //     } else {
-    //         if (startIdx != -1) {
-    //             endIdx = token.idx - 1;
-    //             break;
-    //         }
-    //     }
-    // }
-    // if (endIdx == -1) endIdx = tokenLookup[attributeId].token.length - 1;
     const tokenData = getTokenData(attributeId, attributes, recordRequests);
     if (!tokenData) return null;
     if (startIdx == -1 || endIdx == -1) return null;
