@@ -1,6 +1,6 @@
 import { UploadFileType, UploadStates, UploadWrapperProps } from "@/src/types/shared/upload";
 import UploadField from "./UploadField";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { selectUploadData, setImportOptions } from "@/src/reduxStore/states/upload";
 import { useRouter } from "next/router";
@@ -24,6 +24,12 @@ export default function UploadWrapper(props: UploadWrapperProps) {
     const [fileEndsWithZip, setFileEndsWithZip] = useState<boolean>(false);
 
     const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+    useEffect(() => {
+        return () => {
+            dispatch(setImportOptions(''));
+        }
+    }, []);
 
     return (<>
         <UploadField isFileCleared={props.isFileCleared} uploadStarted={props.uploadStarted} doingSomething={props.doingSomething} progressState={props.progressState} sendSelectedFile={(file) => {
