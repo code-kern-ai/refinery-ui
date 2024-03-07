@@ -29,8 +29,10 @@ export default function FilterAttributesModal(props: FilterAttributesModalProps)
 
     function saveFilteredAttributes() {
         props.setShowEditOption(false);
+        dispatch(closeModal(ModalEnum.FILTERED_ATTRIBUTES));
         dispatch(setModalStates(ModalEnum.FILTERED_ATTRIBUTES, { showEditOption: false }));
-        updateEmbeddingPayloadMut({ variables: { projectId: projectId, embeddingId: modalFilteredAttributes.embeddingId, filterAttributes: JSON.stringify(props.filterAttributesUpdate) } }).then((res) => { });
+        updateEmbeddingPayloadMut({ variables: { projectId: projectId, embeddingId: modalFilteredAttributes.embeddingId, filterAttributes: JSON.stringify(props.filterAttributesUpdate) } }).then((res) => {
+        });
     }
 
     useEffect(() => {
