@@ -71,8 +71,8 @@ export default function GridCards(props: GridCardsProps) {
                     </div>
                     {!(heuristic.stats.length == 1 && heuristic.stats[0].label == '-') && <>
                         {heuristic.stats.map((stat: any) => (<div key={stat.labelId} className="grid grid-cols-3 font-normal text-gray-500 items-center">
-                            <div className="py-2">
-                                <span className={`inline-flex items-center px-2 py-0.5 rounded text-sm font-medium border ${stat.color.backgroundColor} ${stat.color.textColor} ${stat.color.borderColor} ${stat.color.hoverColor}`}>
+                            <div className="py-2 truncate max-w-full">
+                                <span className={`px-2 py-0.5 rounded text-sm font-medium border ${stat.color.backgroundColor} ${stat.color.textColor} ${stat.color.borderColor} ${stat.color.hoverColor}`}>
                                     {stat.label}
                                 </span>
                             </div>
