@@ -1,6 +1,6 @@
 import LoadingIcon from "@/src/components/shared/loading/LoadingIcon";
 import { selectIsManaged } from "@/src/reduxStore/states/general";
-import { openModal, setModalStates } from "@/src/reduxStore/states/modal";
+import { closeModal, openModal, setModalStates } from "@/src/reduxStore/states/modal";
 import { selectAttributes, selectEmbeddings } from "@/src/reduxStore/states/pages/settings";
 import { selectProjectId } from "@/src/reduxStore/states/project";
 import { Embedding, EmbeddingState } from "@/src/types/components/projects/projectId/settings/embeddings";
@@ -19,7 +19,7 @@ import DeleteEmbeddingModal from "./DeleteEmbeddingModal";
 import { useWebsocket } from "@/src/services/base/web-sockets/useWebsocket";
 
 
-export default function Embeddings() {
+export default function Embeddings(props: { refetchEmbeddings: () => void }) {
     const dispatch = useDispatch();
     const router = useRouter();
 
@@ -58,6 +58,7 @@ export default function Embeddings() {
             const loadingEmbeddingsDictCopy = { ...loadingEmbeddingsDict }
             delete loadingEmbeddingsDictCopy[msgParts[2]];
             setLoadingEmbeddingsDict(loadingEmbeddingsDictCopy);
+            props.refetchEmbeddings();
         } else if (msgParts[1] == 'upload_embedding_payload') {
             if (loadingEmbeddingsDict[msgParts[2]] == undefined) {
                 const loadingEmbeddingsDictCopy = { ...loadingEmbeddingsDict };
@@ -111,11 +112,15 @@ export default function Embeddings() {
                                         </td>
                                         {!loadingEmbeddingsDict[embedding.id] ?
                                             <td className="whitespace-nowrap text-center px-3 py-2 text-sm text-gray-500 flex justify-center">
-                                                <Tooltip content={embedding.filterAttributes && embedding.filterAttributes.length > 0 ? TOOLTIPS_DICT.PROJECT_SETTINGS.EMBEDDINGS.HAS_FILTER_ATTRIBUTES : TOOLTIPS_DICT.PROJECT_SETTINGS.EMBEDDINGS.NO_FILTER_ATTRIBUTES} color="invert" >
-                                                    <IconNotes onClick={() => dispatch(setModalStates(ModalEnum.FILTERED_ATTRIBUTES, { embeddingId: embedding.id, open: true, attributeNames: prepareAttributeDataByNames(embedding.filterAttributes), showEditOption: showEditOption }))}
-                                                        className={`h-6 w-6 ${embedding.filterAttributes && embedding.filterAttributes.length > 0 ? 'text-gray-700' : 'text-gray-300'}`} />
+                                                <Tooltip content={!embedding.onQdrant ? TOOLTIPS_DICT.PROJECT_SETTINGS.EMBEDDINGS.NOT_YET_ON_QDRANT : (
+                                                    embedding.filterAttributes && embedding.filterAttributes.length > 0 ?
+                                                        TOOLTIPS_DICT.PROJECT_SETTINGS.EMBEDDINGS.HAS_FILTER_ATTRIBUTES :
+                                                        TOOLTIPS_DICT.PROJECT_SETTINGS.EMBEDDINGS.NO_FILTER_ATTRIBUTES)
+                                                } color="invert" >
+                                                    <IconNotes onClick={() => embedding.onQdrant ? dispatch(setModalStates(ModalEnum.FILTERED_ATTRIBUTES, { embeddingId: embedding.id, open: true, attributeNames: prepareAttributeDataByNames(embedding.filterAttributes), showEditOption: showEditOption })) : null}
+                                                        className={`h-6 w-6 ${embedding.filterAttributes && embedding.filterAttributes.length > 0 ? 'text-gray-700' : 'text-gray-300'} ${embedding.onQdrant ? "" : "cursor-not-allowed opacity-50"}`} />
                                                 </Tooltip>
-                                            </td> : <td><LoadingIcon /></td>}
+                                            </td> : <td className="whitespace-nowrap text-center px-3 py-2 text-sm text-gray-500 flex justify-center"><LoadingIcon /></td>}
                                         <td className="whitespace-nowrap text-center px-3 py-2 text-sm text-gray-500">
                                             <div className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-yellow-100 text-yellow-800">
                                                 {embedding.state == EmbeddingState.QUEUED ? '' : embedding.type == 'ON_ATTRIBUTE' ? 'Attribute Specific' : 'Token Specific'}
@@ -186,6 +191,6 @@ export default function Embeddings() {
             setFilterAttributesUpdate={(value) => setFilterAttributesUpdate(value)} />
 
         <DeleteEmbeddingModal />
-        <AddNewEmbeddingModal  />
+        <AddNewEmbeddingModal />
     </div>);
 }

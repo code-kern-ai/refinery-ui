@@ -20,6 +20,11 @@ export default function GridCards(props: GridCardsProps) {
     const [toggleHeuristicsMut] = useMutation(TOGGLE_HEURISTICS_SELECTED);
 
     function toggleHeuristic(projectId: string, heuristicId: string) {
+        const shallowCopy = [...props.filteredList];
+        const heuristicIndex = shallowCopy.findIndex((heuristic: Heuristic) => heuristic.id === heuristicId);
+        if (heuristicIndex === -1) return;
+        shallowCopy[heuristicIndex] = { ...shallowCopy[heuristicIndex], selected: !shallowCopy[heuristicIndex].selected };
+        props.setFilteredList(shallowCopy);
         toggleHeuristicsMut({ variables: { projectId: projectId, informationSourceId: heuristicId } }).then(() => {
             props.refetch();
         });
@@ -65,26 +70,22 @@ export default function GridCards(props: GridCardsProps) {
                         </div>
                     </div>
                     {!(heuristic.stats.length == 1 && heuristic.stats[0].label == '-') && <>
-                        {heuristic.stats.map((stat: any) => (<div key={stat.labelId} className="flex-row gap-16 font-normal text-gray-500 flex items-center">
+                        {heuristic.stats.map((stat: any) => (<div key={stat.labelId} className="grid grid-cols-3 font-normal text-gray-500 items-center">
                             <div className="py-2">
-                                <span className={`inline-flex items-center px-2 py-0.5 rounded text-sm font-medium border ${stat.color.backgroundColor} ${stat.color.textColor} ${stat.color.borderColor} ${stat.color.hoverColor}`}>
+                                <span className={`px-2 py-0.5 rounded text-sm font-medium max-w-full truncate inline-block border ${stat.color.backgroundColor} ${stat.color.textColor} ${stat.color.borderColor} ${stat.color.hoverColor}`}>
                                     {stat.label}
                                 </span>
                             </div>
+                            <div className="mr-4 py-4 ml-auto text-sm leading-5 font-medium text-gray-900">
+                                <div>Est. Precision</div>
+                                <div className="font-normal text-gray-500">{stat.values.Precision}</div>
+                            </div>
                             <div className="py-4 ml-auto text-sm leading-5 font-medium text-gray-900">
-                                <div className="flex flex-row">
-                                    <div className="mr-4">
-                                        <div>Est. Precision</div>
-                                        <div className="font-normal text-gray-500">{stat.values.Precision}</div>
-                                    </div>
-                                    <div>
-                                        <div>Coverage</div>
-                                        <div className="font-normal text-gray-500">{stat.values.Coverage}&nbsp;
-                                            {stat.values.Coverage == 1 ? 'record' : 'records'}
-                                        </div>
-
-                                    </div>
+                                <div>Coverage</div>
+                                <div className="font-normal text-gray-500">{stat.values.Coverage}&nbsp;
+                                    {stat.values.Coverage == 1 ? 'record' : 'records'}
                                 </div>
+
                             </div>
                         </div>))}
                     </>}

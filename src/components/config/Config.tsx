@@ -1,6 +1,7 @@
 import { CacheEnum, selectCachedValue } from "@/src/reduxStore/states/cachedValues";
-import { selectOrganization } from "@/src/reduxStore/states/general";
+import { selectOrganization, setOrganization } from "@/src/reduxStore/states/general";
 import { ConfigManager } from "@/src/services/base/config";
+import { GET_ORGANIZATION } from "@/src/services/gql/queries/organizations";
 import { CHANGE_ORGANIZATION, UPDATE_CONFIG } from "@/src/services/gql/mutations/organizations";
 import { Configuration, LocalConfig } from "@/src/types/components/config/config"
 import { snakeCaseToCamelCase } from "@/submodules/javascript-functions/case-types-parser";
@@ -8,9 +9,11 @@ import Dropdown2 from "@/submodules/react-components/components/Dropdown2";
 import { useMutation } from "@apollo/client";
 import { IconPlus, IconTrash } from "@tabler/icons-react";
 import { useEffect, useState } from "react"
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
+import { useLazyQuery } from "@apollo/client";
 
 export default function Config() {
+    const dispatch = useDispatch();
     const organization = useSelector(selectOrganization);
     const tokenizerValues = useSelector(selectCachedValue(CacheEnum.TOKENIZER_VALUES));
 
@@ -19,6 +22,7 @@ export default function Config() {
     const [prepareTokenizedValues, setPrepareTokenizedValues] = useState<any[]>([]);
     const [preparedOptions, setPreparedOptions] = useState<any[]>([]);
 
+    const [refetchOrganization] = useLazyQuery(GET_ORGANIZATION, { fetchPolicy: 'no-cache' });
     const [changeOrganizationMut] = useMutation(CHANGE_ORGANIZATION);
     const [updateConfigMut] = useMutation(UPDATE_CONFIG);
 
@@ -55,6 +59,12 @@ export default function Config() {
         setPreparedOptions(removeDuplicates);
     }, [tokenizerValues, localConfig]);
 
+    useEffect(() => {
+        return () => {
+            ConfigManager.refreshConfig();
+        }
+    }, []);
+
     function checkAndSaveValue(value: any, key: string, subkey: string = null) {
         if (key == "limit_checks") {
             if (Number(value) == organization[snakeCaseToCamelCase(subkey)]) return;
@@ -72,6 +82,12 @@ export default function Config() {
             changeOrganizationMut({ variables: { orgId: organization.id, changes: JSON.stringify(updateDict.limit_checks) } }).then((res) => {
                 if (!res?.data?.changeOrganization) {
                     window.alert('something went wrong with the update');
+                } else {
+                    refetchOrganization().then((res) => {
+                        if (res.data["userOrganization"]) {
+                            dispatch(setOrganization(res.data["userOrganization"]));
+                        }
+                    });
                 }
             });
         } else {
@@ -172,6 +188,7 @@ export default function Config() {
                         dropdownItemsClasses="max-h-80 overflow-y-auto"
                         buttonClasses="whitespace-nowrap"
                         dropdownWidth="w-72"
+                        disabled={index < 2}
                     />
                     {index > 1 && <button className="px-1 inline-flex items-center">
                         <IconTrash onClick={() => removeSpacyTokenizer(myConfig)} className="h-6 w-6 text-red-700" />

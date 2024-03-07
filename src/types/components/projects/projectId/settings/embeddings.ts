@@ -22,6 +22,7 @@ export type Embedding = {
     count?: number;
     attributeId?: string;
     custom?: boolean;
+    onQdrant?: boolean;
 };
 
 export enum EmbeddingType {

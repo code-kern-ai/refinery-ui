@@ -53,7 +53,7 @@ function getInitState(): DataBrowserState {
             fullCount: 0,
             queryLimit: 0,
             queryOffset: 0,
-            recordList: [],
+            recordList: null,
             sessionId: ""
         },
         similaritySearch: {

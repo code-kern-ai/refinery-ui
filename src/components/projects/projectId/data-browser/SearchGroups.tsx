@@ -113,7 +113,31 @@ export default function SearchGroups() {
     }, [searchGroupsStore, attributesSortOrder]);
 
     useEffect(() => {
-        if (!user || !activeSearchParams || !labelingTasks || !attributes) return;
+        if (!user || !activeSearchParams || !labelingTasks || !attributes || !projectId) return;
+        if (!fullSearchStore || fullSearchStore[SearchGroup.DRILL_DOWN] == undefined) return;
+        if (recordsInDisplay) return;
+        refreshTextHighlightNeeded();
+        setHighlightingToRecords();
+        if (!(activeSlice && activeSlice.static)) {
+            dispatch(updateAdditionalDataState('loading', true));
+            const refetchTimer = setTimeout(() => {
+                refetchExtendedRecord({
+                    variables: {
+                        projectId: projectId,
+                        filterData: parseFilterToExtended(activeSearchParams, attributes, configuration, labelingTasks, user, fullSearchStore[SearchGroup.DRILL_DOWN]),
+                        offset: 0, limit: 20
+                    }
+                }).then((res) => {
+                    dispatch(setSearchRecordsExtended(postProcessRecordsExtended(res.data['searchRecordsExtended'], labelingTasks)));
+                    dispatch(updateAdditionalDataState('loading', false));
+                });
+            }, 500);
+            return () => clearTimeout(refetchTimer);
+        }
+    }, [activeSearchParams, user, projectId, attributes, labelingTasks, configuration]);
+
+    useEffect(() => {
+        if (!user || !activeSearchParams || !labelingTasks || !attributes || !projectId) return;
         if (!fullSearchStore || fullSearchStore[SearchGroup.DRILL_DOWN] == undefined) return;
         if (recordsInDisplay) return;
         refreshTextHighlightNeeded();
@@ -136,23 +160,8 @@ export default function SearchGroups() {
                     dispatch(updateAdditionalDataState('staticDataSliceCurrentCount', res['data']['staticDataSlicesCurrentCount']));
                 });
             });
-        } else {
-            dispatch(updateAdditionalDataState('loading', true));
-            const refetchTimer = setTimeout(() => {
-                refetchExtendedRecord({
-                    variables: {
-                        projectId: projectId,
-                        filterData: parseFilterToExtended(activeSearchParams, attributes, configuration, labelingTasks, user, fullSearchStore[SearchGroup.DRILL_DOWN]),
-                        offset: 0, limit: 20
-                    }
-                }).then((res) => {
-                    dispatch(setSearchRecordsExtended(postProcessRecordsExtended(res.data['searchRecordsExtended'], labelingTasks)));
-                    dispatch(updateAdditionalDataState('loading', false));
-                });
-            }, 500);
-            return () => clearTimeout(refetchTimer);
         }
-    }, [activeSearchParams, user, projectId, attributes, labelingTasks, configuration, activeSlice]);
+    }, [activeSlice, activeSearchParams, user, projectId, attributes, labelingTasks,]);
 
     useEffect(() => {
         if (!recordList) return;
@@ -477,6 +486,11 @@ export default function SearchGroups() {
         const fullSearchCopy = jsonCopy(fullSearchStore);
         const formControlsIdx = fullSearchCopy[group.key].groupElements['orderBy'][index];
         const findActive = fullSearchCopy[group.key].groupElements['orderBy'].find((el) => el['active'] == true);
+        const findRandom = fullSearchCopy[group.key].groupElements['orderBy'].find((el) => el['orderByKey'] == StaticOrderByKeys.RANDOM);
+        if (findRandom) {
+            findRandom['active'] = false;
+            findRandom['color'] = getActiveNegateGroupColor(findRandom);
+        }
         if (findActive && findActive != formControlsIdx) findActive['active'] = false;
         if (formControlsIdx['active'] && formControlsIdx['direction'] == -1) {
             formControlsIdx['direction'] = 1;
@@ -486,6 +500,18 @@ export default function SearchGroups() {
         } else {
             formControlsIdx['active'] = true;
         }
+        dispatch(setFullSearchStore(fullSearchCopy));
+        updateSearchParams(fullSearchCopy);
+    }
+
+    function updateRandomSeed() {
+        const fullSearchCopy = jsonCopy(fullSearchStore);
+        const formControlsIdx = fullSearchCopy[SearchGroup.ORDER_STATEMENTS].groupElements['orderBy'].find((el) => el['orderByKey'] == StaticOrderByKeys.RANDOM);
+        fullSearchCopy[SearchGroup.ORDER_STATEMENTS].groupElements['orderBy'].forEach((el) => {
+            if (el['orderByKey'] != StaticOrderByKeys.RANDOM) el['active'] = false;
+        });
+        formControlsIdx['active'] = !formControlsIdx['active'];
+        formControlsIdx['color'] = getActiveNegateGroupColor(formControlsIdx);
         dispatch(setFullSearchStore(fullSearchCopy));
         updateSearchParams(fullSearchCopy);
     }
@@ -676,7 +702,7 @@ export default function SearchGroups() {
                         {fullSearchStore[group.key] && <div className="flex-grow flex flex-col">
                             <div>Manually labeled</div>
                             {fullSearchStore[group.key].groupElements['manualLabels'] && fullSearchStore[group.key].groupElements['manualLabels'].length == 0 ? (<ButtonLabelsDisabled />) : (
-                                <Dropdown2 options={fullSearchStore[group.key].groupElements['manualLabels'] ?? []} buttonName={manualLabels.length == 0 ? 'None selected' : manualLabels.join(',')} hasCheckboxesThreeStates={true} keepDrownOpen={true}
+                                <Dropdown2 options={fullSearchStore[group.key].groupElements['manualLabels'] ?? []} buttonName={manualLabels.length == 0 ? 'None selected' : manualLabels.join(', ')} hasCheckboxesThreeStates={true} keepDrownOpen={true}
                                     selectedOption={(option: any) => {
                                         const labels = [...manualLabels, option.name]
                                         setManualLabels(labels);
@@ -686,7 +712,7 @@ export default function SearchGroups() {
 
                             <div className="mt-2">Weakly supervised</div>
                             {fullSearchStore[group.key].groupElements['weakSupervisionLabels'] && fullSearchStore[group.key].groupElements['weakSupervisionLabels'].length == 0 ? (<ButtonLabelsDisabled />) : (
-                                <Dropdown2 options={fullSearchStore[group.key].groupElements['weakSupervisionLabels'] ?? []} buttonName={weakSupervisionLabels.length == 0 ? 'None selected' : weakSupervisionLabels.join(',')} hasCheckboxesThreeStates={true}
+                                <Dropdown2 options={fullSearchStore[group.key].groupElements['weakSupervisionLabels'] ?? []} buttonName={weakSupervisionLabels.length == 0 ? 'None selected' : weakSupervisionLabels.join(', ')} hasCheckboxesThreeStates={true}
                                     selectedOption={(option: any) => {
                                         const labels = [...weakSupervisionLabels, option.name]
                                         setWeakSupervisionLabels(labels);
@@ -714,7 +740,7 @@ export default function SearchGroups() {
 
                             <div className="mt-2">Model callback</div>
                             {fullSearchStore[group.key].groupElements['modelCallbackLabels'] && fullSearchStore[group.key].groupElements['modelCallbackLabels'].length == 0 ? (<ButtonLabelsDisabled />) : (
-                                <Dropdown2 options={fullSearchStore[group.key].groupElements['modelCallbackLabels'] ?? []} buttonName={modelCallBacksLabels.length == 0 ? 'None selected' : modelCallBacksLabels.join(',')} hasCheckboxesThreeStates={true}
+                                <Dropdown2 options={fullSearchStore[group.key].groupElements['modelCallbackLabels'] ?? []} buttonName={modelCallBacksLabels.length == 0 ? 'None selected' : modelCallBacksLabels.join(', ')} hasCheckboxesThreeStates={true}
                                     selectedOption={(option: any) => {
                                         const labels = [...modelCallBacksLabels, option.name]
                                         setModelCallBacksLabels(labels);
@@ -772,7 +798,7 @@ export default function SearchGroups() {
                                         <span className="ml-2 text-sm truncate w-full">{groupItem['displayName']}</span>
                                     </div>
                                 </div>) : (<div className="flex flex-row items-center mr-2">
-                                    <div className="flex flex-row items-center cursor-pointer" onClick={() => setActiveNegateGroup(groupItem, index, group)}>
+                                    <div className="flex flex-row items-center cursor-pointer" onClick={updateRandomSeed}>
                                         <div style={{ backgroundColor: groupItem.color, borderColor: groupItem.color }}
                                             className="ml-2 mr-2 h-4 w-4 border-gray-300 border rounded cursor-pointer hover:bg-gray-200">
                                         </div>

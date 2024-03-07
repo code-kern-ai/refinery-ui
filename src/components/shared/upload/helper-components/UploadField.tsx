@@ -45,6 +45,7 @@ export default function UploadField(props: UploadFieldProps) {
         event.stopPropagation();
         setFile(null);
         fileUpload.current!.value = "";
+        props.sendSelectedFile(null);
     }
 
     return (

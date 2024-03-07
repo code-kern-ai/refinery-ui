@@ -88,8 +88,8 @@ export default function SyncRecordsModal(props: SyncRecordsModalProps) {
                     {Object.entries(props.erdData.cachedRecordChanges).map(([key, value]: any) => (<Fragment key={key}>
                         <span className="bg-white h-full w-full p-1 inline-flex items-center justify-center">{value.display.record}</span>
                         <span className="bg-white h-full w-full p-1 inline-flex items-center justify-center">{value.attributeName}{value.display.subKeyAdd}</span>
-                        <span className="h-full w-full p-1 inline-flex items-center justify-center bg-red-200">{value.display.oldValue}</span>
-                        <span className="h-full w-full p-1 inline-flex items-center justify-center bg-green-200">{value.newValue}</span>
+                        <span className="h-full w-full p-1 inline-flex items-center justify-center bg-red-200">{`${value.display.oldValue}`}</span>
+                        <span className="h-full w-full p-1 inline-flex items-center justify-center bg-green-200">{`${value.newValue}`}</span>
                         <div className="bg-white h-full w-full p-1 inline-flex items-center justify-center cursor-pointer" onClick={() => removeFromCache(key)}>
                             <IconTrash className="text-red-700 h-6 w-6" stroke={2} />
                         </div>

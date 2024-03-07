@@ -1,4 +1,5 @@
 import LoadingIcon from "@/src/components/shared/loading/LoadingIcon";
+import MultilineTooltip from "@/src/components/shared/multilines-tooltip/MultilineTooltip";
 import { selectProjectId } from "@/src/reduxStore/states/project";
 import { CardStats, CardStatsEnum, ProjectOverviewCardsProps } from "@/src/types/components/projects/projectId/project-overview/project-overview";
 import { NOT_AVAILABLE } from "@/src/util/constants";
@@ -33,19 +34,23 @@ export default function ProjectOverviewCards(props: ProjectOverviewCardsProps) {
                     </dt>
                     <dd className="ml-16 pb-6 flex items-baseline sm:pb-7">
                         {props.projectStats.generalLoading ? (<LoadingIcon color={card.color} />) : (
-                            <Tooltip content={card.stats !== CardStatsEnum.INTER_ANNOTATOR ? props.projectStats.general[card.stats] : props.projectStats.interAnnotator}
-                                placement="top" color="invert" className="cursor-auto">
-                                {(card.stats == CardStatsEnum.MANUAL || card.stats == CardStatsEnum.WEAK_SUPERVISION) &&
+                            <>
+                                {card.stats == CardStatsEnum.INFORMATION_SOURCE && <Tooltip content={props.projectStats.tooltipsArray[card.stats] && <MultilineTooltip tooltipLines={[props.projectStats.tooltipsArray[card.stats][0], props.projectStats.tooltipsArray[card.stats][1]]} />} color="invert" placement="top" className="cursor-auto">
                                     <p className="text-2xl font-semibold text-gray-900">
-                                        {props.projectStats.generalStats[card.stats]}
+                                        {props.projectStats.generalPercent[card.stats]}
+                                    </p>
+                                </Tooltip>}
+                                <Tooltip content={card.stats !== CardStatsEnum.INTER_ANNOTATOR ? props.projectStats.general[card.stats] : props.projectStats.interAnnotator}
+                                    placement="top" color="invert" className="cursor-auto">
+                                    {(card.stats == CardStatsEnum.MANUAL || card.stats == CardStatsEnum.WEAK_SUPERVISION) &&
+                                        <p className="text-2xl font-semibold text-gray-900">
+                                            {props.projectStats.generalStats[card.stats]}
+                                        </p>}
+                                    {card.stats == CardStatsEnum.INTER_ANNOTATOR && <p className="text-2xl font-semibold text-gray-900">
+                                        {props.projectStats.interAnnotatorStat == -1 ? NOT_AVAILABLE : (props.projectStats.interAnnotatorStat * 100 + '%')}
                                     </p>}
-                                {card.stats == CardStatsEnum.INFORMATION_SOURCE && <p className="text-2xl font-semibold text-gray-900">
-                                    {props.projectStats.generalPercent[card.stats]}
-                                </p>}
-                                {card.stats == CardStatsEnum.INTER_ANNOTATOR && <p className="text-2xl font-semibold text-gray-900">
-                                    {props.projectStats.interAnnotatorStat == -1 ? NOT_AVAILABLE : props.projectStats.interAnnotatorStat}
-                                </p>}
-                            </Tooltip>
+                                </Tooltip>
+                            </>
                         )}
                         <div className="absolute bottom-0 inset-x-0 bg-gray-50 px-4 py-4 sm:px-6">
                             <div className="text-sm">
@@ -55,7 +60,8 @@ export default function ProjectOverviewCards(props: ProjectOverviewCardsProps) {
                         </div>
                     </dd>
                 </div>
-            ))}
+            ))
+            }
         </dl >
     </div >);
 }

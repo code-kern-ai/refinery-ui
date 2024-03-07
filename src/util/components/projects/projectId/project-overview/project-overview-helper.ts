@@ -27,7 +27,8 @@ export function getEmptyProjectStats(): ProjectStats {
         generalStats: {},
         interAnnotatorLoading: false,
         interAnnotator: NOT_AVAILABLE,
-        interAnnotatorStat: -1
+        interAnnotatorStat: -1,
+        tooltipsArray: []
     }
 }
 
@@ -37,10 +38,13 @@ export function postProcessingStats(projectStats: ProjectStats[]): ProjectStats 
     if (prepareProjectStats.general == undefined) {
         prepareProjectStats.general = {};
         prepareProjectStats.generalPercent = {};
+        prepareProjectStats.tooltipsArray = [];
     }
     projectStats.forEach((element: any) => {
         if (element.source_type == 'INFORMATION_SOURCE') {
             prepareProjectStats.general[element.source_type] = element.absolut_labeled + " hitting on current slice\n" + element.records_in_slice + " defined in labeling task";
+            const tooltipsArray = [element.absolut_labeled + " hitting on current slice", element.records_in_slice + " defined in labeling task"];
+            prepareProjectStats.tooltipsArray[element.source_type] = tooltipsArray;
             prepareProjectStats.generalPercent[element.source_type] = element.absolut_labeled + " (" + element.records_in_slice + ")";
         } else {
             prepareProjectStats.general[element.source_type] = element.absolut_labeled + " of " + element.records_in_slice;
@@ -91,4 +95,24 @@ export function postProcessConfusionMatrix(data: string): any {
             labelIdProgrammatic: e.label_name_ws == '@@OUTSIDE@@' ? 'Outside' : e.label_name_ws
         }
     });
+}
+
+export function calcInterAnnotatorAvg(interAnnotatorMatrix, projectStats: ProjectStats) {
+    const projectStatsCopy = { ...projectStats }
+    let c = 0;
+    let s = 0;
+    interAnnotatorMatrix.elements.forEach(e => {
+        if (e.userIdA != e.userIdB && e.percent != -1) {
+            c++;
+            s += e.percent;
+        }
+    });
+    if (c) {
+        projectStatsCopy.interAnnotator = Number(c / 2) + " with intersections";
+        projectStatsCopy.interAnnotatorStat = s / c;
+    } else {
+        projectStatsCopy.interAnnotator = "No intersections";
+        projectStatsCopy.interAnnotatorStat = -1;
+    }
+    return projectStatsCopy;
 }

@@ -48,7 +48,7 @@ function buildFilterElementAttribute(first: boolean, searchElement: any, attribu
             FILTER: [],
         };
         let added = false;
-        for (let i = 1; i < attributes.length; i++) {
+        for (let i = 0; i < attributes.length; i++) {
             const searchEl = jsonCopy(searchElement);
             searchEl.values.operator = searchEl.values.operator.split(" ").join("_");
             if (attributes[i].dataType != DataTypeEnum.BOOLEAN) {
