@@ -333,7 +333,7 @@ export default function ProjectSettings() {
                 </div>
             </div>
 
-            <Embeddings />
+            <Embeddings refetchEmbeddings={refetchEmbeddingsAndPostProcess} />
             <LabelingTasks />
             {isManaged && <GatesIntegration />}
             <ProjectMetaData />
