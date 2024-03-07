@@ -59,7 +59,7 @@ export default function FilterAttributesModal(props: FilterAttributesModalProps)
         </div>}
         {modalFilteredAttributes.showEditOption && <div className="mt-3">
             <div className="text-xs text-gray-500 text-center italic">Add or remove filter attributes</div>
-            <Dropdown2 options={usableAttributes} buttonName={props.filterAttributesUpdate.length == 0 ? 'None selected' : props.filterAttributesUpdate.join(',')} hasCheckboxes={true}
+            <Dropdown2 options={usableAttributes} buttonName={props.filterAttributesUpdate.length == 0 ? 'None selected' : props.filterAttributesUpdate.join(', ')} hasCheckboxes={true}
                 selectedCheckboxes={checkedAttributes.map(a => a.checked)} hasSelectAll={true}
                 selectedOption={(option: any) => {
                     const attributes = option.filter((o: any) => o.checked).map((o: any) => o.name);
