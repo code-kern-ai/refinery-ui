@@ -59,6 +59,12 @@ export default function Config() {
         setPreparedOptions(removeDuplicates);
     }, [tokenizerValues, localConfig]);
 
+    useEffect(() => {
+        return () => {
+            ConfigManager.refreshConfig();
+        }
+    }, []);
+
     function checkAndSaveValue(value: any, key: string, subkey: string = null) {
         if (key == "limit_checks") {
             if (Number(value) == organization[snakeCaseToCamelCase(subkey)]) return;
@@ -88,8 +94,6 @@ export default function Config() {
             updateConfigMut({ variables: { dictStr: JSON.stringify(updateDict) } }).then((res) => {
                 if (!res?.data?.updateConfig) {
                     window.alert('something went wrong with the update');
-                } else {
-                    ConfigManager.refreshConfig();
                 }
             });
         }
@@ -184,6 +188,7 @@ export default function Config() {
                         dropdownItemsClasses="max-h-80 overflow-y-auto"
                         buttonClasses="whitespace-nowrap"
                         dropdownWidth="w-72"
+                        disabled={index < 2}
                     />
                     {index > 1 && <button className="px-1 inline-flex items-center">
                         <IconTrash onClick={() => removeSpacyTokenizer(myConfig)} className="h-6 w-6 text-red-700" />
