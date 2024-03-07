@@ -432,7 +432,7 @@ export default function LabelingSuiteLabeling() {
     }
 
     function addRla(task: any, labelId: string) {
-        if (!canEditLabels) return;
+        if (!canEditLabels || !task) return;
         if (task.taskType == LabelingTaskTaskType.MULTICLASS_CLASSIFICATION) {
             addLabelToTask(task.id, labelId);
         } else {

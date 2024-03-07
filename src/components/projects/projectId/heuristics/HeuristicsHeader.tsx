@@ -180,7 +180,7 @@ export default function HeuristicsHeader(props: HeuristicsHeaderProps) {
                 </Tooltip>
             </div>
             <div className="grid grid-cols-1 gap-4 xs:flex xs:gap-0 flex-row items-center mt-2 xl:mt-0">
-                {labelingTasks && labelingTasks.length > 0 ? (<Tooltip content={TOOLTIPS_DICT.HEURISTICS.ENABLED_NEW_HEURISTIC} color="invert" placement="bottom">
+                {labelingTasks && labelingTasks.length > 0 ? (<Tooltip content={TOOLTIPS_DICT.HEURISTICS.ENABLED_NEW_HEURISTIC} color="invert" placement="top">
                     <Dropdown2 options={NEW_HEURISTICS} buttonName="New heuristic" tooltipsArray={[null, null, null, isManaged ? null : 'Only available for managed projects']}
                         disabledOptions={[false, false, !(labelingTasks && labelingTasks.length > 0), !isManaged]}
                         selectedOption={(option: string) => executeOption(option)} buttonClasses={`${style.actionsHeight} text-xs whitespace-nowrap`} dropdownClasses="mr-3" dropdownItemsWidth='w-40' dropdownWidth='w-32'
@@ -204,7 +204,7 @@ export default function HeuristicsHeader(props: HeuristicsHeaderProps) {
                         selectedOption={(option: string) => executeOption(option)} dropdownClasses="mr-3" buttonClasses={`${style.actionsHeight} text-xs`} dropdownItemsWidth='w-40' dropdownWidth='w-32'
                         iconsArray={['IconSquareCheck', 'IconSquare', 'IconPlayerPlayFilled', 'IconTrash']} />
                 ) : (
-                    <Tooltip placement="bottom" content={TOOLTIPS_DICT.HEURISTICS.ENABLE_ACTIONS} color="invert">
+                    <Tooltip placement="top" content={TOOLTIPS_DICT.HEURISTICS.ENABLE_ACTIONS} color="invert">
                         <button type="button" disabled={true}
                             className="mr-3 inline-flex items-center justify-center w-full rounded-md border border-gray-300 shadow-sm px-4 py-1.5 bg-white text-xs font-medium text-gray-700 opacity-50 cursor-not-allowed focus:ring-offset-2 focus:ring-offset-gray-400"
                             id="menu-button" aria-expanded="true" aria-haspopup="true">
@@ -222,18 +222,18 @@ export default function HeuristicsHeader(props: HeuristicsHeaderProps) {
                 <div className="flex justify-center overflow-visible">
                     {areHeuristicsSelected ? (<>
                         {areValidHeuristicsSelected ? (
-                            <Tooltip content={TOOLTIPS_DICT.HEURISTICS.WEAK_SUPERVISION} color="invert" placement="bottom">
+                            <Tooltip content={TOOLTIPS_DICT.HEURISTICS.WEAK_SUPERVISION} color="invert" placement="top">
                                 <button onClick={startWeakSupervision}
                                     className="bg-indigo-700 flex items-center text-white text-xs font-semibold mr-3 px-4 py-2 rounded-md border hover:bg-indigo-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
                                     Weak supervision
                                 </button>
                             </Tooltip>
-                        ) : (<Tooltip content={TOOLTIPS_DICT.HEURISTICS.SELECT_AT_LEAST_ONE_VALID_HEURISTIC} color="invert" placement="bottom">
+                        ) : (<Tooltip content={TOOLTIPS_DICT.HEURISTICS.SELECT_AT_LEAST_ONE_VALID_HEURISTIC} color="invert" placement="top">
                             <button className="bg-indigo-700 text-white text-xs font-semibold mr-3 px-4 py-2 rounded-md border opacity-50 cursor-not-allowed" disabled={true}>
                                 Weak supervision
                             </button>
                         </Tooltip>)}
-                    </>) : (<Tooltip content={TOOLTIPS_DICT.HEURISTICS.SELECT_AT_LEAST_ONE_HEURISTIC} color="invert" placement="bottom">
+                    </>) : (<Tooltip content={TOOLTIPS_DICT.HEURISTICS.SELECT_AT_LEAST_ONE_HEURISTIC} color="invert" placement="top">
                         <button className="bg-indigo-700 text-white text-xs font-semibold mr-3 px-4 py-2 rounded-md border opacity-50 cursor-not-allowed" disabled={true}>
                             Weak supervision
                         </button>
@@ -241,14 +241,14 @@ export default function HeuristicsHeader(props: HeuristicsHeaderProps) {
                 </div>
 
                 <div className="flex justify-center overflow-visible">
-                    {currentWeakSupervisionRun ? (<Tooltip content={TOOLTIPS_DICT.HEURISTICS.LAST_WEAK_SUPERVISION_INFO} color="invert" placement="bottom">
+                    {currentWeakSupervisionRun ? (<Tooltip content={TOOLTIPS_DICT.HEURISTICS.LAST_WEAK_SUPERVISION_INFO} color="invert" placement="top">
                         <button onClick={() => dispatch(openModal(ModalEnum.LAST_WEAK_SUPERVISION_RUN))}
                             className="bg-white text-gray-700 text-xs font-medium mr-3 px-4 py-1.5 rounded-md border border-gray-300 cursor-pointer inline-block hover:bg-gray-50">
                             {loadingIconWS ? <div className='flex justify-center items-center h-5 w-5'>
                                 <Loading type="points" size="sm" />
                             </div> : <IconWaveSine size={20} strokeWidth={2} className="text-gray-700" />}
                         </button>
-                    </Tooltip>) : (<Tooltip content={TOOLTIPS_DICT.HEURISTICS.LAST_WEAK_SUPERVISION_INFO} color="invert" placement="bottom">
+                    </Tooltip>) : (<Tooltip content={TOOLTIPS_DICT.HEURISTICS.LAST_WEAK_SUPERVISION_INFO} color="invert" placement="top">
                         <button className="bg-white text-gray-700 text-xs font-medium mr-3 px-4 py-1.5 rounded-md border border-gray-300 cursor-pointer inline-block hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50" disabled={true}>
                             <IconWaveSine size={20} strokeWidth={2} className="text-gray-500" />
                         </button>
@@ -256,7 +256,7 @@ export default function HeuristicsHeader(props: HeuristicsHeaderProps) {
                 </div>
 
                 <div className="flex justify-center overflow-visible">
-                    <Tooltip placement="bottom" content={TOOLTIPS_DICT.HEURISTICS.NAVIGATE_MODEL_CALLBACKS} color="invert">
+                    <Tooltip placement="top" content={TOOLTIPS_DICT.HEURISTICS.NAVIGATE_MODEL_CALLBACKS} color="invert">
                         <a href={`/refinery/projects/${projectId}/model-callbacks`} onClick={(e: any) => { e.preventDefault(); router.push(`/projects/${projectId}/model-callbacks`) }}
                             className="bg-white text-gray-700 text-xs font-medium mr-3 px-4 py-2 rounded-md border border-gray-300 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
                             Model callbacks
@@ -265,7 +265,7 @@ export default function HeuristicsHeader(props: HeuristicsHeaderProps) {
                 </div>
 
                 <div className="flex justify-center overflow-visible">
-                    <Tooltip placement="bottom" content={TOOLTIPS_DICT.HEURISTICS.NAVIGATE_LOOKUP_LISTS} color="invert">
+                    <Tooltip placement="top" content={<div className="w-24">{TOOLTIPS_DICT.HEURISTICS.NAVIGATE_LOOKUP_LISTS}</div>} color="invert">
                         <a href={`/refinery/projects/${projectId}/lookup-lists`} onClick={(e: any) => { e.preventDefault(); router.push(`/projects/${projectId}/lookup-lists`) }}
                             className=" bg-white text-gray-700 text-xs font-medium mr-3 px-4 py-2 rounded-md border border-gray-300 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
                             Lookup lists
