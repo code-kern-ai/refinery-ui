@@ -103,9 +103,11 @@ export default function Layout({ children }) {
             refetchNotificationsAndProcess();
         } else if (msgParts[1] == 'admin_message') {
             refetchAdminMessagesAndProcess();
-        } else if (msgParts[1] == 'project_deleted' && msgParts[3] && user?.id != msgParts[3] && projectId == msgParts[2]) {
+        } else if (msgParts[1] == 'project_deleted' && msgParts[3] != null && user?.id != msgParts[3] && projectId == msgParts[2]) {
             alert('Project deleted');
-            router.push('/projects');
+            setTimeout(() => {
+                router.push('/projects');
+            }, 1000);
         }
     }, [user?.id, notificationsState, projectId]);
 
