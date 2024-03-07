@@ -702,7 +702,7 @@ export default function SearchGroups() {
                         {fullSearchStore[group.key] && <div className="flex-grow flex flex-col">
                             <div>Manually labeled</div>
                             {fullSearchStore[group.key].groupElements['manualLabels'] && fullSearchStore[group.key].groupElements['manualLabels'].length == 0 ? (<ButtonLabelsDisabled />) : (
-                                <Dropdown2 options={fullSearchStore[group.key].groupElements['manualLabels'] ?? []} buttonName={manualLabels.length == 0 ? 'None selected' : manualLabels.join(',')} hasCheckboxesThreeStates={true} keepDrownOpen={true}
+                                <Dropdown2 options={fullSearchStore[group.key].groupElements['manualLabels'] ?? []} buttonName={manualLabels.length == 0 ? 'None selected' : manualLabels.join(', ')} hasCheckboxesThreeStates={true} keepDrownOpen={true}
                                     selectedOption={(option: any) => {
                                         const labels = [...manualLabels, option.name]
                                         setManualLabels(labels);
@@ -712,7 +712,7 @@ export default function SearchGroups() {
 
                             <div className="mt-2">Weakly supervised</div>
                             {fullSearchStore[group.key].groupElements['weakSupervisionLabels'] && fullSearchStore[group.key].groupElements['weakSupervisionLabels'].length == 0 ? (<ButtonLabelsDisabled />) : (
-                                <Dropdown2 options={fullSearchStore[group.key].groupElements['weakSupervisionLabels'] ?? []} buttonName={weakSupervisionLabels.length == 0 ? 'None selected' : weakSupervisionLabels.join(',')} hasCheckboxesThreeStates={true}
+                                <Dropdown2 options={fullSearchStore[group.key].groupElements['weakSupervisionLabels'] ?? []} buttonName={weakSupervisionLabels.length == 0 ? 'None selected' : weakSupervisionLabels.join(', ')} hasCheckboxesThreeStates={true}
                                     selectedOption={(option: any) => {
                                         const labels = [...weakSupervisionLabels, option.name]
                                         setWeakSupervisionLabels(labels);
@@ -740,7 +740,7 @@ export default function SearchGroups() {
 
                             <div className="mt-2">Model callback</div>
                             {fullSearchStore[group.key].groupElements['modelCallbackLabels'] && fullSearchStore[group.key].groupElements['modelCallbackLabels'].length == 0 ? (<ButtonLabelsDisabled />) : (
-                                <Dropdown2 options={fullSearchStore[group.key].groupElements['modelCallbackLabels'] ?? []} buttonName={modelCallBacksLabels.length == 0 ? 'None selected' : modelCallBacksLabels.join(',')} hasCheckboxesThreeStates={true}
+                                <Dropdown2 options={fullSearchStore[group.key].groupElements['modelCallbackLabels'] ?? []} buttonName={modelCallBacksLabels.length == 0 ? 'None selected' : modelCallBacksLabels.join(', ')} hasCheckboxesThreeStates={true}
                                     selectedOption={(option: any) => {
                                         const labels = [...modelCallBacksLabels, option.name]
                                         setModelCallBacksLabels(labels);

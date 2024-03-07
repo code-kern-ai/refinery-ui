@@ -224,7 +224,7 @@ export default function AddNewEmbeddingModal() {
                     <Tooltip content={TOOLTIPS_DICT.PROJECT_SETTINGS.EMBEDDINGS.FILTER_ATTRIBUTES} placement="right" color="invert">
                         <span className="card-title mb-0 label-text flex"><span className="cursor-help underline filtersUnderline">Filter Attributes</span></span>
                     </Tooltip>
-                    <Dropdown2 options={filteredAttributesArray} buttonName={filteredAttributes.length == 0 ? 'None selected' : filteredAttributes.join(',')} hasCheckboxes={true} hasSelectAll={true}
+                    <Dropdown2 options={filteredAttributesArray} buttonName={filteredAttributes.length == 0 ? 'None selected' : filteredAttributes.join(', ')} hasCheckboxes={true} hasSelectAll={true}
                         selectedOption={(option: any) => {
                             const filteredAttributes = [];
                             option.forEach((a: any) => {
