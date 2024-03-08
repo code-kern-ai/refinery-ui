@@ -254,7 +254,6 @@ export default function Upload(props: UploadProps) {
         else setIsProjectTitleDuplicate(false);
     }
 
-    useWebsocket(CurrentPage.UPLOAD_RECORDS, handleWebsocketNotification);
     useWebsocket(CurrentPage.UPLOAD_RECORDS, handleWebsocketNotification, UploadHelper.getProjectId());
 
     return <>
