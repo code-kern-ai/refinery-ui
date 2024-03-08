@@ -223,7 +223,6 @@ export default function ActiveLearning() {
                         <div className="text-sm leading-5 font-medium text-gray-700 inline-block mr-2">Editor</div>
                         <Tooltip content={TOOLTIPS_DICT.LABELING_FUNCTION.LABELING_TASK} color="invert" placement="top">
                             <Dropdown2 options={labelingTasks} buttonName={currentHeuristic?.labelingTaskName} selectedOption={(option: any) => saveHeuristic(option)} dropdownClasses="z-30" />
-
                         </Tooltip>
                         {currentHeuristic.labels?.length == 0 ? (<div className="text-sm font-normal text-gray-500 ml-3">No labels for target task</div>) : <>
                             {currentHeuristic.labels?.map((label: any, index: number) => (
