@@ -243,7 +243,7 @@ export default function ActiveLearning() {
                                 <div className="text-sm leading-5 font-medium text-gray-700 inline-block mr-2">Embeddings</div>
                                 {embeddingsFiltered.map((embedding: Embedding, index: number) => <Fragment key={embedding.id}>
                                     {embedding.state == Status.FINISHED && <Tooltip content={TOOLTIPS_DICT.GENERAL.CLICK_TO_COPY} color="invert" placement="top">
-                                        <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-purple-100 text-purple-700 cursor-pointer" onClick={() => copyToClipboard(embedding.name)}>
+                                        <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-purple-100 text-purple-700 cursor-pointer mr-2" onClick={() => copyToClipboard(embedding.name)}>
                                             {embedding.name}
                                         </span>
                                     </Tooltip>}
