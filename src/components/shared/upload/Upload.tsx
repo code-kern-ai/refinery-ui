@@ -9,7 +9,7 @@ import { CREATE_PROJECT, DELETE_PROJECT, UPDATE_PROJECT_STATUS, UPDATE_PROJECT_T
 import { ProjectStatus } from "@/src/types/components/projects/projects-list";
 import { timer } from "rxjs";
 import { uploadFile } from "@/src/services/base/s3-service";
-import { CurrentPage } from "@/src/types/shared/general";
+import { CurrentPage, CurrentPageSubKey } from "@/src/types/shared/general";
 import { jsonCopy } from "@/submodules/javascript-functions/general";
 import { useRouter } from "next/router";
 import { extendAllProjects, removeFromAllProjectsById, selectAllProjects, selectProjectId } from "@/src/reduxStore/states/project";
@@ -114,7 +114,7 @@ export default function Upload(props: UploadProps) {
         } else {
             console.log("unknown websocket message in part 3:" + msgParts[3], "full message:", msgParts)
         }
-    }, [handleUploadTaskResult]);
+    }, [handleUploadTaskResult, resetUpload, props.uploadOptions?.deleteProjectOnFail, props.uploadOptions?.reloadOnFinish]);
 
     function submitUpload() {
         setSubmitted(true);
@@ -253,7 +253,7 @@ export default function Upload(props: UploadProps) {
         if (findProjectName) setIsProjectTitleDuplicate(true);
         else setIsProjectTitleDuplicate(false);
     }
-
+    useWebsocket(CurrentPage.PROJECTS, handleWebsocketNotification, null, CurrentPageSubKey.FILE_UPLOAD);
     useWebsocket(CurrentPage.UPLOAD_RECORDS, handleWebsocketNotification, UploadHelper.getProjectId());
 
     return <>

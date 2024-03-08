@@ -248,12 +248,12 @@ export default function ActiveLearning() {
                                         </span>
                                     </Tooltip>}
                                     {embedding.state == Status.FAILED && <Tooltip content={TOOLTIPS_DICT.LABELING_FUNCTION.CLICK_TO_COPY_ERROR} color="invert" placement="top">
-                                        <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-red-100 text-red-700 cursor-pointer" onClick={() => copyToClipboard(embedding.name)}>
+                                        <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-red-100 text-red-700 cursor-pointer mr-2" onClick={() => copyToClipboard(embedding.name)}>
                                             {embedding.name}
                                         </span>
                                     </Tooltip>}
-                                    {(embedding.state != Status.FINISHED && embedding.state != Status.FAILED) && <Tooltip content={TOOLTIPS_DICT.LABELING_FUNCTION.CLICK_TO_COPY_ERROR} color="invert" placement="top">
-                                        <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-700 cursor-pointer" onClick={() => copyToClipboard(embedding.name)}>
+                                    {(embedding.state != Status.FINISHED && embedding.state != Status.FAILED) && <Tooltip content={TOOLTIPS_DICT.LABELING_FUNCTION.CLICK_TO_COPY_RUNNING} color="invert" placement="top">
+                                        <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-700 cursor-pointer mr-2" onClick={() => copyToClipboard(embedding.name)}>
                                             {embedding.name}
                                         </span>
                                     </Tooltip>}
