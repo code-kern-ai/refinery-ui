@@ -217,6 +217,7 @@ export default function ActiveLearning() {
 
     return (
         <HeuristicsLayout updateSourceCode={(code) => updateSourceCodeToDisplay(code)}>
+
             {currentHeuristic && <div>
                 <div className="relative flex-shrink-0 min-h-16 flex justify-between pb-2">
                     <div className="flex items-center flex-wrap mt-3">
