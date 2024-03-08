@@ -1,7 +1,7 @@
 import { UploadFileType, UploadProps, UploadState, UploadStates, UploadTask, UploadType } from "@/src/types/shared/upload";
 import { useDispatch, useSelector } from "react-redux";
 import UploadField from "./helper-components/UploadField";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import UploadWrapper from "./helper-components/UploadWrapper";
 import { selectUploadData, setImportOptions } from "@/src/reduxStore/states/upload";
 import { useLazyQuery, useMutation } from "@apollo/client";
@@ -53,7 +53,7 @@ export default function Upload(props: UploadProps) {
     const [getUploadTaskId] = useLazyQuery(GET_UPLOAD_TASK_BY_TASK_ID, { fetchPolicy: 'network-only' });
 
     useEffect(() => {
-        if (!props.uploadOptions.tokenizerValues) return;
+        if (!props.uploadOptions || !props.uploadOptions.tokenizerValues) return;
         const tokenizerValuesDisplay = [...props.uploadOptions.tokenizerValues];
         tokenizerValuesDisplay.forEach((tokenizer: any, index: number) => {
             const tokenizerNameContainsBrackets = tokenizer.name.includes('(') && tokenizer.name.includes(')');
@@ -62,7 +62,7 @@ export default function Upload(props: UploadProps) {
             tokenizerValuesDisplay[index] = tokenizerCopy;
         });
         setPrepareTokenizedValues(tokenizerValuesDisplay);
-    }, [props.uploadOptions.tokenizerValues]);
+    }, [props.uploadOptions]);
 
     useEffect(() => {
         if (props.startUpload) {
@@ -75,7 +75,7 @@ export default function Upload(props: UploadProps) {
             props.isFileUploaded(selectedFile != null);
     }, [selectedFile]);
 
-    function handleWebsocketNotification(msgParts: string[]) {
+    const handleWebsocketNotification = useCallback((msgParts: string[]) => {
         const uploadTask = UploadHelper.getUploadTask();
         const projectId = UploadHelper.getProjectId();
         if (!uploadTask) return;
@@ -114,7 +114,7 @@ export default function Upload(props: UploadProps) {
         } else {
             console.log("unknown websocket message in part 3:" + msgParts[3], "full message:", msgParts)
         }
-    }
+    }, [handleUploadTaskResult]);
 
     function submitUpload() {
         setSubmitted(true);
@@ -219,7 +219,7 @@ export default function Upload(props: UploadProps) {
         UploadHelper.setUploadTask(task);
         if (task.state == UploadStates.DONE || task.progress == 100) {
             clearUploadTask();
-            if (props.uploadOptions.reloadOnFinish) location.reload();
+            if (props.uploadOptions && props.uploadOptions.reloadOnFinish) location.reload();
             else setUploadStarted(false);
             router.push('/projects/' + UploadHelper.getProjectId() + '/settings');
         }
@@ -254,10 +254,11 @@ export default function Upload(props: UploadProps) {
         else setIsProjectTitleDuplicate(false);
     }
 
+    useWebsocket(CurrentPage.UPLOAD_RECORDS, handleWebsocketNotification);
     useWebsocket(CurrentPage.UPLOAD_RECORDS, handleWebsocketNotification, UploadHelper.getProjectId());
 
-    return (
-        <section className={`${!props.uploadOptions.isModal ? 'p-4' : ''}`}>
+    return <>
+        {props.uploadOptions && <section className={`${!props.uploadOptions.isModal ? 'p-4' : ''}`}>
             {uploadFileType == UploadFileType.PROJECT && (<>
                 <UploadField isFileCleared={selectedFile == null} uploadStarted={uploadStarted} doingSomething={doingSomething} progressState={progressState} sendSelectedFile={(file) => {
                     setSelectedFile(file);
@@ -322,6 +323,6 @@ export default function Upload(props: UploadProps) {
                         setSelectedFile(file);
                     }} setKey={(key) => setKey(key)} />)
             }
-        </section >
-    )
+        </section >}
+    </>
 }
