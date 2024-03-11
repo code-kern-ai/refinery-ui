@@ -4,7 +4,6 @@ import { removeFromAllEmbeddingsById } from "@/src/reduxStore/states/pages/setti
 import { selectProjectId } from "@/src/reduxStore/states/project";
 import { DELETE_EMBEDDING, DELETE_FROM_TASK_QUEUE } from "@/src/services/gql/mutations/project-settings";
 import { ModalButton, ModalEnum } from "@/src/types/shared/modal";
-import { jsonCopy } from "@/submodules/javascript-functions/general";
 import { useMutation } from "@apollo/client";
 import { useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
