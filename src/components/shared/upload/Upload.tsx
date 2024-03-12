@@ -114,7 +114,7 @@ export default function Upload(props: UploadProps) {
         } else {
             console.log("unknown websocket message in part 3:" + msgParts[3], "full message:", msgParts)
         }
-    }, [handleUploadTaskResult, resetUpload, props.uploadOptions?.deleteProjectOnFail, props.uploadOptions?.reloadOnFinish]);
+    }, [props.uploadOptions?.deleteProjectOnFail, props.uploadOptions?.reloadOnFinish]);
 
     function submitUpload() {
         setSubmitted(true);
