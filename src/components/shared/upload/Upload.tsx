@@ -270,7 +270,7 @@ export default function Upload(props: UploadProps) {
                 {props.uploadOptions.showBadPasswordMsg && (<div className="text-red-700 text-xs mt-2 text-center">Wrong password</div>)}
             </>
             )}
-            {uploadFileType == UploadFileType.RECORDS_NEW && (<>
+            {uploadFileType == UploadFileType.RECORDS_NEW && (<div className="min-h-full h-[calc(100vh-7rem)] overflow-y-auto">
                 <div className="form-control">
                     <label className="text-gray-500 text-sm font-normal">Project title</label>
                     <div className="flex flex-row">
@@ -303,10 +303,10 @@ export default function Upload(props: UploadProps) {
                     isModal={props.uploadOptions.isModal} submitUpload={submitUpload} sendSelectedFile={(file) => {
                         setSelectedFile(file);
                     }} setKey={(key) => setKey(key)} />
-            </>
+            </div>
             )}
 
-            {uploadFileType == UploadFileType.RECORDS_ADD && (<>
+            {uploadFileType == UploadFileType.RECORDS_ADD && (<div className="min-h-full h-[calc(100vh-7rem)] overflow-y-auto">
                 <div className="text-lg leading-6 text-gray-900 font-medium inline-block">
                     Record upload
                 </div>
@@ -314,7 +314,7 @@ export default function Upload(props: UploadProps) {
                 <UploadWrapper uploadStarted={uploadStarted} doingSomething={doingSomething} progressState={progressState} submitted={submitted} isFileCleared={selectedFile == null}
                     isModal={props.uploadOptions.isModal} submitUpload={submitUpload} sendSelectedFile={(file) => {
                         setSelectedFile(file);
-                    }} setKey={(key) => setKey(key)} /></>)}
+                    }} setKey={(key) => setKey(key)} /></div>)}
 
             {uploadFileType == UploadFileType.KNOWLEDGE_BASE && (
                 <UploadWrapper uploadStarted={uploadStarted} doingSomething={doingSomething} progressState={progressState} submitted={submitted} isFileCleared={selectedFile == null}
