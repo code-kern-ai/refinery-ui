@@ -7,7 +7,7 @@ import { NotificationLevel } from "@/src/types/shared/notification-center";
 import { IconAlertTriangleFilled, IconCircleCheckFilled, IconInfoCircleFilled } from "@tabler/icons-react";
 import { CurrentPage } from "@/src/types/shared/general";
 import { useDispatch, useSelector } from "react-redux";
-import { selectUser } from "@/src/reduxStore/states/general";
+import { selectCurrentPage, selectUser } from "@/src/reduxStore/states/general";
 import { interval } from "rxjs";
 import { setNotificationId } from "@/src/reduxStore/states/tmp";
 import AdminMessages from "../admin-messages/AdminMessages";
@@ -29,6 +29,7 @@ export default function Layout({ children }) {
 
     const user = useSelector(selectUser);
     const projectId = useSelector(selectProjectId);
+    const currentPage = useSelector(selectCurrentPage);
 
     const [deletionTimer, setDeletionTimer] = useState(null);
     const [activeAdminMessages, setActiveAdminMessages] = useState<AdminMessage[]>([]);
@@ -120,7 +121,7 @@ export default function Layout({ children }) {
                 <Sidebar />
                 <div className="h-full w-full flex-1 flex flex-col">
                     <Header />
-                    <div className="block flex-grow h-full w-full bg-gray-100">
+                    <div className={`block flex-grow h-full w-full bg-gray-100 ${currentPage == CurrentPage.NEW_PROJECT ? 'overflow-y-auto' : ''}`}>
                         <main>{children}</main>
                     </div>
                 </div>
