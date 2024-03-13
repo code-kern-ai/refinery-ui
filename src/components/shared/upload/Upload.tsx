@@ -118,7 +118,7 @@ export default function Upload(props: UploadProps) {
 
     function submitUpload() {
         setSubmitted(true);
-        if (!selectedFile) return;
+        if (!selectedFile || isProjectTitleDuplicate || isProjectTitleEmpty) return;
         if (uploadFileType == UploadFileType.RECORDS_NEW) {
             if (projectTitle.trim() == "") {
                 setIsProjectTitleEmpty(true);
