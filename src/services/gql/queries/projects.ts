@@ -36,11 +36,11 @@ query {
   }      
 `;
 
-// TODO: test fastapi impl.
-// export const GET_OVERVIEW_STATS = gql`
-// query{
-//   overviewStats
-// }`;
+// TODO: check resolved
+export const GET_OVERVIEW_STATS = gql`
+query{
+  overviewStats
+}`;
 
 export const GET_ALL_TOKENIZER_OPTIONS = gql`
 query{
