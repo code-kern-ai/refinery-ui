@@ -217,13 +217,13 @@ export default function ActiveLearning() {
 
     return (
         <HeuristicsLayout updateSourceCode={(code) => updateSourceCodeToDisplay(code)}>
+
             {currentHeuristic && <div>
                 <div className="relative flex-shrink-0 min-h-16 flex justify-between pb-2">
                     <div className="flex items-center flex-wrap mt-3">
                         <div className="text-sm leading-5 font-medium text-gray-700 inline-block mr-2">Editor</div>
                         <Tooltip content={TOOLTIPS_DICT.LABELING_FUNCTION.LABELING_TASK} color="invert" placement="top">
                             <Dropdown2 options={labelingTasks} buttonName={currentHeuristic?.labelingTaskName} selectedOption={(option: any) => saveHeuristic(option)} dropdownClasses="z-30" />
-
                         </Tooltip>
                         {currentHeuristic.labels?.length == 0 ? (<div className="text-sm font-normal text-gray-500 ml-3">No labels for target task</div>) : <>
                             {currentHeuristic.labels?.map((label: any, index: number) => (
@@ -243,17 +243,17 @@ export default function ActiveLearning() {
                                 <div className="text-sm leading-5 font-medium text-gray-700 inline-block mr-2">Embeddings</div>
                                 {embeddingsFiltered.map((embedding: Embedding, index: number) => <Fragment key={embedding.id}>
                                     {embedding.state == Status.FINISHED && <Tooltip content={TOOLTIPS_DICT.GENERAL.CLICK_TO_COPY} color="invert" placement="top">
-                                        <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-purple-100 text-purple-700 cursor-pointer" onClick={() => copyToClipboard(embedding.name)}>
+                                        <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-purple-100 text-purple-700 cursor-pointer mr-2" onClick={() => copyToClipboard(embedding.name)}>
                                             {embedding.name}
                                         </span>
                                     </Tooltip>}
                                     {embedding.state == Status.FAILED && <Tooltip content={TOOLTIPS_DICT.LABELING_FUNCTION.CLICK_TO_COPY_ERROR} color="invert" placement="top">
-                                        <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-red-100 text-red-700 cursor-pointer" onClick={() => copyToClipboard(embedding.name)}>
+                                        <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-red-100 text-red-700 cursor-pointer mr-2" onClick={() => copyToClipboard(embedding.name)}>
                                             {embedding.name}
                                         </span>
                                     </Tooltip>}
-                                    {(embedding.state != Status.FINISHED && embedding.state != Status.FAILED) && <Tooltip content={TOOLTIPS_DICT.LABELING_FUNCTION.CLICK_TO_COPY_ERROR} color="invert" placement="top">
-                                        <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-700 cursor-pointer" onClick={() => copyToClipboard(embedding.name)}>
+                                    {(embedding.state != Status.FINISHED && embedding.state != Status.FAILED) && <Tooltip content={TOOLTIPS_DICT.LABELING_FUNCTION.CLICK_TO_COPY_RUNNING} color="invert" placement="top">
+                                        <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-700 cursor-pointer mr-2" onClick={() => copyToClipboard(embedding.name)}>
                                             {embedding.name}
                                         </span>
                                     </Tooltip>}

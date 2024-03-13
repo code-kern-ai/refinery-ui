@@ -2,7 +2,8 @@ import { selectAnnotators, selectEngineers, selectExperts, selectInactiveOrganiz
 import { useSelector } from "react-redux"
 import YoutubeIntroduction from "../projects/YoutubeIntroduction";
 import { User } from "@/src/types/shared/general";
-import { IconCheck, IconUsersGroup } from "@tabler/icons-react";
+import { IconUsersGroup } from "@tabler/icons-react";
+import { UNKNOWN_USER } from "@/src/util/constants";
 
 export default function UsersList() {
     const isManaged = useSelector(selectIsManaged);
@@ -196,7 +197,7 @@ export default function UsersList() {
                                 <div className="min-w-0 flex-1">
                                     <a className="focus:outline-none">
                                         <span className="absolute inset-0" aria-hidden="true"></span>
-                                        <p className="text-sm font-medium text-gray-900">{user.firstName} {user.lastName}</p>
+                                        <p className="text-sm font-medium text-gray-900">{user.firstName && user.lastName ? user.firstName + ' ' + user.lastName : UNKNOWN_USER}</p>
                                         <p className="truncate text-sm text-gray-500">{user.mail}</p>
                                     </a>
                                 </div>
@@ -223,7 +224,7 @@ export default function UsersList() {
                                 <div className="min-w-0 flex-1">
                                     <a className="focus:outline-none">
                                         <span className="absolute inset-0" aria-hidden="true"></span>
-                                        <p className="text-sm font-medium text-gray-900">{user.firstName} {user.lastName}</p>
+                                        <p className="text-sm font-medium text-gray-900">{user.firstName && user.lastName ? user.firstName + ' ' + user.lastName : UNKNOWN_USER}</p>
                                         <p className="truncate text-sm text-gray-500">{user.mail}</p>
                                     </a>
                                 </div>
@@ -259,7 +260,7 @@ export default function UsersList() {
                                 <div className="min-w-0 flex-1">
                                     <a className="focus:outline-none">
                                         <span className="absolute inset-0" aria-hidden="true"></span>
-                                        <p className="text-sm font-medium text-gray-900">{user.firstName} {user.lastName}</p>
+                                        <p className="text-sm font-medium text-gray-900">{user.firstName && user.lastName ? user.firstName + ' ' + user.lastName : UNKNOWN_USER}</p>
                                         <p className="truncate text-sm text-gray-500">{user.mail}</p>
                                     </a>
                                 </div>

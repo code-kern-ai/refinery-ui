@@ -19,6 +19,7 @@ export default function ModalUpload(props: UploadProps) {
     const [projectName, setProjectName] = useState<string>("");
     const [isProjectTitleDuplicate, setProjectTitleDuplicate] = useState<boolean>(false);
     const [startUpload, setStartUpload] = useState<boolean>(false);
+    const [isFileUploaded, setIsFileUploaded] = useState<boolean>(false);
 
     const submitUpload = useCallback(() => {
         if (isProjectTitleDuplicate) return;
@@ -27,9 +28,9 @@ export default function ModalUpload(props: UploadProps) {
             setProjectName("");
             setStartUpload(false);
         });
-    }, []);
+    }, [isProjectTitleDuplicate]);
 
-    const [acceptButton, setAcceptButton] = useState<ModalButton>({ ...ACCEPT_BUTTON, emitFunction: submitUpload });
+    const [acceptButton, setAcceptButton] = useState<ModalButton>(ACCEPT_BUTTON);
     const [uploadOptions, setUploadOptions] = useState<UploadOptions>(null);
 
     const title = getTitle(uploadFileType);
@@ -48,6 +49,10 @@ export default function ModalUpload(props: UploadProps) {
             projectName: projectName,
         });
     }, [projectName, props.uploadOptions, uploadFileType]);
+
+    useEffect(() => {
+        setAcceptButton({ ...acceptButton, disabled: isFileUploaded && !isProjectTitleDuplicate ? false : true, emitFunction: submitUpload });
+    }, [isFileUploaded, isProjectTitleDuplicate, submitUpload]);
 
 
     function checkIfProjectNameDuplicate(value: string) {
@@ -79,7 +84,7 @@ export default function ModalUpload(props: UploadProps) {
                 </div>
             )}
             <Upload uploadOptions={uploadOptions} startUpload={startUpload} isFileUploaded={(isFileUploaded: boolean) => {
-                setAcceptButton({ ...acceptButton, disabled: isFileUploaded ? false : true });
+                setIsFileUploaded(isFileUploaded);
             }} closeModalEvent={props.closeModalEvent} />
         </Modal>
     );

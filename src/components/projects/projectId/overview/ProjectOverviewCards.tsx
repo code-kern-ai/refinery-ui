@@ -47,7 +47,7 @@ export default function ProjectOverviewCards(props: ProjectOverviewCardsProps) {
                                             {props.projectStats.generalStats[card.stats]}
                                         </p>}
                                     {card.stats == CardStatsEnum.INTER_ANNOTATOR && <p className="text-2xl font-semibold text-gray-900">
-                                        {props.projectStats.interAnnotatorStat == -1 ? NOT_AVAILABLE : (props.projectStats.interAnnotatorStat * 100 + '%')}
+                                        {props.projectStats.interAnnotatorStat == -1 ? NOT_AVAILABLE : props.projectStats.interAnnotatorStat}
                                     </p>}
                                 </Tooltip>
                             </>

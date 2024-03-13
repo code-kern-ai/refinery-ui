@@ -52,7 +52,7 @@ export default function AddZeroShotModal() {
     }, [attributes]);
 
     useEffect(() => {
-        if (!project.tokenizer) return;
+        if (!project || !project.tokenizer || !models) return;
         const language = project.tokenizer.split("_")[0];
         const modelsFiltered = models.filter(model => model.language == language).sort((a, b) => a.prio - b.prio);
         dispatch(setCache(CacheEnum.ZERO_SHOT_RECOMMENDATIONS, modelsFiltered));

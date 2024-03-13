@@ -1,7 +1,7 @@
 import { UploadFileType, UploadProps, UploadState, UploadStates, UploadTask, UploadType } from "@/src/types/shared/upload";
 import { useDispatch, useSelector } from "react-redux";
 import UploadField from "./helper-components/UploadField";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import UploadWrapper from "./helper-components/UploadWrapper";
 import { selectUploadData, setImportOptions } from "@/src/reduxStore/states/upload";
 import { useLazyQuery, useMutation } from "@apollo/client";
@@ -9,7 +9,7 @@ import { CREATE_PROJECT, DELETE_PROJECT, UPDATE_PROJECT_STATUS, UPDATE_PROJECT_T
 import { ProjectStatus } from "@/src/types/components/projects/projects-list";
 import { timer } from "rxjs";
 import { uploadFile } from "@/src/services/base/s3-service";
-import { CurrentPage } from "@/src/types/shared/general";
+import { CurrentPage, CurrentPageSubKey } from "@/src/types/shared/general";
 import { jsonCopy } from "@/submodules/javascript-functions/general";
 import { useRouter } from "next/router";
 import { extendAllProjects, removeFromAllProjectsById, selectAllProjects, selectProjectId } from "@/src/reduxStore/states/project";
@@ -53,7 +53,7 @@ export default function Upload(props: UploadProps) {
     const [getUploadTaskId] = useLazyQuery(GET_UPLOAD_TASK_BY_TASK_ID, { fetchPolicy: 'network-only' });
 
     useEffect(() => {
-        if (!props.uploadOptions.tokenizerValues) return;
+        if (!props.uploadOptions || !props.uploadOptions.tokenizerValues) return;
         const tokenizerValuesDisplay = [...props.uploadOptions.tokenizerValues];
         tokenizerValuesDisplay.forEach((tokenizer: any, index: number) => {
             const tokenizerNameContainsBrackets = tokenizer.name.includes('(') && tokenizer.name.includes(')');
@@ -62,7 +62,7 @@ export default function Upload(props: UploadProps) {
             tokenizerValuesDisplay[index] = tokenizerCopy;
         });
         setPrepareTokenizedValues(tokenizerValuesDisplay);
-    }, [props.uploadOptions.tokenizerValues]);
+    }, [props.uploadOptions]);
 
     useEffect(() => {
         if (props.startUpload) {
@@ -75,7 +75,7 @@ export default function Upload(props: UploadProps) {
             props.isFileUploaded(selectedFile != null);
     }, [selectedFile]);
 
-    function handleWebsocketNotification(msgParts: string[]) {
+    const handleWebsocketNotification = useCallback((msgParts: string[]) => {
         const uploadTask = UploadHelper.getUploadTask();
         const projectId = UploadHelper.getProjectId();
         if (!uploadTask) return;
@@ -114,11 +114,11 @@ export default function Upload(props: UploadProps) {
         } else {
             console.log("unknown websocket message in part 3:" + msgParts[3], "full message:", msgParts)
         }
-    }
+    }, [props.uploadOptions?.deleteProjectOnFail, props.uploadOptions?.reloadOnFinish]);
 
     function submitUpload() {
         setSubmitted(true);
-        if (!selectedFile) return;
+        if (!selectedFile || isProjectTitleDuplicate || isProjectTitleEmpty) return;
         if (uploadFileType == UploadFileType.RECORDS_NEW) {
             if (projectTitle.trim() == "") {
                 setIsProjectTitleEmpty(true);
@@ -219,7 +219,7 @@ export default function Upload(props: UploadProps) {
         UploadHelper.setUploadTask(task);
         if (task.state == UploadStates.DONE || task.progress == 100) {
             clearUploadTask();
-            if (props.uploadOptions.reloadOnFinish) location.reload();
+            if (props.uploadOptions && props.uploadOptions.reloadOnFinish) location.reload();
             else setUploadStarted(false);
             router.push('/projects/' + UploadHelper.getProjectId() + '/settings');
         }
@@ -253,11 +253,11 @@ export default function Upload(props: UploadProps) {
         if (findProjectName) setIsProjectTitleDuplicate(true);
         else setIsProjectTitleDuplicate(false);
     }
-
+    useWebsocket(CurrentPage.PROJECTS, handleWebsocketNotification, null, CurrentPageSubKey.FILE_UPLOAD);
     useWebsocket(CurrentPage.UPLOAD_RECORDS, handleWebsocketNotification, UploadHelper.getProjectId());
 
-    return (
-        <section className={`${!props.uploadOptions.isModal ? 'p-4' : ''}`}>
+    return <>
+        {props.uploadOptions && <section className={`${!props.uploadOptions.isModal ? 'p-4' : ''}`}>
             {uploadFileType == UploadFileType.PROJECT && (<>
                 <UploadField isFileCleared={selectedFile == null} uploadStarted={uploadStarted} doingSomething={doingSomething} progressState={progressState} sendSelectedFile={(file) => {
                     setSelectedFile(file);
@@ -270,7 +270,7 @@ export default function Upload(props: UploadProps) {
                 {props.uploadOptions.showBadPasswordMsg && (<div className="text-red-700 text-xs mt-2 text-center">Wrong password</div>)}
             </>
             )}
-            {uploadFileType == UploadFileType.RECORDS_NEW && (<>
+            {uploadFileType == UploadFileType.RECORDS_NEW && (<div className="min-h-full h-[calc(100vh-7rem)] overflow-y-auto">
                 <div className="form-control">
                     <label className="text-gray-500 text-sm font-normal">Project title</label>
                     <div className="flex flex-row">
@@ -303,10 +303,10 @@ export default function Upload(props: UploadProps) {
                     isModal={props.uploadOptions.isModal} submitUpload={submitUpload} sendSelectedFile={(file) => {
                         setSelectedFile(file);
                     }} setKey={(key) => setKey(key)} />
-            </>
+            </div>
             )}
 
-            {uploadFileType == UploadFileType.RECORDS_ADD && (<>
+            {uploadFileType == UploadFileType.RECORDS_ADD && (<div className="min-h-full h-[calc(100vh-7rem)] overflow-y-auto">
                 <div className="text-lg leading-6 text-gray-900 font-medium inline-block">
                     Record upload
                 </div>
@@ -314,7 +314,7 @@ export default function Upload(props: UploadProps) {
                 <UploadWrapper uploadStarted={uploadStarted} doingSomething={doingSomething} progressState={progressState} submitted={submitted} isFileCleared={selectedFile == null}
                     isModal={props.uploadOptions.isModal} submitUpload={submitUpload} sendSelectedFile={(file) => {
                         setSelectedFile(file);
-                    }} setKey={(key) => setKey(key)} /></>)}
+                    }} setKey={(key) => setKey(key)} /></div>)}
 
             {uploadFileType == UploadFileType.KNOWLEDGE_BASE && (
                 <UploadWrapper uploadStarted={uploadStarted} doingSomething={doingSomething} progressState={progressState} submitted={submitted} isFileCleared={selectedFile == null}
@@ -322,6 +322,6 @@ export default function Upload(props: UploadProps) {
                         setSelectedFile(file);
                     }} setKey={(key) => setKey(key)} />)
             }
-        </section >
-    )
+        </section >}
+    </>
 }

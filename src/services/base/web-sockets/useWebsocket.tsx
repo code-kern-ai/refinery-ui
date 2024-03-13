@@ -29,7 +29,8 @@ export function useWebsocket(currentPage: CurrentPage, handleFunction: (msgParts
 const WHITELIST_LOOKUP = {
     [CurrentPage.PROJECTS]: {
         [CurrentPageSubKey.NONE]: ['project_created', 'project_deleted', 'project_update', 'file_upload'],
-        [CurrentPageSubKey.BUTTONS_CONTAINER]: ['bad_password']
+        [CurrentPageSubKey.BUTTONS_CONTAINER]: ['bad_password'],
+        [CurrentPageSubKey.FILE_UPLOAD]: ['file_upload']
     },
     [CurrentPage.UPLOAD_RECORDS]: {
         [CurrentPageSubKey.NONE]: ['file_upload']
