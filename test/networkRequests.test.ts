@@ -1,14 +1,26 @@
-import { getOverviewStats, getIsDemo } from "../src/services/base/organization";
+import { getProjectByProjectId } from '../src/services/base/project';
 
-
-describe('Integration Test for getOverviewStats', () => {
-    it('successfully fetches overview statistics from the backend', async () => {
-        getOverviewStats((data) => {
-            console.log(data);
+describe('Integration Test for getProjectByProjectId', () => {
+    it('getProjectByProjectId: OK', async () => {
+        const fastapi_result = await new Promise<void>((resolve) => {
+            getProjectByProjectId("db66e355-28d5-4807-9594-a46ccff53b94", (result) => {
+                resolve(result);
+            });
         });
 
-        // getIsDemo((data) => {
-        //     console.log(data);
-        // });
+        const graphql_result = {
+            "data": {
+                "projectByProjectId": {
+                    "id": "db66e355-28d5-4807-9594-a46ccff53b94",
+                    "name": "Clickbait",
+                    "description": "A simple binary classification project for detecting clickbait articles.",
+                    "projectType": null,
+                    "tokenizer": "en_core_web_sm",
+                    "numDataScaleUploaded": 3000
+                }
+            }
+        }
+
+        expect(fastapi_result).toEqual(graphql_result);
     });
 });

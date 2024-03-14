@@ -20,6 +20,7 @@ import { ConfigManager } from "../services/base/config";
 import postprocessVersionOverview from "../util/shared/sidebar-helper";
 import { postProcessingEmbeddingPlatforms } from "../util/components/projects/projectId/settings/embeddings-helper";
 import { setDisplayUserRole } from "./states/pages/labeling";
+import { getProjectByProjectId } from "../services/base/project";
 
 export function GlobalStoreDataComponent(props: React.PropsWithChildren) {
     const router = useRouter();
@@ -34,7 +35,6 @@ export function GlobalStoreDataComponent(props: React.PropsWithChildren) {
 
     const [getIsAdmin] = useLazyQuery(GET_IS_ADMIN, { fetchPolicy: "no-cache" });
     const [refetchUserInfo] = useLazyQuery(GET_USER_INFO, { fetchPolicy: 'no-cache' });
-    const [refetchProjectByProjectId] = useLazyQuery(GET_PROJECT_BY_ID, { fetchPolicy: 'no-cache' });
     const [refetchOrganization] = useLazyQuery(GET_ORGANIZATION, { fetchPolicy: 'no-cache' });
     const [refetchOrganizationUsers] = useLazyQuery(GET_ORGANIZATION_USERS, { fetchPolicy: 'no-cache' });
     const [refetchZeroShotRecommendations] = useLazyQuery(GET_ZERO_SHOT_RECOMMENDATIONS, { fetchPolicy: 'cache-first' });
@@ -111,9 +111,9 @@ export function GlobalStoreDataComponent(props: React.PropsWithChildren) {
     useEffect(() => {
         const projectId = router.query.projectId as string;
         if (projectId) {
-            refetchProjectByProjectId({ variables: { projectId: projectId } }).then((res) => {
-                dispatch(setActiveProject(res.data["projectByProjectId"]));
-            });
+            getProjectByProjectId(projectId, (result) => {
+                dispatch(setActiveProject(result));
+            })
         }
         else {
             dispatch(setActiveProject(null));

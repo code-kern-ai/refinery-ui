@@ -36,7 +36,6 @@ query {
   }      
 `;
 
-// TODO: check resolved
 export const GET_OVERVIEW_STATS = gql`
 query{
   overviewStats
