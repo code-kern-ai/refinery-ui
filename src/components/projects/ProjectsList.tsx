@@ -60,7 +60,7 @@ export default function ProjectsList() {
         } else {
             createDefaultOrg();
         }
-    }, [organizationInactive, user, canCreateOrg]);
+    }, [organizationInactive, user]);
 
     function refetchProjectsAndPostProcess() {
         refetchProjects().then((res) => {
@@ -91,8 +91,9 @@ export default function ProjectsList() {
             return;
         }
         refetchCanCreateOrg().then((res) => {
-            setCanCreateOrg(res.data["canCreateLocalOrg"]);
-            if (!canCreateOrg) return;
+            const canCreate = res.data["canCreateLocalOrg"]
+            setCanCreateOrg(canCreate);
+            if (!canCreate) return;
             const localhostOrg = "localhost";
             createOrgMut({ variables: { name: localhostOrg } }).then((res) => {
                 addUserToOrgMut({ variables: { userMail: user.mail, organizationName: localhostOrg } }).then((res) => {
