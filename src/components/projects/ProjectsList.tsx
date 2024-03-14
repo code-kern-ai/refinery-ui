@@ -53,14 +53,14 @@ export default function ProjectsList() {
     }, []);
 
     useEffect(() => {
-        if (organizationInactive == null) return;
+        if (organizationInactive == null || !user) return;
         if (!organizationInactive) {
             refetchProjectsAndPostProcess();
             refetchStatsAndPostProcess();
         } else {
             createDefaultOrg();
         }
-    }, [organizationInactive]);
+    }, [organizationInactive, user, canCreateOrg]);
 
     function refetchProjectsAndPostProcess() {
         refetchProjects().then((res) => {
