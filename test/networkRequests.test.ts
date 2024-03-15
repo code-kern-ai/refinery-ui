@@ -2,8 +2,11 @@ import { getProjectByProjectId } from '../src/services/base/project';
 
 describe('Integration Test for getProjectByProjectId', () => {
     it('getProjectByProjectId: OK', async () => {
+
+        const projectId = "4235c9b2-5cd7-4d90-adcd-871b32205bf6";
+
         const fastapi_result = await new Promise<void>((resolve) => {
-            getProjectByProjectId("db66e355-28d5-4807-9594-a46ccff53b94", (result) => {
+            getProjectByProjectId(projectId, (result) => {
                 resolve(result);
             });
         });
@@ -11,7 +14,7 @@ describe('Integration Test for getProjectByProjectId', () => {
         const graphql_result = {
             "data": {
                 "projectByProjectId": {
-                    "id": "db66e355-28d5-4807-9594-a46ccff53b94",
+                    "id": projectId,
                     "name": "Clickbait",
                     "description": "A simple binary classification project for detecting clickbait articles.",
                     "projectType": null,
