@@ -21,6 +21,7 @@ import postprocessVersionOverview from "../util/shared/sidebar-helper";
 import { postProcessingEmbeddingPlatforms } from "../util/components/projects/projectId/settings/embeddings-helper";
 import { setDisplayUserRole } from "./states/pages/labeling";
 import { getProjectByProjectId } from "../services/base/project";
+import { getIsAdmin } from "../services/base/misc";
 
 export function GlobalStoreDataComponent(props: React.PropsWithChildren) {
     const router = useRouter();
@@ -33,7 +34,6 @@ export function GlobalStoreDataComponent(props: React.PropsWithChildren) {
 
     const [dataLoaded, setDataLoaded] = useState(false);
 
-    const [getIsAdmin] = useLazyQuery(GET_IS_ADMIN, { fetchPolicy: "no-cache" });
     const [refetchUserInfo] = useLazyQuery(GET_USER_INFO, { fetchPolicy: 'no-cache' });
     const [refetchOrganization] = useLazyQuery(GET_ORGANIZATION, { fetchPolicy: 'no-cache' });
     const [refetchOrganizationUsers] = useLazyQuery(GET_ORGANIZATION_USERS, { fetchPolicy: 'no-cache' });
@@ -50,7 +50,7 @@ export function GlobalStoreDataComponent(props: React.PropsWithChildren) {
         getIsDemo((data) => {
             dispatch(setIsDemo(data));
         });
-        getIsAdmin().then((data) => {
+        getIsAdmin((data) => {
             dispatch(setIsAdmin(data.data.isAdmin));
         });
         refetchUserInfo().then((res) => {
