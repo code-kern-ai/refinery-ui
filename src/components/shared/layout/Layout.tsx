@@ -5,7 +5,6 @@ import { GET_ALL_ACTIVE_ADMIN_MESSAGES, NOTIFICATIONS_BY_USER } from "@/src/serv
 import { Fragment, useCallback, useEffect, useState } from "react";
 import { NotificationLevel } from "@/src/types/shared/notification-center";
 import { IconAlertTriangleFilled, IconCircleCheckFilled, IconInfoCircleFilled } from "@tabler/icons-react";
-import { CurrentPage } from "@/src/types/shared/general";
 import { useDispatch, useSelector } from "react-redux";
 import { selectUser } from "@/src/reduxStore/states/general";
 import { interval } from "rxjs";
@@ -20,6 +19,7 @@ import { postProcessNotificationsUser } from "@/src/util/shared/notification-cen
 import { useWebsocket } from "@/src/services/base/web-sockets/useWebsocket";
 import { useRouter } from "next/router";
 import { selectProjectId } from "@/src/reduxStore/states/project";
+import { CurrentPage } from "@/src/types/shared/general";
 
 const MIN_WIDTH = 1250;
 

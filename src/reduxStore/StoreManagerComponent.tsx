@@ -58,6 +58,7 @@ export function GlobalStoreDataComponent(props: React.PropsWithChildren) {
             userInfo.avatarUri = getUserAvatarUri(res.data["userInfo"]);
             dispatch(setUser(userInfo));
             dispatch(setDisplayUserRole(res.data["userInfo"].role));
+
         });
         refetchOrganization().then((res) => {
             if (res.data["userOrganization"]) {
@@ -70,9 +71,6 @@ export function GlobalStoreDataComponent(props: React.PropsWithChildren) {
                 dispatch(setOrganization(null));
                 timer(60000).subscribe(() => location.reload())
             }
-        });
-        refetchOrganizationUsers().then((res) => {
-            dispatch(setAllUsers(res.data["allUsers"]));
         });
 
         // Set cache
@@ -89,6 +87,13 @@ export function GlobalStoreDataComponent(props: React.PropsWithChildren) {
             dispatch(setCache(CacheEnum.EMBEDDING_PLATFORMS, postProcessingEmbeddingPlatforms(res.data['embeddingPlatforms'], organization)))
         });
     }, []);
+
+    useEffect(() => {
+        if (!organization) return;
+        refetchOrganizationUsers().then((res) => {
+            dispatch(setAllUsers(res.data["allUsers"]));
+        });
+    }, [organization]);
 
     useEffect(() => {
         const routeColor = RouteManager.checkRouteHighlight(router.asPath);

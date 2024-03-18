@@ -7,7 +7,7 @@ export type ProjectStats = {
     generalStats: {};
     interAnnotatorLoading: boolean;
     interAnnotator: string;
-    interAnnotatorStat: number;
+    interAnnotatorStat: number | string;
     tooltipsArray?: any;
 };
 

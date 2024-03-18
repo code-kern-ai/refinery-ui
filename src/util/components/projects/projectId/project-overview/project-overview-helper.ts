@@ -110,6 +110,7 @@ export function calcInterAnnotatorAvg(interAnnotatorMatrix, projectStats: Projec
     if (c) {
         projectStatsCopy.interAnnotator = Number(c / 2) + " with intersections";
         projectStatsCopy.interAnnotatorStat = s / c;
+        projectStatsCopy.interAnnotatorStat = percentRoundString(projectStatsCopy.interAnnotatorStat, 2);
     } else {
         projectStatsCopy.interAnnotator = "No intersections";
         projectStatsCopy.interAnnotatorStat = -1;
