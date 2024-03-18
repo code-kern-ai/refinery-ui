@@ -22,6 +22,7 @@ import { postProcessingEmbeddingPlatforms } from "../util/components/projects/pr
 import { setDisplayUserRole } from "./states/pages/labeling";
 import { getProjectByProjectId } from "../services/base/project";
 import { getIsAdmin } from "../services/base/misc";
+import { getUserInfo } from "../services/base/organization";
 
 export function GlobalStoreDataComponent(props: React.PropsWithChildren) {
     const router = useRouter();
@@ -34,7 +35,7 @@ export function GlobalStoreDataComponent(props: React.PropsWithChildren) {
 
     const [dataLoaded, setDataLoaded] = useState(false);
 
-    const [refetchUserInfo] = useLazyQuery(GET_USER_INFO, { fetchPolicy: 'no-cache' });
+    // const [refetchUserInfo] = useLazyQuery(GET_USER_INFO, { fetchPolicy: 'no-cache' });
     const [refetchOrganization] = useLazyQuery(GET_ORGANIZATION, { fetchPolicy: 'no-cache' });
     const [refetchOrganizationUsers] = useLazyQuery(GET_ORGANIZATION_USERS, { fetchPolicy: 'no-cache' });
     const [refetchZeroShotRecommendations] = useLazyQuery(GET_ZERO_SHOT_RECOMMENDATIONS, { fetchPolicy: 'cache-first' });
@@ -47,19 +48,22 @@ export function GlobalStoreDataComponent(props: React.PropsWithChildren) {
         getIsManaged((data) => {
             dispatch(setIsManaged(data));
         });
+
         getIsDemo((data) => {
             dispatch(setIsDemo(data));
         });
+
         getIsAdmin((data) => {
             dispatch(setIsAdmin(data.data.isAdmin));
         });
-        refetchUserInfo().then((res) => {
+
+        getUserInfo((res) => {
             const userInfo = { ...res.data["userInfo"] };
             userInfo.avatarUri = getUserAvatarUri(res.data["userInfo"]);
             dispatch(setUser(userInfo));
             dispatch(setDisplayUserRole(res.data["userInfo"].role));
-
         });
+
         refetchOrganization().then((res) => {
             if (res.data["userOrganization"]) {
                 if (WebSocketsService.getConnectionOpened()) return;
