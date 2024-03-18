@@ -116,8 +116,8 @@ export function GlobalStoreDataComponent(props: React.PropsWithChildren) {
     useEffect(() => {
         const projectId = router.query.projectId as string;
         if (projectId) {
-            getProjectByProjectId(projectId, (result) => {
-                dispatch(setActiveProject(result));
+            getProjectByProjectId(projectId, (res) => {
+                dispatch(setActiveProject(res.data["projectByProjectId"]));
             })
         }
         else {

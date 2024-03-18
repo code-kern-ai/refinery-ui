@@ -32,6 +32,7 @@ import ProjectSnapshotExportModal from "./ProjectSnapshotExportModal";
 import { postProcessLabelingTasks, postProcessLabelingTasksSchema } from "@/src/util/components/projects/projectId/settings/labeling-tasks-helper";
 import { getEmptyBricksIntegratorConfig } from "@/src/util/shared/bricks-integrator-helper";
 import { useWebsocket } from "@/src/services/base/web-sockets/useWebsocket";
+import { getProjectByProjectId } from "@/src/services/base/project";
 
 export default function ProjectSettings() {
     const dispatch = useDispatch();
@@ -52,7 +53,6 @@ export default function ProjectSettings() {
 
     const [refetchAttributes] = useLazyQuery(GET_ATTRIBUTES_BY_PROJECT_ID, { fetchPolicy: "network-only" });
     const [refetchPrimaryKey] = useLazyQuery(CHECK_COMPOSITE_KEY, { fetchPolicy: "no-cache" });
-    const [refetchProjectByProjectId] = useLazyQuery(GET_PROJECT_BY_ID, { fetchPolicy: "no-cache" });
     const [refetchProjectTokenization] = useLazyQuery(GET_PROJECT_TOKENIZATION, { fetchPolicy: "no-cache" });
     const [refetchEmbeddings] = useLazyQuery(GET_EMBEDDING_SCHEMA_BY_PROJECT_ID, { fetchPolicy: "no-cache" });
     const [refetchQueuedTasks] = useLazyQuery(GET_QUEUED_TASKS, { fetchPolicy: "no-cache" });
@@ -218,9 +218,9 @@ export default function ProjectSettings() {
         } else if (msgParts[1] == 'attributes_updated') {
             refetchAttributesAndPostProcess();
         } else if (msgParts[1] == 'project_update' && msgParts[2] == project.id) {
-            refetchProjectByProjectId({ variables: { projectId: project.id } }).then((res) => {
+            getProjectByProjectId(project.id, (res) => {
                 dispatch(setActiveProject(res.data["projectByProjectId"]));
-            });
+            })
         }
         else if (msgParts[1] == 'calculate_attribute') {
             if (msgParts[2] == 'started' && msgParts[3] == 'all') {
