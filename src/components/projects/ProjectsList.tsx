@@ -1,6 +1,6 @@
 import { selectInactiveOrganization, selectIsDemo, selectIsManaged, selectUser, setComments } from "@/src/reduxStore/states/general"
 import { selectAllProjects, setAllProjects } from "@/src/reduxStore/states/project";
-import { GET_OVERVIEW_STATS, GET_PROJECT_LIST } from "@/src/services/gql/queries/projects";
+import { GET_PROJECT_LIST } from "@/src/services/gql/queries/projects";
 import { Project, ProjectStatistics } from "@/src/types/components/projects/projects-list";
 import { CurrentPage } from "@/src/types/shared/general";
 import { percentRoundString } from "@/submodules/javascript-functions/general";
@@ -20,6 +20,7 @@ import { setOverviewFilters } from "@/src/reduxStore/states/tmp";
 import { setDataSlices, setFullSearchStore, setSearchGroupsStore } from "@/src/reduxStore/states/pages/data-browser";
 import { SearchGroup } from "@/submodules/javascript-functions/enums/enums";
 import { useWebsocket } from "@/src/services/base/web-sockets/useWebsocket";
+import { getOverviewStats } from "@/src/services/base/organization";
 
 export default function ProjectsList() {
     const router = useRouter();
@@ -36,7 +37,7 @@ export default function ProjectsList() {
     const [dataLoaded, setDataLoaded] = useState(false);
 
     const [refetchProjects] = useLazyQuery(GET_PROJECT_LIST, { fetchPolicy: "no-cache" });
-    const [refetchStats] = useLazyQuery(GET_OVERVIEW_STATS, { fetchPolicy: "cache-and-network" });
+    // const [refetchStats] = useLazyQuery(GET_OVERVIEW_STATS, { fetchPolicy: "cache-and-network" });
     const [refetchCanCreateOrg] = useLazyQuery(GET_CAN_CREATE_LOCAL_ORG, { fetchPolicy: "no-cache" });
     const [createOrgMut] = useMutation(CREATE_ORGANIZATION);
     const [addUserToOrgMut] = useMutation(ADD_USER_TO_ORGANIZATION);
@@ -71,8 +72,8 @@ export default function ProjectsList() {
     }
 
     function refetchStatsAndPostProcess() {
-        refetchStats().then((res) => {
-            const stats = JSON.parse(res.data["overviewStats"]);
+        getOverviewStats((res) => {
+            const stats = res.data["overviewStats"];
             const statsDict = {};
             if (stats == null) return;
             stats.forEach((stat: ProjectStatistics) => {
