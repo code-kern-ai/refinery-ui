@@ -7,3 +7,8 @@ export function getUserInfo(onResult: (result: any) => void) {
     const finalUrl = `${organizationEndpoint}/user-info`;
     jsonFetchWrapper(finalUrl, FetchType.GET, onResult);
 }
+
+export function getOverviewStats(onResult: (result: any) => void) {
+    const finalUrl = `${organizationEndpoint}/overview-stats`;
+    jsonFetchWrapper(finalUrl, FetchType.GET, onResult);
+}
