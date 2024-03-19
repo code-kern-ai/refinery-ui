@@ -65,7 +65,8 @@ export default function ProjectsList() {
     }, [organizationInactive, user]);
 
     function refetchProjectsAndPostProcess() {
-        getAllProjects(user.id, (res) => {
+        // getAllProjects(user.id, (res) => {
+        refetchProjects().then((res) => {
             const projects = res.data["allProjects"].edges.map((edge: any) => edge.node);
             dispatch(setAllProjects(projects));
             setDataLoaded(true);
