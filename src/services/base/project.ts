@@ -19,12 +19,39 @@ export function getGeneralProjectStats(projectId: string, labelingTaskId: string
     let finalUrl = `${projectEndpoint}/${projectId}/general-project-stats`;
 
     if (labelingTaskId) {
-        finalUrl += `?labelingTaskId=${labelingTaskId}`;
+        finalUrl += `?labeling_task_id=${labelingTaskId}`;
     }
     if (sliceId) {
         finalUrl += labelingTaskId ? '&' : '?';
-        finalUrl += `sliceId=${sliceId}`;
+        finalUrl += `slice_id=${sliceId}`;
     }
 
+    jsonFetchWrapper(finalUrl, FetchType.GET, onResult);
+}
+export function getInterAnnotatorMatrix(projectId: string, labelingTaskId: string | null, sliceId: string | null, includeGoldStar: boolean | null, includeAllOrgUser: boolean | null, onResult: (result: any) => void) {
+
+    let finalUrl = `${projectEndpoint}/${projectId}/inter-annotator-matrix`;
+    let somethingAdded = false;
+
+    if (labelingTaskId) {
+        finalUrl += somethingAdded ? '&' : '?';
+        finalUrl += "labeling_task_id=" + labelingTaskId;
+        somethingAdded = true;
+    }
+    if (sliceId) {
+        finalUrl += somethingAdded ? '&' : '?';
+        finalUrl += "only_on_static_slice=" + sliceId;
+        somethingAdded = true;
+    }
+    if (includeGoldStar) {
+        finalUrl += somethingAdded ? '&' : '?';
+        finalUrl += "include_gold_star=" + includeGoldStar;
+        somethingAdded = true;
+    }
+    if (includeAllOrgUser) {
+        finalUrl += somethingAdded ? '&' : '?';
+        finalUrl += "include_all_org_user=" + includeAllOrgUser;
+        somethingAdded = true;
+    }
     jsonFetchWrapper(finalUrl, FetchType.GET, onResult);
 }

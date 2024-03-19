@@ -31,7 +31,7 @@ import { CommentType } from '@/src/types/shared/comments';
 import { REQUEST_COMMENTS } from '@/src/services/gql/queries/projects';
 import { CommentDataManager } from '@/src/util/classes/comments';
 import { useWebsocket } from '@/src/services/base/web-sockets/useWebsocket';
-import { getGeneralProjectStats } from '@/src/services/base/project';
+import { getGeneralProjectStats, getInterAnnotatorMatrix } from '@/src/services/base/project';
 
 const PROJECT_STATS_INITIAL_STATE: ProjectStats = getEmptyProjectStats();
 
@@ -86,7 +86,7 @@ export default function ProjectOverview() {
         getLabelDistributions();
         getConfidenceDistributions();
         getConfusionMatrix();
-        getInterAnnotatorMatrix();
+        getInterAnnotatorMatrixF();
         getProjectStats();
         saveSettingsToLocalStorage();
     }, [overviewFilters, projectId, labelingTasks]);
@@ -206,16 +206,15 @@ export default function ProjectOverview() {
         });
     }
 
-    function getInterAnnotatorMatrix() {
+    function getInterAnnotatorMatrixF() {
         let values = interAnnotatorFormGroup;
         values.dataSlice = values.dataSlice == "@@NO_SLICE@@" ? null : values.dataSlice;
         const labelingTaskId = overviewFilters.labelingTask?.id;
-        refetchInterAnnotator({ variables: { projectId: projectId, labelingTaskId: labelingTaskId, includeGoldStar: values.goldUser, includeAllOrgUser: values.allUsers, onlyOnStaticSlice: values.dataSlice } }).then((res) => {
+        getInterAnnotatorMatrix(projectId, labelingTaskId, values.dataSlice, values.goldUser, values.allUsers, (res) => {
             if (res['data'] == null) return;
             const matrix = res['data']['interAnnotatorMatrix'];
-            const matrixCopy = { ...matrix };
-            matrixCopy.allUsers = addUserName(matrixCopy.allUsers);
-            setInterAnnotatorMatrix(matrixCopy);
+            addUserName(matrix.allUsers);
+            setInterAnnotatorMatrix(matrix);
         });
         setGoldUserRequested(values.goldUser);
     }
