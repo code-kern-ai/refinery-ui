@@ -37,7 +37,7 @@ export default function ProjectsList() {
     const [canCreateOrg, setCanCreateOrg] = useState(false);
     const [dataLoaded, setDataLoaded] = useState(false);
 
-    const [refetchProjects] = useLazyQuery(GET_PROJECT_LIST, { fetchPolicy: "no-cache" });
+    // const [refetchProjects] = useLazyQuery(GET_PROJECT_LIST, { fetchPolicy: "no-cache" });
     // const [refetchStats] = useLazyQuery(GET_OVERVIEW_STATS, { fetchPolicy: "cache-and-network" });
     const [refetchCanCreateOrg] = useLazyQuery(GET_CAN_CREATE_LOCAL_ORG, { fetchPolicy: "no-cache" });
     const [createOrgMut] = useMutation(CREATE_ORGANIZATION);
@@ -65,8 +65,7 @@ export default function ProjectsList() {
     }, [organizationInactive, user]);
 
     function refetchProjectsAndPostProcess() {
-        // getAllProjects(user.id, (res) => {
-        refetchProjects().then((res) => {
+        getAllProjects(user.id, (res) => {
             const projects = res.data["allProjects"].edges.map((edge: any) => edge.node);
             dispatch(setAllProjects(projects));
             setDataLoaded(true);
