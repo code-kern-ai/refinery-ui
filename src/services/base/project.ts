@@ -13,3 +13,18 @@ export function getAllProjects(userId: string, onResult: (result: any) => void) 
     jsonFetchWrapper(finalUrl, FetchType.GET, onResult);
 }
 
+
+export function getGeneralProjectStats(projectId: string, labelingTaskId: string | null, sliceId: string | null, onResult: (result: any) => void) {
+
+    let finalUrl = `${projectEndpoint}/${projectId}/general-project-stats`;
+
+    if (labelingTaskId) {
+        finalUrl += `?labelingTaskId=${labelingTaskId}`;
+    }
+    if (sliceId) {
+        finalUrl += labelingTaskId ? '&' : '?';
+        finalUrl += `sliceId=${sliceId}`;
+    }
+
+    jsonFetchWrapper(finalUrl, FetchType.GET, onResult);
+}
