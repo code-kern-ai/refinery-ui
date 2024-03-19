@@ -20,6 +20,7 @@ import { setOverviewFilters } from "@/src/reduxStore/states/tmp";
 import { setDataSlices, setFullSearchStore, setSearchGroupsStore } from "@/src/reduxStore/states/pages/data-browser";
 import { SearchGroup } from "@/submodules/javascript-functions/enums/enums";
 import { useWebsocket } from "@/src/services/base/web-sockets/useWebsocket";
+import { getAllProjects } from "@/src/services/base/project";
 
 export default function ProjectsList() {
     const router = useRouter();
@@ -63,7 +64,7 @@ export default function ProjectsList() {
     }, [organizationInactive, user]);
 
     function refetchProjectsAndPostProcess() {
-        refetchProjects().then((res) => {
+        getAllProjects(user.id, (res) => {
             const projects = res.data["allProjects"].edges.map((edge: any) => edge.node);
             dispatch(setAllProjects(projects));
             setDataLoaded(true);
