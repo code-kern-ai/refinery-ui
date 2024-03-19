@@ -31,6 +31,7 @@ import { CommentType } from '@/src/types/shared/comments';
 import { REQUEST_COMMENTS } from '@/src/services/gql/queries/projects';
 import { CommentDataManager } from '@/src/util/classes/comments';
 import { useWebsocket } from '@/src/services/base/web-sockets/useWebsocket';
+import { getGeneralProjectStats } from '@/src/services/base/project';
 
 const PROJECT_STATS_INITIAL_STATE: ProjectStats = getEmptyProjectStats();
 
@@ -65,7 +66,6 @@ export default function ProjectOverview() {
     const [refetchRatsTokenization] = useLazyQuery(IS_RATS_TOKENIZAION_STILL_RUNNING, { fetchPolicy: "no-cache" });
     const [refetchInterAnnotator] = useLazyQuery(GET_INTER_ANNOTATOR_BY_PROJECT_ID, { fetchPolicy: "no-cache" });
     const [refetchComments] = useLazyQuery(REQUEST_COMMENTS, { fetchPolicy: "no-cache" });
-
 
     useEffect(() => {
         if (!projectId) return;
@@ -235,9 +235,10 @@ export default function ProjectOverview() {
         const labelingTaskId = overviewFilters.labelingTask?.id;
         const dataSliceFindId = overviewFilters.dataSlice?.id;
         const dataSliceId = dataSliceFindId == "@@NO_SLICE@@" ? null : dataSliceFindId;
-        refetchProjectStats({ variables: { projectId: projectId, labelingTaskId: labelingTaskId, sliceId: dataSliceId } }).then((res) => {
+
+        getGeneralProjectStats(projectId, labelingTaskId, dataSliceId, (res) => {
             if (res['data'] == null) return;
-            setProjectStats(postProcessingStats(JSON.parse(res['data']['generalProjectStats'])));
+            setProjectStats(postProcessingStats(res['data']['generalProjectStats']));
         });
     }
 

@@ -23,6 +23,7 @@ import { setDisplayUserRole } from "./states/pages/labeling";
 import { getProjectByProjectId } from "../services/base/project";
 import { getIsAdmin } from "../services/base/misc";
 import { getUserInfo } from "../services/base/organization";
+import { getZeroShotRecommendations } from "../services/base/zero-shot";
 
 export function GlobalStoreDataComponent(props: React.PropsWithChildren) {
     const router = useRouter();
@@ -38,7 +39,6 @@ export function GlobalStoreDataComponent(props: React.PropsWithChildren) {
     // const [refetchUserInfo] = useLazyQuery(GET_USER_INFO, { fetchPolicy: 'no-cache' });
     const [refetchOrganization] = useLazyQuery(GET_ORGANIZATION, { fetchPolicy: 'no-cache' });
     const [refetchOrganizationUsers] = useLazyQuery(GET_ORGANIZATION_USERS, { fetchPolicy: 'no-cache' });
-    const [refetchZeroShotRecommendations] = useLazyQuery(GET_ZERO_SHOT_RECOMMENDATIONS, { fetchPolicy: 'cache-first' });
     const [refetchRecommendedEncoders] = useLazyQuery(GET_RECOMMENDED_ENCODERS_FOR_EMBEDDINGS, { fetchPolicy: 'cache-first' });
     const [refetchTokenizerValues] = useLazyQuery(GET_ALL_TOKENIZER_OPTIONS, { fetchPolicy: 'cache-first' });
     const [refetchVersionOverview] = useLazyQuery(GET_VERSION_OVERVIEW, { fetchPolicy: 'no-cache' });
@@ -78,12 +78,6 @@ export function GlobalStoreDataComponent(props: React.PropsWithChildren) {
         });
 
         // Set cache
-        refetchZeroShotRecommendations().then((resZeroShot) => {
-            dispatch(setCache(CacheEnum.ZERO_SHOT_RECOMMENDATIONS, JSON.parse(resZeroShot.data['zeroShotRecommendations'])))
-            refetchRecommendedEncoders().then((resEncoders) => {
-                dispatch(setCache(CacheEnum.MODELS_LIST, postProcessingZeroShotEncoders(JSON.parse(resZeroShot.data['zeroShotRecommendations']), resEncoders.data['recommendedEncoders'])))
-            });
-        });
         refetchVersionOverview().then((res) => {
             dispatch(setCache(CacheEnum.VERSION_OVERVIEW, postprocessVersionOverview(res.data['versionOverview'])));
         });
@@ -123,6 +117,12 @@ export function GlobalStoreDataComponent(props: React.PropsWithChildren) {
             getProjectByProjectId(projectId, (res) => {
                 dispatch(setActiveProject(res.data["projectByProjectId"]));
             })
+            getZeroShotRecommendations(projectId, (res) => {
+                dispatch(setCache(CacheEnum.ZERO_SHOT_RECOMMENDATIONS, res.data['zeroShotRecommendations']))
+                refetchRecommendedEncoders().then((resEncoders) => {
+                    dispatch(setCache(CacheEnum.MODELS_LIST, postProcessingZeroShotEncoders(res.data['zeroShotRecommendations'], resEncoders.data['recommendedEncoders'])))
+                });
+            });
         }
         else {
             dispatch(setActiveProject(null));

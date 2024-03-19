@@ -31,6 +31,7 @@ import { CommentType } from "@/src/types/shared/comments";
 import { CommentDataManager } from "@/src/util/classes/comments";
 import Dropdown2 from "@/submodules/react-components/components/Dropdown2";
 import { useWebsocket } from "@/src/services/base/web-sockets/useWebsocket";
+import { getZeroShotRecommendations } from "@/src/services/base/zero-shot";
 
 export default function ZeroShot() {
     const dispatch = useDispatch();
@@ -50,7 +51,6 @@ export default function ZeroShot() {
     const [refetchCurrentHeuristic] = useLazyQuery(GET_HEURISTICS_BY_ID, { fetchPolicy: "network-only" });
     const [refetchLabelingTasksByProjectId] = useLazyQuery(GET_LABELING_TASKS_BY_PROJECT_ID, { fetchPolicy: "network-only" });
     const [updateHeuristicMut] = useMutation(UPDATE_INFORMATION_SOURCE);
-    const [refetchZeroShotRecommendations] = useLazyQuery(GET_ZERO_SHOT_RECOMMENDATIONS, { fetchPolicy: 'network-only', nextFetchPolicy: 'cache-first' });
     const [refetchComments] = useLazyQuery(REQUEST_COMMENTS, { fetchPolicy: "no-cache" });
 
     useEffect(() => {
@@ -63,8 +63,8 @@ export default function ZeroShot() {
         if (!projectId) return;
         if (!router.query.heuristicId) return;
         refetchLabelingTasksAndProcess();
-        refetchZeroShotRecommendations({ variables: { projectId: projectId } }).then((res) => {
-            setModels(JSON.parse(res.data['zeroShotRecommendations']));
+        getZeroShotRecommendations(projectId, (res) => {
+            setModels(res.data['zeroShotRecommendations']);
         });
     }, [projectId, router.query.heuristicId]);
 
