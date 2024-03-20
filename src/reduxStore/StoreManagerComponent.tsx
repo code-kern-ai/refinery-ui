@@ -5,8 +5,8 @@ import { selectIsAdmin, selectIsDemo, selectIsManaged, selectOrganization, setAl
 import { getUserAvatarUri } from "@/submodules/javascript-functions/general";
 import { setActiveProject } from "./states/project";
 import { useLazyQuery } from "@apollo/client";
-import { GET_ORGANIZATION, GET_ORGANIZATION_USERS, GET_USER_INFO } from "../services/gql/queries/organizations";
-import { GET_IS_ADMIN, GET_VERSION_OVERVIEW } from "../services/gql/queries/config";
+import { GET_ORGANIZATION_USERS } from "../services/gql/queries/organizations";
+import { GET_VERSION_OVERVIEW } from "../services/gql/queries/config";
 import { getIsDemo, getIsManaged } from "../services/base/data-fetch";
 import { WebSocketsService } from "../services/base/web-sockets/WebSocketsService";
 import { timer } from "rxjs";
@@ -20,7 +20,7 @@ import { postProcessingEmbeddingPlatforms } from "../util/components/projects/pr
 import { setDisplayUserRole } from "./states/pages/labeling";
 import { getProjectByProjectId } from "../services/base/project";
 import { getIsAdmin } from "../services/base/misc";
-import { getUserInfo } from "../services/base/organization";
+import { getUserInfo, getOrganization } from "../services/base/organization";
 import { getZeroShotRecommendations } from "../services/base/zero-shot";
 import { getAllTokenizerOptions, getEmbeddingPlatforms, getRecommendedEncoders } from "../services/base/embedding";
 
@@ -36,7 +36,6 @@ export function GlobalStoreDataComponent(props: React.PropsWithChildren) {
     const [dataLoaded, setDataLoaded] = useState(false);
 
     // const [refetchUserInfo] = useLazyQuery(GET_USER_INFO, { fetchPolicy: 'no-cache' });
-    const [refetchOrganization] = useLazyQuery(GET_ORGANIZATION, { fetchPolicy: 'no-cache' });
     const [refetchOrganizationUsers] = useLazyQuery(GET_ORGANIZATION_USERS, { fetchPolicy: 'no-cache' });
     const [refetchVersionOverview] = useLazyQuery(GET_VERSION_OVERVIEW, { fetchPolicy: 'no-cache' });
 
@@ -60,7 +59,7 @@ export function GlobalStoreDataComponent(props: React.PropsWithChildren) {
             dispatch(setDisplayUserRole(res.data["userInfo"].role));
         });
 
-        refetchOrganization().then((res) => {
+        getOrganization((res) => {
             if (res.data["userOrganization"]) {
                 if (WebSocketsService.getConnectionOpened()) return;
                 WebSocketsService.setConnectionOpened(true);

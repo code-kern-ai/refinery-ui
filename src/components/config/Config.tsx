@@ -1,7 +1,6 @@
 import { CacheEnum, selectCachedValue } from "@/src/reduxStore/states/cachedValues";
 import { selectOrganization, setOrganization } from "@/src/reduxStore/states/general";
 import { ConfigManager } from "@/src/services/base/config";
-import { GET_ORGANIZATION } from "@/src/services/gql/queries/organizations";
 import { CHANGE_ORGANIZATION, UPDATE_CONFIG } from "@/src/services/gql/mutations/organizations";
 import { Configuration, LocalConfig } from "@/src/types/components/config/config"
 import { snakeCaseToCamelCase } from "@/submodules/javascript-functions/case-types-parser";
@@ -10,7 +9,7 @@ import { useMutation } from "@apollo/client";
 import { IconPlus, IconTrash } from "@tabler/icons-react";
 import { useEffect, useState } from "react"
 import { useSelector, useDispatch } from "react-redux";
-import { useLazyQuery } from "@apollo/client";
+import { getOrganization } from "@/src/services/base/organization";
 
 export default function Config() {
     const dispatch = useDispatch();
@@ -22,7 +21,6 @@ export default function Config() {
     const [prepareTokenizedValues, setPrepareTokenizedValues] = useState<any[]>([]);
     const [preparedOptions, setPreparedOptions] = useState<any[]>([]);
 
-    const [refetchOrganization] = useLazyQuery(GET_ORGANIZATION, { fetchPolicy: 'no-cache' });
     const [changeOrganizationMut] = useMutation(CHANGE_ORGANIZATION);
     const [updateConfigMut] = useMutation(UPDATE_CONFIG);
 
@@ -83,7 +81,7 @@ export default function Config() {
                 if (!res?.data?.changeOrganization) {
                     window.alert('something went wrong with the update');
                 } else {
-                    refetchOrganization().then((res) => {
+                    getOrganization((res) => {
                         if (res.data["userOrganization"]) {
                             dispatch(setOrganization(res.data["userOrganization"]));
                         }
