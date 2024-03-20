@@ -4,7 +4,6 @@ import { useDispatch, useSelector } from "react-redux";
 import { selectIsAdmin, selectIsDemo, selectIsManaged, selectOrganization, setAllUsers, setIsAdmin, setIsDemo, setIsManaged, setOrganization, setRouteColor, setUser } from "./states/general";
 import { getUserAvatarUri } from "@/submodules/javascript-functions/general";
 import { setActiveProject } from "./states/project";
-import { GET_ALL_TOKENIZER_OPTIONS, GET_PROJECT_BY_ID } from "../services/gql/queries/projects";
 import { useLazyQuery } from "@apollo/client";
 import { GET_ORGANIZATION, GET_ORGANIZATION_USERS, GET_USER_INFO } from "../services/gql/queries/organizations";
 import { GET_IS_ADMIN, GET_VERSION_OVERVIEW } from "../services/gql/queries/config";
@@ -23,7 +22,7 @@ import { getProjectByProjectId } from "../services/base/project";
 import { getIsAdmin } from "../services/base/misc";
 import { getUserInfo } from "../services/base/organization";
 import { getZeroShotRecommendations } from "../services/base/zero-shot";
-import { getEmbeddingPlatforms, getRecommendedEncoders } from "../services/base/embedding";
+import { getAllTokenizerOptions, getEmbeddingPlatforms, getRecommendedEncoders } from "../services/base/embedding";
 
 export function GlobalStoreDataComponent(props: React.PropsWithChildren) {
     const router = useRouter();
@@ -39,7 +38,6 @@ export function GlobalStoreDataComponent(props: React.PropsWithChildren) {
     // const [refetchUserInfo] = useLazyQuery(GET_USER_INFO, { fetchPolicy: 'no-cache' });
     const [refetchOrganization] = useLazyQuery(GET_ORGANIZATION, { fetchPolicy: 'no-cache' });
     const [refetchOrganizationUsers] = useLazyQuery(GET_ORGANIZATION_USERS, { fetchPolicy: 'no-cache' });
-    const [refetchTokenizerValues] = useLazyQuery(GET_ALL_TOKENIZER_OPTIONS, { fetchPolicy: 'cache-first' });
     const [refetchVersionOverview] = useLazyQuery(GET_VERSION_OVERVIEW, { fetchPolicy: 'no-cache' });
 
     useEffect(() => {
@@ -130,9 +128,9 @@ export function GlobalStoreDataComponent(props: React.PropsWithChildren) {
 
     useEffect(() => {
         if (!ConfigManager.isInit()) return;
-        refetchTokenizerValues().then((res) => {
+        getAllTokenizerOptions((res) => {
             dispatch(setCache(CacheEnum.TOKENIZER_VALUES, checkWhitelistTokenizer(res.data['languageModels'], isManaged)));
-        });
+        })
     }, [ConfigManager.isInit(), isManaged]);
 
     if (!dataLoaded) return <></>;

@@ -15,3 +15,9 @@ export function getRecommendedEncoders(projectId: string | null, onResult: (resu
 
     jsonFetchWrapper(finalUrl, FetchType.GET, onResult);
 }
+
+export function getAllTokenizerOptions(onResult: (result: any) => void) {
+    const finalUrl = `${BASE_URL}/language-models`;
+
+    jsonFetchWrapper(finalUrl, FetchType.GET, onResult);
+}
