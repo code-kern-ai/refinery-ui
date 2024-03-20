@@ -3,7 +3,7 @@ import { selectLabelingTasksAll } from "@/src/reduxStore/states/pages/settings";
 import { selectProjectId } from "@/src/reduxStore/states/project";
 import { useWebsocket } from "@/src/services/base/web-sockets/useWebsocket";
 import { LOOKUP_LISTS_BY_PROJECT_ID } from "@/src/services/gql/queries/lookup-lists";
-import { GET_ATTRIBUTES_BY_PROJECT_ID, GET_EMBEDDING_SCHEMA_BY_PROJECT_ID, GET_LABELING_TASKS_BY_PROJECT_ID } from "@/src/services/gql/queries/project-setting";
+import { GET_EMBEDDING_SCHEMA_BY_PROJECT_ID, GET_LABELING_TASKS_BY_PROJECT_ID } from "@/src/services/gql/queries/project-setting";
 import { LabelingTaskTarget, LabelingTaskTaskType } from "@/src/types/components/projects/projectId/settings/labeling-tasks";
 import { BricksVariableType, VariableSelectProps } from "@/src/types/shared/bricks-integrator";
 import { CurrentPage, CurrentPageSubKey } from "@/src/types/shared/general";
@@ -17,6 +17,7 @@ import { useLazyQuery } from "@apollo/client";
 import { IconPlus, IconTrash } from "@tabler/icons-react";
 import { useCallback, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { getAttributes } from "@/src/services/base/attribute";
 
 export default function VariableSelect(props: VariableSelectProps) {
     const dispatch = useDispatch();
@@ -29,7 +30,6 @@ export default function VariableSelect(props: VariableSelectProps) {
     const lookupLists = useSelector(selectBricksIntegratorLookupLists);
     const labels = useSelector(selectBricksIntegratorLabels);
 
-    const [refetchAttributes] = useLazyQuery(GET_ATTRIBUTES_BY_PROJECT_ID, { fetchPolicy: "network-only" });
     const [refetchEmbeddings] = useLazyQuery(GET_EMBEDDING_SCHEMA_BY_PROJECT_ID, { fetchPolicy: "no-cache" });
     const [refetchLookupLists] = useLazyQuery(LOOKUP_LISTS_BY_PROJECT_ID);
     const [refetchLabelingTasksByProjectId] = useLazyQuery(GET_LABELING_TASKS_BY_PROJECT_ID, { fetchPolicy: "network-only" });
@@ -84,7 +84,7 @@ export default function VariableSelect(props: VariableSelectProps) {
     }
 
     function refetchAttributesAndProcess(typeFilter: string[] = ['TEXT'], stateFilter: string[] = ["UPLOADED", "USABLE", "AUTOMATICALLY_CREATED"]) {
-        refetchAttributes({ variables: { projectId: projectId, stateFilter: ['ALL'] } }).then((res) => {
+        getAttributes(projectId, ['ALL'], (res) => {
             const attributes = postProcessingAttributes(res.data['attributesByProjectId']);
             let filtered = attributes.filter(att => stateFilter.includes(att.state));
             if (typeFilter) {

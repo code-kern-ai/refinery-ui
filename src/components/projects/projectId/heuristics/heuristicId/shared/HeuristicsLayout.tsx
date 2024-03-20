@@ -5,7 +5,6 @@ import { selectVisibleAttributesHeuristics, setAllAttributes } from "@/src/redux
 import { selectProjectId } from "@/src/reduxStore/states/project"
 import { UPDATE_INFORMATION_SOURCE } from "@/src/services/gql/mutations/heuristics";
 import { LOOKUP_LISTS_BY_PROJECT_ID } from "@/src/services/gql/queries/lookup-lists";
-import { GET_ATTRIBUTES_BY_PROJECT_ID } from "@/src/services/gql/queries/project-setting";
 import { HeuristicsProperty } from "@/src/types/components/projects/projectId/heuristics/heuristicId/heuristics-details";
 import { Attribute } from "@/src/types/components/projects/projectId/settings/data-schema";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
@@ -18,6 +17,7 @@ import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux"
 import style from '@/src/styles/components/projects/projectId/heuristics/heuristics-details.module.css';
 import { useRouter } from "next/router";
+import { getAttributes } from "@/src/services/base/attribute";
 
 export default function HeuristicsLayout(props: any) {
     const router = useRouter();
@@ -32,7 +32,6 @@ export default function HeuristicsLayout(props: any) {
     const [isNameOpen, setIsNameOpen] = useState(false);
     const [isDescriptionOpen, setIsDescriptionOpen] = useState(false);
 
-    const [refetchAttributes] = useLazyQuery(GET_ATTRIBUTES_BY_PROJECT_ID, { fetchPolicy: "network-only" });
     const [refetchLookupLists] = useLazyQuery(LOOKUP_LISTS_BY_PROJECT_ID, { fetchPolicy: "network-only" });
     const [updateHeuristicMut] = useMutation(UPDATE_INFORMATION_SOURCE);
 
@@ -96,7 +95,7 @@ export default function HeuristicsLayout(props: any) {
     }
 
     function refetchAttributesAndProcess() {
-        refetchAttributes({ variables: { projectId: projectId, stateFilter: ['ALL'] } }).then((res) => {
+        getAttributes(projectId, ['ALL'], (res) => {
             dispatch(setAllAttributes(res.data['attributesByProjectId']));
         });
     }
