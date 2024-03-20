@@ -55,8 +55,8 @@ export function postProcessingStats(projectStats: ProjectStats[]): ProjectStats 
     return prepareProjectStats;
 }
 
-export function postProcessLabelDistribution(data: string): LabelDistribution[] {
-    return matchAndMergeLabelDistributionData(JSON.parse(data));
+export function postProcessLabelDistribution(data: string, dataNeedsParse: boolean = true): LabelDistribution[] {
+    return matchAndMergeLabelDistributionData(dataNeedsParse ? JSON.parse(data) : data);
 }
 
 function matchAndMergeLabelDistributionData(data): LabelDistribution[] {
