@@ -2,7 +2,7 @@ import { useDispatch, useSelector } from "react-redux";
 import DataSchema from "./DataSchema";
 import { selectProject, setActiveProject } from "@/src/reduxStore/states/project";
 import { useLazyQuery } from "@apollo/client";
-import { CHECK_COMPOSITE_KEY, ET_EMBEDDING_SCHEMA_BY_PROJECT_ID, GET_GATES_INTEGRATION_DATA, GET_LABELING_TASKS_BY_PROJECT_ID, GET_PROJECT_TOKENIZATION, GET_QUEUED_TASKS, GET_RECOMMENDED_ENCODERS_FOR_EMBEDDINGS } from "@/src/services/gql/queries/project-setting";
+import { CHECK_COMPOSITE_KEY, GET_EMBEDDING_SCHEMA_BY_PROJECT_ID, GET_GATES_INTEGRATION_DATA, GET_LABELING_TASKS_BY_PROJECT_ID, GET_PROJECT_TOKENIZATION, GET_QUEUED_TASKS, GET_RECOMMENDED_ENCODERS_FOR_EMBEDDINGS } from "@/src/services/gql/queries/project-setting";
 import { useCallback, useEffect, useState } from "react";
 import { selectAttributes, selectEmbeddings, selectGatesIntegration, setAllAttributes, setAllEmbeddings, setAllRecommendedEncodersDict, setGatesIntegration, setLabelingTasksAll, setRecommendedEncodersAll } from "@/src/reduxStore/states/pages/settings";
 import { timer } from "rxjs";
