@@ -31,7 +31,7 @@ import { CommentType } from '@/src/types/shared/comments';
 import { REQUEST_COMMENTS } from '@/src/services/gql/queries/projects';
 import { CommentDataManager } from '@/src/util/classes/comments';
 import { useWebsocket } from '@/src/services/base/web-sockets/useWebsocket';
-import { getGeneralProjectStats, getInterAnnotatorMatrix } from '@/src/services/base/project';
+import { getConfusionMatrix, getGeneralProjectStats, getInterAnnotatorMatrix } from '@/src/services/base/project';
 import { getAttributes } from '@/src/services/base/attribute';
 
 const PROJECT_STATS_INITIAL_STATE: ProjectStats = getEmptyProjectStats();
@@ -61,9 +61,7 @@ export default function ProjectOverview() {
     const [refetchDataSlices] = useLazyQuery(DATA_SLICES, { fetchPolicy: 'network-only' });
     const [refetchLabelDistribution] = useLazyQuery(GET_LABEL_DISTRIBUTION, { fetchPolicy: "no-cache" });
     const [refetchConfidenceDistribution] = useLazyQuery(GET_CONFIDENCE_DISTRIBUTION, { fetchPolicy: "no-cache" });
-    const [refetchConfusionMatrix] = useLazyQuery(GET_CONFUSION_MATRIX, { fetchPolicy: "no-cache" });
     const [refetchRatsTokenization] = useLazyQuery(IS_RATS_TOKENIZAION_STILL_RUNNING, { fetchPolicy: "no-cache" });
-    const [refetchInterAnnotator] = useLazyQuery(GET_INTER_ANNOTATOR_BY_PROJECT_ID, { fetchPolicy: "no-cache" });
     const [refetchComments] = useLazyQuery(REQUEST_COMMENTS, { fetchPolicy: "no-cache" });
 
     useEffect(() => {
@@ -84,7 +82,7 @@ export default function ProjectOverview() {
         setDisplayNERConfusion();
         getLabelDistributions();
         getConfidenceDistributions();
-        getConfusionMatrix();
+        getConfusionMatrixF();
         getInterAnnotatorMatrixF();
         getProjectStats();
         saveSettingsToLocalStorage();
@@ -195,14 +193,15 @@ export default function ProjectOverview() {
         });
     }
 
-    function getConfusionMatrix() {
+    function getConfusionMatrixF() {
         const labelingTaskId = overviewFilters.labelingTask?.id;
         const dataSliceFindId = overviewFilters.dataSlice?.id;
         const dataSliceId = dataSliceFindId == "@@NO_SLICE@@" ? null : dataSliceFindId;
-        refetchConfusionMatrix({ variables: { projectId: projectId, labelingTaskId: labelingTaskId, sliceId: dataSliceId } }).then((res) => {
+        getConfusionMatrix(projectId, labelingTaskId, dataSliceId, (res) => {
             if (res['data'] == null) return;
-            setConfusionMatrix(postProcessConfusionMatrix(res['data']['confusionMatrix']));
+            setConfusionMatrix(postProcessConfusionMatrix(res['data']['confusionMatrix'], false));
         });
+
     }
 
     function getInterAnnotatorMatrixF() {

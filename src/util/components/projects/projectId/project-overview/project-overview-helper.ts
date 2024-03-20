@@ -86,9 +86,11 @@ function matchAndMergeLabelDistributionData(data): LabelDistribution[] {
     return returnData;
 }
 
-export function postProcessConfusionMatrix(data: string): any {
+export function postProcessConfusionMatrix(data: string, dataNeedsParse: boolean = true): any {
     if (!data) return [];
-    return JSON.parse(data).map((e) => {
+    const d = dataNeedsParse ? JSON.parse(data) : data;
+
+    return d.map((e) => {
         return {
             counts: e.count_absolute,
             labelIdManual: e.label_name_manual == '@@OUTSIDE@@' ? 'Outside' : e.label_name_manual,

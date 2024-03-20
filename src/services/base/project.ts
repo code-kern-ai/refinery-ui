@@ -55,3 +55,18 @@ export function getInterAnnotatorMatrix(projectId: string, labelingTaskId: strin
     }
     jsonFetchWrapper(finalUrl, FetchType.GET, onResult);
 }
+
+export function getConfusionMatrix(projectId: string, labelingTaskId: string | null, sliceId: string | null, onResult: (result: any) => void) {
+
+    let finalUrl = `${projectEndpoint}/${projectId}/confusion-matrix`;
+
+    if (labelingTaskId) {
+        finalUrl += `?labeling_task_id=${labelingTaskId}`;
+    }
+    if (sliceId) {
+        finalUrl += labelingTaskId ? '&' : '?';
+        finalUrl += `slice_id=${sliceId}`;
+    }
+
+    jsonFetchWrapper(finalUrl, FetchType.GET, onResult);
+}
