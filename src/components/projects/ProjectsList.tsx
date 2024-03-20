@@ -1,6 +1,5 @@
 import { selectInactiveOrganization, selectIsDemo, selectIsManaged, selectUser, setComments } from "@/src/reduxStore/states/general"
 import { selectAllProjects, setAllProjects } from "@/src/reduxStore/states/project";
-import { GET_PROJECT_LIST } from "@/src/services/gql/queries/projects";
 import { Project, ProjectStatistics } from "@/src/types/components/projects/projects-list";
 import { CurrentPage } from "@/src/types/shared/general";
 import { percentRoundString } from "@/submodules/javascript-functions/general";
@@ -65,7 +64,7 @@ export default function ProjectsList() {
     }, [organizationInactive, user]);
 
     function refetchProjectsAndPostProcess() {
-        getAllProjects(user.id, (res) => {
+        getAllProjects((res) => {
             const projects = res.data["allProjects"].edges.map((edge: any) => edge.node);
             dispatch(setAllProjects(projects));
             setDataLoaded(true);

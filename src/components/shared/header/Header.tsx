@@ -14,11 +14,12 @@ import NotificationCenterModal from "../notification-center/NotificationCenterMo
 import { openModal } from "@/src/reduxStore/states/modal";
 import { ModalEnum } from "@/src/types/shared/modal";
 import { useLazyQuery } from "@apollo/client";
-import { GET_PROJECT_LIST, NOTIFICATIONS } from "@/src/services/gql/queries/projects";
+import { NOTIFICATIONS } from "@/src/services/gql/queries/projects";
 import { postProcessNotifications } from "@/src/util/shared/notification-center-helper";
 import { selectNotificationId, setProjectIdSampleProject } from "@/src/reduxStore/states/tmp";
 import Comments from "../comments/Comments";
 import { arrayToDict } from "@/submodules/javascript-functions/general";
+import { getAllProjects } from "@/src/services/base/project";
 
 export default function Header() {
     const router = useRouter();
@@ -37,7 +38,6 @@ export default function Header() {
     const [organizationInactive, setOrganizationInactive] = useState(null);
 
     const [refetchNotifications] = useLazyQuery(NOTIFICATIONS, { fetchPolicy: 'network-only' });
-    const [refetchProjects] = useLazyQuery(GET_PROJECT_LIST, { fetchPolicy: "no-cache" });
 
     useEffect(() => {
         if (!projectsNames) return;
@@ -56,7 +56,7 @@ export default function Header() {
     }, [notificationId]);
 
     function openModalAndRefetchNotifications() {
-        refetchProjects().then((res) => {
+        getAllProjects((res) => {
             const projects = res.data["allProjects"].edges.map((edge: any) => edge.node);
             dispatch(setAllProjects(projects));
             refetchNotifications().then((res) => {
