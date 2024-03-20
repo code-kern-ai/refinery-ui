@@ -262,7 +262,7 @@ export default function AttributeCalculation() {
                 currentAttributeCopy.state = AttributeState.RUNNING;
                 setCurrentAttribute(currentAttributeCopy);
             } else {
-                refetchAttributes({ variables: { projectId: projectId, stateFilter: ['ALL'] } }).then((res) => {
+                getAttributes(projectId, ['ALL'], (res) => {
                     dispatch(setAllAttributes(res.data['attributesByProjectId']));
                 });
                 refetchAttributeByAttributeId({ variables: { projectId: projectId, attributeId: currentAttribute?.id } }).then((res) => {

@@ -232,7 +232,7 @@ export default function ProjectSettings() {
                 setIsAcRunning(checkIfAcRunning());
                 timer(5000).subscribe(() => checkProjectTokenization());
             } else {
-                refetchAttributes({ variables: { projectId: project.id, stateFilter: ['ALL'] } }).then((res) => {
+                getAttributes(project.id, ['ALL'], (res) => {
                     dispatch(setAllAttributes(res.data['attributesByProjectId']));
                     setIsAcRunning(checkIfAcRunning());
                 });
