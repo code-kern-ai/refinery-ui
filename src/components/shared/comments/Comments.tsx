@@ -12,9 +12,8 @@ import { commentRequestToKey } from "@/src/util/shared/comments-helper";
 import { REQUEST_COMMENTS } from "@/src/services/gql/queries/projects";
 import { useLazyQuery } from "@apollo/client";
 import { selectProjectId } from "@/src/reduxStore/states/project";
-import { useRouter } from "next/router";
-import { GET_ORGANIZATION_USERS } from "@/src/services/gql/queries/organizations";
 import { useWebsocket } from "@/src/services/base/web-sockets/useWebsocket";
+import { getOrganizationUsers } from "@/src/services/base/organization";
 
 export default function Comments() {
     const dispatch = useDispatch();
@@ -24,7 +23,6 @@ export default function Comments() {
     const allUsers = useSelector(selectAllUsers);
 
     const [refetchComments] = useLazyQuery(REQUEST_COMMENTS, { fetchPolicy: "no-cache" });
-    const [refetchOrganizationUsers] = useLazyQuery(GET_ORGANIZATION_USERS, { fetchPolicy: 'no-cache' });
 
     const handleWebsocketNotificationGlobal = useCallback((msgParts: string[]) => {
         //messages will be GLOBAL:{messageType}:{projectId}:{additionalInfo}
@@ -52,7 +50,7 @@ export default function Comments() {
             refetchComments({ variables: { requested: requestJsonString } }).then((res) => {
                 CommentDataManager.parseCommentData(JSON.parse(res.data['getAllComments']));
                 if (allUsers.length == 0) {
-                    refetchOrganizationUsers().then((res) => {
+                    getOrganizationUsers((res) => {
                         dispatch(setAllUsers(res.data["allUsers"]));
                         CommentDataManager.parseToCurrentData(res.data["allUsers"]);
                     });

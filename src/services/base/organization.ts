@@ -8,6 +8,12 @@ export function  getOrganization(onResult: (result: any) => void) {
     jsonFetchWrapper(finalUrl, FetchType.GET, onResult);
 }
 
+export function  getOrganizationUsers(onResult: (result: any) => void) {
+    const finalUrl = `${BASE_URL}/all-users`;
+    jsonFetchWrapper(finalUrl, FetchType.GET, onResult);
+}
+
+
 export function getUserInfo(onResult: (result: any) => void) {
     const finalUrl = `${BASE_URL}/user-info`;
     jsonFetchWrapper(finalUrl, FetchType.GET, onResult);
