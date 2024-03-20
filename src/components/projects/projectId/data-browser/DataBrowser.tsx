@@ -2,7 +2,7 @@ import { selectProjectId } from "@/src/reduxStore/states/project"
 import { useDispatch, useSelector } from "react-redux"
 import DataBrowserSidebar from "./DataBrowserSidebar";
 import { useLazyQuery } from "@apollo/client";
-import { DATA_SLICES, GET_RECORD_COMMENTS, GET_UNIQUE_VALUES_BY_ATTRIBUTES, SEARCH_RECORDS_EXTENDED } from "@/src/services/gql/queries/data-browser";
+import { GET_RECORD_COMMENTS, GET_UNIQUE_VALUES_BY_ATTRIBUTES, SEARCH_RECORDS_EXTENDED } from "@/src/services/gql/queries/data-browser";
 import { useCallback, useEffect, useState } from "react";
 import { expandRecordList, selectRecords, setActiveDataSlice, setDataSlices, setRecordComments, setSearchRecordsExtended, setUniqueValuesDict, setUsersMapCount, updateAdditionalDataState } from "@/src/reduxStore/states/pages/data-browser";
 import { postProcessRecordsExtended, postProcessUniqueValues, postProcessUsersCount } from "@/src/util/components/projects/projectId/data-browser/data-browser-helper";
@@ -19,6 +19,7 @@ import { CommentDataManager } from "@/src/util/classes/comments";
 import { REQUEST_COMMENTS } from "@/src/services/gql/queries/projects";
 import { useWebsocket } from "@/src/services/base/web-sockets/useWebsocket";
 import { getAttributes } from "@/src/services/base/attribute";
+import { getDataSlices } from "@/src/services/base/dataSlices";
 
 const SEARCH_REQUEST = { offset: 0, limit: 20 };
 
@@ -35,7 +36,6 @@ export default function DataBrowser() {
 
     const [searchRequest, setSearchRequest] = useState(SEARCH_REQUEST);
 
-    const [refetchDataSlices] = useLazyQuery(DATA_SLICES, { fetchPolicy: 'network-only' });
     const [refetchLabelingTasksByProjectId] = useLazyQuery(GET_LABELING_TASKS_BY_PROJECT_ID, { fetchPolicy: "network-only" });
     const [refetchUsersCount] = useLazyQuery(GET_ORGANIZATION_USERS_WITH_COUNT, { fetchPolicy: "no-cache" });
     const [refetchExtendedRecord] = useLazyQuery(SEARCH_RECORDS_EXTENDED, { fetchPolicy: "no-cache" });
@@ -95,7 +95,7 @@ export default function DataBrowser() {
     }
 
     function refetchDataSlicesAndProcess(dataSliceId?: string) {
-        refetchDataSlices({ variables: { projectId: projectId } }).then((res) => {
+        getDataSlices(projectId, null, (res) => {
             dispatch(setDataSlices(res.data.dataSlices));
             if (dataSliceId) {
                 const findSlice = res.data.dataSlices.find((slice) => slice.id == dataSliceId);
