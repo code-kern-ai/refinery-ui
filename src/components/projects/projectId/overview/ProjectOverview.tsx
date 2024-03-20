@@ -31,7 +31,7 @@ import { CommentType } from '@/src/types/shared/comments';
 import { REQUEST_COMMENTS } from '@/src/services/gql/queries/projects';
 import { CommentDataManager } from '@/src/util/classes/comments';
 import { useWebsocket } from '@/src/services/base/web-sockets/useWebsocket';
-import { getConfusionMatrix, getGeneralProjectStats, getInterAnnotatorMatrix } from '@/src/services/base/project';
+import { getConfidenceDistribution, getConfusionMatrix, getGeneralProjectStats, getInterAnnotatorMatrix } from '@/src/services/base/project';
 import { getAttributes } from '@/src/services/base/attribute';
 
 const PROJECT_STATS_INITIAL_STATE: ProjectStats = getEmptyProjectStats();
@@ -60,7 +60,7 @@ export default function ProjectOverview() {
     const [refetchLabelingTasksByProjectId] = useLazyQuery(GET_LABELING_TASKS_BY_PROJECT_ID, { fetchPolicy: "network-only" });
     const [refetchDataSlices] = useLazyQuery(DATA_SLICES, { fetchPolicy: 'network-only' });
     const [refetchLabelDistribution] = useLazyQuery(GET_LABEL_DISTRIBUTION, { fetchPolicy: "no-cache" });
-    const [refetchConfidenceDistribution] = useLazyQuery(GET_CONFIDENCE_DISTRIBUTION, { fetchPolicy: "no-cache" });
+    // const [refetchConfidenceDistribution] = useLazyQuery(GET_CONFIDENCE_DISTRIBUTION, { fetchPolicy: "no-cache" });
     const [refetchRatsTokenization] = useLazyQuery(IS_RATS_TOKENIZAION_STILL_RUNNING, { fetchPolicy: "no-cache" });
     const [refetchComments] = useLazyQuery(REQUEST_COMMENTS, { fetchPolicy: "no-cache" });
 
@@ -188,8 +188,9 @@ export default function ProjectOverview() {
         const labelingTaskId = overviewFilters.labelingTask?.id;
         const dataSliceFindId = overviewFilters.dataSlice?.id;
         const dataSliceId = dataSliceFindId == "@@NO_SLICE@@" ? null : dataSliceFindId;
-        refetchConfidenceDistribution({ variables: { projectId: projectId, labelingTaskId: labelingTaskId, sliceId: dataSliceId } }).then((res) => {
-            setConfidenceDistribution(JSON.parse(res['data']['confidenceDistribution']));
+        getConfidenceDistribution(projectId, labelingTaskId, dataSliceId, (res) => {
+            if (res['data'] == null) return;
+            setConfidenceDistribution(res['data']['confidenceDistribution']);
         });
     }
 
