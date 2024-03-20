@@ -1,4 +1,5 @@
-import { MultilineTooltipProps, MultilineTooltip } from "@/src/types/shared/multiline-tooltip";
+import { MultilineTooltipProps } from "@/src/types/shared/multiline-tooltip";
+import type { MultilineTooltip } from "@/src/types/shared/multiline-tooltip";
 import { extendArrayElementsByUniqueId } from "@/submodules/javascript-functions/id-prep";
 import { Fragment, useEffect, useState } from "react";
 
