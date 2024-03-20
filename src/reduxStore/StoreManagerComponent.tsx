@@ -12,7 +12,6 @@ import { getIsDemo, getIsManaged } from "../services/base/data-fetch";
 import { WebSocketsService } from "../services/base/web-sockets/WebSocketsService";
 import { timer } from "rxjs";
 import { RouteManager } from "../services/base/route-manager";
-import { GET_RECOMMENDED_ENCODERS_FOR_EMBEDDINGS } from "../services/gql/queries/project-setting";
 import { CacheEnum, setCache } from "./states/cachedValues";
 import { postProcessingZeroShotEncoders } from "../util/components/models-downloaded/models-downloaded-helper";
 import { checkWhitelistTokenizer } from "../util/components/projects/new-project/new-project-helper";
@@ -24,7 +23,7 @@ import { getProjectByProjectId } from "../services/base/project";
 import { getIsAdmin } from "../services/base/misc";
 import { getUserInfo } from "../services/base/organization";
 import { getZeroShotRecommendations } from "../services/base/zero-shot";
-import { getEmbeddingPlatforms } from "../services/base/embedding";
+import { getEmbeddingPlatforms, getRecommendedEncoders } from "../services/base/embedding";
 
 export function GlobalStoreDataComponent(props: React.PropsWithChildren) {
     const router = useRouter();
@@ -40,7 +39,6 @@ export function GlobalStoreDataComponent(props: React.PropsWithChildren) {
     // const [refetchUserInfo] = useLazyQuery(GET_USER_INFO, { fetchPolicy: 'no-cache' });
     const [refetchOrganization] = useLazyQuery(GET_ORGANIZATION, { fetchPolicy: 'no-cache' });
     const [refetchOrganizationUsers] = useLazyQuery(GET_ORGANIZATION_USERS, { fetchPolicy: 'no-cache' });
-    const [refetchRecommendedEncoders] = useLazyQuery(GET_RECOMMENDED_ENCODERS_FOR_EMBEDDINGS, { fetchPolicy: 'cache-first' });
     const [refetchTokenizerValues] = useLazyQuery(GET_ALL_TOKENIZER_OPTIONS, { fetchPolicy: 'cache-first' });
     const [refetchVersionOverview] = useLazyQuery(GET_VERSION_OVERVIEW, { fetchPolicy: 'no-cache' });
 
@@ -119,7 +117,7 @@ export function GlobalStoreDataComponent(props: React.PropsWithChildren) {
             })
             getZeroShotRecommendations(projectId, (res) => {
                 dispatch(setCache(CacheEnum.ZERO_SHOT_RECOMMENDATIONS, res.data['zeroShotRecommendations']))
-                refetchRecommendedEncoders().then((resEncoders) => {
+                getRecommendedEncoders(null, (resEncoders) => {
                     dispatch(setCache(CacheEnum.MODELS_LIST, postProcessingZeroShotEncoders(res.data['zeroShotRecommendations'], resEncoders.data['recommendedEncoders'])))
                 });
             });
