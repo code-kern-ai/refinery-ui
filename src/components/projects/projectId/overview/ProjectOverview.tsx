@@ -9,11 +9,10 @@ import ProjectOverviewCards from './ProjectOverviewCards';
 import { ProjectStats } from '@/src/types/components/projects/projectId/project-overview/project-overview';
 import style from '@/src/styles/components/projects/projectId/project-overview.module.css';
 import { useRouter } from 'next/router';
-import { GET_CONFIDENCE_DISTRIBUTION, GET_CONFUSION_MATRIX, GET_GENERAL_PROJECT_STATS, GET_INTER_ANNOTATOR_BY_PROJECT_ID, GET_LABEL_DISTRIBUTION, IS_RATS_TOKENIZAION_STILL_RUNNING } from '@/src/services/gql/queries/project-overview';
+import { IS_RATS_TOKENIZAION_STILL_RUNNING } from '@/src/services/gql/queries/project-overview';
 import { GET_LABELING_TASKS_BY_PROJECT_ID } from '@/src/services/gql/queries/project-setting';
 import { postProcessLabelingTasks, postProcessLabelingTasksSchema } from '@/src/util/components/projects/projectId/settings/labeling-tasks-helper';
 import { selectLabelingTasksAll, setAllAttributes, setLabelingTasksAll } from '@/src/reduxStore/states/pages/settings';
-import { DATA_SLICES } from '@/src/services/gql/queries/data-browser';
 import { selectStaticSlices, setDataSlices } from '@/src/reduxStore/states/pages/data-browser';
 import { selectOverviewFilters, setOverviewFilters } from '@/src/reduxStore/states/tmp';
 import { DisplayGraphs } from '@/submodules/javascript-functions/enums/enums';
@@ -33,6 +32,7 @@ import { CommentDataManager } from '@/src/util/classes/comments';
 import { useWebsocket } from '@/src/services/base/web-sockets/useWebsocket';
 import { getConfidenceDistribution, getConfusionMatrix, getGeneralProjectStats, getInterAnnotatorMatrix, getLabelDistribution } from '@/src/services/base/project';
 import { getAttributes } from '@/src/services/base/attribute';
+import { getDataSlices } from '@/src/services/base/dataSlices';
 
 const PROJECT_STATS_INITIAL_STATE: ProjectStats = getEmptyProjectStats();
 
@@ -58,7 +58,6 @@ export default function ProjectOverview() {
     const [goldUserRequested, setGoldUserRequested] = useState<boolean>(false);
 
     const [refetchLabelingTasksByProjectId] = useLazyQuery(GET_LABELING_TASKS_BY_PROJECT_ID, { fetchPolicy: "network-only" });
-    const [refetchDataSlices] = useLazyQuery(DATA_SLICES, { fetchPolicy: 'network-only' });
     const [refetchRatsTokenization] = useLazyQuery(IS_RATS_TOKENIZAION_STILL_RUNNING, { fetchPolicy: "no-cache" });
     const [refetchComments] = useLazyQuery(REQUEST_COMMENTS, { fetchPolicy: "no-cache" });
 
@@ -156,7 +155,7 @@ export default function ProjectOverview() {
     }
 
     function refetchDataSlicesAndProcess() {
-        refetchDataSlices({ variables: { projectId: projectId } }).then((res) => {
+        getDataSlices(projectId, null, (res) => {
             dispatch(setDataSlices(res.data.dataSlices));
         });
     }
