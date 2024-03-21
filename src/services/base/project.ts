@@ -105,3 +105,8 @@ export function getGatesIntegrationData(projectId: string, onResult: (result: an
     const finalUrl = `${projectEndpoint}/${projectId}/gates-integration-data`;
     jsonFetchWrapper(finalUrl, FetchType.GET, onResult);
 }
+
+export function getProjectTokenization(projectId: string, onResult: (result: any) => void) {
+    const finalUrl = `${projectEndpoint}/${projectId}/project-tokenization`;
+    jsonFetchWrapper(finalUrl, FetchType.GET, onResult);
+}

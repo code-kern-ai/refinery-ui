@@ -3,7 +3,7 @@ import { selectAllLookupLists, setAllLookupLists } from "@/src/reduxStore/states
 import { selectAttributes, selectVisibleAttributeAC, setAllAttributes, setLabelingTasksAll, updateAttributeById } from "@/src/reduxStore/states/pages/settings";
 import { selectProjectId } from "@/src/reduxStore/states/project"
 import { UPDATE_ATTRIBUTE } from "@/src/services/gql/mutations/project-settings";
-import { GET_ATTRIBUTE_BY_ATTRIBUTE_ID, GET_LABELING_TASKS_BY_PROJECT_ID, GET_PROJECT_TOKENIZATION } from "@/src/services/gql/queries/project-setting";
+import { GET_ATTRIBUTE_BY_ATTRIBUTE_ID, GET_LABELING_TASKS_BY_PROJECT_ID } from "@/src/services/gql/queries/project-setting";
 import { Attribute, AttributeState } from "@/src/types/components/projects/projectId/settings/data-schema";
 import { CurrentPage, DataTypeEnum } from "@/src/types/shared/general";
 import { postProcessCurrentAttribute } from "@/src/util/components/projects/projectId/settings/attribute-calculation-helper";
@@ -35,6 +35,7 @@ import { postProcessLabelingTasks, postProcessLabelingTasksSchema } from "@/src/
 import { getAllComments } from "@/src/services/base/comment";
 import { getAttributes } from "@/src/services/base/attribute";
 import { getLookupListsByProjectId } from "@/src/services/base/lookup-lists";
+import { getProjectTokenization } from "@/src/services/base/project";
 
 const EDITOR_OPTIONS = { theme: 'vs-light', language: 'python', readOnly: false };
 
@@ -61,7 +62,6 @@ export default function AttributeCalculation() {
     const [checkUnsavedChanges, setCheckUnsavedChanges] = useState(false);
 
     const [updateAttributeMut] = useMutation(UPDATE_ATTRIBUTE);
-    const [refetchProjectTokenization] = useLazyQuery(GET_PROJECT_TOKENIZATION, { fetchPolicy: "no-cache" });
     const [refetchAttributeByAttributeId] = useLazyQuery(GET_ATTRIBUTE_BY_ATTRIBUTE_ID, { fetchPolicy: "no-cache" });
     const [refetchLabelingTasksByProjectId] = useLazyQuery(GET_LABELING_TASKS_BY_PROJECT_ID, { fetchPolicy: "network-only" });
 
@@ -231,7 +231,7 @@ export default function AttributeCalculation() {
     }
 
     function checkProjectTokenization() {
-        refetchProjectTokenization({ variables: { projectId: projectId } }).then((res) => {
+        getProjectTokenization(projectId, (res) => {
             setTokenizationProgress(res.data['projectTokenization']?.progress);
         });
     }
