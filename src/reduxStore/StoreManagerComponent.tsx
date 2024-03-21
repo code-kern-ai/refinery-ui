@@ -4,15 +4,12 @@ import { useDispatch, useSelector } from "react-redux";
 import { selectIsAdmin, selectIsDemo, selectIsManaged, selectOrganization, setAllUsers, setIsAdmin, setIsDemo, setIsManaged, setOrganization, setRouteColor, setUser } from "./states/general";
 import { getUserAvatarUri } from "@/submodules/javascript-functions/general";
 import { setActiveProject } from "./states/project";
-import { GET_ALL_TOKENIZER_OPTIONS, GET_PROJECT_BY_ID } from "../services/gql/queries/projects";
 import { useLazyQuery } from "@apollo/client";
-import { GET_ORGANIZATION, GET_ORGANIZATION_USERS, GET_USER_INFO } from "../services/gql/queries/organizations";
-import { GET_IS_ADMIN, GET_VERSION_OVERVIEW } from "../services/gql/queries/config";
+import { GET_VERSION_OVERVIEW } from "../services/gql/queries/config";
 import { getIsDemo, getIsManaged } from "../services/base/data-fetch";
 import { WebSocketsService } from "../services/base/web-sockets/WebSocketsService";
 import { timer } from "rxjs";
 import { RouteManager } from "../services/base/route-manager";
-import { GET_EMBEDDING_PLATFORMS, GET_RECOMMENDED_ENCODERS_FOR_EMBEDDINGS, GET_ZERO_SHOT_RECOMMENDATIONS } from "../services/gql/queries/project-setting";
 import { CacheEnum, setCache } from "./states/cachedValues";
 import { postProcessingZeroShotEncoders } from "../util/components/models-downloaded/models-downloaded-helper";
 import { checkWhitelistTokenizer } from "../util/components/projects/new-project/new-project-helper";
@@ -22,8 +19,9 @@ import { postProcessingEmbeddingPlatforms } from "../util/components/projects/pr
 import { setDisplayUserRole } from "./states/pages/labeling";
 import { getProjectByProjectId } from "../services/base/project";
 import { getIsAdmin } from "../services/base/misc";
-import { getUserInfo } from "../services/base/organization";
+import { getUserInfo, getOrganization, getOrganizationUsers } from "../services/base/organization";
 import { getZeroShotRecommendations } from "../services/base/zero-shot";
+import { getAllTokenizerOptions, getEmbeddingPlatforms, getRecommendedEncoders } from "../services/base/embedding";
 
 export function GlobalStoreDataComponent(props: React.PropsWithChildren) {
     const router = useRouter();
@@ -37,12 +35,7 @@ export function GlobalStoreDataComponent(props: React.PropsWithChildren) {
     const [dataLoaded, setDataLoaded] = useState(false);
 
     // const [refetchUserInfo] = useLazyQuery(GET_USER_INFO, { fetchPolicy: 'no-cache' });
-    const [refetchOrganization] = useLazyQuery(GET_ORGANIZATION, { fetchPolicy: 'no-cache' });
-    const [refetchOrganizationUsers] = useLazyQuery(GET_ORGANIZATION_USERS, { fetchPolicy: 'no-cache' });
-    const [refetchRecommendedEncoders] = useLazyQuery(GET_RECOMMENDED_ENCODERS_FOR_EMBEDDINGS, { fetchPolicy: 'cache-first' });
-    const [refetchTokenizerValues] = useLazyQuery(GET_ALL_TOKENIZER_OPTIONS, { fetchPolicy: 'cache-first' });
     const [refetchVersionOverview] = useLazyQuery(GET_VERSION_OVERVIEW, { fetchPolicy: 'no-cache' });
-    const [refetchEmbeddingPlatforms] = useLazyQuery(GET_EMBEDDING_PLATFORMS, { fetchPolicy: 'cache-first' });
 
     useEffect(() => {
         getIsManaged((data) => {
@@ -64,7 +57,7 @@ export function GlobalStoreDataComponent(props: React.PropsWithChildren) {
             dispatch(setDisplayUserRole(res.data["userInfo"].role));
         });
 
-        refetchOrganization().then((res) => {
+        getOrganization((res) => {
             if (res.data["userOrganization"]) {
                 if (WebSocketsService.getConnectionOpened()) return;
                 WebSocketsService.setConnectionOpened(true);
@@ -81,14 +74,14 @@ export function GlobalStoreDataComponent(props: React.PropsWithChildren) {
         refetchVersionOverview().then((res) => {
             dispatch(setCache(CacheEnum.VERSION_OVERVIEW, postprocessVersionOverview(res.data['versionOverview'])));
         });
-        refetchEmbeddingPlatforms().then((res) => {
+        getEmbeddingPlatforms((res) => {
             dispatch(setCache(CacheEnum.EMBEDDING_PLATFORMS, postProcessingEmbeddingPlatforms(res.data['embeddingPlatforms'], organization)))
         });
     }, []);
 
     useEffect(() => {
         if (!organization) return;
-        refetchOrganizationUsers().then((res) => {
+        getOrganizationUsers((res) => {
             dispatch(setAllUsers(res.data["allUsers"]));
         });
     }, [organization]);
@@ -119,7 +112,7 @@ export function GlobalStoreDataComponent(props: React.PropsWithChildren) {
             })
             getZeroShotRecommendations(projectId, (res) => {
                 dispatch(setCache(CacheEnum.ZERO_SHOT_RECOMMENDATIONS, res.data['zeroShotRecommendations']))
-                refetchRecommendedEncoders().then((resEncoders) => {
+                getRecommendedEncoders(null, (resEncoders) => {
                     dispatch(setCache(CacheEnum.MODELS_LIST, postProcessingZeroShotEncoders(res.data['zeroShotRecommendations'], resEncoders.data['recommendedEncoders'])))
                 });
             });
@@ -132,9 +125,9 @@ export function GlobalStoreDataComponent(props: React.PropsWithChildren) {
 
     useEffect(() => {
         if (!ConfigManager.isInit()) return;
-        refetchTokenizerValues().then((res) => {
+        getAllTokenizerOptions((res) => {
             dispatch(setCache(CacheEnum.TOKENIZER_VALUES, checkWhitelistTokenizer(res.data['languageModels'], isManaged)));
-        });
+        })
     }, [ConfigManager.isInit(), isManaged]);
 
     if (!dataLoaded) return <></>;

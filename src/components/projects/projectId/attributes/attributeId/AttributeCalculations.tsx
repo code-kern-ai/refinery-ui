@@ -4,7 +4,7 @@ import { selectAttributes, selectVisibleAttributeAC, setAllAttributes, setLabeli
 import { selectProjectId } from "@/src/reduxStore/states/project"
 import { UPDATE_ATTRIBUTE } from "@/src/services/gql/mutations/project-settings";
 import { LOOKUP_LISTS_BY_PROJECT_ID } from "@/src/services/gql/queries/lookup-lists";
-import { GET_ATTRIBUTES_BY_PROJECT_ID, GET_ATTRIBUTE_BY_ATTRIBUTE_ID, GET_LABELING_TASKS_BY_PROJECT_ID, GET_PROJECT_TOKENIZATION } from "@/src/services/gql/queries/project-setting";
+import { GET_ATTRIBUTE_BY_ATTRIBUTE_ID, GET_LABELING_TASKS_BY_PROJECT_ID, GET_PROJECT_TOKENIZATION } from "@/src/services/gql/queries/project-setting";
 import { Attribute, AttributeState } from "@/src/types/components/projects/projectId/settings/data-schema";
 import { CurrentPage, DataTypeEnum } from "@/src/types/shared/general";
 import { postProcessCurrentAttribute } from "@/src/util/components/projects/projectId/settings/attribute-calculation-helper";
@@ -34,6 +34,7 @@ import Dropdown2 from "@/submodules/react-components/components/Dropdown2";
 import { useWebsocket } from "@/src/services/base/web-sockets/useWebsocket";
 import { postProcessLabelingTasks, postProcessLabelingTasksSchema } from "@/src/util/components/projects/projectId/settings/labeling-tasks-helper";
 import { getAllComments } from "@/src/services/base/comment";
+import { getAttributes } from "@/src/services/base/attribute";
 
 const EDITOR_OPTIONS = { theme: 'vs-light', language: 'python', readOnly: false };
 
@@ -59,7 +60,6 @@ export default function AttributeCalculation() {
     const [attributeName, setAttributeName] = useState('');
     const [checkUnsavedChanges, setCheckUnsavedChanges] = useState(false);
 
-    const [refetchAttributes] = useLazyQuery(GET_ATTRIBUTES_BY_PROJECT_ID, { fetchPolicy: "network-only" });
     const [updateAttributeMut] = useMutation(UPDATE_ATTRIBUTE);
     const [refetchLookupLists] = useLazyQuery(LOOKUP_LISTS_BY_PROJECT_ID, { fetchPolicy: "no-cache" });
     const [refetchProjectTokenization] = useLazyQuery(GET_PROJECT_TOKENIZATION, { fetchPolicy: "no-cache" });
@@ -74,7 +74,7 @@ export default function AttributeCalculation() {
     useEffect(() => {
         if (!projectId) return;
         if (!currentAttribute || attributes.length == 0) {
-            refetchAttributes({ variables: { projectId: projectId, stateFilter: ['ALL'] } }).then((res) => {
+            getAttributes(projectId, ['ALL'], (res) => {
                 dispatch(setAllAttributes(res.data['attributesByProjectId']));
                 const currentAttribute = postProcessCurrentAttribute(attributes.find((attribute) => attribute.id === router.query.attributeId));
                 setCurrentAttribute(currentAttribute);
@@ -261,7 +261,7 @@ export default function AttributeCalculation() {
                 currentAttributeCopy.state = AttributeState.RUNNING;
                 setCurrentAttribute(currentAttributeCopy);
             } else {
-                refetchAttributes({ variables: { projectId: projectId, stateFilter: ['ALL'] } }).then((res) => {
+                getAttributes(projectId, ['ALL'], (res) => {
                     dispatch(setAllAttributes(res.data['attributesByProjectId']));
                 });
                 refetchAttributeByAttributeId({ variables: { projectId: projectId, attributeId: currentAttribute?.id } }).then((res) => {

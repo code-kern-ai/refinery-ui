@@ -8,8 +8,8 @@ export function getProjectByProjectId(projectId: string, onResult: (result: any)
     jsonFetchWrapper(finalUrl, FetchType.GET, onResult);
 }
 
-export function getAllProjects(userId: string, onResult: (result: any) => void) {
-    const finalUrl = `${projectEndpoint}/all-projects?userId=${userId}`;
+export function getAllProjects(onResult: (result: any) => void) {
+    const finalUrl = `${projectEndpoint}/all-projects`;
     jsonFetchWrapper(finalUrl, FetchType.GET, onResult);
 }
 
@@ -53,5 +53,50 @@ export function getInterAnnotatorMatrix(projectId: string, labelingTaskId: strin
         finalUrl += "include_all_org_user=" + includeAllOrgUser;
         somethingAdded = true;
     }
+    jsonFetchWrapper(finalUrl, FetchType.GET, onResult);
+}
+
+export function getConfusionMatrix(projectId: string, labelingTaskId: string | null, sliceId: string | null, onResult: (result: any) => void) {
+
+    let finalUrl = `${projectEndpoint}/${projectId}/confusion-matrix`;
+
+    if (labelingTaskId) {
+        finalUrl += `?labeling_task_id=${labelingTaskId}`;
+    }
+    if (sliceId) {
+        finalUrl += labelingTaskId ? '&' : '?';
+        finalUrl += `slice_id=${sliceId}`;
+    }
+
+    jsonFetchWrapper(finalUrl, FetchType.GET, onResult);
+}
+
+export function getConfidenceDistribution(projectId: string, labelingTaskId: string | null, sliceId: string | null, onResult: (result: any) => void) {
+
+    let finalUrl = `${projectEndpoint}/${projectId}/confidence-distribution`;
+
+    if (labelingTaskId) {
+        finalUrl += `?labeling_task_id=${labelingTaskId}`;
+    }
+    if (sliceId) {
+        finalUrl += labelingTaskId ? '&' : '?';
+        finalUrl += `slice_id=${sliceId}`;
+    }
+
+    jsonFetchWrapper(finalUrl, FetchType.GET, onResult);
+}
+
+export function getLabelDistribution(projectId: string, labelingTaskId: string | null, sliceId: string | null, onResult: (result: any) => void) {
+
+    let finalUrl = `${projectEndpoint}/${projectId}/label-distribution`;
+
+    if (labelingTaskId) {
+        finalUrl += `?labeling_task_id=${labelingTaskId}`;
+    }
+    if (sliceId) {
+        finalUrl += labelingTaskId ? '&' : '?';
+        finalUrl += `slice_id=${sliceId}`;
+    }
+
     jsonFetchWrapper(finalUrl, FetchType.GET, onResult);
 }

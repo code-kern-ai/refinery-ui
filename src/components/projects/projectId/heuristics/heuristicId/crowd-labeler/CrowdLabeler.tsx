@@ -17,11 +17,11 @@ import HeuristicStatistics from "../shared/HeuristicStatistics";
 import CrowdLabelerSettings from "./CrowdLabelerSettings";
 import { postProcessCrowdLabeler } from "@/src/util/components/projects/projectId/heuristics/heuristicId/crowd-labeler-helper";
 import { selectDataSlicesAll, setDataSlices } from "@/src/reduxStore/states/pages/data-browser";
-import { DATA_SLICES } from "@/src/services/gql/queries/data-browser";
+import { getAllComments } from "@/src/services/base/comment";
 import { CommentDataManager } from "@/src/util/classes/comments";
 import { CommentType } from "@/src/types/shared/comments";
 import { useWebsocket } from "@/src/services/base/web-sockets/useWebsocket";
-import { getAllComments } from "@/src/services/base/comment";
+import { getDataSlices } from "@/src/services/base/dataSlices";
 
 
 export default function CrowdLabeler() {
@@ -37,16 +37,13 @@ export default function CrowdLabeler() {
 
     const [refetchCurrentHeuristic] = useLazyQuery(GET_HEURISTICS_BY_ID, { fetchPolicy: "network-only" });
     const [refetchLabelingTasksByProjectId] = useLazyQuery(GET_LABELING_TASKS_BY_PROJECT_ID, { fetchPolicy: "network-only" });
-    const [refetchDataSlicesMut] = useLazyQuery(DATA_SLICES, { fetchPolicy: 'network-only' });
     const [refetchAccessLink] = useLazyQuery(GET_ACCESS_LINK, { fetchPolicy: 'network-only' });
 
     useEffect(() => {
         if (!projectId) return;
         if (!router.query.heuristicId) return;
         refetchLabelingTasksAndProcess();
-        refetchDataSlicesMut({ variables: { projectId: projectId, sliceType: "STATIC_DEFAULT" } }).then((res) => {
-            dispatch(setDataSlices(res.data.dataSlices));
-        });
+        getDataSlices(projectId, "STATIC_DEFAULT", (res) => dispatch(setDataSlices(res.data.dataSlices)));
     }, [projectId, router.query.heuristicId]);
 
     useEffect(() => {

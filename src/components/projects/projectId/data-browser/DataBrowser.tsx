@@ -2,11 +2,11 @@ import { selectProjectId } from "@/src/reduxStore/states/project"
 import { useDispatch, useSelector } from "react-redux"
 import DataBrowserSidebar from "./DataBrowserSidebar";
 import { useLazyQuery } from "@apollo/client";
-import { DATA_SLICES, GET_RECORD_COMMENTS, GET_UNIQUE_VALUES_BY_ATTRIBUTES, SEARCH_RECORDS_EXTENDED } from "@/src/services/gql/queries/data-browser";
+import { GET_RECORD_COMMENTS, GET_UNIQUE_VALUES_BY_ATTRIBUTES, SEARCH_RECORDS_EXTENDED } from "@/src/services/gql/queries/data-browser";
 import { useCallback, useEffect, useState } from "react";
 import { expandRecordList, selectRecords, setActiveDataSlice, setDataSlices, setRecordComments, setSearchRecordsExtended, setUniqueValuesDict, setUsersMapCount, updateAdditionalDataState } from "@/src/reduxStore/states/pages/data-browser";
 import { postProcessRecordsExtended, postProcessUniqueValues, postProcessUsersCount } from "@/src/util/components/projects/projectId/data-browser/data-browser-helper";
-import { GET_ATTRIBUTES_BY_PROJECT_ID, GET_EMBEDDING_SCHEMA_BY_PROJECT_ID, GET_LABELING_TASKS_BY_PROJECT_ID } from "@/src/services/gql/queries/project-setting";
+import { GET_EMBEDDING_SCHEMA_BY_PROJECT_ID, GET_LABELING_TASKS_BY_PROJECT_ID } from "@/src/services/gql/queries/project-setting";
 import { selectAttributes, selectLabelingTasksAll, setAllAttributes, setAllEmbeddings, setLabelingTasksAll } from "@/src/reduxStore/states/pages/settings";
 import { postProcessLabelingTasks, postProcessLabelingTasksSchema } from "@/src/util/components/projects/projectId/settings/labeling-tasks-helper";
 import { GET_ORGANIZATION_USERS_WITH_COUNT } from "@/src/services/gql/queries/organizations";
@@ -18,6 +18,8 @@ import { CommentType } from "@/src/types/shared/comments";
 import { CommentDataManager } from "@/src/util/classes/comments";
 import { useWebsocket } from "@/src/services/base/web-sockets/useWebsocket";
 import { getAllComments } from "@/src/services/base/comment";
+import { getAttributes } from "@/src/services/base/attribute";
+import { getDataSlices } from "@/src/services/base/dataSlices";
 
 const SEARCH_REQUEST = { offset: 0, limit: 20 };
 
@@ -34,8 +36,6 @@ export default function DataBrowser() {
 
     const [searchRequest, setSearchRequest] = useState(SEARCH_REQUEST);
 
-    const [refetchDataSlices] = useLazyQuery(DATA_SLICES, { fetchPolicy: 'network-only' });
-    const [refetchAttributes] = useLazyQuery(GET_ATTRIBUTES_BY_PROJECT_ID, { fetchPolicy: "network-only" });
     const [refetchLabelingTasksByProjectId] = useLazyQuery(GET_LABELING_TASKS_BY_PROJECT_ID, { fetchPolicy: "network-only" });
     const [refetchUsersCount] = useLazyQuery(GET_ORGANIZATION_USERS_WITH_COUNT, { fetchPolicy: "no-cache" });
     const [refetchExtendedRecord] = useLazyQuery(SEARCH_RECORDS_EXTENDED, { fetchPolicy: "no-cache" });
@@ -94,7 +94,7 @@ export default function DataBrowser() {
     }
 
     function refetchDataSlicesAndProcess(dataSliceId?: string) {
-        refetchDataSlices({ variables: { projectId: projectId } }).then((res) => {
+        getDataSlices(projectId, null, (res) => {
             dispatch(setDataSlices(res.data.dataSlices));
             if (dataSliceId) {
                 const findSlice = res.data.dataSlices.find((slice) => slice.id == dataSliceId);
@@ -104,7 +104,7 @@ export default function DataBrowser() {
     }
 
     function refetchAttributesAndProcess() {
-        refetchAttributes({ variables: { projectId: projectId, stateFilter: ['ALL'] } }).then((res) => {
+        getAttributes(projectId, ['ALL'], (res) => {
             dispatch(setAllAttributes(res.data['attributesByProjectId']));
         });
     }

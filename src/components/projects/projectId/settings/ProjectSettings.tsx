@@ -2,7 +2,7 @@ import { useDispatch, useSelector } from "react-redux";
 import DataSchema from "./DataSchema";
 import { selectProject, setActiveProject } from "@/src/reduxStore/states/project";
 import { useLazyQuery } from "@apollo/client";
-import { CHECK_COMPOSITE_KEY, GET_ATTRIBUTES_BY_PROJECT_ID, GET_EMBEDDING_SCHEMA_BY_PROJECT_ID, GET_GATES_INTEGRATION_DATA, GET_LABELING_TASKS_BY_PROJECT_ID, GET_PROJECT_TOKENIZATION, GET_QUEUED_TASKS, GET_RECOMMENDED_ENCODERS_FOR_EMBEDDINGS } from "@/src/services/gql/queries/project-setting";
+import { CHECK_COMPOSITE_KEY, GET_EMBEDDING_SCHEMA_BY_PROJECT_ID, GET_GATES_INTEGRATION_DATA, GET_LABELING_TASKS_BY_PROJECT_ID, GET_PROJECT_TOKENIZATION, GET_QUEUED_TASKS } from "@/src/services/gql/queries/project-setting";
 import { useCallback, useEffect, useState } from "react";
 import { selectAttributes, selectEmbeddings, selectGatesIntegration, setAllAttributes, setAllEmbeddings, setAllRecommendedEncodersDict, setGatesIntegration, setLabelingTasksAll, setRecommendedEncodersAll } from "@/src/reduxStore/states/pages/settings";
 import { timer } from "rxjs";
@@ -12,7 +12,6 @@ import { openModal, setModalStates } from "@/src/reduxStore/states/modal";
 import { useRouter } from "next/router";
 import { setUploadFileType } from "@/src/reduxStore/states/upload";
 import { UploadFileType } from "@/src/types/shared/upload";
-import { GET_PROJECT_BY_ID, REQUEST_COMMENTS } from "@/src/services/gql/queries/projects";
 import { CurrentPage } from "@/src/types/shared/general";
 import { Tooltip } from "@nextui-org/react";
 import ProjectMetaData from "./ProjectMetaData";
@@ -34,6 +33,8 @@ import { getEmptyBricksIntegratorConfig } from "@/src/util/shared/bricks-integra
 import { useWebsocket } from "@/src/services/base/web-sockets/useWebsocket";
 import { getProjectByProjectId } from "@/src/services/base/project";
 import { getAllComments } from "@/src/services/base/comment";
+import { getAttributes } from "@/src/services/base/attribute";
+import { getRecommendedEncoders } from "@/src/services/base/embedding";
 
 export default function ProjectSettings() {
     const dispatch = useDispatch();
@@ -52,12 +53,10 @@ export default function ProjectSettings() {
     const [tokenizationProgress, setTokenizationProgress] = useState(null);
     const [checkIfAcUploadedRecords, setCheckIfAcUploadedRecords] = useState(false);
 
-    const [refetchAttributes] = useLazyQuery(GET_ATTRIBUTES_BY_PROJECT_ID, { fetchPolicy: "network-only" });
     const [refetchPrimaryKey] = useLazyQuery(CHECK_COMPOSITE_KEY, { fetchPolicy: "no-cache" });
     const [refetchProjectTokenization] = useLazyQuery(GET_PROJECT_TOKENIZATION, { fetchPolicy: "no-cache" });
     const [refetchEmbeddings] = useLazyQuery(GET_EMBEDDING_SCHEMA_BY_PROJECT_ID, { fetchPolicy: "no-cache" });
     const [refetchQueuedTasks] = useLazyQuery(GET_QUEUED_TASKS, { fetchPolicy: "no-cache" });
-    const [refetchRecommendedEncodersForEmbeddings] = useLazyQuery(GET_RECOMMENDED_ENCODERS_FOR_EMBEDDINGS, { fetchPolicy: "no-cache" });
     const [refetchGatesIntegrationData] = useLazyQuery(GET_GATES_INTEGRATION_DATA, { fetchPolicy: 'no-cache' });
     const [refetchLabelingTasksByProjectId] = useLazyQuery(GET_LABELING_TASKS_BY_PROJECT_ID, { fetchPolicy: "network-only" });
 
@@ -80,11 +79,12 @@ export default function ProjectSettings() {
     useEffect(() => {
         if (!project) return;
         requestPKeyCheck();
-        refetchRecommendedEncodersForEmbeddings({ variables: { projectId: project.id } }).then((encoder) => {
-            const encoderSuggestions = encoder['data']['recommendedEncoders'].filter(e => e.tokenizers.includes("all") || e.tokenizers.includes(project.tokenizer));
+        getRecommendedEncoders(project.id, (res) => {
+            const encoderSuggestions = res['data']['recommendedEncoders'].filter(e => e.tokenizers.includes("all") || e.tokenizers.includes(project.tokenizer));
             dispatch(setRecommendedEncodersAll(encoderSuggestions as RecommendedEncoder[]));
-            dispatch(setAllRecommendedEncodersDict(postProcessingRecommendedEncoders(attributes, project.tokenizer, encoder['data']['recommendedEncoders'])));
+            dispatch(setAllRecommendedEncodersDict(postProcessingRecommendedEncoders(attributes, project.tokenizer, res['data']['recommendedEncoders'])));
         });
+
     }, [attributes]);
 
     useEffect(() => {
@@ -109,7 +109,7 @@ export default function ProjectSettings() {
     }
 
     function refetchAttributesAndPostProcess() {
-        refetchAttributes({ variables: { projectId: project.id, stateFilter: ['ALL'] } }).then((res) => {
+        getAttributes(project.id, ['ALL'], (res) => {
             dispatch(setAllAttributes(res.data['attributesByProjectId']));
         });
     }
@@ -232,7 +232,7 @@ export default function ProjectSettings() {
                 setIsAcRunning(checkIfAcRunning());
                 timer(5000).subscribe(() => checkProjectTokenization());
             } else {
-                refetchAttributes({ variables: { projectId: project.id, stateFilter: ['ALL'] } }).then((res) => {
+                getAttributes(project.id, ['ALL'], (res) => {
                     dispatch(setAllAttributes(res.data['attributesByProjectId']));
                     setIsAcRunning(checkIfAcRunning());
                 });
