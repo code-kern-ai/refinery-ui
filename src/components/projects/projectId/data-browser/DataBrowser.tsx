@@ -16,8 +16,8 @@ import { postProcessingEmbeddings } from "@/src/util/components/projects/project
 import { CurrentPage } from "@/src/types/shared/general";
 import { CommentType } from "@/src/types/shared/comments";
 import { CommentDataManager } from "@/src/util/classes/comments";
-import { REQUEST_COMMENTS } from "@/src/services/gql/queries/projects";
 import { useWebsocket } from "@/src/services/base/web-sockets/useWebsocket";
+import { getAllComments } from "@/src/services/base/comment";
 
 const SEARCH_REQUEST = { offset: 0, limit: 20 };
 
@@ -41,7 +41,6 @@ export default function DataBrowser() {
     const [refetchExtendedRecord] = useLazyQuery(SEARCH_RECORDS_EXTENDED, { fetchPolicy: "no-cache" });
     const [refetchEmbeddings] = useLazyQuery(GET_EMBEDDING_SCHEMA_BY_PROJECT_ID, { fetchPolicy: "network-only" });
     const [refetchRecordComments] = useLazyQuery(GET_RECORD_COMMENTS, { fetchPolicy: "no-cache" });
-    const [refetchComments] = useLazyQuery(REQUEST_COMMENTS, { fetchPolicy: "no-cache" });
     const [refetchUniqueValues] = useLazyQuery(GET_UNIQUE_VALUES_BY_ATTRIBUTES, { fetchPolicy: "no-cache" });
 
     useEffect(() => {
@@ -87,8 +86,8 @@ export default function DataBrowser() {
         CommentDataManager.unregisterCommentRequests(CurrentPage.DATA_BROWSER);
         CommentDataManager.registerCommentRequests(CurrentPage.DATA_BROWSER, requests);
         const requestJsonString = CommentDataManager.buildRequestJSON();
-        refetchComments({ variables: { requested: requestJsonString } }).then((res) => {
-            CommentDataManager.parseCommentData(JSON.parse(res.data['getAllComments']));
+        getAllComments(requestJsonString, (res) => {
+            CommentDataManager.parseCommentData(res.data['getAllComments']);
             CommentDataManager.parseToCurrentData(users);
             dispatch(setComments(CommentDataManager.currentDataOrder));
         });

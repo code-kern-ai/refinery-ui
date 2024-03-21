@@ -3,7 +3,7 @@ import LoadingIcon from "@/src/components/shared/loading/LoadingIcon";
 import MultilineTooltip from "@/src/components/shared/multilines-tooltip/MultilineTooltip";
 import { selectAllUsers, setComments } from "@/src/reduxStore/states/general";
 import { selectProjectId } from "@/src/reduxStore/states/project"
-import { REQUEST_COMMENTS } from "@/src/services/gql/queries/projects";
+import { getAllComments } from "@/src/services/base/comment";
 import { RUN_RECORD_IDE } from "@/src/services/gql/queries/record-ide";
 import { LabelingLinkType } from "@/src/types/components/projects/projectId/labeling/labeling-main-component";
 import { CommentType } from "@/src/types/shared/comments";
@@ -40,7 +40,6 @@ export default function RecordIDE() {
     const [debounceTimer, setDebounceTimer] = useState(null);
 
     const [refetchRecordIde] = useLazyQuery(RUN_RECORD_IDE, { fetchPolicy: "network-only" });
-    const [refetchComments] = useLazyQuery(REQUEST_COMMENTS, { fetchPolicy: "no-cache" });
 
     const huddleData = JSON.parse(localStorage.getItem("huddleData"));
 
@@ -91,8 +90,8 @@ export default function RecordIDE() {
         CommentDataManager.unregisterCommentRequests(CurrentPage.RECORD_IDE);
         CommentDataManager.registerCommentRequests(CurrentPage.RECORD_IDE, requests);
         const requestJsonString = CommentDataManager.buildRequestJSON();
-        refetchComments({ variables: { requested: requestJsonString } }).then((res) => {
-            CommentDataManager.parseCommentData(JSON.parse(res.data['getAllComments']));
+        getAllComments(requestJsonString, (res) => {
+            CommentDataManager.parseCommentData(res.data['getAllComments']);
             CommentDataManager.parseToCurrentData(allUsers);
             dispatch(setComments(CommentDataManager.currentDataOrder));
         });
