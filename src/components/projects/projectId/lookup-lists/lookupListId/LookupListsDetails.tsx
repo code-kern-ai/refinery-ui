@@ -21,7 +21,7 @@ import { selectAllUsers, setComments } from "@/src/reduxStore/states/general";
 import { CommentType } from "@/src/types/shared/comments";
 import { CommentDataManager } from "@/src/util/classes/comments";
 import { useWebsocket } from "@/src/services/base/web-sockets/useWebsocket";
-import { getLookupListsByLookupListId } from "@/src/services/base/lookup-lists";
+import { getLookupListsByLookupListId, getTermsByLookupListId } from "@/src/services/base/lookup-lists";
 import { getAllComments } from "@/src/services/base/comment";
 
 export default function LookupListsDetails() {
@@ -39,14 +39,13 @@ export default function LookupListsDetails() {
     const [finalSize, setFinalSize] = useState(0);
     const [description, setDescription] = useState('');
 
-    const [refetchTermsLookupList] = useLazyQuery(TERMS_BY_KNOWLEDGE_BASE_ID, { fetchPolicy: 'cache-and-network' });
     const [updateLookupListMut] = useMutation(UPDATE_KNOWLEDGE_BASE);
 
     const nameRef = useRef<HTMLInputElement>(null);
     const descriptionRef = useRef<HTMLInputElement>(null);
 
     useEffect(() => {
-        if (!projectId) return;
+        if (!projectId || !router.query.lookupListId) return;
         getLookupListsByLookupListId(projectId, router.query.lookupListId as string, (res) => {
             setLookupList(postProcessLookupList(res.data['knowledgeBaseByKnowledgeBaseId']));
         });
@@ -81,7 +80,7 @@ export default function LookupListsDetails() {
     }
 
     function refetchTerms() {
-        refetchTermsLookupList({ variables: { projectId: projectId, knowledgeBaseId: router.query.lookupListId } }).then((res) => {
+        getTermsByLookupListId(projectId, router.query.lookupListId as string, (res) => {
             setFinalSize(res.data['termsByKnowledgeBaseId'].length);
             setTerms(postProcessTerms(res.data['termsByKnowledgeBaseId']));
         });
