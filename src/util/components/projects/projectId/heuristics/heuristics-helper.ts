@@ -9,9 +9,9 @@ import { getColorStruct, mapInformationSourceStatsGlobal } from "./shared-helper
 export const ACTIONS_DROPDOWN_OPTIONS = ['Select all', 'Deselect all', 'Run selected', 'Delete selected'];
 export const NEW_HEURISTICS = ['Labeling function', 'Active learning', 'Zero-shot', 'Crowd labeler'];
 
-export function postProcessHeuristics(heuristics: string, projectId: string): Heuristic[] {
+export function postProcessHeuristics(heuristics: any, projectId: string): Heuristic[] {
     if (!heuristics) return [];
-    return JSON.parse(heuristics).map((source: Heuristic) => {
+    return heuristics.map((source: Heuristic) => {
         source.labelSource = LabelSource.INFORMATION_SOURCE;
         source.stats = mapInformationSourceStatsGlobal(source.stat_data);
         source.stats.forEach((stat) => {
