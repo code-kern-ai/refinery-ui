@@ -2,7 +2,7 @@ import { useDispatch, useSelector } from "react-redux";
 import DataSchema from "./DataSchema";
 import { selectProject, setActiveProject } from "@/src/reduxStore/states/project";
 import { useLazyQuery } from "@apollo/client";
-import { GET_EMBEDDING_SCHEMA_BY_PROJECT_ID, GET_LABELING_TASKS_BY_PROJECT_ID, GET_QUEUED_TASKS } from "@/src/services/gql/queries/project-setting";
+import { GET_EMBEDDING_SCHEMA_BY_PROJECT_ID, GET_LABELING_TASKS_BY_PROJECT_ID } from "@/src/services/gql/queries/project-setting";
 import { useCallback, useEffect, useState } from "react";
 import { selectAttributes, selectEmbeddings, selectGatesIntegration, setAllAttributes, setAllEmbeddings, setAllRecommendedEncodersDict, setGatesIntegration, setLabelingTasksAll, setRecommendedEncodersAll } from "@/src/reduxStore/states/pages/settings";
 import { timer } from "rxjs";
@@ -35,6 +35,7 @@ import { getGatesIntegrationData, getProjectByProjectId, getProjectTokenization 
 import { getAllComments } from "@/src/services/base/comment";
 import { getAttributes, getCheckCompositeKey } from "@/src/services/base/attribute";
 import { getRecommendedEncoders } from "@/src/services/base/embedding";
+import { getQueuedTasks } from "@/src/services/base/project-setting";
 
 export default function ProjectSettings() {
     const dispatch = useDispatch();
@@ -54,7 +55,6 @@ export default function ProjectSettings() {
     const [checkIfAcUploadedRecords, setCheckIfAcUploadedRecords] = useState(false);
 
     const [refetchEmbeddings] = useLazyQuery(GET_EMBEDDING_SCHEMA_BY_PROJECT_ID, { fetchPolicy: "no-cache" });
-    const [refetchQueuedTasks] = useLazyQuery(GET_QUEUED_TASKS, { fetchPolicy: "no-cache" });
     const [refetchLabelingTasksByProjectId] = useLazyQuery(GET_LABELING_TASKS_BY_PROJECT_ID, { fetchPolicy: "network-only" });
 
     useEffect(() => {
@@ -113,7 +113,7 @@ export default function ProjectSettings() {
 
     function refetchEmbeddingsAndPostProcess() {
         refetchEmbeddings({ variables: { projectId: project.id } }).then((res) => {
-            refetchQueuedTasks({ variables: { projectId: project.id, taskType: "EMBEDDING" } }).then((queuedTasks) => {
+            getQueuedTasks(project.id, "EMBEDDING", (queuedTasks) => {
                 const queuedEmbeddings = queuedTasks.data['queuedTasks'].map((task) => {
                     const copy = { ...task };
                     copy.taskInfo = JSON.parse(task.taskInfo);
@@ -172,7 +172,7 @@ export default function ProjectSettings() {
             }
 
             refetchEmbeddings({ variables: { projectId: project.id } }).then((res) => {
-                refetchQueuedTasks({ variables: { projectId: project.id, taskType: "EMBEDDING" } }).then((queuedTasks) => {
+                getQueuedTasks(project.id, "EMBEDDING", (queuedTasks) => {
                     const queuedEmbeddings = queuedTasks.data['queuedTasks'].map((task) => {
                         const copy = { ...task };
                         copy.taskInfo = JSON.parse(task.taskInfo);
