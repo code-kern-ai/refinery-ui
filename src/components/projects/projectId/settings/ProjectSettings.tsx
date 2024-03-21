@@ -31,7 +31,7 @@ import ProjectSnapshotExportModal from "./ProjectSnapshotExportModal";
 import { postProcessLabelingTasks, postProcessLabelingTasksSchema } from "@/src/util/components/projects/projectId/settings/labeling-tasks-helper";
 import { getEmptyBricksIntegratorConfig } from "@/src/util/shared/bricks-integrator-helper";
 import { useWebsocket } from "@/src/services/base/web-sockets/useWebsocket";
-import { getGatesIntegrationData, getLabelingTasksByProjectId, getLabelingTasksByProjectId, getProjectByProjectId, getProjectTokenization } from "@/src/services/base/project";
+import { getGatesIntegrationData, getLabelingTasksByProjectId, getProjectByProjectId, getProjectTokenization } from "@/src/services/base/project";
 import { getAllComments } from "@/src/services/base/comment";
 import { getAttributes, getCheckCompositeKey } from "@/src/services/base/attribute";
 import { getRecommendedEncoders } from "@/src/services/base/embedding";
