@@ -9,7 +9,6 @@ import { GET_EMBEDDING_SCHEMA_BY_PROJECT_ID, GET_LABELING_TASKS_BY_PROJECT_ID } 
 import { useLazyQuery } from "@apollo/client";
 import { postProcessLabelingTasks, postProcessLabelingTasksSchema } from "@/src/util/components/projects/projectId/settings/labeling-tasks-helper";
 import { postProcessHeuristics } from "@/src/util/components/projects/projectId/heuristics/heuristics-helper";
-import { GET_HEURISTICS_OVERVIEW_DATA } from "@/src/services/gql/queries/heuristics";
 import { selectHeuristicsAll, setAllHeuristics } from "@/src/reduxStore/states/pages/heuristics";
 import GridCards from "@/src/components/shared/grid-cards/GridCards";
 import HeuristicsHeader from "./HeuristicsHeader";
@@ -25,6 +24,7 @@ import { getEmptyBricksIntegratorConfig } from "@/src/util/shared/bricks-integra
 import { useWebsocket } from "@/src/services/base/web-sockets/useWebsocket";
 import { getAllComments } from "@/src/services/base/comment";
 import { getAttributes } from "@/src/services/base/attribute";
+import { getInformationSourcesOverviewData } from "@/src/services/base/heuristic";
 
 export function HeuristicsOverview() {
     const dispatch = useDispatch();
@@ -38,7 +38,6 @@ export function HeuristicsOverview() {
     const [filteredList, setFilteredList] = useState([]);
 
     const [refetchLabelingTasksByProjectId] = useLazyQuery(GET_LABELING_TASKS_BY_PROJECT_ID, { fetchPolicy: "network-only" });
-    const [refetchHeuristics] = useLazyQuery(GET_HEURISTICS_OVERVIEW_DATA, { fetchPolicy: "network-only" });
     const [refetchEmbeddings] = useLazyQuery(GET_EMBEDDING_SCHEMA_BY_PROJECT_ID, { fetchPolicy: "no-cache" });
 
     useEffect(() => {
@@ -84,7 +83,7 @@ export function HeuristicsOverview() {
     }
 
     function refetchHeuristicsAndProcess() {
-        refetchHeuristics({ variables: { projectId: projectId } }).then((res) => {
+        getInformationSourcesOverviewData(projectId, (res) => {
             const heuristics = postProcessHeuristics(res['data']['informationSourcesOverviewData'], projectId);
             dispatch(setAllHeuristics(heuristics));
             setFilteredList(heuristics);
