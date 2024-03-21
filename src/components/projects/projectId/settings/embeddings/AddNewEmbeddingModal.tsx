@@ -4,8 +4,8 @@ import { selectModal } from "@/src/reduxStore/states/modal";
 import { setModelsDownloaded } from "@/src/reduxStore/states/pages/models-downloaded";
 import { selectEmbeddings, selectRecommendedEncodersAll, selectRecommendedEncodersDict, selectUsableNonTextAttributes, selectUseableEmbedableAttributes, setAllRecommendedEncodersDict } from "@/src/reduxStore/states/pages/settings";
 import { selectProjectId } from "@/src/reduxStore/states/project";
+import { getModelProviderInfo } from "@/src/services/base/project";
 import { CREATE_EMBEDDING } from "@/src/services/gql/mutations/project-settings";
-import { GET_MODEL_PROVIDER_INFO } from "@/src/services/gql/queries/projects";
 import { ModelsDownloaded } from "@/src/types/components/models-downloaded/models-downloaded";
 import { Attribute } from "@/src/types/components/projects/projectId/settings/data-schema";
 import { EmbeddingPlatform, EmbeddingType, PlatformType, SuggestionsProps } from "@/src/types/components/projects/projectId/settings/embeddings";
@@ -15,7 +15,7 @@ import { postProcessingModelsDownload } from "@/src/util/components/models-downl
 import { DEFAULT_AZURE_TYPE, GRANULARITY_TYPES_ARRAY, checkIfCreateEmbeddingIsDisabled, platformNamesDict } from "@/src/util/components/projects/projectId/settings/embeddings-helper";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
 import Dropdown2 from "@/submodules/react-components/components/Dropdown2";
-import { useLazyQuery, useMutation } from "@apollo/client";
+import { useMutation } from "@apollo/client";
 import { Tooltip } from "@nextui-org/react";
 import { IconExternalLink } from "@tabler/icons-react";
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -334,8 +334,6 @@ function SuggestionsModel(props: SuggestionsProps) {
     const [hoverBoxList, setHoverBoxList] = useState<any[]>([]);
     const [filteredList, setFilteredList] = useState<any[]>([]);
 
-    const [refetchModelsDownload] = useLazyQuery(GET_MODEL_PROVIDER_INFO, { fetchPolicy: 'network-only', nextFetchPolicy: 'cache-first' });
-
     useEffect(() => {
         if (!props.options) return;
         setFilteredList(props.options);
@@ -343,7 +341,7 @@ function SuggestionsModel(props: SuggestionsProps) {
 
     useEffect(() => {
         if (!filteredList) return;
-        refetchModelsDownload().then((res) => {
+        getModelProviderInfo((res) => {
             const modelsDownloaded = postProcessingModelsDownload(res.data['modelProviderInfo']);
             dispatch(setModelsDownloaded(res.data['modelProviderInfo']));
             const colorDownloadedModels = filteredList.map((model: any) => {

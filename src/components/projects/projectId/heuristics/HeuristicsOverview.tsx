@@ -5,11 +5,8 @@ import { useCallback, useEffect, useState } from "react";
 import { selectEmbeddings, selectUsableNonTextAttributes, setAllAttributes, setAllEmbeddings, setLabelingTasksAll } from "@/src/reduxStore/states/pages/settings";
 import { CurrentPage } from "@/src/types/shared/general";
 import { LabelingTask } from "@/src/types/components/projects/projectId/settings/labeling-tasks";
-import { GET_EMBEDDING_SCHEMA_BY_PROJECT_ID } from "@/src/services/gql/queries/project-setting";
-import { useLazyQuery } from "@apollo/client";
 import { postProcessLabelingTasks, postProcessLabelingTasksSchema } from "@/src/util/components/projects/projectId/settings/labeling-tasks-helper";
 import { postProcessHeuristics } from "@/src/util/components/projects/projectId/heuristics/heuristics-helper";
-import { GET_HEURISTICS_OVERVIEW_DATA } from "@/src/services/gql/queries/heuristics";
 import { selectHeuristicsAll, setAllHeuristics } from "@/src/reduxStore/states/pages/heuristics";
 import GridCards from "@/src/components/shared/grid-cards/GridCards";
 import HeuristicsHeader from "./HeuristicsHeader";
@@ -25,6 +22,7 @@ import { getEmptyBricksIntegratorConfig } from "@/src/util/shared/bricks-integra
 import { useWebsocket } from "@/src/services/base/web-sockets/useWebsocket";
 import { getAllComments } from "@/src/services/base/comment";
 import { getAttributes } from "@/src/services/base/attribute";
+import { getInformationSourcesOverviewData } from "@/src/services/base/heuristic";
 import { getLabelingTasksByProjectId } from "@/src/services/base/project";
 
 export function HeuristicsOverview() {
@@ -35,11 +33,7 @@ export function HeuristicsOverview() {
     const embeddings = useSelector(selectEmbeddings);
     const attributes = useSelector(selectUsableNonTextAttributes);
     const allUsers = useSelector(selectAllUsers);
-
     const [filteredList, setFilteredList] = useState([]);
-
-    const [refetchHeuristics] = useLazyQuery(GET_HEURISTICS_OVERVIEW_DATA, { fetchPolicy: "network-only" });
-    const [refetchEmbeddings] = useLazyQuery(GET_EMBEDDING_SCHEMA_BY_PROJECT_ID, { fetchPolicy: "no-cache" });
 
     useEffect(() => {
         if (!projectId || !embeddings || !attributes) return;
@@ -84,7 +78,7 @@ export function HeuristicsOverview() {
     }
 
     function refetchHeuristicsAndProcess() {
-        refetchHeuristics({ variables: { projectId: projectId } }).then((res) => {
+        getInformationSourcesOverviewData(projectId, (res) => {
             const heuristics = postProcessHeuristics(res['data']['informationSourcesOverviewData'], projectId);
             dispatch(setAllHeuristics(heuristics));
             setFilteredList(heuristics);

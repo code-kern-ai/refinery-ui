@@ -9,3 +9,8 @@ export function getAttributes(projectId: string, stateFilter: string[], onResult
     const finalUrl = `${attributeEndpoint}/${projectId}/all-attributes?${stateFilterQuery}`;
     jsonFetchWrapper(finalUrl, FetchType.GET, onResult);
 }
+
+export function getCheckCompositeKey(projectId: string, onResult: (result: any) => void) {
+    const finalUrl = `${attributeEndpoint}/${projectId}/check-composite-key`;
+    jsonFetchWrapper(finalUrl, FetchType.GET, onResult);
+}

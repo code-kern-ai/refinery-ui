@@ -2,7 +2,6 @@ import { selectBricksIntegratorAttributes, selectBricksIntegratorEmbeddings, sel
 import { selectLabelingTasksAll } from "@/src/reduxStore/states/pages/settings";
 import { selectProjectId } from "@/src/reduxStore/states/project";
 import { useWebsocket } from "@/src/services/base/web-sockets/useWebsocket";
-import { LOOKUP_LISTS_BY_PROJECT_ID } from "@/src/services/gql/queries/lookup-lists";
 import { GET_EMBEDDING_SCHEMA_BY_PROJECT_ID } from "@/src/services/gql/queries/project-setting";
 import { LabelingTaskTarget, LabelingTaskTaskType } from "@/src/types/components/projects/projectId/settings/labeling-tasks";
 import { BricksVariableType, VariableSelectProps } from "@/src/types/shared/bricks-integrator";

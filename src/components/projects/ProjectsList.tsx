@@ -36,8 +36,6 @@ export default function ProjectsList() {
     const [canCreateOrg, setCanCreateOrg] = useState(false);
     const [dataLoaded, setDataLoaded] = useState(false);
 
-    // const [refetchProjects] = useLazyQuery(GET_PROJECT_LIST, { fetchPolicy: "no-cache" });
-    // const [refetchStats] = useLazyQuery(GET_OVERVIEW_STATS, { fetchPolicy: "cache-and-network" });
     const [refetchCanCreateOrg] = useLazyQuery(GET_CAN_CREATE_LOCAL_ORG, { fetchPolicy: "no-cache" });
     const [createOrgMut] = useMutation(CREATE_ORGANIZATION);
     const [addUserToOrgMut] = useMutation(ADD_USER_TO_ORGANIZATION);

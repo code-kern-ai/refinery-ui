@@ -59,6 +59,7 @@ export default function ModelCallbacks() {
             const labelingTasks = postProcessLabelingTasks(res['data']['projectByProjectId']['labelingTasks']['edges']);
             dispatch(setLabelingTasksAll(postProcessLabelingTasksSchema(labelingTasks)));
         });
+
     }
 
     function refetchModelCallbacksAndProcess() {

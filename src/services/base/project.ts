@@ -18,7 +18,6 @@ export function getAllProjects(onResult: (result: any) => void) {
     jsonFetchWrapper(finalUrl, FetchType.GET, onResult);
 }
 
-
 export function getGeneralProjectStats(projectId: string, labelingTaskId: string | null, sliceId: string | null, onResult: (result: any) => void) {
 
     let finalUrl = `${projectEndpoint}/${projectId}/general-project-stats`;
@@ -33,6 +32,7 @@ export function getGeneralProjectStats(projectId: string, labelingTaskId: string
 
     jsonFetchWrapper(finalUrl, FetchType.GET, onResult);
 }
+
 export function getInterAnnotatorMatrix(projectId: string, labelingTaskId: string | null, sliceId: string | null, includeGoldStar: boolean | null, includeAllOrgUser: boolean | null, onResult: (result: any) => void) {
 
     let finalUrl = `${projectEndpoint}/${projectId}/inter-annotator-matrix`;
@@ -103,5 +103,24 @@ export function getLabelDistribution(projectId: string, labelingTaskId: string |
         finalUrl += `slice_id=${sliceId}`;
     }
 
+    jsonFetchWrapper(finalUrl, FetchType.GET, onResult);
+}
+
+export function getGatesIntegrationData(projectId: string, onResult: (result: any) => void) {
+    const finalUrl = `${projectEndpoint}/${projectId}/gates-integration-data`;
+    jsonFetchWrapper(finalUrl, FetchType.GET, onResult);
+}
+
+export function getProjectTokenization(projectId: string, onResult: (result: any) => void) {
+    const finalUrl = `${projectEndpoint}/${projectId}/project-tokenization`;
+    jsonFetchWrapper(finalUrl, FetchType.GET, onResult);
+}
+export function getLabelingTasksByProjectId(projectId: string, onResult: (result: any) => void) {
+    const finalUrl = `${projectEndpoint}/${projectId}/labeling-tasks-by-project-id`;
+    jsonFetchWrapper(finalUrl, FetchType.GET, onResult);
+}
+
+export function getModelProviderInfo(onResult: (result: any) => void) {
+    const finalUrl = `${projectEndpoint}/model-provider-info`;
     jsonFetchWrapper(finalUrl, FetchType.GET, onResult);
 }

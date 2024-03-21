@@ -2,7 +2,7 @@ import { useDispatch, useSelector } from "react-redux";
 import DataSchema from "./DataSchema";
 import { selectProject, setActiveProject } from "@/src/reduxStore/states/project";
 import { useLazyQuery } from "@apollo/client";
-import { CHECK_COMPOSITE_KEY, GET_EMBEDDING_SCHEMA_BY_PROJECT_ID, GET_GATES_INTEGRATION_DATA, GET_PROJECT_TOKENIZATION, GET_QUEUED_TASKS } from "@/src/services/gql/queries/project-setting";
+import { GET_EMBEDDING_SCHEMA_BY_PROJECT_ID } from "@/src/services/gql/queries/project-setting";
 import { useCallback, useEffect, useState } from "react";
 import { selectAttributes, selectEmbeddings, selectGatesIntegration, setAllAttributes, setAllEmbeddings, setAllRecommendedEncodersDict, setGatesIntegration, setLabelingTasksAll, setRecommendedEncodersAll } from "@/src/reduxStore/states/pages/settings";
 import { timer } from "rxjs";
@@ -31,10 +31,11 @@ import ProjectSnapshotExportModal from "./ProjectSnapshotExportModal";
 import { postProcessLabelingTasks, postProcessLabelingTasksSchema } from "@/src/util/components/projects/projectId/settings/labeling-tasks-helper";
 import { getEmptyBricksIntegratorConfig } from "@/src/util/shared/bricks-integrator-helper";
 import { useWebsocket } from "@/src/services/base/web-sockets/useWebsocket";
-import { getLabelingTasksByProjectId, getProjectByProjectId } from "@/src/services/base/project";
+import { getGatesIntegrationData, getLabelingTasksByProjectId, getLabelingTasksByProjectId, getProjectByProjectId, getProjectTokenization } from "@/src/services/base/project";
 import { getAllComments } from "@/src/services/base/comment";
-import { getAttributes } from "@/src/services/base/attribute";
+import { getAttributes, getCheckCompositeKey } from "@/src/services/base/attribute";
 import { getRecommendedEncoders } from "@/src/services/base/embedding";
+import { getQueuedTasks } from "@/src/services/base/project-setting";
 
 export default function ProjectSettings() {
     const dispatch = useDispatch();
@@ -53,11 +54,7 @@ export default function ProjectSettings() {
     const [tokenizationProgress, setTokenizationProgress] = useState(null);
     const [checkIfAcUploadedRecords, setCheckIfAcUploadedRecords] = useState(false);
 
-    const [refetchPrimaryKey] = useLazyQuery(CHECK_COMPOSITE_KEY, { fetchPolicy: "no-cache" });
-    const [refetchProjectTokenization] = useLazyQuery(GET_PROJECT_TOKENIZATION, { fetchPolicy: "no-cache" });
     const [refetchEmbeddings] = useLazyQuery(GET_EMBEDDING_SCHEMA_BY_PROJECT_ID, { fetchPolicy: "no-cache" });
-    const [refetchQueuedTasks] = useLazyQuery(GET_QUEUED_TASKS, { fetchPolicy: "no-cache" });
-    const [refetchGatesIntegrationData] = useLazyQuery(GET_GATES_INTEGRATION_DATA, { fetchPolicy: 'no-cache' });
 
     useEffect(() => {
         if (!project) return;
@@ -115,7 +112,7 @@ export default function ProjectSettings() {
 
     function refetchEmbeddingsAndPostProcess() {
         refetchEmbeddings({ variables: { projectId: project.id } }).then((res) => {
-            refetchQueuedTasks({ variables: { projectId: project.id, taskType: "EMBEDDING" } }).then((queuedTasks) => {
+            getQueuedTasks(project.id, "EMBEDDING", (queuedTasks) => {
                 const queuedEmbeddings = queuedTasks.data['queuedTasks'].map((task) => {
                     const copy = { ...task };
                     copy.taskInfo = JSON.parse(task.taskInfo);
@@ -131,7 +128,7 @@ export default function ProjectSettings() {
         setPKeyValid(null);
         if (pKeyCheckTimer) pKeyCheckTimer.unsubscribe();
         const tmpTimer = timer(500).subscribe(() => {
-            refetchPrimaryKey({ variables: { projectId: project.id } }).then((res) => {
+            getCheckCompositeKey(project.id, (res) => {
                 setPKeyCheckTimer(null);
                 if (anyPKey()) setPKeyValid(res.data['checkCompositeKey']);
                 else setPKeyValid(null);
@@ -149,7 +146,7 @@ export default function ProjectSettings() {
     }
 
     function checkProjectTokenization() {
-        refetchProjectTokenization({ variables: { projectId: project.id } }).then((res) => {
+        getProjectTokenization(project.id, (res) => {
             setTokenizationProgress(res.data['projectTokenization']?.progress);
             setIsAcRunning(checkIfAcRunning());
         });
@@ -174,7 +171,7 @@ export default function ProjectSettings() {
             }
 
             refetchEmbeddings({ variables: { projectId: project.id } }).then((res) => {
-                refetchQueuedTasks({ variables: { projectId: project.id, taskType: "EMBEDDING" } }).then((queuedTasks) => {
+                getQueuedTasks(project.id, "EMBEDDING", (queuedTasks) => {
                     const queuedEmbeddings = queuedTasks.data['queuedTasks'].map((task) => {
                         const copy = { ...task };
                         copy.taskInfo = JSON.parse(task.taskInfo);
@@ -260,9 +257,9 @@ export default function ProjectSettings() {
     }, [project, embeddings, gatesIntegrationData, isAcRunning, tokenizationProgress]);
 
     function refetchAndSetGatesIntegrationData() {
-        refetchGatesIntegrationData({ variables: { projectId: project.id } }).then((res) => {
+        getGatesIntegrationData(project.id, (res) => {
             dispatch(setGatesIntegration(res.data['getGatesIntegrationData']));
-        });
+        })
     }
 
     function refetchLabelingTasksAndProcess() {

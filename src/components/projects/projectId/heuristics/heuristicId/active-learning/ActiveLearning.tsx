@@ -36,6 +36,7 @@ import Dropdown2 from "@/submodules/react-components/components/Dropdown2";
 import LoadingIcon from "@/src/components/shared/loading/LoadingIcon";
 import { useWebsocket } from "@/src/services/base/web-sockets/useWebsocket";
 import { getAllComments } from "@/src/services/base/comment";
+import { getLabelingTasksByProjectId } from "@/src/services/base/project";
 
 export default function ActiveLearning() {
     const dispatch = useDispatch();

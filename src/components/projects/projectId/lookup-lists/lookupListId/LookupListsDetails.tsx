@@ -1,16 +1,15 @@
 import { updateLookupListState } from "@/src/reduxStore/states/pages/lookup-lists";
 import { selectProjectId } from "@/src/reduxStore/states/project"
 import { UPDATE_KNOWLEDGE_BASE } from "@/src/services/gql/mutations/lookup-lists";
-import { LOOKUP_LIST_BY_LOOKUP_LIST_ID, TERMS_BY_KNOWLEDGE_BASE_ID } from "@/src/services/gql/queries/lookup-lists";
 import { LookupList, LookupListProperty, Term } from "@/src/types/components/projects/projectId/lookup-lists";
 import { postProcessLookupList, postProcessTerms } from "@/src/util/components/projects/projectId/lookup-lists-helper";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
 import { copyToClipboard } from "@/submodules/javascript-functions/general";
-import { useLazyQuery, useMutation } from "@apollo/client";
+import { useMutation } from "@apollo/client";
 import { Tooltip } from "@nextui-org/react";
 import { IconArrowLeft } from "@tabler/icons-react";
 import { useRouter } from "next/router";
-import { use, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux"
 import LookupListOperations from "./LookupListOperations";
 import DangerZone from "@/src/components/shared/danger-zone/DangerZone";
@@ -21,7 +20,7 @@ import { selectAllUsers, setComments } from "@/src/reduxStore/states/general";
 import { CommentType } from "@/src/types/shared/comments";
 import { CommentDataManager } from "@/src/util/classes/comments";
 import { useWebsocket } from "@/src/services/base/web-sockets/useWebsocket";
-import { getLookupListsByLookupListId } from "@/src/services/base/lookup-lists";
+import { getLookupListsByLookupListId, getTermsByLookupListId } from "@/src/services/base/lookup-lists";
 import { getAllComments } from "@/src/services/base/comment";
 
 export default function LookupListsDetails() {
@@ -39,14 +38,13 @@ export default function LookupListsDetails() {
     const [finalSize, setFinalSize] = useState(0);
     const [description, setDescription] = useState('');
 
-    const [refetchTermsLookupList] = useLazyQuery(TERMS_BY_KNOWLEDGE_BASE_ID, { fetchPolicy: 'cache-and-network' });
     const [updateLookupListMut] = useMutation(UPDATE_KNOWLEDGE_BASE);
 
     const nameRef = useRef<HTMLInputElement>(null);
     const descriptionRef = useRef<HTMLInputElement>(null);
 
     useEffect(() => {
-        if (!projectId) return;
+        if (!projectId || !router.query.lookupListId) return;
         getLookupListsByLookupListId(projectId, router.query.lookupListId as string, (res) => {
             setLookupList(postProcessLookupList(res.data['knowledgeBaseByKnowledgeBaseId']));
         });
@@ -81,7 +79,7 @@ export default function LookupListsDetails() {
     }
 
     function refetchTerms() {
-        refetchTermsLookupList({ variables: { projectId: projectId, knowledgeBaseId: router.query.lookupListId } }).then((res) => {
+        getTermsByLookupListId(projectId, router.query.lookupListId as string, (res) => {
             setFinalSize(res.data['termsByKnowledgeBaseId'].length);
             setTerms(postProcessTerms(res.data['termsByKnowledgeBaseId']));
         });

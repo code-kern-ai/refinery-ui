@@ -4,13 +4,12 @@ import { selectAllLookupLists, setAllLookupLists } from "@/src/reduxStore/states
 import { selectVisibleAttributesHeuristics, setAllAttributes } from "@/src/reduxStore/states/pages/settings";
 import { selectProjectId } from "@/src/reduxStore/states/project"
 import { UPDATE_INFORMATION_SOURCE } from "@/src/services/gql/mutations/heuristics";
-import { LOOKUP_LISTS_BY_PROJECT_ID } from "@/src/services/gql/queries/lookup-lists";
 import { HeuristicsProperty } from "@/src/types/components/projects/projectId/heuristics/heuristicId/heuristics-details";
 import { Attribute } from "@/src/types/components/projects/projectId/settings/data-schema";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
 import { InformationSourceType } from "@/submodules/javascript-functions/enums/enums";
 import { copyToClipboard } from "@/submodules/javascript-functions/general";
-import { useLazyQuery, useMutation } from "@apollo/client";
+import { useMutation } from "@apollo/client";
 import { Tooltip } from "@nextui-org/react";
 import { IconArrowLeft } from "@tabler/icons-react";
 import { useEffect, useRef, useState } from "react";

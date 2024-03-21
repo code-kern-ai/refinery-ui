@@ -12,3 +12,8 @@ export function getLookupListsByLookupListId(projectId: string, lookupListId: st
     const finalUrl = `${lookupListsEndpoint}/lookup-lists/${projectId}/${lookupListId}`;
     return jsonFetchWrapper(finalUrl, FetchType.GET, onResult);
 }
+
+export function getTermsByLookupListId(projectId: string, lookupListId: string, onResult: (result: any) => void) {
+    const finalUrl = `${lookupListsEndpoint}/lookup-lists/${projectId}/${lookupListId}/terms`;
+    return jsonFetchWrapper(finalUrl, FetchType.GET, onResult);
+}
