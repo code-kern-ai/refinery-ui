@@ -18,11 +18,11 @@ import { DangerZoneEnum } from "@/src/types/shared/danger-zone";
 import Terms from "./Terms";
 import { CurrentPage } from "@/src/types/shared/general";
 import { selectAllUsers, setComments } from "@/src/reduxStore/states/general";
-import { REQUEST_COMMENTS } from "@/src/services/gql/queries/projects";
 import { CommentType } from "@/src/types/shared/comments";
 import { CommentDataManager } from "@/src/util/classes/comments";
 import { useWebsocket } from "@/src/services/base/web-sockets/useWebsocket";
 import { getLookupListsByLookupListId } from "@/src/services/base/lookup-lists";
+import { getAllComments } from "@/src/services/base/comment";
 
 export default function LookupListsDetails() {
     const router = useRouter();
@@ -41,7 +41,6 @@ export default function LookupListsDetails() {
 
     const [refetchTermsLookupList] = useLazyQuery(TERMS_BY_KNOWLEDGE_BASE_ID, { fetchPolicy: 'cache-and-network' });
     const [updateLookupListMut] = useMutation(UPDATE_KNOWLEDGE_BASE);
-    const [refetchComments] = useLazyQuery(REQUEST_COMMENTS, { fetchPolicy: "no-cache" });
 
     const nameRef = useRef<HTMLInputElement>(null);
     const descriptionRef = useRef<HTMLInputElement>(null);
@@ -74,8 +73,8 @@ export default function LookupListsDetails() {
         CommentDataManager.unregisterCommentRequests(CurrentPage.LOOKUP_LISTS_DETAILS);
         CommentDataManager.registerCommentRequests(CurrentPage.LOOKUP_LISTS_DETAILS, requests);
         const requestJsonString = CommentDataManager.buildRequestJSON();
-        refetchComments({ variables: { requested: requestJsonString } }).then((res) => {
-            CommentDataManager.parseCommentData(JSON.parse(res.data['getAllComments']));
+        getAllComments(requestJsonString, (res) => {
+            CommentDataManager.parseCommentData(res.data['getAllComments']);
             CommentDataManager.parseToCurrentData(allUsers);
             dispatch(setComments(CommentDataManager.currentDataOrder));
         });

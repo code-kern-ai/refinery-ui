@@ -16,12 +16,12 @@ import { ACTIONS_DROPDOWN_OPTIONS } from "@/src/util/components/projects/project
 import { CurrentPage } from "@/src/types/shared/general";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
 import { selectAllUsers, setComments } from "@/src/reduxStore/states/general";
-import { REQUEST_COMMENTS } from "@/src/services/gql/queries/projects";
 import { CommentDataManager } from "@/src/util/classes/comments";
 import { CommentType } from "@/src/types/shared/comments";
 import DeleteLookupListsModal from "./DeleteLookupListsModal";
 import Dropdown2 from "@/submodules/react-components/components/Dropdown2";
 import { useWebsocket } from "@/src/services/base/web-sockets/useWebsocket";
+import { getAllComments } from "@/src/services/base/comment";
 import { getLookupListsByProjectId } from "@/src/services/base/lookup-lists";
 
 
@@ -39,7 +39,6 @@ export default function LookupListsOverview() {
     const [countSelected, setCountSelected] = useState(0);
 
     const [createLookupListMut] = useMutation(CREATE_LOOKUP_LIST);
-    const [refetchComments] = useLazyQuery(REQUEST_COMMENTS, { fetchPolicy: "no-cache" });
 
     useEffect(() => {
         prepareSelectionList();
@@ -56,8 +55,8 @@ export default function LookupListsOverview() {
         CommentDataManager.unregisterCommentRequests(CurrentPage.LOOKUP_LISTS_OVERVIEW);
         CommentDataManager.registerCommentRequests(CurrentPage.LOOKUP_LISTS_OVERVIEW, requests);
         const requestJsonString = CommentDataManager.buildRequestJSON();
-        refetchComments({ variables: { requested: requestJsonString } }).then((res) => {
-            CommentDataManager.parseCommentData(JSON.parse(res.data['getAllComments']));
+        getAllComments(requestJsonString, (res) => {
+            CommentDataManager.parseCommentData(res.data['getAllComments']);
             CommentDataManager.parseToCurrentData(allUsers);
             dispatch(setComments(CommentDataManager.currentDataOrder));
         });
