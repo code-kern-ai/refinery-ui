@@ -7,3 +7,8 @@ export function getInformationSourcesOverviewData(projectId: string, onResult: (
     const finalUrl = `${heuristicEndpoint}/${projectId}/information-sources-overview-data`;
     jsonFetchWrapper(finalUrl, FetchType.GET, onResult);
 }
+
+export function getWeakSupervisionRun(projectId: string, onResult: (result: any) => void) {
+    const finalUrl = `${heuristicEndpoint}/${projectId}/weak-supervision-run`;
+    jsonFetchWrapper(finalUrl, FetchType.GET, onResult);
+}

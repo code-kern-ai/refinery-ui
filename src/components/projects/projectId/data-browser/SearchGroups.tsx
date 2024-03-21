@@ -30,7 +30,7 @@ import { AttributeVisibility } from "@/src/types/components/projects/projectId/s
 import { ChevronDownIcon } from "@heroicons/react/20/solid";
 import Dropdown2 from "@/submodules/react-components/components/Dropdown2";
 import { checkActiveGroups, prefillActiveValues } from "@/src/util/components/projects/projectId/data-browser/prefill-values-helper";
-import { getWeakSupervisionRun } from "@/src/services/base/heuristics";
+import { getWeakSupervisionRun } from "@/src/services/base/heuristic";
 
 const GROUP_SORT_ORDER = 0;
 let GLOBAL_SEARCH_GROUP_COUNT = 0;

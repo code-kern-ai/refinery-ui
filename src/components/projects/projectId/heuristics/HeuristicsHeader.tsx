@@ -24,7 +24,7 @@ import LastWeakSupervisionModal from './modals/LastWeakSupervisionModal';
 import DeleteHeuristicsModal from './DeleteHeuristicsModal';
 import Dropdown2 from '@/submodules/react-components/components/Dropdown2';
 import { useWebsocket } from '@/src/services/base/web-sockets/useWebsocket';
-import { getWeakSupervisionRun } from "@/src/services/base/heuristics";
+import { getWeakSupervisionRun } from "@/src/services/base/heuristic";
 
 
 export default function HeuristicsHeader(props: HeuristicsHeaderProps) {
