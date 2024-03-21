@@ -12,3 +12,8 @@ export function getVersionOverview(onResult: (result: any) => void) {
     const finalUrl = `${miscEndpoint}/version-overview`;
     jsonFetchWrapper(finalUrl, FetchType.GET, onResult);
 }
+
+export function getHasUpdates(onResult: (result: any) => void) {
+    const finalUrl = `${miscEndpoint}/has-updates`;
+    jsonFetchWrapper(finalUrl, FetchType.GET, onResult);
+}
