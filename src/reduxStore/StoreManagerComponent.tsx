@@ -4,8 +4,6 @@ import { useDispatch, useSelector } from "react-redux";
 import { selectIsAdmin, selectIsDemo, selectIsManaged, selectOrganization, setAllUsers, setIsAdmin, setIsDemo, setIsManaged, setOrganization, setRouteColor, setUser } from "./states/general";
 import { getUserAvatarUri } from "@/submodules/javascript-functions/general";
 import { setActiveProject } from "./states/project";
-import { useLazyQuery } from "@apollo/client";
-import { GET_VERSION_OVERVIEW } from "../services/gql/queries/config";
 import { getIsDemo, getIsManaged } from "../services/base/data-fetch";
 import { WebSocketsService } from "../services/base/web-sockets/WebSocketsService";
 import { timer } from "rxjs";
@@ -18,7 +16,7 @@ import postprocessVersionOverview from "../util/shared/sidebar-helper";
 import { postProcessingEmbeddingPlatforms } from "../util/components/projects/projectId/settings/embeddings-helper";
 import { setDisplayUserRole } from "./states/pages/labeling";
 import { getProjectByProjectId } from "../services/base/project";
-import { getIsAdmin } from "../services/base/misc";
+import { getIsAdmin, getVersionOverview } from "../services/base/misc";
 import { getUserInfo, getOrganization, getOrganizationUsers } from "../services/base/organization";
 import { getZeroShotRecommendations } from "../services/base/zero-shot";
 import { getAllTokenizerOptions, getEmbeddingPlatforms, getRecommendedEncoders } from "../services/base/embedding";
@@ -35,7 +33,6 @@ export function GlobalStoreDataComponent(props: React.PropsWithChildren) {
     const [dataLoaded, setDataLoaded] = useState(false);
 
     // const [refetchUserInfo] = useLazyQuery(GET_USER_INFO, { fetchPolicy: 'no-cache' });
-    const [refetchVersionOverview] = useLazyQuery(GET_VERSION_OVERVIEW, { fetchPolicy: 'no-cache' });
 
     useEffect(() => {
         getIsManaged((data) => {
@@ -71,7 +68,7 @@ export function GlobalStoreDataComponent(props: React.PropsWithChildren) {
         });
 
         // Set cache
-        refetchVersionOverview().then((res) => {
+        getVersionOverview((res) => {
             dispatch(setCache(CacheEnum.VERSION_OVERVIEW, postprocessVersionOverview(res.data['versionOverview'])));
         });
         getEmbeddingPlatforms((res) => {
