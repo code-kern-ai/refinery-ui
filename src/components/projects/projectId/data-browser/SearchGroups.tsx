@@ -24,13 +24,13 @@ import { getRegexFromFilter, updateSearchParameters } from "@/src/util/component
 import { jsonCopy } from "@/submodules/javascript-functions/general";
 import UserInfoModal from "./modals/UserInfoModal";
 import { getColorForDataType } from "@/src/util/components/projects/projectId/settings/data-schema-helper";
-import { GET_CURRENT_WEAK_SUPERVISION_RUN } from "@/src/services/gql/queries/heuristics";
 import { Status } from "@/src/types/shared/statuses";
 import { postProcessCurrentWeakSupervisionRun } from "@/src/util/components/projects/projectId/heuristics/heuristics-helper";
 import { AttributeVisibility } from "@/src/types/components/projects/projectId/settings/data-schema";
 import { ChevronDownIcon } from "@heroicons/react/20/solid";
 import Dropdown2 from "@/submodules/react-components/components/Dropdown2";
 import { checkActiveGroups, prefillActiveValues } from "@/src/util/components/projects/projectId/data-browser/prefill-values-helper";
+import { getWeakSupervisionRun } from "@/src/services/base/heuristics";
 
 const GROUP_SORT_ORDER = 0;
 let GLOBAL_SEARCH_GROUP_COUNT = 0;
@@ -71,7 +71,7 @@ export default function SearchGroups() {
     const [selectedHeuristicsWS, setSelectedHeuristicsWS] = useState<string[]>([]);
 
     const [refetchExtendedRecord] = useLazyQuery(SEARCH_RECORDS_EXTENDED, { fetchPolicy: "no-cache" });
-    const [refetchCurrentWeakSupervision] = useLazyQuery(GET_CURRENT_WEAK_SUPERVISION_RUN, { fetchPolicy: "network-only" });
+    // const [refetchCurrentWeakSupervision] = useLazyQuery(GET_CURRENT_WEAK_SUPERVISION_RUN, { fetchPolicy: "network-only" });
     const [refetchRecordsStatic] = useLazyQuery(GET_RECORDS_BY_STATIC_SLICE, { fetchPolicy: "network-only" });
     const [refetchStaticSliceCurrentCount] = useLazyQuery(GET_STATIC_DATA_SLICE_CURRENT_COUNT, { fetchPolicy: "network-only" });
 
@@ -589,7 +589,7 @@ export default function SearchGroups() {
     }
 
     function refetchCurrentWeakSupervisionAndProcess() {
-        refetchCurrentWeakSupervision({ variables: { projectId: projectId } }).then((res) => {
+        getWeakSupervisionRun(projectId, res => {
             if (res == null) {
                 setCurrentWeakSupervisionRun({ state: Status.NOT_YET_RUN });
             } else {

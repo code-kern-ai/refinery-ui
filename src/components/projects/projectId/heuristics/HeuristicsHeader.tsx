@@ -5,7 +5,6 @@ import { selectHeuristicsAll, setHeuristicType } from '@/src/reduxStore/states/p
 import { selectLabelingTasksAll } from '@/src/reduxStore/states/pages/settings';
 import { selectProjectId } from '@/src/reduxStore/states/project';
 import { CREATE_INFORMATION_SOURCE_PAYLOAD, RUN_ZERO_SHOT_PROJECT, SET_ALL_HEURISTICS, START_WEAK_SUPERVISIONS } from '@/src/services/gql/mutations/heuristics';
-import { GET_CURRENT_WEAK_SUPERVISION_RUN } from '@/src/services/gql/queries/heuristics';
 import style from '@/src/styles/components/projects/projectId/heuristics/heuristics.module.css';
 import { Heuristic, HeuristicsHeaderProps } from '@/src/types/components/projects/projectId/heuristics/heuristics';
 import { LabelingTask } from '@/src/types/components/projects/projectId/settings/labeling-tasks';
@@ -25,6 +24,7 @@ import LastWeakSupervisionModal from './modals/LastWeakSupervisionModal';
 import DeleteHeuristicsModal from './DeleteHeuristicsModal';
 import Dropdown2 from '@/submodules/react-components/components/Dropdown2';
 import { useWebsocket } from '@/src/services/base/web-sockets/useWebsocket';
+import { getWeakSupervisionRun } from "@/src/services/base/heuristics";
 
 
 export default function HeuristicsHeader(props: HeuristicsHeaderProps) {
@@ -47,7 +47,6 @@ export default function HeuristicsHeader(props: HeuristicsHeaderProps) {
 
     const [setHeuristicsMut] = useMutation(SET_ALL_HEURISTICS);
     const [startWeakSupervisionMut] = useMutation(START_WEAK_SUPERVISIONS);
-    const [refetchCurrentWeakSupervision] = useLazyQuery(GET_CURRENT_WEAK_SUPERVISION_RUN, { fetchPolicy: "network-only" });
     const [createTaskMut] = useMutation(CREATE_INFORMATION_SOURCE_PAYLOAD);
     const [runZeroShotMut] = useMutation(RUN_ZERO_SHOT_PROJECT);
 
@@ -64,7 +63,7 @@ export default function HeuristicsHeader(props: HeuristicsHeaderProps) {
 
 
     function refetchCurrentWeakSupervisionAndProcess() {
-        refetchCurrentWeakSupervision({ variables: { projectId: projectId } }).then((res) => {
+        getWeakSupervisionRun(projectId, (res) => {
             if (res == null) {
                 setCurrentWeakSupervisionRun({ state: Status.NOT_YET_RUN });
             } else {
