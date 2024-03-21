@@ -32,8 +32,6 @@ export function GlobalStoreDataComponent(props: React.PropsWithChildren) {
 
     const [dataLoaded, setDataLoaded] = useState(false);
 
-    // const [refetchUserInfo] = useLazyQuery(GET_USER_INFO, { fetchPolicy: 'no-cache' });
-
     useEffect(() => {
         getIsManaged((data) => {
             dispatch(setIsManaged(data));

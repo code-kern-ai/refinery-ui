@@ -1,16 +1,15 @@
 import { updateLookupListState } from "@/src/reduxStore/states/pages/lookup-lists";
 import { selectProjectId } from "@/src/reduxStore/states/project"
 import { UPDATE_KNOWLEDGE_BASE } from "@/src/services/gql/mutations/lookup-lists";
-import { LOOKUP_LIST_BY_LOOKUP_LIST_ID, TERMS_BY_KNOWLEDGE_BASE_ID } from "@/src/services/gql/queries/lookup-lists";
 import { LookupList, LookupListProperty, Term } from "@/src/types/components/projects/projectId/lookup-lists";
 import { postProcessLookupList, postProcessTerms } from "@/src/util/components/projects/projectId/lookup-lists-helper";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
 import { copyToClipboard } from "@/submodules/javascript-functions/general";
-import { useLazyQuery, useMutation } from "@apollo/client";
+import { useMutation } from "@apollo/client";
 import { Tooltip } from "@nextui-org/react";
 import { IconArrowLeft } from "@tabler/icons-react";
 import { useRouter } from "next/router";
-import { use, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux"
 import LookupListOperations from "./LookupListOperations";
 import DangerZone from "@/src/components/shared/danger-zone/DangerZone";
