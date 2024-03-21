@@ -22,6 +22,7 @@ import { REQUEST_COMMENTS } from "@/src/services/gql/queries/projects";
 import { CommentType } from "@/src/types/shared/comments";
 import { CommentDataManager } from "@/src/util/classes/comments";
 import { useWebsocket } from "@/src/services/base/web-sockets/useWebsocket";
+import { getLookupListsByLookupListId } from "@/src/services/base/lookup-lists";
 
 export default function LookupListsDetails() {
     const router = useRouter();
@@ -38,7 +39,6 @@ export default function LookupListsDetails() {
     const [finalSize, setFinalSize] = useState(0);
     const [description, setDescription] = useState('');
 
-    const [refetchCurrentLookupList] = useLazyQuery(LOOKUP_LIST_BY_LOOKUP_LIST_ID, { fetchPolicy: 'network-only', nextFetchPolicy: 'cache-first' });
     const [refetchTermsLookupList] = useLazyQuery(TERMS_BY_KNOWLEDGE_BASE_ID, { fetchPolicy: 'cache-and-network' });
     const [updateLookupListMut] = useMutation(UPDATE_KNOWLEDGE_BASE);
     const [refetchComments] = useLazyQuery(REQUEST_COMMENTS, { fetchPolicy: "no-cache" });
@@ -48,7 +48,7 @@ export default function LookupListsDetails() {
 
     useEffect(() => {
         if (!projectId) return;
-        refetchCurrentLookupList({ variables: { projectId: projectId, knowledgeBaseId: router.query.lookupListId } }).then((res) => {
+        getLookupListsByLookupListId(projectId, router.query.lookupListId as string, (res) => {
             setLookupList(postProcessLookupList(res.data['knowledgeBaseByKnowledgeBaseId']));
         });
         refetchTerms();
@@ -136,7 +136,7 @@ export default function LookupListsDetails() {
     function handleWebsocketNotification(msgParts: string[]) {
         if (msgParts[2] == router.query.lookupListId) {
             if (msgParts[1] == 'knowledge_base_updated') {
-                refetchCurrentLookupList({ variables: { projectId: projectId, knowledgeBaseId: router.query.lookupListId } }).then((res) => {
+                getLookupListsByLookupListId(projectId, router.query.lookupListId as string, (res) => {
                     setLookupList(postProcessLookupList(res.data['knowledgeBaseByKnowledgeBaseId']));
                 });
             } else if (msgParts[1] == 'knowledge_base_deleted') {
@@ -211,7 +211,7 @@ export default function LookupListsDetails() {
                         className="font-dmMono px-4 py-2 rounded-none rounded-r-md border border-gray-300 text-gray-500 sm:text-sm bg-gray-100 cursor-pointer">
                         {lookupList.pythonVariable}</span>
                 </Tooltip>
-                <LookupListOperations  refetchTerms={refetchTerms}/>
+                <LookupListOperations refetchTerms={refetchTerms} />
             </div>
             <Terms terms={terms} finalSize={finalSize} refetchTerms={refetchTerms} setTerms={(terms: Term[]) => setTerms(terms)} />
             <DangerZone elementType={DangerZoneEnum.LOOKUP_LIST} name={lookupList.name} id={lookupList.id} />
