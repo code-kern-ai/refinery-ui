@@ -8,7 +8,6 @@ export function getEmbeddingPlatforms(onResult: (result: any) => void) {
     jsonFetchWrapper(finalUrl, FetchType.GET, onResult);
 }
 
-
 export function getRecommendedEncoders(projectId: string | null, onResult: (result: any) => void) {
     let finalUrl = `${BASE_URL}/recommended-encoders`;
     if (projectId) finalUrl += `?project_id=${projectId}`;
