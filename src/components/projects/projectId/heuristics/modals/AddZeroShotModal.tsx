@@ -2,11 +2,11 @@ import Modal from "@/src/components/shared/modal/Modal";
 import { CacheEnum, selectCachedValue, setCache } from "@/src/reduxStore/states/cachedValues";
 import { selectModal } from "@/src/reduxStore/states/modal";
 import { selectHeuristicType } from "@/src/reduxStore/states/pages/heuristics";
-import { selectModelsDownloaded, setModelsDownloaded } from "@/src/reduxStore/states/pages/models-downloaded";
+import { setModelsDownloaded } from "@/src/reduxStore/states/pages/models-downloaded";
 import { selectLabelingTasksAll, selectUseableEmbedableAttributes } from "@/src/reduxStore/states/pages/settings";
 import { selectProject, selectProjectId } from "@/src/reduxStore/states/project";
+import { getModelProviderInfo } from "@/src/services/base/project";
 import { CREATE_ZERO_SHOT_INFORMATION_SOURCE } from "@/src/services/gql/mutations/heuristics";
-import { GET_MODEL_PROVIDER_INFO } from "@/src/services/gql/queries/projects";
 import { ModelsDownloaded } from "@/src/types/components/models-downloaded/models-downloaded";
 import { LabelingTaskTaskType } from "@/src/types/components/projects/projectId/settings/labeling-tasks";
 import { ModalButton, ModalEnum } from "@/src/types/shared/modal";
@@ -15,10 +15,10 @@ import { getRouterLinkHeuristic } from "@/src/util/components/projects/projectId
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
 import { InformationSourceType } from "@/submodules/javascript-functions/enums/enums";
 import Dropdown2 from "@/submodules/react-components/components/Dropdown2";
-import { useLazyQuery, useMutation } from "@apollo/client";
+import { useMutation } from "@apollo/client";
 import { Tooltip } from "@nextui-org/react";
 import { useRouter } from "next/router";
-import { use, useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
 const ACCEPT_BUTTON = { buttonCaption: 'Create', useButton: true, disabled: true };
@@ -43,8 +43,6 @@ export default function AddZeroShotModal() {
     const [hoverBoxList, setHoverBoxList] = useState<any[]>([]);
     const [colorDownloadedModels, setColorDownloadedModels] = useState<boolean[]>([]);
     const [filteredList, setFilteredList] = useState<any[]>([]);
-
-    const [refetchModelsDownload] = useLazyQuery(GET_MODEL_PROVIDER_INFO, { fetchPolicy: 'network-only', nextFetchPolicy: 'cache-first' });
 
     useEffect(() => {
         if (!attributes) return;
@@ -74,7 +72,7 @@ export default function AddZeroShotModal() {
             }
         });
         setHoverBoxList(hoverBoxList);
-        refetchModelsDownload().then((res) => {
+        getModelProviderInfo((res) => {
             const modelsDownloaded = postProcessingModelsDownload(res.data['modelProviderInfo']);
             dispatch(setModelsDownloaded(res.data['modelProviderInfo']));
             const colorDownloadedModels = filteredList.map((model: any) => {

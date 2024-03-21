@@ -110,3 +110,8 @@ export function getProjectTokenization(projectId: string, onResult: (result: any
     const finalUrl = `${projectEndpoint}/${projectId}/project-tokenization`;
     jsonFetchWrapper(finalUrl, FetchType.GET, onResult);
 }
+
+export function getModelProviderInfo(onResult: (result: any) => void) {
+    const finalUrl = `${projectEndpoint}/model-provider-info`;
+    jsonFetchWrapper(finalUrl, FetchType.GET, onResult);
+}
