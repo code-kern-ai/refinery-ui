@@ -18,6 +18,7 @@ import { useDispatch, useSelector } from "react-redux"
 import style from '@/src/styles/components/projects/projectId/heuristics/heuristics-details.module.css';
 import { useRouter } from "next/router";
 import { getAttributes } from "@/src/services/base/attribute";
+import { getLookupListsByProjectId } from "@/src/services/base/lookup-lists";
 
 export default function HeuristicsLayout(props: any) {
     const router = useRouter();
@@ -32,7 +33,6 @@ export default function HeuristicsLayout(props: any) {
     const [isNameOpen, setIsNameOpen] = useState(false);
     const [isDescriptionOpen, setIsDescriptionOpen] = useState(false);
 
-    const [refetchLookupLists] = useLazyQuery(LOOKUP_LISTS_BY_PROJECT_ID, { fetchPolicy: "network-only" });
     const [updateHeuristicMut] = useMutation(UPDATE_INFORMATION_SOURCE);
 
     const nameRef = useRef<HTMLInputElement>(null);
@@ -101,8 +101,8 @@ export default function HeuristicsLayout(props: any) {
     }
 
     function refetchLookupListsAndProcess() {
-        refetchLookupLists({ variables: { projectId: projectId } }).then((res) => {
-            dispatch(setAllLookupLists(res.data["knowledgeBasesByProjectId"]));
+        getLookupListsByProjectId(projectId, (res) => {
+            dispatch(setAllLookupLists(res.data['knowledgeBasesByProjectId']));
         });
     }
 

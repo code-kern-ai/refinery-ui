@@ -22,6 +22,7 @@ import { CommentType } from "@/src/types/shared/comments";
 import DeleteLookupListsModal from "./DeleteLookupListsModal";
 import Dropdown2 from "@/submodules/react-components/components/Dropdown2";
 import { useWebsocket } from "@/src/services/base/web-sockets/useWebsocket";
+import { getLookupListsByProjectId } from "@/src/services/base/lookup-lists";
 
 
 export default function LookupListsOverview() {
@@ -37,7 +38,6 @@ export default function LookupListsOverview() {
     const [selectionList, setSelectionList] = useState('');
     const [countSelected, setCountSelected] = useState(0);
 
-    const [refetchLookupLists] = useLazyQuery(LOOKUP_LISTS_BY_PROJECT_ID, { fetchPolicy: "network-only" });
     const [createLookupListMut] = useMutation(CREATE_LOOKUP_LIST);
     const [refetchComments] = useLazyQuery(REQUEST_COMMENTS, { fetchPolicy: "no-cache" });
 
@@ -65,7 +65,7 @@ export default function LookupListsOverview() {
 
     useEffect(() => {
         if (!projectId) return;
-        refetchLookupLists({ variables: { projectId: projectId } }).then((res) => {
+        getLookupListsByProjectId(projectId, (res) => {
             dispatch(setAllLookupLists(res.data["knowledgeBasesByProjectId"]));
         });
     }, [projectId]);
@@ -114,7 +114,7 @@ export default function LookupListsOverview() {
 
     const handleWebsocketNotification = useCallback((msgParts: string[]) => {
         if (['knowledge_base_updated', 'knowledge_base_deleted', 'knowledge_base_created'].includes(msgParts[1])) {
-            refetchLookupLists({ variables: { projectId: projectId } }).then((res) => {
+            getLookupListsByProjectId(projectId, (res) => {
                 dispatch(setAllLookupLists(res.data["knowledgeBasesByProjectId"]));
             });
         }
