@@ -18,6 +18,7 @@ import { IconPlus, IconTrash } from "@tabler/icons-react";
 import { useCallback, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { getAttributes } from "@/src/services/base/attribute";
+import { getLookupListsByProjectId } from "@/src/services/base/lookup-lists";
 
 export default function VariableSelect(props: VariableSelectProps) {
     const dispatch = useDispatch();
@@ -31,7 +32,6 @@ export default function VariableSelect(props: VariableSelectProps) {
     const labels = useSelector(selectBricksIntegratorLabels);
 
     const [refetchEmbeddings] = useLazyQuery(GET_EMBEDDING_SCHEMA_BY_PROJECT_ID, { fetchPolicy: "no-cache" });
-    const [refetchLookupLists] = useLazyQuery(LOOKUP_LISTS_BY_PROJECT_ID);
     const [refetchLabelingTasksByProjectId] = useLazyQuery(GET_LABELING_TASKS_BY_PROJECT_ID, { fetchPolicy: "network-only" });
 
     useEffect(() => {
@@ -117,7 +117,7 @@ export default function VariableSelect(props: VariableSelectProps) {
     }
 
     function refetchLookupListsAndProcess() {
-        refetchLookupLists({ variables: { projectId: projectId } }).then((res) => {
+        getLookupListsByProjectId(projectId, res => {
             const lookupLists = res.data["knowledgeBasesByProjectId"];
             if (!lookupLists) {
                 console.log("lookup lists not yet loaded");
