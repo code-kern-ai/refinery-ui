@@ -8,6 +8,11 @@ export function getProjectByProjectId(projectId: string, onResult: (result: any)
     jsonFetchWrapper(finalUrl, FetchType.GET, onResult);
 }
 
+export function getLabelingTasksByProjectId(projectId: string, onResult: (result: any) => void) {
+    const finalUrl = `${projectEndpoint}/${projectId}/project-by-project-id?labeling_tasks=true`;
+    jsonFetchWrapper(finalUrl, FetchType.GET, onResult);
+}
+
 export function getAllProjects(onResult: (result: any) => void) {
     const finalUrl = `${projectEndpoint}/all-projects`;
     jsonFetchWrapper(finalUrl, FetchType.GET, onResult);

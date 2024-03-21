@@ -15,7 +15,7 @@ import { useDispatch, useSelector } from "react-redux";
 import style from "@/src/styles/components/projects/projectId/labeling.module.css";
 import NavigationBarTop from "./NavigationBarTop";
 import NavigationBarBottom from "./NavigationBarBottom";
-import { GET_LABELING_TASKS_BY_PROJECT_ID, GET_RECORD_BY_RECORD_ID } from "@/src/services/gql/queries/project-setting";
+import { GET_RECORD_BY_RECORD_ID } from "@/src/services/gql/queries/project-setting";
 import { combineLatest } from "rxjs";
 import LabelingSuiteTaskHeader from "../sub-components/LabelingSuiteTaskHeader";
 import LabelingSuiteOverviewTable from "../sub-components/LabelingSuiteOverviewTable";
@@ -30,6 +30,7 @@ import { LabelingTask } from "@/src/types/components/projects/projectId/settings
 import { useWebsocket } from "@/src/services/base/web-sockets/useWebsocket";
 import { getAllComments } from "@/src/services/base/comment";
 import { getAttributes } from "@/src/services/base/attribute";
+import { getLabelingTasksByProjectId } from "@/src/services/base/project";
 
 const SETTINGS_KEY = 'labelingSettings';
 
@@ -56,7 +57,6 @@ export default function LabelingMainComponent() {
     const [refetchTokenizedRecord] = useLazyQuery(GET_TOKENIZED_RECORD, { fetchPolicy: 'no-cache' });
     const [refetchRecordByRecordId] = useLazyQuery(GET_RECORD_BY_RECORD_ID, { fetchPolicy: 'no-cache' });
     const [refetchRla] = useLazyQuery(GET_RECORD_LABEL_ASSOCIATIONS, { fetchPolicy: 'network-only' });
-    const [refetchLabelingTasksByProjectId] = useLazyQuery(GET_LABELING_TASKS_BY_PROJECT_ID, { fetchPolicy: "network-only" });
     const [refetchLinkLocked] = useLazyQuery(LINK_LOCKED, { fetchPolicy: "no-cache" });
 
     useEffect(() => {
@@ -288,7 +288,7 @@ export default function LabelingMainComponent() {
     }
 
     function refetchLabelingTasksAndProcess() {
-        refetchLabelingTasksByProjectId({ variables: { projectId: projectId } }).then((res) => {
+        getLabelingTasksByProjectId(projectId, (res) => {
             const labelingTasks = postProcessLabelingTasks(res['data']['projectByProjectId']['labelingTasks']['edges']);
             const labelingTasksProcessed = postProcessLabelingTasksSchema(labelingTasks);
             dispatch(setLabelingTasksAll(prepareTasksForRole(labelingTasksProcessed, userDisplayRole)));

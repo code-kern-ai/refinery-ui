@@ -6,7 +6,7 @@ import { useLazyQuery, useMutation } from "@apollo/client";
 import { GET_HEURISTICS_BY_ID } from "@/src/services/gql/queries/heuristics";
 import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/router";
-import { GET_LABELING_TASKS_BY_PROJECT_ID, GET_ZERO_SHOT_RECOMMENDATIONS } from "@/src/services/gql/queries/project-setting";
+import { GET_ZERO_SHOT_RECOMMENDATIONS } from "@/src/services/gql/queries/project-setting";
 import { postProcessLabelingTasks, postProcessLabelingTasksSchema } from "@/src/util/components/projects/projectId/settings/labeling-tasks-helper";
 import { selectLabelingTasksAll, selectTextAttributes, setLabelingTasksAll } from "@/src/reduxStore/states/pages/settings";
 import { CurrentPage } from "@/src/types/shared/general";
@@ -32,6 +32,7 @@ import Dropdown2 from "@/submodules/react-components/components/Dropdown2";
 import { useWebsocket } from "@/src/services/base/web-sockets/useWebsocket";
 import { getZeroShotRecommendations } from "@/src/services/base/zero-shot";
 import { getAllComments } from "@/src/services/base/comment";
+import { getLabelingTasksByProjectId } from "@/src/services/base/project";
 
 export default function ZeroShot() {
     const dispatch = useDispatch();
@@ -49,7 +50,6 @@ export default function ZeroShot() {
     const [confidences, setConfidences] = useState<any[]>(CONFIDENCE_INTERVALS);
 
     const [refetchCurrentHeuristic] = useLazyQuery(GET_HEURISTICS_BY_ID, { fetchPolicy: "network-only" });
-    const [refetchLabelingTasksByProjectId] = useLazyQuery(GET_LABELING_TASKS_BY_PROJECT_ID, { fetchPolicy: "network-only" });
     const [updateHeuristicMut] = useMutation(UPDATE_INFORMATION_SOURCE);
 
     useEffect(() => {
@@ -101,7 +101,7 @@ export default function ZeroShot() {
     }
 
     function refetchLabelingTasksAndProcess() {
-        refetchLabelingTasksByProjectId({ variables: { projectId: projectId } }).then((res) => {
+        getLabelingTasksByProjectId(projectId, (res) => {
             const labelingTasks = postProcessLabelingTasks(res['data']['projectByProjectId']['labelingTasks']['edges']);
             dispatch(setLabelingTasksAll(postProcessLabelingTasksSchema(labelingTasks)));
         });

@@ -10,10 +10,9 @@ import { ProjectStats } from '@/src/types/components/projects/projectId/project-
 import style from '@/src/styles/components/projects/projectId/project-overview.module.css';
 import { useRouter } from 'next/router';
 import { IS_RATS_TOKENIZAION_STILL_RUNNING } from '@/src/services/gql/queries/project-overview';
-import { GET_LABELING_TASKS_BY_PROJECT_ID } from '@/src/services/gql/queries/project-setting';
 import { postProcessLabelingTasks, postProcessLabelingTasksSchema } from '@/src/util/components/projects/projectId/settings/labeling-tasks-helper';
 import { selectLabelingTasksAll, setAllAttributes, setLabelingTasksAll } from '@/src/reduxStore/states/pages/settings';
-import { selectStaticSlices, setDataSlices } from '@/src/reduxStore/states/pages/data-browser';
+import { setDataSlices } from '@/src/reduxStore/states/pages/data-browser';
 import { selectOverviewFilters, setOverviewFilters } from '@/src/reduxStore/states/tmp';
 import { DisplayGraphs } from '@/submodules/javascript-functions/enums/enums';
 import LabelDistributionBarChart from './charts/LabelDistributionBarChart';
@@ -30,7 +29,7 @@ import { CommentType } from '@/src/types/shared/comments';
 import { CommentDataManager } from '@/src/util/classes/comments';
 import { useWebsocket } from '@/src/services/base/web-sockets/useWebsocket';
 import { getAllComments } from '@/src/services/base/comment';
-import { getConfidenceDistribution, getConfusionMatrix, getGeneralProjectStats, getInterAnnotatorMatrix, getLabelDistribution } from '@/src/services/base/project';
+import { getConfidenceDistribution, getConfusionMatrix, getGeneralProjectStats, getInterAnnotatorMatrix, getLabelDistribution, getLabelingTasksByProjectId } from '@/src/services/base/project';
 import { getAttributes } from '@/src/services/base/attribute';
 import { getDataSlices } from '@/src/services/base/dataSlices';
 
@@ -42,7 +41,6 @@ export default function ProjectOverview() {
 
     const projectId = useSelector(selectProjectId);
     const labelingTasks = useSelector(selectLabelingTasksAll);
-    const dataSlices = useSelector(selectStaticSlices);
     const overviewFilters = useSelector(selectOverviewFilters);
     const isManaged = useSelector(selectIsManaged);
     const allUsers = useSelector(selectAllUsers);
@@ -57,7 +55,6 @@ export default function ProjectOverview() {
     const [interAnnotatorMatrix, setInterAnnotatorMatrix] = useState<any>(null);
     const [goldUserRequested, setGoldUserRequested] = useState<boolean>(false);
 
-    const [refetchLabelingTasksByProjectId] = useLazyQuery(GET_LABELING_TASKS_BY_PROJECT_ID, { fetchPolicy: "network-only" });
     const [refetchRatsTokenization] = useLazyQuery(IS_RATS_TOKENIZAION_STILL_RUNNING, { fetchPolicy: "no-cache" });
 
     useEffect(() => {
@@ -147,7 +144,7 @@ export default function ProjectOverview() {
     }
 
     function refetchLabelingTasksAndProcess() {
-        refetchLabelingTasksByProjectId({ variables: { projectId: projectId } }).then((res) => {
+        getLabelingTasksByProjectId(projectId, (res) => {
             const labelingTasks = postProcessLabelingTasks(res['data']['projectByProjectId']['labelingTasks']['edges']);
             dispatch(setLabelingTasksAll(postProcessLabelingTasksSchema(labelingTasks)));
         });
