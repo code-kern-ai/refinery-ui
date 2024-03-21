@@ -2,7 +2,6 @@ import { selectHeuristic, setActiveHeuristics } from "@/src/reduxStore/states/pa
 import { selectLabelingTasksAll, setLabelingTasksAll } from "@/src/reduxStore/states/pages/settings";
 import { selectProjectId } from "@/src/reduxStore/states/project";
 import { GET_ACCESS_LINK, GET_HEURISTICS_BY_ID } from "@/src/services/gql/queries/heuristics";
-import { GET_LABELING_TASKS_BY_PROJECT_ID } from "@/src/services/gql/queries/project-setting";
 import { CurrentPage } from "@/src/types/shared/general";
 import { postProcessLabelingTasks, postProcessLabelingTasksSchema } from "@/src/util/components/projects/projectId/settings/labeling-tasks-helper";
 import { useLazyQuery } from "@apollo/client";
@@ -22,6 +21,7 @@ import { CommentDataManager } from "@/src/util/classes/comments";
 import { CommentType } from "@/src/types/shared/comments";
 import { useWebsocket } from "@/src/services/base/web-sockets/useWebsocket";
 import { getDataSlices } from "@/src/services/base/dataSlices";
+import { getLabelingTasksByProjectId } from "@/src/services/base/project";
 
 
 export default function CrowdLabeler() {
@@ -36,7 +36,6 @@ export default function CrowdLabeler() {
     const allUsers = useSelector(selectAllUsers);
 
     const [refetchCurrentHeuristic] = useLazyQuery(GET_HEURISTICS_BY_ID, { fetchPolicy: "network-only" });
-    const [refetchLabelingTasksByProjectId] = useLazyQuery(GET_LABELING_TASKS_BY_PROJECT_ID, { fetchPolicy: "network-only" });
     const [refetchAccessLink] = useLazyQuery(GET_ACCESS_LINK, { fetchPolicy: 'network-only' });
 
     useEffect(() => {
@@ -86,7 +85,7 @@ export default function CrowdLabeler() {
     }
 
     function refetchLabelingTasksAndProcess() {
-        refetchLabelingTasksByProjectId({ variables: { projectId: projectId } }).then((res) => {
+        getLabelingTasksByProjectId(projectId, (res) => {
             const labelingTasks = postProcessLabelingTasks(res['data']['projectByProjectId']['labelingTasks']['edges']);
             dispatch(setLabelingTasksAll(postProcessLabelingTasksSchema(labelingTasks)));
         });

@@ -110,6 +110,10 @@ export function getProjectTokenization(projectId: string, onResult: (result: any
     const finalUrl = `${projectEndpoint}/${projectId}/project-tokenization`;
     jsonFetchWrapper(finalUrl, FetchType.GET, onResult);
 }
+export function getLabelingTasksByProjectId(projectId: string, onResult: (result: any) => void) {
+    const finalUrl = `${projectEndpoint}/${projectId}/labeling-tasks-by-project-id`;
+    jsonFetchWrapper(finalUrl, FetchType.GET, onResult);
+}
 
 export function getModelProviderInfo(onResult: (result: any) => void) {
     const finalUrl = `${projectEndpoint}/model-provider-info`;
