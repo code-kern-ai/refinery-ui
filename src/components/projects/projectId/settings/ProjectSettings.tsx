@@ -12,7 +12,6 @@ import { openModal, setModalStates } from "@/src/reduxStore/states/modal";
 import { useRouter } from "next/router";
 import { setUploadFileType } from "@/src/reduxStore/states/upload";
 import { UploadFileType } from "@/src/types/shared/upload";
-import { REQUEST_COMMENTS } from "@/src/services/gql/queries/projects";
 import { CurrentPage } from "@/src/types/shared/general";
 import { Tooltip } from "@nextui-org/react";
 import ProjectMetaData from "./ProjectMetaData";
@@ -33,6 +32,7 @@ import { postProcessLabelingTasks, postProcessLabelingTasksSchema } from "@/src/
 import { getEmptyBricksIntegratorConfig } from "@/src/util/shared/bricks-integrator-helper";
 import { useWebsocket } from "@/src/services/base/web-sockets/useWebsocket";
 import { getProjectByProjectId } from "@/src/services/base/project";
+import { getAllComments } from "@/src/services/base/comment";
 import { getAttributes } from "@/src/services/base/attribute";
 import { getRecommendedEncoders } from "@/src/services/base/embedding";
 
@@ -57,7 +57,6 @@ export default function ProjectSettings() {
     const [refetchProjectTokenization] = useLazyQuery(GET_PROJECT_TOKENIZATION, { fetchPolicy: "no-cache" });
     const [refetchEmbeddings] = useLazyQuery(GET_EMBEDDING_SCHEMA_BY_PROJECT_ID, { fetchPolicy: "no-cache" });
     const [refetchQueuedTasks] = useLazyQuery(GET_QUEUED_TASKS, { fetchPolicy: "no-cache" });
-    const [refetchComments] = useLazyQuery(REQUEST_COMMENTS, { fetchPolicy: "no-cache" });
     const [refetchGatesIntegrationData] = useLazyQuery(GET_GATES_INTEGRATION_DATA, { fetchPolicy: 'no-cache' });
     const [refetchLabelingTasksByProjectId] = useLazyQuery(GET_LABELING_TASKS_BY_PROJECT_ID, { fetchPolicy: "network-only" });
 
@@ -102,8 +101,8 @@ export default function ProjectSettings() {
         CommentDataManager.unregisterCommentRequests(CurrentPage.PROJECT_SETTINGS);
         CommentDataManager.registerCommentRequests(CurrentPage.PROJECT_SETTINGS, requests);
         const requestJsonString = CommentDataManager.buildRequestJSON();
-        refetchComments({ variables: { requested: requestJsonString } }).then((res) => {
-            CommentDataManager.parseCommentData(JSON.parse(res.data['getAllComments']));
+        getAllComments(requestJsonString, (res) => {
+            CommentDataManager.parseCommentData(res.data['getAllComments']);
             CommentDataManager.parseToCurrentData(allUsers);
             dispatch(setComments(CommentDataManager.currentDataOrder));
         });

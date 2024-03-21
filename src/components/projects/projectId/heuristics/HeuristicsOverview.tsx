@@ -20,10 +20,10 @@ import AddCrowdLabelerModal from "./modals/AddCrowdLabelerModal";
 import { postProcessingEmbeddings } from "@/src/util/components/projects/projectId/settings/embeddings-helper";
 import { CommentType } from "@/src/types/shared/comments";
 import { CommentDataManager } from "@/src/util/classes/comments";
-import { REQUEST_COMMENTS } from "@/src/services/gql/queries/projects";
 import { selectAllUsers, setBricksIntegrator, setComments } from "@/src/reduxStore/states/general";
 import { getEmptyBricksIntegratorConfig } from "@/src/util/shared/bricks-integrator-helper";
 import { useWebsocket } from "@/src/services/base/web-sockets/useWebsocket";
+import { getAllComments } from "@/src/services/base/comment";
 import { getAttributes } from "@/src/services/base/attribute";
 
 export function HeuristicsOverview() {
@@ -40,7 +40,6 @@ export function HeuristicsOverview() {
     const [refetchLabelingTasksByProjectId] = useLazyQuery(GET_LABELING_TASKS_BY_PROJECT_ID, { fetchPolicy: "network-only" });
     const [refetchHeuristics] = useLazyQuery(GET_HEURISTICS_OVERVIEW_DATA, { fetchPolicy: "network-only" });
     const [refetchEmbeddings] = useLazyQuery(GET_EMBEDDING_SCHEMA_BY_PROJECT_ID, { fetchPolicy: "no-cache" });
-    const [refetchComments] = useLazyQuery(REQUEST_COMMENTS, { fetchPolicy: "no-cache" });
 
     useEffect(() => {
         if (!projectId || !embeddings || !attributes) return;
@@ -70,8 +69,8 @@ export function HeuristicsOverview() {
         CommentDataManager.unregisterCommentRequests(CurrentPage.HEURISTICS);
         CommentDataManager.registerCommentRequests(CurrentPage.HEURISTICS, requests);
         const requestJsonString = CommentDataManager.buildRequestJSON();
-        refetchComments({ variables: { requested: requestJsonString } }).then((res) => {
-            CommentDataManager.parseCommentData(JSON.parse(res.data['getAllComments']));
+        getAllComments(requestJsonString, (res) => {
+            CommentDataManager.parseCommentData(res.data['getAllComments']);
             CommentDataManager.parseToCurrentData(allUsers);
             dispatch(setComments(CommentDataManager.currentDataOrder));
         });

@@ -26,7 +26,6 @@ import LoadingIcon from "@/src/components/shared/loading/LoadingIcon";
 import { debounceTime, distinctUntilChanged, fromEvent, timer } from "rxjs";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
 import { selectAllUsers, setComments } from "@/src/reduxStore/states/general";
-import { REQUEST_COMMENTS } from "@/src/services/gql/queries/projects";
 import { CommentDataManager } from "@/src/util/classes/comments";
 import { CommentType } from "@/src/types/shared/comments";
 import BricksIntegrator from "@/src/components/shared/bricks-integrator/BricksIntegrator";
@@ -34,7 +33,9 @@ import { AttributeCodeLookup } from "@/src/util/classes/attribute-calculation";
 import Dropdown2 from "@/submodules/react-components/components/Dropdown2";
 import { useWebsocket } from "@/src/services/base/web-sockets/useWebsocket";
 import { postProcessLabelingTasks, postProcessLabelingTasksSchema } from "@/src/util/components/projects/projectId/settings/labeling-tasks-helper";
+import { getAllComments } from "@/src/services/base/comment";
 import { getAttributes } from "@/src/services/base/attribute";
+import { getLookupListsByProjectId } from "@/src/services/base/lookup-lists";
 
 const EDITOR_OPTIONS = { theme: 'vs-light', language: 'python', readOnly: false };
 
@@ -61,10 +62,8 @@ export default function AttributeCalculation() {
     const [checkUnsavedChanges, setCheckUnsavedChanges] = useState(false);
 
     const [updateAttributeMut] = useMutation(UPDATE_ATTRIBUTE);
-    const [refetchLookupLists] = useLazyQuery(LOOKUP_LISTS_BY_PROJECT_ID, { fetchPolicy: "no-cache" });
     const [refetchProjectTokenization] = useLazyQuery(GET_PROJECT_TOKENIZATION, { fetchPolicy: "no-cache" });
     const [refetchAttributeByAttributeId] = useLazyQuery(GET_ATTRIBUTE_BY_ATTRIBUTE_ID, { fetchPolicy: "no-cache" });
-    const [refetchComments] = useLazyQuery(REQUEST_COMMENTS, { fetchPolicy: "no-cache" });
     const [refetchLabelingTasksByProjectId] = useLazyQuery(GET_LABELING_TASKS_BY_PROJECT_ID, { fetchPolicy: "network-only" });
 
     useEffect(() => {
@@ -83,7 +82,7 @@ export default function AttributeCalculation() {
             });
         }
         if (lookupLists.length == 0) {
-            refetchLookupLists({ variables: { projectId: projectId } }).then((res) => {
+            getLookupListsByProjectId(projectId, (res) => {
                 dispatch(setAllLookupLists(res.data['knowledgeBasesByProjectId']));
             });
         }
@@ -146,8 +145,8 @@ export default function AttributeCalculation() {
         CommentDataManager.unregisterCommentRequests(CurrentPage.ATTRIBUTE_CALCULATION);
         CommentDataManager.registerCommentRequests(CurrentPage.ATTRIBUTE_CALCULATION, requests);
         const requestJsonString = CommentDataManager.buildRequestJSON();
-        refetchComments({ variables: { requested: requestJsonString } }).then((res) => {
-            CommentDataManager.parseCommentData(JSON.parse(res.data['getAllComments']));
+        getAllComments(requestJsonString, (res) => {
+            CommentDataManager.parseCommentData(res.data['getAllComments']);
             CommentDataManager.parseToCurrentData(allUsers);
             dispatch(setComments(CommentDataManager.currentDataOrder));
         });
@@ -275,7 +274,7 @@ export default function AttributeCalculation() {
                 }
             }
         } else if (['knowledge_base_updated', 'knowledge_base_deleted', 'knowledge_base_created'].includes(msgParts[1])) {
-            refetchLookupLists({ variables: { projectId: projectId } }).then((res) => {
+            getLookupListsByProjectId(projectId, (res) => {
                 dispatch(setAllLookupLists(res.data['knowledgeBasesByProjectId']));
             });
         } else if (msgParts[1] == 'tokenization' && msgParts[2] == 'docbin') {
