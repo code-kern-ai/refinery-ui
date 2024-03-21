@@ -24,6 +24,8 @@ import { getAllComments } from "@/src/services/base/comment";
 import { getAttributes } from "@/src/services/base/attribute";
 import { getInformationSourcesOverviewData } from "@/src/services/base/heuristic";
 import { getLabelingTasksByProjectId } from "@/src/services/base/project";
+import { GET_EMBEDDING_SCHEMA_BY_PROJECT_ID } from "@/src/services/gql/queries/project-setting";
+import { useLazyQuery, useMutation } from "@apollo/client";
 
 export function HeuristicsOverview() {
     const dispatch = useDispatch();
@@ -34,6 +36,9 @@ export function HeuristicsOverview() {
     const attributes = useSelector(selectUsableNonTextAttributes);
     const allUsers = useSelector(selectAllUsers);
     const [filteredList, setFilteredList] = useState([]);
+
+    const [refetchEmbeddings] = useLazyQuery (GET_EMBEDDING_SCHEMA_BY_PROJECT_ID, { fetchPolicy: "no-cache" });
+
 
     useEffect(() => {
         if (!projectId || !embeddings || !attributes) return;
