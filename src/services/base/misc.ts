@@ -7,3 +7,8 @@ export function getIsAdmin(onResult: (result: any) => void) {
     const finalUrl = `${miscEndpoint}/is-admin`;
     jsonFetchWrapper(finalUrl, FetchType.GET, onResult);
 }
+
+export function getVersionOverview(onResult: (result: any) => void) {
+    const finalUrl = `${miscEndpoint}/version-overview`;
+    jsonFetchWrapper(finalUrl, FetchType.GET, onResult);
+}
