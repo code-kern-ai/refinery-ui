@@ -7,5 +7,3 @@ export function getZeroShotRecommendations(projectId: string, onResult: (result:
     const finalUrl = `${zeroShotEndpoint}/zero-shot-recommendations/${projectId}`;
     jsonFetchWrapper(finalUrl, FetchType.GET, onResult);
 }
-
-

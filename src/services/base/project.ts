@@ -13,7 +13,6 @@ export function getAllProjects(onResult: (result: any) => void) {
     jsonFetchWrapper(finalUrl, FetchType.GET, onResult);
 }
 
-
 export function getGeneralProjectStats(projectId: string, labelingTaskId: string | null, sliceId: string | null, onResult: (result: any) => void) {
 
     let finalUrl = `${projectEndpoint}/${projectId}/general-project-stats`;
@@ -28,6 +27,7 @@ export function getGeneralProjectStats(projectId: string, labelingTaskId: string
 
     jsonFetchWrapper(finalUrl, FetchType.GET, onResult);
 }
+
 export function getInterAnnotatorMatrix(projectId: string, labelingTaskId: string | null, sliceId: string | null, includeGoldStar: boolean | null, includeAllOrgUser: boolean | null, onResult: (result: any) => void) {
 
     let finalUrl = `${projectEndpoint}/${projectId}/inter-annotator-matrix`;
@@ -112,5 +112,10 @@ export function getProjectTokenization(projectId: string, onResult: (result: any
 }
 export function getLabelingTasksByProjectId(projectId: string, onResult: (result: any) => void) {
     const finalUrl = `${projectEndpoint}/${projectId}/labeling-tasks-by-project-id`;
+    jsonFetchWrapper(finalUrl, FetchType.GET, onResult);
+}
+
+export function getModelProviderInfo(onResult: (result: any) => void) {
+    const finalUrl = `${projectEndpoint}/model-provider-info`;
     jsonFetchWrapper(finalUrl, FetchType.GET, onResult);
 }
