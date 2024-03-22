@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { selectProjectId } from "@/src/reduxStore/states/project";
 import { useCallback, useEffect, useState } from "react";
 import { useLazyQuery, useMutation } from "@apollo/client";
-import { GET_LABELING_FUNCTION_ON_10_RECORDS, GET_TASK_BY_TASK_ID } from "@/src/services/gql/queries/heuristics";
+import { GET_LABELING_FUNCTION_ON_10_RECORDS } from "@/src/services/gql/queries/heuristics";
 import { selectHeuristic, setActiveHeuristics, updateHeuristicsState } from "@/src/reduxStore/states/pages/heuristics";
 import { postProcessCurrentHeuristic, postProcessLastTaskLogs } from "@/src/util/components/projects/projectId/heuristics/heuristicId/heuristics-details-helper";
 import { Tooltip } from "@nextui-org/react";
@@ -39,7 +39,7 @@ import { parseContainerLogsData } from "@/submodules/javascript-functions/logs-p
 import { useWebsocket } from "@/src/services/base/web-sockets/useWebsocket";
 import { getAllComments } from "@/src/services/base/comment";
 import { getLabelingTasksByProjectId } from "@/src/services/base/project";
-import { getHeuristicByHeuristicId } from "@/src/services/base/heuristic";
+import { getHeuristicByHeuristicId, getPayloadByPayloadId } from "@/src/services/base/heuristic";
 
 export default function LabelingFunction() {
     const dispatch = useDispatch();
@@ -60,7 +60,6 @@ export default function LabelingFunction() {
     const [runOn10IsRunning, setRunOn10IsRunning] = useState(false);
 
     const [updateHeuristicMut] = useMutation(UPDATE_INFORMATION_SOURCE);
-    const [refetchTaskByTaskId] = useLazyQuery(GET_TASK_BY_TASK_ID, { fetchPolicy: "network-only" });
     const [refetchRunOn10] = useLazyQuery(GET_LABELING_FUNCTION_ON_10_RECORDS, { fetchPolicy: "no-cache" });
 
     useEffect(() => {
@@ -135,7 +134,7 @@ export default function LabelingFunction() {
             setLastTaskLogs(["Task is queued for execution"]);
             return;
         }
-        refetchTaskByTaskId({ variables: { projectId: projectId, payloadId: currentHeuristic.lastPayload.id } }).then((res) => {
+        getPayloadByPayloadId(projectId, currentHeuristic.lastPayload.id, (res) => {
             setLastTaskLogs(postProcessLastTaskLogs((res['data']['payloadByPayloadId'])));
         });
     }

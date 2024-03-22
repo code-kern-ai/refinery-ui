@@ -17,3 +17,8 @@ export function getHeuristicByHeuristicId(projectId: string, heuristicId: string
     const finalUrl = `${heuristicEndpoint}/${projectId}/${heuristicId}/heuristic-by-id`;
     jsonFetchWrapper(finalUrl, FetchType.GET, onResult);
 }
+
+export function getPayloadByPayloadId(projectId: string, payloadId: string, onResult: (result: any) => void) {
+    const finalUrl = `${heuristicEndpoint}/${projectId}/${payloadId}/payload-by-id`;
+    jsonFetchWrapper(finalUrl, FetchType.GET, onResult);
+}

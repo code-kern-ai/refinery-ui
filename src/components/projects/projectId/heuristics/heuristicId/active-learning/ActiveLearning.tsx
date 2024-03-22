@@ -3,7 +3,6 @@ import HeuristicsLayout from "../shared/HeuristicsLayout";
 import { useRouter } from "next/router";
 import { selectProjectId } from "@/src/reduxStore/states/project";
 import { useLazyQuery, useMutation } from "@apollo/client";
-import { GET_TASK_BY_TASK_ID } from "@/src/services/gql/queries/heuristics";
 import { Fragment, useCallback, useEffect, useState } from "react";
 import { selectHeuristic, setActiveHeuristics, updateHeuristicsState } from "@/src/reduxStore/states/pages/heuristics";
 import { getClassLine, postProcessCurrentHeuristic, postProcessLastTaskLogs } from "@/src/util/components/projects/projectId/heuristics/heuristicId/heuristics-details-helper";
@@ -37,7 +36,7 @@ import LoadingIcon from "@/src/components/shared/loading/LoadingIcon";
 import { useWebsocket } from "@/src/services/base/web-sockets/useWebsocket";
 import { getAllComments } from "@/src/services/base/comment";
 import { getLabelingTasksByProjectId } from "@/src/services/base/project";
-import { getHeuristicByHeuristicId } from "@/src/services/base/heuristic";
+import { getHeuristicByHeuristicId, getPayloadByPayloadId } from "@/src/services/base/heuristic";
 
 export default function ActiveLearning() {
     const dispatch = useDispatch();
@@ -57,7 +56,6 @@ export default function ActiveLearning() {
 
     const [updateHeuristicMut] = useMutation(UPDATE_INFORMATION_SOURCE);
     const [refetchEmbeddings] = useLazyQuery(GET_EMBEDDING_SCHEMA_BY_PROJECT_ID, { fetchPolicy: "network-only" });
-    const [refetchTaskByTaskId] = useLazyQuery(GET_TASK_BY_TASK_ID, { fetchPolicy: "no-cache" });
 
     useEffect(() => {
         if (!projectId) return;
@@ -110,7 +108,7 @@ export default function ActiveLearning() {
             setLastTaskLogs(["Task is queued for execution"]);
             return;
         }
-        refetchTaskByTaskId({ variables: { projectId: projectId, payloadId: currentHeuristic.lastTask.id } }).then((res) => {
+        getPayloadByPayloadId(projectId, currentHeuristic.lastTask.id, (res) => {
             setLastTaskLogs(postProcessLastTaskLogs((res['data']['payloadByPayloadId'])));
         });
     }
