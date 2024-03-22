@@ -7,3 +7,8 @@ export function getQueuedTasks(projectId: string, taskType: string, onResult: (r
     const finalUrl = `${projectSettingEndpoint}/${projectId}/queued-tasks/${taskType}`;
     jsonFetchWrapper(finalUrl, FetchType.GET, onResult);
 }
+
+export function getAttributeByAttributeId(projectId: string, attributeId: string, onResult: (result: any) => void) {
+    const finalUrl = `${projectSettingEndpoint}/${projectId}/${attributeId}/attribute-by-id`;
+    jsonFetchWrapper(finalUrl, FetchType.GET, onResult);
+}
