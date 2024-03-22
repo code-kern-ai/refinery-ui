@@ -12,3 +12,8 @@ export function getWeakSupervisionRun(projectId: string, onResult: (result: any)
     const finalUrl = `${heuristicEndpoint}/${projectId}/weak-supervision-run`;
     jsonFetchWrapper(finalUrl, FetchType.GET, onResult);
 }
+
+export function getHeuristicByHeuristicId(projectId: string, heuristicId: string, onResult: (result: any) => void) {
+    const finalUrl = `${heuristicEndpoint}/${projectId}/${heuristicId}/heuristic-by-id`;
+    jsonFetchWrapper(finalUrl, FetchType.GET, onResult);
+}

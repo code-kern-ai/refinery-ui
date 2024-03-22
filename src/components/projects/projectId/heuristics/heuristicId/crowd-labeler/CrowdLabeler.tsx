@@ -1,7 +1,7 @@
 import { selectHeuristic, setActiveHeuristics } from "@/src/reduxStore/states/pages/heuristics";
 import { selectLabelingTasksAll, setLabelingTasksAll } from "@/src/reduxStore/states/pages/settings";
 import { selectProjectId } from "@/src/reduxStore/states/project";
-import { GET_ACCESS_LINK, GET_HEURISTICS_BY_ID } from "@/src/services/gql/queries/heuristics";
+import { GET_ACCESS_LINK } from "@/src/services/gql/queries/heuristics";
 import { CurrentPage } from "@/src/types/shared/general";
 import { postProcessLabelingTasks, postProcessLabelingTasksSchema } from "@/src/util/components/projects/projectId/settings/labeling-tasks-helper";
 import { useLazyQuery } from "@apollo/client";
@@ -22,6 +22,7 @@ import { CommentType } from "@/src/types/shared/comments";
 import { useWebsocket } from "@/src/services/base/web-sockets/useWebsocket";
 import { getDataSlices } from "@/src/services/base/dataSlices";
 import { getLabelingTasksByProjectId } from "@/src/services/base/project";
+import { getHeuristicByHeuristicId } from "@/src/services/base/heuristic";
 
 
 export default function CrowdLabeler() {
@@ -35,7 +36,6 @@ export default function CrowdLabeler() {
     const dataSlices = useSelector(selectDataSlicesAll);
     const allUsers = useSelector(selectAllUsers);
 
-    const [refetchCurrentHeuristic] = useLazyQuery(GET_HEURISTICS_BY_ID, { fetchPolicy: "network-only" });
     const [refetchAccessLink] = useLazyQuery(GET_ACCESS_LINK, { fetchPolicy: 'network-only' });
 
     useEffect(() => {
@@ -74,7 +74,7 @@ export default function CrowdLabeler() {
     }
 
     function refetchCurrentHeuristicAndProcess() {
-        refetchCurrentHeuristic({ variables: { projectId: projectId, informationSourceId: router.query.heuristicId } }).then((res) => {
+        getHeuristicByHeuristicId(projectId, router.query.heuristicId as string, (res) => {
             const currentHeuristic: any = postProcessCrowdLabeler(res['data']['informationSourceBySourceId'], labelingTasks);
             if (!currentHeuristic.crowdLabelerSettings.accessLinkId) {
                 dispatch(setActiveHeuristics(currentHeuristic));

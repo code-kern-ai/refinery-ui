@@ -3,7 +3,7 @@ import HeuristicsLayout from "../shared/HeuristicsLayout";
 import { useRouter } from "next/router";
 import { selectProjectId } from "@/src/reduxStore/states/project";
 import { useLazyQuery, useMutation } from "@apollo/client";
-import { GET_HEURISTICS_BY_ID, GET_TASK_BY_TASK_ID } from "@/src/services/gql/queries/heuristics";
+import { GET_TASK_BY_TASK_ID } from "@/src/services/gql/queries/heuristics";
 import { Fragment, useCallback, useEffect, useState } from "react";
 import { selectHeuristic, setActiveHeuristics, updateHeuristicsState } from "@/src/reduxStore/states/pages/heuristics";
 import { getClassLine, postProcessCurrentHeuristic, postProcessLastTaskLogs } from "@/src/util/components/projects/projectId/heuristics/heuristicId/heuristics-details-helper";
@@ -37,6 +37,7 @@ import LoadingIcon from "@/src/components/shared/loading/LoadingIcon";
 import { useWebsocket } from "@/src/services/base/web-sockets/useWebsocket";
 import { getAllComments } from "@/src/services/base/comment";
 import { getLabelingTasksByProjectId } from "@/src/services/base/project";
+import { getHeuristicByHeuristicId } from "@/src/services/base/heuristic";
 
 export default function ActiveLearning() {
     const dispatch = useDispatch();
@@ -54,7 +55,6 @@ export default function ActiveLearning() {
     const [isInitialAL, setIsInitialAL] = useState<boolean>(null);  //null as add state to differentiate between initial, not and unchecked
     const [checkUnsavedChanges, setCheckUnsavedChanges] = useState(false);
 
-    const [refetchCurrentHeuristic] = useLazyQuery(GET_HEURISTICS_BY_ID, { fetchPolicy: "network-only" });
     const [updateHeuristicMut] = useMutation(UPDATE_INFORMATION_SOURCE);
     const [refetchEmbeddings] = useLazyQuery(GET_EMBEDDING_SCHEMA_BY_PROJECT_ID, { fetchPolicy: "network-only" });
     const [refetchTaskByTaskId] = useLazyQuery(GET_TASK_BY_TASK_ID, { fetchPolicy: "no-cache" });
@@ -116,7 +116,7 @@ export default function ActiveLearning() {
     }
 
     function refetchCurrentHeuristicAndProcess() {
-        refetchCurrentHeuristic({ variables: { projectId: projectId, informationSourceId: router.query.heuristicId } }).then((res) => {
+        getHeuristicByHeuristicId(projectId, router.query.heuristicId as string, (res) => {
             dispatch(setActiveHeuristics(postProcessCurrentHeuristic(res['data']['informationSourceBySourceId'], labelingTasks)));
         });
     }

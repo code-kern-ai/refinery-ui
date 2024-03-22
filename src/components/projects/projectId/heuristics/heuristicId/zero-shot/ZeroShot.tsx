@@ -3,7 +3,6 @@ import { useDispatch, useSelector } from "react-redux"
 import HeuristicsLayout from "../shared/HeuristicsLayout";
 import { selectProjectId } from "@/src/reduxStore/states/project";
 import { useLazyQuery, useMutation } from "@apollo/client";
-import { GET_HEURISTICS_BY_ID } from "@/src/services/gql/queries/heuristics";
 import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { postProcessLabelingTasks, postProcessLabelingTasksSchema } from "@/src/util/components/projects/projectId/settings/labeling-tasks-helper";
@@ -32,6 +31,7 @@ import { useWebsocket } from "@/src/services/base/web-sockets/useWebsocket";
 import { getZeroShotRecommendations } from "@/src/services/base/zero-shot";
 import { getAllComments } from "@/src/services/base/comment";
 import { getLabelingTasksByProjectId } from "@/src/services/base/project";
+import { getHeuristicByHeuristicId } from "@/src/services/base/heuristic";
 
 export default function ZeroShot() {
     const dispatch = useDispatch();
@@ -48,7 +48,6 @@ export default function ZeroShot() {
     const [models, setModels] = useState([]);
     const [confidences, setConfidences] = useState<any[]>(CONFIDENCE_INTERVALS);
 
-    const [refetchCurrentHeuristic] = useLazyQuery(GET_HEURISTICS_BY_ID, { fetchPolicy: "network-only" });
     const [updateHeuristicMut] = useMutation(UPDATE_INFORMATION_SOURCE);
 
     useEffect(() => {
@@ -94,7 +93,7 @@ export default function ZeroShot() {
     }
 
     function refetchCurrentHeuristicAndProcess() {
-        refetchCurrentHeuristic({ variables: { projectId: projectId, informationSourceId: router.query.heuristicId } }).then((res) => {
+        getHeuristicByHeuristicId(projectId, router.query.heuristicId as string, (res) => {
             dispatch(setActiveHeuristics(postProcessZeroShot(res['data']['informationSourceBySourceId'], labelingTasks, textAttributes)));
         });
     }
