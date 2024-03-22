@@ -9,3 +9,8 @@ export function getDataSlices(projectId: string, sliceType: string | null, onRes
 
     jsonFetchWrapper(finalUrl, FetchType.GET, onResult);
 }
+
+export function getUniqueValuesByAttributes(projectId: string, onResult: (result: any) => void) {
+    const finalUrl = `${BASE_URL}/${projectId}/unique-values`;
+    jsonFetchWrapper(finalUrl, FetchType.GET, onResult);
+}

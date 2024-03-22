@@ -19,7 +19,7 @@ import { CommentDataManager } from "@/src/util/classes/comments";
 import { useWebsocket } from "@/src/services/base/web-sockets/useWebsocket";
 import { getAllComments } from "@/src/services/base/comment";
 import { getAttributes } from "@/src/services/base/attribute";
-import { getDataSlices } from "@/src/services/base/dataSlices";
+import { getDataSlices, getUniqueValuesByAttributes } from "@/src/services/base/dataSlices";
 import { getLabelingTasksByProjectId } from "@/src/services/base/project";
 
 const SEARCH_REQUEST = { offset: 0, limit: 20 };
@@ -142,7 +142,7 @@ export default function DataBrowser() {
     }
 
     function refetchUniqueValuesAndProcess() {
-        refetchUniqueValues({ variables: { projectId: projectId } }).then((res) => {
+        getUniqueValuesByAttributes(projectId, (res) => {
             dispatch(setUniqueValuesDict(postProcessUniqueValues(res.data['uniqueValuesByAttributes'], attributes)));
         });
     }

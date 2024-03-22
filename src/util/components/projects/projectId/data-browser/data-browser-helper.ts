@@ -199,7 +199,7 @@ function parseUTC(utc: string, forOutlier: boolean = false) {
 }
 
 export function postProcessUniqueValues(uniqueValues: any, attributesSortOrder: any) {
-    const uniqueValuesDict = JSON.parse(uniqueValues);
+    const uniqueValuesDict = uniqueValues;
     for (let key in uniqueValuesDict) {
         const attributeType = getAttributeType(attributesSortOrder, key);
         if (attributeType == 'TEXT') {
