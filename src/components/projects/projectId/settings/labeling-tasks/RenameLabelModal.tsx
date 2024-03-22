@@ -3,8 +3,8 @@ import Modal from "@/src/components/shared/modal/Modal";
 import { initModal, openModal, selectModal } from "@/src/reduxStore/states/modal";
 import { selectLabelingTasksAll, setLabelingTasksAll } from "@/src/reduxStore/states/pages/settings";
 import { selectProjectId } from "@/src/reduxStore/states/project";
+import { getCheckRenameLabel } from "@/src/services/base/project-setting";
 import { HANDLE_LABEL_RENAME_WARNING, UPDATE_LABEL_NAME } from "@/src/services/gql/mutations/project-settings";
-import { CHECK_RENAME_LABEL } from "@/src/services/gql/queries/project-setting";
 import { LabelType, LabelingTask, RenameLabelData } from "@/src/types/components/projects/projectId/settings/labeling-tasks";
 import { ModalButton, ModalEnum } from "@/src/types/shared/modal";
 import { LabelHelper } from "@/src/util/classes/label-helper";
@@ -27,7 +27,6 @@ export default function RenameLabelModal() {
 
     const [renameLabelData, setRenameLabelData] = useState<RenameLabelData>(null);
 
-    const [refetchCheckRenameLabel] = useLazyQuery(CHECK_RENAME_LABEL, { fetchPolicy: "no-cache" });
     const [updateLabelNameMut] = useMutation(UPDATE_LABEL_NAME);
     const [handleRenameWarningMut] = useMutation(HANDLE_LABEL_RENAME_WARNING);
 
@@ -63,8 +62,8 @@ export default function RenameLabelModal() {
     const [acceptButtonRename, setAcceptButtonRename] = useState<ModalButton>(ACCEPT_BUTTON);
 
     function checkRenameLabel() {
-        refetchCheckRenameLabel({ variables: { projectId: projectId, labelId: modalRenameLabel.label.id, newName: renameLabelData.newLabelName } }).then((res: any) => {
-            const result = JSON.parse(res.data['checkRenameLabel']);
+        getCheckRenameLabel(projectId, modalRenameLabel.label.id, renameLabelData.newLabelName, res => {
+            const result = res.data['checkRenameLabel'];
             const renameLabelDataCopy = { ...renameLabelData };
             result.warnings.forEach(e => {
                 e.open = false;
