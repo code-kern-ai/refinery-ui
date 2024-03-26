@@ -2,7 +2,6 @@ import { selectBricksIntegratorAttributes, selectBricksIntegratorEmbeddings, sel
 import { selectLabelingTasksAll } from "@/src/reduxStore/states/pages/settings";
 import { selectProjectId } from "@/src/reduxStore/states/project";
 import { useWebsocket } from "@/src/services/base/web-sockets/useWebsocket";
-import { GET_EMBEDDING_SCHEMA_BY_PROJECT_ID } from "@/src/services/gql/queries/project-setting";
 import { LabelingTaskTarget, LabelingTaskTaskType } from "@/src/types/components/projects/projectId/settings/labeling-tasks";
 import { BricksVariableType, VariableSelectProps } from "@/src/types/shared/bricks-integrator";
 import { CurrentPage, CurrentPageSubKey } from "@/src/types/shared/general";
@@ -12,7 +11,6 @@ import { postProcessingAttributes } from "@/src/util/components/projects/project
 import { postProcessLabelingTasks } from "@/src/util/components/projects/projectId/settings/labeling-tasks-helper";
 import { getIsoCodes } from "@/src/util/shared/bricks-integrator-helper";
 import Dropdown2 from "@/submodules/react-components/components/Dropdown2";
-import { useLazyQuery } from "@apollo/client";
 import { IconPlus, IconTrash } from "@tabler/icons-react";
 import { useCallback, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -30,8 +28,6 @@ export default function VariableSelect(props: VariableSelectProps) {
     const labelingTasks = useSelector(selectLabelingTasksAll);
     const lookupLists = useSelector(selectBricksIntegratorLookupLists);
     const labels = useSelector(selectBricksIntegratorLabels);
-
-    const [refetchEmbeddings] = useLazyQuery(GET_EMBEDDING_SCHEMA_BY_PROJECT_ID, { fetchPolicy: "no-cache" });
 
     useEffect(() => {
         if (!props.variable || !labelingTasks) return;
@@ -99,7 +95,7 @@ export default function VariableSelect(props: VariableSelectProps) {
     }
 
     function refetchEmbeddingsAndProcess(labelingTaskId: string | null = null) {
-        refetchEmbeddings({ variables: { projectId: projectId } }).then((res) => {
+        getEmbeddingSchemas({ variables: { projectId: projectId } }).then((res) => {
             const embeddings = res.data['projectByProjectId']['embeddings']['edges'].map((e) => e['node']);
             if (!embeddings || !labelingTasks) {
                 console.log("labeling Tasks or embeddings not yet loaded");
