@@ -2,7 +2,7 @@ import { useDispatch, useSelector } from "react-redux";
 import HeuristicsLayout from "../shared/HeuristicsLayout";
 import { useRouter } from "next/router";
 import { selectProjectId } from "@/src/reduxStore/states/project";
-import { useLazyQuery, useMutation } from "@apollo/client";
+import { useMutation } from "@apollo/client";
 import { Fragment, useCallback, useEffect, useState } from "react";
 import { selectHeuristic, setActiveHeuristics, updateHeuristicsState } from "@/src/reduxStore/states/pages/heuristics";
 import { getClassLine, postProcessCurrentHeuristic, postProcessLastTaskLogs } from "@/src/util/components/projects/projectId/heuristics/heuristicId/heuristics-details-helper";
@@ -11,7 +11,6 @@ import { Tooltip } from "@nextui-org/react";
 import { selectEmbeddings, selectEmbeddingsFiltered, selectLabelingTasksAll, selectVisibleAttributesHeuristics, setAllEmbeddings, setFilteredEmbeddings, setLabelingTasksAll } from "@/src/reduxStore/states/pages/settings";
 import { UPDATE_INFORMATION_SOURCE } from "@/src/services/gql/mutations/heuristics";
 import { postProcessLabelingTasks, postProcessLabelingTasksSchema } from "@/src/util/components/projects/projectId/settings/labeling-tasks-helper";
-import { GET_EMBEDDING_SCHEMA_BY_PROJECT_ID } from "@/src/services/gql/queries/project-setting";
 import { postProcessingEmbeddings } from "@/src/util/components/projects/projectId/settings/embeddings-helper";
 import { embeddingRelevant } from "@/src/util/components/projects/projectId/heuristics/heuristicId/labeling-functions-helper";
 import { Embedding } from "@/src/types/components/projects/projectId/settings/embeddings";
@@ -37,6 +36,7 @@ import { useWebsocket } from "@/src/services/base/web-sockets/useWebsocket";
 import { getAllComments } from "@/src/services/base/comment";
 import { getLabelingTasksByProjectId } from "@/src/services/base/project";
 import { getHeuristicByHeuristicId, getPayloadByPayloadId } from "@/src/services/base/heuristic";
+import { getEmbeddings } from "@/src/services/base/embedding";
 
 export default function ActiveLearning() {
     const dispatch = useDispatch();
@@ -55,7 +55,6 @@ export default function ActiveLearning() {
     const [checkUnsavedChanges, setCheckUnsavedChanges] = useState(false);
 
     const [updateHeuristicMut] = useMutation(UPDATE_INFORMATION_SOURCE);
-    const [refetchEmbeddings] = useLazyQuery(GET_EMBEDDING_SCHEMA_BY_PROJECT_ID, { fetchPolicy: "network-only" });
 
     useEffect(() => {
         if (!projectId) return;
@@ -135,7 +134,7 @@ export default function ActiveLearning() {
     }
 
     function refetchEmbeddingsAndPostProcess() {
-        refetchEmbeddings({ variables: { projectId: projectId } }).then((res) => {
+        getEmbeddings(projectId, (res) => {
             const embeddings = postProcessingEmbeddings(res.data['projectByProjectId']['embeddings']['edges'].map((e) => e['node']), []);
             dispatch(setAllEmbeddings(embeddings));
         });

@@ -20,3 +20,10 @@ export function getAllTokenizerOptions(onResult: (result: any) => void) {
 
     jsonFetchWrapper(finalUrl, FetchType.GET, onResult);
 }
+
+export function getEmbeddings(projectId: string, onResult: (result: any) => void) {
+    const finalUrl = `${BASE_URL}/embeddings-by-project?project_id=${projectId}`;
+
+    jsonFetchWrapper(finalUrl, FetchType.GET, onResult);
+}
+

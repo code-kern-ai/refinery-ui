@@ -2,11 +2,9 @@ import { selectProjectId } from "@/src/reduxStore/states/project"
 import { useDispatch, useSelector } from "react-redux"
 import DataBrowserSidebar from "./DataBrowserSidebar";
 import { useLazyQuery } from "@apollo/client";
-import { GET_UNIQUE_VALUES_BY_ATTRIBUTES } from "@/src/services/gql/queries/data-browser";
 import { useCallback, useEffect, useState } from "react";
 import { expandRecordList, selectRecords, setActiveDataSlice, setDataSlices, setRecordComments, setSearchRecordsExtended, setUniqueValuesDict, setUsersMapCount, updateAdditionalDataState } from "@/src/reduxStore/states/pages/data-browser";
 import { postProcessRecordsExtended, postProcessUniqueValues, postProcessUsersCount } from "@/src/util/components/projects/projectId/data-browser/data-browser-helper";
-import { GET_EMBEDDING_SCHEMA_BY_PROJECT_ID } from "@/src/services/gql/queries/project-setting";
 import { selectAttributes, selectLabelingTasksAll, setAllAttributes, setAllEmbeddings, setLabelingTasksAll } from "@/src/reduxStore/states/pages/settings";
 import { postProcessLabelingTasks, postProcessLabelingTasksSchema } from "@/src/util/components/projects/projectId/settings/labeling-tasks-helper";
 import { GET_ORGANIZATION_USERS_WITH_COUNT } from "@/src/services/gql/queries/organizations";
@@ -22,6 +20,7 @@ import { getAttributes } from "@/src/services/base/attribute";
 import { getDataSlices, getUniqueValuesByAttributes } from "@/src/services/base/dataSlices";
 import { getLabelingTasksByProjectId } from "@/src/services/base/project";
 import { getRecordComments, searchRecordsExtended } from "@/src/services/base/data-browser";
+import { getEmbeddings } from "@/src/services/base/embedding";
 
 const SEARCH_REQUEST = { offset: 0, limit: 20 };
 
@@ -35,12 +34,9 @@ export default function DataBrowser() {
     const user = useSelector(selectUser);
     const recordList = useSelector(selectRecords).recordList;
 
-
     const [searchRequest, setSearchRequest] = useState(SEARCH_REQUEST);
 
     const [refetchUsersCount] = useLazyQuery(GET_ORGANIZATION_USERS_WITH_COUNT, { fetchPolicy: "no-cache" });
-    const [refetchEmbeddings] = useLazyQuery(GET_EMBEDDING_SCHEMA_BY_PROJECT_ID, { fetchPolicy: "network-only" });
-    const [refetchUniqueValues] = useLazyQuery(GET_UNIQUE_VALUES_BY_ATTRIBUTES, { fetchPolicy: "no-cache" });
 
     useEffect(() => {
         if (!projectId) return;
@@ -122,7 +118,7 @@ export default function DataBrowser() {
     }
 
     function refetchEmbeddingsAndPostProcess() {
-        refetchEmbeddings({ variables: { projectId: projectId } }).then((res) => {
+        getEmbeddings(projectId, (res) => {
             const embeddings = postProcessingEmbeddings(res.data['projectByProjectId']['embeddings']['edges'].map((e) => e['node']), []);
             dispatch(setAllEmbeddings(embeddings));
         });

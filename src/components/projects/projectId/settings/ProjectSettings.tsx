@@ -1,8 +1,6 @@
 import { useDispatch, useSelector } from "react-redux";
 import DataSchema from "./DataSchema";
 import { selectProject, setActiveProject } from "@/src/reduxStore/states/project";
-import { useLazyQuery } from "@apollo/client";
-import { GET_EMBEDDING_SCHEMA_BY_PROJECT_ID } from "@/src/services/gql/queries/project-setting";
 import { useCallback, useEffect, useState } from "react";
 import { selectAttributes, selectEmbeddings, selectGatesIntegration, setAllAttributes, setAllEmbeddings, setAllRecommendedEncodersDict, setGatesIntegration, setLabelingTasksAll, setRecommendedEncodersAll } from "@/src/reduxStore/states/pages/settings";
 import { timer } from "rxjs";
@@ -34,7 +32,7 @@ import { useWebsocket } from "@/src/services/base/web-sockets/useWebsocket";
 import { getGatesIntegrationData, getLabelingTasksByProjectId, getProjectByProjectId, getProjectTokenization } from "@/src/services/base/project";
 import { getAllComments } from "@/src/services/base/comment";
 import { getAttributes, getCheckCompositeKey } from "@/src/services/base/attribute";
-import { getRecommendedEncoders } from "@/src/services/base/embedding";
+import { getEmbeddings, getRecommendedEncoders } from "@/src/services/base/embedding";
 import { getQueuedTasks } from "@/src/services/base/project-setting";
 
 export default function ProjectSettings() {
@@ -53,8 +51,6 @@ export default function ProjectSettings() {
     const [isAcRunning, setIsAcRunning] = useState(false);
     const [tokenizationProgress, setTokenizationProgress] = useState(null);
     const [checkIfAcUploadedRecords, setCheckIfAcUploadedRecords] = useState(false);
-
-    const [refetchEmbeddings] = useLazyQuery(GET_EMBEDDING_SCHEMA_BY_PROJECT_ID, { fetchPolicy: "no-cache" });
 
     useEffect(() => {
         if (!project) return;
@@ -111,7 +107,7 @@ export default function ProjectSettings() {
     }
 
     function refetchEmbeddingsAndPostProcess() {
-        refetchEmbeddings({ variables: { projectId: project.id } }).then((res) => {
+        getEmbeddings(project.id, (res) => {
             getQueuedTasks(project.id, "EMBEDDING", (queuedTasks) => {
                 const queuedEmbeddings = queuedTasks.data['queuedTasks'].map((task) => {
                     const copy = { ...task };
