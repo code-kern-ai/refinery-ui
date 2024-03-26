@@ -3,7 +3,7 @@ import { openModal, selectModal } from "@/src/reduxStore/states/modal";
 import { selectActiveSearchParams, selectActiveSlice, selectAdditionalData, selectConfiguration, selectDataSlicesAll, setActiveDataSlice, updateAdditionalDataState } from "@/src/reduxStore/states/pages/data-browser";
 import { selectAttributes, selectEmbeddings, selectLabelingTasksAll } from "@/src/reduxStore/states/pages/settings";
 import { selectProjectId } from "@/src/reduxStore/states/project";
-import { CREATE_OUTLIER_SLICE, UPDATE_DATA_SLICE } from "@/src/services/gql/mutations/data-browser";
+import { UPDATE_DATA_SLICE } from "@/src/services/gql/mutations/data-browser";
 import { ModalEnum } from "@/src/types/shared/modal";
 import { getRawFilterForSave, parseFilterToExtended } from "@/src/util/components/projects/projectId/data-browser/filter-parser-helper";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
@@ -14,6 +14,7 @@ import { IconChartBubble, IconFilter, IconRotate } from "@tabler/icons-react";
 import { useDispatch, useSelector } from "react-redux";
 import CreateOutlierSliceModal from "./modals/CreateOutlierSliceModal";
 import SaveDataSliceModal from "./modals/SaveDataSliceModal";
+import { createOutlierSlice } from "@/src/services/base/data-browser";
 
 export function DataSliceOperations(props: { fullSearch: {} }) {
     const dispatch = useDispatch();
@@ -30,7 +31,6 @@ export function DataSliceOperations(props: { fullSearch: {} }) {
     const embeddings = useSelector(selectEmbeddings);
 
     const [updateDataSliceMut] = useMutation(UPDATE_DATA_SLICE);
-    const [createOutlierSliceMut] = useMutation(CREATE_OUTLIER_SLICE);
 
     function updateSlice() {
         updateDataSliceMut({
@@ -50,8 +50,7 @@ export function DataSliceOperations(props: { fullSearch: {} }) {
     function requestOutlierSlice() {
         if (embeddings.length == 0) return;
         let embeddingId = embeddings.length == 1 ? embeddings[0].id : modalOutlierSlice.embeddingId;
-
-        createOutlierSliceMut({ variables: { projectId: projectId, embeddingId } }).then((res) => { });
+        createOutlierSlice(projectId, embeddingId, (result: any) => { });
     }
 
     return (<div>
