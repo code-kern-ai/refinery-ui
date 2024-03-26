@@ -165,7 +165,7 @@ export default function ProjectSettings() {
                 return;
             }
 
-            refetchEmbeddings({ variables: { projectId: project.id } }).then((res) => {
+            getEmbeddings(project.id, (res) => {
                 getQueuedTasks(project.id, "EMBEDDING", (queuedTasks) => {
                     const queuedEmbeddings = queuedTasks.data['queuedTasks'].map((task) => {
                         const copy = { ...task };

@@ -17,6 +17,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { getAttributes } from "@/src/services/base/attribute";
 import { getLookupListsByProjectId } from "@/src/services/base/lookup-lists";
 import { getLabelingTasksByProjectId } from "@/src/services/base/project";
+import { getEmbeddings } from "@/src/services/base/embedding";
 
 export default function VariableSelect(props: VariableSelectProps) {
     const dispatch = useDispatch();
@@ -95,7 +96,7 @@ export default function VariableSelect(props: VariableSelectProps) {
     }
 
     function refetchEmbeddingsAndProcess(labelingTaskId: string | null = null) {
-        getEmbeddingSchemas({ variables: { projectId: projectId } }).then((res) => {
+        getEmbeddings(projectId, (res) => {
             const embeddings = res.data['projectByProjectId']['embeddings']['edges'].map((e) => e['node']);
             if (!embeddings || !labelingTasks) {
                 console.log("labeling Tasks or embeddings not yet loaded");
