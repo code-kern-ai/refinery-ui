@@ -9,7 +9,6 @@ import { postProcessRecordsExtended, postProcessUniqueValues, postProcessUsersCo
 import { GET_EMBEDDING_SCHEMA_BY_PROJECT_ID } from "@/src/services/gql/queries/project-setting";
 import { selectAttributes, selectLabelingTasksAll, setAllAttributes, setAllEmbeddings, setLabelingTasksAll } from "@/src/reduxStore/states/pages/settings";
 import { postProcessLabelingTasks, postProcessLabelingTasksSchema } from "@/src/util/components/projects/projectId/settings/labeling-tasks-helper";
-import { GET_ORGANIZATION_USERS_WITH_COUNT } from "@/src/services/gql/queries/organizations";
 import { selectAllUsers, selectUser, setComments } from "@/src/reduxStore/states/general";
 import DataBrowserRecords from "./DataBrowserRecords";
 import { postProcessingEmbeddings } from "@/src/util/components/projects/projectId/settings/embeddings-helper";
@@ -22,6 +21,7 @@ import { getAttributes } from "@/src/services/base/attribute";
 import { getDataSlices, getUniqueValuesByAttributes } from "@/src/services/base/dataSlices";
 import { getLabelingTasksByProjectId } from "@/src/services/base/project";
 import { getRecordComments, searchRecordsExtended } from "@/src/services/base/data-browser";
+import { getAllUsersWithRecordCount } from "@/src/services/base/organization";
 
 const SEARCH_REQUEST = { offset: 0, limit: 20 };
 
@@ -38,7 +38,6 @@ export default function DataBrowser() {
 
     const [searchRequest, setSearchRequest] = useState(SEARCH_REQUEST);
 
-    const [refetchUsersCount] = useLazyQuery(GET_ORGANIZATION_USERS_WITH_COUNT, { fetchPolicy: "no-cache" });
     const [refetchEmbeddings] = useLazyQuery(GET_EMBEDDING_SCHEMA_BY_PROJECT_ID, { fetchPolicy: "network-only" });
     const [refetchUniqueValues] = useLazyQuery(GET_UNIQUE_VALUES_BY_ATTRIBUTES, { fetchPolicy: "no-cache" });
 
@@ -116,7 +115,7 @@ export default function DataBrowser() {
     }
 
     function refetchUsersCountAndProcess() {
-        refetchUsersCount({ variables: { projectId: projectId } }).then((res) => {
+        getAllUsersWithRecordCount(projectId, (res) => {
             dispatch(setUsersMapCount(postProcessUsersCount(res.data['allUsersWithRecordCount'], users, user)));
         });
     }
