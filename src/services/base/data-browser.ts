@@ -12,3 +12,8 @@ export function searchRecordsExtended(projectId: string, filterData: string[], o
     const finalUrl = `${dataBrowserEndpoint}/${projectId}/search-records-extended`;
     jsonFetchWrapper(finalUrl, FetchType.POST, onResult, JSON.stringify({ filterData: filterData, offset: offset, limit: limit }));
 }
+
+export function createOutlierSlice(projectId: string, embeddingId: string, onResult: (result: any) => void) {
+    const finalUrl = `${dataBrowserEndpoint}/${projectId}/create-outlier-slice/${embeddingId}`;
+    jsonFetchWrapper(finalUrl, FetchType.POST, onResult);
+}

@@ -1,28 +1,28 @@
 import { FetchType, jsonFetchWrapper } from "../../../submodules/javascript-functions/basic-fetch";
 import { BACKEND_BASE_URI } from "./_settings";
 
-export const BASE_URL = `${BACKEND_BASE_URI}/api/v1/embedding`;
+export const embeddingEndpoint = `${BACKEND_BASE_URI}/api/v1/embedding`;
 
 export function getEmbeddingPlatforms(onResult: (result: any) => void) {
-    const finalUrl = `${BASE_URL}/embedding-platforms`;
+    const finalUrl = `${embeddingEndpoint}/embedding-platforms`;
     jsonFetchWrapper(finalUrl, FetchType.GET, onResult);
 }
 
 export function getRecommendedEncoders(projectId: string | null, onResult: (result: any) => void) {
-    let finalUrl = `${BASE_URL}/recommended-encoders`;
+    let finalUrl = `${embeddingEndpoint}/recommended-encoders`;
     if (projectId) finalUrl += `?project_id=${projectId}`;
 
     jsonFetchWrapper(finalUrl, FetchType.GET, onResult);
 }
 
 export function getAllTokenizerOptions(onResult: (result: any) => void) {
-    const finalUrl = `${BASE_URL}/language-models`;
+    const finalUrl = `${embeddingEndpoint}/language-models`;
 
     jsonFetchWrapper(finalUrl, FetchType.GET, onResult);
 }
 
 export function getEmbeddings(projectId: string, onResult: (result: any) => void) {
-    const finalUrl = `${BASE_URL}/embeddings-by-project?project_id=${projectId}`;
+    const finalUrl = `${embeddingEndpoint}/embeddings-by-project?project_id=${projectId}`;
 
     jsonFetchWrapper(finalUrl, FetchType.GET, onResult);
 }
