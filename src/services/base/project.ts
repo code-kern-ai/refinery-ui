@@ -120,3 +120,8 @@ export function getModelProviderInfo(onResult: (result: any) => void) {
     const finalUrl = `${projectEndpoint}/model-provider-info`;
     jsonFetchWrapper(finalUrl, FetchType.GET, onResult);
 }
+
+export function getRecordExportFromData(projectId: string, onResult: (result: any) => void) {
+    const finalUrl = `${projectEndpoint}/${projectId}/record-export-by-project-id`;
+    jsonFetchWrapper(finalUrl, FetchType.GET, onResult);
+}
