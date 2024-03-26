@@ -2,7 +2,7 @@ import { selectProjectId } from "@/src/reduxStore/states/project"
 import { useDispatch, useSelector } from "react-redux"
 import DataBrowserSidebar from "./DataBrowserSidebar";
 import { useLazyQuery } from "@apollo/client";
-import { GET_UNIQUE_VALUES_BY_ATTRIBUTES, SEARCH_RECORDS_EXTENDED } from "@/src/services/gql/queries/data-browser";
+import { GET_UNIQUE_VALUES_BY_ATTRIBUTES } from "@/src/services/gql/queries/data-browser";
 import { useCallback, useEffect, useState } from "react";
 import { expandRecordList, selectRecords, setActiveDataSlice, setDataSlices, setRecordComments, setSearchRecordsExtended, setUniqueValuesDict, setUsersMapCount, updateAdditionalDataState } from "@/src/reduxStore/states/pages/data-browser";
 import { postProcessRecordsExtended, postProcessUniqueValues, postProcessUsersCount } from "@/src/util/components/projects/projectId/data-browser/data-browser-helper";
@@ -21,7 +21,7 @@ import { getAllComments } from "@/src/services/base/comment";
 import { getAttributes } from "@/src/services/base/attribute";
 import { getDataSlices, getUniqueValuesByAttributes } from "@/src/services/base/dataSlices";
 import { getLabelingTasksByProjectId } from "@/src/services/base/project";
-import { getRecordComments } from "@/src/services/base/data-browser";
+import { getRecordComments, searchRecordsExtended } from "@/src/services/base/data-browser";
 
 const SEARCH_REQUEST = { offset: 0, limit: 20 };
 
@@ -39,7 +39,6 @@ export default function DataBrowser() {
     const [searchRequest, setSearchRequest] = useState(SEARCH_REQUEST);
 
     const [refetchUsersCount] = useLazyQuery(GET_ORGANIZATION_USERS_WITH_COUNT, { fetchPolicy: "no-cache" });
-    const [refetchExtendedRecord] = useLazyQuery(SEARCH_RECORDS_EXTENDED, { fetchPolicy: "no-cache" });
     const [refetchEmbeddings] = useLazyQuery(GET_EMBEDDING_SCHEMA_BY_PROJECT_ID, { fetchPolicy: "network-only" });
     const [refetchUniqueValues] = useLazyQuery(GET_UNIQUE_VALUES_BY_ATTRIBUTES, { fetchPolicy: "no-cache" });
 
@@ -63,7 +62,7 @@ export default function DataBrowser() {
         if (!projectId) return;
         if (!searchRequest) return;
         if (searchRequest.offset == 0) return;
-        refetchExtendedRecord({ variables: { projectId: projectId, filterData: JSON.stringify({}), offset: searchRequest.offset, limit: searchRequest.limit } }).then((res) => {
+        searchRecordsExtended(projectId, [], searchRequest.offset, searchRequest.limit, (res) => {
             const parsedRecordData = postProcessRecordsExtended(res.data['searchRecordsExtended'], labelingTasks);
             dispatch(expandRecordList(parsedRecordData));
             refetchRecordCommentsAndProcess(parsedRecordData.recordList);
