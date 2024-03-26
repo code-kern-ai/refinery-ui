@@ -17,7 +17,7 @@ import { ModalEnum } from "@/src/types/shared/modal";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
 import { DataSliceOperations } from "./DataSliceOperations";
 import { useLazyQuery } from "@apollo/client";
-import { GET_RECORDS_BY_STATIC_SLICE, GET_STATIC_DATA_SLICE_CURRENT_COUNT } from "@/src/services/gql/queries/data-browser";
+import { GET_STATIC_DATA_SLICE_CURRENT_COUNT } from "@/src/services/gql/queries/data-browser";
 import { getActiveNegateGroupColor, postProcessRecordsExtended } from "@/src/util/components/projects/projectId/data-browser/data-browser-helper";
 import { parseFilterToExtended } from "@/src/util/components/projects/projectId/data-browser/filter-parser-helper";
 import { getRegexFromFilter, updateSearchParameters } from "@/src/util/components/projects/projectId/data-browser/search-parameters";
@@ -31,7 +31,7 @@ import { ChevronDownIcon } from "@heroicons/react/20/solid";
 import Dropdown2 from "@/submodules/react-components/components/Dropdown2";
 import { checkActiveGroups, prefillActiveValues } from "@/src/util/components/projects/projectId/data-browser/prefill-values-helper";
 import { getWeakSupervisionRun } from "@/src/services/base/heuristic";
-import { searchRecordsExtended } from "@/src/services/base/data-browser";
+import { getRecordsByStaticSlice, searchRecordsExtended } from "@/src/services/base/data-browser";
 
 const GROUP_SORT_ORDER = 0;
 let GLOBAL_SEARCH_GROUP_COUNT = 0;
@@ -71,7 +71,6 @@ export default function SearchGroups() {
     const [currentWeakSupervisionRun, setCurrentWeakSupervisionRun] = useState(null);
     const [selectedHeuristicsWS, setSelectedHeuristicsWS] = useState<string[]>([]);
 
-    const [refetchRecordsStatic] = useLazyQuery(GET_RECORDS_BY_STATIC_SLICE, { fetchPolicy: "network-only" });
     const [refetchStaticSliceCurrentCount] = useLazyQuery(GET_STATIC_DATA_SLICE_CURRENT_COUNT, { fetchPolicy: "network-only" });
 
     useEffect(() => {
@@ -136,13 +135,9 @@ export default function SearchGroups() {
         refreshTextHighlightNeeded();
         setHighlightingToRecords();
         if (activeSlice && activeSlice.static) {
-            refetchRecordsStatic({
-                variables: {
-                    sliceId: activeSlice.id,
-                    projectId: projectId,
-                    offset: 0, limit: 20
-                }
-            }).then((res) => {
+            getRecordsByStaticSlice(projectId, activeSlice.id, {
+                offset: 0, limit: 20
+            }, (res) => {
                 dispatch(setSearchRecordsExtended(postProcessRecordsExtended(res.data['recordsByStaticSlice'], labelingTasks)));
                 refetchStaticSliceCurrentCount({ variables: { projectId: projectId, sliceId: activeSlice.id } }).then((res) => {
                     if (!res.data) {

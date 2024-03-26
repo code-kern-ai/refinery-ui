@@ -17,3 +17,13 @@ export function createOutlierSlice(projectId: string, embeddingId: string, onRes
     const finalUrl = `${dataBrowserEndpoint}/${projectId}/create-outlier-slice/${embeddingId}`;
     jsonFetchWrapper(finalUrl, FetchType.POST, onResult);
 }
+
+export function getRecordsByStaticSlice(projectId: string,
+    sliceId: string, options: {
+        orderBy?: string,
+        offset?: number,
+        limit?: number,
+    }, onResult: (result: any) => void) {
+    const finalUrl = `${dataBrowserEndpoint}/${projectId}/records-by-static-slice/${sliceId}`;
+    jsonFetchWrapper(finalUrl, FetchType.POST, onResult, JSON.stringify({ options }));
+}
