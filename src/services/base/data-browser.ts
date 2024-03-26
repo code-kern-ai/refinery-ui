@@ -7,3 +7,8 @@ export function getRecordComments(projectId: string, recordIds: string[], onResu
     const finalUrl = `${dataBrowserEndpoint}/${projectId}/record-comments`;
     jsonFetchWrapper(finalUrl, FetchType.POST, onResult, JSON.stringify({ recordIds: recordIds }));
 }
+
+export function searchRecordsExtended(projectId: string, filterData: string[], offset: number, limit: number, onResult: (result: any) => void) {
+    const finalUrl = `${dataBrowserEndpoint}/${projectId}/search-records-extended`;
+    jsonFetchWrapper(finalUrl, FetchType.POST, onResult, JSON.stringify({ filterData: filterData, offset: offset, limit: limit }));
+}
