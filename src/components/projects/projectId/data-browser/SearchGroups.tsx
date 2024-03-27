@@ -1,4 +1,4 @@
-import { selectAttributes, selectAttributesDict, selectLabelingTasksAll, selectVisibleAttributesHeuristics } from "@/src/reduxStore/states/pages/settings";
+import { selectAttributesDict, selectLabelingTasksAll, selectVisibleAttributesHeuristics } from "@/src/reduxStore/states/pages/settings";
 import { selectProjectId } from "@/src/reduxStore/states/project";
 import { attributeCreateSearchGroup, commentsCreateSearchGroup, generateRandomSeed, getBasicGroupItems, getBasicSearchGroup, getBasicSearchItem, labelingTasksCreateSearchGroup, orderByCreateSearchGroup, userCreateSearchGroup } from "@/src/util/components/projects/projectId/data-browser/search-groups-helper";
 import { SearchGroup, Slice, StaticOrderByKeys } from "@/submodules/javascript-functions/enums/enums";
@@ -16,8 +16,6 @@ import { setModalStates } from "@/src/reduxStore/states/modal";
 import { ModalEnum } from "@/src/types/shared/modal";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
 import { DataSliceOperations } from "./DataSliceOperations";
-import { useLazyQuery } from "@apollo/client";
-import { GET_STATIC_DATA_SLICE_CURRENT_COUNT } from "@/src/services/gql/queries/data-browser";
 import { getActiveNegateGroupColor, postProcessRecordsExtended } from "@/src/util/components/projects/projectId/data-browser/data-browser-helper";
 import { parseFilterToExtended } from "@/src/util/components/projects/projectId/data-browser/filter-parser-helper";
 import { getRegexFromFilter, updateSearchParameters } from "@/src/util/components/projects/projectId/data-browser/search-parameters";
@@ -32,6 +30,7 @@ import Dropdown2 from "@/submodules/react-components/components/Dropdown2";
 import { checkActiveGroups, prefillActiveValues } from "@/src/util/components/projects/projectId/data-browser/prefill-values-helper";
 import { getWeakSupervisionRun } from "@/src/services/base/heuristic";
 import { getRecordsByStaticSlice, searchRecordsExtended } from "@/src/services/base/data-browser";
+import { staticDataSlicesCurrentCount } from "@/src/services/base/dataSlices";
 
 const GROUP_SORT_ORDER = 0;
 let GLOBAL_SEARCH_GROUP_COUNT = 0;
@@ -70,8 +69,6 @@ export default function SearchGroups() {
     const [backgroundColors, setBackgroundColors] = useState<string[]>([]);
     const [currentWeakSupervisionRun, setCurrentWeakSupervisionRun] = useState(null);
     const [selectedHeuristicsWS, setSelectedHeuristicsWS] = useState<string[]>([]);
-
-    const [refetchStaticSliceCurrentCount] = useLazyQuery(GET_STATIC_DATA_SLICE_CURRENT_COUNT, { fetchPolicy: "network-only" });
 
     useEffect(() => {
         if (!projectId || !users || !labelingTasks || !attributesSortOrder || !usersMap) return;
@@ -139,7 +136,7 @@ export default function SearchGroups() {
                 offset: 0, limit: 20
             }, (res) => {
                 dispatch(setSearchRecordsExtended(postProcessRecordsExtended(res.data['recordsByStaticSlice'], labelingTasks)));
-                refetchStaticSliceCurrentCount({ variables: { projectId: projectId, sliceId: activeSlice.id } }).then((res) => {
+                staticDataSlicesCurrentCount(projectId, activeSlice.id, (res) => {
                     if (!res.data) {
                         dispatch(updateAdditionalDataState('staticDataSliceCurrentCount', null));
                         return;

@@ -14,3 +14,8 @@ export function getUniqueValuesByAttributes(projectId: string, onResult: (result
     const finalUrl = `${dataSliceEndpoint}/${projectId}/unique-values`;
     jsonFetchWrapper(finalUrl, FetchType.GET, onResult);
 }
+
+export function staticDataSlicesCurrentCount(projectId: string, sliceId: string, onResult: (result: any) => void) {
+    const finalUrl = `${dataSliceEndpoint}/${projectId}/static-data-slices-current-count/${sliceId}`;
+    jsonFetchWrapper(finalUrl, FetchType.GET, onResult);
+}
