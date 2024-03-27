@@ -1,7 +1,7 @@
 import { selectAllUsers, selectUser, setBricksIntegrator, setComments } from "@/src/reduxStore/states/general";
 import { setAvailableLinks, updateRecordRequests, setSelectedLink, selectRecordRequestsRla, updateUsers, setSettings, selectSettings, setUserDisplayId, selectRecordRequestsRecord, initOnLabelPageDestruction, selectUserDisplayId, selectDisplayUserRole, setDisplayUserRole } from "@/src/reduxStore/states/pages/labeling";
 import { selectProjectId } from "@/src/reduxStore/states/project"
-import { AVAILABLE_LABELING_LINKS, GET_RECORD_LABEL_ASSOCIATIONS, GET_TOKENIZED_RECORD, LINK_LOCKED, REQUEST_HUDDLE_DATA } from "@/src/services/gql/queries/labeling";
+import { GET_RECORD_LABEL_ASSOCIATIONS, GET_TOKENIZED_RECORD, LINK_LOCKED, REQUEST_HUDDLE_DATA } from "@/src/services/gql/queries/labeling";
 import { LabelingLinkType } from "@/src/types/components/projects/projectId/labeling/labeling-main-component";
 import { UserRole } from "@/src/types/shared/sidebar";
 import { LabelingSuiteManager } from "@/src/util/classes/labeling/manager";
@@ -31,6 +31,7 @@ import { useWebsocket } from "@/src/services/base/web-sockets/useWebsocket";
 import { getAllComments } from "@/src/services/base/comment";
 import { getAttributes } from "@/src/services/base/attribute";
 import { getLabelingTasksByProjectId } from "@/src/services/base/project";
+import { getAvailableLinks } from "@/src/services/base/labeling";
 
 const SETTINGS_KEY = 'labelingSettings';
 
@@ -53,7 +54,6 @@ export default function LabelingMainComponent() {
     const [lockedLink, setLockedLink] = useState(false);
 
     const [refetchHuddleData] = useLazyQuery(REQUEST_HUDDLE_DATA, { fetchPolicy: 'no-cache' });
-    const [refetchAvailableLinks] = useLazyQuery(AVAILABLE_LABELING_LINKS, { fetchPolicy: 'no-cache' });
     const [refetchTokenizedRecord] = useLazyQuery(GET_TOKENIZED_RECORD, { fetchPolicy: 'no-cache' });
     const [refetchRecordByRecordId] = useLazyQuery(GET_RECORD_BY_RECORD_ID, { fetchPolicy: 'no-cache' });
     const [refetchRla] = useLazyQuery(GET_RECORD_LABEL_ASSOCIATIONS, { fetchPolicy: 'network-only' });
@@ -273,7 +273,7 @@ export default function LabelingMainComponent() {
     function collectAvailableLinks() {
         if (userDisplayRole?.role == UserRole.ENGINEER) return;
         const heuristicId = SessionManager.labelingLinkData.linkType == LabelingLinkType.HEURISTIC ? SessionManager.labelingLinkData.huddleId : null;
-        refetchAvailableLinks({ variables: { projectId: projectId, assumedRole: user?.role, assumedHeuristicId: heuristicId } }).then((result) => {
+        getAvailableLinks(projectId, user?.role, heuristicId, (result) => {
             const availableLinks = result['data']['availableLinks'];
             dispatch(setAvailableLinks(availableLinks));
             const linkRoute = router.asPath.split("?")[0];

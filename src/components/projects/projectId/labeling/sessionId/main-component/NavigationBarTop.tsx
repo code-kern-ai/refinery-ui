@@ -12,9 +12,8 @@ import { useDispatch, useSelector } from "react-redux";
 import style from '@/src/styles/components/projects/projectId/labeling.module.css';
 import Dropdown2 from "@/submodules/react-components/components/Dropdown2";
 import { useEffect } from "react";
-import { useLazyQuery } from "@apollo/client";
-import { AVAILABLE_LABELING_LINKS } from "@/src/services/gql/queries/labeling";
 import { parseLinkFromText } from "@/src/util/shared/link-parser-helper";
+import { getAvailableLinks } from "@/src/services/base/labeling";
 
 export default function NavigationBarTop(props: NavigationBarTopProps) {
     const router = useRouter();
@@ -28,12 +27,10 @@ export default function NavigationBarTop(props: NavigationBarTopProps) {
     const displayId = useSelector(selectUserDisplayId);
     const userDisplayRole = useSelector(selectDisplayUserRole);
 
-    const [refetchAvailableLinks] = useLazyQuery(AVAILABLE_LABELING_LINKS, { fetchPolicy: 'no-cache' });
-
     useEffect(() => {
         if (userDisplayRole?.role == UserRole.ENGINEER || !SessionManager.labelingLinkData) return;
         const heuristicId = SessionManager.labelingLinkData.linkType == LabelingLinkType.HEURISTIC ? SessionManager.labelingLinkData.huddleId : null;
-        refetchAvailableLinks({ variables: { projectId: projectId, assumedRole: userDisplayRole?.role, assumedHeuristicId: heuristicId } }).then((result) => {
+        getAvailableLinks(projectId, user?.role, heuristicId, (result) => {
             const availableLinks = result['data']['availableLinks'];
             dispatch(setAvailableLinks(availableLinks));
             const linkRoute = router.asPath.split("?")[0];
