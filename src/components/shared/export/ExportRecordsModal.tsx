@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { closeModal, selectModal } from "@/src/reduxStore/states/modal";
 import { useCallback, useEffect, useState } from "react";
 import { selectProjectId } from "@/src/reduxStore/states/project";
-import { GET_RECORD_EXPORT_FORM_DATA, LAST_RECORD_EXPORT_CREDENTIALS, PREPARE_RECORD_EXPORT } from "@/src/services/gql/queries/project-setting";
+import { LAST_RECORD_EXPORT_CREDENTIALS, PREPARE_RECORD_EXPORT } from "@/src/services/gql/queries/project-setting";
 import { useLazyQuery } from "@apollo/client";
 import { ExportEnums, ExportFileType, ExportFormat, ExportPreset, ExportProps, ExportRowType } from "@/src/types/shared/export";
 import { enumToArray, jsonCopy } from "@/submodules/javascript-functions/general";
@@ -27,6 +27,7 @@ import { selectUser } from "@/src/reduxStore/states/general";
 import CryptedField from "../crypted-field/CryptedField";
 import { extendArrayElementsByUniqueId } from "@/submodules/javascript-functions/id-prep";
 import { useWebsocket } from "@/src/services/base/web-sockets/useWebsocket";
+import { getRecordExportFromData } from "@/src/services/base/project";
 
 export default function ExportRecordsModal(props: ExportProps) {
     const dispatch = useDispatch();
@@ -43,7 +44,6 @@ export default function ExportRecordsModal(props: ExportProps) {
     const [prepareErrors, setPrepareErrors] = useState<string[]>([]);
 
     const [refetchLastRecordsExportCredentials] = useLazyQuery(LAST_RECORD_EXPORT_CREDENTIALS, { fetchPolicy: "no-cache" });
-    const [refetchRecordExportFromData] = useLazyQuery(GET_RECORD_EXPORT_FORM_DATA, { fetchPolicy: "no-cache" });
     const [refetchPrepareRecordExport] = useLazyQuery(PREPARE_RECORD_EXPORT, { fetchPolicy: "no-cache" });
 
     useEffect(() => {
@@ -91,7 +91,7 @@ export default function ExportRecordsModal(props: ExportProps) {
         enumArraysCopy.set(ExportEnums.ExportFormat, enumToArray(ExportFormat, { caseType: caseType.CAPITALIZE_FIRST_PER_WORD }));
         enumArraysCopy.set(ExportEnums.LabelSource, enumToArray(LabelSource, { nameFunction: labelSourceToString }));
         if (!force && enumArraysCopy[ExportEnums.Heuristics]) return;
-        refetchRecordExportFromData({ variables: { projectId: projectId } }).then((res) => {
+        getRecordExportFromData(projectId, (res) => {
             const postProcessedRes = postProcessExportRecordData(res['data']['projectByProjectId']);
             enumArraysCopy.set(ExportEnums.Heuristics, postProcessedRes.informationSources);
             enumArraysCopy.set(ExportEnums.Attributes, postProcessedRes.attributes);
