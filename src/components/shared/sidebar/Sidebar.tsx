@@ -220,7 +220,7 @@ export default function Sidebar() {
                             </div>}
 
                             {isManaged && <div className="flex items-center justify-center mt-4">
-                                <AppSelectionDropdown cockpit={true} gates={true} workflow={true}></AppSelectionDropdown>
+                                <AppSelectionDropdown cockpit={true} gates={true}></AppSelectionDropdown>
                             </div>}
 
                             <div className="flex-shrink-0 flex pt-3 pb-10 justify-center">
