@@ -27,3 +27,10 @@ export function getRecordsByStaticSlice(projectId: string,
     const finalUrl = `${dataBrowserEndpoint}/${projectId}/records-by-static-slice/${sliceId}`;
     jsonFetchWrapper(finalUrl, FetchType.POST, onResult, JSON.stringify({ options }));
 }
+
+export function createDataSlice(projectId: string, options: {
+    name: string, static: boolean, filterRaw: string, filterData: string[]
+}, onResult: (result: any) => void) {
+    const finalUrl = `${dataBrowserEndpoint}/${projectId}/create-data-slice`;
+    jsonFetchWrapper(finalUrl, FetchType.POST, onResult, JSON.stringify({ options }));
+}
