@@ -175,7 +175,7 @@ export default function RecordIDE() {
         setOutput("");
     }
 
-    return (<div className="relative h-full">
+    return (<>
         {projectId && <div className={`bg-white grid overflow-hidden ${vertical ? 'grid-cols-2' : 'grid-cols-1'}`}>
             <div className="h-full">
                 <div className="m-3 flex items-center">
@@ -224,7 +224,7 @@ export default function RecordIDE() {
                     height={screenHeight}
                     onChange={(val) => setCode(val)} />
             </div>
-            <div className={`h-screen border-gray-300 ${vertical ? 'border-l' : 'border-t'}`}>
+            <div className={`h-full border-gray-300 ${vertical ? 'border-l' : 'border-t'}`}>
                 <div className="flex flex-row m-3 items-center">
                     <span className="mr-4">Shell</span>
                     <Tooltip content={<MultilineTooltip tooltipLines={['Press Shift + Enter in the editor', 'to run the code']} />} color="invert" placement="bottom">
@@ -266,5 +266,5 @@ export default function RecordIDE() {
                 </div>}
             </div>
         </div>}
-    </div >)
+    </>)
 }
