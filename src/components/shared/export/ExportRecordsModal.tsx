@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { closeModal, selectModal } from "@/src/reduxStore/states/modal";
 import { useCallback, useEffect, useState } from "react";
 import { selectProjectId } from "@/src/reduxStore/states/project";
-import { LAST_RECORD_EXPORT_CREDENTIALS, PREPARE_RECORD_EXPORT } from "@/src/services/gql/queries/project-setting";
+import { PREPARE_RECORD_EXPORT } from "@/src/services/gql/queries/project-setting";
 import { useLazyQuery } from "@apollo/client";
 import { ExportEnums, ExportFileType, ExportFormat, ExportPreset, ExportProps, ExportRowType } from "@/src/types/shared/export";
 import { enumToArray, jsonCopy } from "@/submodules/javascript-functions/general";
@@ -28,6 +28,7 @@ import CryptedField from "../crypted-field/CryptedField";
 import { extendArrayElementsByUniqueId } from "@/submodules/javascript-functions/id-prep";
 import { useWebsocket } from "@/src/services/base/web-sockets/useWebsocket";
 import { getRecordExportFromData } from "@/src/services/base/project";
+import { getLastRecordExportCredentials } from "@/src/services/base/project-setting";
 
 export default function ExportRecordsModal(props: ExportProps) {
     const dispatch = useDispatch();
@@ -43,7 +44,6 @@ export default function ExportRecordsModal(props: ExportProps) {
     const [key, setKey] = useState('');
     const [prepareErrors, setPrepareErrors] = useState<string[]>([]);
 
-    const [refetchLastRecordsExportCredentials] = useLazyQuery(LAST_RECORD_EXPORT_CREDENTIALS, { fetchPolicy: "no-cache" });
     const [refetchPrepareRecordExport] = useLazyQuery(PREPARE_RECORD_EXPORT, { fetchPolicy: "no-cache" });
 
     useEffect(() => {
@@ -71,7 +71,7 @@ export default function ExportRecordsModal(props: ExportProps) {
     }, [modal]);
 
     function requestRecordsExportCredentials() {
-        refetchLastRecordsExportCredentials({ variables: { projectId: projectId } }).then((res) => {
+        getLastRecordExportCredentials(projectId, (res) => {
             const recordExportCredentials = res.data['lastRecordExportCredentials'];
             if (!recordExportCredentials) setRecordExportCredentials(null);
             else {

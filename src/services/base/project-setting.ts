@@ -17,3 +17,8 @@ export function getCheckRenameLabel(projectId: string, labelId: string, newName:
     const finalUrl = `${projectSettingEndpoint}/${projectId}/check-rename-label/?label_id=${labelId}&new_name=${newName}`;
     jsonFetchWrapper(finalUrl, FetchType.GET, onResult);
 }
+
+export function getLastRecordExportCredentials(projectId: string, onResult: (result: any) => void) {
+    const finalUrl = `${projectSettingEndpoint}/${projectId}/last-record-export-credentials`;
+    jsonFetchWrapper(finalUrl, FetchType.GET, onResult);
+}
