@@ -292,7 +292,7 @@ export default function AttributeCalculation() {
 
     useWebsocket(CurrentPage.ATTRIBUTE_CALCULATION, handleWebsocketNotification, projectId);
 
-    return (projectId && <div className="bg-white p-4 overflow-y-auto max-h-full" style={{ width: 'calc(100vw - 75px)', minWidth: '1175px' }} onScroll={(e: any) => onScrollEvent(e)}>
+    return (projectId && <div className="bg-white p-4 overflow-y-auto max-h-full" style={{ width: 'calc(100vw - 95px)', minWidth: '1175px' }} onScroll={(e: any) => onScrollEvent(e)}>
         {currentAttribute && <div>
             <div className={`sticky z-40 h-12 ${isHeaderNormal ? 'top-1' : '-top-5'}`}>
                 <div className={`bg-white flex-grow ${isHeaderNormal ? '' : 'shadow'}`}>
