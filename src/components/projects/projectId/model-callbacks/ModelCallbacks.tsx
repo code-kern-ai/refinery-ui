@@ -1,11 +1,9 @@
 import { selectLabelingTasksAll, setLabelingTasksAll } from "@/src/reduxStore/states/pages/settings";
 import { selectProjectId } from "@/src/reduxStore/states/project"
-import { GET_MODEL_CALLBACKS_OVERVIEW_DATA } from "@/src/services/gql/queries/model-callbacks";
 import { LabelingTask } from "@/src/types/components/projects/projectId/settings/labeling-tasks";
 import { ACTIONS_DROPDOWN_OPTIONS, postProcessModelCallbacks } from "@/src/util/components/projects/projectId/model-callbacks-helper";
 import { postProcessLabelingTasks, postProcessLabelingTasksSchema } from "@/src/util/components/projects/projectId/settings/labeling-tasks-helper";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
-import { useLazyQuery } from "@apollo/client";
 import { Tooltip } from "@nextui-org/react";
 import { IconPlus } from "@tabler/icons-react";
 import { useRouter } from "next/router";
@@ -20,6 +18,7 @@ import DeleteModelCallBacksModal from "./DeleteModelCallbacksModal";
 import Dropdown2 from "@/submodules/react-components/components/Dropdown2";
 import { useWebsocket } from "@/src/services/base/web-sockets/useWebsocket";
 import { getLabelingTasksByProjectId } from "@/src/services/base/project";
+import { getModelCallbacksOverviewData } from "@/src/services/base/heuristic";
 
 
 export default function ModelCallbacks() {
@@ -36,8 +35,6 @@ export default function ModelCallbacks() {
     const [selectionList, setSelectionList] = useState('');
     const [countSelected, setCountSelected] = useState(0);
     const [filteredList, setFilteredList] = useState([]);
-
-    const [refetchModelCallbacks] = useLazyQuery(GET_MODEL_CALLBACKS_OVERVIEW_DATA, { fetchPolicy: "network-only" });
 
     useEffect(() => {
         prepareSelectionList();
@@ -63,7 +60,7 @@ export default function ModelCallbacks() {
     }
 
     function refetchModelCallbacksAndProcess() {
-        refetchModelCallbacks({ variables: { projectId: projectId } }).then((res) => {
+        getModelCallbacksOverviewData(projectId, (res) => {
             const modelCallbacks = postProcessModelCallbacks(res['data']['modelCallbacksOverviewData']);
             setModelCallbacks(modelCallbacks);
             setFilteredList(modelCallbacks);
