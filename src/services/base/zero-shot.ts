@@ -7,3 +7,8 @@ export function getZeroShotRecommendations(projectId: string, onResult: (result:
     const finalUrl = `${zeroShotEndpoint}/${projectId}/zero-shot-recommendations`;
     jsonFetchWrapper(finalUrl, FetchType.GET, onResult);
 }
+
+export function getZeroShotText(projectId: string, heuristicId: string, config: string, text: string, runIndividually: boolean, labelNames: string[], onResult: (result: any) => void) {
+    const finalUrl = `${zeroShotEndpoint}/${projectId}/zero-shot-text`;
+    jsonFetchWrapper(finalUrl, FetchType.POST, onResult, JSON.stringify({ heuristicId, config, text, runIndividually, labelNames }));
+}
