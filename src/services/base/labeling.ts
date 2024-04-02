@@ -15,3 +15,8 @@ export function getHuddleData(projectId: string, options: {
     const finalUrl = `${labelingEndpoint}/${projectId}/huddle-data`;
     jsonFetchWrapper(finalUrl, FetchType.POST, onResult, JSON.stringify(options));
 }
+
+export function deleteRecordLabelAssociationByIds(projectId: string, recordId: string, associationIds: string[], onResult: (result: any) => void) {
+    const finalUrl = `${labelingEndpoint}/${projectId}/record-label-association-by-ids`;
+    jsonFetchWrapper(finalUrl, FetchType.DELETE, onResult, JSON.stringify({ recordId, associationIds }));
+}
