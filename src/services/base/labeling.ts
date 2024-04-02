@@ -20,3 +20,8 @@ export function deleteRecordLabelAssociationByIds(projectId: string, recordId: s
     const finalUrl = `${labelingEndpoint}/${projectId}/record-label-association-by-ids`;
     jsonFetchWrapper(finalUrl, FetchType.DELETE, onResult, JSON.stringify({ recordId, associationIds }));
 }
+
+export function deleteRecordById(projectId: string, recordId: string, onResult: (result: any) => void) {
+    const finalUrl = `${labelingEndpoint}/${projectId}/${recordId}/record-by-id`;
+    return jsonFetchWrapper(finalUrl, FetchType.DELETE, onResult);
+}
