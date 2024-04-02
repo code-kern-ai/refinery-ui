@@ -29,3 +29,8 @@ export function prepareRecordExport(projectId: string, options: {
     const finalUrl = `${projectSettingEndpoint}/${projectId}/prepare-record-export`;
     jsonFetchWrapper(finalUrl, FetchType.POST, onResult, JSON.stringify({ options }));
 }
+
+export function createLabel(projectId: string, labelName: string, labelingTaskId: string, labelColor: string, onResult: (result: any) => void) {
+    const finalUrl = `${projectSettingEndpoint}/${projectId}/create-label`;
+    jsonFetchWrapper(finalUrl, FetchType.POST, onResult, JSON.stringify({ labelName, labelingTaskId, labelColor }));
+}

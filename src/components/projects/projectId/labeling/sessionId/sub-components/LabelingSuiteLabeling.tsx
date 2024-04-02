@@ -18,7 +18,7 @@ import { jsonCopy } from "@/submodules/javascript-functions/general"
 import { InformationSourceType, LabelSource } from "@/submodules/javascript-functions/enums/enums"
 import { LabelingSuiteManager } from "@/src/util/classes/labeling/manager";
 import { useMutation } from "@apollo/client"
-import { ADD_CLASSIFICATION_LABELS_TO_RECORD, ADD_EXTRACTION_LABEL_TO_RECORD, CREATE_LABEL, DELETE_RECORD_LABEL_ASSOCIATION_BY_ID, REMOVE_GOLD_STAR_ANNOTATION_FOR_TASK, SET_GOLD_STAR_ANNOTATION_FOR_TASK } from "@/src/services/gql/mutations/labeling"
+import { ADD_CLASSIFICATION_LABELS_TO_RECORD, ADD_EXTRACTION_LABEL_TO_RECORD, DELETE_RECORD_LABEL_ASSOCIATION_BY_ID, REMOVE_GOLD_STAR_ANNOTATION_FOR_TASK, SET_GOLD_STAR_ANNOTATION_FOR_TASK } from "@/src/services/gql/mutations/labeling"
 import { SessionManager } from "@/src/util/classes/labeling/session-manager"
 import { GOLD_STAR_USER_ID } from "@/src/util/components/projects/projectId/labeling/labeling-main-component-helper"
 import { useRouter } from "next/router"
@@ -27,6 +27,7 @@ import { filterRlaDataForUser } from "@/src/util/components/projects/projectId/l
 import { LabelingPageParts } from "@/src/types/components/projects/projectId/labeling/labeling-main-component"
 import style from '@/src/styles/components/projects/projectId/labeling.module.css';
 import { getStoreSnapshotValue } from "@/src/reduxStore/store"
+import { createLabel } from "@/src/services/base/project-setting"
 
 const L_VARS = getDefaultLabelingVars();
 
@@ -66,7 +67,6 @@ export default function LabelingSuiteLabeling() {
     const [deleteRlaByIdMut] = useMutation(DELETE_RECORD_LABEL_ASSOCIATION_BY_ID);
     const [addClassificationLabelToRecordMut] = useMutation(ADD_CLASSIFICATION_LABELS_TO_RECORD);
     const [addExtractionLabelToRecordMut] = useMutation(ADD_EXTRACTION_LABEL_TO_RECORD);
-    const [createNewLabelMut] = useMutation(CREATE_LABEL);
     const [setGoldStarMut] = useMutation(SET_GOLD_STAR_ANNOTATION_FOR_TASK);
     const [removeGoldStarMut] = useMutation(REMOVE_GOLD_STAR_ANNOTATION_FOR_TASK);
 
@@ -511,7 +511,7 @@ export default function LabelingSuiteLabeling() {
     }
 
     function addNewLabelToTask(newLabel: string, task: any) {
-        createNewLabelMut({ variables: { projectId: projectId, labelingTaskId: task.id, labelName: newLabel, labelColor: DEFAULT_LABEL_COLOR } }).then((res) => {
+        createLabel(projectId, newLabel, task.id, DEFAULT_LABEL_COLOR, () => {
             rebuildLabelLookup();
         });
     }
