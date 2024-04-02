@@ -14,7 +14,7 @@ export function getAttributeByAttributeId(projectId: string, attributeId: string
 }
 
 export function getCheckRenameLabel(projectId: string, labelId: string, newName: string, onResult: (result: any) => void) {
-    const finalUrl = `${projectSettingEndpoint}/${projectId}/check-rename-label/?label_id=${labelId}&new_name=${newName}`;
+    const finalUrl = `${projectSettingEndpoint}/${projectId}/check-rename-label?label_id=${labelId}&new_name=${newName}`;
     jsonFetchWrapper(finalUrl, FetchType.GET, onResult);
 }
 
@@ -33,4 +33,9 @@ export function prepareRecordExport(projectId: string, options: {
 export function createLabel(projectId: string, labelName: string, labelingTaskId: string, labelColor: string, onResult: (result: any) => void) {
     const finalUrl = `${projectSettingEndpoint}/${projectId}/create-label`;
     jsonFetchWrapper(finalUrl, FetchType.POST, onResult, JSON.stringify({ labelName, labelingTaskId, labelColor }));
+}
+
+export function getRecordByRecordId(projectId: string, recordId: string, onResult: (result: any) => void) {
+    const finalUrl = `${projectSettingEndpoint}/${projectId}/record-by-record-id?record_id=${recordId}`;
+    jsonFetchWrapper(finalUrl, FetchType.GET, onResult);
 }
