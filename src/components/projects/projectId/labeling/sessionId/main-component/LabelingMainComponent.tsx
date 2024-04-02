@@ -15,7 +15,6 @@ import { useDispatch, useSelector } from "react-redux";
 import style from "@/src/styles/components/projects/projectId/labeling.module.css";
 import NavigationBarTop from "./NavigationBarTop";
 import NavigationBarBottom from "./NavigationBarBottom";
-import { GET_RECORD_BY_RECORD_ID } from "@/src/services/gql/queries/project-setting";
 import { combineLatest } from "rxjs";
 import LabelingSuiteTaskHeader from "../sub-components/LabelingSuiteTaskHeader";
 import LabelingSuiteOverviewTable from "../sub-components/LabelingSuiteOverviewTable";
@@ -32,6 +31,7 @@ import { getAllComments } from "@/src/services/base/comment";
 import { getAttributes } from "@/src/services/base/attribute";
 import { getLabelingTasksByProjectId } from "@/src/services/base/project";
 import { getAvailableLinks, getHuddleData, getTokenizedRecord } from "@/src/services/base/labeling";
+import { getRecordByRecordId } from "@/src/services/base/project-setting";
 
 const SETTINGS_KEY = 'labelingSettings';
 
@@ -53,7 +53,6 @@ export default function LabelingMainComponent() {
     const [absoluteWarning, setAbsoluteWarning] = useState(null);
     const [lockedLink, setLockedLink] = useState(false);
 
-    const [refetchRecordByRecordId] = useLazyQuery(GET_RECORD_BY_RECORD_ID, { fetchPolicy: 'no-cache' });
     const [refetchRla] = useLazyQuery(GET_RECORD_LABEL_ASSOCIATIONS, { fetchPolicy: 'network-only' });
     const [refetchLinkLocked] = useLazyQuery(LINK_LOCKED, { fetchPolicy: "no-cache" });
 
@@ -160,11 +159,12 @@ export default function LabelingMainComponent() {
             getTokenizedRecord(SessionManager.currentRecordId, (res) => {
                 dispatch(updateRecordRequests('token', res.data.tokenizeRecord));
             });
+            getRecordByRecordId(projectId, SessionManager.currentRecordId, (res) => {
+                dispatch(updateRecordRequests('record', res.data.recordByRecordId));
+            });
             combineLatest([
-                refetchRecordByRecordId({ variables: { projectId, recordId: SessionManager.currentRecordId } }),
                 refetchRla({ variables: { projectId, recordId: SessionManager.currentRecordId } })
-            ]).subscribe(([record, rla]) => {
-                dispatch(updateRecordRequests('record', record.data.recordByRecordId));
+            ]).subscribe(([rla]) => {
                 const rlas = rla['data']?.['recordByRecordId']?.['recordLabelAssociations']['edges'].map(e => e.node);
                 dispatch(updateRecordRequests('rla', prepareRLADataForRole(rlas, user, userDisplayId, userDisplayRole)));
             });
