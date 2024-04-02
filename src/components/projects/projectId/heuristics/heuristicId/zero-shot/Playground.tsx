@@ -16,6 +16,7 @@ import { useDispatch, useSelector } from "react-redux";
 import ZeroShotExecution from "./ZeroShotExecution";
 import WhySoLongModal from "./WhySoLongModal";
 import { PlaygroundProps } from "@/src/types/components/projects/projectId/heuristics/heuristicId/zero-shot";
+import { getZeroShotText } from "@/src/services/base/zero-shot";
 
 export default function Playground(props: PlaygroundProps) {
     const dispatch = useDispatch();
@@ -28,8 +29,6 @@ export default function Playground(props: PlaygroundProps) {
     const [customLabels, setCustomLabels] = useState<string>("");
     const [testerRequestedSomething, setTesterRequestedSomething] = useState<boolean>(false);
     const [singleLineTesterResult, setSingleLineTesterResult] = useState<string[]>([]);
-
-    const [refetchZeroShotText] = useLazyQuery(GET_ZERO_SHOT_TEXT, { fetchPolicy: 'network-only' });
 
     function runZeroShotTest() {
         if (testInput.length == 0) return;
@@ -45,11 +44,7 @@ export default function Playground(props: PlaygroundProps) {
         if (!labels.length) return;
         setTesterRequestedSomething(true);
         setSingleLineTesterResult([]);
-        refetchZeroShotText({
-            variables: {
-                projectId: projectId, informationSourceId: currentHeuristic.id, config: currentHeuristic.zeroShotSettings.targetConfig, text: testInput, runIndividually: currentHeuristic.zeroShotSettings.runIndividually, labels: JSON.stringify(labels)
-            }
-        }).then(res => {
+        getZeroShotText(projectId, currentHeuristic.id, currentHeuristic.zeroShotSettings.targetConfig, testInput, currentHeuristic.zeroShotSettings.runIndividually, labels, (res) => {
             const labels = labelingTasks.find(task => task.id == currentHeuristic.labelingTaskId).labels
             setSingleLineTesterResult(postProcessZeroShotText(res.data['zeroShotText'], labels).labels);
             setTesterRequestedSomething(false);

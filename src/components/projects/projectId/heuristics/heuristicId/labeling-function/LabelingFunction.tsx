@@ -3,8 +3,7 @@ import HeuristicsLayout from "../shared/HeuristicsLayout";
 import { useDispatch, useSelector } from "react-redux";
 import { selectProjectId } from "@/src/reduxStore/states/project";
 import { useCallback, useEffect, useState } from "react";
-import { useLazyQuery, useMutation } from "@apollo/client";
-import { GET_LABELING_FUNCTION_ON_10_RECORDS } from "@/src/services/gql/queries/heuristics";
+import { useMutation } from "@apollo/client";
 import { selectHeuristic, setActiveHeuristics, updateHeuristicsState } from "@/src/reduxStore/states/pages/heuristics";
 import { postProcessCurrentHeuristic, postProcessLastTaskLogs } from "@/src/util/components/projects/projectId/heuristics/heuristicId/heuristics-details-helper";
 import { Tooltip } from "@nextui-org/react";
@@ -39,7 +38,7 @@ import { parseContainerLogsData } from "@/submodules/javascript-functions/logs-p
 import { useWebsocket } from "@/src/services/base/web-sockets/useWebsocket";
 import { getAllComments } from "@/src/services/base/comment";
 import { getLabelingTasksByProjectId } from "@/src/services/base/project";
-import { getHeuristicByHeuristicId, getPayloadByPayloadId } from "@/src/services/base/heuristic";
+import { getHeuristicByHeuristicId, getLabelingFunctionOn10Records, getPayloadByPayloadId } from "@/src/services/base/heuristic";
 
 export default function LabelingFunction() {
     const dispatch = useDispatch();
@@ -60,7 +59,6 @@ export default function LabelingFunction() {
     const [runOn10IsRunning, setRunOn10IsRunning] = useState(false);
 
     const [updateHeuristicMut] = useMutation(UPDATE_INFORMATION_SOURCE);
-    const [refetchRunOn10] = useLazyQuery(GET_LABELING_FUNCTION_ON_10_RECORDS, { fetchPolicy: "no-cache" });
 
     useEffect(() => {
         if (!projectId) return;
@@ -139,10 +137,10 @@ export default function LabelingFunction() {
         });
     }
 
-    function getLabelingFunctionOn10Records() {
+    function executeLabelingFunctionOn10Records() {
         setDisplayLogWarning(true);
         setRunOn10IsRunning(true);
-        refetchRunOn10({ variables: { projectId: projectId, informationSourceId: currentHeuristic.id } }).then((res) => {
+        getLabelingFunctionOn10Records(projectId, currentHeuristic.id, (res) => {
             setRunOn10IsRunning(false);
             setSampleRecords(postProcessSampleRecords(res['data']['getLabelingFunctionOn10Records'], labelingTasks, currentHeuristic.labelingTaskId));
             setLastTaskLogs(parseContainerLogsData(res['data']['getLabelingFunctionOn10Records']['containerLogs']))
@@ -276,7 +274,7 @@ export default function LabelingFunction() {
                                 selectedOption={(option: any) => setSelectedAttribute(option)} />
                         </div>
                         <Tooltip content={selectedAttribute == null ? TOOLTIPS_DICT.LABELING_FUNCTION.SELECT_ATTRIBUTE : TOOLTIPS_DICT.LABELING_FUNCTION.RUN_ON_10} color="invert" placement="left">
-                            <button disabled={selectedAttribute == null} onClick={getLabelingFunctionOn10Records}
+                            <button disabled={selectedAttribute == null} onClick={executeLabelingFunctionOn10Records}
                                 className="bg-white text-gray-700 text-xs font-semibold px-4 py-2 rounded-md border border-gray-300 hover:bg-gray-50 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed">
                                 Run on 10
                             </button>
