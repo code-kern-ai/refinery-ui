@@ -3,14 +3,12 @@ import ModalUpload from "@/src/components/shared/upload/ModalUpload";
 import { openModal } from "@/src/reduxStore/states/modal";
 import { selectProjectId } from "@/src/reduxStore/states/project";
 import { setUploadFileType } from "@/src/reduxStore/states/upload";
-import { EXPORT_LIST } from "@/src/services/gql/queries/lookup-lists";
 import { LookupListOperationsProps } from "@/src/types/components/projects/projectId/lookup-lists";
 import { DownloadState } from "@/src/types/components/projects/projectId/settings/project-export";
 import { ModalEnum } from "@/src/types/shared/modal";
 import { UploadFileType } from "@/src/types/shared/upload";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
 import { downloadByteData } from "@/submodules/javascript-functions/export";
-import { useLazyQuery, useMutation } from "@apollo/client";
 import { Tooltip } from "@nextui-org/react";
 import { IconClipboard, IconClipboardOff, IconDownload, IconUpload } from "@tabler/icons-react";
 import { useRouter } from "next/router";
@@ -19,6 +17,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { timer } from "rxjs";
 import PasteLookupListModal from "./PasteLookupListModal";
 import RemoveLookupListModal from "./RemoveLookupListModal";
+import { getExportLookupList } from "@/src/services/base/lookup-lists";
 
 const BASE_OPTIONS = { reloadOnFinish: true, closeModalOnClick: true, isModal: true, knowledgeBaseId: null };
 
@@ -31,17 +30,15 @@ export default function LookupListOperations(props: LookupListOperationsProps) {
     const [downloadMessage, setDownloadMessage] = useState<DownloadState>(DownloadState.NONE);
     const [uploadOptions, setUploadOptions] = useState(BASE_OPTIONS);
 
-    const [refetchExportList] = useLazyQuery(EXPORT_LIST, { fetchPolicy: 'no-cache' });
-
     useEffect(() => {
         setUploadOptions({ ...BASE_OPTIONS, knowledgeBaseId: router.query.lookupListId });
     }, [router.query.lookupListId]);
 
     function requestFileExport(): void {
         setDownloadMessage(DownloadState.PREPARATION);
-        refetchExportList({ variables: { projectId: projectId, listId: router.query.lookupListId } }).then((res) => {
+        getExportLookupList(projectId, router.query.lookupListId, (res) => {
             setDownloadMessage(DownloadState.DOWNLOAD);
-            const downloadContent = JSON.parse(JSON.parse(res.data['exportKnowledgeBase']));
+            const downloadContent = JSON.parse(res.data['exportKnowledgeBase']);
             downloadByteData(downloadContent, 'lookup_list.json');
             const timerTime = Math.max(2000, res.data['exportKnowledgeBase'].length * 0.0001);
             timer(timerTime).subscribe(() => setDownloadMessage(DownloadState.NONE));
