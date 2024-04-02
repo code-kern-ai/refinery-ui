@@ -1,5 +1,5 @@
-import { FetchType, jsonFetchWrapper } from "../../../submodules/javascript-functions/basic-fetch";
-import { BACKEND_BASE_URI } from "../../../src/services/base/_settings";
+import { FetchType, jsonFetchWrapper } from "@/submodules/javascript-functions/basic-fetch";
+import { BACKEND_BASE_URI } from "./_settings";
 
 export const projectSettingEndpoint = `${BACKEND_BASE_URI}/api/v1/project-setting`;
 
