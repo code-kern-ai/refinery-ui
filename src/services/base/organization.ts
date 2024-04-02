@@ -32,3 +32,8 @@ export function getAllUsersWithRecordCount(projectId: string, onResult: (result:
     const finalUrl = `${organizationEndpoint}/${projectId}/all-users-with-record-count`;
     jsonFetchWrapper(finalUrl, FetchType.GET, onResult);
 }
+
+export function getCanCreateLocalOrg(onResult: (result: any) => void) {
+    const finalUrl = `${organizationEndpoint}/can-create-local-org`;
+    jsonFetchWrapper(finalUrl, FetchType.GET, onResult);
+}

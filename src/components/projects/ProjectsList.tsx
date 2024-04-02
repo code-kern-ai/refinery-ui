@@ -20,7 +20,7 @@ import { setDataSlices, setFullSearchStore, setSearchGroupsStore } from "@/src/r
 import { SearchGroup } from "@/submodules/javascript-functions/enums/enums";
 import { useWebsocket } from "@/src/services/base/web-sockets/useWebsocket";
 import { getAllProjects } from "@/src/services/base/project";
-import { getOverviewStats } from "@/src/services/base/organization";
+import { getCanCreateLocalOrg, getOverviewStats } from "@/src/services/base/organization";
 
 export default function ProjectsList() {
     const router = useRouter();
@@ -36,7 +36,6 @@ export default function ProjectsList() {
     const [canCreateOrg, setCanCreateOrg] = useState(false);
     const [dataLoaded, setDataLoaded] = useState(false);
 
-    const [refetchCanCreateOrg] = useLazyQuery(GET_CAN_CREATE_LOCAL_ORG, { fetchPolicy: "no-cache" });
     const [createOrgMut] = useMutation(CREATE_ORGANIZATION);
     const [addUserToOrgMut] = useMutation(ADD_USER_TO_ORGANIZATION);
 
@@ -89,7 +88,7 @@ export default function ProjectsList() {
             setDataLoaded(true);
             return;
         }
-        refetchCanCreateOrg().then((res) => {
+        getCanCreateLocalOrg(res => {
             const canCreate = res.data["canCreateLocalOrg"]
             setCanCreateOrg(canCreate);
             if (!canCreate) return;
