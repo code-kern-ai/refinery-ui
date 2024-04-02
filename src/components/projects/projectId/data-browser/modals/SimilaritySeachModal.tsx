@@ -3,7 +3,7 @@ import { selectModal } from "@/src/reduxStore/states/modal";
 import { selectActiveSearchParams, selectSimilaritySearch, selectUniqueValuesDict, setRecordsInDisplay, setSearchRecordsExtended } from "@/src/reduxStore/states/pages/data-browser";
 import { selectEmbeddings, selectLabelingTasksAll, selectOnAttributeEmbeddings, selectUsableAttributes } from "@/src/reduxStore/states/pages/settings";
 import { selectProjectId } from "@/src/reduxStore/states/project";
-import { SEARCH_SIMILAR_RECORDS } from "@/src/services/gql/queries/data-browser";
+import { getRecordsBySimilarity } from "@/src/services/base/data-browser";
 import { FilterIntegrationOperator, SearchOperator } from "@/src/types/components/projects/projectId/data-browser/search-operators";
 import { Embedding } from "@/src/types/components/projects/projectId/settings/embeddings";
 import { DataTypeEnum } from "@/src/types/shared/general";
@@ -42,18 +42,10 @@ export default function SimilaritySearchModal() {
     const [operatorsDict, setOperatorsDict] = useState<{ [key: string]: string[] }>({});
     const [tooltipsDict, setTooltipsDict] = useState<{ [key: string]: string[] }>({});
 
-    const [refetchSimilarRecords] = useLazyQuery(SEARCH_SIMILAR_RECORDS, { fetchPolicy: 'network-only' });
 
     function getSimilarRecords(hasFilter: boolean = false) {
-        refetchSimilarRecords({
-            variables: {
-                projectId: projectId,
-                embeddingId: selectedEmbedding.id,
-                recordId: modalSS.recordId,
-                attFilter: hasFilter ? prepareAttFilter(filterAttributesForm, attributes) : null,
-                recordSubKey: null
-            }
-        }).then((res) => {
+        const attFilter = hasFilter ? prepareAttFilter(filterAttributesForm, attributes) : null;
+        getRecordsBySimilarity(projectId, selectedEmbedding.id, modalSS.recordId, attFilter, null, (res) => {
             dispatch(setSearchRecordsExtended(postProcessRecordsExtended(res.data['searchRecordsBySimilarity'], labelingTasks)));
             dispatch(setRecordsInDisplay(true));
         });

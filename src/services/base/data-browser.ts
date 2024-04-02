@@ -34,3 +34,8 @@ export function createDataSlice(projectId: string, options: {
     const finalUrl = `${dataBrowserEndpoint}/${projectId}/create-data-slice`;
     jsonFetchWrapper(finalUrl, FetchType.POST, onResult, JSON.stringify({ options }));
 }
+
+export function getRecordsBySimilarity(projectId: string, embeddingId: string, recordId: string, attFilter: string, recordSubKey: number, onResult: (result: any) => void) {
+    const finalUrl = `${dataBrowserEndpoint}/${projectId}/search-records-by-similarity`;
+    jsonFetchWrapper(finalUrl, FetchType.POST, onResult, JSON.stringify({ embeddingId, recordId, attFilter, recordSubKey }));
+}
