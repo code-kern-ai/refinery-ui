@@ -4,8 +4,6 @@ import { useDispatch, useSelector } from "react-redux";
 import { closeModal, selectModal } from "@/src/reduxStore/states/modal";
 import { useCallback, useEffect, useState } from "react";
 import { selectProjectId } from "@/src/reduxStore/states/project";
-import { PREPARE_RECORD_EXPORT } from "@/src/services/gql/queries/project-setting";
-import { useLazyQuery } from "@apollo/client";
 import { ExportEnums, ExportFileType, ExportFormat, ExportPreset, ExportProps, ExportRowType } from "@/src/types/shared/export";
 import { enumToArray, jsonCopy } from "@/submodules/javascript-functions/general";
 import { caseType } from "@/submodules/javascript-functions/case-types-parser";
@@ -28,7 +26,7 @@ import CryptedField from "../crypted-field/CryptedField";
 import { extendArrayElementsByUniqueId } from "@/submodules/javascript-functions/id-prep";
 import { useWebsocket } from "@/src/services/base/web-sockets/useWebsocket";
 import { getRecordExportFromData } from "@/src/services/base/project";
-import { getLastRecordExportCredentials } from "@/src/services/base/project-setting";
+import { getLastRecordExportCredentials, prepareRecordExport } from "@/src/services/base/project-setting";
 
 export default function ExportRecordsModal(props: ExportProps) {
     const dispatch = useDispatch();
@@ -43,8 +41,6 @@ export default function ExportRecordsModal(props: ExportProps) {
     const [downloadState, setDownloadState] = useState<DownloadState>(DownloadState.NONE);
     const [key, setKey] = useState('');
     const [prepareErrors, setPrepareErrors] = useState<string[]>([]);
-
-    const [refetchPrepareRecordExport] = useLazyQuery(PREPARE_RECORD_EXPORT, { fetchPolicy: "no-cache" });
 
     useEffect(() => {
         if (!modal || !modal.open) return;
@@ -216,7 +212,7 @@ export default function ExportRecordsModal(props: ExportProps) {
         setDownloadState(DownloadState.PREPARATION);
         let keyToSend = key;
         if (!keyToSend) keyToSend = null;
-        refetchPrepareRecordExport({ variables: { projectId: projectId, exportOptions: jsonString, key: keyToSend } }).then((res) => {
+        prepareRecordExport(projectId, { exportOptions: jsonString, key: keyToSend }, (res) => {
             if (res.data['prepareRecordExport'] != "") {
                 ExportHelper.error.push("Something went wrong in the backend:");
                 ExportHelper.error.push(res.data['prepareRecordExport']);

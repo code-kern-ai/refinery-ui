@@ -22,3 +22,10 @@ export function getLastRecordExportCredentials(projectId: string, onResult: (res
     const finalUrl = `${projectSettingEndpoint}/${projectId}/last-record-export-credentials`;
     jsonFetchWrapper(finalUrl, FetchType.GET, onResult);
 }
+
+export function prepareRecordExport(projectId: string, options: {
+    exportOptions: string, key: string | null
+}, onResult: (result: any) => void) {
+    const finalUrl = `${projectSettingEndpoint}/${projectId}/prepare-record-export`;
+    jsonFetchWrapper(finalUrl, FetchType.POST, onResult, JSON.stringify({ options }));
+}
