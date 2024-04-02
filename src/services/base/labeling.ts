@@ -15,3 +15,8 @@ export function getHuddleData(projectId: string, options: {
     const finalUrl = `${labelingEndpoint}/${projectId}/huddle-data`;
     jsonFetchWrapper(finalUrl, FetchType.POST, onResult, JSON.stringify(options));
 }
+
+export function getTokenizedRecord(recordId: string, onResult: (result: any) => void) {
+    const finalUrl = `${labelingEndpoint}/tokenized-record`;
+    jsonFetchWrapper(finalUrl, FetchType.POST, onResult, JSON.stringify({ recordId }));
+}
