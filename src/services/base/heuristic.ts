@@ -27,3 +27,8 @@ export function getLabelingFunctionOn10Records(projectId: string, heuristicId: s
     const finalUrl = `${heuristicEndpoint}/${projectId}/${heuristicId}/lf-on-10-records`;
     jsonFetchWrapper(finalUrl, FetchType.GET, onResult);
 }
+
+export function getAccessLink(projectId: string, linkId: string, onResult: (result: any) => void) {
+    const finalUrl = `${heuristicEndpoint}/${projectId}/access-link?link_id=${linkId}`;
+    jsonFetchWrapper(finalUrl, FetchType.GET, onResult);
+}
