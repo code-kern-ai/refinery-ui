@@ -6,7 +6,8 @@ import { selectEmbeddings } from "@/src/reduxStore/states/pages/settings";
 import { selectProjectId } from "@/src/reduxStore/states/project";
 import { downloadFile } from "@/src/services/base/s3-service";
 import { useWebsocket } from "@/src/services/base/web-sockets/useWebsocket";
-import { GET_PROJECT_SIZE, LAST_PROJECT_EXPORT_CREDENTIALS, PREPARE_PROJECT_EXPORT } from "@/src/services/gql/queries/project-setting";
+import { GET_PROJECT_SIZE, PREPARE_PROJECT_EXPORT } from "@/src/services/gql/queries/project-setting";
+import { getLastProjectExportCredentials } from '@/src/services/base/project';
 import { DownloadState, ProjectSize } from "@/src/types/components/projects/projectId/settings/project-export";
 import { CurrentPage, CurrentPageSubKey } from "@/src/types/shared/general";
 import { ModalEnum } from "@/src/types/shared/modal";
@@ -17,7 +18,6 @@ import { formatBytes } from "@/submodules/javascript-functions/general";
 import { useLazyQuery } from "@apollo/client";
 import { Tooltip } from "@nextui-org/react";
 import { IconDownload, IconInfoCircle } from "@tabler/icons-react";
-import { useRouter } from "next/router";
 import { Fragment, useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { timer } from "rxjs";
@@ -37,7 +37,6 @@ export default function ProjectSnapshotExportModal() {
     const [key, setKey] = useState('');
 
     const [refetchProjectSize] = useLazyQuery(GET_PROJECT_SIZE, { fetchPolicy: "network-only" });
-    const [refetchLastProjectExportCredentials] = useLazyQuery(LAST_PROJECT_EXPORT_CREDENTIALS, { fetchPolicy: "no-cache" });
     const [refetchProjectExport] = useLazyQuery(PREPARE_PROJECT_EXPORT, { fetchPolicy: "network-only" });
 
     useEffect(() => {
@@ -65,7 +64,7 @@ export default function ProjectSnapshotExportModal() {
     }
 
     function requestProjectExportCredentials() {
-        refetchLastProjectExportCredentials({ variables: { projectId: projectId } }).then((res) => {
+        getLastProjectExportCredentials(projectId, (res) => {
             const projectExportCredentials = res.data['lastProjectExportCredentials'];
             if (!projectExportCredentials) setProjectExportCredentials(null);
             else {

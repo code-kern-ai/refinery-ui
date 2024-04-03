@@ -135,3 +135,8 @@ export function getAccessTokens(projectId: string, onResult: (result: any) => vo
     const finalUrl = `${projectEndpoint}/${projectId}/access-tokens`;
     jsonFetchWrapper(finalUrl, FetchType.GET, onResult);
 }
+
+export function getLastProjectExportCredentials(projectId: string, onResult: (result: any) => void) {
+    const finalUrl = `${projectEndpoint}/${projectId}/last-export-credentials`;
+    jsonFetchWrapper(finalUrl, FetchType.GET, onResult);
+}
