@@ -44,3 +44,8 @@ export function getProjectSize(projectId: string, onResult: (result: any) => voi
     const finalUrl = `${projectSettingEndpoint}/${projectId}/project-size`;
     jsonFetchWrapper(finalUrl, FetchType.GET, onResult);
 }
+
+export function createLabels(projectId: string, labelingTaskId: string, labels: string[], onResult: (result: any) => void) {
+    const finalUrl = `${projectSettingEndpoint}/${projectId}/create-labels`;
+    jsonFetchWrapper(finalUrl, FetchType.POST, onResult, JSON.stringify({ labelingTaskId, labels }));
+}
