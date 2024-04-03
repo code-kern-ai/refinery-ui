@@ -1,11 +1,9 @@
 import { openModal, setModalStates } from "@/src/reduxStore/states/modal";
 import { selectProjectId } from "@/src/reduxStore/states/project";
-import { GET_ALL_PERSONAL_ACCESS_TOKENS } from "@/src/services/gql/queries/project-admin";
 import { PersonalAccessToken } from "@/src/types/components/projects/projectId/project-admin";
 import { ModalEnum } from "@/src/types/shared/modal";
 import { postProcessPersonalAccessToken } from "@/src/util/components/projects/projectId/project-admin-helper";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
-import { useLazyQuery } from "@apollo/client"
 import { Tooltip } from "@nextui-org/react";
 import { IconPlus, IconTrash } from "@tabler/icons-react";
 import { useCallback, useEffect, useState } from "react";
@@ -16,6 +14,7 @@ import { CurrentPage } from "@/src/types/shared/general";
 import { useRouter } from "next/router";
 import { selectIsAdmin } from "@/src/reduxStore/states/general";
 import { useWebsocket } from "@/src/services/base/web-sockets/useWebsocket";
+import { getAccessTokens } from "@/src/services/base/project";
 
 export default function ProjectAdmin() {
     const router = useRouter();
@@ -25,8 +24,6 @@ export default function ProjectAdmin() {
     const isAdmin = useSelector(selectIsAdmin);
 
     const [accessTokens, setAccessTokens] = useState<PersonalAccessToken[]>([]);
-
-    const [refetchAccessTokens] = useLazyQuery(GET_ALL_PERSONAL_ACCESS_TOKENS, { fetchPolicy: "network-only" });
 
     useEffect(() => {
         if (!projectId) return;
@@ -41,7 +38,7 @@ export default function ProjectAdmin() {
     }, [projectId]);
 
     function refetchAccessTokensAndProcess() {
-        refetchAccessTokens({ variables: { projectId: projectId } }).then((res) => {
+        getAccessTokens(projectId, (res) => {
             setAccessTokens(postProcessPersonalAccessToken(res.data['allPersonalAccessTokens']));
         });
     }
