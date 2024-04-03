@@ -10,11 +10,11 @@ import { copyToClipboard, jsonCopy } from "@/submodules/javascript-functions/gen
 import style from '@/src/styles/shared/bricks-integrator.module.css';
 import { Fragment, useEffect } from "react";
 import { selectLabelingTasksAll } from "@/src/reduxStore/states/pages/settings";
-import { CREATE_LABELS } from "@/src/services/gql/queries/project-setting";
 import { useMutation } from "@apollo/client";
 import { selectProjectId } from "@/src/reduxStore/states/project";
 import { CREATE_TASK_AND_LABELS } from "@/src/services/gql/mutations/project-settings";
 import Dropdown2 from "@/submodules/react-components/components/Dropdown2";
+import { createLabels } from "@/src/services/base/project-setting";
 
 export default function PageIntegration(props: PageIntegrationProps) {
     const dispatch = useDispatch();
@@ -24,7 +24,6 @@ export default function PageIntegration(props: PageIntegrationProps) {
     const projectId = useSelector(selectProjectId);
     const labelingTasksBricks = useSelector(selectBricksIntegratorLabelingTasks);
 
-    const [createLabelsMut] = useMutation(CREATE_LABELS);
     const [createTaskAndLabelsMut] = useMutation(CREATE_TASK_AND_LABELS);
 
     useEffect(() => {
@@ -65,7 +64,7 @@ export default function PageIntegration(props: PageIntegrationProps) {
     function addMissingLabelsToTask() {
         if (!props.labelingTaskId) return;
         const missing = BricksCodeParser.expected.expectedTaskLabels.filter(x => !x.exists).map(x => x.label);
-        createLabelsMut({ variables: { projectId: projectId, labelingTaskId: props.labelingTaskId, labels: missing } }).then((res) => {
+        createLabels(projectId, props.labelingTaskId, missing, () => {
             props.selectDifferentTask(props.labelingTaskId)
         });
     }

@@ -4,9 +4,10 @@ import Modal from "@/src/components/shared/modal/Modal";
 import { closeModal, selectModal } from "@/src/reduxStore/states/modal";
 import { selectEmbeddings } from "@/src/reduxStore/states/pages/settings";
 import { selectProjectId } from "@/src/reduxStore/states/project";
+import { getProjectSize } from "@/src/services/base/project-setting";
 import { downloadFile } from "@/src/services/base/s3-service";
 import { useWebsocket } from "@/src/services/base/web-sockets/useWebsocket";
-import { GET_PROJECT_SIZE, PREPARE_PROJECT_EXPORT } from "@/src/services/gql/queries/project-setting";
+import { PREPARE_PROJECT_EXPORT } from "@/src/services/gql/queries/project-setting";
 import { getLastProjectExportCredentials } from '@/src/services/base/project';
 import { DownloadState, ProjectSize } from "@/src/types/components/projects/projectId/settings/project-export";
 import { CurrentPage, CurrentPageSubKey } from "@/src/types/shared/general";
@@ -36,7 +37,6 @@ export default function ProjectSnapshotExportModal() {
     const [downloadPrepareMessage, setDownloadPrepareMessage] = useState(null);
     const [key, setKey] = useState('');
 
-    const [refetchProjectSize] = useLazyQuery(GET_PROJECT_SIZE, { fetchPolicy: "network-only" });
     const [refetchProjectExport] = useLazyQuery(PREPARE_PROJECT_EXPORT, { fetchPolicy: "network-only" });
 
     useEffect(() => {
@@ -57,7 +57,7 @@ export default function ProjectSnapshotExportModal() {
     }, [projectExportArray]);
 
     function requestProjectSize() {
-        refetchProjectSize({ variables: { projectId: projectId } }).then((res) => {
+        getProjectSize(projectId, (res) => {
             setProjectSize(res.data['projectSize']);
             setProjectExportArray(postProcessingFormGroups(res.data['projectSize'], embeddings));
         });
