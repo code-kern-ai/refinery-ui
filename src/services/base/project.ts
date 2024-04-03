@@ -151,3 +151,8 @@ export function getNotifications(userFilter: boolean, limit: number, onResult: (
     const finalUrl = `${projectEndpoint}/notifications?user_filter=${userFilter}&limit=${limit}&project_filter=${project_filter}&level_filter=${level_filter}&type_filter=${type_filter}`;
     jsonFetchWrapper(finalUrl, FetchType.GET, onResult);
 }
+
+export function getUploadTaskById(projectId: string, uploadTaskId: string, onResult: (result: any) => void) {
+    const finalUrl = `${projectEndpoint}/${projectId}/upload-task-by-id?upload_task_id=${uploadTaskId}`;
+    return jsonFetchWrapper(finalUrl, FetchType.GET, onResult);
+}
