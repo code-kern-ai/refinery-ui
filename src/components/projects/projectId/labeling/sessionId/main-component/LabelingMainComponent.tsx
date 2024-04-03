@@ -1,7 +1,7 @@
 import { selectAllUsers, selectUser, setBricksIntegrator, setComments } from "@/src/reduxStore/states/general";
 import { setAvailableLinks, updateRecordRequests, setSelectedLink, selectRecordRequestsRla, updateUsers, setSettings, selectSettings, setUserDisplayId, selectRecordRequestsRecord, initOnLabelPageDestruction, selectUserDisplayId, selectDisplayUserRole, setDisplayUserRole } from "@/src/reduxStore/states/pages/labeling";
 import { selectProjectId } from "@/src/reduxStore/states/project"
-import { GET_RECORD_LABEL_ASSOCIATIONS, LINK_LOCKED } from "@/src/services/gql/queries/labeling";
+import { GET_RECORD_LABEL_ASSOCIATIONS } from "@/src/services/gql/queries/labeling";
 import { LabelingLinkType } from "@/src/types/components/projects/projectId/labeling/labeling-main-component";
 import { UserRole } from "@/src/types/shared/sidebar";
 import { LabelingSuiteManager } from "@/src/util/classes/labeling/manager";
@@ -54,7 +54,6 @@ export default function LabelingMainComponent() {
     const [lockedLink, setLockedLink] = useState(false);
 
     const [refetchRla] = useLazyQuery(GET_RECORD_LABEL_ASSOCIATIONS, { fetchPolicy: 'network-only' });
-    const [refetchLinkLocked] = useLazyQuery(LINK_LOCKED, { fetchPolicy: "no-cache" });
 
     useEffect(() => {
         if (!projectId || !router.query) return;
