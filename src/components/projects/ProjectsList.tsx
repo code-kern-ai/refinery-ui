@@ -13,7 +13,6 @@ import ProjectCard from "./ProjectCard";
 import { GET_CAN_CREATE_LOCAL_ORG } from "@/src/services/gql/queries/organizations";
 import { ADD_USER_TO_ORGANIZATION, CREATE_ORGANIZATION } from "@/src/services/gql/mutations/organizations";
 import style from "@/src/styles/components/projects/projects-list.module.css";
-import { useRouter } from "next/router";
 import AdminDeleteProjectModal from "./AdminDeleteProjectModal";
 import { setAllAttributes, setAllEmbeddings, setLabelingTasksAll } from "@/src/reduxStore/states/pages/settings";
 import { setOverviewFilters } from "@/src/reduxStore/states/tmp";
@@ -22,7 +21,6 @@ import { SearchGroup } from "@/submodules/javascript-functions/enums/enums";
 import { useWebsocket } from "@/src/services/base/web-sockets/useWebsocket";
 
 export default function ProjectsList() {
-    const router = useRouter();
     const dispatch = useDispatch();
 
     const organizationInactive = useSelector(selectInactiveOrganization);
@@ -219,7 +217,7 @@ export default function ProjectsList() {
                             <div className="ml-4">
                                 <ButtonsContainer />
                             </div>
-                            <div className="h-screen overflow-y-auto my-3">
+                            <div className="h-full overflow-y-auto my-3">
                                 <div className={style.scrollableSize}>
                                     {projects && projects.map((project: Project) => (
                                         <ProjectCard project={project} projectStatisticsById={projectStatisticsById} key={project.id}></ProjectCard>
