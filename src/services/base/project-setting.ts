@@ -39,3 +39,8 @@ export function getRecordByRecordId(projectId: string, recordId: string, onResul
     const finalUrl = `${projectSettingEndpoint}/${projectId}/record-by-record-id?record_id=${recordId}`;
     jsonFetchWrapper(finalUrl, FetchType.GET, onResult);
 }
+
+export function getProjectSize(projectId: string, onResult: (result: any) => void) {
+    const finalUrl = `${projectSettingEndpoint}/${projectId}/project-size`;
+    jsonFetchWrapper(finalUrl, FetchType.GET, onResult);
+}
