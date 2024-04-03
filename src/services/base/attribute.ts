@@ -14,3 +14,8 @@ export function getCheckCompositeKey(projectId: string, onResult: (result: any) 
     const finalUrl = `${attributeEndpoint}/${projectId}/check-composite-key`;
     jsonFetchWrapper(finalUrl, FetchType.GET, onResult);
 }
+
+export function getSampleRecords(projectId: string, attributeId: string, onResult: (result: any) => void) {
+    const finalUrl = `${attributeEndpoint}/${projectId}/${attributeId}/sample-records`;
+    jsonFetchWrapper(finalUrl, FetchType.GET, onResult);
+}
