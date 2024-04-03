@@ -30,3 +30,8 @@ export function deleteRecordById(projectId: string, recordId: string, onResult: 
     const finalUrl = `${labelingEndpoint}/${projectId}/${recordId}/record-by-id`;
     return jsonFetchWrapper(finalUrl, FetchType.DELETE, onResult);
 }
+
+export function getLinkLocked(projectId: string, linkRoute: string, onResult: (result: any) => void) {
+    const finalUrl = `${labelingEndpoint}/${projectId}/link-locked`;
+    jsonFetchWrapper(finalUrl, FetchType.POST, onResult, JSON.stringify(linkRoute));
+}

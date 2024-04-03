@@ -1,7 +1,7 @@
 import { selectAllUsers, selectUser, setBricksIntegrator, setComments } from "@/src/reduxStore/states/general";
 import { setAvailableLinks, updateRecordRequests, setSelectedLink, selectRecordRequestsRla, updateUsers, setSettings, selectSettings, setUserDisplayId, selectRecordRequestsRecord, initOnLabelPageDestruction, selectUserDisplayId, selectDisplayUserRole, setDisplayUserRole } from "@/src/reduxStore/states/pages/labeling";
 import { selectProjectId } from "@/src/reduxStore/states/project"
-import { GET_RECORD_LABEL_ASSOCIATIONS, LINK_LOCKED } from "@/src/services/gql/queries/labeling";
+import { GET_RECORD_LABEL_ASSOCIATIONS } from "@/src/services/gql/queries/labeling";
 import { LabelingLinkType } from "@/src/types/components/projects/projectId/labeling/labeling-main-component";
 import { UserRole } from "@/src/types/shared/sidebar";
 import { LabelingSuiteManager } from "@/src/util/classes/labeling/manager";
@@ -30,7 +30,7 @@ import { useWebsocket } from "@/src/services/base/web-sockets/useWebsocket";
 import { getAllComments } from "@/src/services/base/comment";
 import { getAttributes } from "@/src/services/base/attribute";
 import { getLabelingTasksByProjectId } from "@/src/services/base/project";
-import { getAvailableLinks, getHuddleData, getTokenizedRecord } from "@/src/services/base/labeling";
+import { getAvailableLinks, getHuddleData, getLinkLocked, getTokenizedRecord } from "@/src/services/base/labeling";
 import { getRecordByRecordId } from "@/src/services/base/project-setting";
 
 const SETTINGS_KEY = 'labelingSettings';
@@ -54,7 +54,6 @@ export default function LabelingMainComponent() {
     const [lockedLink, setLockedLink] = useState(false);
 
     const [refetchRla] = useLazyQuery(GET_RECORD_LABEL_ASSOCIATIONS, { fetchPolicy: 'network-only' });
-    const [refetchLinkLocked] = useLazyQuery(LINK_LOCKED, { fetchPolicy: "no-cache" });
 
     useEffect(() => {
         if (!projectId || !router.query) return;
@@ -89,7 +88,7 @@ export default function LabelingMainComponent() {
             dispatch(setDisplayUserRole(user.role));
             return;
         }
-        refetchLinkLocked({ variables: { projectId: projectId, linkRoute: router.asPath } }).then((result) => {
+        getLinkLocked(projectId, router.asPath, (result) => {
             const lockedLink = result['data']['linkLocked'];
             if (lockedLink) {
                 setAbsoluteWarning('This link is locked, contact your supervisor to request access');

@@ -1,6 +1,5 @@
 import { selectProjectId } from '@/src/reduxStore/states/project';
 import { CurrentPage } from '@/src/types/shared/general';
-import { useLazyQuery } from '@apollo/client';
 import { useCallback, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import ProjectOverviewHeader from './ProjectOverviewHeader';
@@ -9,7 +8,6 @@ import ProjectOverviewCards from './ProjectOverviewCards';
 import { ProjectStats } from '@/src/types/components/projects/projectId/project-overview/project-overview';
 import style from '@/src/styles/components/projects/projectId/project-overview.module.css';
 import { useRouter } from 'next/router';
-import { IS_RATS_TOKENIZAION_STILL_RUNNING } from '@/src/services/gql/queries/project-overview';
 import { postProcessLabelingTasks, postProcessLabelingTasksSchema } from '@/src/util/components/projects/projectId/settings/labeling-tasks-helper';
 import { selectLabelingTasksAll, setAllAttributes, setLabelingTasksAll } from '@/src/reduxStore/states/pages/settings';
 import { setDataSlices } from '@/src/reduxStore/states/pages/data-browser';
@@ -29,7 +27,7 @@ import { CommentType } from '@/src/types/shared/comments';
 import { CommentDataManager } from '@/src/util/classes/comments';
 import { useWebsocket } from '@/src/services/base/web-sockets/useWebsocket';
 import { getAllComments } from '@/src/services/base/comment';
-import { getConfidenceDistribution, getConfusionMatrix, getGeneralProjectStats, getInterAnnotatorMatrix, getLabelDistribution, getLabelingTasksByProjectId } from '@/src/services/base/project';
+import { getConfidenceDistribution, getConfusionMatrix, getGeneralProjectStats, getInterAnnotatorMatrix, getLabelDistribution, getLabelingTasksByProjectId, getRatsTokenization } from '@/src/services/base/project';
 import { getAttributes } from '@/src/services/base/attribute';
 import { getDataSlices } from '@/src/services/base/dataSlices';
 
@@ -54,8 +52,6 @@ export default function ProjectOverview() {
     const [interAnnotatorFormGroup, setInterAnnotatorFormGroup] = useState<any>({});
     const [interAnnotatorMatrix, setInterAnnotatorMatrix] = useState<any>(null);
     const [goldUserRequested, setGoldUserRequested] = useState<boolean>(false);
-
-    const [refetchRatsTokenization] = useLazyQuery(IS_RATS_TOKENIZAION_STILL_RUNNING, { fetchPolicy: "no-cache" });
 
     useEffect(() => {
         if (!projectId) return;
@@ -161,7 +157,7 @@ export default function ProjectOverview() {
         if (labelingTaskTaskType != LabelingTaskTaskType.INFORMATION_EXTRACTION) {
             setDisplayConfusion(true);
         } else {
-            refetchRatsTokenization({ variables: { projectId: projectId } }).then((res) => {
+            getRatsTokenization(projectId, (res) => {
                 const resFinal = res['data']['isRatsTokenizationStillRunning'];
                 setDisplayConfusion(!resFinal);
             });
