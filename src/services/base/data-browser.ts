@@ -1,5 +1,6 @@
 import { FetchType, jsonFetchWrapper } from "@/submodules/javascript-functions/basic-fetch";
 import { BACKEND_BASE_URI } from "./_settings";
+import { convertCamelToSnakeCase } from "@/submodules/javascript-functions/case-types-parser";
 
 export const dataBrowserEndpoint = `${BACKEND_BASE_URI}/api/v1/data-browser`;
 
@@ -44,5 +45,5 @@ export function updateDataSlice(projectId: string, options: {
     dataSliceId: string, static: boolean, filterRaw: string, filterData: string[]
 }, onResult: (result: any) => void) {
     const finalUrl = `${dataBrowserEndpoint}/${projectId}/update-data-slice`;
-    jsonFetchWrapper(finalUrl, FetchType.POST, onResult, JSON.stringify({ options }));
+    jsonFetchWrapper(finalUrl, FetchType.POST, onResult, JSON.stringify(convertCamelToSnakeCase(options)));
 }
