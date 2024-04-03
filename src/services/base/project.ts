@@ -1,5 +1,6 @@
 import { FetchType, jsonFetchWrapper } from "@/submodules/javascript-functions/basic-fetch";
 import { BACKEND_BASE_URI } from "./_settings";
+import { UploadType } from "@/src/types/shared/upload";
 
 export const projectEndpoint = `${BACKEND_BASE_URI}/api/v1/project`;
 
@@ -138,5 +139,15 @@ export function getAccessTokens(projectId: string, onResult: (result: any) => vo
 
 export function getLastProjectExportCredentials(projectId: string, onResult: (result: any) => void) {
     const finalUrl = `${projectEndpoint}/${projectId}/last-export-credentials`;
+    jsonFetchWrapper(finalUrl, FetchType.GET, onResult);
+}
+
+export function getUploadCredentialsAndId(projectId: string, fileName: string, fileType: string, fileImportOptions: string, uploadType: UploadType, key: string, onResult: (result: any) => void) {
+    const finalUrl = `${projectEndpoint}/${projectId}/upload-credentials-and-id`;
+    jsonFetchWrapper(finalUrl, FetchType.POST, onResult, JSON.stringify({ file_name: fileName, file_type: fileType, file_import_options: fileImportOptions, upload_type: uploadType, key }));
+}
+
+export function getNotifications(userFilter: boolean, limit: number, onResult: (result: any) => void, project_filter?: string[], level_filter?: string[], type_filter?: string[]) {
+    const finalUrl = `${projectEndpoint}/notifications?user_filter=${userFilter}&limit=${limit}&project_filter=${project_filter}&level_filter=${level_filter}&type_filter=${type_filter}`;
     jsonFetchWrapper(finalUrl, FetchType.GET, onResult);
 }

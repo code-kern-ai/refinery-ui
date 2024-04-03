@@ -13,7 +13,7 @@ import { CurrentPage, CurrentPageSubKey } from "@/src/types/shared/general";
 import { jsonCopy } from "@/submodules/javascript-functions/general";
 import { useRouter } from "next/router";
 import { extendAllProjects, removeFromAllProjectsById, selectAllProjects, selectProjectId } from "@/src/reduxStore/states/project";
-import { GET_UPLOAD_CREDENTIALS_AND_ID, GET_UPLOAD_TASK_BY_TASK_ID } from "@/src/services/gql/queries/projects";
+import { GET_UPLOAD_TASK_BY_TASK_ID } from "@/src/services/gql/queries/projects";
 import { UPLOAD_TOKENIZERS } from "@/src/util/constants";
 import { UploadHelper, ZIP_TYPE } from "@/src/util/classes/upload-helper";
 import CryptedField from "../crypted-field/CryptedField";
@@ -21,6 +21,7 @@ import { closeModal } from "@/src/reduxStore/states/modal";
 import { ModalEnum } from "@/src/types/shared/modal";
 import Dropdown2 from "@/submodules/react-components/components/Dropdown2";
 import { useWebsocket } from "@/src/services/base/web-sockets/useWebsocket";
+import { getUploadCredentialsAndId } from "@/src/services/base/project";
 
 export default function Upload(props: UploadProps) {
     const router = useRouter();
@@ -49,7 +50,6 @@ export default function Upload(props: UploadProps) {
     const [deleteProjectMut] = useMutation(DELETE_PROJECT);
     const [updateProjectTokenizerMut] = useMutation(UPDATE_PROJECT_TOKENIZER);
     const [updateProjectStatusMut] = useMutation(UPDATE_PROJECT_STATUS);
-    const [uploadCredentialsMut] = useLazyQuery(GET_UPLOAD_CREDENTIALS_AND_ID, { fetchPolicy: 'network-only' });
     const [getUploadTaskId] = useLazyQuery(GET_UPLOAD_TASK_BY_TASK_ID, { fetchPolicy: 'network-only' });
 
     useEffect(() => {
@@ -182,8 +182,8 @@ export default function Upload(props: UploadProps) {
     function finishUpUpload(finalFinalName: string, importOptionsPrep: string) {
         let keyToSend = key;
         if (!keyToSend) keyToSend = null;
-        uploadCredentialsMut({ variables: { projectId: UploadHelper.getProjectId(), fileName: finalFinalName, fileType: uploadFileType, fileImportOptions: importOptionsPrep, uploadType: UploadType.DEFAULT, key: keyToSend } }).then((results) => {
-            const credentialsAndUploadId = JSON.parse(JSON.parse(results.data['uploadCredentialsAndId']));
+        getUploadCredentialsAndId(UploadHelper.getProjectId(), finalFinalName, uploadFileType, importOptionsPrep, UploadType.DEFAULT, keyToSend, (results) => {
+            const credentialsAndUploadId = JSON.parse(results.data['uploadCredentialsAndId']);
             uploadFileToMinio(credentialsAndUploadId, finalFinalName);
         });
     }
