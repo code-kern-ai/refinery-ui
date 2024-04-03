@@ -19,3 +19,8 @@ export function staticDataSlicesCurrentCount(projectId: string, sliceId: string,
     const finalUrl = `${dataSliceEndpoint}/${projectId}/static-data-slices-current-count/${sliceId}`;
     jsonFetchWrapper(finalUrl, FetchType.GET, onResult);
 }
+
+export function deleteDataSliceById(projectId: string, dataSliceId: string, onResult: (result: any) => void) {
+    const finalUrl = `${dataSliceEndpoint}/${projectId}/${dataSliceId}`;
+    jsonFetchWrapper(finalUrl, FetchType.DELETE, onResult);
+}
