@@ -1,6 +1,7 @@
 import { FetchType, jsonFetchWrapper } from "@/submodules/javascript-functions/basic-fetch";
 import { BACKEND_BASE_URI } from "./_settings";
 import { LabelingLinkType } from "@/src/types/components/projects/projectId/labeling/labeling-main-component";
+import { convertCamelToSnakeCase } from "@/submodules/javascript-functions/case-types-parser";
 
 export const labelingEndpoint = `${BACKEND_BASE_URI}/api/v1/labeling`;
 
@@ -33,5 +34,5 @@ export function deleteRecordById(projectId: string, recordId: string, onResult: 
 
 export function getLinkLocked(projectId: string, linkRoute: string, onResult: (result: any) => void) {
     const finalUrl = `${labelingEndpoint}/${projectId}/link-locked`;
-    jsonFetchWrapper(finalUrl, FetchType.POST, onResult, JSON.stringify(linkRoute));
+    jsonFetchWrapper(finalUrl, FetchType.POST, onResult, JSON.stringify(convertCamelToSnakeCase(linkRoute)));
 }
