@@ -30,7 +30,7 @@ import { useWebsocket } from "@/src/services/base/web-sockets/useWebsocket";
 import { getAllComments } from "@/src/services/base/comment";
 import { getAttributes } from "@/src/services/base/attribute";
 import { getLabelingTasksByProjectId } from "@/src/services/base/project";
-import { getAvailableLinks, getHuddleData, getTokenizedRecord } from "@/src/services/base/labeling";
+import { getAvailableLinks, getHuddleData, getLinkLocked, getTokenizedRecord } from "@/src/services/base/labeling";
 import { getRecordByRecordId } from "@/src/services/base/project-setting";
 
 const SETTINGS_KEY = 'labelingSettings';
@@ -89,7 +89,7 @@ export default function LabelingMainComponent() {
             dispatch(setDisplayUserRole(user.role));
             return;
         }
-        refetchLinkLocked({ variables: { projectId: projectId, linkRoute: router.asPath } }).then((result) => {
+        getLinkLocked(projectId, router.asPath, (result) => {
             const lockedLink = result['data']['linkLocked'];
             if (lockedLink) {
                 setAbsoluteWarning('This link is locked, contact your supervisor to request access');
