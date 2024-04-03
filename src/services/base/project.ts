@@ -140,3 +140,8 @@ export function getLastProjectExportCredentials(projectId: string, onResult: (re
     const finalUrl = `${projectEndpoint}/${projectId}/last-export-credentials`;
     jsonFetchWrapper(finalUrl, FetchType.GET, onResult);
 }
+
+export function getNotifications(userFilter: boolean, limit: number, onResult: (result: any) => void, project_filter?: string[], level_filter?: string[], type_filter?: string[]) {
+    const finalUrl = `${projectEndpoint}/notifications?user_filter=${userFilter}&limit=${limit}&project_filter=${project_filter}&level_filter=${level_filter}&type_filter=${type_filter}`;
+    jsonFetchWrapper(finalUrl, FetchType.GET, onResult);
+}
