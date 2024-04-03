@@ -2,11 +2,10 @@ import LoadingIcon from "@/src/components/shared/loading/LoadingIcon";
 import Modal from "@/src/components/shared/modal/Modal";
 import { selectModal, setModalStates } from "@/src/reduxStore/states/modal";
 import { selectProjectId } from "@/src/reduxStore/states/project";
-import { EDIT_RECORDS } from "@/src/services/gql/mutations/edit-records";
+import { syncEditedRecords } from "@/src/services/base/record";
 import { SyncRecordsModalProps } from "@/src/types/components/projects/projectId/edit-records";
 import { ModalButton, ModalEnum } from "@/src/types/shared/modal";
 import { jsonCopy } from "@/submodules/javascript-functions/general";
-import { useMutation } from "@apollo/client";
 import { IconAlertTriangleFilled, IconInfoCircle, IconTrash } from "@tabler/icons-react";
 import { Fragment, useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -21,8 +20,6 @@ export default function SyncRecordsModal(props: SyncRecordsModalProps) {
 
     const [acceptButton, setAcceptButton] = useState<ModalButton>(ACCEPT_BUTTON);
 
-    const [syncChangesMut] = useMutation(EDIT_RECORDS);
-
     const syncChanges = useCallback(() => {
         const erdDataCopy = { ...props.erdData };
         erdDataCopy.syncing = true;
@@ -30,7 +27,7 @@ export default function SyncRecordsModal(props: SyncRecordsModalProps) {
         props.setErdData(erdDataCopy);
         const changes = jsonCopy(erdDataCopy.cachedRecordChanges);
         for (const key in changes) delete changes[key].display;
-        syncChangesMut({ variables: { projectId: projectId, changes: JSON.stringify(changes) } }).then((res) => {
+        syncEditedRecords(projectId, changes, (res) => {
             const tmp = res?.data?.editRecords;
             if (tmp?.ok) {
                 erdDataCopy.data.records = jsonCopy(erdDataCopy.displayRecords);

@@ -4,7 +4,7 @@ import MultilineTooltip from "@/src/components/shared/multilines-tooltip/Multili
 import { selectAllUsers, setComments } from "@/src/reduxStore/states/general";
 import { selectProjectId } from "@/src/reduxStore/states/project"
 import { getAllComments } from "@/src/services/base/comment";
-import { RUN_RECORD_IDE } from "@/src/services/gql/queries/record-ide";
+import { getRecordIDE } from "@/src/services/base/record-ide";
 import { LabelingLinkType } from "@/src/types/components/projects/projectId/labeling/labeling-main-component";
 import { CommentType } from "@/src/types/shared/comments";
 import { CurrentPage } from "@/src/types/shared/general";
@@ -12,7 +12,6 @@ import { CommentDataManager } from "@/src/util/classes/comments";
 import { DEFAULT_CODE, PASS_ME, caesarCipher } from "@/src/util/components/projects/projectId/record-ide/record-ide-helper";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
 import { tryParseJSON } from "@/submodules/javascript-functions/general";
-import { useLazyQuery } from "@apollo/client";
 import { Editor } from "@monaco-editor/react";
 import { Tooltip } from "@nextui-org/react";
 import { IconArrowBack, IconArrowBigUp, IconBorderHorizontal, IconBorderVertical } from "@tabler/icons-react";
@@ -38,8 +37,6 @@ export default function RecordIDE() {
     const [loading, setLoading] = useState(false);
     const [output, setOutput] = useState("");
     const [debounceTimer, setDebounceTimer] = useState(null);
-
-    const [refetchRecordIde] = useLazyQuery(RUN_RECORD_IDE, { fetchPolicy: "network-only" });
 
     const huddleData = JSON.parse(localStorage.getItem("huddleData"));
 
@@ -133,7 +130,7 @@ export default function RecordIDE() {
         const recordId = huddleData.recordIds[position - 1];
         if (debounceTimer) debounceTimer.unsubscribe();
         const timerSave = timer(400).subscribe(() => {
-            refetchRecordIde({ variables: { projectId: projectId, recordId, code: code } }).then((res) => {
+            getRecordIDE(projectId, recordId, code, (res) => {
                 if (!res.data || res.data["runRecordIde"] == null) {
                     setOutput("");
                     setLoading(false);

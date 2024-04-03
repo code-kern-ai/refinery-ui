@@ -37,3 +37,8 @@ export function getAccessLink(projectId: string, linkId: string, onResult: (resu
     const finalUrl = `${heuristicEndpoint}/${projectId}/access-link?link_id=${linkId}`;
     jsonFetchWrapper(finalUrl, FetchType.GET, onResult);
 }
+
+export function toggleHeuristicById(projectId: string, heuristicId: string, onResult: (result: any) => void) {
+    const finalUrl = `${heuristicEndpoint}/${projectId}/${heuristicId}/toggle-heuristic`;
+    jsonFetchWrapper(finalUrl, FetchType.POST, onResult);
+}
