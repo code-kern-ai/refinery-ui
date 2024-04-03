@@ -1,7 +1,7 @@
 import { DangerZoneEnum, DangerZoneProps } from "@/src/types/shared/danger-zone";
 import Modal from "../modal/Modal";
 import { ModalButton, ModalEnum } from "@/src/types/shared/modal";
-import { use, useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { selectModal } from "@/src/reduxStore/states/modal";
 import { useDispatch, useSelector } from "react-redux";
 import { useMutation } from "@apollo/client";
@@ -11,8 +11,8 @@ import LoadingIcon from "../loading/LoadingIcon";
 import { selectProjectId } from "@/src/reduxStore/states/project";
 import { DELETE_LOOKUP_LIST } from "@/src/services/gql/mutations/lookup-lists";
 import { removeFromAllLookupListById } from "@/src/reduxStore/states/pages/lookup-lists";
-import { DELETE_HEURISTIC } from "@/src/services/gql/mutations/heuristics";
 import { useRouter } from "next/router";
+import { deleteHeuristicById } from "@/src/services/base/heuristic";
 
 const ABORT_BUTTON = { buttonCaption: 'Delete', disabled: false, useButton: true };
 
@@ -27,7 +27,6 @@ export default function DeleteElementModal(props: DangerZoneProps) {
 
     const [deleteAttributeMut] = useMutation(DELETE_USER_ATTRIBUTE)
     const [deleteLookupListMut] = useMutation(DELETE_LOOKUP_LIST);
-    const [deleteHeuristicMut] = useMutation(DELETE_HEURISTIC);
 
     const deleteElement = useCallback(() => {
         setIsDeleting(true);
@@ -50,7 +49,7 @@ export default function DeleteElementModal(props: DangerZoneProps) {
             case DangerZoneEnum.ACTIVE_LEARNING:
             case DangerZoneEnum.ZERO_SHOT:
             case DangerZoneEnum.CROWD_LABELER:
-                deleteHeuristicMut({ variables: { projectId: projectId, informationSourceId: props.id } }).then(() => {
+                deleteHeuristicById(projectId, props.id, (res) => {
                     setIsDeleting(false);
                 });
                 router.push(`/projects/${projectId}/heuristics`);

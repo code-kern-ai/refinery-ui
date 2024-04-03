@@ -2,10 +2,9 @@ import Modal from "@/src/components/shared/modal/Modal";
 import { selectModal } from "@/src/reduxStore/states/modal";
 import { selectHeuristicsAll } from "@/src/reduxStore/states/pages/heuristics";
 import { selectProjectId } from "@/src/reduxStore/states/project";
-import { DELETE_HEURISTIC } from "@/src/services/gql/mutations/heuristics";
+import { deleteHeuristicById } from "@/src/services/base/heuristic";
 import { DeleteHeuristicsModalProps } from "@/src/types/components/projects/projectId/heuristics/heuristics";
 import { ModalButton, ModalEnum } from "@/src/types/shared/modal";
-import { useMutation } from "@apollo/client";
 import { useCallback, useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 
@@ -18,12 +17,12 @@ export default function DeleteHeuristicsModal(props: DeleteHeuristicsModalProps)
 
     const [abortButton, setAbortButton] = useState<ModalButton>(ABORT_BUTTON);
 
-    const [deleteHeuristicMut] = useMutation(DELETE_HEURISTIC);
-
     const deleteHeuristics = useCallback(() => {
         heuristics.forEach((heuristic) => {
             if (heuristic.selected) {
-                deleteHeuristicMut({ variables: { projectId: projectId, informationSourceId: heuristic.id } }).then(() => props.refetch());
+                deleteHeuristicById(projectId, heuristic.id, (res) => {
+                    props.refetch();
+                })
             }
         });
     }, [modalDelete]);

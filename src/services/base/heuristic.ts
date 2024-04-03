@@ -42,3 +42,8 @@ export function toggleHeuristicById(projectId: string, heuristicId: string, onRe
     const finalUrl = `${heuristicEndpoint}/${projectId}/${heuristicId}/toggle-heuristic`;
     jsonFetchWrapper(finalUrl, FetchType.POST, onResult);
 }
+
+export function deleteHeuristicById(projectId: string, heuristicId: string, onResult: (result: any) => void) {
+    const finalUrl = `${heuristicEndpoint}/${projectId}/${heuristicId}/delete-heuristic`;
+    jsonFetchWrapper(finalUrl, FetchType.DELETE, onResult);
+}
