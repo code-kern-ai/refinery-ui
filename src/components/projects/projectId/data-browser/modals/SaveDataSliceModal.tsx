@@ -4,7 +4,7 @@ import { selectModal, setModalStates } from "@/src/reduxStore/states/modal";
 import { extendAllDataSlices, selectActiveSearchParams, selectActiveSlice, selectAdditionalData, selectConfiguration, selectDataSlicesAll, setActiveDataSlice, updateAdditionalDataState } from "@/src/reduxStore/states/pages/data-browser";
 import { selectAttributes, selectLabelingTasksAll } from "@/src/reduxStore/states/pages/settings";
 import { selectProjectId } from "@/src/reduxStore/states/project";
-import { createDataSlice } from "@/src/services/base/data-browser";
+import { createDataSlice, updateDataSlice } from "@/src/services/base/data-browser";
 import { UPDATE_DATA_SLICE } from "@/src/services/gql/mutations/data-browser";
 import { DataSlice } from "@/src/types/components/projects/projectId/data-browser/data-browser";
 import { ModalButton, ModalEnum } from "@/src/types/shared/modal"
@@ -80,15 +80,23 @@ export default function SaveDataSliceModal(props: { fullSearch: {} }) {
 
     const updateSlice = useCallback((sliceId: string) => {
         const finalStatic = isStatic == null ? activeSlice.static : isStatic;
-        updateDataSliceMut({
-            variables: {
-                projectId: projectId,
-                static: finalStatic,
-                dataSliceId: sliceId,
-                filterRaw: getRawFilterForSave(props.fullSearch),
-                filterData: parseFilterToExtended(activeSearchParams, attributes, configuration, labelingTasks, user, props.fullSearch[SearchGroup.DRILL_DOWN].value)
-            }
-        }).then((res) => { });
+
+        updateDataSlice(projectId, {
+            static: finalStatic,
+            dataSliceId: sliceId,
+            filterRaw: getRawFilterForSave(props.fullSearch),
+            filterData: parseFilterToExtended(activeSearchParams, attributes, configuration, labelingTasks, user, props.fullSearch[SearchGroup.DRILL_DOWN].value)
+        }, (res) => { });
+
+        // updateDataSliceMut({
+        //     variables: {
+        //         projectId: projectId,
+        //         static: finalStatic,
+        //         dataSliceId: sliceId,
+        //         filterRaw: getRawFilterForSave(props.fullSearch),
+        //         filterData: parseFilterToExtended(activeSearchParams, attributes, configuration, labelingTasks, user, props.fullSearch[SearchGroup.DRILL_DOWN].value)
+        //     }
+        // }).then((res) => { });
     }, [activeSlice, isStatic, props.fullSearch]);
 
     return (<Modal modalName={ModalEnum.SAVE_DATA_SLICE} acceptButton={acceptButton}>
