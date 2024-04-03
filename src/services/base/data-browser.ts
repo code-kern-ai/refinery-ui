@@ -39,3 +39,10 @@ export function getRecordsBySimilarity(projectId: string, embeddingId: string, r
     const finalUrl = `${dataBrowserEndpoint}/${projectId}/search-records-by-similarity`;
     jsonFetchWrapper(finalUrl, FetchType.POST, onResult, JSON.stringify({ embeddingId, recordId, attFilter, recordSubKey }));
 }
+
+export function updateDataSlice(projectId: string, options: {
+    dataSliceId: string, static: boolean, filterRaw: string, filterData: string[]
+}, onResult: (result: any) => void) {
+    const finalUrl = `${dataBrowserEndpoint}/${projectId}/update-data-slice`;
+    jsonFetchWrapper(finalUrl, FetchType.POST, onResult, JSON.stringify({ options }));
+}

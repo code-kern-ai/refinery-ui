@@ -14,7 +14,7 @@ import { IconChartBubble, IconFilter, IconRotate } from "@tabler/icons-react";
 import { useDispatch, useSelector } from "react-redux";
 import CreateOutlierSliceModal from "./modals/CreateOutlierSliceModal";
 import SaveDataSliceModal from "./modals/SaveDataSliceModal";
-import { createOutlierSlice } from "@/src/services/base/data-browser";
+import { createOutlierSlice, updateDataSlice } from "@/src/services/base/data-browser";
 
 export function DataSliceOperations(props: { fullSearch: {} }) {
     const dispatch = useDispatch();
@@ -33,17 +33,25 @@ export function DataSliceOperations(props: { fullSearch: {} }) {
     const [updateDataSliceMut] = useMutation(UPDATE_DATA_SLICE);
 
     function updateSlice() {
-        updateDataSliceMut({
-            variables: {
-                projectId: projectId,
-                static: activeSlice.static,
-                dataSliceId: activeSlice.id,
-                filterRaw: getRawFilterForSave(props.fullSearch),
-                filterData: parseFilterToExtended(activeSearchParams, attributes, configuration, labelingTasks, user, props.fullSearch[SearchGroup.DRILL_DOWN].value)
-            }
-        }).then((res) => {
+        updateDataSlice(projectId, {
+            static: activeSlice.static,
+            dataSliceId: activeSlice.id,
+            filterRaw: getRawFilterForSave(props.fullSearch),
+            filterData: parseFilterToExtended(activeSearchParams, attributes, configuration, labelingTasks, user, props.fullSearch[SearchGroup.DRILL_DOWN].value)
+        }, (res) => {
             dispatch(setActiveDataSlice(activeSlice));
         });
+        // updateDataSliceMut({
+        //     variables: {
+        //         projectId: projectId,
+        //         static: activeSlice.static,
+        //         dataSliceId: activeSlice.id,
+        //         filterRaw: getRawFilterForSave(props.fullSearch),
+        //         filterData: parseFilterToExtended(activeSearchParams, attributes, configuration, labelingTasks, user, props.fullSearch[SearchGroup.DRILL_DOWN].value)
+        //     }
+        // }).then((res) => {
+        //     dispatch(setActiveDataSlice(activeSlice));
+        // });
         dispatch(updateAdditionalDataState('displayOutdatedWarning', false));
     }
 
