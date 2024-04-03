@@ -130,3 +130,8 @@ export function getRatsTokenization(projectId: string, onResult: (result: any) =
     const finalUrl = `${projectEndpoint}/${projectId}/rats-running`;
     jsonFetchWrapper(finalUrl, FetchType.GET, onResult);
 }
+
+export function getAccessTokens(projectId: string, onResult: (result: any) => void) {
+    const finalUrl = `${projectEndpoint}/${projectId}/access-tokens`;
+    jsonFetchWrapper(finalUrl, FetchType.GET, onResult);
+}
