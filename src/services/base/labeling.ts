@@ -48,3 +48,10 @@ export function removeAccessLink(projectId: string, linkId: string, onResult: (r
     const finalUrl = `${labelingEndpoint}/${projectId}/remove-access-link`;
     jsonFetchWrapper(finalUrl, FetchType.DELETE, onResult, JSON.stringify({ "value": linkId }));
 }
+
+export function lockAccessLink(projectId: string, options: {
+    linkId: string, lockState: boolean
+}, onResult: (result: any) => void) {
+    const finalUrl = `${labelingEndpoint}/${projectId}/lock-access-link`;
+    jsonFetchWrapper(finalUrl, FetchType.PUT, onResult, JSON.stringify(convertCamelToSnakeCase(options)));
+}
