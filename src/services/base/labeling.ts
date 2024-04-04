@@ -49,6 +49,13 @@ export function removeAccessLink(projectId: string, linkId: string, onResult: (r
     jsonFetchWrapper(finalUrl, FetchType.DELETE, onResult, JSON.stringify({ "value": linkId }));
 }
 
+export function lockAccessLink(projectId: string, options: {
+    linkId: string, lockState: boolean
+}, onResult: (result: any) => void) {
+    const finalUrl = `${labelingEndpoint}/${projectId}/lock-access-link`;
+    jsonFetchWrapper(finalUrl, FetchType.PUT, onResult, JSON.stringify(convertCamelToSnakeCase(options)));
+}
+
 export function addClassificationLabels(projectId: string, recordId: string, labelingTaskId: string, labelId: string, asGoldStar: boolean, sourceId: string, onResult: (result: any) => void) {
     const finalUrl = `${labelingEndpoint}/${projectId}/add-classification-labels`;
     const body = {

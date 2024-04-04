@@ -4,8 +4,7 @@ import { selectHeuristic, updateHeuristicsState } from "@/src/reduxStore/states/
 import { setDisplayUserRole } from "@/src/reduxStore/states/pages/labeling";
 import { selectLabelingTasksAll } from "@/src/reduxStore/states/pages/settings";
 import { selectProjectId } from "@/src/reduxStore/states/project";
-import { generateAccessLink as gal, removeAccessLink as ral } from "@/src/services/base/labeling";
-import { LOCK_ACCESS_LINK } from "@/src/services/gql/mutations/heuristics";
+import { generateAccessLink as gal, lockAccessLink, removeAccessLink as ral } from "@/src/services/base/labeling";
 import { updateHeuristicPost } from "@/src/services/base/heuristic";
 import { UserRole } from "@/src/types/shared/sidebar";
 import { parseToSettingsJson } from "@/src/util/components/projects/projectId/heuristics/heuristicId/crowd-labeler-helper";
@@ -13,7 +12,6 @@ import { buildFullLink, parseLinkFromText } from "@/src/util/shared/link-parser-
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
 import { copyToClipboard } from "@/submodules/javascript-functions/general";
 import Dropdown2 from "@/submodules/react-components/components/Dropdown2";
-import { useMutation } from "@apollo/client";
 import { Tooltip } from "@nextui-org/react";
 import { IconLock, IconLockOpen, IconTrash } from "@tabler/icons-react";
 import { useRouter } from "next/router";
@@ -30,8 +28,6 @@ export default function CrowdLabelerSettings() {
     const annotatorsDict = useSelector(selectAnnotatorsDict);
     const dataSlices = useSelector(selectDataSlicesAll);
     const dataSlicesDict = useSelector(selectDataSlicesDict);
-
-    const [changeAccessLinkMut] = useMutation(LOCK_ACCESS_LINK);
 
     function saveHeuristic(labelingTaskParam: any, crowdLabelerSettings: any = null) {
         const labelingTaskId = labelingTaskParam ? labelingTaskParam.id : currentHeuristic.labelingTaskId;
@@ -80,7 +76,7 @@ export default function CrowdLabelerSettings() {
 
     function changeAccessLinkLock() {
         if (!currentHeuristic.crowdLabelerSettings.accessLinkId) return;
-        changeAccessLinkMut({ variables: { projectId: projectId, linkId: currentHeuristic.crowdLabelerSettings.accessLinkId, lockState: !currentHeuristic.crowdLabelerSettings.accessLinkLocked } }).then((res) => {
+        lockAccessLink(projectId, { linkId: currentHeuristic.crowdLabelerSettings.accessLinkId, lockState: !currentHeuristic.crowdLabelerSettings.accessLinkLocked }, (res) => {
             dispatch(updateHeuristicsState(currentHeuristic.id, { crowdLabelerSettings: { ...currentHeuristic.crowdLabelerSettings, accessLinkLocked: !currentHeuristic.crowdLabelerSettings.accessLinkLocked } }));
         });
     }
