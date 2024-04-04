@@ -6,7 +6,7 @@ import { setModelsDownloaded } from "@/src/reduxStore/states/pages/models-downlo
 import { selectLabelingTasksAll, selectUseableEmbedableAttributes } from "@/src/reduxStore/states/pages/settings";
 import { selectProject, selectProjectId } from "@/src/reduxStore/states/project";
 import { getModelProviderInfo } from "@/src/services/base/project";
-import { CREATE_ZERO_SHOT_INFORMATION_SOURCE } from "@/src/services/gql/mutations/heuristics";
+import { createZeroShotPost } from "@/src/services/base/zero-shot";
 import { ModelsDownloaded } from "@/src/types/components/models-downloaded/models-downloaded";
 import { LabelingTaskTaskType } from "@/src/types/components/projects/projectId/settings/labeling-tasks";
 import { ModalButton, ModalEnum } from "@/src/types/shared/modal";
@@ -15,7 +15,6 @@ import { getRouterLinkHeuristic } from "@/src/util/components/projects/projectId
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
 import { InformationSourceType } from "@/submodules/javascript-functions/enums/enums";
 import Dropdown2 from "@/submodules/react-components/components/Dropdown2";
-import { useMutation } from "@apollo/client";
 import { Tooltip } from "@nextui-org/react";
 import { useRouter } from "next/router";
 import { useCallback, useEffect, useState } from "react";
@@ -83,17 +82,15 @@ export default function AddZeroShotModal() {
         });
     }, [filteredList, model]);
 
-    const [createZeroShotMut] = useMutation(CREATE_ZERO_SHOT_INFORMATION_SOURCE);
-
     const createZeroShot = useCallback(() => {
         const parseTask = labelingTask.split(' - ');
         const taskName = parseTask.length > 0 ? parseTask[parseTask.length - 1] : labelingTask;
         const labelingTaskId = labelingTasks.find(lt => lt.name == taskName)?.id;
         const attributeId = attribute.id ?? '';
-        createZeroShotMut({ variables: { projectId: projectId, targetConfig: model, labelingTaskId: labelingTaskId, attributeId: attributeId } }).then((res) => {
-            let id = res['data']?.['createZeroShotInformationSource']['id'];
+        createZeroShotPost(projectId, model, labelingTaskId, attributeId, (res) => {
+            const id = res['data']?.['createZeroShotInformationSource']['id'];
             if (id) {
-                router.push(getRouterLinkHeuristic(heuristicType, projectId, id))
+                router.push(getRouterLinkHeuristic(heuristicType, projectId, id));
             } else {
                 console.log("can't find newly created id for " + heuristicType + " --> can't open");
             }

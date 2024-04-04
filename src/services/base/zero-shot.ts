@@ -1,5 +1,6 @@
 import { FetchType, jsonFetchWrapper } from "@/submodules/javascript-functions/basic-fetch";
 import { BACKEND_BASE_URI } from "./_settings";
+import { convertCamelToSnakeCase } from "@/submodules/javascript-functions/case-types-parser";
 
 export const zeroShotEndpoint = `${BACKEND_BASE_URI}/api/v1/zero-shot`;
 
@@ -21,4 +22,14 @@ export function getZeroShot10Records(projectId: string, heuristicId: string, lab
 export function initZeroShot(projectId: string, heuristicId: string, onResult: (result: any) => void) {
     const finalUrl = `${zeroShotEndpoint}/${projectId}/${heuristicId}/run-zero-shot`;
     jsonFetchWrapper(finalUrl, FetchType.POST, onResult);
+}
+
+export function createZeroShotPost(projectId: string, targetConfig: string, labelingTaskId: string, attributeId: string, onResult: (result: any) => void) {
+    const finalUrl = `${zeroShotEndpoint}/${projectId}/create-zero-shot`;
+    const body = {
+        targetConfig: targetConfig,
+        labelingTaskId: labelingTaskId,
+        attributeId: attributeId
+    };
+    jsonFetchWrapper(finalUrl, FetchType.POST, onResult, JSON.stringify(convertCamelToSnakeCase(body)));
 }
