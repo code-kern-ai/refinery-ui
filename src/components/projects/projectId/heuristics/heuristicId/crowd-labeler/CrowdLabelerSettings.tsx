@@ -5,7 +5,7 @@ import { setDisplayUserRole } from "@/src/reduxStore/states/pages/labeling";
 import { selectLabelingTasksAll } from "@/src/reduxStore/states/pages/settings";
 import { selectProjectId } from "@/src/reduxStore/states/project";
 import { generateAccessLink as gal, removeAccessLink as ral } from "@/src/services/base/labeling";
-import { LOCK_ACCESS_LINK, UPDATE_INFORMATION_SOURCE } from "@/src/services/gql/mutations/heuristics";
+import { LOCK_ACCESS_LINK } from "@/src/services/gql/mutations/heuristics";
 import { updateHeuristicPost } from "@/src/services/base/heuristic";
 import { UserRole } from "@/src/types/shared/sidebar";
 import { parseToSettingsJson } from "@/src/util/components/projects/projectId/heuristics/heuristicId/crowd-labeler-helper";
@@ -31,7 +31,6 @@ export default function CrowdLabelerSettings() {
     const dataSlices = useSelector(selectDataSlicesAll);
     const dataSlicesDict = useSelector(selectDataSlicesDict);
 
-    const [updateHeuristicMut] = useMutation(UPDATE_INFORMATION_SOURCE);
     const [changeAccessLinkMut] = useMutation(LOCK_ACCESS_LINK);
 
     function saveHeuristic(labelingTaskParam: any, crowdLabelerSettings: any = null) {
