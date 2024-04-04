@@ -56,3 +56,9 @@ export function changeOrganization(orgId: string, changes: string, onResult: (re
     const body = { orgId, changes };
     jsonFetchWrapper(finalUrl, FetchType.POST, onResult, JSON.stringify(convertCamelToSnakeCase(body)));
 }
+
+export function updateConfig(dictStr: string, onResult: (result: any) => void) {
+    const finalUrl = `${organizationEndpoint}/update-config`;
+    const body = { dictStr };
+    jsonFetchWrapper(finalUrl, FetchType.POST, onResult, JSON.stringify(convertCamelToSnakeCase(body)));
+}
