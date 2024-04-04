@@ -4,7 +4,7 @@ import UploadField from "./helper-components/UploadField";
 import { useCallback, useEffect, useState } from "react";
 import UploadWrapper from "./helper-components/UploadWrapper";
 import { selectUploadData, setImportOptions } from "@/src/reduxStore/states/upload";
-import { useLazyQuery, useMutation } from "@apollo/client";
+import { useMutation } from "@apollo/client";
 import { CREATE_PROJECT, DELETE_PROJECT, UPDATE_PROJECT_STATUS, UPDATE_PROJECT_TOKENIZER } from "@/src/services/gql/mutations/projects";
 import { ProjectStatus } from "@/src/types/components/projects/projects-list";
 import { timer } from "rxjs";
@@ -13,7 +13,6 @@ import { CurrentPage, CurrentPageSubKey } from "@/src/types/shared/general";
 import { jsonCopy } from "@/submodules/javascript-functions/general";
 import { useRouter } from "next/router";
 import { extendAllProjects, removeFromAllProjectsById, selectAllProjects, selectProjectId } from "@/src/reduxStore/states/project";
-import { GET_UPLOAD_TASK_BY_TASK_ID } from "@/src/services/gql/queries/projects";
 import { UPLOAD_TOKENIZERS } from "@/src/util/constants";
 import { UploadHelper, ZIP_TYPE } from "@/src/util/classes/upload-helper";
 import CryptedField from "../crypted-field/CryptedField";
@@ -21,7 +20,7 @@ import { closeModal } from "@/src/reduxStore/states/modal";
 import { ModalEnum } from "@/src/types/shared/modal";
 import Dropdown2 from "@/submodules/react-components/components/Dropdown2";
 import { useWebsocket } from "@/src/services/base/web-sockets/useWebsocket";
-import { getUploadCredentialsAndId } from "@/src/services/base/project";
+import { getUploadCredentialsAndId, getUploadTaskById } from "@/src/services/base/project";
 
 export default function Upload(props: UploadProps) {
     const router = useRouter();
@@ -50,7 +49,6 @@ export default function Upload(props: UploadProps) {
     const [deleteProjectMut] = useMutation(DELETE_PROJECT);
     const [updateProjectTokenizerMut] = useMutation(UPDATE_PROJECT_TOKENIZER);
     const [updateProjectStatusMut] = useMutation(UPDATE_PROJECT_STATUS);
-    const [getUploadTaskId] = useLazyQuery(GET_UPLOAD_TASK_BY_TASK_ID, { fetchPolicy: 'network-only' });
 
     useEffect(() => {
         if (!props.uploadOptions || !props.uploadOptions.tokenizerValues) return;
@@ -82,7 +80,7 @@ export default function Upload(props: UploadProps) {
         if (msgParts[2] != uploadTask.id) return;
         if (msgParts[3] == 'state') {
             if (msgParts[4] == UploadStates.DONE) {
-                getUploadTaskId({ variables: { projectId: projectId, uploadTaskId: uploadTask.id, } }).then((res) => {
+                getUploadTaskById(projectId, uploadTask.id, (res) => {
                     const task = res.data['uploadTaskById'];
                     handleUploadTaskResult(task);
                 });
@@ -101,7 +99,7 @@ export default function Upload(props: UploadProps) {
             }
         } else if (msgParts[3] == 'progress') {
             if (msgParts[4] == "100") {
-                getUploadTaskId({ variables: { projectId: projectId, uploadTaskId: uploadTask.id, } }).then((res) => {
+                getUploadTaskById(projectId, uploadTask.id, (res) => {
                     const task = res.data['uploadTaskById'];
                     handleUploadTaskResult(task);
                 });
@@ -183,7 +181,7 @@ export default function Upload(props: UploadProps) {
         let keyToSend = key;
         if (!keyToSend) keyToSend = null;
         getUploadCredentialsAndId(UploadHelper.getProjectId(), finalFinalName, uploadFileType, importOptionsPrep, UploadType.DEFAULT, keyToSend, (results) => {
-            const credentialsAndUploadId = JSON.parse(results.data['uploadCredentialsAndId']);
+            const credentialsAndUploadId = JSON.parse(JSON.parse(results.data['uploadCredentialsAndId']));
             uploadFileToMinio(credentialsAndUploadId, finalFinalName);
         });
     }
@@ -191,7 +189,7 @@ export default function Upload(props: UploadProps) {
     function uploadFileToMinio(credentialsAndUploadId: any, fileName: string) {
         setUploadStarted(true);
         setDoingSomething(true);
-        getUploadTaskId({ variables: { projectId: UploadHelper.getProjectId(), uploadTaskId: credentialsAndUploadId.uploadTaskId, } }).then((res) => {
+        getUploadTaskById(UploadHelper.getProjectId(), credentialsAndUploadId.uploadTaskId, (res) => {
             const task = res.data['uploadTaskById'];
             handleUploadTaskResult(task);
             uploadFile(credentialsAndUploadId, selectedFile, fileName).subscribe((progress) => {

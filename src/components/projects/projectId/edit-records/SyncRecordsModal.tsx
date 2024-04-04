@@ -39,7 +39,7 @@ export default function SyncRecordsModal(props: SyncRecordsModalProps) {
             }
             erdDataCopy.syncing = false;
             props.setErdData(erdDataCopy);
-        }).catch((err) => {
+        }, (err) => {
             erdDataCopy.errors = ["Request didn't go through"];
             erdDataCopy.syncing = false;
             props.setErdData(erdDataCopy);

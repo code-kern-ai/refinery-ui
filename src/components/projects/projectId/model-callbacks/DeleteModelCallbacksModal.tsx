@@ -1,33 +1,24 @@
 import Modal from "@/src/components/shared/modal/Modal";
 import { selectModal } from "@/src/reduxStore/states/modal";
 import { selectProjectId } from "@/src/reduxStore/states/project";
-import { DELETE_HEURISTIC } from "@/src/services/gql/mutations/heuristics";
+import { deleteHeuristicById } from "@/src/services/base/heuristic";
 import { DeleteModelCallBacksModalProps } from "@/src/types/components/projects/projectId/model-callbacks";
 import { ModalButton, ModalEnum } from "@/src/types/shared/modal";
-import { useMutation } from "@apollo/client";
 import { useCallback, useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 
 const ABORT_BUTTON = { buttonCaption: "Delete", useButton: true, disabled: false };
 
 export default function DeleteModelCallBacksModal(props: DeleteModelCallBacksModalProps) {
-    const dispatch = useDispatch();
 
     const projectId = useSelector(selectProjectId)
     const modalDelete = useSelector(selectModal(ModalEnum.DELETE_MODEL_CALLBACKS));
-
-    const [deleteHeuristicMut] = useMutation(DELETE_HEURISTIC);
 
     const deleteModelCallbacks = useCallback(() => {
         props.checkedModelCallbacks.forEach((checked, index) => {
             if (checked) {
                 const modelCallBack = props.modelCallBacks[index];
-                deleteHeuristicMut({
-                    variables: {
-                        projectId: projectId,
-                        knowledgeBaseId: modelCallBack.id
-                    }
-                }).then((res) => {
+                deleteHeuristicById(projectId, modelCallBack.id, (res) => {
                     props.removeModelCallBack(modelCallBack.id)
                 });
             }
