@@ -33,3 +33,12 @@ export function createZeroShotPost(projectId: string, targetConfig: string, labe
     };
     jsonFetchWrapper(finalUrl, FetchType.POST, onResult, JSON.stringify(convertCamelToSnakeCase(body)));
 }
+
+export function cancelZeroShot(projectId: string, heuristicId: string, payloadId: string, onResult: (result: any) => void) {
+    const finalUrl = `${zeroShotEndpoint}/${projectId}/cancel-zero-shot`;
+    const body = {
+        heuristicId: heuristicId,
+        payloadId: payloadId
+    };
+    jsonFetchWrapper(finalUrl, FetchType.POST, onResult, JSON.stringify(convertCamelToSnakeCase(body)));
+}
