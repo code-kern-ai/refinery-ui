@@ -1,5 +1,6 @@
 import { FetchType, jsonFetchWrapper } from "@/submodules/javascript-functions/basic-fetch";
 import { BACKEND_BASE_URI } from "./_settings";
+import { convertCamelToSnakeCase } from "@/submodules/javascript-functions/case-types-parser";
 
 export const heuristicEndpoint = `${BACKEND_BASE_URI}/api/v1/heuristic`;
 
@@ -56,4 +57,16 @@ export function createTask(projectId: string, heuristicId: string, onResult: (re
 export function deleteHeuristicById(projectId: string, heuristicId: string, onResult: (result: any) => void) {
     const finalUrl = `${heuristicEndpoint}/${projectId}/${heuristicId}/delete-heuristic`;
     jsonFetchWrapper(finalUrl, FetchType.DELETE, onResult);
+}
+
+export function createHeuristicPost(projectId: string, labelingTaskId: string, sourceCode: string, name: string, description: string, type: string, onResult: (result: any) => void) {
+    const finalUrl = `${heuristicEndpoint}/${projectId}/create-heuristic`;
+    const body = {
+        labelingTaskId: labelingTaskId,
+        sourceCode: sourceCode,
+        name: name,
+        description: description,
+        type: type
+    };
+    jsonFetchWrapper(finalUrl, FetchType.POST, onResult, JSON.stringify(convertCamelToSnakeCase(body)));
 }
