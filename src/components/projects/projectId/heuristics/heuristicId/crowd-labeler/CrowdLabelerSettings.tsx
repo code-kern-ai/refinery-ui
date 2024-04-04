@@ -6,6 +6,7 @@ import { selectLabelingTasksAll } from "@/src/reduxStore/states/pages/settings";
 import { selectProjectId } from "@/src/reduxStore/states/project";
 import { generateAccessLink } from "@/src/services/base/labeling";
 import { LOCK_ACCESS_LINK, REMOVE_ACCESS_LINK, UPDATE_INFORMATION_SOURCE } from "@/src/services/gql/mutations/heuristics";
+import { updateHeuristicPost } from "@/src/services/base/heuristic";
 import { UserRole } from "@/src/types/shared/sidebar";
 import { parseToSettingsJson } from "@/src/util/components/projects/projectId/heuristics/heuristicId/crowd-labeler-helper";
 import { buildFullLink, parseLinkFromText } from "@/src/util/shared/link-parser-helper";
@@ -37,8 +38,7 @@ export default function CrowdLabelerSettings() {
     function saveHeuristic(labelingTaskParam: any, crowdLabelerSettings: any = null) {
         const labelingTaskId = labelingTaskParam ? labelingTaskParam.id : currentHeuristic.labelingTaskId;
         const code = parseToSettingsJson(crowdLabelerSettings ? crowdLabelerSettings : currentHeuristic.crowdLabelerSettings);
-        updateHeuristicMut({ variables: { projectId: projectId, informationSourceId: currentHeuristic.id, labelingTaskId: labelingTaskId, code: code } }).then((res) => {
-        });
+        updateHeuristicPost(projectId, currentHeuristic.id, labelingTaskId, code, currentHeuristic.description, currentHeuristic.name, (res) => { });
     }
 
     function changeSettings(attributeName: string, newValue: any, saveToDb: boolean = true) {
@@ -56,7 +56,7 @@ export default function CrowdLabelerSettings() {
             const link = res.data.generateAccessLink.link;
             const labelingTask = currentHeuristic.labelingTaskId;
             const code = parseToSettingsJson({ ...currentHeuristic.crowdLabelerSettings, accessLinkId: link.id });
-            updateHeuristicMut({ variables: { projectId: projectId, informationSourceId: currentHeuristic.id, labelingTaskId: labelingTask, code: code } }).then((res) => {
+            updateHeuristicPost(projectId, currentHeuristic.id, labelingTask, code, currentHeuristic.description, currentHeuristic.name, (res) => {
                 dispatch(updateHeuristicsState(currentHeuristic.id, { crowdLabelerSettings: { ...currentHeuristic.crowdLabelerSettings, accessLinkId: link.id, accessLinkLocked: link.isLocked, accessLinkParsed: buildFullLink(link.link), isHTTPS: window.location.protocol == 'https:' } }));
             });
         });
@@ -67,7 +67,7 @@ export default function CrowdLabelerSettings() {
             dispatch(updateHeuristicsState(currentHeuristic.id, { crowdLabelerSettings: { ...currentHeuristic.crowdLabelerSettings, accessLink: null, accessLinkId: null, accessLinkParsed: null } }));
             const labelingTask = currentHeuristic.labelingTaskId;
             const code = parseToSettingsJson({ ...currentHeuristic.crowdLabelerSettings, accessLinkId: null });
-            updateHeuristicMut({ variables: { projectId: projectId, informationSourceId: currentHeuristic.id, labelingTaskId: labelingTask, code: code } }).then((res) => {
+            updateHeuristicPost(projectId, currentHeuristic.id, labelingTask, code, currentHeuristic.description, currentHeuristic.name, (res) => {
                 dispatch(updateHeuristicsState(currentHeuristic.id, { crowdLabelerSettings: { ...currentHeuristic.crowdLabelerSettings, accessLink: null, accessLinkId: null, accessLinkParsed: null } }));
             });
         });

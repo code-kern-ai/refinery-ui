@@ -3,13 +3,11 @@ import { selectHeuristic, setActiveHeuristics, updateHeuristicsState } from "@/s
 import { selectAllLookupLists, setAllLookupLists } from "@/src/reduxStore/states/pages/lookup-lists";
 import { selectVisibleAttributesHeuristics, setAllAttributes } from "@/src/reduxStore/states/pages/settings";
 import { selectProjectId } from "@/src/reduxStore/states/project"
-import { UPDATE_INFORMATION_SOURCE } from "@/src/services/gql/mutations/heuristics";
 import { HeuristicsProperty } from "@/src/types/components/projects/projectId/heuristics/heuristicId/heuristics-details";
 import { Attribute } from "@/src/types/components/projects/projectId/settings/data-schema";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
 import { InformationSourceType } from "@/submodules/javascript-functions/enums/enums";
 import { copyToClipboard } from "@/submodules/javascript-functions/general";
-import { useMutation } from "@apollo/client";
 import { Tooltip } from "@nextui-org/react";
 import { IconArrowLeft } from "@tabler/icons-react";
 import { useEffect, useRef, useState } from "react";
@@ -18,6 +16,7 @@ import style from '@/src/styles/components/projects/projectId/heuristics/heurist
 import { useRouter } from "next/router";
 import { getAttributes } from "@/src/services/base/attribute";
 import { getLookupListsByProjectId } from "@/src/services/base/lookup-lists";
+import { updateHeuristicPost } from "@/src/services/base/heuristic";
 
 export default function HeuristicsLayout(props: any) {
     const router = useRouter();
@@ -31,8 +30,6 @@ export default function HeuristicsLayout(props: any) {
     const [isHeaderNormal, setIsHeaderNormal] = useState(true);
     const [isNameOpen, setIsNameOpen] = useState(false);
     const [isDescriptionOpen, setIsDescriptionOpen] = useState(false);
-
-    const [updateHeuristicMut] = useMutation(UPDATE_INFORMATION_SOURCE);
 
     const nameRef = useRef<HTMLInputElement>(null);
     const descriptionRef = useRef<HTMLInputElement>(null);
@@ -80,7 +77,7 @@ export default function HeuristicsLayout(props: any) {
 
     function saveHeuristic() {
         if (currentHeuristic.name == "") return;
-        updateHeuristicMut({ variables: { projectId: projectId, informationSourceId: currentHeuristic.id, labelingTaskId: currentHeuristic.labelingTaskId, name: currentHeuristic.name, description: currentHeuristic.description } }).then((res) => {
+        updateHeuristicPost(projectId, currentHeuristic.id, currentHeuristic.labelingTaskId, currentHeuristic.sourceCode, currentHeuristic.description, currentHeuristic.name, (res) => {
             dispatch(updateHeuristicsState(currentHeuristic.id, { name: currentHeuristic.name, description: currentHeuristic.description }));
             if (currentHeuristic.informationSourceType == InformationSourceType.LABELING_FUNCTION || currentHeuristic.informationSourceType == InformationSourceType.ACTIVE_LEARNING) {
                 props.updateSourceCode(currentHeuristic.sourceCode);

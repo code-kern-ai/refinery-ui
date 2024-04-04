@@ -2,13 +2,12 @@ import Modal from "@/src/components/shared/modal/Modal";
 import { selectHeuristicType } from "@/src/reduxStore/states/pages/heuristics";
 import { selectLabelingTasksAll } from "@/src/reduxStore/states/pages/settings";
 import { selectProjectId } from "@/src/reduxStore/states/project";
-import { CREATE_HEURISTIC } from "@/src/services/gql/mutations/heuristics";
+import { createHeuristicPost } from "@/src/services/base/heuristic";
 import { LabelingTask } from "@/src/types/components/projects/projectId/settings/labeling-tasks";
 import { ModalButton, ModalEnum } from "@/src/types/shared/modal";
 import { DEFAULT_DESCRIPTION, getFunctionName, getInformationSourceTemplate, getRouterLinkHeuristic } from "@/src/util/components/projects/projectId/heuristics/heuristics-helper";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
 import Dropdown2 from "@/submodules/react-components/components/Dropdown2";
-import { useMutation } from "@apollo/client";
 import { Tooltip } from "@nextui-org/react";
 import { useRouter } from "next/router";
 import { useCallback, useEffect, useState } from "react";
@@ -27,22 +26,11 @@ export default function AddLabelingFunctionModal() {
     const [name, setName] = useState('');
     const [description, setDescription] = useState('');
 
-    const [createHeuristicMut] = useMutation(CREATE_HEURISTIC);
-
     const createHeuristic = useCallback(() => {
         const matching = labelingTasks.filter(e => e.id == labelingTask.id);
         const codeData = getInformationSourceTemplate(matching, heuristicType, '');
         if (!codeData) return;
-        createHeuristicMut({
-            variables: {
-                projectId: projectId,
-                labelingTaskId: labelingTask.id,
-                sourceCode: codeData.code,
-                name: name,
-                description: description,
-                type: heuristicType
-            }
-        }).then((res) => {
+        createHeuristicPost(projectId, labelingTask.id, codeData.code, name, description, heuristicType, (res) => {
             let id = res['data']?.['createInformationSource']?.['informationSource']?.['id'];
             if (id) {
                 router.push(getRouterLinkHeuristic(heuristicType, projectId, id))
