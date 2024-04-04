@@ -67,3 +67,18 @@ export function addClassificationLabels(projectId: string, recordId: string, lab
     }
     jsonFetchWrapper(finalUrl, FetchType.POST, onResult, JSON.stringify(convertCamelToSnakeCase(body)));
 }
+
+export function addExtractionLabel(projectId: string, recordId: string, labelingTaskId: string, tokenStartIndex: number, tokenEndIndex: number, value: string, labelId: string, asGoldStar: boolean, sourceId: string, onResult: (result: any) => void) {
+    const finalUrl = `${labelingEndpoint}/${projectId}/add-extraction-label`;
+    const body = {
+        recordId,
+        labelingTaskId,
+        tokenStartIndex,
+        tokenEndIndex,
+        value,
+        labelId,
+        asGoldStar,
+        sourceId
+    }
+    jsonFetchWrapper(finalUrl, FetchType.POST, onResult, JSON.stringify(convertCamelToSnakeCase(body)));
+}
