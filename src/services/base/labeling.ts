@@ -36,3 +36,10 @@ export function getLinkLocked(projectId: string, linkRoute: string, onResult: (r
     const finalUrl = `${labelingEndpoint}/${projectId}/link-locked`;
     jsonFetchWrapper(finalUrl, FetchType.POST, onResult, JSON.stringify(convertCamelToSnakeCase(linkRoute)));
 }
+
+export function generateAccessLink(projectId: string, options: {
+    type: string, id: string,
+}, onResult: (result: any) => void) {
+    const finalUrl = `${labelingEndpoint}/${projectId}/generate-access-link`;
+    jsonFetchWrapper(finalUrl, FetchType.POST, onResult, JSON.stringify(convertCamelToSnakeCase(options)));
+}
