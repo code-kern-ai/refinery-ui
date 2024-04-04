@@ -44,6 +44,16 @@ export function toggleHeuristicById(projectId: string, heuristicId: string, onRe
     jsonFetchWrapper(finalUrl, FetchType.POST, onResult);
 }
 
+export function setAllHeuristics(projectId: string, value: boolean, onResult: (result: any) => void) {
+    const finalUrl = `${heuristicEndpoint}/${projectId}?value=${value}`;
+    jsonFetchWrapper(finalUrl, FetchType.POST, onResult);
+}
+
+export function createTask(projectId: string, heuristicId: string, onResult: (result: any) => void) {
+    const finalUrl = `${heuristicEndpoint}/${projectId}/${heuristicId}/payload`;
+    jsonFetchWrapper(finalUrl, FetchType.POST, onResult);
+}
+
 export function deleteHeuristicById(projectId: string, heuristicId: string, onResult: (result: any) => void) {
     const finalUrl = `${heuristicEndpoint}/${projectId}/${heuristicId}/delete-heuristic`;
     jsonFetchWrapper(finalUrl, FetchType.DELETE, onResult);

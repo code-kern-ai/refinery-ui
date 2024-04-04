@@ -4,7 +4,6 @@ import { openModal, selectModal } from '@/src/reduxStore/states/modal';
 import { selectHeuristicsAll, setHeuristicType } from '@/src/reduxStore/states/pages/heuristics';
 import { selectLabelingTasksAll } from '@/src/reduxStore/states/pages/settings';
 import { selectProjectId } from '@/src/reduxStore/states/project';
-import { CREATE_INFORMATION_SOURCE_PAYLOAD, RUN_ZERO_SHOT_PROJECT, SET_ALL_HEURISTICS, START_WEAK_SUPERVISIONS } from '@/src/services/gql/mutations/heuristics';
 import style from '@/src/styles/components/projects/projectId/heuristics/heuristics.module.css';
 import { Heuristic, HeuristicsHeaderProps } from '@/src/types/components/projects/projectId/heuristics/heuristics';
 import { LabelingTask } from '@/src/types/components/projects/projectId/settings/labeling-tasks';
@@ -14,7 +13,6 @@ import { Status } from '@/src/types/shared/statuses';
 import { ACTIONS_DROPDOWN_OPTIONS, NEW_HEURISTICS, checkSelectedHeuristics, postProcessCurrentWeakSupervisionRun } from '@/src/util/components/projects/projectId/heuristics/heuristics-helper';
 import { TOOLTIPS_DICT } from '@/src/util/tooltip-constants';
 import { InformationSourceType } from '@/submodules/javascript-functions/enums/enums';
-import { useLazyQuery, useMutation } from '@apollo/client';
 import { Tooltip } from '@nextui-org/react';
 import { IconPlus, IconWaveSine } from '@tabler/icons-react';
 import { useRouter } from 'next/router';
@@ -24,7 +22,9 @@ import LastWeakSupervisionModal from './modals/LastWeakSupervisionModal';
 import DeleteHeuristicsModal from './DeleteHeuristicsModal';
 import Dropdown2 from '@/submodules/react-components/components/Dropdown2';
 import { useWebsocket } from '@/src/services/base/web-sockets/useWebsocket';
-import { getWeakSupervisionRun } from "@/src/services/base/heuristic";
+import { createTask, getWeakSupervisionRun, setAllHeuristics } from "@/src/services/base/heuristic";
+import { initZeroShot } from "@/src/services/base/zero-shot";
+import { initWeakSupervision } from "@/src/services/base/weak-supervision";
 
 
 export default function HeuristicsHeader(props: HeuristicsHeaderProps) {
@@ -45,10 +45,6 @@ export default function HeuristicsHeader(props: HeuristicsHeaderProps) {
     const [currentWeakSupervisionRun, setCurrentWeakSupervisionRun] = useState(null);
     const [loadingIconWS, setLoadingIconWS] = useState(false);
 
-    const [setHeuristicsMut] = useMutation(SET_ALL_HEURISTICS);
-    const [startWeakSupervisionMut] = useMutation(START_WEAK_SUPERVISIONS);
-    const [createTaskMut] = useMutation(CREATE_INFORMATION_SOURCE_PAYLOAD);
-    const [runZeroShotMut] = useMutation(RUN_ZERO_SHOT_PROJECT);
 
     useEffect(() => {
         if (!heuristics) return;
@@ -121,15 +117,15 @@ export default function HeuristicsHeader(props: HeuristicsHeaderProps) {
 
     function runHeuristic(type: InformationSourceType, id: string) {
         if (type == InformationSourceType.ZERO_SHOT) {
-            runZeroShotMut({ variables: { projectId: projectId, informationSourceId: id } }).then(() => { });
+            initZeroShot(projectId, id, () => { });
         } else if (type == InformationSourceType.CROWD_LABELER) {
         } else {
-            createTaskMut({ variables: { projectId: projectId, informationSourceId: id } }).then(() => { });
+            createTask(projectId, id, () => { });
         }
     }
 
     function selectHeuristics(checked: boolean) {
-        setHeuristicsMut({ variables: { projectId: projectId, value: checked } }).then(() => { props.refetch() });
+        setAllHeuristics(projectId, checked, () => { props.refetch() });
     }
 
     function prepareSelectionList() {
@@ -147,8 +143,7 @@ export default function HeuristicsHeader(props: HeuristicsHeaderProps) {
     }
 
     function startWeakSupervision() {
-        startWeakSupervisionMut({ variables: { projectId: projectId } }).then(() => {
-        });
+        initWeakSupervision(projectId, () => { });
     }
 
     const handleWebsocketNotification = useCallback((msgParts: string[]) => {
