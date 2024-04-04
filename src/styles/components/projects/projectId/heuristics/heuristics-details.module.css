@@ -6,6 +6,7 @@
 
 @media screen and (min-width: 1250px) {
     .widthSize {
-        width: calc(100vw - 75px);
+        width: calc(100vw - 95px);
+        min-width: 1175px;
     }
 }

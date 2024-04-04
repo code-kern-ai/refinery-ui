@@ -14,6 +14,7 @@ import { useRouter } from "next/router";
 import { ModalEnum } from "@/src/types/shared/modal";
 import { openModal } from "@/src/reduxStore/states/modal";
 import { useWebsocket } from "@/src/services/base/web-sockets/useWebsocket";
+import { scrollElementIntoView } from "@/submodules/javascript-functions/scrollHelper";
 
 export default function EditRecords() {
     const dispatch = useDispatch();
@@ -41,6 +42,7 @@ export default function EditRecords() {
         if (!erdDataCopy.modals.hideExplainModal) {
             dispatch(openModal(ModalEnum.EXPLAIN_EDIT_RECORDS));
         }
+        scrollElementIntoView('flash-it', 100);
     }, [sessionData, projectId]);
 
     useEffect(() => {
@@ -71,9 +73,9 @@ export default function EditRecords() {
 
     useWebsocket(CurrentPage.EDIT_RECORDS, handleWebsocketNotification, projectId);
 
-    return (<>{projectId && <div className="h-screen bg-white flex flex-col">
+    return (<>{projectId && <div className="h-full bg-white flex flex-col">
         <NavBarTopEditRecords erdData={erdData} setErdData={(erdData) => setErdData(erdData)} />
-        <div className={`grid items-start pt-2 px-2 pb-8 gap-2 flex-grow overflow-y-auto auto-rows-max ${erdData.columnClass}`} style={{ maxHeight: 'calc(100vh - 95px)' }}>
+        <div className={`grid items-start p-2 gap-2 flex-grow overflow-y-auto auto-rows-max ${erdData.columnClass}`} >
             {erdData.data && <>
                 {erdData.displayRecords.map((record) =>
                     <div key={record.id} className={`relative space-x-3 items-center bg-white overflow-hidden shadow rounded-lg border w-full scroll-mt-8 ${erdData.displayRecords?.length > 2 ? style.item : ''} `}

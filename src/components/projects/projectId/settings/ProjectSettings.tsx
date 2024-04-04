@@ -276,7 +276,7 @@ export default function ProjectSettings() {
     useWebsocket(CurrentPage.PROJECT_SETTINGS, handleWebsocketNotification, project?.id);
 
     return (<div>
-        {project != null && <div className="p-4 bg-gray-100 pb-10 h-screen overflow-y-auto flex-1 flex flex-col">
+        {project != null && <div className="p-4 bg-gray-100 h-full flex-1 flex flex-col overflow-y-auto">
             <DataSchema isAcOrTokenizationRunning={isAcRunning || tokenizationProgress < 1} pKeyValid={pKeyValid} />
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-2 mt-1 align-top">
