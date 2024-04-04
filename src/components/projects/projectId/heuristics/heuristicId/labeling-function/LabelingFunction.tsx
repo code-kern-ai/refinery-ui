@@ -3,14 +3,12 @@ import HeuristicsLayout from "../shared/HeuristicsLayout";
 import { useDispatch, useSelector } from "react-redux";
 import { selectProjectId } from "@/src/reduxStore/states/project";
 import { useCallback, useEffect, useState } from "react";
-import { useMutation } from "@apollo/client";
 import { selectHeuristic, setActiveHeuristics, updateHeuristicsState } from "@/src/reduxStore/states/pages/heuristics";
 import { postProcessCurrentHeuristic, postProcessLastTaskLogs } from "@/src/util/components/projects/projectId/heuristics/heuristicId/heuristics-details-helper";
 import { Tooltip } from "@nextui-org/react";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
 import { postProcessLabelingTasks, postProcessLabelingTasksSchema } from "@/src/util/components/projects/projectId/settings/labeling-tasks-helper";
 import { selectVisibleAttributesHeuristics, selectLabelingTasksAll, setLabelingTasksAll } from "@/src/reduxStore/states/pages/settings";
-import { UPDATE_INFORMATION_SOURCE } from "@/src/services/gql/mutations/heuristics";
 import HeuristicsEditor from "../shared/HeuristicsEditor";
 import DangerZone from "@/src/components/shared/danger-zone/DangerZone";
 import HeuristicRunButtons from "../shared/HeuristicRunButtons";
@@ -38,7 +36,7 @@ import { parseContainerLogsData } from "@/submodules/javascript-functions/logs-p
 import { useWebsocket } from "@/src/services/base/web-sockets/useWebsocket";
 import { getAllComments } from "@/src/services/base/comment";
 import { getLabelingTasksByProjectId } from "@/src/services/base/project";
-import { getHeuristicByHeuristicId, getLabelingFunctionOn10Records, getPayloadByPayloadId } from "@/src/services/base/heuristic";
+import { getHeuristicByHeuristicId, getLabelingFunctionOn10Records, getPayloadByPayloadId, updateHeuristicPost } from "@/src/services/base/heuristic";
 
 export default function LabelingFunction() {
     const dispatch = useDispatch();
@@ -57,8 +55,6 @@ export default function LabelingFunction() {
     const [isInitialLf, setIsInitialLf] = useState<boolean>(null);  //null as add state to differentiate between initial, not and unchecked
     const [checkUnsavedChanges, setCheckUnsavedChanges] = useState(false);
     const [runOn10IsRunning, setRunOn10IsRunning] = useState(false);
-
-    const [updateHeuristicMut] = useMutation(UPDATE_INFORMATION_SOURCE);
 
     useEffect(() => {
         if (!projectId) return;
@@ -116,7 +112,7 @@ export default function LabelingFunction() {
     function saveHeuristic(labelingTask: any) {
         const newCode = checkTemplateCodeChange(labelingTask);
         if (newCode) updateSourceCode(newCode, labelingTask.id);
-        updateHeuristicMut({ variables: { projectId: projectId, informationSourceId: currentHeuristic.id, labelingTaskId: labelingTask.id } }).then((res) => {
+        updateHeuristicPost(projectId, currentHeuristic.id, labelingTask.id, currentHeuristic.sourceCode, currentHeuristic.description, currentHeuristic.name, (res) => {
             dispatch(updateHeuristicsState(currentHeuristic.id, { labelingTaskId: labelingTask.id, labelingTaskName: labelingTask.name, labels: labelingTask.labels }))
         });
     }
@@ -168,7 +164,7 @@ export default function LabelingFunction() {
             return;
         }
         const finalSourceCode = value.replace(regMatch[0], 'def lf(record)');
-        updateHeuristicMut({ variables: { projectId: projectId, informationSourceId: currentHeuristic.id, labelingTaskId: labelingTaskId ?? currentHeuristic.labelingTaskId, code: finalSourceCode, name: regMatch[2] } }).then((res) => {
+        updateHeuristicPost(projectId, currentHeuristic.id, labelingTaskId ?? currentHeuristic.labelingTaskId, finalSourceCode, currentHeuristic.description, regMatch[2], (res) => {
             dispatch(updateHeuristicsState(currentHeuristic.id, { sourceCode: finalSourceCode, name: regMatch[2] }));
             updateSourceCodeToDisplay(finalSourceCode);
         });
@@ -202,7 +198,7 @@ export default function LabelingFunction() {
 
     function setValueToLabelingTask(value: string) {
         const labelingTask = labelingTasks.find(a => a.id == value);
-        updateHeuristicMut({ variables: { projectId: projectId, informationSourceId: currentHeuristic.id, labelingTaskId: labelingTask.id } }).then((res) => {
+        updateHeuristicPost(projectId, currentHeuristic.id, labelingTask.id, currentHeuristic.sourceCode, currentHeuristic.description, currentHeuristic.name, (res) => {
             dispatch(updateHeuristicsState(currentHeuristic.id, { labelingTaskId: labelingTask.id, labelingTaskName: labelingTask.name, labels: labelingTask.labels }))
         });
     }

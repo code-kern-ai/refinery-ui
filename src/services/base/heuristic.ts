@@ -70,3 +70,14 @@ export function createHeuristicPost(projectId: string, labelingTaskId: string, s
     };
     jsonFetchWrapper(finalUrl, FetchType.POST, onResult, JSON.stringify(convertCamelToSnakeCase(body)));
 }
+
+export function updateHeuristicPost(projectId: string, heuristicId: string, labelingTaskId: string, code: string, description: string, name: string, onResult: (result: any) => void) {
+    const finalUrl = `${heuristicEndpoint}/${projectId}/${heuristicId}/update-heuristic`;
+    const body = {
+        labelingTaskId: labelingTaskId,
+        code: code,
+        description: description,
+        name: name
+    };
+    jsonFetchWrapper(finalUrl, FetchType.POST, onResult, JSON.stringify(convertCamelToSnakeCase(body)));
+}

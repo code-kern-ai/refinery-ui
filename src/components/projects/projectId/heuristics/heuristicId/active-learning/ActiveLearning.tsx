@@ -2,14 +2,12 @@ import { useDispatch, useSelector } from "react-redux";
 import HeuristicsLayout from "../shared/HeuristicsLayout";
 import { useRouter } from "next/router";
 import { selectProjectId } from "@/src/reduxStore/states/project";
-import { useMutation } from "@apollo/client";
 import { Fragment, useCallback, useEffect, useState } from "react";
 import { selectHeuristic, setActiveHeuristics, updateHeuristicsState } from "@/src/reduxStore/states/pages/heuristics";
 import { getClassLine, postProcessCurrentHeuristic, postProcessLastTaskLogs } from "@/src/util/components/projects/projectId/heuristics/heuristicId/heuristics-details-helper";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
 import { Tooltip } from "@nextui-org/react";
 import { selectEmbeddings, selectEmbeddingsFiltered, selectLabelingTasksAll, selectVisibleAttributesHeuristics, setAllEmbeddings, setFilteredEmbeddings, setLabelingTasksAll } from "@/src/reduxStore/states/pages/settings";
-import { UPDATE_INFORMATION_SOURCE } from "@/src/services/gql/mutations/heuristics";
 import { postProcessLabelingTasks, postProcessLabelingTasksSchema } from "@/src/util/components/projects/projectId/settings/labeling-tasks-helper";
 import { postProcessingEmbeddings } from "@/src/util/components/projects/projectId/settings/embeddings-helper";
 import { embeddingRelevant } from "@/src/util/components/projects/projectId/heuristics/heuristicId/labeling-functions-helper";
@@ -35,7 +33,7 @@ import LoadingIcon from "@/src/components/shared/loading/LoadingIcon";
 import { useWebsocket } from "@/src/services/base/web-sockets/useWebsocket";
 import { getAllComments } from "@/src/services/base/comment";
 import { getLabelingTasksByProjectId } from "@/src/services/base/project";
-import { getHeuristicByHeuristicId, getPayloadByPayloadId } from "@/src/services/base/heuristic";
+import { getHeuristicByHeuristicId, getPayloadByPayloadId, updateHeuristicPost } from "@/src/services/base/heuristic";
 import { getEmbeddings } from "@/src/services/base/embedding";
 
 export default function ActiveLearning() {
@@ -53,8 +51,6 @@ export default function ActiveLearning() {
     const [lastTaskLogs, setLastTaskLogs] = useState<string[]>([]);
     const [isInitialAL, setIsInitialAL] = useState<boolean>(null);  //null as add state to differentiate between initial, not and unchecked
     const [checkUnsavedChanges, setCheckUnsavedChanges] = useState(false);
-
-    const [updateHeuristicMut] = useMutation(UPDATE_INFORMATION_SOURCE);
 
     useEffect(() => {
         if (!projectId) return;
@@ -121,7 +117,7 @@ export default function ActiveLearning() {
     function saveHeuristic(labelingTask: any) {
         const newCode = checkTemplateCodeChange(labelingTask);
         if (newCode) updateSourceCode(newCode, labelingTask.id);
-        updateHeuristicMut({ variables: { projectId: projectId, informationSourceId: currentHeuristic.id, labelingTaskId: labelingTask.id } }).then((res) => {
+        updateHeuristicPost(projectId, currentHeuristic.id, labelingTask.id, currentHeuristic.sourceCode, currentHeuristic.description, currentHeuristic.name, (res) => {
             dispatch(updateHeuristicsState(currentHeuristic.id, { labelingTaskId: labelingTask.id, labelingTaskName: labelingTask.name, labels: labelingTask.labels }));
         });
     }
@@ -170,7 +166,7 @@ export default function ActiveLearning() {
         }
         const labelingTaskFinalId = labelingTaskId ?? currentHeuristic.labelingTaskId;
         const finalSourceCode = value.replace(regMatch[0], getClassLine(null, labelingTasks, labelingTaskFinalId));
-        updateHeuristicMut({ variables: { projectId: projectId, informationSourceId: currentHeuristic.id, labelingTaskId: labelingTaskFinalId, code: finalSourceCode, name: regMatch[1] } }).then((res) => {
+        updateHeuristicPost(projectId, currentHeuristic.id, labelingTaskFinalId, finalSourceCode, currentHeuristic.description, regMatch[1], (res) => {
             dispatch(updateHeuristicsState(currentHeuristic.id, { sourceCode: finalSourceCode, name: regMatch[1] }));
             updateSourceCodeToDisplay(finalSourceCode);
         });
@@ -203,7 +199,7 @@ export default function ActiveLearning() {
 
     function setValueToLabelingTask(value: string) {
         const labelingTask = labelingTasks.find(a => a.id == value);
-        updateHeuristicMut({ variables: { projectId: projectId, informationSourceId: currentHeuristic.id, labelingTaskId: labelingTask.id } }).then((res) => {
+        updateHeuristicPost(projectId, currentHeuristic.id, labelingTask.id, currentHeuristic.sourceCode, currentHeuristic.description, currentHeuristic.name, (res) => {
             dispatch(updateHeuristicsState(currentHeuristic.id, { labelingTaskId: labelingTask.id, labelingTaskName: labelingTask.name, labels: labelingTask.labels }));
         });
     }
