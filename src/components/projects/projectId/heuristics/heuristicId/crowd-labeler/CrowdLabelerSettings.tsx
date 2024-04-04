@@ -4,7 +4,8 @@ import { selectHeuristic, updateHeuristicsState } from "@/src/reduxStore/states/
 import { setDisplayUserRole } from "@/src/reduxStore/states/pages/labeling";
 import { selectLabelingTasksAll } from "@/src/reduxStore/states/pages/settings";
 import { selectProjectId } from "@/src/reduxStore/states/project";
-import { CREATE_ACCESS_LINK, LOCK_ACCESS_LINK, REMOVE_ACCESS_LINK, UPDATE_INFORMATION_SOURCE } from "@/src/services/gql/mutations/heuristics";
+import { generateAccessLink } from "@/src/services/base/labeling";
+import { LOCK_ACCESS_LINK, REMOVE_ACCESS_LINK, UPDATE_INFORMATION_SOURCE } from "@/src/services/gql/mutations/heuristics";
 import { UserRole } from "@/src/types/shared/sidebar";
 import { parseToSettingsJson } from "@/src/util/components/projects/projectId/heuristics/heuristicId/crowd-labeler-helper";
 import { buildFullLink, parseLinkFromText } from "@/src/util/shared/link-parser-helper";
@@ -30,7 +31,6 @@ export default function CrowdLabelerSettings() {
     const dataSlicesDict = useSelector(selectDataSlicesDict);
 
     const [updateHeuristicMut] = useMutation(UPDATE_INFORMATION_SOURCE);
-    const [createAccessLinkMut] = useMutation(CREATE_ACCESS_LINK);
     const [removeAccessLinkMut] = useMutation(REMOVE_ACCESS_LINK);
     const [changeAccessLinkMut] = useMutation(LOCK_ACCESS_LINK);
 
@@ -51,8 +51,8 @@ export default function CrowdLabelerSettings() {
         if (saveToDb) saveHeuristic(null, crowdLabelerSettingsCopy);
     }
 
-    function generateAccessLink() {
-        createAccessLinkMut({ variables: { projectId: projectId, type: "HEURISTIC", id: currentHeuristic.id } }).then((res) => {
+    function createAccessLink() {
+        generateAccessLink(projectId, { type: "HEURISTIC", id: currentHeuristic.id }, (res) => {
             const link = res.data.generateAccessLink.link;
             const labelingTask = currentHeuristic.labelingTaskId;
             const code = parseToSettingsJson({ ...currentHeuristic.crowdLabelerSettings, accessLinkId: link.id });
@@ -126,7 +126,7 @@ export default function CrowdLabelerSettings() {
                 </Tooltip>
             </div>
             <div className="mt-4">
-                <button onClick={generateAccessLink} disabled={!currentHeuristic.labelingTaskId || !currentHeuristic.crowdLabelerSettings.annotatorId || !currentHeuristic.crowdLabelerSettings.dataSliceId || currentHeuristic.crowdLabelerSettings.accessLinkId}
+                <button onClick={createAccessLink} disabled={!currentHeuristic.labelingTaskId || !currentHeuristic.crowdLabelerSettings.annotatorId || !currentHeuristic.crowdLabelerSettings.dataSliceId || currentHeuristic.crowdLabelerSettings.accessLinkId}
                     className="w-40 bg-indigo-700 text-white text-xs leading-4 font-semibold px-4 py-2 rounded-md cursor-pointer hover:bg-indigo-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed">
                     Generate link</button>
                 {currentHeuristic.crowdLabelerSettings.accessLinkParsed && <div className="mt-2">
