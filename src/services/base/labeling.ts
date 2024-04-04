@@ -48,3 +48,15 @@ export function removeAccessLink(projectId: string, linkId: string, onResult: (r
     const finalUrl = `${labelingEndpoint}/${projectId}/remove-access-link`;
     jsonFetchWrapper(finalUrl, FetchType.DELETE, onResult, JSON.stringify({ "value": linkId }));
 }
+
+export function addClassificationLabels(projectId: string, recordId: string, labelingTaskId: string, labelId: string, asGoldStar: boolean, sourceId: string, onResult: (result: any) => void) {
+    const finalUrl = `${labelingEndpoint}/${projectId}/add-classification-labels`;
+    const body = {
+        recordId,
+        labelingTaskId,
+        labelId,
+        asGoldStar,
+        sourceId
+    }
+    jsonFetchWrapper(finalUrl, FetchType.POST, onResult, JSON.stringify(convertCamelToSnakeCase(body)));
+}

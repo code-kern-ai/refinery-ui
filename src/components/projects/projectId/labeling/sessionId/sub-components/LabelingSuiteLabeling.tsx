@@ -28,7 +28,7 @@ import { LabelingPageParts } from "@/src/types/components/projects/projectId/lab
 import style from '@/src/styles/components/projects/projectId/labeling.module.css';
 import { getStoreSnapshotValue } from "@/src/reduxStore/store"
 import { createLabel } from "@/src/services/base/project-setting"
-import { deleteRecordLabelAssociationByIds } from "@/src/services/base/labeling"
+import { addClassificationLabels, deleteRecordLabelAssociationByIds } from "@/src/services/base/labeling"
 
 const L_VARS = getDefaultLabelingVars();
 
@@ -65,7 +65,6 @@ export default function LabelingSuiteLabeling() {
 
     const extractionRef = useRef(null);
 
-    const [addClassificationLabelToRecordMut] = useMutation(ADD_CLASSIFICATION_LABELS_TO_RECORD);
     const [addExtractionLabelToRecordMut] = useMutation(ADD_EXTRACTION_LABEL_TO_RECORD);
     const [setGoldStarMut] = useMutation(SET_GOLD_STAR_ANNOTATION_FOR_TASK);
     const [removeGoldStarMut] = useMutation(REMOVE_GOLD_STAR_ANNOTATION_FOR_TASK);
@@ -460,7 +459,7 @@ export default function LabelingSuiteLabeling() {
         if (existingLabels.length == 1) return;
         const sourceId = SessionManager.getSourceId();
         const asGoldStar = displayUserId == GOLD_STAR_USER_ID ? true : null;
-        addClassificationLabelToRecordMut({ variables: { projectId: projectId, recordId: record.id, labelingTaskId: labelingTaskId, labelId: labelId, asGoldStar: asGoldStar, sourceId: sourceId } }).then((res) => {
+        addClassificationLabels(projectId, record.id, labelingTaskId, labelId, asGoldStar, sourceId, () => {
             if (settings.main.autoNextRecord) {
                 SessionManager.nextRecord();
                 SessionManager.currentRecordId = SessionManager.huddleData.recordIds[SessionManager.huddleData.linkData.requestedPos - 1];
