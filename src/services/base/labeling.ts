@@ -43,3 +43,8 @@ export function generateAccessLink(projectId: string, options: {
     const finalUrl = `${labelingEndpoint}/${projectId}/generate-access-link`;
     jsonFetchWrapper(finalUrl, FetchType.POST, onResult, JSON.stringify(convertCamelToSnakeCase(options)));
 }
+
+export function removeAccessLink(projectId: string, linkId: string, onResult: (result: any) => void) {
+    const finalUrl = `${labelingEndpoint}/${projectId}/remove-access-link`;
+    jsonFetchWrapper(finalUrl, FetchType.DELETE, onResult, JSON.stringify({ "value": linkId }));
+}

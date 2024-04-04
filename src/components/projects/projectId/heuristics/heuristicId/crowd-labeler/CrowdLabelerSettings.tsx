@@ -4,8 +4,8 @@ import { selectHeuristic, updateHeuristicsState } from "@/src/reduxStore/states/
 import { setDisplayUserRole } from "@/src/reduxStore/states/pages/labeling";
 import { selectLabelingTasksAll } from "@/src/reduxStore/states/pages/settings";
 import { selectProjectId } from "@/src/reduxStore/states/project";
-import { generateAccessLink } from "@/src/services/base/labeling";
-import { LOCK_ACCESS_LINK, REMOVE_ACCESS_LINK, UPDATE_INFORMATION_SOURCE } from "@/src/services/gql/mutations/heuristics";
+import { generateAccessLink as gal, removeAccessLink as ral } from "@/src/services/base/labeling";
+import { LOCK_ACCESS_LINK, UPDATE_INFORMATION_SOURCE } from "@/src/services/gql/mutations/heuristics";
 import { updateHeuristicPost } from "@/src/services/base/heuristic";
 import { UserRole } from "@/src/types/shared/sidebar";
 import { parseToSettingsJson } from "@/src/util/components/projects/projectId/heuristics/heuristicId/crowd-labeler-helper";
@@ -32,7 +32,6 @@ export default function CrowdLabelerSettings() {
     const dataSlicesDict = useSelector(selectDataSlicesDict);
 
     const [updateHeuristicMut] = useMutation(UPDATE_INFORMATION_SOURCE);
-    const [removeAccessLinkMut] = useMutation(REMOVE_ACCESS_LINK);
     const [changeAccessLinkMut] = useMutation(LOCK_ACCESS_LINK);
 
     function saveHeuristic(labelingTaskParam: any, crowdLabelerSettings: any = null) {
@@ -51,8 +50,8 @@ export default function CrowdLabelerSettings() {
         if (saveToDb) saveHeuristic(null, crowdLabelerSettingsCopy);
     }
 
-    function createAccessLink() {
-        generateAccessLink(projectId, { type: "HEURISTIC", id: currentHeuristic.id }, (res) => {
+    function generateAccessLink() {
+        gal(projectId, { type: "HEURISTIC", id: currentHeuristic.id }, (res) => {
             const link = res.data.generateAccessLink.link;
             const labelingTask = currentHeuristic.labelingTaskId;
             const code = parseToSettingsJson({ ...currentHeuristic.crowdLabelerSettings, accessLinkId: link.id });
@@ -63,7 +62,7 @@ export default function CrowdLabelerSettings() {
     }
 
     function removeAccessLink() {
-        removeAccessLinkMut({ variables: { projectId: projectId, linkId: currentHeuristic.crowdLabelerSettings.accessLinkId } }).then((res) => {
+        ral(projectId, currentHeuristic.crowdLabelerSettings.accessLinkId, (res) => {
             dispatch(updateHeuristicsState(currentHeuristic.id, { crowdLabelerSettings: { ...currentHeuristic.crowdLabelerSettings, accessLink: null, accessLinkId: null, accessLinkParsed: null } }));
             const labelingTask = currentHeuristic.labelingTaskId;
             const code = parseToSettingsJson({ ...currentHeuristic.crowdLabelerSettings, accessLinkId: null });
@@ -126,7 +125,7 @@ export default function CrowdLabelerSettings() {
                 </Tooltip>
             </div>
             <div className="mt-4">
-                <button onClick={createAccessLink} disabled={!currentHeuristic.labelingTaskId || !currentHeuristic.crowdLabelerSettings.annotatorId || !currentHeuristic.crowdLabelerSettings.dataSliceId || currentHeuristic.crowdLabelerSettings.accessLinkId}
+                <button onClick={generateAccessLink} disabled={!currentHeuristic.labelingTaskId || !currentHeuristic.crowdLabelerSettings.annotatorId || !currentHeuristic.crowdLabelerSettings.dataSliceId || currentHeuristic.crowdLabelerSettings.accessLinkId}
                     className="w-40 bg-indigo-700 text-white text-xs leading-4 font-semibold px-4 py-2 rounded-md cursor-pointer hover:bg-indigo-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed">
                     Generate link</button>
                 {currentHeuristic.crowdLabelerSettings.accessLinkParsed && <div className="mt-2">
