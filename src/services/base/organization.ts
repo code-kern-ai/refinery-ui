@@ -50,3 +50,9 @@ export function addUserToOrganization(userMail: string, organizationName: string
     const body = { userMail, organizationName };
     jsonFetchWrapper(finalUrl, FetchType.POST, onResult, JSON.stringify(convertCamelToSnakeCase(body)));
 }
+
+export function changeOrganization(orgId: string, changes: string, onResult: (result: any) => void) {
+    const finalUrl = `${organizationEndpoint}/change-organization`;
+    const body = { orgId, changes };
+    jsonFetchWrapper(finalUrl, FetchType.POST, onResult, JSON.stringify(convertCamelToSnakeCase(body)));
+}

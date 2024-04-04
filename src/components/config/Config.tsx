@@ -1,7 +1,7 @@
 import { CacheEnum, selectCachedValue } from "@/src/reduxStore/states/cachedValues";
 import { selectOrganization, setOrganization } from "@/src/reduxStore/states/general";
 import { ConfigManager } from "@/src/services/base/config";
-import { CHANGE_ORGANIZATION, UPDATE_CONFIG } from "@/src/services/gql/mutations/organizations";
+import { UPDATE_CONFIG } from "@/src/services/gql/mutations/organizations";
 import { Configuration, LocalConfig } from "@/src/types/components/config/config"
 import { snakeCaseToCamelCase } from "@/submodules/javascript-functions/case-types-parser";
 import Dropdown2 from "@/submodules/react-components/components/Dropdown2";
@@ -9,7 +9,7 @@ import { useMutation } from "@apollo/client";
 import { IconPlus, IconTrash } from "@tabler/icons-react";
 import { useEffect, useState } from "react"
 import { useSelector, useDispatch } from "react-redux";
-import { getOrganization } from "@/src/services/base/organization";
+import { changeOrganization, getOrganization } from "@/src/services/base/organization";
 
 export default function Config() {
     const dispatch = useDispatch();
@@ -21,7 +21,6 @@ export default function Config() {
     const [prepareTokenizedValues, setPrepareTokenizedValues] = useState<any[]>([]);
     const [preparedOptions, setPreparedOptions] = useState<any[]>([]);
 
-    const [changeOrganizationMut] = useMutation(CHANGE_ORGANIZATION);
     const [updateConfigMut] = useMutation(UPDATE_CONFIG);
 
     useEffect(() => {
@@ -77,7 +76,7 @@ export default function Config() {
             updateDict[key] = value;
         }
         if (subkey == 'max_rows' || subkey == 'max_cols' || subkey == 'max_char_count') {
-            changeOrganizationMut({ variables: { orgId: organization.id, changes: JSON.stringify(updateDict.limit_checks) } }).then((res) => {
+            changeOrganization(organization.id, JSON.stringify(updateDict.limit_checks), (res) => {
                 if (!res?.data?.changeOrganization) {
                     window.alert('something went wrong with the update');
                 } else {
