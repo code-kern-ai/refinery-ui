@@ -82,3 +82,22 @@ export function addExtractionLabel(projectId: string, recordId: string, labeling
     }
     jsonFetchWrapper(finalUrl, FetchType.POST, onResult, JSON.stringify(convertCamelToSnakeCase(body)));
 }
+
+export function setGoldStar(projectId: string, recordId: string, labelingTaskId: string, goldUserId: string, onResult: (result: any) => void) {
+    const finalUrl = `${labelingEndpoint}/${projectId}/set-gold-star`;
+    const body = {
+        recordId,
+        labelingTaskId,
+        goldUserId
+    }
+    jsonFetchWrapper(finalUrl, FetchType.POST, onResult, JSON.stringify(convertCamelToSnakeCase(body)));
+}
+
+export function removeGoldStar(projectId: string, recordId: string, labelingTaskId: string, onResult: (result: any) => void) {
+    const finalUrl = `${labelingEndpoint}/${projectId}/remove-gold-star`;
+    const body = {
+        recordId,
+        labelingTaskId
+    }
+    jsonFetchWrapper(finalUrl, FetchType.POST, onResult, JSON.stringify(convertCamelToSnakeCase(body)));
+}
