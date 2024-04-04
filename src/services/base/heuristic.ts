@@ -42,3 +42,13 @@ export function toggleHeuristicById(projectId: string, heuristicId: string, onRe
     const finalUrl = `${heuristicEndpoint}/${projectId}/${heuristicId}/toggle-heuristic`;
     jsonFetchWrapper(finalUrl, FetchType.POST, onResult);
 }
+
+export function setAllHeuristics(projectId: string, value: boolean, onResult: (result: any) => void) {
+    const finalUrl = `${heuristicEndpoint}/${projectId}?value=${value}`;
+    jsonFetchWrapper(finalUrl, FetchType.POST, onResult);
+}
+
+export function createTask(projectId: string, heuristicId: string, onResult: (result: any) => void) {
+    const finalUrl = `${heuristicEndpoint}/${projectId}/${heuristicId}/payload`;
+    jsonFetchWrapper(finalUrl, FetchType.POST, onResult);
+}

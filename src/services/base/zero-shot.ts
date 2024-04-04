@@ -17,3 +17,8 @@ export function getZeroShot10Records(projectId: string, heuristicId: string, lab
     const finalUrl = `${zeroShotEndpoint}/${projectId}/zero-shot-10-records`;
     jsonFetchWrapper(finalUrl, FetchType.POST, onResult, JSON.stringify({ heuristicId, labelNames }));
 }
+
+export function initZeroShot(projectId: string, heuristicId: string, onResult: (result: any) => void) {
+    const finalUrl = `${zeroShotEndpoint}/${projectId}/${heuristicId}/run-zero-shot`;
+    jsonFetchWrapper(finalUrl, FetchType.POST, onResult);
+}

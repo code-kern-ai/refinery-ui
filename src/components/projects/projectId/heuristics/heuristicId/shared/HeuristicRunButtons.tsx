@@ -1,7 +1,8 @@
 import LoadingIcon from "@/src/components/shared/loading/LoadingIcon";
 import { selectHeuristic } from "@/src/reduxStore/states/pages/heuristics";
 import { selectProjectId } from "@/src/reduxStore/states/project";
-import { CREATE_INFORMATION_SOURCE_PAYLOAD, RUN_HEURISTIC_THEN_TRIGGER_WEAK_SUPERVISION } from "@/src/services/gql/mutations/heuristics";
+import { createTask } from "@/src/services/base/heuristic";
+import { RUN_HEURISTIC_THEN_TRIGGER_WEAK_SUPERVISION } from "@/src/services/gql/mutations/heuristics";
 import { HeuristicRunButtonsProps } from "@/src/types/components/projects/projectId/heuristics/heuristicId/heuristics-details";
 import { Status } from "@/src/types/shared/statuses";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
@@ -19,7 +20,6 @@ export default function HeuristicRunButtons(props: HeuristicRunButtonsProps) {
     const [canStartHeuristic, setCanStartHeuristic] = useState(true);
     const [justClickedRun, setJustClickedRun] = useState(false);
 
-    const [createTaskMut] = useMutation(CREATE_INFORMATION_SOURCE_PAYLOAD);
     const [runHeuristicAndWeaklySuperviseMut] = useMutation(RUN_HEURISTIC_THEN_TRIGGER_WEAK_SUPERVISION);
 
     useEffect(() => {
@@ -28,7 +28,7 @@ export default function HeuristicRunButtons(props: HeuristicRunButtonsProps) {
 
     function runHeuristic() {
         setJustClickedRun(true);
-        createTaskMut({ variables: { projectId: projectId, informationSourceId: currentHeuristic.id } }).then((res) => {
+        createTask(projectId, currentHeuristic.id, (res) => {
             setJustClickedRun(false);
             if (currentHeuristic.informationSourceType === InformationSourceType.LABELING_FUNCTION) {
                 props.updateDisplayLogWarning(false);
