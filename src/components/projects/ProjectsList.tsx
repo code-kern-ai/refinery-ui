@@ -3,14 +3,11 @@ import { selectAllProjects, setAllProjects } from "@/src/reduxStore/states/proje
 import { Project, ProjectStatistics } from "@/src/types/components/projects/projects-list";
 import { CurrentPage } from "@/src/types/shared/general";
 import { percentRoundString } from "@/submodules/javascript-functions/general";
-import { useLazyQuery, useMutation } from "@apollo/client";
 import { useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import YoutubeIntroduction from "./YoutubeIntroduction";
 import ButtonsContainer from "./ButtonsContainer";
 import ProjectCard from "./ProjectCard";
-import { GET_CAN_CREATE_LOCAL_ORG } from "@/src/services/gql/queries/organizations";
-import { ADD_USER_TO_ORGANIZATION, CREATE_ORGANIZATION } from "@/src/services/gql/mutations/organizations";
 import style from "@/src/styles/components/projects/projects-list.module.css";
 import { useRouter } from "next/router";
 import AdminDeleteProjectModal from "./AdminDeleteProjectModal";
@@ -20,7 +17,7 @@ import { setDataSlices, setFullSearchStore, setSearchGroupsStore } from "@/src/r
 import { SearchGroup } from "@/submodules/javascript-functions/enums/enums";
 import { useWebsocket } from "@/src/services/base/web-sockets/useWebsocket";
 import { getAllProjects } from "@/src/services/base/project";
-import { getCanCreateLocalOrg, getOverviewStats } from "@/src/services/base/organization";
+import { addUserToOrganization, createOrganization, getCanCreateLocalOrg, getOverviewStats } from "@/src/services/base/organization";
 
 export default function ProjectsList() {
     const router = useRouter();
@@ -35,9 +32,6 @@ export default function ProjectsList() {
     const [projectStatisticsById, setProjectStatisticsById] = useState({});
     const [canCreateOrg, setCanCreateOrg] = useState(false);
     const [dataLoaded, setDataLoaded] = useState(false);
-
-    const [createOrgMut] = useMutation(CREATE_ORGANIZATION);
-    const [addUserToOrgMut] = useMutation(ADD_USER_TO_ORGANIZATION);
 
     useEffect(() => {
         dispatch(setLabelingTasksAll(null));
@@ -93,12 +87,12 @@ export default function ProjectsList() {
             setCanCreateOrg(canCreate);
             if (!canCreate) return;
             const localhostOrg = "localhost";
-            createOrgMut({ variables: { name: localhostOrg } }).then((res) => {
-                addUserToOrgMut({ variables: { userMail: user.mail, organizationName: localhostOrg } }).then((res) => {
+            createOrganization(localhostOrg, () => {
+                addUserToOrganization(user.mail, localhostOrg, () => {
                     location.reload();
                     setDataLoaded(true);
                 });
-            });
+            })
         });
     }
 
