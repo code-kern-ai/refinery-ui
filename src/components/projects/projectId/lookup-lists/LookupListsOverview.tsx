@@ -3,8 +3,6 @@ import React, { useCallback, useEffect, useState } from "react"
 import { useDispatch, useSelector } from "react-redux";
 import { extendAllLookupLists, selectAllLookupLists, selectCheckedLookupLists, setAllLookupLists, setCheckedLookupLists } from "@/src/reduxStore/states/pages/lookup-lists";
 import { Tooltip } from "@nextui-org/react";
-import { useMutation } from "@apollo/client";
-import { CREATE_LOOKUP_LIST } from "@/src/services/gql/mutations/lookup-lists";
 import { LookupList } from "@/src/types/components/projects/projectId/lookup-lists";
 import { LookupListCard } from "./LookupListCard";
 import style from '@/src/styles/components/projects/projectId/lookup-lists.module.css';
@@ -21,7 +19,7 @@ import DeleteLookupListsModal from "./DeleteLookupListsModal";
 import Dropdown2 from "@/submodules/react-components/components/Dropdown2";
 import { useWebsocket } from "@/src/services/base/web-sockets/useWebsocket";
 import { getAllComments } from "@/src/services/base/comment";
-import { getLookupListsByProjectId } from "@/src/services/base/lookup-lists";
+import { createKnowledgeBase, getLookupListsByProjectId } from "@/src/services/base/lookup-lists";
 
 
 export default function LookupListsOverview() {
@@ -36,8 +34,6 @@ export default function LookupListsOverview() {
 
     const [selectionList, setSelectionList] = useState('');
     const [countSelected, setCountSelected] = useState(0);
-
-    const [createLookupListMut] = useMutation(CREATE_LOOKUP_LIST);
 
     useEffect(() => {
         prepareSelectionList();
@@ -69,7 +65,7 @@ export default function LookupListsOverview() {
     }, [projectId]);
 
     function createLookupList() {
-        createLookupListMut({ variables: { projectId: projectId } }).then((res) => {
+        createKnowledgeBase(projectId, (res) => {
             const lookupList = res.data?.createKnowledgeBase["knowledgeBase"];
             dispatch(extendAllLookupLists(lookupList));
             router.push(`/projects/${projectId}/lookup-lists/${lookupList.id}`);

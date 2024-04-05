@@ -4,21 +4,26 @@ import { BACKEND_BASE_URI } from "./_settings";
 export const lookupListsEndpoint = `${BACKEND_BASE_URI}/api/v1/lookup-lists`;
 
 export function getLookupListsByProjectId(projectId: string, onResult: (result: any) => void) {
-    const finalUrl = `${lookupListsEndpoint}/lookup-lists/${projectId}`;
+    const finalUrl = `${lookupListsEndpoint}/${projectId}/get-lookup-lists-by-project-id`;
     jsonFetchWrapper(finalUrl, FetchType.GET, onResult);
 }
 
 export function getLookupListsByLookupListId(projectId: string, lookupListId: string, onResult: (result: any) => void) {
-    const finalUrl = `${lookupListsEndpoint}/lookup-lists/${projectId}/${lookupListId}`;
+    const finalUrl = `${lookupListsEndpoint}/${projectId}/${lookupListId}/get-lookup-lists-by-lookup-list-id`;
     return jsonFetchWrapper(finalUrl, FetchType.GET, onResult);
 }
 
 export function getTermsByLookupListId(projectId: string, lookupListId: string, onResult: (result: any) => void) {
-    const finalUrl = `${lookupListsEndpoint}/lookup-lists/${projectId}/${lookupListId}/terms`;
+    const finalUrl = `${lookupListsEndpoint}/${projectId}/${lookupListId}/terms`;
     return jsonFetchWrapper(finalUrl, FetchType.GET, onResult);
 }
 
 export function getExportLookupList(projectId: string, lookupListId: string | string[], onResult: (result: any) => void) {
-    const finalUrl = `${lookupListsEndpoint}/lookup-lists/${projectId}/${lookupListId}/export`;
+    const finalUrl = `${lookupListsEndpoint}/${projectId}/${lookupListId}/export`;
     jsonFetchWrapper(finalUrl, FetchType.GET, onResult);
+}
+
+export function createKnowledgeBase(projectId: string, onResult: (result: any) => void) {
+    const finalUrl = `${lookupListsEndpoint}/${projectId}/knowledge-base`;
+    jsonFetchWrapper(finalUrl, FetchType.POST, onResult);
 }
