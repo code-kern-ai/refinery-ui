@@ -167,3 +167,8 @@ export function deletePersonalToken(projectId: string, tokenId: string, onResult
     const finalUrl = `${projectEndpoint}/${projectId}/${tokenId}/delete-personal-token`;
     jsonFetchWrapper(finalUrl, FetchType.DELETE, onResult);
 }
+
+export function updateProjectNameAndDescriptionPost(projectId: string, name: string, description: string, onResult: (result: any) => void) {
+    const finalUrl = `${projectEndpoint}/${projectId}/update-project-name-description`;
+    jsonFetchWrapper(finalUrl, FetchType.POST, onResult, JSON.stringify({ name, description }));
+}
