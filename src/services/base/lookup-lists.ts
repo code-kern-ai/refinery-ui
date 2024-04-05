@@ -4,12 +4,12 @@ import { BACKEND_BASE_URI } from "./_settings";
 export const lookupListsEndpoint = `${BACKEND_BASE_URI}/api/v1/lookup-lists`;
 
 export function getLookupListsByProjectId(projectId: string, onResult: (result: any) => void) {
-    const finalUrl = `${lookupListsEndpoint}/lookup-lists/${projectId}`;
+    const finalUrl = `${lookupListsEndpoint}/${projectId}/get-lookup-lists-by-project-id`;
     jsonFetchWrapper(finalUrl, FetchType.GET, onResult);
 }
 
 export function getLookupListsByLookupListId(projectId: string, lookupListId: string, onResult: (result: any) => void) {
-    const finalUrl = `${lookupListsEndpoint}/${projectId}/${lookupListId}/get-lookup-list-by-lookup-list-id`;
+    const finalUrl = `${lookupListsEndpoint}/${projectId}/${lookupListId}/get-lookup-lists-by-lookup-list-id`;
     return jsonFetchWrapper(finalUrl, FetchType.GET, onResult);
 }
 
