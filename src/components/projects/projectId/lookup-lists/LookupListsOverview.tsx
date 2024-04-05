@@ -3,8 +3,6 @@ import React, { useCallback, useEffect, useState } from "react"
 import { useDispatch, useSelector } from "react-redux";
 import { extendAllLookupLists, selectAllLookupLists, selectCheckedLookupLists, setAllLookupLists, setCheckedLookupLists } from "@/src/reduxStore/states/pages/lookup-lists";
 import { Tooltip } from "@nextui-org/react";
-import { useMutation } from "@apollo/client";
-import { CREATE_LOOKUP_LIST } from "@/src/services/gql/mutations/lookup-lists";
 import { LookupList } from "@/src/types/components/projects/projectId/lookup-lists";
 import { LookupListCard } from "./LookupListCard";
 import style from '@/src/styles/components/projects/projectId/lookup-lists.module.css';
