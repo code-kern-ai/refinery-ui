@@ -1,5 +1,6 @@
 import { FetchType, jsonFetchWrapper } from "@/submodules/javascript-functions/basic-fetch";
 import { BACKEND_BASE_URI } from "./_settings";
+import { convertCamelToSnakeCase } from "@/submodules/javascript-functions/case-types-parser";
 
 export const embeddingEndpoint = `${BACKEND_BASE_URI}/api/v1/embedding`;
 
@@ -27,3 +28,17 @@ export function getEmbeddings(projectId: string, onResult: (result: any) => void
     jsonFetchWrapper(finalUrl, FetchType.GET, onResult);
 }
 
+export function deleteFromTaskQueue(projectId: string, taskId: string, onResult: (result: any) => void) {
+    const finalUrl = `${embeddingEndpoint}/${projectId}/${taskId}/delete-from-task-queue`;
+    jsonFetchWrapper(finalUrl, FetchType.DELETE, onResult);
+}
+
+export function deleteEmbeddingPost(projectId: string, embeddingId: string, onResult: (result: any) => void) {
+    const finalUrl = `${embeddingEndpoint}/${projectId}/${embeddingId}/delete-embedding`;
+    jsonFetchWrapper(finalUrl, FetchType.DELETE, onResult);
+}
+
+export function createEmbeddingPost(projectId: string, attributeId: string, config: string, onResult: (result: any) => void) {
+    const finalUrl = `${embeddingEndpoint}/${projectId}/create-embedding`;
+    jsonFetchWrapper(finalUrl, FetchType.POST, onResult, JSON.stringify(convertCamelToSnakeCase({ attributeId, config })));
+}

@@ -2,7 +2,7 @@ import Modal from "@/src/components/shared/modal/Modal";
 import { selectModal } from "@/src/reduxStore/states/modal";
 import { removeFromAllEmbeddingsById } from "@/src/reduxStore/states/pages/settings";
 import { selectProjectId } from "@/src/reduxStore/states/project";
-import { deleteEmbeddingPost, deleteFromTaskQueue } from "@/src/services/base/project-setting";
+import { deleteEmbeddingPost, deleteFromTaskQueue } from "@/src/services/base/embedding";
 import { ModalButton, ModalEnum } from "@/src/types/shared/modal";
 import { useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
