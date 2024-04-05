@@ -9,7 +9,7 @@ export function getLookupListsByProjectId(projectId: string, onResult: (result: 
 }
 
 export function getLookupListsByLookupListId(projectId: string, lookupListId: string, onResult: (result: any) => void) {
-    const finalUrl = `${lookupListsEndpoint}/lookup-lists/${projectId}/${lookupListId}`;
+    const finalUrl = `${lookupListsEndpoint}/${projectId}/${lookupListId}/get-lookup-list-by-id`;
     return jsonFetchWrapper(finalUrl, FetchType.GET, onResult);
 }
 
