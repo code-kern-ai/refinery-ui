@@ -55,3 +55,8 @@ export function createAttribute(projectId: string, name: string, dataType: strin
     const finalUrl = `${projectSettingEndpoint}/${projectId}/create-attribute`;
     jsonFetchWrapper(finalUrl, FetchType.POST, onResult, JSON.stringify(convertCamelToSnakeCase({ name, dataType })));
 }
+
+export function updateAttribute(projectId: string, attributeId: string, onResult: (result: any) => void, dataType?: string, isPrimaryKey?: boolean, name?: string, sourceCode?: string, visibility?: string) {
+    const finalUrl = `${projectSettingEndpoint}/${projectId}/update-attribute`;
+    jsonFetchWrapper(finalUrl, FetchType.POST, onResult, JSON.stringify(convertCamelToSnakeCase({ attributeId, dataType, isPrimaryKey, name, sourceCode, visibility })));
+}
