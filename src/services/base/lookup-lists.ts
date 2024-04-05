@@ -20,7 +20,6 @@ export function getTermsByLookupListId(projectId: string, lookupListId: string, 
 
 export function getExportLookupList(projectId: string, lookupListId: string | string[], onResult: (result: any) => void) {
     const finalUrl = `${lookupListsEndpoint}/lookup-lists/${projectId}/${lookupListId}/export`;
-    console.log("REACHED getExportLookupList")
     jsonFetchWrapper(finalUrl, FetchType.GET, onResult);
 }
 
