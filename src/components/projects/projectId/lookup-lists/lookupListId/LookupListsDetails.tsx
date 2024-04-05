@@ -1,11 +1,9 @@
 import { updateLookupListState } from "@/src/reduxStore/states/pages/lookup-lists";
 import { selectProjectId } from "@/src/reduxStore/states/project"
-import { UPDATE_KNOWLEDGE_BASE } from "@/src/services/gql/mutations/lookup-lists";
 import { LookupList, LookupListProperty, Term } from "@/src/types/components/projects/projectId/lookup-lists";
 import { postProcessLookupList, postProcessTerms } from "@/src/util/components/projects/projectId/lookup-lists-helper";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
 import { copyToClipboard } from "@/submodules/javascript-functions/general";
-import { useMutation } from "@apollo/client";
 import { Tooltip } from "@nextui-org/react";
 import { IconArrowLeft } from "@tabler/icons-react";
 import { useRouter } from "next/router";
@@ -20,7 +18,7 @@ import { selectAllUsers, setComments } from "@/src/reduxStore/states/general";
 import { CommentType } from "@/src/types/shared/comments";
 import { CommentDataManager } from "@/src/util/classes/comments";
 import { useWebsocket } from "@/src/services/base/web-sockets/useWebsocket";
-import { getLookupListsByLookupListId, getTermsByLookupListId } from "@/src/services/base/lookup-lists";
+import { getLookupListsByLookupListId, getTermsByLookupListId, updateKnowledgeBase } from "@/src/services/base/lookup-lists";
 import { getAllComments } from "@/src/services/base/comment";
 
 export default function LookupListsDetails() {
@@ -37,8 +35,6 @@ export default function LookupListsDetails() {
     const [isDescriptionOpen, setIsDescriptionOpen] = useState(false);
     const [finalSize, setFinalSize] = useState(0);
     const [description, setDescription] = useState('');
-
-    const [updateLookupListMut] = useMutation(UPDATE_KNOWLEDGE_BASE);
 
     const nameRef = useRef<HTMLInputElement>(null);
     const descriptionRef = useRef<HTMLInputElement>(null);
@@ -95,9 +91,7 @@ export default function LookupListsDetails() {
     }
 
     function saveLookupList() {
-        updateLookupListMut({
-            variables: { projectId: projectId, knowledgeBaseId: lookupList.id, name: lookupList.name, description: lookupList.description }
-        }).then((res) => {
+        updateKnowledgeBase(projectId, { knowledgeBaseId: lookupList.id, name: lookupList.name, description: lookupList.description }, (res) => {
             dispatch(updateLookupListState(lookupList.id, { name: lookupList.name, description: lookupList.description }))
         });
     }

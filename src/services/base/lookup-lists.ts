@@ -1,5 +1,6 @@
 import { FetchType, jsonFetchWrapper } from "@/submodules/javascript-functions/basic-fetch";
 import { BACKEND_BASE_URI } from "./_settings";
+import { convertCamelToSnakeCase } from "@/submodules/javascript-functions/case-types-parser";
 
 export const lookupListsEndpoint = `${BACKEND_BASE_URI}/api/v1/lookup-lists`;
 
@@ -24,6 +25,13 @@ export function getExportLookupList(projectId: string, lookupListId: string | st
 }
 
 export function createKnowledgeBase(projectId: string, onResult: (result: any) => void) {
-    const finalUrl = `${lookupListsEndpoint}/${projectId}/knowledge-base`;
+    const finalUrl = `${lookupListsEndpoint}/${projectId}/create-knowledge-base`;
     jsonFetchWrapper(finalUrl, FetchType.POST, onResult);
+}
+
+export function updateKnowledgeBase(projectId: string, options: {
+    knowledgeBaseId: string, name: string, description: string
+}, onResult: (result: any) => void) {
+    const finalUrl = `${lookupListsEndpoint}/${projectId}/update-knowledge-base`;
+    jsonFetchWrapper(finalUrl, FetchType.POST, onResult, JSON.stringify(convertCamelToSnakeCase(options)));
 }
