@@ -1,5 +1,6 @@
 import { FetchType, jsonFetchWrapper } from "@/submodules/javascript-functions/basic-fetch";
 import { BACKEND_BASE_URI } from "./_settings";
+import { convertCamelToSnakeCase } from "@/submodules/javascript-functions/case-types-parser";
 
 export const projectSettingEndpoint = `${BACKEND_BASE_URI}/api/v1/project-setting`;
 
@@ -48,4 +49,9 @@ export function getProjectSize(projectId: string, onResult: (result: any) => voi
 export function createLabels(projectId: string, labelingTaskId: string, labels: string[], onResult: (result: any) => void) {
     const finalUrl = `${projectSettingEndpoint}/${projectId}/create-labels`;
     jsonFetchWrapper(finalUrl, FetchType.POST, onResult, JSON.stringify({ labelingTaskId, labels }));
+}
+
+export function createAttribute(projectId: string, name: string, dataType: string, onResult: (result: any) => void) {
+    const finalUrl = `${projectSettingEndpoint}/${projectId}/create-attribute`;
+    jsonFetchWrapper(finalUrl, FetchType.POST, onResult, JSON.stringify(convertCamelToSnakeCase({ name, dataType })));
 }
