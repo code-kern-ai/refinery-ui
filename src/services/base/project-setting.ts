@@ -65,3 +65,13 @@ export function updateProjectGates(projectId: string, onResult: (result: any) =>
     const finalUrl = `${projectSettingEndpoint}/${projectId}/update-project-gates`;
     jsonFetchWrapper(finalUrl, FetchType.POST, onResult);
 }
+
+export function deleteFromTaskQueue(projectId: string, taskId: string, onResult: (result: any) => void) {
+    const finalUrl = `${projectSettingEndpoint}/${projectId}/${taskId}/delete-from-task-queue`;
+    jsonFetchWrapper(finalUrl, FetchType.DELETE, onResult);
+}
+
+export function deleteEmbeddingPost(projectId: string, embeddingId: string, onResult: (result: any) => void) {
+    const finalUrl = `${projectSettingEndpoint}/${projectId}/${embeddingId}/delete-embedding`;
+    jsonFetchWrapper(finalUrl, FetchType.DELETE, onResult);
+}
