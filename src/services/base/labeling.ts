@@ -55,3 +55,49 @@ export function lockAccessLink(projectId: string, options: {
     const finalUrl = `${labelingEndpoint}/${projectId}/lock-access-link`;
     jsonFetchWrapper(finalUrl, FetchType.PUT, onResult, JSON.stringify(convertCamelToSnakeCase(options)));
 }
+
+export function addClassificationLabels(projectId: string, recordId: string, labelingTaskId: string, labelId: string, asGoldStar: boolean, sourceId: string, onResult: (result: any) => void) {
+    const finalUrl = `${labelingEndpoint}/${projectId}/add-classification-labels`;
+    const body = {
+        recordId,
+        labelingTaskId,
+        labelId,
+        asGoldStar,
+        sourceId
+    }
+    jsonFetchWrapper(finalUrl, FetchType.POST, onResult, JSON.stringify(convertCamelToSnakeCase(body)));
+}
+
+export function addExtractionLabel(projectId: string, recordId: string, labelingTaskId: string, tokenStartIndex: number, tokenEndIndex: number, value: string, labelId: string, asGoldStar: boolean, sourceId: string, onResult: (result: any) => void) {
+    const finalUrl = `${labelingEndpoint}/${projectId}/add-extraction-label`;
+    const body = {
+        recordId,
+        labelingTaskId,
+        tokenStartIndex,
+        tokenEndIndex,
+        value,
+        labelId,
+        asGoldStar,
+        sourceId
+    }
+    jsonFetchWrapper(finalUrl, FetchType.POST, onResult, JSON.stringify(convertCamelToSnakeCase(body)));
+}
+
+export function setGoldStar(projectId: string, recordId: string, labelingTaskId: string, goldUserId: string, onResult: (result: any) => void) {
+    const finalUrl = `${labelingEndpoint}/${projectId}/set-gold-star`;
+    const body = {
+        recordId,
+        labelingTaskId,
+        goldUserId
+    }
+    jsonFetchWrapper(finalUrl, FetchType.POST, onResult, JSON.stringify(convertCamelToSnakeCase(body)));
+}
+
+export function removeGoldStar(projectId: string, recordId: string, labelingTaskId: string, onResult: (result: any) => void) {
+    const finalUrl = `${labelingEndpoint}/${projectId}/remove-gold-star`;
+    const body = {
+        recordId,
+        labelingTaskId
+    }
+    jsonFetchWrapper(finalUrl, FetchType.POST, onResult, JSON.stringify(convertCamelToSnakeCase(body)));
+}
