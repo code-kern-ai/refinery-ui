@@ -2,13 +2,11 @@ import Statuses from "@/src/components/shared/statuses/Statuses";
 import { selectAllLookupLists, setAllLookupLists } from "@/src/reduxStore/states/pages/lookup-lists";
 import { selectAttributes, selectVisibleAttributeAC, setAllAttributes, setLabelingTasksAll, updateAttributeById } from "@/src/reduxStore/states/pages/settings";
 import { selectProjectId } from "@/src/reduxStore/states/project"
-import { UPDATE_ATTRIBUTE } from "@/src/services/gql/mutations/project-settings";
 import { Attribute, AttributeState } from "@/src/types/components/projects/projectId/settings/data-schema";
 import { CurrentPage, DataTypeEnum } from "@/src/types/shared/general";
 import { postProcessCurrentAttribute } from "@/src/util/components/projects/projectId/settings/attribute-calculation-helper";
 import { ATTRIBUTES_VISIBILITY_STATES, DATA_TYPES, getTooltipVisibilityState } from "@/src/util/components/projects/projectId/settings/data-schema-helper";
 import { copyToClipboard } from "@/submodules/javascript-functions/general";
-import { useMutation } from "@apollo/client";
 import { Editor } from "@monaco-editor/react";
 import { Tooltip } from "@nextui-org/react";
 import { IconAlertTriangleFilled, IconArrowLeft, IconCircleCheckFilled } from "@tabler/icons-react";
@@ -35,7 +33,7 @@ import { getAllComments } from "@/src/services/base/comment";
 import { getAttributes } from "@/src/services/base/attribute";
 import { getLookupListsByProjectId } from "@/src/services/base/lookup-lists";
 import { getLabelingTasksByProjectId, getProjectTokenization } from "@/src/services/base/project";
-import { getAttributeByAttributeId } from "@/src/services/base/project-setting";
+import { getAttributeByAttributeId, updateAttribute } from "@/src/services/base/project-setting";
 
 const EDITOR_OPTIONS = { theme: 'vs-light', language: 'python', readOnly: false };
 
@@ -60,8 +58,6 @@ export default function AttributeCalculation() {
     const [editorValue, setEditorValue] = useState('');
     const [attributeName, setAttributeName] = useState('');
     const [checkUnsavedChanges, setCheckUnsavedChanges] = useState(false);
-
-    const [updateAttributeMut] = useMutation(UPDATE_ATTRIBUTE);
 
     useEffect(() => {
         if (!currentAttribute) return;
@@ -173,12 +169,12 @@ export default function AttributeCalculation() {
         const attributeNew = { ...currentAttribute };
         attributeNew.name = name;
         attributeNew.saveSourceCode = false;
-        updateAttributeMut({ variables: { projectId: projectId, attributeId: currentAttribute.id, name: attributeNew.name } }).then(() => {
+        updateAttribute(projectId, currentAttribute.id, (res) => {
             setCurrentAttribute(postProcessCurrentAttribute(attributeNew));
             setEditorValue(attributeNew.sourceCode.replace('def ac(record)', 'def ' + attributeNew.name + '(record)'));
             dispatch(updateAttributeById(attributeNew));
             setDuplicateNameExists(false);
-        });
+        }, null, null, attributeNew.name);
     }
 
     function updateVisibility(option: any) {
@@ -187,10 +183,10 @@ export default function AttributeCalculation() {
         attributeNew.visibilityIndex = ATTRIBUTES_VISIBILITY_STATES.findIndex((state) => state.name === option);
         attributeNew.visibilityName = option.name;
         attributeNew.saveSourceCode = false;
-        updateAttributeMut({ variables: { projectId: projectId, attributeId: currentAttribute.id, visibility: attributeNew.visibility } }).then(() => {
+        updateAttribute(projectId, currentAttribute.id, (res) => {
             setCurrentAttribute(postProcessCurrentAttribute(attributeNew));
             dispatch(updateAttributeById(attributeNew));
-        });
+        }, null, null, null, null, attributeNew.visibility);
     }
 
     function updateDataType(option: any) {
@@ -198,10 +194,10 @@ export default function AttributeCalculation() {
         attributeNew.dataType = option.value;
         attributeNew.dataTypeName = option.name;
         attributeNew.saveSourceCode = false;
-        updateAttributeMut({ variables: { projectId: projectId, attributeId: currentAttribute.id, dataType: attributeNew.dataType } }).then(() => {
+        updateAttribute(projectId, currentAttribute.id, (res) => {
             setCurrentAttribute(postProcessCurrentAttribute(attributeNew));
             dispatch(updateAttributeById(attributeNew));
-        });
+        }, attributeNew.dataType);
     }
 
     function openBricksIntegrator() {
@@ -224,8 +220,9 @@ export default function AttributeCalculation() {
             return;
         }
         const finalSourceCode = value.replace(regMatch[0], 'def ac(record)');
-        updateAttributeMut({ variables: { projectId: projectId, attributeId: currentAttribute.id, sourceCode: finalSourceCode, name: attributeNameParam } }).then(() => {
-        });
+        updateAttribute(projectId, currentAttribute.id, (res) => {
+
+        }, null, null, attributeNameParam, finalSourceCode);
     }
 
     function checkProjectTokenization() {
