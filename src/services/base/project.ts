@@ -1,6 +1,7 @@
 import { FetchType, jsonFetchWrapper } from "@/submodules/javascript-functions/basic-fetch";
 import { BACKEND_BASE_URI } from "./_settings";
 import { UploadType } from "@/src/types/shared/upload";
+import { convertCamelToSnakeCase } from "@/submodules/javascript-functions/case-types-parser";
 
 export const projectEndpoint = `${BACKEND_BASE_URI}/api/v1/project`;
 
@@ -155,4 +156,14 @@ export function getNotifications(userFilter: boolean, limit: number, onResult: (
 export function getUploadTaskById(projectId: string, uploadTaskId: string, onResult: (result: any) => void) {
     const finalUrl = `${projectEndpoint}/${projectId}/upload-task-by-id?upload_task_id=${uploadTaskId}`;
     return jsonFetchWrapper(finalUrl, FetchType.GET, onResult);
+}
+
+export function createPersonalToken(projectId: string, name: string, expiresAt: string, scope: string, onResult: (result: any) => void) {
+    const finalUrl = `${projectEndpoint}/${projectId}/create-personal-token`;
+    jsonFetchWrapper(finalUrl, FetchType.POST, onResult, JSON.stringify(convertCamelToSnakeCase({ name, expiresAt, scope })));
+}
+
+export function deletePersonalToken(projectId: string, tokenId: string, onResult: (result: any) => void) {
+    const finalUrl = `${projectEndpoint}/${projectId}/${tokenId}/delete-personal-token`;
+    jsonFetchWrapper(finalUrl, FetchType.DELETE, onResult);
 }

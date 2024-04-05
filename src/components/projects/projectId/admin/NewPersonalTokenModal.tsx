@@ -1,14 +1,13 @@
 import Modal from "@/src/components/shared/modal/Modal";
 import { closeModal, selectModal } from "@/src/reduxStore/states/modal";
 import { selectProjectId } from "@/src/reduxStore/states/project";
-import { CREATE_PERSONAL_ACCESS_TOKEN } from "@/src/services/gql/mutations/project-admin";
+import { createPersonalToken } from "@/src/services/base/project";
 import { PersonalTokenModalProps } from "@/src/types/components/projects/projectId/project-admin";
 import { ModalEnum } from "@/src/types/shared/modal";
 import { EXPIRATION_TIME, READ_WRITE_SCOPE } from "@/src/util/components/projects/projectId/project-admin-helper";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
 import { copyToClipboard } from "@/submodules/javascript-functions/general";
 import Dropdown2 from "@/submodules/react-components/components/Dropdown2";
-import { useMutation } from "@apollo/client";
 import { Tooltip } from "@nextui-org/react";
 import { useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -26,8 +25,6 @@ export default function NewPersonalToken(props: PersonalTokenModalProps) {
     const [newToken, setNewToken] = useState<string>(null);
     const [tokenCopied, setTokenCopied] = useState(false);
 
-    const [createNewTokenMut] = useMutation(CREATE_PERSONAL_ACCESS_TOKEN);
-
     useEffect(() => {
         if (!modalNewToken.open) {
             setTokenName('');
@@ -39,7 +36,7 @@ export default function NewPersonalToken(props: PersonalTokenModalProps) {
     }, [modalNewToken]);
 
     const createNewToken = useCallback(() => {
-        createNewTokenMut({ variables: { projectId: projectId, name: tokenName, expiresAt: expirationTime.value, scope: READ_WRITE_SCOPE } }).then((res) => {
+        createPersonalToken(projectId, tokenName, expirationTime.value, READ_WRITE_SCOPE, (res) => {
             setNewToken(res['data']['createPersonalAccessToken']['token']);
             props.refetchTokens();
             setTokenName("");
