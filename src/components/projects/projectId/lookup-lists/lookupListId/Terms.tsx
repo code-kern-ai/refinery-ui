@@ -1,12 +1,10 @@
 import { selectProjectId } from "@/src/reduxStore/states/project";
-import { deleteTerm as dlt, blacklistTerm as blt, addTermToKnowledgeBase as tkb } from "@/src/services/base/lookup-lists";
-import { UPDATE_TERM } from "@/src/services/gql/mutations/lookup-lists";
+import { deleteTerm as dlt, blacklistTerm as blt, addTermToKnowledgeBase as tkb, updateTerm } from "@/src/services/base/lookup-lists";
 import { Term, TermsProps } from "@/src/types/components/projects/projectId/lookup-lists";
 import { BLACKLISTED_TERMS_DROPDOWN_OPTIONS, TERMS_DROPDOWN_OPTIONS, isTermUnique } from "@/src/util/components/projects/projectId/lookup-lists-helper";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
 import { jsonCopy } from "@/submodules/javascript-functions/general";
 import Dropdown2 from "@/submodules/react-components/components/Dropdown2";
-import { useMutation } from "@apollo/client";
 import { Tooltip } from "@nextui-org/react";
 import { IconCircleCheckFilled, IconCircleMinus } from "@tabler/icons-react";
 import { useRouter } from "next/router";
@@ -24,8 +22,6 @@ export default function Terms(props: TermsProps) {
     const [editableTerm, setEditableTerm] = useState('');
     const [newTermName, setNewTermName] = useState('');
     const [newDescription, setNewDescription] = useState('');
-
-    const [updateTermMut] = useMutation(UPDATE_TERM);
 
     function addTermToKnowledgeBaseImpl() {
         if (name == '' || !isTermUnique(name, terms)) return;
@@ -70,7 +66,7 @@ export default function Terms(props: TermsProps) {
         if (open) {
             setEditableTerm(termId);
         } else {
-            updateTermMut({ variables: { projectId: projectId, termId: termId, value: value, comment: comment ?? '' } }).then((res) => {
+            updateTerm(projectId, { termId: termId, value: value, comment: comment ?? '' }, (res) => {
                 props.refetchTerms();
             });
         }

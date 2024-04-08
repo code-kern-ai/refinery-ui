@@ -64,3 +64,10 @@ export function pasteKnowledgeTerms(projectId: string, options: {
     const finalUrl = `${lookupListsEndpoint}/${projectId}/paste-knowledge-terms`;
     jsonFetchWrapper(finalUrl, FetchType.POST, onResult, JSON.stringify(convertCamelToSnakeCase(options)));
 }
+
+export function updateTerm(projectId: string, options: {
+    termId: string, value: string, comment: string
+}, onResult: (result: any) => void) {
+    const finalUrl = `${lookupListsEndpoint}/${projectId}/update-term`;
+    jsonFetchWrapper(finalUrl, FetchType.PUT, onResult, JSON.stringify(convertCamelToSnakeCase(options)));
+}
