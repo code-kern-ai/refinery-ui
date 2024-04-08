@@ -108,3 +108,8 @@ export function updateLabelingTask(projectId: string, options: {
     const finalUrl = `${labelingEndpoint}/${projectId}/update-labeling-task`;
     jsonFetchWrapper(finalUrl, FetchType.PUT, onResult, JSON.stringify(convertCamelToSnakeCase(options)));
 }
+
+export function deleteLabelingTask(projectId: string, labelingTaskId: string, onResult: (results: any) => void) {
+    const finalUrl = `${labelingEndpoint}/${projectId}/delete-labeling-task`;
+    jsonFetchWrapper(finalUrl, FetchType.DELETE, onResult, JSON.stringify(convertCamelToSnakeCase({ "value": labelingTaskId })));
+}
