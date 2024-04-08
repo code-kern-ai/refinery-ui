@@ -6,13 +6,11 @@ import { ModalEnum } from "@/src/types/shared/modal";
 import { LabelHelper } from "@/src/util/classes/label-helper";
 import { isTaskNameUnique, labelingTaskFromString, labelingTaskToString } from "@/src/util/components/projects/projectId/settings/labeling-tasks-helper";
 import { jsonCopy } from "@/submodules/javascript-functions/general";
-import { useMutation } from "@apollo/client";
 import { Tooltip } from "@nextui-org/react";
 import { IconColorPicker, IconPlus, IconTrash } from "@tabler/icons-react";
 import { useEffect, useState } from "react"
 import { useDispatch, useSelector } from "react-redux";
 import RenameLabelModal from "./RenameLabelModal";
-import { UPDATE_LABELING_TASK } from "@/src/services/gql/mutations/project-settings";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
 import AddLabelingTaskModal from "./AddLabelingTaskModal";
 import DeleteLabelingTaskModal from "./DeleteLabelingTaskModal";
@@ -20,6 +18,7 @@ import DeleteLabelModal from "./DeleteLabelModal";
 import AddLabelModal from "./AddLabelModal";
 import ChangeColorModal from "./ChangeColorModal";
 import Dropdown2 from "@/submodules/react-components/components/Dropdown2";
+import { updateLabelingTask } from "@/src/services/base/labeling";
 
 export default function LabelingTasks() {
     const dispatch = useDispatch();
@@ -28,8 +27,6 @@ export default function LabelingTasks() {
     const labelingTasksSchema = useSelector(selectLabelingTasksAll);
 
     const [labelingTasksDropdownArray, setLabelingTasksDropdownArray] = useState<{ name: string, value: string }[]>([]);
-
-    const [updateLabelingTaskMut] = useMutation(UPDATE_LABELING_TASK);
 
     useEffect(() => {
         LabelHelper.setLabelColorOptions();
@@ -51,7 +48,12 @@ export default function LabelingTasks() {
         dispatch(setLabelingTasksAll(labelingTasksSchemaCopy));
         if (value == '') return;
         if (!isTaskNameUnique(labelingTasksSchema, value)) return;
-        updateLabelingTaskMut({ variables: { projectId: projectId, labelingTaskId: task.id, labelingTaskName: value, labelingTaskType: task.taskType, labelingTaskTargetId: task.targetId == "" ? null : task.targetId } }).then((res) => {
+        updateLabelingTask(projectId, {
+            labelingTaskId: task.id,
+            labelingTaskName: value,
+            labelingTaskType: task.taskType,
+            labelingTaskTargetId: task.targetId == "" ? null : task.targetId
+        }, (res) => {
             const labelingTasksSchemaCopy = jsonCopy(labelingTasksSchema);
             labelingTasksSchemaCopy[index].name = value;
             labelingTasksSchemaCopy[index].nameOpen = false;
@@ -60,7 +62,12 @@ export default function LabelingTasks() {
     }
 
     function updateLabelingTaskType(task: LabelingTask, index: number, value: string) {
-        updateLabelingTaskMut({ variables: { projectId: projectId, labelingTaskId: task.id, labelingTaskName: task.name, labelingTaskType: value, labelingTaskTargetId: task.targetId == "" ? null : task.targetId } }).then((res) => {
+        updateLabelingTask(projectId, {
+            labelingTaskId: task.id,
+            labelingTaskName: task.name,
+            labelingTaskType: value,
+            labelingTaskTargetId: task.targetId == "" ? null : task.targetId
+        }, (res) => {
             const labelingTasksSchemaCopy = jsonCopy(labelingTasksSchema);
             labelingTasksSchemaCopy[index].taskType = value;
             dispatch(setLabelingTasksAll(labelingTasksSchemaCopy));

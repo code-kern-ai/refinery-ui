@@ -101,3 +101,10 @@ export function removeGoldStar(projectId: string, recordId: string, labelingTask
     }
     jsonFetchWrapper(finalUrl, FetchType.POST, onResult, JSON.stringify(convertCamelToSnakeCase(body)));
 }
+
+export function updateLabelingTask(projectId: string, options: {
+    labelingTaskId: string, labelingTaskName: string, labelingTaskType: string, labelingTaskTargetId: string
+}, onResult: (result: any) => void) {
+    const finalUrl = `${labelingEndpoint}/${projectId}/update-labeling-task`;
+    jsonFetchWrapper(finalUrl, FetchType.PUT, onResult, JSON.stringify(convertCamelToSnakeCase(options)));
+}
