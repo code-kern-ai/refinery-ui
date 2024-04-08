@@ -25,7 +25,7 @@ import { filterRlaDataForUser } from "@/src/util/components/projects/projectId/l
 import { LabelingPageParts } from "@/src/types/components/projects/projectId/labeling/labeling-main-component"
 import style from '@/src/styles/components/projects/projectId/labeling.module.css';
 import { getStoreSnapshotValue } from "@/src/reduxStore/store"
-import { createLabel } from "@/src/services/base/project-setting"
+import { createLabel } from "@/src/services/base/labeling";
 import { addClassificationLabels, addExtractionLabel, deleteRecordLabelAssociationByIds, removeGoldStar, setGoldStar } from "@/src/services/base/labeling"
 
 const L_VARS = getDefaultLabelingVars();
@@ -502,7 +502,7 @@ export default function LabelingSuiteLabeling() {
     }
 
     function addNewLabelToTask(newLabel: string, task: any) {
-        createLabel(projectId, newLabel, task.id, DEFAULT_LABEL_COLOR, () => {
+        createLabel(projectId, newLabel, task.id, DEFAULT_LABEL_COLOR, (res) => {
             rebuildLabelLookup();
         });
     }

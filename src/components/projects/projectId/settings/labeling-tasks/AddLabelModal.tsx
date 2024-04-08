@@ -1,7 +1,7 @@
 import Modal from "@/src/components/shared/modal/Modal";
 import { selectModal, setModalStates } from "@/src/reduxStore/states/modal";
 import { selectProjectId } from "@/src/reduxStore/states/project";
-import { createLabel } from "@/src/services/base/project-setting";
+import { createLabel } from "@/src/services/base/labeling";
 import { ModalButton, ModalEnum } from "@/src/types/shared/modal";
 import { LabelHelper } from "@/src/util/classes/label-helper";
 import { useCallback, useEffect, useState } from "react";
@@ -21,7 +21,7 @@ export default function AddLabelModal() {
     const addLabel = useCallback(() => {
         const labelColor = LabelHelper.addLabel(modalAddLabel.taskId, labelName);
         dispatch(setModalStates(ModalEnum.ADD_LABEL, { ...modalAddLabel, open: true }));
-        createLabel(projectId, labelName, modalAddLabel.taskId, labelColor, () => {
+        createLabel(projectId, labelName, modalAddLabel.taskId, labelColor, (res) => {
             setLabelName('');
         });
     }, [modalAddLabel, labelName, modalAddLabel.taskId]);

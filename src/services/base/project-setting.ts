@@ -31,11 +31,6 @@ export function prepareRecordExport(projectId: string, options: {
     jsonFetchWrapper(finalUrl, FetchType.POST, onResult, JSON.stringify({ options }));
 }
 
-export function createLabel(projectId: string, labelName: string, labelingTaskId: string, labelColor: string, onResult: (result: any) => void) {
-    const finalUrl = `${projectSettingEndpoint}/${projectId}/create-label`;
-    jsonFetchWrapper(finalUrl, FetchType.POST, onResult, JSON.stringify({ labelName, labelingTaskId, labelColor }));
-}
-
 export function getRecordByRecordId(projectId: string, recordId: string, onResult: (result: any) => void) {
     const finalUrl = `${projectSettingEndpoint}/${projectId}/record-by-record-id?record_id=${recordId}`;
     jsonFetchWrapper(finalUrl, FetchType.GET, onResult);
