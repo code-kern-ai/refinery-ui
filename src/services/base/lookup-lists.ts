@@ -57,3 +57,10 @@ export function blacklistTerm(projectId: string, termId: string, onResult: (resu
     const finalUrl = `${lookupListsEndpoint}/${projectId}/blacklist-term/${termId}`;
     jsonFetchWrapper(finalUrl, FetchType.PUT, onResult);
 }
+
+export function pasteKnowledgeTerms(projectId: string, options: {
+    knowledgeBaseId: string | string[], values: string, split: string, delete: boolean
+}, onResult: (result: any) => void) {
+    const finalUrl = `${lookupListsEndpoint}/${projectId}/paste-knowledge-terms`;
+    jsonFetchWrapper(finalUrl, FetchType.POST, onResult, JSON.stringify(convertCamelToSnakeCase(options)));
+}
