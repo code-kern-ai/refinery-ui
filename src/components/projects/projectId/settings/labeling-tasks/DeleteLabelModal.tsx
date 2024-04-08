@@ -2,12 +2,11 @@ import Modal from "@/src/components/shared/modal/Modal";
 import { selectModal } from "@/src/reduxStore/states/modal";
 import { removeLabelFromLabelingTask } from "@/src/reduxStore/states/pages/settings";
 import { selectProjectId } from "@/src/reduxStore/states/project";
-import { DELETE_LABEL } from "@/src/services/gql/mutations/project-settings";
 import { ModalButton, ModalEnum } from "@/src/types/shared/modal";
 import { LabelHelper } from "@/src/util/classes/label-helper";
-import { useMutation } from "@apollo/client";
 import { useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { deleteLabel as dl } from "@/src/services/base/labeling";
 
 const ABORT_BUTTON = { buttonCaption: 'Delete label', disabled: false, useButton: true };
 
@@ -19,11 +18,9 @@ export default function DeleteLabelModal() {
 
     const [abortButton, setAbortButton] = useState<ModalButton>(ABORT_BUTTON);
 
-    const [deleteLabelMut] = useMutation(DELETE_LABEL);
-
     const deleteLabel = useCallback(() => {
         LabelHelper.removeLabel(modalDeleteLabel.taskId, modalDeleteLabel.label.color.name);
-        deleteLabelMut({ variables: { projectId: projectId, labelId: modalDeleteLabel.label.id } }).then(() => {
+        dl(projectId, modalDeleteLabel.label.id, (res) => {
             dispatch(removeLabelFromLabelingTask(modalDeleteLabel.taskId, modalDeleteLabel.label.id));
         });
     }, [modalDeleteLabel]);

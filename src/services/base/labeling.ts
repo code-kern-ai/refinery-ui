@@ -120,3 +120,8 @@ export function createLabelingTask(projectId: string, options: {
     const finalUrl = `${labelingEndpoint}/${projectId}/create-labeling-task`;
     jsonFetchWrapper(finalUrl, FetchType.POST, onResult, JSON.stringify(convertCamelToSnakeCase(options)));
 }
+
+export function deleteLabel(projectId: string, labelId: string, onResult: (result: any) => void) {
+    const finalUrl = `${labelingEndpoint}/${projectId}/delete-label`;
+    jsonFetchWrapper(finalUrl, FetchType.DELETE, onResult, JSON.stringify(convertCamelToSnakeCase({ "value": labelId })));
+}
