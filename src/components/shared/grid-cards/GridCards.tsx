@@ -54,12 +54,12 @@ export default function GridCards(props: GridCardsProps) {
                 <div className="flex-1 min-w-0 text-sm leading-5">
                     <div className="flow-root font-medium">
                         <div className="text-gray-900 float-left"> {heuristic.name}</div>
-                        <a className="text-green-800 float-right cursor-pointer" href={`/refinery${heuristic.routerLink}`} onClick={(e) => {
+                        {heuristic.routerLink && <a className="text-green-800 float-right cursor-pointer" href={`/refinery${heuristic.routerLink}`} onClick={(e) => {
                             e.preventDefault();
                             router.push(`${heuristic.routerLink}`);
                         }}> Details
                             <IconArrowRight className="h-5 w-5 inline-block text-green-800" />
-                        </a>
+                        </a>}
                     </div>
                     <div className="flow-root font-normal">
                         <div className="text-gray-500 float-left line-clamp-3" style={{ maxWidth: '250px' }}>
