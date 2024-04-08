@@ -55,7 +55,13 @@ export default function Header() {
         getAllProjects((res) => {
             const projects = res.data["allProjects"].edges.map((edge: any) => edge.node);
             dispatch(setAllProjects(projects));
-            getNotifications(true, 50, (res) => {
+            getNotifications({
+                projectFilter: [],
+                levelFilter: [],
+                typeFilter: [],
+                userFilter: true,
+                limit: 50
+            }, (res) => {
                 dispatch(setNotifications(postProcessNotifications(res.data['notifications'], arrayToDict(projects, 'id'), notificationId)));
                 dispatch(openModal(ModalEnum.NOTIFICATION_CENTER));
             });
