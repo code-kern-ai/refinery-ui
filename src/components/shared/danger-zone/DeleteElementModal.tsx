@@ -9,10 +9,10 @@ import { DELETE_USER_ATTRIBUTE } from "@/src/services/gql/mutations/projects";
 import { removeFromAllAttributesById } from "@/src/reduxStore/states/pages/settings";
 import LoadingIcon from "../loading/LoadingIcon";
 import { selectProjectId } from "@/src/reduxStore/states/project";
-import { DELETE_LOOKUP_LIST } from "@/src/services/gql/mutations/lookup-lists";
 import { removeFromAllLookupListById } from "@/src/reduxStore/states/pages/lookup-lists";
 import { useRouter } from "next/router";
 import { deleteHeuristicById } from "@/src/services/base/heuristic";
+import { deleteKnowledgeBase } from "@/src/services/base/lookup-lists";
 
 const ABORT_BUTTON = { buttonCaption: 'Delete', disabled: false, useButton: true };
 
@@ -26,7 +26,6 @@ export default function DeleteElementModal(props: DangerZoneProps) {
     const [isDeleting, setIsDeleting] = useState(false);
 
     const [deleteAttributeMut] = useMutation(DELETE_USER_ATTRIBUTE)
-    const [deleteLookupListMut] = useMutation(DELETE_LOOKUP_LIST);
 
     const deleteElement = useCallback(() => {
         setIsDeleting(true);
@@ -39,7 +38,7 @@ export default function DeleteElementModal(props: DangerZoneProps) {
                 });
                 break;
             case DangerZoneEnum.LOOKUP_LIST:
-                deleteLookupListMut({ variables: { projectId: projectId, knowledgeBaseId: props.id } }).then(() => {
+                deleteKnowledgeBase(projectId, props.id, (res) => {
                     setIsDeleting(false);
                     dispatch(removeFromAllLookupListById(props.id));
                 });

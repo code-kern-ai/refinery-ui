@@ -29,9 +29,14 @@ export function createKnowledgeBase(projectId: string, onResult: (result: any) =
     jsonFetchWrapper(finalUrl, FetchType.POST, onResult);
 }
 
+export function deleteKnowledgeBase(projectId: string, knowledgeBaseId: string, onResult: (result: any) => void) {
+    const finalUrl = `${lookupListsEndpoint}/${projectId}/delete-knowledge-base/${knowledgeBaseId}`;
+    jsonFetchWrapper(finalUrl, FetchType.DELETE, onResult);
+}
+
 export function updateKnowledgeBase(projectId: string, options: {
     knowledgeBaseId: string, name: string, description: string
 }, onResult: (result: any) => void) {
     const finalUrl = `${lookupListsEndpoint}/${projectId}/update-knowledge-base`;
-    jsonFetchWrapper(finalUrl, FetchType.POST, onResult, JSON.stringify(convertCamelToSnakeCase(options)));
+    jsonFetchWrapper(finalUrl, FetchType.PUT, onResult, JSON.stringify(convertCamelToSnakeCase(options)));
 }
