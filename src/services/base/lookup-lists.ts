@@ -47,3 +47,8 @@ export function addTermToKnowledgeBase(projectId: string, options: {
     const finalUrl = `${lookupListsEndpoint}/${projectId}/add-term-to-knowledge-base`;
     jsonFetchWrapper(finalUrl, FetchType.POST, onResult, JSON.stringify(convertCamelToSnakeCase(options)));
 }
+
+export function deleteTerm(projectId: string, termId: string, onResult: (result: any) => void) {
+    const finalUrl = `${lookupListsEndpoint}/${projectId}/delete-term/${termId}`;
+    jsonFetchWrapper(finalUrl, FetchType.DELETE, onResult);
+}
