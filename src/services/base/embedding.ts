@@ -42,3 +42,10 @@ export function createEmbeddingPost(projectId: string, attributeId: string, conf
     const finalUrl = `${embeddingEndpoint}/${projectId}/create-embedding`;
     jsonFetchWrapper(finalUrl, FetchType.POST, onResult, JSON.stringify(convertCamelToSnakeCase({ attributeId, config })));
 }
+
+export function updateEmbeddingPayload(projectId: string, options: {
+    embeddingId: string, filterAttributes: any
+}, onResult: (result: any) => void) {
+    const finalUrl = `${embeddingEndpoint}/${projectId}/update-embedding-payload`;
+    jsonFetchWrapper(finalUrl, FetchType.POST, onResult, JSON.stringify(convertCamelToSnakeCase(options)));
+}

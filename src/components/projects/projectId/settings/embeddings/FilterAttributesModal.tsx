@@ -2,11 +2,10 @@ import Modal from "@/src/components/shared/modal/Modal";
 import { closeModal, selectModal, setModalStates } from "@/src/reduxStore/states/modal";
 import { selectUsableNonTextAttributes } from "@/src/reduxStore/states/pages/settings";
 import { selectProjectId } from "@/src/reduxStore/states/project";
-import { UPDATE_EMBEDDING_PAYLOAD } from "@/src/services/gql/mutations/project-settings";
+import { updateEmbeddingPayload } from "@/src/services/base/embedding";
 import { FilterAttributesModalProps } from "@/src/types/components/projects/projectId/settings/embeddings";
 import { ModalEnum } from "@/src/types/shared/modal";
 import Dropdown2 from "@/submodules/react-components/components/Dropdown2";
-import { useMutation } from "@apollo/client";
 import { Tooltip } from "@nextui-org/react";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -20,8 +19,6 @@ export default function FilterAttributesModal(props: FilterAttributesModalProps)
 
     const [checkedAttributes, setCheckedAttributes] = useState([]);
 
-    const [updateEmbeddingPayloadMut] = useMutation(UPDATE_EMBEDDING_PAYLOAD);
-
     function editFilteredAttributes() {
         props.setShowEditOption(true);
         dispatch(setModalStates(ModalEnum.FILTERED_ATTRIBUTES, { showEditOption: true }));
@@ -31,8 +28,7 @@ export default function FilterAttributesModal(props: FilterAttributesModalProps)
         props.setShowEditOption(false);
         dispatch(closeModal(ModalEnum.FILTERED_ATTRIBUTES));
         dispatch(setModalStates(ModalEnum.FILTERED_ATTRIBUTES, { showEditOption: false }));
-        updateEmbeddingPayloadMut({ variables: { projectId: projectId, embeddingId: modalFilteredAttributes.embeddingId, filterAttributes: JSON.stringify(props.filterAttributesUpdate) } }).then((res) => {
-        });
+        updateEmbeddingPayload(projectId, { embeddingId: modalFilteredAttributes.embeddingId, filterAttributes: props.filterAttributesUpdate }, (res) => { });
     }
 
     useEffect(() => {
