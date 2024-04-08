@@ -52,3 +52,8 @@ export function deleteTerm(projectId: string, termId: string, onResult: (result:
     const finalUrl = `${lookupListsEndpoint}/${projectId}/delete-term/${termId}`;
     jsonFetchWrapper(finalUrl, FetchType.DELETE, onResult);
 }
+
+export function blacklistTerm(projectId: string, termId: string, onResult: (result: any) => void) {
+    const finalUrl = `${lookupListsEndpoint}/${projectId}/blacklist-term/${termId}`;
+    jsonFetchWrapper(finalUrl, FetchType.PUT, onResult);
+}

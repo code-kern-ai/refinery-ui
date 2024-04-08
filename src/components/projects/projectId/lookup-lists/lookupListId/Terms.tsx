@@ -1,6 +1,6 @@
 import { selectProjectId } from "@/src/reduxStore/states/project";
-import { deleteTerm, addTermToKnowledgeBase as tkb } from "@/src/services/base/lookup-lists";
-import { BLACKLIST_TERM, UPDATE_TERM } from "@/src/services/gql/mutations/lookup-lists";
+import { deleteTerm as dlt, blacklistTerm as blt, addTermToKnowledgeBase as tkb } from "@/src/services/base/lookup-lists";
+import { UPDATE_TERM } from "@/src/services/gql/mutations/lookup-lists";
 import { Term, TermsProps } from "@/src/types/components/projects/projectId/lookup-lists";
 import { BLACKLISTED_TERMS_DROPDOWN_OPTIONS, TERMS_DROPDOWN_OPTIONS, isTermUnique } from "@/src/util/components/projects/projectId/lookup-lists-helper";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
@@ -25,7 +25,6 @@ export default function Terms(props: TermsProps) {
     const [newTermName, setNewTermName] = useState('');
     const [newDescription, setNewDescription] = useState('');
 
-    const [blacklistTermMut] = useMutation(BLACKLIST_TERM);
     const [updateTermMut] = useMutation(UPDATE_TERM);
 
     function addTermToKnowledgeBaseImpl() {
@@ -55,13 +54,13 @@ export default function Terms(props: TermsProps) {
     }
 
     function removeTerm(term: Term) {
-        deleteTerm(projectId, term.id, (res) => {
+        dlt(projectId, term.id, (res) => {
             props.refetchTerms();
         });
     }
 
     function blacklistTerm(term: Term) {
-        blacklistTermMut({ variables: { projectId: projectId, termId: term.id } }).then((res) => {
+        blt(projectId, term.id, (res) => {
             props.refetchTerms();
         });
     }
