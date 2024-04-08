@@ -8,7 +8,7 @@ import { selectAllProjects } from '@/src/reduxStore/states/project';
 import { ModalButton, ModalEnum } from '@/src/types/shared/modal';
 import { closeModal, openModal } from '@/src/reduxStore/states/modal';
 import Modal from '../shared/modal/Modal';
-import { IconAlertTriangle, IconFishHook, IconMessageCircle, IconNews } from '@tabler/icons-react';
+import { IconAlertTriangle, IconCarCrash, IconFishHook, IconMessageCircle, IconNews } from '@tabler/icons-react';
 import { CREATE_SAMPLE_PROJECT } from '@/src/services/gql/mutations/projects';
 import { setSearchGroupsStore } from '@/src/reduxStore/states/pages/data-browser';
 import { selectProjectIdSampleProject, setProjectIdSampleProject } from '@/src/reduxStore/states/tmp';
@@ -118,6 +118,30 @@ export default function SampleProjectsDropdown() {
                                     onClick={() => {
                                         importSampleProject("Clickbait - initial", "Clickbait - initial");
                                     }} >
+                                    <span>Initial (only contains the initial data set and labels.)</span>
+                                </a>
+                            )}
+                        </Menu.Item>
+                        <Menu.Item>
+                            {({ active }) => (
+                                <a key="sample-project-1" style={{ borderBottom: '1px dashed #e2e8f0' }}
+                                    className={`opacity-100 cursor-pointer text-gray-900 block px-3 py-2 text-sm ${active ? "bg-kernindigo text-white" : ""}`}
+                                    onClick={() => {
+                                        importSampleProject("Global Guard Insurance", "Global Guard Insurance");
+                                    }}>
+                                    <IconCarCrash className="h-5 w-5 inline-block" />
+                                    <span className="ml-2">Global Guard Insurance</span>
+                                    <div className="mt-2">Reference data for RAG project.</div>
+                                </a>
+                            )}
+                        </Menu.Item>
+                        <Menu.Item>
+                            {({ active }) => (
+                                <a key="sample-project-1" style={{ borderBottom: '1px solid #e2e8f0' }}
+                                    className={`opacity-100 cursor-pointer text-gray-900 block px-3 py-2 text-sm ${active ? "bg-kernindigo text-white" : ""}`}
+                                    onClick={() => {
+                                        importSampleProject("Global Guard Insurance - initial", "Global Guard Insurance - initial");
+                                    }}>
                                     <span>Initial (only contains the initial data set and labels.)</span>
                                 </a>
                             )}
