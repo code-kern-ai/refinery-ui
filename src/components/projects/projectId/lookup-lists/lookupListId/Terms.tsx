@@ -1,5 +1,6 @@
 import { selectProjectId } from "@/src/reduxStore/states/project";
-import { ADD_TERM_TO_LOOKUP_LIST, BLACKLIST_TERM, REMOVE_TERM, UPDATE_TERM } from "@/src/services/gql/mutations/lookup-lists";
+import { addTermToKnowledgeBase as tkb } from "@/src/services/base/lookup-lists";
+import { BLACKLIST_TERM, REMOVE_TERM, UPDATE_TERM } from "@/src/services/gql/mutations/lookup-lists";
 import { Term, TermsProps } from "@/src/types/components/projects/projectId/lookup-lists";
 import { BLACKLISTED_TERMS_DROPDOWN_OPTIONS, TERMS_DROPDOWN_OPTIONS, isTermUnique } from "@/src/util/components/projects/projectId/lookup-lists-helper";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
@@ -24,14 +25,13 @@ export default function Terms(props: TermsProps) {
     const [newTermName, setNewTermName] = useState('');
     const [newDescription, setNewDescription] = useState('');
 
-    const [addTermsMut] = useMutation(ADD_TERM_TO_LOOKUP_LIST);
     const [removeTermMut] = useMutation(REMOVE_TERM);
     const [blacklistTermMut] = useMutation(BLACKLIST_TERM);
     const [updateTermMut] = useMutation(UPDATE_TERM);
 
-    function addTermToKnowledgeBase() {
+    function addTermToKnowledgeBaseImpl() {
         if (name == '' || !isTermUnique(name, terms)) return;
-        addTermsMut({ variables: { projectId: projectId, value: name, comment: description, knowledgeBaseId: router.query.lookupListId } }).then((res) => {
+        tkb(projectId, { value: name, comment: description, knowledgeBaseId: router.query.lookupListId }, (res) => {
             setName("");
             setDescription("");
             props.refetchTerms();
@@ -97,16 +97,16 @@ export default function Terms(props: TermsProps) {
                 <input value={name} type="text" onInput={(e: any) => setName(e.target.value)} onKeyUp={(e: any) => isTermUnique(e.target.value, terms)}
                     onKeyDown={(e: any) => {
                         if (e.key == "Enter") {
-                            addTermToKnowledgeBase();
+                            addTermToKnowledgeBaseImpl();
                         }
                     }} className="h-8 w-96 text-sm border-gray-300 rounded-md placeholder-italic border text-gray-900 pl-4 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100" placeholder="Term" />
                 <input value={description} type="text" onInput={(e: any) => setDescription(e.target.value)} onKeyUp={(e: any) => isTermUnique(e.target.value, terms)}
                     onKeyDown={(e: any) => {
                         if (e.key == "Enter") {
-                            addTermToKnowledgeBase();
+                            addTermToKnowledgeBaseImpl();
                         }
                     }} className="h-8 w-96 text-sm border-gray-300 rounded-md placeholder-italic border text-gray-900 pl-4 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100" placeholder="Description - optional" />
-                <button disabled={name == '' || !isTermUnique(name, terms)} onClick={addTermToKnowledgeBase}
+                <button disabled={name == '' || !isTermUnique(name, terms)} onClick={addTermToKnowledgeBaseImpl}
                     className="bg-indigo-700 flex-shrink-0 text-white text-xs font-semibold px-4 py-2 rounded-md cursor-pointer hover:bg-indigo-800 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed">
                     Add term</button>
             </div>

@@ -40,3 +40,10 @@ export function updateKnowledgeBase(projectId: string, options: {
     const finalUrl = `${lookupListsEndpoint}/${projectId}/update-knowledge-base`;
     jsonFetchWrapper(finalUrl, FetchType.PUT, onResult, JSON.stringify(convertCamelToSnakeCase(options)));
 }
+
+export function addTermToKnowledgeBase(projectId: string, options: {
+    value: string, comment: string, knowledgeBaseId: string | string[]
+}, onResult: (result: any) => void) {
+    const finalUrl = `${lookupListsEndpoint}/${projectId}/add-term-to-knowledge-base`;
+    jsonFetchWrapper(finalUrl, FetchType.POST, onResult, JSON.stringify(convertCamelToSnakeCase(options)));
+}
