@@ -130,3 +130,10 @@ export function createLabel(projectId: string, labelName: string, labelingTaskId
     const finalUrl = `${labelingEndpoint}/${projectId}/create-label`;
     jsonFetchWrapper(finalUrl, FetchType.POST, onResult, JSON.stringify({ labelName, labelingTaskId, labelColor }));
 }
+
+export function updateLabelColor(projectId: string, options: {
+    labelingTaskLabelId: string, labelColor: string
+}, onResult: (result: any) => void) {
+    const finalUrl = `${labelingEndpoint}/${projectId}/update-label-color`;
+    jsonFetchWrapper(finalUrl, FetchType.PUT, onResult, JSON.stringify(convertCamelToSnakeCase(options)));
+}
