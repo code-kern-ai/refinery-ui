@@ -4,18 +4,16 @@ import { initModal, openModal, selectModal } from "@/src/reduxStore/states/modal
 import { selectLabelingTasksAll, setLabelingTasksAll } from "@/src/reduxStore/states/pages/settings";
 import { selectProjectId } from "@/src/reduxStore/states/project";
 import { getCheckRenameLabel } from "@/src/services/base/project-setting";
-import { UPDATE_LABEL_NAME } from "@/src/services/gql/mutations/project-settings";
 import { LabelType, LabelingTask, RenameLabelData } from "@/src/types/components/projects/projectId/settings/labeling-tasks";
 import { ModalButton, ModalEnum } from "@/src/types/shared/modal";
 import { LabelHelper } from "@/src/util/classes/label-helper";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
 import { jsonCopy } from "@/submodules/javascript-functions/general";
-import { useMutation } from "@apollo/client";
 import { Tooltip } from "@nextui-org/react";
 import { IconAlertTriangleFilled, IconInfoCircleFilled, IconTriangleInverted } from "@tabler/icons-react";
 import { useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { handleLabelRenameWarnings } from "@/src/services/base/labeling";
+import { handleLabelRenameWarnings, updateLabelName } from "@/src/services/base/labeling";
 
 const ACCEPT_BUTTON = { buttonCaption: 'Rename', useButton: true }
 
@@ -28,8 +26,6 @@ export default function RenameLabelModal() {
 
     const [renameLabelData, setRenameLabelData] = useState<RenameLabelData>(null);
 
-    const [updateLabelNameMut] = useMutation(UPDATE_LABEL_NAME);
-
     useEffect(() => {
         setRenameLabelData({
             checkResults: null,
@@ -39,7 +35,7 @@ export default function RenameLabelModal() {
     }, [modalRenameLabel]);
 
     const renameLabel = useCallback(() => {
-        updateLabelNameMut({ variables: { projectId: projectId, labelId: modalRenameLabel.label.id, newName: renameLabelData.newLabelName } }).then((res) => {
+        updateLabelName(projectId, { labelId: modalRenameLabel.label.id, newName: renameLabelData.newLabelName }, (res) => {
             const labelingTasksSchemaCopy = jsonCopy(labelingTasksSchema);
             const labelingTask = labelingTasksSchemaCopy.find((task: LabelingTask) => task.id == modalRenameLabel.taskId);
             const label = labelingTask.labels.find((label: LabelType) => label.id == modalRenameLabel.label.id);

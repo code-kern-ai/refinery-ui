@@ -151,3 +151,10 @@ export function handleLabelRenameWarnings(projectId: string, options: {
     const finalUrl = `${labelingEndpoint}/${projectId}/handle-label-rename-warnings`;
     jsonFetchWrapper(finalUrl, FetchType.POST, onResult, JSON.stringify(convertCamelToSnakeCase(options)));
 }
+
+export function updateLabelName(projectId: string, options: {
+    labelId: string, newName: string
+}, onResult: (result: any) => void) {
+    const finalUrl = `${labelingEndpoint}/${projectId}/update-label-name`;
+    jsonFetchWrapper(finalUrl, FetchType.PUT, onResult, JSON.stringify(convertCamelToSnakeCase(options)));
+}
