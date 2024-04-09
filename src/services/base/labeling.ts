@@ -137,3 +137,10 @@ export function updateLabelColor(projectId: string, options: {
     const finalUrl = `${labelingEndpoint}/${projectId}/update-label-color`;
     jsonFetchWrapper(finalUrl, FetchType.PUT, onResult, JSON.stringify(convertCamelToSnakeCase(options)));
 }
+
+export function updateLabelHotkey(projectId: string, options: {
+    labelingTaskLabelId: string, labelHotkey: string
+}, onResult: (result: any) => void) {
+    const finalUrl = `${labelingEndpoint}/${projectId}/update-label-hotkey`;
+    jsonFetchWrapper(finalUrl, FetchType.PUT, onResult, JSON.stringify(convertCamelToSnakeCase(options)));
+}
