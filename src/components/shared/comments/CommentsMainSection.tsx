@@ -7,12 +7,13 @@ import { useCallback, useEffect, useState } from "react";
 import DisplayComments from "./DisplayComments";
 import { useSelector } from "react-redux";
 import { selectAllUsers, selectComments } from "@/src/reduxStore/states/general";
-import { CREATE_COMMENT, DELETE_COMMENT, UPDATE_COMMENT } from "@/src/services/gql/mutations/projects";
+import { DELETE_COMMENT, UPDATE_COMMENT } from "@/src/services/gql/mutations/projects";
 import { useMutation } from "@apollo/client";
 import { selectProjectId } from "@/src/reduxStore/states/project";
 import { CommentCreation } from "./CommentCreation";
 import { convertTypeToKey } from "@/src/util/shared/comments-helper";
 import { CommentDataManager } from "@/src/util/classes/comments";
+import { createComment } from "@/src/services/base/comment";
 
 export default function CommentsMainSection(props: CommentMainSectionProps) {
     const comments = useSelector(selectComments);
@@ -28,7 +29,6 @@ export default function CommentsMainSection(props: CommentMainSectionProps) {
 
     const [editCommentMut] = useMutation(UPDATE_COMMENT);
     const [deleteCommentMut] = useMutation(DELETE_COMMENT);
-    const [createCommentMut] = useMutation(CREATE_COMMENT)
 
     useEffect(() => {
         if (!comments) return;
@@ -98,7 +98,7 @@ export default function CommentsMainSection(props: CommentMainSectionProps) {
     }, [commentTextsArray, projectId, allUsers]);
 
     const saveComment = useCallback((type: string, commentId: string, comment: string, isPrivate: boolean) => {
-        createCommentMut({ variables: { projectId: projectId, comment: comment, xftype: convertTypeToKey(type), xfkey: commentId, isPrivate: isPrivate } }).then(() => {
+        createComment({ comment: comment, xftype: convertTypeToKey(type), xfkey: commentId, projectId: projectId, isPrivate: isPrivate }, (res) => {
             setCommentTextsArray([...commentTextsArray, comment]);
         });
     }, [commentTextsArray]);
