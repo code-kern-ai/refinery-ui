@@ -7,13 +7,11 @@ import { useCallback, useEffect, useState } from "react";
 import DisplayComments from "./DisplayComments";
 import { useSelector } from "react-redux";
 import { selectAllUsers, selectComments } from "@/src/reduxStore/states/general";
-import { UPDATE_COMMENT } from "@/src/services/gql/mutations/projects";
-import { useMutation } from "@apollo/client";
 import { selectProjectId } from "@/src/reduxStore/states/project";
 import { CommentCreation } from "./CommentCreation";
 import { convertTypeToKey } from "@/src/util/shared/comments-helper";
 import { CommentDataManager } from "@/src/util/classes/comments";
-import { createComment, deleteComment as del } from "@/src/services/base/comment";
+import { createComment, deleteComment as del, updateComment as upd } from "@/src/services/base/comment";
 
 export default function CommentsMainSection(props: CommentMainSectionProps) {
     const comments = useSelector(selectComments);
@@ -26,8 +24,6 @@ export default function CommentsMainSection(props: CommentMainSectionProps) {
     const [openCommentsArray, setOpenCommentsArray] = useState<boolean[]>([]);
     const [editCommentsArray, setEditCommentsArray] = useState<boolean[]>([]);
     const [commentTextsArray, setCommentTextsArray] = useState<string[]>([]);
-
-    const [editCommentMut] = useMutation(UPDATE_COMMENT);
 
     useEffect(() => {
         if (!comments) return;
@@ -82,7 +78,7 @@ export default function CommentsMainSection(props: CommentMainSectionProps) {
         event.stopPropagation();
         const changes = {};
         changes[toChangeKey] = toChangeValue;
-        editCommentMut({ variables: { commentId: commentId, changes: JSON.stringify(changes), projectId: projectId } });
+        upd({ commentId: commentId, changes: changes, projectId: projectId }, (res) => { });
         if (toChangeKey == 'comment') {
             handleEditComment(index);
         }

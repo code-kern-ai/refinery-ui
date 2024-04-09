@@ -27,3 +27,12 @@ export function deleteComment(options: {
     let finalUrl = `${commentEndpoint}/delete-comment`;
     jsonFetchWrapper(finalUrl, FetchType.DELETE, onResult, JSON.stringify(convertCamelToSnakeCase(options)));
 }
+
+export function updateComment(options: {
+    commentId: string,
+    changes: any,
+    projectId?: string
+}, onResult: (result: any) => void) {
+    let finalUrl = `${commentEndpoint}/update-comment`;
+    jsonFetchWrapper(finalUrl, FetchType.PUT, onResult, JSON.stringify(convertCamelToSnakeCase(options)));
+}
