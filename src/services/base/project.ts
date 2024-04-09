@@ -183,3 +183,10 @@ export function deleteProject(projectId: string, onResult: (result: any) => void
     const finalUrl = `${projectEndpoint}/${projectId}/delete-project`;
     jsonFetchWrapper(finalUrl, FetchType.DELETE, onResult);
 }
+
+export function createProject(options: {
+    name: string, description: string
+}, onResult: (result: any) => void) {
+    const finalUrl = `${projectEndpoint}/create-project`;
+    jsonFetchWrapper(finalUrl, FetchType.POST, onResult, JSON.stringify(convertCamelToSnakeCase(options)));
+}

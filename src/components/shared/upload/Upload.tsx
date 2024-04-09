@@ -5,7 +5,7 @@ import { useCallback, useEffect, useState } from "react";
 import UploadWrapper from "./helper-components/UploadWrapper";
 import { selectUploadData, setImportOptions } from "@/src/reduxStore/states/upload";
 import { useMutation } from "@apollo/client";
-import { CREATE_PROJECT, UPDATE_PROJECT_STATUS, UPDATE_PROJECT_TOKENIZER } from "@/src/services/gql/mutations/projects";
+import { UPDATE_PROJECT_STATUS, UPDATE_PROJECT_TOKENIZER } from "@/src/services/gql/mutations/projects";
 import { ProjectStatus } from "@/src/types/components/projects/projects-list";
 import { timer } from "rxjs";
 import { uploadFile } from "@/src/services/base/s3-service";
@@ -20,7 +20,7 @@ import { closeModal } from "@/src/reduxStore/states/modal";
 import { ModalEnum } from "@/src/types/shared/modal";
 import Dropdown2 from "@/submodules/react-components/components/Dropdown2";
 import { useWebsocket } from "@/src/services/base/web-sockets/useWebsocket";
-import { getUploadCredentialsAndId, getUploadTaskById, deleteProject as dlp } from "@/src/services/base/project";
+import { getUploadCredentialsAndId, getUploadTaskById, deleteProject as dlp, createProject as crp } from "@/src/services/base/project";
 
 export default function Upload(props: UploadProps) {
     const router = useRouter();
@@ -45,7 +45,6 @@ export default function Upload(props: UploadProps) {
     const [key, setKey] = useState("");
     const [fileEndsWithZip, setFileEndsWithZip] = useState<boolean>(false);
 
-    const [createProjectMut] = useMutation(CREATE_PROJECT);
     const [updateProjectTokenizerMut] = useMutation(UPDATE_PROJECT_TOKENIZER);
     const [updateProjectStatusMut] = useMutation(UPDATE_PROJECT_STATUS);
 
@@ -121,14 +120,14 @@ export default function Upload(props: UploadProps) {
                 setIsProjectTitleEmpty(true);
                 return;
             }
-            createProjectMut({ variables: { name: projectTitle, description: projectDescription } }).then((res) => {
+            crp({ name: projectTitle, description: projectDescription }, (res) => {
                 const project = res.data.createProject['project'];
                 dispatch(extendAllProjects(project));
                 UploadHelper.setProjectId(project.id);
                 executeUploadFile();
             })
         } else if (uploadFileType == UploadFileType.PROJECT) {
-            createProjectMut({ variables: { name: props.uploadOptions.projectName, description: "Created during file upload " + selectedFile?.name } }).then((res) => {
+            crp({ name: props.uploadOptions.projectName, description: "Created during file upload " + selectedFile?.name }, (res) => {
                 const project = res.data.createProject['project'];
                 dispatch(extendAllProjects(project));
                 UploadHelper.setProjectId(project.id);
