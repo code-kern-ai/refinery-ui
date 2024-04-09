@@ -155,7 +155,7 @@ export default function LabelingMainComponent() {
             return;
         }
         setTimeout(() => {
-            getTokenizedRecord(SessionManager.currentRecordId, (res) => {
+            getTokenizedRecord({ recordId: SessionManager.currentRecordId }, (res) => {
                 dispatch(updateRecordRequests('token', res.data.tokenizeRecord));
             });
             getRecordByRecordId(projectId, SessionManager.currentRecordId, (res) => {

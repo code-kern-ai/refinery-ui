@@ -190,3 +190,10 @@ export function createProject(options: {
     const finalUrl = `${projectEndpoint}/create-project`;
     jsonFetchWrapper(finalUrl, FetchType.POST, onResult, JSON.stringify(convertCamelToSnakeCase(options)));
 }
+
+export function updateProjectTokenizer(projectId: string, options: {
+    tokenizer: string
+}, onResult: (result: any) => void) {
+    const finalUrl = `${projectEndpoint}/${projectId}/update-project-tokenizer`;
+    jsonFetchWrapper(finalUrl, FetchType.PUT, onResult, JSON.stringify(convertCamelToSnakeCase(options)));
+}

@@ -17,9 +17,11 @@ export function getHuddleData(projectId: string, options: {
     jsonFetchWrapper(finalUrl, FetchType.POST, onResult, JSON.stringify(options));
 }
 
-export function getTokenizedRecord(recordId: string, onResult: (result: any) => void) {
+export function getTokenizedRecord(options: {
+    recordId: string
+}, onResult: (result: any) => void) {
     const finalUrl = `${labelingEndpoint}/tokenized-record`;
-    jsonFetchWrapper(finalUrl, FetchType.POST, onResult, JSON.stringify({ recordId }));
+    jsonFetchWrapper(finalUrl, FetchType.POST, onResult, JSON.stringify(convertCamelToSnakeCase(options)));
 }
 
 export function deleteRecordLabelAssociationByIds(projectId: string, recordId: string, associationIds: string[], onResult: (result: any) => void) {
