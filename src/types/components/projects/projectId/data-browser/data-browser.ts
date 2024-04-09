@@ -54,4 +54,5 @@ export enum LineBreaksType {
 
 export type DataBrowserRecordsProps = {
     refetchNextRecords: () => void;
+    clearSearchRequest: () => void;
 };

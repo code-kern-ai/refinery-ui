@@ -48,6 +48,7 @@ export default function DataBrowserRecords(props: DataBrowserRecordsProps) {
         dispatch(updateAdditionalDataState('clearFullSearch', true));
         dispatch(updateAdditionalDataState('displayOutdatedWarning', false));
         dispatch(updateAdditionalDataState('canUpdateDynamicSlice', false));
+        props.clearSearchRequest();
     }
 
     function storePreliminaryRecordIds(index: number, forEdit: boolean = false) {
