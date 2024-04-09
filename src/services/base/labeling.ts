@@ -144,3 +144,10 @@ export function updateLabelHotkey(projectId: string, options: {
     const finalUrl = `${labelingEndpoint}/${projectId}/update-label-hotkey`;
     jsonFetchWrapper(finalUrl, FetchType.PUT, onResult, JSON.stringify(convertCamelToSnakeCase(options)));
 }
+
+export function handleLabelRenameWarnings(projectId: string, options: {
+    warningData: any
+}, onResult: (result: any) => void) {
+    const finalUrl = `${labelingEndpoint}/${projectId}/handle-label-rename-warnings`;
+    jsonFetchWrapper(finalUrl, FetchType.POST, onResult, JSON.stringify(convertCamelToSnakeCase(options)));
+}

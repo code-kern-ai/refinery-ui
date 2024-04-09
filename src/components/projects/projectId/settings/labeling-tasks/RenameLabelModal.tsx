@@ -4,17 +4,18 @@ import { initModal, openModal, selectModal } from "@/src/reduxStore/states/modal
 import { selectLabelingTasksAll, setLabelingTasksAll } from "@/src/reduxStore/states/pages/settings";
 import { selectProjectId } from "@/src/reduxStore/states/project";
 import { getCheckRenameLabel } from "@/src/services/base/project-setting";
-import { HANDLE_LABEL_RENAME_WARNING, UPDATE_LABEL_NAME } from "@/src/services/gql/mutations/project-settings";
+import { UPDATE_LABEL_NAME } from "@/src/services/gql/mutations/project-settings";
 import { LabelType, LabelingTask, RenameLabelData } from "@/src/types/components/projects/projectId/settings/labeling-tasks";
 import { ModalButton, ModalEnum } from "@/src/types/shared/modal";
 import { LabelHelper } from "@/src/util/classes/label-helper";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
 import { jsonCopy } from "@/submodules/javascript-functions/general";
-import { useLazyQuery, useMutation } from "@apollo/client";
+import { useMutation } from "@apollo/client";
 import { Tooltip } from "@nextui-org/react";
 import { IconAlertTriangleFilled, IconInfoCircleFilled, IconTriangleInverted } from "@tabler/icons-react";
 import { useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { handleLabelRenameWarnings } from "@/src/services/base/labeling";
 
 const ACCEPT_BUTTON = { buttonCaption: 'Rename', useButton: true }
 
@@ -28,7 +29,6 @@ export default function RenameLabelModal() {
     const [renameLabelData, setRenameLabelData] = useState<RenameLabelData>(null);
 
     const [updateLabelNameMut] = useMutation(UPDATE_LABEL_NAME);
-    const [handleRenameWarningMut] = useMutation(HANDLE_LABEL_RENAME_WARNING);
 
     useEffect(() => {
         setRenameLabelData({
@@ -78,7 +78,7 @@ export default function RenameLabelModal() {
 
     function handleLabelRenameWarning(warning: any) {
         if (warning == null) return;
-        handleRenameWarningMut({ variables: { projectId: projectId, warningData: JSON.stringify(warning) } }).then((res) => {
+        handleLabelRenameWarnings(projectId, { warningData: warning }, (res) => {
             checkRenameLabel();
         });
 
