@@ -1,13 +1,12 @@
 import { selectProject, setActiveProject } from "@/src/reduxStore/states/project";
 import { updateProjectNameAndDescriptionPost } from "@/src/services/base/project";
-import { DELETE_PROJECT } from "@/src/services/gql/mutations/projects";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
-import { useMutation } from "@apollo/client";
 import { Tooltip } from "@nextui-org/react";
 import { IconWreckingBall } from "@tabler/icons-react";
 import { useRouter } from "next/router";
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { deleteProject as dlp } from "@/src/services/base/project";
 
 export default function ProjectMetaData() {
     const router = useRouter();
@@ -18,8 +17,6 @@ export default function ProjectMetaData() {
     const [projectName, setProjectName] = useState('');
     const [projectDescription, setProjectDescription] = useState('');
     const [projectNameDelete, setProjectNameDelete] = useState('');
-
-    const [deleteProjectMut] = useMutation(DELETE_PROJECT);
 
     function updateProjectNameAndDescription() {
         if (projectName === '' && projectDescription === '') return;
@@ -36,7 +33,7 @@ export default function ProjectMetaData() {
     }
 
     function deleteProject() {
-        deleteProjectMut({ variables: { projectId: project.id } }).then(() => {
+        dlp(project.id, (res) => {
             router.push('/projects');
         });
     }

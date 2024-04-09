@@ -178,3 +178,8 @@ export function updateProjectNameAndDescriptionPost(projectId: string, name: str
     const finalUrl = `${projectEndpoint}/${projectId}/update-project-name-description`;
     jsonFetchWrapper(finalUrl, FetchType.POST, onResult, JSON.stringify({ name, description }));
 }
+
+export function deleteProject(projectId: string, onResult: (result: any) => void) {
+    const finalUrl = `${projectEndpoint}/${projectId}/delete-project`;
+    jsonFetchWrapper(finalUrl, FetchType.DELETE, onResult);
+}
