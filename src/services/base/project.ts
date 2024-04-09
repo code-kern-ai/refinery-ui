@@ -197,3 +197,10 @@ export function updateProjectTokenizer(projectId: string, options: {
     const finalUrl = `${projectEndpoint}/${projectId}/update-project-tokenizer`;
     jsonFetchWrapper(finalUrl, FetchType.PUT, onResult, JSON.stringify(convertCamelToSnakeCase(options)));
 }
+
+export function updateProjectStatus(projectId: string, options: {
+    newStatus: string
+}, onResult: (result: any) => void) {
+    const finalUrl = `${projectEndpoint}/${projectId}/update-project-status`;
+    jsonFetchWrapper(finalUrl, FetchType.PUT, onResult, JSON.stringify(convertCamelToSnakeCase(options)));
+}

@@ -4,8 +4,6 @@ import UploadField from "./helper-components/UploadField";
 import { useCallback, useEffect, useState } from "react";
 import UploadWrapper from "./helper-components/UploadWrapper";
 import { selectUploadData, setImportOptions } from "@/src/reduxStore/states/upload";
-import { useMutation } from "@apollo/client";
-import { UPDATE_PROJECT_STATUS } from "@/src/services/gql/mutations/projects";
 import { ProjectStatus } from "@/src/types/components/projects/projects-list";
 import { timer } from "rxjs";
 import { uploadFile } from "@/src/services/base/s3-service";
@@ -20,7 +18,7 @@ import { closeModal } from "@/src/reduxStore/states/modal";
 import { ModalEnum } from "@/src/types/shared/modal";
 import Dropdown2 from "@/submodules/react-components/components/Dropdown2";
 import { useWebsocket } from "@/src/services/base/web-sockets/useWebsocket";
-import { getUploadCredentialsAndId, getUploadTaskById, deleteProject as dlp, createProject as crp, updateProjectTokenizer } from "@/src/services/base/project";
+import { getUploadCredentialsAndId, getUploadTaskById, deleteProject as dlp, createProject as crp, updateProjectTokenizer, updateProjectStatus } from "@/src/services/base/project";
 
 export default function Upload(props: UploadProps) {
     const router = useRouter();
@@ -44,8 +42,6 @@ export default function Upload(props: UploadProps) {
     const [prepareTokenizedValues, setPrepareTokenizedValues] = useState<any[]>([]);
     const [key, setKey] = useState("");
     const [fileEndsWithZip, setFileEndsWithZip] = useState<boolean>(false);
-
-    const [updateProjectStatusMut] = useMutation(UPDATE_PROJECT_STATUS);
 
     useEffect(() => {
         if (!props.uploadOptions || !props.uploadOptions.tokenizerValues) return;
@@ -156,7 +152,7 @@ export default function Upload(props: UploadProps) {
             tokenizerPrep = UPLOAD_TOKENIZERS.ENGLISH.TOKENIZER; // dummy tokenizer, actual value is set during import of project
         }
         updateProjectTokenizer(UploadHelper.getProjectId(), { tokenizer: tokenizerPrep }, (res) => {
-            updateProjectStatusMut({ variables: { projectId: UploadHelper.getProjectId(), newStatus: ProjectStatus.INIT_COMPLETE } })
+            updateProjectStatus(UploadHelper.getProjectId(), { newStatus: ProjectStatus.INIT_COMPLETE }, (result) => { });
         });
     }
 
