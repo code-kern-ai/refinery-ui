@@ -4,7 +4,7 @@ import { BACKEND_BASE_URI } from "./_settings";
 export const dataSliceEndpoint = `${BACKEND_BASE_URI}/api/v1/data-slice`;
 
 export function getDataSlices(projectId: string, sliceType: string | null, onResult: (result: any) => void) {
-    let finalUrl = `${dataSliceEndpoint}/${projectId}`;
+    let finalUrl = `${dataSliceEndpoint}/${projectId}/get-data-slices`;
     if (sliceType) finalUrl += `?slice_type=${sliceType}`;
 
     jsonFetchWrapper(finalUrl, FetchType.GET, onResult);
