@@ -14,6 +14,13 @@ export function getAttributeByAttributeId(projectId: string, attributeId: string
     jsonFetchWrapper(finalUrl, FetchType.GET, onResult);
 }
 
+export function prepareProjectExport(projectId: string, options: {
+    exportOptions: string, key: string | null
+}, onResult: (result: any) => void) {
+    const finalUrl = `${projectSettingEndpoint}/${projectId}/prepare-project-export`;
+    jsonFetchWrapper(finalUrl, FetchType.POST, onResult, JSON.stringify(convertCamelToSnakeCase(options)));
+}
+
 export function getCheckRenameLabel(projectId: string, labelId: string, newName: string, onResult: (result: any) => void) {
     const finalUrl = `${projectSettingEndpoint}/${projectId}/check-rename-label?label_id=${labelId}&new_name=${newName}`;
     jsonFetchWrapper(finalUrl, FetchType.GET, onResult);
