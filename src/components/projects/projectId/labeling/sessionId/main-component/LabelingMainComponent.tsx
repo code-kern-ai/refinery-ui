@@ -88,7 +88,7 @@ export default function LabelingMainComponent() {
             dispatch(setDisplayUserRole(user.role));
             return;
         }
-        getLinkLocked(projectId, router.asPath, (result) => {
+        getLinkLocked(projectId, { linkRoute: router.asPath }, (result) => {
             const lockedLink = result['data']['linkLocked'];
             if (lockedLink) {
                 setAbsoluteWarning('This link is locked, contact your supervisor to request access');

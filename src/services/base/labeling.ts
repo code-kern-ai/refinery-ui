@@ -34,9 +34,11 @@ export function deleteRecordById(projectId: string, recordId: string, onResult: 
     return jsonFetchWrapper(finalUrl, FetchType.DELETE, onResult);
 }
 
-export function getLinkLocked(projectId: string, linkRoute: string, onResult: (result: any) => void) {
+export function getLinkLocked(projectId: string, options: {
+    linkRoute: string
+}, onResult: (result: any) => void) {
     const finalUrl = `${labelingEndpoint}/${projectId}/link-locked`;
-    jsonFetchWrapper(finalUrl, FetchType.POST, onResult, JSON.stringify(convertCamelToSnakeCase(linkRoute)));
+    jsonFetchWrapper(finalUrl, FetchType.POST, onResult, JSON.stringify(convertCamelToSnakeCase(options)));
 }
 
 export function generateAccessLink(projectId: string, options: {
