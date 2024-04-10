@@ -25,3 +25,10 @@ export function modelProviderDeleteModel(options: {
     const finalUrl = `${miscEndpoint}/model-provider-delete-model`;
     jsonFetchWrapper(finalUrl, FetchType.DELETE, onResult, JSON.stringify(convertCamelToSnakeCase(options)));
 }
+
+export function modelProviderDownloadModel(options: {
+    modelName: string
+}, onResult: (result: any) => void) {
+    const finalUrl = `${miscEndpoint}/model-provider-download-model`;
+    jsonFetchWrapper(finalUrl, FetchType.POST, onResult, JSON.stringify(convertCamelToSnakeCase(options)));
+}
