@@ -60,3 +60,10 @@ export function updateProjectGates(projectId: string, onResult: (result: any) =>
     const finalUrl = `${projectSettingEndpoint}/${projectId}/update-project-gates`;
     jsonFetchWrapper(finalUrl, FetchType.POST, onResult);
 }
+
+export function calculateUserAttributeAllRecords(projectId: string, options: {
+    attributeId: string
+}, onResult: (result: any) => void) {
+    const finalUrl = `${projectSettingEndpoint}/${projectId}/calculate-user-attribute-all-records`;
+    jsonFetchWrapper(finalUrl, FetchType.POST, onResult, JSON.stringify(convertCamelToSnakeCase(options)));
+}
