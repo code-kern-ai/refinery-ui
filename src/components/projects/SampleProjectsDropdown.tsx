@@ -1,7 +1,6 @@
 import { Fragment, useCallback, useEffect, useRef, useState } from 'react'
 import { Menu, Transition } from '@headlessui/react'
 import { ChevronDownIcon } from '@heroicons/react/20/solid'
-import { useMutation } from '@apollo/client';
 import { useRouter } from 'next/router';
 import { useDispatch, useSelector } from 'react-redux';
 import { selectAllProjects } from '@/src/reduxStore/states/project';
@@ -9,9 +8,9 @@ import { ModalButton, ModalEnum } from '@/src/types/shared/modal';
 import { closeModal, openModal } from '@/src/reduxStore/states/modal';
 import Modal from '../shared/modal/Modal';
 import { IconAlertTriangle, IconFishHook, IconMessageCircle, IconNews } from '@tabler/icons-react';
-import { CREATE_SAMPLE_PROJECT } from '@/src/services/gql/mutations/projects';
 import { setSearchGroupsStore } from '@/src/reduxStore/states/pages/data-browser';
 import { selectProjectIdSampleProject, setProjectIdSampleProject } from '@/src/reduxStore/states/tmp';
+import { createSampleProject } from '@/src/services/base/project';
 
 const ACCEPT_BUTTON = { buttonCaption: "Create", closeAfterClick: false, useButton: true, disabled: true };
 
@@ -26,8 +25,6 @@ export default function SampleProjectsDropdown() {
     const [projectTypeInput, setProjectTypeInput] = useState("");
     const [projectNameExists, setProjectNameExists] = useState(false);
 
-    const [createSampleProjectMut] = useMutation(CREATE_SAMPLE_PROJECT);
-
     const importSampleProject = useCallback((projectName?: string, projectType?: string) => {
         const checkIfProjectExists = projects.find((project) => project.name === projectName);
         if (checkIfProjectExists) {
@@ -41,7 +38,7 @@ export default function SampleProjectsDropdown() {
         const projectTypeFinal = projectType ? projectType : projectTypeInput;
         dispatch(closeModal(ModalEnum.SAMPLE_PROJECT_TITLE));
         dispatch(setSearchGroupsStore({}));
-        createSampleProjectMut({ variables: { name: projectNameFinal, projectType: projectTypeFinal } }).then((res) => {
+        createSampleProject({ name: projectNameFinal, projectType: projectTypeFinal }, (res) => {
             dispatch(closeModal(ModalEnum.SAMPLE_PROJECT_TITLE));
             const projectId = res['data']['createSampleProject']['project'].id;
             dispatch(setProjectIdSampleProject(projectId));

@@ -204,3 +204,10 @@ export function updateProjectStatus(projectId: string, options: {
     const finalUrl = `${projectEndpoint}/${projectId}/update-project-status`;
     jsonFetchWrapper(finalUrl, FetchType.PUT, onResult, JSON.stringify(convertCamelToSnakeCase(options)));
 }
+
+export function createSampleProject(options: {
+    name: string, projectType: string
+}, onResult: (result: any) => void) {
+    const finalUrl = `${projectEndpoint}/create-sample-project`;
+    jsonFetchWrapper(finalUrl, FetchType.POST, onResult, JSON.stringify(convertCamelToSnakeCase(options)));
+}
