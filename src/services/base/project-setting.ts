@@ -67,3 +67,10 @@ export function calculateUserAttributeAllRecords(projectId: string, options: {
     const finalUrl = `${projectSettingEndpoint}/${projectId}/calculate-user-attribute-all-records`;
     jsonFetchWrapper(finalUrl, FetchType.POST, onResult, JSON.stringify(convertCamelToSnakeCase(options)));
 }
+
+export function createTaskAndLabels(projectId: string, options: {
+    labelingTaskName: string, labelingTaskType: string, labelingTaskTargetId: string, labels: string[]
+}, onResult: (result: any) => void) {
+    const finalUrl = `${projectSettingEndpoint}/${projectId}/create-task-and-labels`;
+    jsonFetchWrapper(finalUrl, FetchType.POST, onResult, JSON.stringify(convertCamelToSnakeCase(options)));
+}
