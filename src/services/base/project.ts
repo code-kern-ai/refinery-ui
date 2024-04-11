@@ -148,17 +148,6 @@ export function getUploadCredentialsAndId(projectId: string, fileName: string, f
     jsonFetchWrapper(finalUrl, FetchType.POST, onResult, JSON.stringify({ file_name: fileName, file_type: fileType, file_import_options: fileImportOptions, upload_type: uploadType, key }));
 }
 
-export function getNotifications(options: {
-    projectFilter: string[],
-    levelFilter: string[],
-    typeFilter: string[],
-    userFilter: boolean,
-    limit: number,
-}, onResult: (result: any) => void) {
-    const finalUrl = `${projectEndpoint}/notifications`;
-    jsonFetchWrapper(finalUrl, FetchType.POST, onResult, JSON.stringify(convertCamelToSnakeCase(options)));
-}
-
 export function getUploadTaskById(projectId: string, uploadTaskId: string, onResult: (result: any) => void) {
     const finalUrl = `${projectEndpoint}/${projectId}/upload-task-by-id?upload_task_id=${uploadTaskId}`;
     return jsonFetchWrapper(finalUrl, FetchType.GET, onResult);

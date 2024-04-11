@@ -17,7 +17,8 @@ import { postProcessNotifications } from "@/src/util/shared/notification-center-
 import { selectNotificationId, setProjectIdSampleProject } from "@/src/reduxStore/states/tmp";
 import Comments from "../comments/Comments";
 import { arrayToDict } from "@/submodules/javascript-functions/general";
-import { getAllProjects, getNotifications } from "@/src/services/base/project";
+import { getAllProjects } from "@/src/services/base/project";
+import { getNotifications } from "@/src/services/base/notification";
 
 export default function Header() {
     const router = useRouter();

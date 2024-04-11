@@ -49,12 +49,12 @@ export function addTermToKnowledgeBasePost(projectId: string, options: {
 }
 
 export function deleteTermPost(projectId: string, termId: string, onResult: (result: any) => void) {
-    const finalUrl = `${lookupListsEndpoint}/${projectId}/delete-term/${termId}`;
+    const finalUrl = `${lookupListsEndpoint}/${projectId}/${termId}/delete-term`;
     jsonFetchWrapper(finalUrl, FetchType.DELETE, onResult);
 }
 
 export function blacklistTermPost(projectId: string, termId: string, onResult: (result: any) => void) {
-    const finalUrl = `${lookupListsEndpoint}/${projectId}/blacklist-term/${termId}`;
+    const finalUrl = `${lookupListsEndpoint}/${projectId}/${termId}/blacklist-term`;
     jsonFetchWrapper(finalUrl, FetchType.PUT, onResult);
 }
 
