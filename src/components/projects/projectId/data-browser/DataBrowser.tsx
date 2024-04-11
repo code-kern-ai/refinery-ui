@@ -4,7 +4,7 @@ import DataBrowserSidebar from "./DataBrowserSidebar";
 import { useLazyQuery } from "@apollo/client";
 import { DATA_SLICES, GET_RECORD_COMMENTS, GET_UNIQUE_VALUES_BY_ATTRIBUTES, SEARCH_RECORDS_EXTENDED } from "@/src/services/gql/queries/data-browser";
 import { useCallback, useEffect, useState } from "react";
-import { expandRecordList, selectRecords, setActiveDataSlice, setDataSlices, setRecordComments, setSearchRecordsExtended, setUniqueValuesDict, setUsersMapCount, updateAdditionalDataState } from "@/src/reduxStore/states/pages/data-browser";
+import { expandRecordList, selectActiveSearchParams, selectConfiguration, selectFullSearchStore, selectRecords, setActiveDataSlice, setDataSlices, setRecordComments, setSearchRecordsExtended, setUniqueValuesDict, setUsersMapCount, updateAdditionalDataState } from "@/src/reduxStore/states/pages/data-browser";
 import { postProcessRecordsExtended, postProcessUniqueValues, postProcessUsersCount } from "@/src/util/components/projects/projectId/data-browser/data-browser-helper";
 import { GET_ATTRIBUTES_BY_PROJECT_ID, GET_EMBEDDING_SCHEMA_BY_PROJECT_ID, GET_LABELING_TASKS_BY_PROJECT_ID } from "@/src/services/gql/queries/project-setting";
 import { selectAttributes, selectLabelingTasksAll, setAllAttributes, setAllEmbeddings, setLabelingTasksAll } from "@/src/reduxStore/states/pages/settings";
@@ -18,6 +18,8 @@ import { CommentType } from "@/src/types/shared/comments";
 import { CommentDataManager } from "@/src/util/classes/comments";
 import { REQUEST_COMMENTS } from "@/src/services/gql/queries/projects";
 import { useWebsocket } from "@/src/services/base/web-sockets/useWebsocket";
+import { parseFilterToExtended } from "@/src/util/components/projects/projectId/data-browser/filter-parser-helper";
+import { SearchGroup } from "@/submodules/javascript-functions/enums/enums";
 
 const SEARCH_REQUEST = { offset: 0, limit: 20 };
 
@@ -30,7 +32,10 @@ export default function DataBrowser() {
     const attributes = useSelector(selectAttributes);
     const user = useSelector(selectUser);
     const recordList = useSelector(selectRecords).recordList;
-
+    const activeSearchParams = useSelector(selectActiveSearchParams);
+    const configuration = useSelector(selectConfiguration);
+    const fullSearchStore = useSelector(selectFullSearchStore);
+    const fullCount = useSelector(selectRecords).fullCount;
 
     const [searchRequest, setSearchRequest] = useState(SEARCH_REQUEST);
 
@@ -61,15 +66,16 @@ export default function DataBrowser() {
     }, [projectId, labelingTasks, recordList]);
 
     useEffect(() => {
-        if (!projectId) return;
+        if (!projectId || !labelingTasks || !attributes) return;
         if (!searchRequest) return;
-        if (searchRequest.offset == 0) return;
-        refetchExtendedRecord({ variables: { projectId: projectId, filterData: JSON.stringify({}), offset: searchRequest.offset, limit: searchRequest.limit } }).then((res) => {
+        if (searchRequest.offset == 0 || searchRequest.offset > fullCount) return;
+        const filterData = parseFilterToExtended(activeSearchParams, attributes, configuration, labelingTasks, user, fullSearchStore[SearchGroup.DRILL_DOWN])
+        refetchExtendedRecord({ variables: { projectId: projectId, filterData: filterData, offset: searchRequest.offset, limit: searchRequest.limit } }).then((res) => {
             const parsedRecordData = postProcessRecordsExtended(res.data['searchRecordsExtended'], labelingTasks);
             dispatch(expandRecordList(parsedRecordData));
             refetchRecordCommentsAndProcess(parsedRecordData.recordList);
         });
-    }, [searchRequest]);
+    }, [searchRequest, activeSearchParams, projectId, attributes, configuration, labelingTasks, user, fullSearchStore]);
 
     useEffect(() => {
         if (!projectId || users.length == 0) return;
@@ -139,6 +145,7 @@ export default function DataBrowser() {
     }
 
     function getNextRecords() {
+        console.log('getNextRecords?')
         setSearchRequest({ offset: searchRequest.offset + searchRequest.limit, limit: searchRequest.limit });
     }
 
@@ -147,6 +154,10 @@ export default function DataBrowser() {
             dispatch(setUniqueValuesDict(postProcessUniqueValues(res.data['uniqueValuesByAttributes'], attributes)));
         });
     }
+
+    const setSearchRequestToInit = useCallback(() => {
+        setSearchRequest(SEARCH_REQUEST);
+    }, []);
 
     const handleWebsocketNotification = useCallback((msgParts: string[]) => {
         if (['data_slice_created', 'data_slice_updated', 'data_slice_deleted'].includes(msgParts[1])) {
@@ -169,7 +180,7 @@ export default function DataBrowser() {
     return (<>
         {projectId && <div className="flex flex-row h-full">
             <DataBrowserSidebar />
-            <DataBrowserRecords refetchNextRecords={getNextRecords} />
+            <DataBrowserRecords refetchNextRecords={getNextRecords} clearSearchRequest={setSearchRequestToInit} />
         </div>}
     </>)
 }
