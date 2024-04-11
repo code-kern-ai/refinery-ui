@@ -14,7 +14,6 @@ import { checkDecimalPatterns, getAttributeType, getFilterIntegrationOperatorToo
 import { getColorForDataType } from "@/src/util/components/projects/projectId/settings/data-schema-helper";
 import { extendArrayElementsByUniqueId } from "@/submodules/javascript-functions/id-prep";
 import Dropdown2 from "@/submodules/react-components/components/Dropdown2";
-import { useLazyQuery } from "@apollo/client";
 import { IconPlus, IconTrash } from "@tabler/icons-react";
 import { useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";

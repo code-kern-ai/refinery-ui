@@ -11,7 +11,7 @@ import { Tooltip } from "@nextui-org/react";
 import { IconPencil } from "@tabler/icons-react";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { updateLabelColor as ulc, updateLabelHotkey } from "@/src/services/base/labeling";
+import { updateLabelColorPost, updateLabelHotkey } from "@/src/services/base/labeling";
 
 export default function ChangeColorModal() {
     const dispatch = useDispatch();
@@ -64,7 +64,7 @@ export default function ChangeColorModal() {
 
     function updateLabelColor(newColor: string) {
         LabelHelper.updateLabelColor(modalChangeColor.taskId, modalChangeColor.label.color.name, newColor);
-        ulc(projectId, {
+        updateLabelColorPost(projectId, {
             labelingTaskLabelId: modalChangeColor.label.id,
             labelColor: newColor
         }, (res) => {

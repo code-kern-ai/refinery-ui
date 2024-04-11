@@ -1,5 +1,5 @@
 import { selectProjectId } from "@/src/reduxStore/states/project";
-import { deleteTerm as dlt, blacklistTerm as blt, addTermToKnowledgeBase as tkb, updateTerm } from "@/src/services/base/lookup-lists";
+import { deleteTermPost, blacklistTermPost, addTermToKnowledgeBasePost, updateTerm } from "@/src/services/base/lookup-lists";
 import { Term, TermsProps } from "@/src/types/components/projects/projectId/lookup-lists";
 import { BLACKLISTED_TERMS_DROPDOWN_OPTIONS, TERMS_DROPDOWN_OPTIONS, isTermUnique } from "@/src/util/components/projects/projectId/lookup-lists-helper";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
@@ -25,7 +25,7 @@ export default function Terms(props: TermsProps) {
 
     function addTermToKnowledgeBaseImpl() {
         if (name == '' || !isTermUnique(name, terms)) return;
-        tkb(projectId, { value: name, comment: description, knowledgeBaseId: router.query.lookupListId }, (res) => {
+        addTermToKnowledgeBasePost(projectId, { value: name, comment: description, knowledgeBaseId: router.query.lookupListId }, (res) => {
             setName("");
             setDescription("");
             props.refetchTerms();
@@ -50,13 +50,13 @@ export default function Terms(props: TermsProps) {
     }
 
     function removeTerm(term: Term) {
-        dlt(projectId, term.id, (res) => {
+        deleteTermPost(projectId, term.id, (res) => {
             props.refetchTerms();
         });
     }
 
     function blacklistTerm(term: Term) {
-        blt(projectId, term.id, (res) => {
+        blacklistTermPost(projectId, term.id, (res) => {
             props.refetchTerms();
         });
     }

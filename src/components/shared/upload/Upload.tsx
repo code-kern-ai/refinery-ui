@@ -18,7 +18,7 @@ import { closeModal } from "@/src/reduxStore/states/modal";
 import { ModalEnum } from "@/src/types/shared/modal";
 import Dropdown2 from "@/submodules/react-components/components/Dropdown2";
 import { useWebsocket } from "@/src/services/base/web-sockets/useWebsocket";
-import { getUploadCredentialsAndId, getUploadTaskById, deleteProject as dlp, createProject as crp, updateProjectTokenizer, updateProjectStatus } from "@/src/services/base/project";
+import { getUploadCredentialsAndId, getUploadTaskById, deleteProjectPost, createProjectPost, updateProjectTokenizer, updateProjectStatus } from "@/src/services/base/project";
 
 export default function Upload(props: UploadProps) {
     const router = useRouter();
@@ -115,14 +115,14 @@ export default function Upload(props: UploadProps) {
                 setIsProjectTitleEmpty(true);
                 return;
             }
-            crp({ name: projectTitle, description: projectDescription }, (res) => {
+            createProjectPost({ name: projectTitle, description: projectDescription }, (res) => {
                 const project = res.data.createProject['project'];
                 dispatch(extendAllProjects(project));
                 UploadHelper.setProjectId(project.id);
                 executeUploadFile();
             })
         } else if (uploadFileType == UploadFileType.PROJECT) {
-            crp({ name: props.uploadOptions.projectName, description: "Created during file upload " + selectedFile?.name }, (res) => {
+            createProjectPost({ name: props.uploadOptions.projectName, description: "Created during file upload " + selectedFile?.name }, (res) => {
                 const project = res.data.createProject['project'];
                 dispatch(extendAllProjects(project));
                 UploadHelper.setProjectId(project.id);
@@ -233,7 +233,7 @@ export default function Upload(props: UploadProps) {
 
     function deleteExistingProject() {
         const projectId = UploadHelper.getProjectId();
-        dlp(projectId, (res) => {
+        deleteProjectPost(projectId, (res) => {
             dispatch(removeFromAllProjectsById(projectId));
         });
     }

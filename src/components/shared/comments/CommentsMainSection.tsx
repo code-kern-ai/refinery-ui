@@ -11,7 +11,7 @@ import { selectProjectId } from "@/src/reduxStore/states/project";
 import { CommentCreation } from "./CommentCreation";
 import { convertTypeToKey } from "@/src/util/shared/comments-helper";
 import { CommentDataManager } from "@/src/util/classes/comments";
-import { createComment, deleteComment as del, updateComment as upd } from "@/src/services/base/comment";
+import { createComment, deleteCommentPost, updateCommentPost } from "@/src/services/base/comment";
 
 export default function CommentsMainSection(props: CommentMainSectionProps) {
     const comments = useSelector(selectComments);
@@ -78,14 +78,14 @@ export default function CommentsMainSection(props: CommentMainSectionProps) {
         event.stopPropagation();
         const changes = {};
         changes[toChangeKey] = toChangeValue;
-        upd({ commentId: commentId, changes: changes, projectId: projectId }, (res) => { });
+        updateCommentPost({ commentId: commentId, changes: changes, projectId: projectId }, (res) => { });
         if (toChangeKey == 'comment') {
             handleEditComment(index);
         }
     }, [projectId]);
 
     const deleteComment = useCallback((commentId: string) => {
-        del({ commentId: commentId, projectId: projectId }, (res) => {
+        deleteCommentPost({ commentId: commentId, projectId: projectId }, (res) => {
             setCommentTextsArray(commentTextsArray.filter((commentText: string) => commentText != commentTextsArray[commentId]));
             CommentDataManager.removeCommentFromData(commentId);
             CommentDataManager.parseToCurrentData(allUsers);

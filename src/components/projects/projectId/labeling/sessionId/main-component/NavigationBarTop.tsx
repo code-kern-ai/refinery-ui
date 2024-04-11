@@ -30,7 +30,7 @@ export default function NavigationBarTop(props: NavigationBarTopProps) {
     useEffect(() => {
         if (userDisplayRole?.role == UserRole.ENGINEER || !SessionManager.labelingLinkData) return;
         const heuristicId = SessionManager.labelingLinkData.linkType == LabelingLinkType.HEURISTIC ? SessionManager.labelingLinkData.huddleId : null;
-        getAvailableLinks(projectId, user?.role, heuristicId, (result) => {
+        getAvailableLinks(projectId, userDisplayRole?.role, heuristicId, (result) => {
             const availableLinks = result['data']['availableLinks'];
             dispatch(setAvailableLinks(availableLinks));
             const linkRoute = router.asPath.split("?")[0];

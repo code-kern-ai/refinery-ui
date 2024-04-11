@@ -6,7 +6,7 @@ import { IconWreckingBall } from "@tabler/icons-react";
 import { useRouter } from "next/router";
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { deleteProject as dlp } from "@/src/services/base/project";
+import { deleteProjectPost } from "@/src/services/base/project";
 
 export default function ProjectMetaData() {
     const router = useRouter();
@@ -33,7 +33,7 @@ export default function ProjectMetaData() {
     }
 
     function deleteProject() {
-        dlp(project.id, (res) => {
+        deleteProjectPost(project.id, (res) => {
             router.push('/projects');
         });
     }

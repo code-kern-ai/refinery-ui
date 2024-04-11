@@ -52,7 +52,7 @@ export default function AddModelDownloadModal() {
     }, [modelsDownloaded, filteredList, modalAddModel, modelsList, modelName]);
 
     const addModel = useCallback(() => {
-        modelProviderDownloadModel({ modelName: modelName }, (res) => {
+        modelProviderDownloadModel(modelName, (res) => {
             const newModel = {
                 "name": modelName,
                 "date": dateAsUTCDate(new Date()).toLocaleString(),

@@ -16,7 +16,7 @@ export default function DeleteModelDownloadModal() {
     const [abortButton, setAbortButton] = useState<ModalButton>(ABORT_BUTTON);
 
     const deleteModel = useCallback(() => {
-        modelProviderDeleteModel({ modelName: modalDeleteModel.modelName }, (res) => {
+        modelProviderDeleteModel(modalDeleteModel.modelName, (res) => {
             dispatch(removeModelDownloadByName(modalDeleteModel.modelName));
         });
     }, [modalDeleteModel.modelName]);

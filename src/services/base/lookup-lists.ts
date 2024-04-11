@@ -41,19 +41,19 @@ export function updateKnowledgeBase(projectId: string, options: {
     jsonFetchWrapper(finalUrl, FetchType.PUT, onResult, JSON.stringify(convertCamelToSnakeCase(options)));
 }
 
-export function addTermToKnowledgeBase(projectId: string, options: {
+export function addTermToKnowledgeBasePost(projectId: string, options: {
     value: string, comment: string, knowledgeBaseId: string | string[]
 }, onResult: (result: any) => void) {
     const finalUrl = `${lookupListsEndpoint}/${projectId}/add-term-to-knowledge-base`;
     jsonFetchWrapper(finalUrl, FetchType.POST, onResult, JSON.stringify(convertCamelToSnakeCase(options)));
 }
 
-export function deleteTerm(projectId: string, termId: string, onResult: (result: any) => void) {
+export function deleteTermPost(projectId: string, termId: string, onResult: (result: any) => void) {
     const finalUrl = `${lookupListsEndpoint}/${projectId}/delete-term/${termId}`;
     jsonFetchWrapper(finalUrl, FetchType.DELETE, onResult);
 }
 
-export function blacklistTerm(projectId: string, termId: string, onResult: (result: any) => void) {
+export function blacklistTermPost(projectId: string, termId: string, onResult: (result: any) => void) {
     const finalUrl = `${lookupListsEndpoint}/${projectId}/blacklist-term/${termId}`;
     jsonFetchWrapper(finalUrl, FetchType.PUT, onResult);
 }

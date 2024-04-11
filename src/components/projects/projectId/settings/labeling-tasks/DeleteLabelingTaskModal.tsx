@@ -5,7 +5,7 @@ import { selectProjectId } from "@/src/reduxStore/states/project";
 import { ModalButton, ModalEnum } from "@/src/types/shared/modal";
 import { useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { deleteLabelingTask as dlt } from "@/src/services/base/labeling";
+import { deleteLabelingTaskPost } from "@/src/services/base/labeling";
 
 const ABORT_BUTTON = { buttonCaption: 'Delete labeling task', disabled: false, useButton: true };
 
@@ -18,7 +18,7 @@ export default function DeleteLabelingTaskModal() {
     const [abortButton, setAbortButton] = useState<ModalButton>(ABORT_BUTTON);
 
     const deleteLabelingTask = useCallback(() => {
-        dlt(projectId, modalDeleteLabelingTask.taskId, (res) => {
+        deleteLabelingTaskPost(projectId, modalDeleteLabelingTask.taskId, (res) => {
             dispatch(removeFromAllLabelingTasksById(modalDeleteLabelingTask.taskId));
         });
     }, [modalDeleteLabelingTask]);

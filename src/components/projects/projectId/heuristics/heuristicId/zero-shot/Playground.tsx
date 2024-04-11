@@ -1,14 +1,11 @@
 import LoadingIcon from "@/src/components/shared/loading/LoadingIcon";
-import Modal from "@/src/components/shared/modal/Modal";
 import { openModal } from "@/src/reduxStore/states/modal";
 import { selectHeuristic } from "@/src/reduxStore/states/pages/heuristics";
 import { selectLabelingTasksAll } from "@/src/reduxStore/states/pages/settings";
 import { selectProjectId } from "@/src/reduxStore/states/project";
-import { GET_ZERO_SHOT_TEXT } from "@/src/services/gql/queries/heuristics";
 import { ModalEnum } from "@/src/types/shared/modal";
 import { postProcessZeroShotText } from "@/src/util/components/projects/projectId/heuristics/heuristicId/zero-shot-helper";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
-import { useLazyQuery } from "@apollo/client";
 import { Tooltip } from "@nextui-org/react";
 import { IconAlertTriangle } from "@tabler/icons-react";
 import { Fragment, useState } from "react"

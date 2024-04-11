@@ -131,7 +131,6 @@ export default function SearchGroups() {
         if (recordsInDisplay) return;
         refreshTextHighlightNeeded();
         setHighlightingToRecords();
-        console.log("here")
         if (activeSlice && activeSlice.static) {
             let options: any = {};
             if (activeSlice.sliceType == Slice.STATIC_DEFAULT) {

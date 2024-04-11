@@ -68,7 +68,7 @@ export function updateProjectGates(projectId: string, onResult: (result: any) =>
     jsonFetchWrapper(finalUrl, FetchType.POST, onResult);
 }
 
-export function calculateUserAttributeAllRecords(projectId: string, options: {
+export function calculateUserAttributeAllRecordsPost(projectId: string, options: {
     attributeId: string
 }, onResult: (result: any) => void) {
     const finalUrl = `${projectSettingEndpoint}/${projectId}/calculate-user-attribute-all-records`;

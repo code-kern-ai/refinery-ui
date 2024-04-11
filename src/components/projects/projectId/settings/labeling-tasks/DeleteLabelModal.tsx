@@ -6,7 +6,7 @@ import { ModalButton, ModalEnum } from "@/src/types/shared/modal";
 import { LabelHelper } from "@/src/util/classes/label-helper";
 import { useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { deleteLabel as dl } from "@/src/services/base/labeling";
+import { deleteLabelPost } from "@/src/services/base/labeling";
 
 const ABORT_BUTTON = { buttonCaption: 'Delete label', disabled: false, useButton: true };
 
@@ -20,7 +20,7 @@ export default function DeleteLabelModal() {
 
     const deleteLabel = useCallback(() => {
         LabelHelper.removeLabel(modalDeleteLabel.taskId, modalDeleteLabel.label.color.name);
-        dl(projectId, modalDeleteLabel.label.id, (res) => {
+        deleteLabelPost(projectId, modalDeleteLabel.label.id, (res) => {
             dispatch(removeLabelFromLabelingTask(modalDeleteLabel.taskId, modalDeleteLabel.label.id));
         });
     }, [modalDeleteLabel]);

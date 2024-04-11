@@ -8,8 +8,6 @@ import { useState } from 'react';
 import AppSelectionDropdown from '@/submodules/react-components/components/AppSelectionDropdown';
 import { ModalEnum } from '@/src/types/shared/modal';
 import { openModal } from '@/src/reduxStore/states/modal';
-import { useLazyQuery } from '@apollo/client';
-import { GET_HAS_UPDATES } from '@/src/services/gql/queries/config';
 import { IconAlertCircle, IconApi, IconBrandDiscord, IconBulb, IconChartPie, IconClipboard, IconMaximize, IconMinimize, IconTag, IconTriangleSquareCircle, IconUserCircle } from '@tabler/icons-react';
 import { IconSettings } from '@tabler/icons-react';
 import { useRouter } from 'next/router';

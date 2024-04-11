@@ -41,14 +41,14 @@ export function getLinkLocked(projectId: string, options: {
     jsonFetchWrapper(finalUrl, FetchType.POST, onResult, JSON.stringify(convertCamelToSnakeCase(options)));
 }
 
-export function generateAccessLink(projectId: string, options: {
+export function generateAccessLinkPost(projectId: string, options: {
     type: string, id: string,
 }, onResult: (result: any) => void) {
     const finalUrl = `${labelingEndpoint}/${projectId}/generate-access-link`;
     jsonFetchWrapper(finalUrl, FetchType.POST, onResult, JSON.stringify(convertCamelToSnakeCase(options)));
 }
 
-export function removeAccessLink(projectId: string, linkId: string, onResult: (result: any) => void) {
+export function removeAccessLinkPost(projectId: string, linkId: string, onResult: (result: any) => void) {
     const finalUrl = `${labelingEndpoint}/${projectId}/remove-access-link`;
     jsonFetchWrapper(finalUrl, FetchType.DELETE, onResult, JSON.stringify({ "value": linkId }));
 }
@@ -113,7 +113,7 @@ export function updateLabelingTask(projectId: string, options: {
     jsonFetchWrapper(finalUrl, FetchType.PUT, onResult, JSON.stringify(convertCamelToSnakeCase(options)));
 }
 
-export function deleteLabelingTask(projectId: string, labelingTaskId: string, onResult: (results: any) => void) {
+export function deleteLabelingTaskPost(projectId: string, labelingTaskId: string, onResult: (results: any) => void) {
     const finalUrl = `${labelingEndpoint}/${projectId}/delete-labeling-task`;
     jsonFetchWrapper(finalUrl, FetchType.DELETE, onResult, JSON.stringify(convertCamelToSnakeCase({ "value": labelingTaskId })));
 }
@@ -125,7 +125,7 @@ export function createLabelingTask(projectId: string, options: {
     jsonFetchWrapper(finalUrl, FetchType.POST, onResult, JSON.stringify(convertCamelToSnakeCase(options)));
 }
 
-export function deleteLabel(projectId: string, labelId: string, onResult: (result: any) => void) {
+export function deleteLabelPost(projectId: string, labelId: string, onResult: (result: any) => void) {
     const finalUrl = `${labelingEndpoint}/${projectId}/delete-label`;
     jsonFetchWrapper(finalUrl, FetchType.DELETE, onResult, JSON.stringify(convertCamelToSnakeCase({ "value": labelId })));
 }
@@ -135,7 +135,7 @@ export function createLabel(projectId: string, labelName: string, labelingTaskId
     jsonFetchWrapper(finalUrl, FetchType.POST, onResult, JSON.stringify({ labelName, labelingTaskId, labelColor }));
 }
 
-export function updateLabelColor(projectId: string, options: {
+export function updateLabelColorPost(projectId: string, options: {
     labelingTaskLabelId: string, labelColor: string
 }, onResult: (result: any) => void) {
     const finalUrl = `${labelingEndpoint}/${projectId}/update-label-color`;

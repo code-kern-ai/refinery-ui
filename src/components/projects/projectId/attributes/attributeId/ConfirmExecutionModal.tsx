@@ -5,7 +5,7 @@ import { ConfirmExecutionModalProps } from "@/src/types/components/projects/proj
 import { ModalButton, ModalEnum } from "@/src/types/shared/modal";
 import { useCallback, useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-import { calculateUserAttributeAllRecords as calcAtt } from "@/src/services/base/project-setting";
+import { calculateUserAttributeAllRecordsPost } from "@/src/services/base/project-setting";
 
 const ACCEPT_BUTTON = { buttonCaption: 'Accept', useButton: true };
 
@@ -15,7 +15,7 @@ export default function ConfirmExecutionModal(props: ConfirmExecutionModalProps)
     const modalExecuteAll = useSelector(selectModal(ModalEnum.EXECUTE_ATTRIBUTE_CALCULATION));
 
     const calculateUserAttributeAllRecords = useCallback(() => {
-        calcAtt(projectId, { attributeId: props.currentAttributeId }, (res) => { });
+        calculateUserAttributeAllRecordsPost(projectId, { attributeId: props.currentAttributeId }, (res) => { });
     }, [modalExecuteAll]);
 
     useEffect(() => {

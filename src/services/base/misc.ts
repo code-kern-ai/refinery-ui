@@ -19,16 +19,12 @@ export function getHasUpdates(onResult: (result: any) => void) {
     jsonFetchWrapper(finalUrl, FetchType.GET, onResult);
 }
 
-export function modelProviderDeleteModel(options: {
-    modelName: string
-}, onResult: (result: any) => void) {
+export function modelProviderDeleteModel(modelName: string, onResult: (result: any) => void) {
     const finalUrl = `${miscEndpoint}/model-provider-delete-model`;
-    jsonFetchWrapper(finalUrl, FetchType.DELETE, onResult, JSON.stringify(convertCamelToSnakeCase(options)));
+    jsonFetchWrapper(finalUrl, FetchType.DELETE, onResult, JSON.stringify(convertCamelToSnakeCase({ modelName })));
 }
 
-export function modelProviderDownloadModel(options: {
-    modelName: string
-}, onResult: (result: any) => void) {
+export function modelProviderDownloadModel(modelName: string, onResult: (result: any) => void) {
     const finalUrl = `${miscEndpoint}/model-provider-download-model`;
-    jsonFetchWrapper(finalUrl, FetchType.POST, onResult, JSON.stringify(convertCamelToSnakeCase(options)));
+    jsonFetchWrapper(finalUrl, FetchType.POST, onResult, JSON.stringify(convertCamelToSnakeCase({ modelName })));
 }

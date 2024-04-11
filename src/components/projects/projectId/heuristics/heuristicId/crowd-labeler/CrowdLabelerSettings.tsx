@@ -4,7 +4,7 @@ import { selectHeuristic, updateHeuristicsState } from "@/src/reduxStore/states/
 import { setDisplayUserRole } from "@/src/reduxStore/states/pages/labeling";
 import { selectLabelingTasksAll } from "@/src/reduxStore/states/pages/settings";
 import { selectProjectId } from "@/src/reduxStore/states/project";
-import { generateAccessLink as gal, lockAccessLink, removeAccessLink as ral } from "@/src/services/base/labeling";
+import { generateAccessLinkPost, lockAccessLink, removeAccessLinkPost } from "@/src/services/base/labeling";
 import { updateHeuristicPost } from "@/src/services/base/heuristic";
 import { UserRole } from "@/src/types/shared/sidebar";
 import { parseToSettingsJson } from "@/src/util/components/projects/projectId/heuristics/heuristicId/crowd-labeler-helper";
@@ -46,7 +46,7 @@ export default function CrowdLabelerSettings() {
     }
 
     function generateAccessLink() {
-        gal(projectId, { type: "HEURISTIC", id: currentHeuristic.id }, (res) => {
+        generateAccessLinkPost(projectId, { type: "HEURISTIC", id: currentHeuristic.id }, (res) => {
             const link = res.data.generateAccessLink.link;
             const labelingTask = currentHeuristic.labelingTaskId;
             const code = parseToSettingsJson({ ...currentHeuristic.crowdLabelerSettings, accessLinkId: link.id });
@@ -57,7 +57,7 @@ export default function CrowdLabelerSettings() {
     }
 
     function removeAccessLink() {
-        ral(projectId, currentHeuristic.crowdLabelerSettings.accessLinkId, (res) => {
+        removeAccessLinkPost(projectId, currentHeuristic.crowdLabelerSettings.accessLinkId, (res) => {
             dispatch(updateHeuristicsState(currentHeuristic.id, { crowdLabelerSettings: { ...currentHeuristic.crowdLabelerSettings, accessLink: null, accessLinkId: null, accessLinkParsed: null } }));
             const labelingTask = currentHeuristic.labelingTaskId;
             const code = parseToSettingsJson({ ...currentHeuristic.crowdLabelerSettings, accessLinkId: null });

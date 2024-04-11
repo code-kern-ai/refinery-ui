@@ -20,7 +20,7 @@ export function createComment(options: {
     jsonFetchWrapper(finalUrl, FetchType.POST, onResult, JSON.stringify(convertCamelToSnakeCase(options)));
 }
 
-export function deleteComment(options: {
+export function deleteCommentPost(options: {
     commentId: string,
     projectId?: string
 }, onResult: (result: any) => void) {
@@ -28,7 +28,7 @@ export function deleteComment(options: {
     jsonFetchWrapper(finalUrl, FetchType.DELETE, onResult, JSON.stringify(convertCamelToSnakeCase(options)));
 }
 
-export function updateComment(options: {
+export function updateCommentPost(options: {
     commentId: string,
     changes: any,
     projectId?: string
