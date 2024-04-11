@@ -131,10 +131,14 @@ export default function SearchGroups() {
         if (recordsInDisplay) return;
         refreshTextHighlightNeeded();
         setHighlightingToRecords();
+        console.log("here")
         if (activeSlice && activeSlice.static) {
-            getRecordsByStaticSlice(projectId, activeSlice.id, {
-                offset: 0, limit: 20
-            }, (res) => {
+            let options: any = {};
+            if (activeSlice.sliceType == Slice.STATIC_DEFAULT) {
+                options.offset = 0;
+                options.limit = 20;
+            }
+            getRecordsByStaticSlice(projectId, activeSlice.id, options, (res) => {
                 dispatch(setSearchRecordsExtended(postProcessRecordsExtended(res.data['recordsByStaticSlice'], labelingTasks)));
                 staticDataSlicesCurrentCount(projectId, activeSlice.id, (res) => {
                     if (!res.data) {
@@ -591,11 +595,11 @@ export default function SearchGroups() {
                     <ChevronDownIcon className="text-gray-700" />
                 </div>
                 <div className="flex flex-col">
-                    <div className="font-bold truncate" style={{ maxWidth: '21rem' }}>
+                    <div className="font-bold truncate" style={{ maxWidth: '20rem' }}>
                         {searchGroupsStore[group.key].name}
                         {searchGroupsStore[group.key].nameAdd != '' && <label className="font-normal ml-2">{searchGroupsStore[group.key].nameAdd}</label>}
                     </div>
-                    <div className="text-xs text-gray-400 truncate" style={{ maxWidth: '21rem' }}>
+                    <div className="text-xs text-gray-400 truncate" style={{ maxWidth: '20rem' }}>
                         {searchGroupsStore[group.key].subText}
                         {searchGroupsStore[group.key].nameAdd != '' && <label className="font-normal ml-1">{searchGroupsStore[group.key].nameAdd}</label>}
                     </div>
@@ -688,7 +692,7 @@ export default function SearchGroups() {
                             <div>Manually labeled</div>
                             {fullSearchStore[group.key].groupElements['manualLabels'] && fullSearchStore[group.key].groupElements['manualLabels'].length == 0 ? (<ButtonLabelsDisabled />) : (
                                 <Dropdown2 options={fullSearchStore[group.key].groupElements['manualLabels'] ?? []} buttonName={manualLabels.length == 0 ? 'None selected' : manualLabels.join(', ')} hasCheckboxesThreeStates={true} keepDrownOpen={true}
-                                    selectedOption={(option: any) => {
+                                    dropdownWidth="w-80" selectedOption={(option: any) => {
                                         const labels = [...manualLabels, option.name]
                                         setManualLabels(labels);
                                         updateLabelsFullSearch(option, group.key, 'manualLabels');
@@ -698,7 +702,7 @@ export default function SearchGroups() {
                             <div className="mt-2">Weakly supervised</div>
                             {fullSearchStore[group.key].groupElements['weakSupervisionLabels'] && fullSearchStore[group.key].groupElements['weakSupervisionLabels'].length == 0 ? (<ButtonLabelsDisabled />) : (
                                 <Dropdown2 options={fullSearchStore[group.key].groupElements['weakSupervisionLabels'] ?? []} buttonName={weakSupervisionLabels.length == 0 ? 'None selected' : weakSupervisionLabels.join(', ')} hasCheckboxesThreeStates={true}
-                                    selectedOption={(option: any) => {
+                                    dropdownWidth="w-80" selectedOption={(option: any) => {
                                         const labels = [...weakSupervisionLabels, option.name]
                                         setWeakSupervisionLabels(labels);
                                         updateLabelsFullSearch(option, group.key, 'weakSupervisionLabels');
@@ -726,7 +730,7 @@ export default function SearchGroups() {
                             <div className="mt-2">Model callback</div>
                             {fullSearchStore[group.key].groupElements['modelCallbackLabels'] && fullSearchStore[group.key].groupElements['modelCallbackLabels'].length == 0 ? (<ButtonLabelsDisabled />) : (
                                 <Dropdown2 options={fullSearchStore[group.key].groupElements['modelCallbackLabels'] ?? []} buttonName={modelCallBacksLabels.length == 0 ? 'None selected' : modelCallBacksLabels.join(', ')} hasCheckboxesThreeStates={true}
-                                    selectedOption={(option: any) => {
+                                    dropdownWidth="w-80" selectedOption={(option: any) => {
                                         const labels = [...modelCallBacksLabels, option.name]
                                         setModelCallBacksLabels(labels);
                                         updateLabelsFullSearch(option, group.key, 'modelCallbackLabels');

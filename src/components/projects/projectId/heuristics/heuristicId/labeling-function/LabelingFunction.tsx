@@ -8,7 +8,7 @@ import { postProcessCurrentHeuristic, postProcessLastTaskLogs } from "@/src/util
 import { Tooltip } from "@nextui-org/react";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
 import { postProcessLabelingTasks, postProcessLabelingTasksSchema } from "@/src/util/components/projects/projectId/settings/labeling-tasks-helper";
-import { selectVisibleAttributesHeuristics, selectLabelingTasksAll, setLabelingTasksAll } from "@/src/reduxStore/states/pages/settings";
+import { selectVisibleAttributesHeuristics, selectLabelingTasksAll, setLabelingTasksAll, SELECT_LABELING_TASKS_ALL_SNAPSHOT_ACCESS } from "@/src/reduxStore/states/pages/settings";
 import HeuristicsEditor from "../shared/HeuristicsEditor";
 import DangerZone from "@/src/components/shared/danger-zone/DangerZone";
 import HeuristicRunButtons from "../shared/HeuristicRunButtons";
@@ -37,6 +37,7 @@ import { useWebsocket } from "@/src/services/base/web-sockets/useWebsocket";
 import { getAllComments } from "@/src/services/base/comment";
 import { getLabelingTasksByProjectId } from "@/src/services/base/project";
 import { getHeuristicByHeuristicId, getLabelingFunctionOn10Records, getPayloadByPayloadId, updateHeuristicPost } from "@/src/services/base/heuristic";
+import { getStoreSnapshotValue } from "@/src/reduxStore/store";
 
 export default function LabelingFunction() {
     const dispatch = useDispatch();
@@ -196,12 +197,25 @@ export default function LabelingFunction() {
         }
     }, [currentHeuristic]);
 
-    function setValueToLabelingTask(value: string) {
+
+
+    const setValueToLabelingTask = useCallback((value: string) => {
         const labelingTask = labelingTasks.find(a => a.id == value);
-        updateHeuristicPost(projectId, currentHeuristic.id, labelingTask.id, currentHeuristic.sourceCode, currentHeuristic.description, currentHeuristic.name, (res) => {
-            dispatch(updateHeuristicsState(currentHeuristic.id, { labelingTaskId: labelingTask.id, labelingTaskName: labelingTask.name, labels: labelingTask.labels }))
-        });
-    }
+        const updateHeuristic = (labelingTasks: any[], maxI: number, task?: any) => {
+            const labelingTask = task || labelingTasks.find(a => a.id == value);
+            if (!labelingTask && maxI > 0) {
+                setTimeout(() => updateHeuristic(getStoreSnapshotValue(SELECT_LABELING_TASKS_ALL_SNAPSHOT_ACCESS), maxI - 1), 100);
+            } else {
+                updateHeuristicPost(projectId, currentHeuristic.id, labelingTask.id, currentHeuristic.sourceCode, currentHeuristic.description, currentHeuristic.name, (res) => {
+                    dispatch(updateHeuristicsState(currentHeuristic.id, { labelingTaskId: labelingTask.id, labelingTaskName: labelingTask.name, labels: labelingTask.labels }))
+                });
+            }
+        }
+        if (!labelingTask) {
+            //try timeout as this is usually caused by race condition (creating the task+label through the integrator)
+            setTimeout(() => updateHeuristic(getStoreSnapshotValue(SELECT_LABELING_TASKS_ALL_SNAPSHOT_ACCESS), 5), 100);
+        } else updateHeuristic(labelingTasks, 0, labelingTask);
+    }, [projectId, currentHeuristic, labelingTasks])
 
     useWebsocket(CurrentPage.LABELING_FUNCTION, handleWebsocketNotification, projectId);
 

@@ -155,7 +155,7 @@ export default function AddZeroShotModal() {
                 </div>
             </Tooltip>
             <Dropdown2 options={filteredList && filteredList} hasSearchBar={true} optionsHaveLink={true} optionsHaveHoverBox={true} valuePropertyPath="configString"
-                useDifferentTextColor={colorDownloadedModels} differentTextColor="green"
+                useDifferentTextColor={colorDownloadedModels} differentTextColor="green" ignoreDisabledForSearch={true}
                 linkList={filteredList && filteredList.map(model => model.link)}
                 selectedOption={(option: any) => setModel(option.configString)}
                 hoverBoxList={hoverBoxList}

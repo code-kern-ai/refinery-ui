@@ -114,11 +114,11 @@ export default function BricksIntegratorModal(props: BricksIntegratorModalProps)
                 </div>
             </div>
             <PageSearch
-                requestSearchDebounce={(value) => props.requestSearchDebounce(value)}
-                setGroupActive={(key: string) => props.setGroupActive(key)}
-                selectSearchResult={(id: number) => props.selectSearchResult(id)} />
+                requestSearchDebounce={props.requestSearchDebounce}
+                setGroupActive={props.setGroupActive}
+                selectSearchResult={props.selectSearchResult} />
             <PageOverview
-                setCodeTester={(code: string) => props.setCodeTester(code)} />
+                setCodeTester={props.setCodeTester} />
             <PageInputExample requestExample={props.requestExample} />
             <PageIntegration
                 functionType={props.functionType}
@@ -126,8 +126,8 @@ export default function BricksIntegratorModal(props: BricksIntegratorModalProps)
                 forIde={props.forIde}
                 labelingTaskId={props.labelingTaskId}
                 nameLookups={props.nameLookups}
-                checkCanAccept={(configCopy) => props.checkCanAccept(configCopy)}
-                selectDifferentTask={(taskId: string) => props.selectDifferentTask(taskId)} />
+                checkCanAccept={props.checkCanAccept}
+                selectDifferentTask={props.selectDifferentTask} />
         </div>}
     </Modal >
     )

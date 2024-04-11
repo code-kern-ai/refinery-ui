@@ -3,7 +3,7 @@ import { selectIsManaged } from "@/src/reduxStore/states/general";
 import { closeModal, openModal, setModalStates } from "@/src/reduxStore/states/modal";
 import { selectAttributes, selectEmbeddings } from "@/src/reduxStore/states/pages/settings";
 import { selectProjectId } from "@/src/reduxStore/states/project";
-import { Embedding, EmbeddingState } from "@/src/types/components/projects/projectId/settings/embeddings";
+import { Embedding, EmbeddingState, EmbeddingType } from "@/src/types/components/projects/projectId/settings/embeddings";
 import { CurrentPage, CurrentPageSubKey } from "@/src/types/shared/general";
 import { ModalEnum } from "@/src/types/shared/modal";
 import { DATA_TYPES, getColorForDataType } from "@/src/util/components/projects/projectId/settings/data-schema-helper";
@@ -123,7 +123,7 @@ export default function Embeddings(props: { refetchEmbeddings: () => void }) {
                                             </td> : <td className="whitespace-nowrap text-center px-3 py-2 text-sm text-gray-500 flex justify-center"><LoadingIcon /></td>}
                                         <td className="whitespace-nowrap text-center px-3 py-2 text-sm text-gray-500">
                                             <div className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-yellow-100 text-yellow-800">
-                                                {embedding.state == EmbeddingState.QUEUED ? '' : embedding.type == 'ON_ATTRIBUTE' ? 'Attribute Specific' : 'Token Specific'}
+                                                {embedding.type == EmbeddingType.ON_ATTRIBUTE ? 'Attribute Specific' : 'Token Specific'}
                                             </div>
                                         </td>
                                         <td className={`text-center px-3 text-sm text-gray-500 ${embedding.state != EmbeddingState.FINISHED && embedding.state != EmbeddingState.FAILED ? 'py-0' : 'whitespace-nowrap py-2 flex justify-center'}`}>

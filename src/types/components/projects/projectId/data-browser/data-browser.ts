@@ -12,7 +12,7 @@ export type DataSlice = {
     createdAt: string;
     createdBy: string;
     sliceType: string;
-    info: string; // is a JSONstring and gets parsed when applied
+    info: { [key: string]: any };
     color: any;
     displayName: string;
 };
@@ -54,4 +54,5 @@ export enum LineBreaksType {
 
 export type DataBrowserRecordsProps = {
     refetchNextRecords: () => void;
+    clearSearchRequest: () => void;
 };

@@ -51,9 +51,8 @@ export function updateSliceInfoHelper(slice: DataSlice, projectId: string, users
     if (findById) { sliceInfo["Created by"] = findById.firstName + " " + findById.lastName };
     sliceInfo["Type"] = sliceTypeToString(slice.sliceType);
 
-    const info = JSON.parse(slice.info);
-    for (let key in info) {
-        sliceInfo[key] = info[key];
+    for (let key in slice.info) {
+        sliceInfo[key] = slice.info[key];
     }
     if (slice.sliceType == Slice.STATIC_DEFAULT) {
         sliceInfo["Link"] = "/projects/" + projectId + "/labeling/" + slice.id;

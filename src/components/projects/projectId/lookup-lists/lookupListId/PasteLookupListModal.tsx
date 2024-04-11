@@ -21,7 +21,7 @@ export default function PasteLookupListModal() {
             knowledgeBaseId: router.query.lookupListId,
             values: inputArea,
             split: inputSplit,
-            delete: true
+            delete: false
         }, (res) => {
             setInputArea("");
         });
