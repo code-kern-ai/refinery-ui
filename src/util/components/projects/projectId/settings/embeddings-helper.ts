@@ -8,7 +8,6 @@ export const DEFAULT_AZURE_TYPE = 'azure';
 export function postProcessingEmbeddings(embeddings: Embedding[], queuedEmbeddings: any[]): any[] {
     const preparedEmbeddings: any[] = jsonCopy(embeddings);
     queuedEmbeddings.forEach((task: any) => {
-        console.log(task)
         preparedEmbeddings.push({
             id: task.id,
             name: task.taskInfo.embeddingName,
