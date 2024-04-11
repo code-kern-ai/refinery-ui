@@ -37,7 +37,7 @@ export default function NewPersonalToken(props: PersonalTokenModalProps) {
 
     const createNewToken = useCallback(() => {
         createPersonalToken(projectId, tokenName, expirationTime.value, READ_WRITE_SCOPE, (res) => {
-            setNewToken(res['data']['createPersonalAccessToken']['token']);
+            setNewToken(res['data']['createPersonalAccessToken']);
             props.refetchTokens();
             setTokenName("");
             setDuplicateTokenName(false);
