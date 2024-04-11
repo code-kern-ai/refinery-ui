@@ -45,7 +45,7 @@ export function toggleHeuristicById(projectId: string, heuristicId: string, onRe
 }
 
 export function setAllHeuristics(projectId: string, value: boolean, onResult: (result: any) => void) {
-    const finalUrl = `${heuristicEndpoint}/${projectId}?value=${value}`;
+    const finalUrl = `${heuristicEndpoint}/${projectId}/change-selection-state?value=${value}`;
     jsonFetchWrapper(finalUrl, FetchType.POST, onResult);
 }
 
