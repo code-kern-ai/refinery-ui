@@ -3,6 +3,7 @@ import Modal from "@/src/components/shared/modal/Modal";
 import { initModal, openModal, selectModal } from "@/src/reduxStore/states/modal";
 import { selectLabelingTasksAll, setLabelingTasksAll } from "@/src/reduxStore/states/pages/settings";
 import { selectProjectId } from "@/src/reduxStore/states/project";
+import { handleLabelRenameWarnings, updateLabelName } from "@/src/services/base/labeling-tasks";
 import { getCheckRenameLabel } from "@/src/services/base/project-setting";
 import { LabelType, LabelingTask, RenameLabelData } from "@/src/types/components/projects/projectId/settings/labeling-tasks";
 import { ModalButton, ModalEnum } from "@/src/types/shared/modal";
@@ -13,7 +14,6 @@ import { Tooltip } from "@nextui-org/react";
 import { IconAlertTriangleFilled, IconInfoCircleFilled, IconTriangleInverted } from "@tabler/icons-react";
 import { useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { handleLabelRenameWarnings, updateLabelName } from "@/src/services/base/labeling";
 
 const ACCEPT_BUTTON = { buttonCaption: 'Rename', useButton: true }
 

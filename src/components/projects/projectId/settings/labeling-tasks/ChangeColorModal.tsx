@@ -2,6 +2,7 @@ import Modal from "@/src/components/shared/modal/Modal";
 import { selectModal, setModalStates } from "@/src/reduxStore/states/modal";
 import { selectLabelingTasksAll, setLabelingTasksAll } from "@/src/reduxStore/states/pages/settings";
 import { selectProjectId } from "@/src/reduxStore/states/project";
+import { updateLabelColorPost, updateLabelHotkey } from "@/src/services/base/labeling-tasks";
 import { LabelColors, LabelType, LabelingTask } from "@/src/types/components/projects/projectId/settings/labeling-tasks";
 import { ModalEnum } from "@/src/types/shared/modal";
 import { LabelHelper } from "@/src/util/classes/label-helper";
@@ -11,7 +12,6 @@ import { Tooltip } from "@nextui-org/react";
 import { IconPencil } from "@tabler/icons-react";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { updateLabelColorPost, updateLabelHotkey } from "@/src/services/base/labeling";
 
 export default function ChangeColorModal() {
     const dispatch = useDispatch();

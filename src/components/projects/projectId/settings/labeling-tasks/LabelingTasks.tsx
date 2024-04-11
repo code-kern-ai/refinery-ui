@@ -18,7 +18,7 @@ import DeleteLabelModal from "./DeleteLabelModal";
 import AddLabelModal from "./AddLabelModal";
 import ChangeColorModal from "./ChangeColorModal";
 import Dropdown2 from "@/submodules/react-components/components/Dropdown2";
-import { updateLabelingTask } from "@/src/services/base/labeling";
+import { updateLabelingTask } from "@/src/services/base/labeling-tasks";
 
 export default function LabelingTasks() {
     const dispatch = useDispatch();

@@ -6,7 +6,7 @@ import { ModalButton, ModalEnum } from "@/src/types/shared/modal";
 import { LabelHelper } from "@/src/util/classes/label-helper";
 import { useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { deleteLabelPost } from "@/src/services/base/labeling";
+import { deleteLabelPost } from "@/src/services/base/labeling-tasks";
 
 const ABORT_BUTTON = { buttonCaption: 'Delete label', disabled: false, useButton: true };
 
