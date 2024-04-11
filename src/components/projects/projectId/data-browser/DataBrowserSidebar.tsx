@@ -94,13 +94,13 @@ export default function DataBrowserSidebar() {
 
                 {dataSlices && <div className="mt-2 mb-4">
                     {dataSlices.length > 0 && <div className="w-full grid grid-cols-2 gap-y-1 items-center justify-center" style={{ gridColumnGap: '26px' }}>
-                        {filteredSlices.map((slice: DataSlice, index: number) => (<Tooltip content={!slice.static ? <div className="w-24">{slice.name}</div> : null} color="invert" placement={index % 2 == 0 ? 'right' : 'left'} key={slice.id}>
+                        {filteredSlices.map((slice: DataSlice, index: number) => (<Tooltip content={!slice.static ? <div className="w-24 break-words">{slice.name}</div> : null} color="invert" placement={index % 2 == 0 ? 'right' : 'left'} key={slice.id}>
                             <button onClick={() => toggleSlice(slice)} style={{ width: '170px' }}
                                 className={`cursor-pointer inline-flex border items-center justify-between px-2.5 py-1.5 shadow-sm text-sm font-medium rounded text-gray-700 bg-white hover:bg-gray-50 focus:outline-none ${activeSlice?.id == slice.id ? 'ring-blue-500 ring-2' : ' border-gray-200'}`}>
                                 <label className="cursor-pointer mr-2" onClick={(e) => { updateSliceInfo(slice); e.stopPropagation(); }}>
                                     <IconInfoCircle className={`w-6 h-6 ${slice.color.textColor} ${slice.color.fillColor}`} />
                                 </label>
-                                <label className={`text-gray-700 truncate label-max-width cursor-pointer ${slice.sliceType == Slice.STATIC_OUTLIER ? 'text-xs whitespace-pre' : 'text-sm'}`}>
+                                <label className={`text-gray-700 truncate cursor-pointer ${slice.sliceType == Slice.STATIC_OUTLIER ? 'text-xs whitespace-pre' : 'text-sm'}`}>
                                     {slice.displayName}</label>
                                 <label className="cursor-pointer mr-2" onClick={(e) => {
                                     dispatch(setModalStates(ModalEnum.DELETE_SLICE, { sliceId: slice.id, open: true }));

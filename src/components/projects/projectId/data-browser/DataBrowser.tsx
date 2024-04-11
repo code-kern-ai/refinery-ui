@@ -35,6 +35,7 @@ export default function DataBrowser() {
     const activeSearchParams = useSelector(selectActiveSearchParams);
     const configuration = useSelector(selectConfiguration);
     const fullSearchStore = useSelector(selectFullSearchStore);
+    const fullCount = useSelector(selectRecords).fullCount;
 
     const [searchRequest, setSearchRequest] = useState(SEARCH_REQUEST);
 
@@ -67,7 +68,7 @@ export default function DataBrowser() {
     useEffect(() => {
         if (!projectId || !labelingTasks || !attributes) return;
         if (!searchRequest) return;
-        if (searchRequest.offset == 0) return;
+        if (searchRequest.offset == 0 || searchRequest.offset > fullCount) return;
         const filterData = parseFilterToExtended(activeSearchParams, attributes, configuration, labelingTasks, user, fullSearchStore[SearchGroup.DRILL_DOWN])
         refetchExtendedRecord({ variables: { projectId: projectId, filterData: filterData, offset: searchRequest.offset, limit: searchRequest.limit } }).then((res) => {
             const parsedRecordData = postProcessRecordsExtended(res.data['searchRecordsExtended'], labelingTasks);
@@ -144,6 +145,7 @@ export default function DataBrowser() {
     }
 
     function getNextRecords() {
+        console.log('getNextRecords?')
         setSearchRequest({ offset: searchRequest.offset + searchRequest.limit, limit: searchRequest.limit });
     }
 
@@ -152,6 +154,10 @@ export default function DataBrowser() {
             dispatch(setUniqueValuesDict(postProcessUniqueValues(res.data['uniqueValuesByAttributes'], attributes)));
         });
     }
+
+    const setSearchRequestToInit = useCallback(() => {
+        setSearchRequest(SEARCH_REQUEST);
+    }, []);
 
     const handleWebsocketNotification = useCallback((msgParts: string[]) => {
         if (['data_slice_created', 'data_slice_updated', 'data_slice_deleted'].includes(msgParts[1])) {
@@ -174,9 +180,7 @@ export default function DataBrowser() {
     return (<>
         {projectId && <div className="flex flex-row h-full">
             <DataBrowserSidebar />
-            <DataBrowserRecords refetchNextRecords={getNextRecords} clearSearchRequest={() => {
-                setSearchRequest(SEARCH_REQUEST);
-            }} />
+            <DataBrowserRecords refetchNextRecords={getNextRecords} clearSearchRequest={setSearchRequestToInit} />
         </div>}
     </>)
 }
