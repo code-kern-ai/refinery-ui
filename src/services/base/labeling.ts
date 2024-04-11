@@ -162,3 +162,8 @@ export function updateLabelName(projectId: string, options: {
     const finalUrl = `${labelingEndpoint}/${projectId}/update-label-name`;
     jsonFetchWrapper(finalUrl, FetchType.PUT, onResult, JSON.stringify(convertCamelToSnakeCase(options)));
 }
+
+export function getRecordLabelAssociations(projectId: string, recordId: string, onResult: (result: any) => void) {
+    const finalUrl = `${labelingEndpoint}/${projectId}/record-label-associations?record_id=${recordId}`;
+    jsonFetchWrapper(finalUrl, FetchType.GET, onResult);
+}

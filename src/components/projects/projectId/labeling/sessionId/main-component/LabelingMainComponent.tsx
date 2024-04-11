@@ -1,21 +1,19 @@
 import { selectAllUsers, selectUser, setBricksIntegrator, setComments } from "@/src/reduxStore/states/general";
 import { setAvailableLinks, updateRecordRequests, setSelectedLink, selectRecordRequestsRla, updateUsers, setSettings, selectSettings, setUserDisplayId, selectRecordRequestsRecord, initOnLabelPageDestruction, selectUserDisplayId, selectDisplayUserRole, setDisplayUserRole } from "@/src/reduxStore/states/pages/labeling";
 import { selectProjectId } from "@/src/reduxStore/states/project"
-import { GET_RECORD_LABEL_ASSOCIATIONS } from "@/src/services/gql/queries/labeling";
 import { LabelingLinkType } from "@/src/types/components/projects/projectId/labeling/labeling-main-component";
 import { UserRole } from "@/src/types/shared/sidebar";
 import { LabelingSuiteManager } from "@/src/util/classes/labeling/manager";
 import { SessionManager } from "@/src/util/classes/labeling/session-manager";
 import { UserManager } from "@/src/util/classes/labeling/user-manager";
 import { DUMMY_HUDDLE_ID, getDefaultLabelingSuiteSettings, parseLabelingLink, prepareRLADataForRole } from "@/src/util/components/projects/projectId/labeling/labeling-main-component-helper";
-import { useLazyQuery } from "@apollo/client";
 import { useRouter } from "next/router";
 import { useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import style from "@/src/styles/components/projects/projectId/labeling.module.css";
 import NavigationBarTop from "./NavigationBarTop";
 import NavigationBarBottom from "./NavigationBarBottom";
-import { combineLatest } from "rxjs";
+
 import LabelingSuiteTaskHeader from "../sub-components/LabelingSuiteTaskHeader";
 import LabelingSuiteOverviewTable from "../sub-components/LabelingSuiteOverviewTable";
 import LabelingSuiteLabeling from "../sub-components/LabelingSuiteLabeling";
@@ -30,7 +28,7 @@ import { useWebsocket } from "@/src/services/base/web-sockets/useWebsocket";
 import { getAllComments } from "@/src/services/base/comment";
 import { getAttributes } from "@/src/services/base/attribute";
 import { getLabelingTasksByProjectId } from "@/src/services/base/project";
-import { getAvailableLinks, getHuddleData, getLinkLocked, getTokenizedRecord } from "@/src/services/base/labeling";
+import { getAvailableLinks, getHuddleData, getLinkLocked, getRecordLabelAssociations, getTokenizedRecord } from "@/src/services/base/labeling";
 import { getRecordByRecordId } from "@/src/services/base/project-setting";
 
 const SETTINGS_KEY = 'labelingSettings';
@@ -52,8 +50,6 @@ export default function LabelingMainComponent() {
     const [huddleData, setHuddleData] = useState(null);
     const [absoluteWarning, setAbsoluteWarning] = useState(null);
     const [lockedLink, setLockedLink] = useState(false);
-
-    const [refetchRla] = useLazyQuery(GET_RECORD_LABEL_ASSOCIATIONS, { fetchPolicy: 'network-only' });
 
     useEffect(() => {
         if (!projectId || !router.query) return;
@@ -161,9 +157,7 @@ export default function LabelingMainComponent() {
             getRecordByRecordId(projectId, SessionManager.currentRecordId, (res) => {
                 dispatch(updateRecordRequests('record', res.data.recordByRecordId));
             });
-            combineLatest([
-                refetchRla({ variables: { projectId, recordId: SessionManager.currentRecordId } })
-            ]).subscribe(([rla]) => {
+            getRecordLabelAssociations(projectId, SessionManager.currentRecordId, (rla) => {
                 const rlas = rla['data']?.['recordByRecordId']?.['recordLabelAssociations']['edges'].map(e => e.node);
                 dispatch(updateRecordRequests('rla', prepareRLADataForRole(rlas, user, userDisplayId, userDisplayRole)));
             });
@@ -320,8 +314,9 @@ export default function LabelingMainComponent() {
         } else if (['payload_finished', 'weak_supervision_finished', 'rla_created', 'rla_deleted'].includes(msgParts[1])) {
             const recordId = SessionManager.currentRecordId ?? record.id;
             if (msgParts[2] == recordId) {
-                refetchRla({ variables: { projectId, recordId: recordId } }).then((result) => {
-                    const rlas = result['data']?.['recordByRecordId']?.['recordLabelAssociations']['edges'].map(e => e.node);
+                getRecordLabelAssociations(projectId, recordId, (rla) => {
+                    console.log(rla)
+                    const rlas = rla['data']?.['recordByRecordId']?.['recordLabelAssociations']['edges'].map(e => e.node);
                     dispatch(updateRecordRequests('rla', prepareRLADataForRole(rlas, user, userDisplayId, userDisplayRole)));
                 });
             }
