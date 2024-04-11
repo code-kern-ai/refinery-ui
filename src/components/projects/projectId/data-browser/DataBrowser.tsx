@@ -2,7 +2,7 @@ import { selectProjectId } from "@/src/reduxStore/states/project"
 import { useDispatch, useSelector } from "react-redux"
 import DataBrowserSidebar from "./DataBrowserSidebar";
 import { useCallback, useEffect, useState } from "react";
-import { expandRecordList, selectActiveSearchParams, selectConfiguration, selectFullSearchStore, selectRecords, setActiveDataSlice, setDataSlices, setRecordComments, setSearchRecordsExtended, setUniqueValuesDict, setUsersMapCount, updateAdditionalDataState } from "@/src/reduxStore/states/pages/data-browser";
+import { expandRecordList, selectActiveSearchParams, selectActiveSlice, selectConfiguration, selectFullSearchStore, selectRecords, setActiveDataSlice, setDataSlices, setRecordComments, setSearchRecordsExtended, setUniqueValuesDict, setUsersMapCount, updateAdditionalDataState } from "@/src/reduxStore/states/pages/data-browser";
 import { postProcessRecordsExtended, postProcessUniqueValues, postProcessUsersCount } from "@/src/util/components/projects/projectId/data-browser/data-browser-helper";
 import { selectAttributes, selectLabelingTasksAll, setAllAttributes, setAllEmbeddings, setLabelingTasksAll } from "@/src/reduxStore/states/pages/settings";
 import { postProcessLabelingTasks, postProcessLabelingTasksSchema } from "@/src/util/components/projects/projectId/settings/labeling-tasks-helper";
@@ -17,11 +17,11 @@ import { getAllComments } from "@/src/services/base/comment";
 import { getAttributes } from "@/src/services/base/attribute";
 import { getDataSlices, getUniqueValuesByAttributes } from "@/src/services/base/dataSlices";
 import { getLabelingTasksByProjectId } from "@/src/services/base/project";
-import { getRecordComments, searchRecordsExtended } from "@/src/services/base/data-browser";
+import { getRecordComments, getRecordsByStaticSlice, searchRecordsExtended } from "@/src/services/base/data-browser";
 import { getAllUsersWithRecordCount } from "@/src/services/base/organization";
 import { getEmbeddings } from "@/src/services/base/embedding";
 import { parseFilterToExtended } from "@/src/util/components/projects/projectId/data-browser/filter-parser-helper";
-import { SearchGroup } from "@/submodules/javascript-functions/enums/enums";
+import { SearchGroup, Slice } from "@/submodules/javascript-functions/enums/enums";
 
 const SEARCH_REQUEST = { offset: 0, limit: 20 };
 
@@ -38,6 +38,7 @@ export default function DataBrowser() {
     const configuration = useSelector(selectConfiguration);
     const fullSearchStore = useSelector(selectFullSearchStore);
     const fullCount = useSelector(selectRecords).fullCount;
+    const activeSlice = useSelector(selectActiveSlice);
 
     const [searchRequest, setSearchRequest] = useState(SEARCH_REQUEST);
 
@@ -61,12 +62,20 @@ export default function DataBrowser() {
         if (!projectId || !labelingTasks || !attributes) return;
         if (!searchRequest) return;
         if (searchRequest.offset == 0 || searchRequest.offset > fullCount) return;
-        const filterData = parseFilterToExtended(activeSearchParams, attributes, configuration, labelingTasks, user, fullSearchStore[SearchGroup.DRILL_DOWN])
-        searchRecordsExtended(projectId, filterData, searchRequest.offset, searchRequest.limit, (res) => {
-            const parsedRecordData = postProcessRecordsExtended(res.data['searchRecordsExtended'], labelingTasks);
-            dispatch(expandRecordList(parsedRecordData));
-            refetchRecordCommentsAndProcess(parsedRecordData.recordList);
-        });
+        if (activeSlice && activeSlice.sliceType == Slice.STATIC_DEFAULT) {
+            getRecordsByStaticSlice(projectId, activeSlice.id, {
+                offset: searchRequest.offset, limit: searchRequest.limit
+            }, (res) => {
+                dispatch(expandRecordList(postProcessRecordsExtended(res.data['recordsByStaticSlice'], labelingTasks)));
+            });
+        } else {
+            const filterData = parseFilterToExtended(activeSearchParams, attributes, configuration, labelingTasks, user, fullSearchStore[SearchGroup.DRILL_DOWN])
+            searchRecordsExtended(projectId, filterData, searchRequest.offset, searchRequest.limit, (res) => {
+                const parsedRecordData = postProcessRecordsExtended(res.data['searchRecordsExtended'], labelingTasks);
+                dispatch(expandRecordList(parsedRecordData));
+                refetchRecordCommentsAndProcess(parsedRecordData.recordList);
+            });
+        }
     }, [searchRequest, activeSearchParams, projectId, attributes, configuration, labelingTasks, user, fullSearchStore]);
 
     useEffect(() => {
@@ -137,7 +146,6 @@ export default function DataBrowser() {
     }
 
     function getNextRecords() {
-        console.log('getNextRecords?')
         setSearchRequest({ offset: searchRequest.offset + searchRequest.limit, limit: searchRequest.limit });
     }
 

@@ -131,10 +131,14 @@ export default function SearchGroups() {
         if (recordsInDisplay) return;
         refreshTextHighlightNeeded();
         setHighlightingToRecords();
+        console.log("here")
         if (activeSlice && activeSlice.static) {
-            getRecordsByStaticSlice(projectId, activeSlice.id, {
-                offset: 0, limit: 20
-            }, (res) => {
+            let options: any = {};
+            if (activeSlice.sliceType == Slice.STATIC_DEFAULT) {
+                options.offset = 0;
+                options.limit = 20;
+            }
+            getRecordsByStaticSlice(projectId, activeSlice.id, options, (res) => {
                 dispatch(setSearchRecordsExtended(postProcessRecordsExtended(res.data['recordsByStaticSlice'], labelingTasks)));
                 staticDataSlicesCurrentCount(projectId, activeSlice.id, (res) => {
                     if (!res.data) {
