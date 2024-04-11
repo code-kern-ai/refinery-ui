@@ -324,12 +324,14 @@ export default function AddNewEmbeddingModal() {
     )
 }
 
-function SuggestionsModel(props: SuggestionsProps) {
-    const dispatch = useDispatch();
+const DUMMY_LIST = []
 
-    const [colorDownloadedModels, setColorDownloadedModels] = useState<boolean[]>([]);
-    const [hoverBoxList, setHoverBoxList] = useState<any[]>([]);
-    const [filteredList, setFilteredList] = useState<any[]>([]);
+function SuggestionsModel(props: SuggestionsProps) {
+
+    const [colorDownloadedModels, setColorDownloadedModels] = useState<boolean[]>(DUMMY_LIST);
+    const [cachedModelInfo, setCachedModelInfo] = useState<any[]>(null);
+    const [hoverBoxList, setHoverBoxList] = useState<any[]>(DUMMY_LIST);
+    const [filteredList, setFilteredList] = useState<any[]>(DUMMY_LIST);
 
     useEffect(() => {
         if (!props.options) return;
@@ -337,18 +339,25 @@ function SuggestionsModel(props: SuggestionsProps) {
     }, [props.options]);
 
     useEffect(() => {
-        if (!filteredList) return;
+        //collect on mount (open modal)
         getModelProviderInfo((res) => {
-            const modelsDownloaded = postProcessingModelsDownload(res.data['modelProviderInfo']);
-            dispatch(setModelsDownloaded(res.data['modelProviderInfo']));
-            const colorDownloadedModels = filteredList.map((model: any) => {
-                const checkIfModelExists = modelsDownloaded.find((modelDownloaded: ModelsDownloaded) => modelDownloaded.name === model.configString);
-                return checkIfModelExists !== undefined;
-            });
-            setColorDownloadedModels(colorDownloadedModels);
+            setCachedModelInfo(postProcessingModelsDownload(res.data['modelProviderInfo']));
         });
+    }, [])
+
+    useEffect(() => {
+        if (!filteredList || !cachedModelInfo) return;
+        const colorDownloadedModels = filteredList.map((model: any) => {
+            const checkIfModelExists = cachedModelInfo.find((modelDownloaded: ModelsDownloaded) => modelDownloaded.name === model.configString);
+            return checkIfModelExists !== undefined;
+        });
+        setColorDownloadedModels(colorDownloadedModels);
+    }, [cachedModelInfo, filteredList, props.options]);
+
+    useEffect(() => {
         setHoverBoxList(filteredList.map((model: any) => model.description));
-    }, [filteredList, props.options, props.selectedOption]);
+    }, [filteredList, props.options])
+
 
     return <><Tooltip content={TOOLTIPS_DICT.PROJECT_SETTINGS.EMBEDDINGS.MODEL} placement="right" color="invert">
         <span className="card-title mb-0 label-text flex"><span className="cursor-help underline filtersUnderline">Model</span></span>
