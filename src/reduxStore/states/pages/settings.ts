@@ -144,6 +144,7 @@ export const selectEmbeddingsFiltered = (state) => state.settings.embeddings.fil
 export const selectRecommendedEncodersAll = (state) => state.settings.recommendedEncodersAll;
 export const selectRecommendedEncodersDict = (state) => state.settings.recommendedEncodersDict;
 
+export const SELECT_LABELING_TASKS_ALL_SNAPSHOT_ACCESS = ['settings', 'labelingTasks', 'all'];
 export const selectLabelingTasksAll = (state) => state.settings.labelingTasks.all;
 export const selectAttributesDict = createSelector([selectAttributes], (a): any => a ? arrayToDict(a, 'id') : null);
 export const selectLabelingTasksDict = createSelector([selectLabelingTasksAll], (a): any => a ? arrayToDict(a, 'id') : null);

@@ -391,16 +391,16 @@ export default function BricksIntegrator(_props: BricksIntegratorProps) {
                 forIde={forIde}
                 labelingTaskId={props.labelingTaskId}
                 requestSearch={requestSearch}
-                switchToPage={(page: IntegratorPage) => switchToPage(page)}
-                requestSearchDebounce={(value: string) => requestSearchDebounce(value)}
-                setGroupActive={(key: string) => setGroupActive(key)}
-                selectSearchResult={(id: number) => selectSearchResult(id)}
-                setCodeTester={(code: string) => setCodeTesterCode(code)}
-                optionClicked={(option: string) => optionClicked(option)}
+                switchToPage={switchToPage}
+                requestSearchDebounce={requestSearchDebounce}
+                setGroupActive={setGroupActive}
+                selectSearchResult={selectSearchResult}
+                setCodeTester={setCodeTesterCode}
+                optionClicked={optionClicked}
                 requestExample={requestExample}
-                checkCanAccept={(configCopy) => checkCanAccept(configCopy)}
-                selectDifferentTask={(taskId: string) => selectDifferentTask(taskId)}
-                newTaskId={(taskId: string) => props.newTaskId(taskId)} />
+                checkCanAccept={checkCanAccept}
+                selectDifferentTask={selectDifferentTask}
+                newTaskId={props.newTaskId} />
         </div>
     )
 }
