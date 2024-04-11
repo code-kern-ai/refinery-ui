@@ -304,7 +304,7 @@ export default function UsersList() {
                                     </div>
                                     <div className="font-normal text-xl text-gray-500 mt-5">
                                         In a 15 minute onboarding call, we can directly assign you access. Reach out to us &nbsp;
-                                        <a href="https://www.kern.ai/waitlist" target="_blank"><span
+                                        <a href="https://www.kern.ai/schedule-demo" target="_blank"><span
                                             className="underline cursor-pointer">here</span></a>.
                                     </div>
                                     <div className="text-gray-500 mt-5">

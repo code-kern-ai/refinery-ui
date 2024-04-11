@@ -9,7 +9,6 @@ import YoutubeIntroduction from "./YoutubeIntroduction";
 import ButtonsContainer from "./ButtonsContainer";
 import ProjectCard from "./ProjectCard";
 import style from "@/src/styles/components/projects/projects-list.module.css";
-import { useRouter } from "next/router";
 import AdminDeleteProjectModal from "./AdminDeleteProjectModal";
 import { setAllAttributes, setAllEmbeddings, setLabelingTasksAll } from "@/src/reduxStore/states/pages/settings";
 import { setOverviewFilters } from "@/src/reduxStore/states/tmp";
@@ -20,7 +19,6 @@ import { getAllProjects } from "@/src/services/base/project";
 import { addUserToOrganization, createOrganization, getCanCreateLocalOrg, getOverviewStats } from "@/src/services/base/organization";
 
 export default function ProjectsList() {
-    const router = useRouter();
     const dispatch = useDispatch();
 
     const organizationInactive = useSelector(selectInactiveOrganization);
@@ -135,7 +133,7 @@ export default function ProjectsList() {
                                             </div>
                                             <div className="font-normal text-xl text-gray-500 mt-5">
                                                 In a 15 minute onboarding call, we can directly assign you access. Reach out to us &nbsp;
-                                                <a href="https://www.kern.ai/waitlist" target="_blank"><span
+                                                <a href="https://www.kern.ai/schedule-demo" target="_blank"><span
                                                     className="underline cursor-pointer">here</span></a>.
                                             </div>
                                             <div className="text-gray-500 mt-5">
@@ -211,7 +209,7 @@ export default function ProjectsList() {
                             <div className="ml-4">
                                 <ButtonsContainer />
                             </div>
-                            <div className="h-screen overflow-y-auto my-3">
+                            <div className="h-full overflow-y-auto my-3">
                                 <div className={style.scrollableSize}>
                                     {projects && projects.map((project: Project) => (
                                         <ProjectCard project={project} projectStatisticsById={projectStatisticsById} key={project.id}></ProjectCard>
