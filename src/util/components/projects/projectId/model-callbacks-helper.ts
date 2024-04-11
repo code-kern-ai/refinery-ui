@@ -7,7 +7,7 @@ export function postProcessModelCallbacks(modelCallBack: any[]) {
     if (!modelCallBack) return [];
     return modelCallBack.map((source) => {
         source.labelSource = LabelSource.INFORMATION_SOURCE;
-        source.stats = mapInformationSourceStatsGlobal(source.stat_data);
+        source.stats = mapInformationSourceStatsGlobal(source.statData);
         source.stats.forEach((stat) => {
             stat.color = getColorStruct(stat.color);
         });

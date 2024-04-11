@@ -13,7 +13,7 @@ export function postProcessHeuristics(heuristics: any, projectId: string): Heuri
     if (!heuristics) return [];
     return heuristics.map((source: Heuristic) => {
         source.labelSource = LabelSource.INFORMATION_SOURCE;
-        source.stats = mapInformationSourceStatsGlobal(source.stat_data);
+        source.stats = mapInformationSourceStatsGlobal(source.statData);
         source.stats.forEach((stat) => {
             stat.color = getColorStruct(stat.color);
         });

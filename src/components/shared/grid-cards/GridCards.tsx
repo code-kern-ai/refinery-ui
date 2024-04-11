@@ -26,7 +26,6 @@ export default function GridCards(props: GridCardsProps) {
             props.refetch();
         });
     }
-
     return (<>
         {props.filteredList.map((heuristic: Heuristic, index: number) => (<div key={heuristic.id}>
             <div className={`relative flex space-x-3 items-center rounded-lg border border-gray-300 bg-white px-6 py-5 shadow-sm hover:border-gray-400 ${props.filteredList.length > 2 ? style.item : ''}`}>
