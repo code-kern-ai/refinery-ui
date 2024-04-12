@@ -2,10 +2,10 @@ import Modal from "@/src/components/shared/modal/Modal";
 import { selectModal } from "@/src/reduxStore/states/modal";
 import { removeFromAllLabelingTasksById } from "@/src/reduxStore/states/pages/settings";
 import { selectProjectId } from "@/src/reduxStore/states/project";
+import { deleteLabelingTaskPost } from "@/src/services/base/labeling-tasks";
 import { ModalButton, ModalEnum } from "@/src/types/shared/modal";
 import { useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { deleteLabelingTaskPost } from "@/src/services/base/labeling";
 
 const ABORT_BUTTON = { buttonCaption: 'Delete labeling task', disabled: false, useButton: true };
 

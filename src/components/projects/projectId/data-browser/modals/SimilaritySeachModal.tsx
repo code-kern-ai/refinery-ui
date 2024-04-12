@@ -52,11 +52,11 @@ export default function SimilaritySearchModal() {
 
     const requestSimilaritySearch = useCallback(() => {
         getSimilarRecords(true);
-    }, [modalSS, selectedEmbedding]);
+    }, [modalSS, selectedEmbedding, filterAttributesForm]);
 
     const requestSimilaritySearchWithoutFilter = useCallback(() => {
         getSimilarRecords(false);
-    }, [modalSS, selectedEmbedding]);
+    }, [modalSS, selectedEmbedding, filterAttributesForm]);
 
     useEffect(() => {
         setAcceptButton({ ...ACCEPT_BUTTON, emitFunction: requestSimilaritySearch, disabled: selectedEmbedding == null });
