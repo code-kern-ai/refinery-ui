@@ -181,7 +181,7 @@ export function HeuristicsOverview() {
                     </div>
                 </div>
             ) : (<>
-                <div className="overflow-y-auto" style={{ maxHeight: 'calc(100vh - 150px)' }}>
+                <div className="overflow-y-auto">
                     <div className={`mt-8 ${filteredList.length > 3 ? style.flexContainer : 'grid gap-6 grid-cols-3'}`}>
                         {heuristics.length > 0 && filteredList.length == 0 && <span className="text-gray-500 text-base leading-6 font-normal mt-4">No heuristics for this labeling task</span>}
                         <GridCards filteredList={filteredList} refetch={refetchHeuristicsAndProcess} setFilteredList={setFilteredList} />
