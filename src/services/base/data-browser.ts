@@ -33,7 +33,7 @@ export function createDataSlice(projectId: string, options: {
     name: string, static: boolean, filterRaw: string, filterData: string[]
 }, onResult: (result: any) => void) {
     const finalUrl = `${dataBrowserEndpoint}/${projectId}/create-data-slice`;
-    jsonFetchWrapper(finalUrl, FetchType.POST, onResult, JSON.stringify({ options }));
+    jsonFetchWrapper(finalUrl, FetchType.POST, onResult, JSON.stringify({ "name": options.name, "static": options.static, "filterRaw": options.filterRaw, "filterData": options.filterData }));
 }
 
 export function getRecordsBySimilarity(projectId: string, embeddingId: string, recordId: string, attFilter: string, recordSubKey: number, onResult: (result: any) => void) {
