@@ -23,8 +23,7 @@ export function getAllTokenizerOptions(onResult: (result: any) => void) {
 }
 
 export function getEmbeddings(projectId: string, onResult: (result: any) => void) {
-    const finalUrl = `${embeddingEndpoint}/embeddings-by-project?project_id=${projectId}`;
-
+    const finalUrl = `${embeddingEndpoint}/${projectId}/embeddings-by-project`;
     jsonFetchWrapper(finalUrl, FetchType.GET, onResult);
 }
 
