@@ -315,7 +315,6 @@ export default function LabelingMainComponent() {
             const recordId = SessionManager.currentRecordId ?? record.id;
             if (msgParts[2] == recordId) {
                 getRecordLabelAssociations(projectId, recordId, (rla) => {
-                    console.log(rla)
                     const rlas = rla['data']?.['recordByRecordId']?.['recordLabelAssociations']['edges'].map(e => e.node);
                     dispatch(updateRecordRequests('rla', prepareRLADataForRole(rlas, user, userDisplayId, userDisplayRole)));
                 });
