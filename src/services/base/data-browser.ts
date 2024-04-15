@@ -26,7 +26,7 @@ export function getRecordsByStaticSlice(projectId: string,
         limit?: number,
     }, onResult: (result: any) => void) {
     const finalUrl = `${dataBrowserEndpoint}/${projectId}/records-by-static-slice/${sliceId}`;
-    jsonFetchWrapper(finalUrl, FetchType.POST, onResult, JSON.stringify({ options }));
+    jsonFetchWrapper(finalUrl, FetchType.POST, onResult, JSON.stringify({ "orderBy": options.orderBy, "offset": options.offset, "limit": options.limit }));
 }
 
 export function createDataSlice(projectId: string, options: {
