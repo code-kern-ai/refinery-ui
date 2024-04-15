@@ -103,7 +103,7 @@ export default function RenameLabelModal() {
                 <div className="self-center flex flex-row flex-nowrap items-center justify-center">
                     <p className="mr-2 font-bold">Change label name:</p><span
                         className={`border rounded-md py-1 px-2 text-sm font-medium shadow-sm  text-center ${modalRenameLabel.label.color?.backgroundColor} ${modalRenameLabel.label.color?.textColor} ${modalRenameLabel.label.color?.borderColor} ${modalRenameLabel.label.color?.hoverColor}`}>{modalRenameLabel.label.name}</span>
-                    <Tooltip content={TOOLTIPS_DICT.PROJECT_SETTINGS.LABELING_TASK.INFO_RENAME_LABEL} color="invert" placeholder="top" className="ml-2">
+                    <Tooltip content={TOOLTIPS_DICT.PROJECT_SETTINGS.LABELING_TASK.INFO_RENAME_LABEL} color="invert" placement="top" className="ml-2">
                         <IconInfoCircleFilled className="h-6 w-6 text-blue-500" />
                     </Tooltip>
                 </div>
