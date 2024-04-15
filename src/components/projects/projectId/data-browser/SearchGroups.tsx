@@ -133,7 +133,7 @@ export default function SearchGroups() {
         setHighlightingToRecords();
         if (activeSlice && activeSlice.static) {
             let options: any = {};
-            if (activeSlice.sliceType == Slice.STATIC_DEFAULT) {
+            if (activeSlice.sliceType == Slice.STATIC_DEFAULT || activeSlice.sliceType == Slice.STATIC_OUTLIER) {
                 options.offset = 0;
                 options.limit = 20;
             }
