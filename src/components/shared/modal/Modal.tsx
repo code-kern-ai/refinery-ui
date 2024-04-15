@@ -3,7 +3,7 @@ import { Fragment } from 'react'
 import { Dialog, Transition } from '@headlessui/react'
 import { isStringTrue } from '@/submodules/javascript-functions/general';
 import { useDispatch, useSelector } from 'react-redux';
-import { Modal, closeModal, initModal, openModal, selectModal, selectAllOpenModals } from '@/src/reduxStore/states/modal';
+import { closeModal, initModal, openModal, selectModal, selectAllOpenModals } from '@/src/reduxStore/states/modal';
 import { ModalButton, ModalButtonType } from '@/src/types/shared/modal';
 import { modalButtonCaption } from '@/src/util/shared/modal-helper';
 
