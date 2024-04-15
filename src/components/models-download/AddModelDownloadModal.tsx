@@ -79,7 +79,7 @@ export default function AddModelDownloadModal() {
                     <span className="card-title mb-0 label-text flex"><span className="cursor-help underline filtersUnderline">Name</span></span>
                 </Tooltip>
                 <Dropdown2 options={filteredList && filteredList} useDifferentTextColor={colorDownloadedModels} differentTextColor="green" valuePropertyPath="configString"
-                    hasSearchBar={true} dropdownItemsClasses="max-h-96 overflow-y-auto"
+                    hasSearchBar={true} dropdownItemsClasses="max-h-96 overflow-y-auto" ignoreDisabledForSearch={true}
                     selectedOption={(option: any) => {
                         setModelName(option.configString);
                     }} optionsHaveHoverBox={true} hoverBoxList={hoverBoxList} lineSeparatorIndex={lineSeparatorIndex}
