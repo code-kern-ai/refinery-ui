@@ -1,7 +1,5 @@
-import { useLazyQuery } from "@apollo/client";
 import Header from "../header/Header";
 import Sidebar from "../sidebar/Sidebar";
-import { GET_ALL_ACTIVE_ADMIN_MESSAGES, NOTIFICATIONS_BY_USER } from "@/src/services/gql/queries/projects";
 import { Fragment, useCallback, useEffect, useState } from "react";
 import { NotificationLevel } from "@/src/types/shared/notification-center";
 import { IconAlertTriangleFilled, IconCircleCheckFilled, IconInfoCircleFilled } from "@tabler/icons-react";
@@ -20,6 +18,8 @@ import { useWebsocket } from "@/src/services/base/web-sockets/useWebsocket";
 import { useRouter } from "next/router";
 import { selectProjectId } from "@/src/reduxStore/states/project";
 import { CurrentPage } from "@/src/types/shared/general";
+import { getNotificationsByUser } from "@/src/services/base/notification";
+import { getAllActiveAdminMessages } from "@/src/services/base/organization";
 
 const MIN_WIDTH = 1250;
 
@@ -35,9 +35,6 @@ export default function Layout({ children }) {
     const [activeAdminMessages, setActiveAdminMessages] = useState<AdminMessage[]>([]);
     const [windowWidth, setWindowWidth] = useState(window.innerWidth);
     const [notificationsState, setNotificationsState] = useState([]);
-
-    const [refetchNotificationsByUser] = useLazyQuery(NOTIFICATIONS_BY_USER, { fetchPolicy: 'network-only' });
-    const [refetchAdminMessages] = useLazyQuery(GET_ALL_ACTIVE_ADMIN_MESSAGES, { fetchPolicy: 'network-only' });
 
     useEffect(() => {
         refetchNotificationsAndProcess();
@@ -80,15 +77,13 @@ export default function Layout({ children }) {
 
 
     function refetchNotificationsAndProcess() {
-        refetchNotificationsByUser().then((res) => {
+        getNotificationsByUser((res) => {
             setNotificationsState(postProcessNotificationsUser(res['data']['notificationsByUserId'], notificationsState));
         });
     }
 
     function refetchAdminMessagesAndProcess() {
-        refetchAdminMessages().then((res) => {
-            setActiveAdminMessages(postProcessAdminMessages(res['data']['allActiveAdminMessages']));
-        });
+        getAllActiveAdminMessages((res) => setActiveAdminMessages(postProcessAdminMessages(res['data']['allActiveAdminMessages'])));
     }
 
     function unsubscribeDeletionTimer(deletionTimer) {

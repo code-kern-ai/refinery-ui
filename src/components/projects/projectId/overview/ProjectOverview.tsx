@@ -1,6 +1,5 @@
 import { selectProjectId } from '@/src/reduxStore/states/project';
 import { CurrentPage } from '@/src/types/shared/general';
-import { useLazyQuery } from '@apollo/client';
 import { useCallback, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import ProjectOverviewHeader from './ProjectOverviewHeader';
@@ -9,12 +8,9 @@ import ProjectOverviewCards from './ProjectOverviewCards';
 import { ProjectStats } from '@/src/types/components/projects/projectId/project-overview/project-overview';
 import style from '@/src/styles/components/projects/projectId/project-overview.module.css';
 import { useRouter } from 'next/router';
-import { GET_CONFIDENCE_DISTRIBUTION, GET_CONFUSION_MATRIX, GET_GENERAL_PROJECT_STATS, GET_INTER_ANNOTATOR_BY_PROJECT_ID, GET_LABEL_DISTRIBUTION, IS_RATS_TOKENIZAION_STILL_RUNNING } from '@/src/services/gql/queries/project-overview';
-import { GET_ATTRIBUTES_BY_PROJECT_ID, GET_LABELING_TASKS_BY_PROJECT_ID } from '@/src/services/gql/queries/project-setting';
 import { postProcessLabelingTasks, postProcessLabelingTasksSchema } from '@/src/util/components/projects/projectId/settings/labeling-tasks-helper';
 import { selectLabelingTasksAll, setAllAttributes, setLabelingTasksAll } from '@/src/reduxStore/states/pages/settings';
-import { DATA_SLICES } from '@/src/services/gql/queries/data-browser';
-import { selectStaticSlices, setDataSlices } from '@/src/reduxStore/states/pages/data-browser';
+import { setDataSlices } from '@/src/reduxStore/states/pages/data-browser';
 import { selectOverviewFilters, setOverviewFilters } from '@/src/reduxStore/states/tmp';
 import { DisplayGraphs } from '@/submodules/javascript-functions/enums/enums';
 import LabelDistributionBarChart from './charts/LabelDistributionBarChart';
@@ -28,9 +24,12 @@ import InterAnnotatorBarChart from './charts/InterAnnotatorBarChart';
 import { selectAllUsers, selectIsManaged, setComments } from '@/src/reduxStore/states/general';
 import { IconUsers } from '@tabler/icons-react';
 import { CommentType } from '@/src/types/shared/comments';
-import { REQUEST_COMMENTS } from '@/src/services/gql/queries/projects';
 import { CommentDataManager } from '@/src/util/classes/comments';
 import { useWebsocket } from '@/src/services/base/web-sockets/useWebsocket';
+import { getAllComments } from '@/src/services/base/comment';
+import { getConfidenceDistribution, getConfusionMatrix, getGeneralProjectStats, getInterAnnotatorMatrix, getLabelDistribution, getLabelingTasksByProjectId, getRatsTokenization } from '@/src/services/base/project';
+import { getAttributes } from '@/src/services/base/attribute';
+import { getDataSlices } from '@/src/services/base/dataSlices';
 
 const PROJECT_STATS_INITIAL_STATE: ProjectStats = getEmptyProjectStats();
 
@@ -40,7 +39,6 @@ export default function ProjectOverview() {
 
     const projectId = useSelector(selectProjectId);
     const labelingTasks = useSelector(selectLabelingTasksAll);
-    const dataSlices = useSelector(selectStaticSlices);
     const overviewFilters = useSelector(selectOverviewFilters);
     const isManaged = useSelector(selectIsManaged);
     const allUsers = useSelector(selectAllUsers);
@@ -54,18 +52,6 @@ export default function ProjectOverview() {
     const [interAnnotatorFormGroup, setInterAnnotatorFormGroup] = useState<any>({});
     const [interAnnotatorMatrix, setInterAnnotatorMatrix] = useState<any>(null);
     const [goldUserRequested, setGoldUserRequested] = useState<boolean>(false);
-
-    const [refetchProjectStats] = useLazyQuery(GET_GENERAL_PROJECT_STATS, { fetchPolicy: "no-cache" });
-    const [refetchLabelingTasksByProjectId] = useLazyQuery(GET_LABELING_TASKS_BY_PROJECT_ID, { fetchPolicy: "network-only" });
-    const [refetchAttributes] = useLazyQuery(GET_ATTRIBUTES_BY_PROJECT_ID, { fetchPolicy: "network-only" });
-    const [refetchDataSlices] = useLazyQuery(DATA_SLICES, { fetchPolicy: 'network-only' });
-    const [refetchLabelDistribution] = useLazyQuery(GET_LABEL_DISTRIBUTION, { fetchPolicy: "no-cache" });
-    const [refetchConfidenceDistribution] = useLazyQuery(GET_CONFIDENCE_DISTRIBUTION, { fetchPolicy: "no-cache" });
-    const [refetchConfusionMatrix] = useLazyQuery(GET_CONFUSION_MATRIX, { fetchPolicy: "no-cache" });
-    const [refetchRatsTokenization] = useLazyQuery(IS_RATS_TOKENIZAION_STILL_RUNNING, { fetchPolicy: "no-cache" });
-    const [refetchInterAnnotator] = useLazyQuery(GET_INTER_ANNOTATOR_BY_PROJECT_ID, { fetchPolicy: "no-cache" });
-    const [refetchComments] = useLazyQuery(REQUEST_COMMENTS, { fetchPolicy: "no-cache" });
-
 
     useEffect(() => {
         if (!projectId) return;
@@ -85,8 +71,8 @@ export default function ProjectOverview() {
         setDisplayNERConfusion();
         getLabelDistributions();
         getConfidenceDistributions();
-        getConfusionMatrix();
-        getInterAnnotatorMatrix();
+        getConfusionMatrixF();
+        getInterAnnotatorMatrixF();
         getProjectStats();
         saveSettingsToLocalStorage();
     }, [overviewFilters, projectId, labelingTasks]);
@@ -115,8 +101,8 @@ export default function ProjectOverview() {
         CommentDataManager.unregisterCommentRequests(CurrentPage.PROJECT_OVERVIEW);
         CommentDataManager.registerCommentRequests(CurrentPage.PROJECT_OVERVIEW, requests);
         const requestJsonString = CommentDataManager.buildRequestJSON();
-        refetchComments({ variables: { requested: requestJsonString } }).then((res) => {
-            CommentDataManager.parseCommentData(JSON.parse(res.data['getAllComments']));
+        getAllComments(requestJsonString, (res) => {
+            CommentDataManager.parseCommentData(res.data['getAllComments']);
             CommentDataManager.parseToCurrentData(allUsers);
             dispatch(setComments(CommentDataManager.currentDataOrder));
         });
@@ -148,20 +134,20 @@ export default function ProjectOverview() {
     }
 
     function refetchAttributesAndProcess() {
-        refetchAttributes({ variables: { projectId: projectId, stateFilter: ['ALL'] } }).then((res) => {
+        getAttributes(projectId, ['ALL'], (res) => {
             dispatch(setAllAttributes(res.data['attributesByProjectId']));
         });
     }
 
     function refetchLabelingTasksAndProcess() {
-        refetchLabelingTasksByProjectId({ variables: { projectId: projectId } }).then((res) => {
+        getLabelingTasksByProjectId(projectId, (res) => {
             const labelingTasks = postProcessLabelingTasks(res['data']['projectByProjectId']['labelingTasks']['edges']);
             dispatch(setLabelingTasksAll(postProcessLabelingTasksSchema(labelingTasks)));
         });
     }
 
     function refetchDataSlicesAndProcess() {
-        refetchDataSlices({ variables: { projectId: projectId } }).then((res) => {
+        getDataSlices(projectId, null, (res) => {
             dispatch(setDataSlices(res.data.dataSlices));
         });
     }
@@ -171,7 +157,7 @@ export default function ProjectOverview() {
         if (labelingTaskTaskType != LabelingTaskTaskType.INFORMATION_EXTRACTION) {
             setDisplayConfusion(true);
         } else {
-            refetchRatsTokenization({ variables: { projectId: projectId } }).then((res) => {
+            getRatsTokenization(projectId, (res) => {
                 const resFinal = res['data']['isRatsTokenizationStillRunning'];
                 setDisplayConfusion(!resFinal);
             });
@@ -182,8 +168,9 @@ export default function ProjectOverview() {
         const labelingTaskId = overviewFilters.labelingTask?.id;
         const dataSliceFindId = overviewFilters.dataSlice?.id;
         const dataSliceId = dataSliceFindId == "@@NO_SLICE@@" ? null : dataSliceFindId;
-        refetchLabelDistribution({ variables: { projectId: projectId, labelingTaskId: labelingTaskId, sliceId: dataSliceId } }).then((res) => {
-            setLabelDistribution(postProcessLabelDistribution(res['data']['labelDistribution']));
+        getLabelDistribution(projectId, labelingTaskId, dataSliceId, (res) => {
+            if (res['data'] == null) return;
+            setLabelDistribution(postProcessLabelDistribution(res['data']['labelDistribution'], false));
         });
     }
 
@@ -191,31 +178,32 @@ export default function ProjectOverview() {
         const labelingTaskId = overviewFilters.labelingTask?.id;
         const dataSliceFindId = overviewFilters.dataSlice?.id;
         const dataSliceId = dataSliceFindId == "@@NO_SLICE@@" ? null : dataSliceFindId;
-        refetchConfidenceDistribution({ variables: { projectId: projectId, labelingTaskId: labelingTaskId, sliceId: dataSliceId } }).then((res) => {
-            setConfidenceDistribution(JSON.parse(res['data']['confidenceDistribution']));
+        getConfidenceDistribution(projectId, labelingTaskId, dataSliceId, (res) => {
+            if (res['data'] == null) return;
+            setConfidenceDistribution(res['data']['confidenceDistribution']);
         });
     }
 
-    function getConfusionMatrix() {
+    function getConfusionMatrixF() {
         const labelingTaskId = overviewFilters.labelingTask?.id;
         const dataSliceFindId = overviewFilters.dataSlice?.id;
         const dataSliceId = dataSliceFindId == "@@NO_SLICE@@" ? null : dataSliceFindId;
-        refetchConfusionMatrix({ variables: { projectId: projectId, labelingTaskId: labelingTaskId, sliceId: dataSliceId } }).then((res) => {
+        getConfusionMatrix(projectId, labelingTaskId, dataSliceId, (res) => {
             if (res['data'] == null) return;
-            setConfusionMatrix(postProcessConfusionMatrix(res['data']['confusionMatrix']));
+            setConfusionMatrix(postProcessConfusionMatrix(res['data']['confusionMatrix'], false));
         });
+
     }
 
-    function getInterAnnotatorMatrix() {
+    function getInterAnnotatorMatrixF() {
         let values = interAnnotatorFormGroup;
         values.dataSlice = values.dataSlice == "@@NO_SLICE@@" ? null : values.dataSlice;
         const labelingTaskId = overviewFilters.labelingTask?.id;
-        refetchInterAnnotator({ variables: { projectId: projectId, labelingTaskId: labelingTaskId, includeGoldStar: values.goldUser, includeAllOrgUser: values.allUsers, onlyOnStaticSlice: values.dataSlice } }).then((res) => {
+        getInterAnnotatorMatrix(projectId, labelingTaskId, values.dataSlice, values.goldUser, values.allUsers, (res) => {
             if (res['data'] == null) return;
             const matrix = res['data']['interAnnotatorMatrix'];
-            const matrixCopy = { ...matrix };
-            matrixCopy.allUsers = addUserName(matrixCopy.allUsers);
-            setInterAnnotatorMatrix(matrixCopy);
+            addUserName(matrix.allUsers);
+            setInterAnnotatorMatrix(matrix);
         });
         setGoldUserRequested(values.goldUser);
     }
@@ -235,9 +223,10 @@ export default function ProjectOverview() {
         const labelingTaskId = overviewFilters.labelingTask?.id;
         const dataSliceFindId = overviewFilters.dataSlice?.id;
         const dataSliceId = dataSliceFindId == "@@NO_SLICE@@" ? null : dataSliceFindId;
-        refetchProjectStats({ variables: { projectId: projectId, labelingTaskId: labelingTaskId, sliceId: dataSliceId } }).then((res) => {
+
+        getGeneralProjectStats(projectId, labelingTaskId, dataSliceId, (res) => {
             if (res['data'] == null) return;
-            setProjectStats(postProcessingStats(JSON.parse(res['data']['generalProjectStats'])));
+            setProjectStats(postProcessingStats(res['data']['generalProjectStats']));
         });
     }
 

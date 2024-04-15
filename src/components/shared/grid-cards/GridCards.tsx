@@ -7,17 +7,14 @@ import { Tooltip } from "@nextui-org/react";
 import { IconArrowRight, IconBolt, IconCode, IconSparkles, IconUsers } from "@tabler/icons-react";
 import { useSelector } from "react-redux";
 import style from '@/src/styles/components/projects/projectId/heuristics/heuristics.module.css';
-import { useMutation } from "@apollo/client";
-import { TOGGLE_HEURISTICS_SELECTED } from "@/src/services/gql/mutations/heuristics";
 import { useRouter } from "next/router";
 import Statuses from "../statuses/Statuses";
+import { toggleHeuristicById } from "@/src/services/base/heuristic";
 
 export default function GridCards(props: GridCardsProps) {
     const router = useRouter();
 
     const projectId = useSelector(selectProjectId);
-
-    const [toggleHeuristicsMut] = useMutation(TOGGLE_HEURISTICS_SELECTED);
 
     function toggleHeuristic(projectId: string, heuristicId: string) {
         const shallowCopy = [...props.filteredList];
@@ -25,11 +22,10 @@ export default function GridCards(props: GridCardsProps) {
         if (heuristicIndex === -1) return;
         shallowCopy[heuristicIndex] = { ...shallowCopy[heuristicIndex], selected: !shallowCopy[heuristicIndex].selected };
         props.setFilteredList(shallowCopy);
-        toggleHeuristicsMut({ variables: { projectId: projectId, informationSourceId: heuristicId } }).then(() => {
+        toggleHeuristicById(projectId, heuristicId, () => {
             props.refetch();
         });
     }
-
     return (<>
         {props.filteredList.map((heuristic: Heuristic, index: number) => (<div key={heuristic.id}>
             <div className={`relative flex space-x-3 items-center rounded-lg border border-gray-300 bg-white px-6 py-5 shadow-sm hover:border-gray-400 ${props.filteredList.length > 2 ? style.item : ''}`}>

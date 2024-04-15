@@ -1,14 +1,11 @@
 import LoadingIcon from "@/src/components/shared/loading/LoadingIcon";
-import Modal from "@/src/components/shared/modal/Modal";
 import { openModal } from "@/src/reduxStore/states/modal";
 import { selectHeuristic } from "@/src/reduxStore/states/pages/heuristics";
 import { selectLabelingTasksAll } from "@/src/reduxStore/states/pages/settings";
 import { selectProjectId } from "@/src/reduxStore/states/project";
-import { GET_ZERO_SHOT_TEXT } from "@/src/services/gql/queries/heuristics";
 import { ModalEnum } from "@/src/types/shared/modal";
 import { postProcessZeroShotText } from "@/src/util/components/projects/projectId/heuristics/heuristicId/zero-shot-helper";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
-import { useLazyQuery } from "@apollo/client";
 import { Tooltip } from "@nextui-org/react";
 import { IconAlertTriangle } from "@tabler/icons-react";
 import { Fragment, useState } from "react"
@@ -16,6 +13,7 @@ import { useDispatch, useSelector } from "react-redux";
 import ZeroShotExecution from "./ZeroShotExecution";
 import WhySoLongModal from "./WhySoLongModal";
 import { PlaygroundProps } from "@/src/types/components/projects/projectId/heuristics/heuristicId/zero-shot";
+import { getZeroShotText } from "@/src/services/base/zero-shot";
 
 export default function Playground(props: PlaygroundProps) {
     const dispatch = useDispatch();
@@ -28,8 +26,6 @@ export default function Playground(props: PlaygroundProps) {
     const [customLabels, setCustomLabels] = useState<string>("");
     const [testerRequestedSomething, setTesterRequestedSomething] = useState<boolean>(false);
     const [singleLineTesterResult, setSingleLineTesterResult] = useState<string[]>([]);
-
-    const [refetchZeroShotText] = useLazyQuery(GET_ZERO_SHOT_TEXT, { fetchPolicy: 'network-only' });
 
     function runZeroShotTest() {
         if (testInput.length == 0) return;
@@ -45,11 +41,7 @@ export default function Playground(props: PlaygroundProps) {
         if (!labels.length) return;
         setTesterRequestedSomething(true);
         setSingleLineTesterResult([]);
-        refetchZeroShotText({
-            variables: {
-                projectId: projectId, informationSourceId: currentHeuristic.id, config: currentHeuristic.zeroShotSettings.targetConfig, text: testInput, runIndividually: currentHeuristic.zeroShotSettings.runIndividually, labels: JSON.stringify(labels)
-            }
-        }).then(res => {
+        getZeroShotText(projectId, currentHeuristic.id, currentHeuristic.zeroShotSettings.targetConfig, testInput, currentHeuristic.zeroShotSettings.runIndividually, labels, (res) => {
             const labels = labelingTasks.find(task => task.id == currentHeuristic.labelingTaskId).labels
             setSingleLineTesterResult(postProcessZeroShotText(res.data['zeroShotText'], labels).labels);
             setTesterRequestedSomething(false);

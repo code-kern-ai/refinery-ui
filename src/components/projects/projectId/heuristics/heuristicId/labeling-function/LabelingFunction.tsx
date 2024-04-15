@@ -3,16 +3,12 @@ import HeuristicsLayout from "../shared/HeuristicsLayout";
 import { useDispatch, useSelector } from "react-redux";
 import { selectProjectId } from "@/src/reduxStore/states/project";
 import { useCallback, useEffect, useState } from "react";
-import { useLazyQuery, useMutation } from "@apollo/client";
-import { GET_HEURISTICS_BY_ID, GET_LABELING_FUNCTION_ON_10_RECORDS, GET_TASK_BY_TASK_ID } from "@/src/services/gql/queries/heuristics";
 import { selectHeuristic, setActiveHeuristics, updateHeuristicsState } from "@/src/reduxStore/states/pages/heuristics";
 import { postProcessCurrentHeuristic, postProcessLastTaskLogs } from "@/src/util/components/projects/projectId/heuristics/heuristicId/heuristics-details-helper";
 import { Tooltip } from "@nextui-org/react";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
-import { GET_LABELING_TASKS_BY_PROJECT_ID } from "@/src/services/gql/queries/project-setting";
 import { postProcessLabelingTasks, postProcessLabelingTasksSchema } from "@/src/util/components/projects/projectId/settings/labeling-tasks-helper";
-import { selectVisibleAttributesHeuristics, selectLabelingTasksAll, setLabelingTasksAll } from "@/src/reduxStore/states/pages/settings";
-import { UPDATE_INFORMATION_SOURCE } from "@/src/services/gql/mutations/heuristics";
+import { selectVisibleAttributesHeuristics, selectLabelingTasksAll, setLabelingTasksAll, SELECT_LABELING_TASKS_ALL_SNAPSHOT_ACCESS } from "@/src/reduxStore/states/pages/settings";
 import HeuristicsEditor from "../shared/HeuristicsEditor";
 import DangerZone from "@/src/components/shared/danger-zone/DangerZone";
 import HeuristicRunButtons from "../shared/HeuristicRunButtons";
@@ -28,7 +24,6 @@ import CalculationProgress from "./CalculationProgress";
 import { copyToClipboard } from "@/submodules/javascript-functions/general";
 import { CurrentPage } from "@/src/types/shared/general";
 import { selectAllUsers, setBricksIntegrator, setComments } from "@/src/reduxStore/states/general";
-import { REQUEST_COMMENTS } from "@/src/services/gql/queries/projects";
 import { CommentType } from "@/src/types/shared/comments";
 import { CommentDataManager } from "@/src/util/classes/comments";
 import BricksIntegrator from "@/src/components/shared/bricks-integrator/BricksIntegrator";
@@ -39,6 +34,10 @@ import { Attribute } from "@/src/types/components/projects/projectId/settings/da
 import LoadingIcon from "@/src/components/shared/loading/LoadingIcon";
 import { parseContainerLogsData } from "@/submodules/javascript-functions/logs-parser";
 import { useWebsocket } from "@/src/services/base/web-sockets/useWebsocket";
+import { getAllComments } from "@/src/services/base/comment";
+import { getLabelingTasksByProjectId } from "@/src/services/base/project";
+import { getHeuristicByHeuristicId, getLabelingFunctionOn10Records, getPayloadByPayloadId, updateHeuristicPost } from "@/src/services/base/heuristic";
+import { getStoreSnapshotValue } from "@/src/reduxStore/store";
 
 export default function LabelingFunction() {
     const dispatch = useDispatch();
@@ -57,13 +56,6 @@ export default function LabelingFunction() {
     const [isInitialLf, setIsInitialLf] = useState<boolean>(null);  //null as add state to differentiate between initial, not and unchecked
     const [checkUnsavedChanges, setCheckUnsavedChanges] = useState(false);
     const [runOn10IsRunning, setRunOn10IsRunning] = useState(false);
-
-    const [refetchCurrentHeuristic] = useLazyQuery(GET_HEURISTICS_BY_ID, { fetchPolicy: "network-only" });
-    const [refetchLabelingTasksByProjectId] = useLazyQuery(GET_LABELING_TASKS_BY_PROJECT_ID, { fetchPolicy: "network-only" });
-    const [updateHeuristicMut] = useMutation(UPDATE_INFORMATION_SOURCE);
-    const [refetchTaskByTaskId] = useLazyQuery(GET_TASK_BY_TASK_ID, { fetchPolicy: "network-only" });
-    const [refetchRunOn10] = useLazyQuery(GET_LABELING_FUNCTION_ON_10_RECORDS, { fetchPolicy: "no-cache" });
-    const [refetchComments] = useLazyQuery(REQUEST_COMMENTS, { fetchPolicy: "no-cache" });
 
     useEffect(() => {
         if (!projectId) return;
@@ -98,21 +90,21 @@ export default function LabelingFunction() {
         CommentDataManager.unregisterCommentRequests(CurrentPage.LABELING_FUNCTION);
         CommentDataManager.registerCommentRequests(CurrentPage.LABELING_FUNCTION, requests);
         const requestJsonString = CommentDataManager.buildRequestJSON();
-        refetchComments({ variables: { requested: requestJsonString } }).then((res) => {
-            CommentDataManager.parseCommentData(JSON.parse(res.data['getAllComments']));
+        getAllComments(requestJsonString, (res) => {
+            CommentDataManager.parseCommentData(res.data['getAllComments']);
             CommentDataManager.parseToCurrentData(allUsers);
             dispatch(setComments(CommentDataManager.currentDataOrder));
         });
     }
 
     function refetchCurrentHeuristicAndProcess() {
-        refetchCurrentHeuristic({ variables: { projectId: projectId, informationSourceId: router.query.heuristicId } }).then((res) => {
+        getHeuristicByHeuristicId(projectId, router.query.heuristicId as string, (res) => {
             dispatch(setActiveHeuristics(postProcessCurrentHeuristic(res['data']['informationSourceBySourceId'], labelingTasks)));
         });
     }
 
     function refetchLabelingTasksAndProcess() {
-        refetchLabelingTasksByProjectId({ variables: { projectId: projectId } }).then((res) => {
+        getLabelingTasksByProjectId(projectId, (res) => {
             const labelingTasks = postProcessLabelingTasks(res['data']['projectByProjectId']['labelingTasks']['edges']);
             dispatch(setLabelingTasksAll(postProcessLabelingTasksSchema(labelingTasks)));
         });
@@ -121,7 +113,7 @@ export default function LabelingFunction() {
     function saveHeuristic(labelingTask: any) {
         const newCode = checkTemplateCodeChange(labelingTask);
         if (newCode) updateSourceCode(newCode, labelingTask.id);
-        updateHeuristicMut({ variables: { projectId: projectId, informationSourceId: currentHeuristic.id, labelingTaskId: labelingTask.id } }).then((res) => {
+        updateHeuristicPost(projectId, currentHeuristic.id, labelingTask.id, currentHeuristic.sourceCode, currentHeuristic.description, currentHeuristic.name, (res) => {
             dispatch(updateHeuristicsState(currentHeuristic.id, { labelingTaskId: labelingTask.id, labelingTaskName: labelingTask.name, labels: labelingTask.labels }))
         });
     }
@@ -137,15 +129,15 @@ export default function LabelingFunction() {
             setLastTaskLogs(["Task is queued for execution"]);
             return;
         }
-        refetchTaskByTaskId({ variables: { projectId: projectId, payloadId: currentHeuristic.lastPayload.id } }).then((res) => {
+        getPayloadByPayloadId(projectId, currentHeuristic.lastPayload.id, (res) => {
             setLastTaskLogs(postProcessLastTaskLogs((res['data']['payloadByPayloadId'])));
         });
     }
 
-    function getLabelingFunctionOn10Records() {
+    function executeLabelingFunctionOn10Records() {
         setDisplayLogWarning(true);
         setRunOn10IsRunning(true);
-        refetchRunOn10({ variables: { projectId: projectId, informationSourceId: currentHeuristic.id } }).then((res) => {
+        getLabelingFunctionOn10Records(projectId, currentHeuristic.id, (res) => {
             setRunOn10IsRunning(false);
             setSampleRecords(postProcessSampleRecords(res['data']['getLabelingFunctionOn10Records'], labelingTasks, currentHeuristic.labelingTaskId));
             setLastTaskLogs(parseContainerLogsData(res['data']['getLabelingFunctionOn10Records']['containerLogs']))
@@ -173,7 +165,7 @@ export default function LabelingFunction() {
             return;
         }
         const finalSourceCode = value.replace(regMatch[0], 'def lf(record)');
-        updateHeuristicMut({ variables: { projectId: projectId, informationSourceId: currentHeuristic.id, labelingTaskId: labelingTaskId ?? currentHeuristic.labelingTaskId, code: finalSourceCode, name: regMatch[2] } }).then((res) => {
+        updateHeuristicPost(projectId, currentHeuristic.id, labelingTaskId ?? currentHeuristic.labelingTaskId, finalSourceCode, currentHeuristic.description, regMatch[2], (res) => {
             dispatch(updateHeuristicsState(currentHeuristic.id, { sourceCode: finalSourceCode, name: regMatch[2] }));
             updateSourceCodeToDisplay(finalSourceCode);
         });
@@ -205,12 +197,25 @@ export default function LabelingFunction() {
         }
     }, [currentHeuristic]);
 
-    function setValueToLabelingTask(value: string) {
+
+
+    const setValueToLabelingTask = useCallback((value: string) => {
         const labelingTask = labelingTasks.find(a => a.id == value);
-        updateHeuristicMut({ variables: { projectId: projectId, informationSourceId: currentHeuristic.id, labelingTaskId: labelingTask.id } }).then((res) => {
-            dispatch(updateHeuristicsState(currentHeuristic.id, { labelingTaskId: labelingTask.id, labelingTaskName: labelingTask.name, labels: labelingTask.labels }))
-        });
-    }
+        const updateHeuristic = (labelingTasks: any[], maxI: number, task?: any) => {
+            const labelingTask = task || labelingTasks.find(a => a.id == value);
+            if (!labelingTask && maxI > 0) {
+                setTimeout(() => updateHeuristic(getStoreSnapshotValue(SELECT_LABELING_TASKS_ALL_SNAPSHOT_ACCESS), maxI - 1), 100);
+            } else {
+                updateHeuristicPost(projectId, currentHeuristic.id, labelingTask.id, currentHeuristic.sourceCode, currentHeuristic.description, currentHeuristic.name, (res) => {
+                    dispatch(updateHeuristicsState(currentHeuristic.id, { labelingTaskId: labelingTask.id, labelingTaskName: labelingTask.name, labels: labelingTask.labels }))
+                });
+            }
+        }
+        if (!labelingTask) {
+            //try timeout as this is usually caused by race condition (creating the task+label through the integrator)
+            setTimeout(() => updateHeuristic(getStoreSnapshotValue(SELECT_LABELING_TASKS_ALL_SNAPSHOT_ACCESS), 5), 100);
+        } else updateHeuristic(labelingTasks, 0, labelingTask);
+    }, [projectId, currentHeuristic, labelingTasks])
 
     useWebsocket(CurrentPage.LABELING_FUNCTION, handleWebsocketNotification, projectId);
 
@@ -279,7 +284,7 @@ export default function LabelingFunction() {
                                 selectedOption={(option: any) => setSelectedAttribute(option)} />
                         </div>
                         <Tooltip content={selectedAttribute == null ? TOOLTIPS_DICT.LABELING_FUNCTION.SELECT_ATTRIBUTE : TOOLTIPS_DICT.LABELING_FUNCTION.RUN_ON_10} color="invert" placement="left">
-                            <button disabled={selectedAttribute == null} onClick={getLabelingFunctionOn10Records}
+                            <button disabled={selectedAttribute == null} onClick={executeLabelingFunctionOn10Records}
                                 className="bg-white text-gray-700 text-xs font-semibold px-4 py-2 rounded-md border border-gray-300 hover:bg-gray-50 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed">
                                 Run on 10
                             </button>

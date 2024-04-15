@@ -1,8 +1,7 @@
 import Modal from "@/src/components/shared/modal/Modal";
 import { selectProjectId } from "@/src/reduxStore/states/project";
-import { PASTE_TERM } from "@/src/services/gql/mutations/lookup-lists";
+import { pasteKnowledgeTerms } from "@/src/services/base/lookup-lists";
 import { ModalButton, ModalEnum } from "@/src/types/shared/modal";
-import { useMutation } from "@apollo/client";
 import { useRouter } from "next/router";
 import { useCallback, useEffect, useState } from "react";
 import { useSelector } from "react-redux";
@@ -17,10 +16,13 @@ export default function PasteLookupListModal() {
     const [inputSplit, setInputSplit] = useState("\\n");
     const [inputArea, setInputArea] = useState("");
 
-    const [pasteLookupListMut] = useMutation(PASTE_TERM);
-
     const pasteLookupList = useCallback(() => {
-        pasteLookupListMut({ variables: { projectId: projectId, knowledgeBaseId: router.query.lookupListId, values: inputArea, split: inputSplit, delete: false } }).then((res) => {
+        pasteKnowledgeTerms(projectId, {
+            knowledgeBaseId: router.query.lookupListId,
+            values: inputArea,
+            split: inputSplit,
+            delete: false
+        }, (res) => {
             setInputArea("");
         });
     }, [inputArea, inputSplit]);

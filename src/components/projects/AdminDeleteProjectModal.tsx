@@ -4,9 +4,8 @@ import { useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { selectIsAdmin } from "@/src/reduxStore/states/general";
 import { closeModal, selectModal } from "@/src/reduxStore/states/modal";
-import { useMutation } from "@apollo/client";
-import { DELETE_PROJECT } from "@/src/services/gql/mutations/projects";
 import { removeFromAllProjectsById } from "@/src/reduxStore/states/project";
+import { deleteProjectPost } from "@/src/services/base/project";
 
 const ACCEPT_BUTTON = { buttonCaption: "Delete and never show again", useButton: true };
 const ABORT_BUTTON = { buttonCaption: "Delete", useButton: true };
@@ -17,13 +16,10 @@ export default function AdminDeleteProjectModal() {
     const isAdmin = useSelector(selectIsAdmin);
     const modal = useSelector(selectModal(ModalEnum.ADMIN_DELETE_PROJECT));
 
-    const [deleteProjectByIdMut] = useMutation(DELETE_PROJECT, { fetchPolicy: "no-cache" });
-
-
     const adminDeleteProject = useCallback(() => {
         if (!isAdmin) return;
         const projectId = modal.projectId;
-        deleteProjectByIdMut({ variables: { projectId: projectId } }).then(() => {
+        deleteProjectPost(projectId, (res) => {
             dispatch(closeModal(ModalEnum.ADMIN_DELETE_PROJECT));
             dispatch(removeFromAllProjectsById(projectId));
         })

@@ -2,16 +2,12 @@ import { selectHeuristic, setActiveHeuristics, updateHeuristicsState } from "@/s
 import { useDispatch, useSelector } from "react-redux"
 import HeuristicsLayout from "../shared/HeuristicsLayout";
 import { selectProjectId } from "@/src/reduxStore/states/project";
-import { useLazyQuery, useMutation } from "@apollo/client";
-import { GET_HEURISTICS_BY_ID } from "@/src/services/gql/queries/heuristics";
 import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/router";
-import { GET_LABELING_TASKS_BY_PROJECT_ID, GET_ZERO_SHOT_RECOMMENDATIONS } from "@/src/services/gql/queries/project-setting";
 import { postProcessLabelingTasks, postProcessLabelingTasksSchema } from "@/src/util/components/projects/projectId/settings/labeling-tasks-helper";
 import { selectLabelingTasksAll, selectTextAttributes, setLabelingTasksAll } from "@/src/reduxStore/states/pages/settings";
 import { CurrentPage } from "@/src/types/shared/general";
 import { CONFIDENCE_INTERVALS, parseToSettingsJson, postProcessZeroShot } from "@/src/util/components/projects/projectId/heuristics/heuristicId/zero-shot-helper";
-import { UPDATE_INFORMATION_SOURCE } from "@/src/services/gql/mutations/heuristics";
 import { LabelingTaskTarget } from "@/src/types/components/projects/projectId/settings/labeling-tasks";
 import { Tooltip } from "@nextui-org/react";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
@@ -26,11 +22,14 @@ import DangerZone from "@/src/components/shared/danger-zone/DangerZone";
 import { DangerZoneEnum } from "@/src/types/shared/danger-zone";
 import CalculationProgress from "./CalculationProgress";
 import { Status } from "@/src/types/shared/statuses";
-import { REQUEST_COMMENTS } from "@/src/services/gql/queries/projects";
 import { CommentType } from "@/src/types/shared/comments";
 import { CommentDataManager } from "@/src/util/classes/comments";
 import Dropdown2 from "@/submodules/react-components/components/Dropdown2";
 import { useWebsocket } from "@/src/services/base/web-sockets/useWebsocket";
+import { getZeroShotRecommendations } from "@/src/services/base/zero-shot";
+import { getAllComments } from "@/src/services/base/comment";
+import { getLabelingTasksByProjectId } from "@/src/services/base/project";
+import { getHeuristicByHeuristicId, updateHeuristicPost } from "@/src/services/base/heuristic";
 
 export default function ZeroShot() {
     const dispatch = useDispatch();
@@ -47,12 +46,6 @@ export default function ZeroShot() {
     const [models, setModels] = useState([]);
     const [confidences, setConfidences] = useState<any[]>(CONFIDENCE_INTERVALS);
 
-    const [refetchCurrentHeuristic] = useLazyQuery(GET_HEURISTICS_BY_ID, { fetchPolicy: "network-only" });
-    const [refetchLabelingTasksByProjectId] = useLazyQuery(GET_LABELING_TASKS_BY_PROJECT_ID, { fetchPolicy: "network-only" });
-    const [updateHeuristicMut] = useMutation(UPDATE_INFORMATION_SOURCE);
-    const [refetchZeroShotRecommendations] = useLazyQuery(GET_ZERO_SHOT_RECOMMENDATIONS, { fetchPolicy: 'network-only', nextFetchPolicy: 'cache-first' });
-    const [refetchComments] = useLazyQuery(REQUEST_COMMENTS, { fetchPolicy: "no-cache" });
-
     useEffect(() => {
         setConfidences(CONFIDENCE_INTERVALS.map((conf) => {
             return { value: conf, label: conf + '%' };
@@ -63,8 +56,8 @@ export default function ZeroShot() {
         if (!projectId) return;
         if (!router.query.heuristicId) return;
         refetchLabelingTasksAndProcess();
-        refetchZeroShotRecommendations({ variables: { projectId: projectId } }).then((res) => {
-            setModels(JSON.parse(res.data['zeroShotRecommendations']));
+        getZeroShotRecommendations(projectId, (res) => {
+            setModels(res.data['zeroShotRecommendations']);
         });
     }, [projectId, router.query.heuristicId]);
 
@@ -88,21 +81,21 @@ export default function ZeroShot() {
         CommentDataManager.unregisterCommentRequests(CurrentPage.ZERO_SHOT);
         CommentDataManager.registerCommentRequests(CurrentPage.ZERO_SHOT, requests);
         const requestJsonString = CommentDataManager.buildRequestJSON();
-        refetchComments({ variables: { requested: requestJsonString } }).then((res) => {
-            CommentDataManager.parseCommentData(JSON.parse(res.data['getAllComments']));
+        getAllComments(requestJsonString, (res) => {
+            CommentDataManager.parseCommentData(res.data['getAllComments']);
             CommentDataManager.parseToCurrentData(allUsers);
             dispatch(setComments(CommentDataManager.currentDataOrder));
         });
     }
 
     function refetchCurrentHeuristicAndProcess() {
-        refetchCurrentHeuristic({ variables: { projectId: projectId, informationSourceId: router.query.heuristicId } }).then((res) => {
+        getHeuristicByHeuristicId(projectId, router.query.heuristicId as string, (res) => {
             dispatch(setActiveHeuristics(postProcessZeroShot(res['data']['informationSourceBySourceId'], labelingTasks, textAttributes)));
         });
     }
 
     function refetchLabelingTasksAndProcess() {
-        refetchLabelingTasksByProjectId({ variables: { projectId: projectId } }).then((res) => {
+        getLabelingTasksByProjectId(projectId, (res) => {
             const labelingTasks = postProcessLabelingTasks(res['data']['projectByProjectId']['labelingTasks']['edges']);
             dispatch(setLabelingTasksAll(postProcessLabelingTasksSchema(labelingTasks)));
         });
@@ -111,7 +104,7 @@ export default function ZeroShot() {
     function saveHeuristic(labelingTaskParam?: any, zeroShotSettings?: ZeroShotSettings) {
         const labelingTask = labelingTaskParam ? labelingTaskParam.id : currentHeuristic.zeroShotSettings.taskId;
         const code = parseToSettingsJson(zeroShotSettings ? zeroShotSettings : currentHeuristic.zeroShotSettings);
-        updateHeuristicMut({ variables: { projectId: projectId, informationSourceId: currentHeuristic.id, labelingTaskId: labelingTask, code: code } }).then((res) => {
+        updateHeuristicPost(projectId, currentHeuristic.id, labelingTask, code, currentHeuristic.description, currentHeuristic.name, (res) => {
             dispatch(updateHeuristicsState(currentHeuristic.id, { zeroShotSettings: zeroShotSettings ? zeroShotSettings : currentHeuristic.zeroShotSettings, labelingTaskId: labelingTask.id, labelingTaskName: labelingTask.name, labels: labelingTask.labels }))
         });
     }

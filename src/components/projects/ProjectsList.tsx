@@ -1,17 +1,13 @@
 import { selectInactiveOrganization, selectIsDemo, selectIsManaged, selectUser, setComments } from "@/src/reduxStore/states/general"
 import { selectAllProjects, setAllProjects } from "@/src/reduxStore/states/project";
-import { GET_OVERVIEW_STATS, GET_PROJECT_LIST } from "@/src/services/gql/queries/projects";
 import { Project, ProjectStatistics } from "@/src/types/components/projects/projects-list";
 import { CurrentPage } from "@/src/types/shared/general";
 import { percentRoundString } from "@/submodules/javascript-functions/general";
-import { useLazyQuery, useMutation } from "@apollo/client";
 import { useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import YoutubeIntroduction from "./YoutubeIntroduction";
 import ButtonsContainer from "./ButtonsContainer";
 import ProjectCard from "./ProjectCard";
-import { GET_CAN_CREATE_LOCAL_ORG } from "@/src/services/gql/queries/organizations";
-import { ADD_USER_TO_ORGANIZATION, CREATE_ORGANIZATION } from "@/src/services/gql/mutations/organizations";
 import style from "@/src/styles/components/projects/projects-list.module.css";
 import AdminDeleteProjectModal from "./AdminDeleteProjectModal";
 import { setAllAttributes, setAllEmbeddings, setLabelingTasksAll } from "@/src/reduxStore/states/pages/settings";
@@ -19,6 +15,8 @@ import { setOverviewFilters } from "@/src/reduxStore/states/tmp";
 import { setDataSlices, setFullSearchStore, setSearchGroupsStore } from "@/src/reduxStore/states/pages/data-browser";
 import { SearchGroup } from "@/submodules/javascript-functions/enums/enums";
 import { useWebsocket } from "@/src/services/base/web-sockets/useWebsocket";
+import { getAllProjects } from "@/src/services/base/project";
+import { addUserToOrganization, createOrganization, getCanCreateLocalOrg, getOverviewStats } from "@/src/services/base/organization";
 
 export default function ProjectsList() {
     const dispatch = useDispatch();
@@ -32,12 +30,6 @@ export default function ProjectsList() {
     const [projectStatisticsById, setProjectStatisticsById] = useState({});
     const [canCreateOrg, setCanCreateOrg] = useState(false);
     const [dataLoaded, setDataLoaded] = useState(false);
-
-    const [refetchProjects] = useLazyQuery(GET_PROJECT_LIST, { fetchPolicy: "no-cache" });
-    const [refetchStats] = useLazyQuery(GET_OVERVIEW_STATS, { fetchPolicy: "cache-and-network" });
-    const [refetchCanCreateOrg] = useLazyQuery(GET_CAN_CREATE_LOCAL_ORG, { fetchPolicy: "no-cache" });
-    const [createOrgMut] = useMutation(CREATE_ORGANIZATION);
-    const [addUserToOrgMut] = useMutation(ADD_USER_TO_ORGANIZATION);
 
     useEffect(() => {
         dispatch(setLabelingTasksAll(null));
@@ -61,7 +53,7 @@ export default function ProjectsList() {
     }, [organizationInactive, user]);
 
     function refetchProjectsAndPostProcess() {
-        refetchProjects().then((res) => {
+        getAllProjects((res) => {
             const projects = res.data["allProjects"].edges.map((edge: any) => edge.node);
             dispatch(setAllProjects(projects));
             setDataLoaded(true);
@@ -69,8 +61,8 @@ export default function ProjectsList() {
     }
 
     function refetchStatsAndPostProcess() {
-        refetchStats().then((res) => {
-            const stats = JSON.parse(res.data["overviewStats"]);
+        getOverviewStats((res) => {
+            const stats = res.data["overviewStats"];
             const statsDict = {};
             if (stats == null) return;
             stats.forEach((stat: ProjectStatistics) => {
@@ -88,17 +80,17 @@ export default function ProjectsList() {
             setDataLoaded(true);
             return;
         }
-        refetchCanCreateOrg().then((res) => {
+        getCanCreateLocalOrg(res => {
             const canCreate = res.data["canCreateLocalOrg"]
             setCanCreateOrg(canCreate);
             if (!canCreate) return;
             const localhostOrg = "localhost";
-            createOrgMut({ variables: { name: localhostOrg } }).then((res) => {
-                addUserToOrgMut({ variables: { userMail: user.mail, organizationName: localhostOrg } }).then((res) => {
+            createOrganization(localhostOrg, () => {
+                addUserToOrganization(user.mail, localhostOrg, () => {
                     location.reload();
                     setDataLoaded(true);
                 });
-            });
+            })
         });
     }
 

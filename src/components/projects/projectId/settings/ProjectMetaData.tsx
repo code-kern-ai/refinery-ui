@@ -1,13 +1,12 @@
 import { selectProject, setActiveProject } from "@/src/reduxStore/states/project";
-import { UPDATE_PROJECT_NAME_AND_DESCRIPTION } from "@/src/services/gql/mutations/project-settings";
-import { DELETE_PROJECT } from "@/src/services/gql/mutations/projects";
+import { updateProjectNameAndDescriptionPost } from "@/src/services/base/project";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
-import { useMutation } from "@apollo/client";
 import { Tooltip } from "@nextui-org/react";
 import { IconWreckingBall } from "@tabler/icons-react";
 import { useRouter } from "next/router";
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { deleteProjectPost } from "@/src/services/base/project";
 
 export default function ProjectMetaData() {
     const router = useRouter();
@@ -19,14 +18,11 @@ export default function ProjectMetaData() {
     const [projectDescription, setProjectDescription] = useState('');
     const [projectNameDelete, setProjectNameDelete] = useState('');
 
-    const [updateProjectNameAndDescMut] = useMutation(UPDATE_PROJECT_NAME_AND_DESCRIPTION);
-    const [deleteProjectMut] = useMutation(DELETE_PROJECT);
-
     function updateProjectNameAndDescription() {
         if (projectName === '' && projectDescription === '') return;
         if (projectName === '') setProjectName(project.name);
         if (projectDescription === '') setProjectDescription(project.description);
-        updateProjectNameAndDescMut({ variables: { projectId: project.id, name: projectName, description: projectDescription != '' ? projectDescription : project.description } }).then((res) => {
+        updateProjectNameAndDescriptionPost(project.id, projectName, projectDescription != '' ? projectDescription : project.description, (res) => {
             const activeProject = { ...project };
             activeProject.name = projectName;
             activeProject.description = projectDescription;
@@ -37,7 +33,7 @@ export default function ProjectMetaData() {
     }
 
     function deleteProject() {
-        deleteProjectMut({ variables: { projectId: project.id } }).then(() => {
+        deleteProjectPost(project.id, (res) => {
             router.push('/projects');
         });
     }

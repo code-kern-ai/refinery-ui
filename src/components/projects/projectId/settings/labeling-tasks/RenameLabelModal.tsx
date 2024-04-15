@@ -3,14 +3,13 @@ import Modal from "@/src/components/shared/modal/Modal";
 import { initModal, openModal, selectModal } from "@/src/reduxStore/states/modal";
 import { selectLabelingTasksAll, setLabelingTasksAll } from "@/src/reduxStore/states/pages/settings";
 import { selectProjectId } from "@/src/reduxStore/states/project";
-import { HANDLE_LABEL_RENAME_WARNING, UPDATE_LABEL_NAME } from "@/src/services/gql/mutations/project-settings";
-import { CHECK_RENAME_LABEL } from "@/src/services/gql/queries/project-setting";
+import { handleLabelRenameWarnings, updateLabelName } from "@/src/services/base/labeling-tasks";
+import { getCheckRenameLabel } from "@/src/services/base/project-setting";
 import { LabelType, LabelingTask, RenameLabelData } from "@/src/types/components/projects/projectId/settings/labeling-tasks";
 import { ModalButton, ModalEnum } from "@/src/types/shared/modal";
 import { LabelHelper } from "@/src/util/classes/label-helper";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
 import { jsonCopy } from "@/submodules/javascript-functions/general";
-import { useLazyQuery, useMutation } from "@apollo/client";
 import { Tooltip } from "@nextui-org/react";
 import { IconAlertTriangleFilled, IconInfoCircleFilled, IconTriangleInverted } from "@tabler/icons-react";
 import { useCallback, useEffect, useState } from "react";
@@ -27,10 +26,6 @@ export default function RenameLabelModal() {
 
     const [renameLabelData, setRenameLabelData] = useState<RenameLabelData>(null);
 
-    const [refetchCheckRenameLabel] = useLazyQuery(CHECK_RENAME_LABEL, { fetchPolicy: "no-cache" });
-    const [updateLabelNameMut] = useMutation(UPDATE_LABEL_NAME);
-    const [handleRenameWarningMut] = useMutation(HANDLE_LABEL_RENAME_WARNING);
-
     useEffect(() => {
         setRenameLabelData({
             checkResults: null,
@@ -40,7 +35,7 @@ export default function RenameLabelModal() {
     }, [modalRenameLabel]);
 
     const renameLabel = useCallback(() => {
-        updateLabelNameMut({ variables: { projectId: projectId, labelId: modalRenameLabel.label.id, newName: renameLabelData.newLabelName } }).then((res) => {
+        updateLabelName(projectId, { labelId: modalRenameLabel.label.id, newName: renameLabelData.newLabelName }, (res) => {
             const labelingTasksSchemaCopy = jsonCopy(labelingTasksSchema);
             const labelingTask = labelingTasksSchemaCopy.find((task: LabelingTask) => task.id == modalRenameLabel.taskId);
             const label = labelingTask.labels.find((label: LabelType) => label.id == modalRenameLabel.label.id);
@@ -63,8 +58,8 @@ export default function RenameLabelModal() {
     const [acceptButtonRename, setAcceptButtonRename] = useState<ModalButton>(ACCEPT_BUTTON);
 
     function checkRenameLabel() {
-        refetchCheckRenameLabel({ variables: { projectId: projectId, labelId: modalRenameLabel.label.id, newName: renameLabelData.newLabelName } }).then((res: any) => {
-            const result = JSON.parse(res.data['checkRenameLabel']);
+        getCheckRenameLabel(projectId, modalRenameLabel.label.id, renameLabelData.newLabelName, res => {
+            const result = res.data['checkRenameLabel'];
             const renameLabelDataCopy = { ...renameLabelData };
             result.warnings.forEach(e => {
                 e.open = false;
@@ -79,7 +74,7 @@ export default function RenameLabelModal() {
 
     function handleLabelRenameWarning(warning: any) {
         if (warning == null) return;
-        handleRenameWarningMut({ variables: { projectId: projectId, warningData: JSON.stringify(warning) } }).then((res) => {
+        handleLabelRenameWarnings(projectId, { warningData: warning }, (res) => {
             checkRenameLabel();
         });
 

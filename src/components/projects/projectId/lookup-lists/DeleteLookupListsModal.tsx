@@ -2,10 +2,9 @@ import Modal from "@/src/components/shared/modal/Modal";
 import { selectModal } from "@/src/reduxStore/states/modal";
 import { removeFromAllLookupListById, selectAllLookupLists, selectCheckedLookupLists } from "@/src/reduxStore/states/pages/lookup-lists";
 import { selectProjectId } from "@/src/reduxStore/states/project";
-import { DELETE_LOOKUP_LIST } from "@/src/services/gql/mutations/lookup-lists";
+import { deleteKnowledgeBase } from "@/src/services/base/lookup-lists";
 import { DeleteLookupListsModalProps } from "@/src/types/components/projects/projectId/lookup-lists";
 import { ModalButton, ModalEnum } from "@/src/types/shared/modal";
-import { useMutation } from "@apollo/client";
 import { useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
@@ -21,19 +20,11 @@ export default function DeleteLookupListsModal(props: DeleteLookupListsModalProp
 
     const [abortButton, setAbortButton] = useState<ModalButton>(ABORT_BUTTON);
 
-    const [deleteLookupListMut] = useMutation(DELETE_LOOKUP_LIST);
-
-
     const deleteLookupLists = useCallback(() => {
         checkedLookupLists.forEach((checked, index) => {
             if (checked) {
                 const lookupList = lookupLists[index];
-                deleteLookupListMut({
-                    variables: {
-                        projectId: projectId,
-                        knowledgeBaseId: lookupList.id
-                    }
-                }).then((res) => {
+                deleteKnowledgeBase(projectId, lookupList.id, (res) => {
                     dispatch(removeFromAllLookupListById(lookupList.id));
                 });
             }

@@ -2,17 +2,13 @@ import { useDispatch, useSelector } from "react-redux";
 import HeuristicsLayout from "../shared/HeuristicsLayout";
 import { useRouter } from "next/router";
 import { selectProjectId } from "@/src/reduxStore/states/project";
-import { useLazyQuery, useMutation } from "@apollo/client";
-import { GET_HEURISTICS_BY_ID, GET_TASK_BY_TASK_ID } from "@/src/services/gql/queries/heuristics";
 import { Fragment, useCallback, useEffect, useState } from "react";
 import { selectHeuristic, setActiveHeuristics, updateHeuristicsState } from "@/src/reduxStore/states/pages/heuristics";
 import { getClassLine, postProcessCurrentHeuristic, postProcessLastTaskLogs } from "@/src/util/components/projects/projectId/heuristics/heuristicId/heuristics-details-helper";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
 import { Tooltip } from "@nextui-org/react";
 import { selectEmbeddings, selectEmbeddingsFiltered, selectLabelingTasksAll, selectVisibleAttributesHeuristics, setAllEmbeddings, setFilteredEmbeddings, setLabelingTasksAll } from "@/src/reduxStore/states/pages/settings";
-import { UPDATE_INFORMATION_SOURCE } from "@/src/services/gql/mutations/heuristics";
 import { postProcessLabelingTasks, postProcessLabelingTasksSchema } from "@/src/util/components/projects/projectId/settings/labeling-tasks-helper";
-import { GET_EMBEDDING_SCHEMA_BY_PROJECT_ID, GET_LABELING_TASKS_BY_PROJECT_ID } from "@/src/services/gql/queries/project-setting";
 import { postProcessingEmbeddings } from "@/src/util/components/projects/projectId/settings/embeddings-helper";
 import { embeddingRelevant } from "@/src/util/components/projects/projectId/heuristics/heuristicId/labeling-functions-helper";
 import { Embedding } from "@/src/types/components/projects/projectId/settings/embeddings";
@@ -29,14 +25,16 @@ import { CurrentPage } from "@/src/types/shared/general";
 import { selectAllUsers, setBricksIntegrator, setLabelsBricksIntegrator, setComments } from "@/src/reduxStore/states/general";
 import { CommentType } from "@/src/types/shared/comments";
 import { CommentDataManager } from "@/src/util/classes/comments";
-import { REQUEST_COMMENTS } from "@/src/services/gql/queries/projects";
 import BricksIntegrator from "@/src/components/shared/bricks-integrator/BricksIntegrator";
 import { InformationSourceCodeLookup, InformationSourceExamples } from "@/src/util/classes/heuristics";
 import { getInformationSourceTemplate } from "@/src/util/components/projects/projectId/heuristics/heuristics-helper";
 import Dropdown2 from "@/submodules/react-components/components/Dropdown2";
 import LoadingIcon from "@/src/components/shared/loading/LoadingIcon";
 import { useWebsocket } from "@/src/services/base/web-sockets/useWebsocket";
-import { BricksCodeParser } from "@/src/util/classes/bricks-integrator/bricks-integrator";
+import { getAllComments } from "@/src/services/base/comment";
+import { getLabelingTasksByProjectId } from "@/src/services/base/project";
+import { getHeuristicByHeuristicId, getPayloadByPayloadId, updateHeuristicPost } from "@/src/services/base/heuristic";
+import { getEmbeddings } from "@/src/services/base/embedding";
 
 export default function ActiveLearning() {
     const dispatch = useDispatch();
@@ -53,13 +51,6 @@ export default function ActiveLearning() {
     const [lastTaskLogs, setLastTaskLogs] = useState<string[]>([]);
     const [isInitialAL, setIsInitialAL] = useState<boolean>(null);  //null as add state to differentiate between initial, not and unchecked
     const [checkUnsavedChanges, setCheckUnsavedChanges] = useState(false);
-
-    const [refetchCurrentHeuristic] = useLazyQuery(GET_HEURISTICS_BY_ID, { fetchPolicy: "network-only" });
-    const [refetchLabelingTasksByProjectId] = useLazyQuery(GET_LABELING_TASKS_BY_PROJECT_ID, { fetchPolicy: "network-only" });
-    const [updateHeuristicMut] = useMutation(UPDATE_INFORMATION_SOURCE);
-    const [refetchEmbeddings] = useLazyQuery(GET_EMBEDDING_SCHEMA_BY_PROJECT_ID, { fetchPolicy: "network-only" });
-    const [refetchTaskByTaskId] = useLazyQuery(GET_TASK_BY_TASK_ID, { fetchPolicy: "no-cache" });
-    const [refetchComments] = useLazyQuery(REQUEST_COMMENTS, { fetchPolicy: "no-cache" });
 
     useEffect(() => {
         if (!projectId) return;
@@ -99,8 +90,8 @@ export default function ActiveLearning() {
         CommentDataManager.unregisterCommentRequests(CurrentPage.ACTIVE_LEARNING);
         CommentDataManager.registerCommentRequests(CurrentPage.ACTIVE_LEARNING, requests);
         const requestJsonString = CommentDataManager.buildRequestJSON();
-        refetchComments({ variables: { requested: requestJsonString } }).then((res) => {
-            CommentDataManager.parseCommentData(JSON.parse(res.data['getAllComments']));
+        getAllComments(requestJsonString, (res) => {
+            CommentDataManager.parseCommentData(res.data['getAllComments']);
             CommentDataManager.parseToCurrentData(allUsers);
             dispatch(setComments(CommentDataManager.currentDataOrder));
         });
@@ -112,13 +103,13 @@ export default function ActiveLearning() {
             setLastTaskLogs(["Task is queued for execution"]);
             return;
         }
-        refetchTaskByTaskId({ variables: { projectId: projectId, payloadId: currentHeuristic.lastTask.id } }).then((res) => {
+        getPayloadByPayloadId(projectId, currentHeuristic.lastTask.id, (res) => {
             setLastTaskLogs(postProcessLastTaskLogs((res['data']['payloadByPayloadId'])));
         });
     }
 
     function refetchCurrentHeuristicAndProcess() {
-        refetchCurrentHeuristic({ variables: { projectId: projectId, informationSourceId: router.query.heuristicId } }).then((res) => {
+        getHeuristicByHeuristicId(projectId, router.query.heuristicId as string, (res) => {
             dispatch(setActiveHeuristics(postProcessCurrentHeuristic(res['data']['informationSourceBySourceId'], labelingTasks)));
         });
     }
@@ -126,20 +117,20 @@ export default function ActiveLearning() {
     function saveHeuristic(labelingTask: any) {
         const newCode = checkTemplateCodeChange(labelingTask);
         if (newCode) updateSourceCode(newCode, labelingTask.id);
-        updateHeuristicMut({ variables: { projectId: projectId, informationSourceId: currentHeuristic.id, labelingTaskId: labelingTask.id } }).then((res) => {
+        updateHeuristicPost(projectId, currentHeuristic.id, labelingTask.id, currentHeuristic.sourceCode, currentHeuristic.description, currentHeuristic.name, (res) => {
             dispatch(updateHeuristicsState(currentHeuristic.id, { labelingTaskId: labelingTask.id, labelingTaskName: labelingTask.name, labels: labelingTask.labels }));
         });
     }
 
     function refetchLabelingTasksAndProcess() {
-        refetchLabelingTasksByProjectId({ variables: { projectId: projectId } }).then((res) => {
+        getLabelingTasksByProjectId(projectId, (res) => {
             const labelingTasks = postProcessLabelingTasks(res['data']['projectByProjectId']['labelingTasks']['edges']);
             dispatch(setLabelingTasksAll(postProcessLabelingTasksSchema(labelingTasks)));
         });
     }
 
     function refetchEmbeddingsAndPostProcess() {
-        refetchEmbeddings({ variables: { projectId: projectId } }).then((res) => {
+        getEmbeddings(projectId, (res) => {
             const embeddings = postProcessingEmbeddings(res.data['projectByProjectId']['embeddings']['edges'].map((e) => e['node']), []);
             dispatch(setAllEmbeddings(embeddings));
         });
@@ -175,7 +166,7 @@ export default function ActiveLearning() {
         }
         const labelingTaskFinalId = labelingTaskId ?? currentHeuristic.labelingTaskId;
         const finalSourceCode = value.replace(regMatch[0], getClassLine(null, labelingTasks, labelingTaskFinalId));
-        updateHeuristicMut({ variables: { projectId: projectId, informationSourceId: currentHeuristic.id, labelingTaskId: labelingTaskFinalId, code: finalSourceCode, name: regMatch[1] } }).then((res) => {
+        updateHeuristicPost(projectId, currentHeuristic.id, labelingTaskFinalId, finalSourceCode, currentHeuristic.description, regMatch[1], (res) => {
             dispatch(updateHeuristicsState(currentHeuristic.id, { sourceCode: finalSourceCode, name: regMatch[1] }));
             updateSourceCodeToDisplay(finalSourceCode);
         });
@@ -208,7 +199,7 @@ export default function ActiveLearning() {
 
     function setValueToLabelingTask(value: string) {
         const labelingTask = labelingTasks.find(a => a.id == value);
-        updateHeuristicMut({ variables: { projectId: projectId, informationSourceId: currentHeuristic.id, labelingTaskId: labelingTask.id } }).then((res) => {
+        updateHeuristicPost(projectId, currentHeuristic.id, labelingTask.id, currentHeuristic.sourceCode, currentHeuristic.description, currentHeuristic.name, (res) => {
             dispatch(updateHeuristicsState(currentHeuristic.id, { labelingTaskId: labelingTask.id, labelingTaskName: labelingTask.name, labels: labelingTask.labels }));
         });
     }

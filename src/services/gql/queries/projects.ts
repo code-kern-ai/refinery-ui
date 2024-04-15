@@ -99,16 +99,6 @@ query {
 }
 `;
 
-export const NOTIFICATIONS_BY_USER = gql`
-query {
-  notificationsByUserId {
-  message
-  level
-  id
-}
-}
-`;
-
 export const REQUEST_COMMENTS = gql`
 query ($requested: JSONString!) {
   getAllComments(requested: $requested)

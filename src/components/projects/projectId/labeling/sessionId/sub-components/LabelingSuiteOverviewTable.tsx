@@ -2,13 +2,11 @@ import { selectUser } from "@/src/reduxStore/states/general";
 import { openModal } from "@/src/reduxStore/states/modal";
 import { removeFromRlaById, selectDisplayUserRole, selectHoverGroupDict, selectRecordRequestsRecord, selectRecordRequestsRla, selectSettings, selectTmpHighlightIds, selectUserDisplayId, setHoverGroupDict, tmpAddHighlightIds } from "@/src/reduxStore/states/pages/labeling";
 import { selectProjectId } from "@/src/reduxStore/states/project";
-import { DELETE_RECORD_LABEL_ASSOCIATION_BY_ID } from "@/src/services/gql/mutations/labeling";
 import { HeaderHover, TableDisplayData } from "@/src/types/components/projects/projectId/labeling/overview-table";
 import { ModalEnum } from "@/src/types/shared/modal";
 import { LabelingSuiteManager } from "@/src/util/classes/labeling/manager";
 import { buildOverviewTableDisplayArray, filterRlaDataForUser, filterRlaLabelCondition, getEmptyHeaderHover, rlasHaveHeuristicData } from "@/src/util/components/projects/projectId/labeling/overview-table-helper";
 import { LabelSource } from "@/submodules/javascript-functions/enums/enums";
-import { useMutation } from "@apollo/client";
 import { IconSearch, IconTrash } from "@tabler/icons-react";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -17,6 +15,7 @@ import { LabelingPageParts } from "@/src/types/components/projects/projectId/lab
 import style from '@/src/styles/components/projects/projectId/labeling.module.css';
 import { LabelSourceHover } from "@/src/types/components/projects/projectId/labeling/labeling";
 import { UserRole } from "@/src/types/shared/sidebar";
+import { deleteRecordLabelAssociationByIds } from "@/src/services/base/labeling";
 
 
 function shouldHighLight(tmpHighlightIds: string[], comparedIds: string[], additionalComparedIds?: string[]) {
@@ -43,8 +42,6 @@ export default function LabelingSuiteOverviewTable() {
     const [fullData, setFullData] = useState<TableDisplayData[]>([]);
     const [dataHasHeuristics, setDataHasHeuristics] = useState(false);
     const [headerHover, setHeaderHover] = useState<HeaderHover>(getEmptyHeaderHover());
-
-    const [deleteRlaByIdMut] = useMutation(DELETE_RECORD_LABEL_ASSOCIATION_BY_ID);
 
     useEffect(() => {
         if (!user || !userDisplayRole) return;
@@ -94,7 +91,7 @@ export default function LabelingSuiteOverviewTable() {
 
     function deleteLabelFromRecord(rlaId: string) {
         LabelingSuiteManager.somethingLoading = true;
-        deleteRlaByIdMut({ variables: { projectId: projectId, recordId: record.id, associationIds: [rlaId] } }).then(res => {
+        deleteRecordLabelAssociationByIds(projectId, record.id, [rlaId], () => {
             dispatch(removeFromRlaById(rlaId));
         });
     }

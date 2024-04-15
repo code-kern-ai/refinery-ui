@@ -1,12 +1,10 @@
 import LoadingIcon from "@/src/components/shared/loading/LoadingIcon";
 import { setModalStates } from "@/src/reduxStore/states/modal";
 import { selectProjectId } from "@/src/reduxStore/states/project";
-import { CALCULATE_USER_ATTRIBUTE_SAMPLE_RECORDS, GET_RECORD_BY_RECORD_ID } from "@/src/services/gql/queries/project-setting";
 import { ExecutionContainerProps, SampleRecord } from "@/src/types/components/projects/projectId/settings/attribute-calculation";
 import { AttributeState } from "@/src/types/components/projects/projectId/settings/data-schema";
 import { ModalEnum } from "@/src/types/shared/modal";
 import { postProcessRecordByRecordId } from "@/src/util/components/projects/projectId/settings/attribute-calculation-helper";
-import { useLazyQuery } from "@apollo/client";
 import { Tooltip } from "@nextui-org/react";
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -14,6 +12,8 @@ import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
 import ConfirmExecutionModal from "./ConfirmExecutionModal";
 import ViewRecordDetailsModal from "./ViewRecordDetailsModal";
 import { extendArrayElementsByUniqueId } from "@/submodules/javascript-functions/id-prep";
+import { getRecordByRecordId } from "@/src/services/base/project-setting";
+import { getSampleRecords } from "@/src/services/base/attribute";
 
 export default function ExecutionContainer(props: ExecutionContainerProps) {
     const projectId = useSelector(selectProjectId);
@@ -26,13 +26,10 @@ export default function ExecutionContainer(props: ExecutionContainerProps) {
     const [checkIfAtLeastRunning, setCheckIfAtLeastRunning] = useState(false);
     const [checkIfAtLeastQueued, setCheckIfAtLeastQueued] = useState(false);
 
-    const [refetchSampleRecords] = useLazyQuery(CALCULATE_USER_ATTRIBUTE_SAMPLE_RECORDS, { fetchPolicy: 'no-cache' });
-    const [refetchRecordByRecordId] = useLazyQuery(GET_RECORD_BY_RECORD_ID, { fetchPolicy: 'no-cache' });
-
     function calculateUserAttributeSampleRecords() {
         if (requestedSomething) return;
         setRequestedSomething(true);
-        refetchSampleRecords({ variables: { projectId: projectId, attributeId: props.currentAttribute.id } }).then((res) => {
+        getSampleRecords(projectId, props.currentAttribute.id, (res) => {
             const sampleRecordsFinal = { ...res.data['calculateUserAttributeSampleRecords'] };
             setRequestedSomething(false);
             setRunOn10HasError(sampleRecordsFinal.calculatedAttributes.length > 0 ? false : true);
@@ -43,13 +40,11 @@ export default function ExecutionContainer(props: ExecutionContainerProps) {
             sampleRecordsFinal.calculatedAttributesDisplay = extendArrayElementsByUniqueId(sampleRecordsFinal.calculatedAttributes);
             setSampleRecords(sampleRecordsFinal);
             props.refetchCurrentAttribute();
-        }, () => {
-            setRequestedSomething(false);
-        })
+        });
     }
 
     function recordByRecordId(recordId: string) {
-        refetchRecordByRecordId({ variables: { projectId: projectId, recordId: recordId } }).then((res) => {
+        getRecordByRecordId(projectId, recordId, (res) => {
             dispatch(setModalStates(ModalEnum.VIEW_RECORD_DETAILS, { record: postProcessRecordByRecordId(res.data['recordByRecordId']) }));
         });
     }

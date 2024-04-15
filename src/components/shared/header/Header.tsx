@@ -13,12 +13,12 @@ import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
 import NotificationCenterModal from "../notification-center/NotificationCenterModal";
 import { openModal } from "@/src/reduxStore/states/modal";
 import { ModalEnum } from "@/src/types/shared/modal";
-import { useLazyQuery } from "@apollo/client";
-import { GET_PROJECT_LIST, NOTIFICATIONS } from "@/src/services/gql/queries/projects";
 import { postProcessNotifications } from "@/src/util/shared/notification-center-helper";
 import { selectNotificationId, setProjectIdSampleProject } from "@/src/reduxStore/states/tmp";
 import Comments from "../comments/Comments";
 import { arrayToDict } from "@/submodules/javascript-functions/general";
+import { getAllProjects } from "@/src/services/base/project";
+import { getNotifications } from "@/src/services/base/notification";
 
 export default function Header() {
     const router = useRouter();
@@ -35,9 +35,6 @@ export default function Header() {
     const displayComments = useSelector(selectDisplayIconComments);
 
     const [organizationInactive, setOrganizationInactive] = useState(null);
-
-    const [refetchNotifications] = useLazyQuery(NOTIFICATIONS, { fetchPolicy: 'network-only' });
-    const [refetchProjects] = useLazyQuery(GET_PROJECT_LIST, { fetchPolicy: "no-cache" });
 
     useEffect(() => {
         if (!projectsNames) return;
@@ -56,10 +53,16 @@ export default function Header() {
     }, [notificationId]);
 
     function openModalAndRefetchNotifications() {
-        refetchProjects().then((res) => {
+        getAllProjects((res) => {
             const projects = res.data["allProjects"].edges.map((edge: any) => edge.node);
             dispatch(setAllProjects(projects));
-            refetchNotifications().then((res) => {
+            getNotifications({
+                projectFilter: [],
+                levelFilter: [],
+                typeFilter: [],
+                userFilter: true,
+                limit: 50
+            }, (res) => {
                 dispatch(setNotifications(postProcessNotifications(res.data['notifications'], arrayToDict(projects, 'id'), notificationId)));
                 dispatch(openModal(ModalEnum.NOTIFICATION_CENTER));
             });

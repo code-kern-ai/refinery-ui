@@ -4,8 +4,6 @@ import UploadField from "./helper-components/UploadField";
 import { useCallback, useEffect, useState } from "react";
 import UploadWrapper from "./helper-components/UploadWrapper";
 import { selectUploadData, setImportOptions } from "@/src/reduxStore/states/upload";
-import { useLazyQuery, useMutation } from "@apollo/client";
-import { CREATE_PROJECT, DELETE_PROJECT, UPDATE_PROJECT_STATUS, UPDATE_PROJECT_TOKENIZER } from "@/src/services/gql/mutations/projects";
 import { ProjectStatus } from "@/src/types/components/projects/projects-list";
 import { timer } from "rxjs";
 import { uploadFile } from "@/src/services/base/s3-service";
@@ -13,7 +11,6 @@ import { CurrentPage, CurrentPageSubKey } from "@/src/types/shared/general";
 import { jsonCopy } from "@/submodules/javascript-functions/general";
 import { useRouter } from "next/router";
 import { extendAllProjects, removeFromAllProjectsById, selectAllProjects, selectProjectId } from "@/src/reduxStore/states/project";
-import { GET_UPLOAD_CREDENTIALS_AND_ID, GET_UPLOAD_TASK_BY_TASK_ID } from "@/src/services/gql/queries/projects";
 import { UPLOAD_TOKENIZERS } from "@/src/util/constants";
 import { UploadHelper, ZIP_TYPE } from "@/src/util/classes/upload-helper";
 import CryptedField from "../crypted-field/CryptedField";
@@ -21,6 +18,7 @@ import { closeModal } from "@/src/reduxStore/states/modal";
 import { ModalEnum } from "@/src/types/shared/modal";
 import Dropdown2 from "@/submodules/react-components/components/Dropdown2";
 import { useWebsocket } from "@/src/services/base/web-sockets/useWebsocket";
+import { getUploadCredentialsAndId, getUploadTaskById, deleteProjectPost, createProjectPost, updateProjectTokenizer, updateProjectStatus } from "@/src/services/base/project";
 
 export default function Upload(props: UploadProps) {
     const router = useRouter();
@@ -44,13 +42,6 @@ export default function Upload(props: UploadProps) {
     const [prepareTokenizedValues, setPrepareTokenizedValues] = useState<any[]>([]);
     const [key, setKey] = useState("");
     const [fileEndsWithZip, setFileEndsWithZip] = useState<boolean>(false);
-
-    const [createProjectMut] = useMutation(CREATE_PROJECT);
-    const [deleteProjectMut] = useMutation(DELETE_PROJECT);
-    const [updateProjectTokenizerMut] = useMutation(UPDATE_PROJECT_TOKENIZER);
-    const [updateProjectStatusMut] = useMutation(UPDATE_PROJECT_STATUS);
-    const [uploadCredentialsMut] = useLazyQuery(GET_UPLOAD_CREDENTIALS_AND_ID, { fetchPolicy: 'network-only' });
-    const [getUploadTaskId] = useLazyQuery(GET_UPLOAD_TASK_BY_TASK_ID, { fetchPolicy: 'network-only' });
 
     useEffect(() => {
         if (!props.uploadOptions || !props.uploadOptions.tokenizerValues) return;
@@ -82,7 +73,7 @@ export default function Upload(props: UploadProps) {
         if (msgParts[2] != uploadTask.id) return;
         if (msgParts[3] == 'state') {
             if (msgParts[4] == UploadStates.DONE) {
-                getUploadTaskId({ variables: { projectId: projectId, uploadTaskId: uploadTask.id, } }).then((res) => {
+                getUploadTaskById(projectId, uploadTask.id, (res) => {
                     const task = res.data['uploadTaskById'];
                     handleUploadTaskResult(task);
                 });
@@ -101,7 +92,7 @@ export default function Upload(props: UploadProps) {
             }
         } else if (msgParts[3] == 'progress') {
             if (msgParts[4] == "100") {
-                getUploadTaskId({ variables: { projectId: projectId, uploadTaskId: uploadTask.id, } }).then((res) => {
+                getUploadTaskById(projectId, uploadTask.id, (res) => {
                     const task = res.data['uploadTaskById'];
                     handleUploadTaskResult(task);
                 });
@@ -124,14 +115,14 @@ export default function Upload(props: UploadProps) {
                 setIsProjectTitleEmpty(true);
                 return;
             }
-            createProjectMut({ variables: { name: projectTitle, description: projectDescription } }).then((res) => {
+            createProjectPost({ name: projectTitle, description: projectDescription }, (res) => {
                 const project = res.data.createProject['project'];
                 dispatch(extendAllProjects(project));
                 UploadHelper.setProjectId(project.id);
                 executeUploadFile();
             })
         } else if (uploadFileType == UploadFileType.PROJECT) {
-            createProjectMut({ variables: { name: props.uploadOptions.projectName, description: "Created during file upload " + selectedFile?.name } }).then((res) => {
+            createProjectPost({ name: props.uploadOptions.projectName, description: "Created during file upload " + selectedFile?.name }, (res) => {
                 const project = res.data.createProject['project'];
                 dispatch(extendAllProjects(project));
                 UploadHelper.setProjectId(project.id);
@@ -160,9 +151,8 @@ export default function Upload(props: UploadProps) {
         } else {
             tokenizerPrep = UPLOAD_TOKENIZERS.ENGLISH.TOKENIZER; // dummy tokenizer, actual value is set during import of project
         }
-
-        updateProjectTokenizerMut({ variables: { projectId: UploadHelper.getProjectId(), tokenizer: tokenizerPrep } }).then((res) => {
-            updateProjectStatusMut({ variables: { projectId: UploadHelper.getProjectId(), newStatus: ProjectStatus.INIT_COMPLETE } })
+        updateProjectTokenizer(UploadHelper.getProjectId(), { tokenizer: tokenizerPrep }, (res) => {
+            updateProjectStatus(UploadHelper.getProjectId(), { newStatus: ProjectStatus.INIT_COMPLETE }, (result) => { });
         });
     }
 
@@ -182,7 +172,7 @@ export default function Upload(props: UploadProps) {
     function finishUpUpload(finalFinalName: string, importOptionsPrep: string) {
         let keyToSend = key;
         if (!keyToSend) keyToSend = null;
-        uploadCredentialsMut({ variables: { projectId: UploadHelper.getProjectId(), fileName: finalFinalName, fileType: uploadFileType, fileImportOptions: importOptionsPrep, uploadType: UploadType.DEFAULT, key: keyToSend } }).then((results) => {
+        getUploadCredentialsAndId(UploadHelper.getProjectId(), finalFinalName, uploadFileType, importOptionsPrep, UploadType.DEFAULT, keyToSend, (results) => {
             const credentialsAndUploadId = JSON.parse(JSON.parse(results.data['uploadCredentialsAndId']));
             uploadFileToMinio(credentialsAndUploadId, finalFinalName);
         });
@@ -191,7 +181,7 @@ export default function Upload(props: UploadProps) {
     function uploadFileToMinio(credentialsAndUploadId: any, fileName: string) {
         setUploadStarted(true);
         setDoingSomething(true);
-        getUploadTaskId({ variables: { projectId: UploadHelper.getProjectId(), uploadTaskId: credentialsAndUploadId.uploadTaskId, } }).then((res) => {
+        getUploadTaskById(UploadHelper.getProjectId(), credentialsAndUploadId.uploadTaskId, (res) => {
             const task = res.data['uploadTaskById'];
             handleUploadTaskResult(task);
             uploadFile(credentialsAndUploadId, selectedFile, fileName).subscribe((progress) => {
@@ -243,7 +233,7 @@ export default function Upload(props: UploadProps) {
 
     function deleteExistingProject() {
         const projectId = UploadHelper.getProjectId();
-        deleteProjectMut({ variables: { projectId: projectId } }).then((res) => {
+        deleteProjectPost(projectId, (res) => {
             dispatch(removeFromAllProjectsById(projectId));
         });
     }

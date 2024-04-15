@@ -2,8 +2,6 @@ import { selectBricksIntegratorAttributes, selectBricksIntegratorEmbeddings, sel
 import { selectLabelingTasksAll } from "@/src/reduxStore/states/pages/settings";
 import { selectProjectId } from "@/src/reduxStore/states/project";
 import { useWebsocket } from "@/src/services/base/web-sockets/useWebsocket";
-import { LOOKUP_LISTS_BY_PROJECT_ID } from "@/src/services/gql/queries/lookup-lists";
-import { GET_ATTRIBUTES_BY_PROJECT_ID, GET_EMBEDDING_SCHEMA_BY_PROJECT_ID, GET_LABELING_TASKS_BY_PROJECT_ID } from "@/src/services/gql/queries/project-setting";
 import { LabelingTaskTarget, LabelingTaskTaskType } from "@/src/types/components/projects/projectId/settings/labeling-tasks";
 import { BricksVariableType, VariableSelectProps } from "@/src/types/shared/bricks-integrator";
 import { CurrentPage, CurrentPageSubKey } from "@/src/types/shared/general";
@@ -13,10 +11,13 @@ import { postProcessingAttributes } from "@/src/util/components/projects/project
 import { postProcessLabelingTasks } from "@/src/util/components/projects/projectId/settings/labeling-tasks-helper";
 import { getIsoCodes } from "@/src/util/shared/bricks-integrator-helper";
 import Dropdown2 from "@/submodules/react-components/components/Dropdown2";
-import { useLazyQuery } from "@apollo/client";
 import { IconPlus, IconTrash } from "@tabler/icons-react";
 import { useCallback, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { getAttributes } from "@/src/services/base/attribute";
+import { getLookupListsByProjectId } from "@/src/services/base/lookup-lists";
+import { getLabelingTasksByProjectId } from "@/src/services/base/project";
+import { getEmbeddings } from "@/src/services/base/embedding";
 
 export default function VariableSelect(props: VariableSelectProps) {
     const dispatch = useDispatch();
@@ -28,11 +29,6 @@ export default function VariableSelect(props: VariableSelectProps) {
     const labelingTasks = useSelector(selectLabelingTasksAll);
     const lookupLists = useSelector(selectBricksIntegratorLookupLists);
     const labels = useSelector(selectBricksIntegratorLabels);
-
-    const [refetchAttributes] = useLazyQuery(GET_ATTRIBUTES_BY_PROJECT_ID, { fetchPolicy: "network-only" });
-    const [refetchEmbeddings] = useLazyQuery(GET_EMBEDDING_SCHEMA_BY_PROJECT_ID, { fetchPolicy: "no-cache" });
-    const [refetchLookupLists] = useLazyQuery(LOOKUP_LISTS_BY_PROJECT_ID);
-    const [refetchLabelingTasksByProjectId] = useLazyQuery(GET_LABELING_TASKS_BY_PROJECT_ID, { fetchPolicy: "network-only" });
 
     useEffect(() => {
         if (!props.variable || !labelingTasks) return;
@@ -84,7 +80,7 @@ export default function VariableSelect(props: VariableSelectProps) {
     }
 
     function refetchAttributesAndProcess(typeFilter: string[] = ['TEXT'], stateFilter: string[] = ["UPLOADED", "USABLE", "AUTOMATICALLY_CREATED"]) {
-        refetchAttributes({ variables: { projectId: projectId, stateFilter: ['ALL'] } }).then((res) => {
+        getAttributes(projectId, ['ALL'], (res) => {
             const attributes = postProcessingAttributes(res.data['attributesByProjectId']);
             let filtered = attributes.filter(att => stateFilter.includes(att.state));
             if (typeFilter) {
@@ -100,7 +96,7 @@ export default function VariableSelect(props: VariableSelectProps) {
     }
 
     function refetchEmbeddingsAndProcess(labelingTaskId: string | null = null) {
-        refetchEmbeddings({ variables: { projectId: projectId } }).then((res) => {
+        getEmbeddings(projectId, (res) => {
             const embeddings = res.data['projectByProjectId']['embeddings']['edges'].map((e) => e['node']);
             if (!embeddings || !labelingTasks) {
                 console.log("labeling Tasks or embeddings not yet loaded");
@@ -117,7 +113,7 @@ export default function VariableSelect(props: VariableSelectProps) {
     }
 
     function refetchLookupListsAndProcess() {
-        refetchLookupLists({ variables: { projectId: projectId } }).then((res) => {
+        getLookupListsByProjectId(projectId, res => {
             const lookupLists = res.data["knowledgeBasesByProjectId"];
             if (!lookupLists) {
                 console.log("lookup lists not yet loaded");
@@ -129,7 +125,7 @@ export default function VariableSelect(props: VariableSelectProps) {
     }
 
     function refetchLabelingTasksAndProcess(typeFilter: string) {
-        refetchLabelingTasksByProjectId({ variables: { projectId: projectId } }).then((res) => {
+        getLabelingTasksByProjectId(projectId, (res) => {
             const labelingTasks = postProcessLabelingTasks(res['data']['projectByProjectId']['labelingTasks']['edges']);
             if (!labelingTasks) {
                 console.log("labeling Tasks not yet loaded");

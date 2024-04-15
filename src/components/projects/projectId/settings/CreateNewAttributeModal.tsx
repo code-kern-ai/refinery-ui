@@ -3,14 +3,13 @@ import { setCurrentPage } from "@/src/reduxStore/states/general";
 import { selectModal } from "@/src/reduxStore/states/modal";
 import { selectAttributes } from "@/src/reduxStore/states/pages/settings";
 import { selectProjectId } from "@/src/reduxStore/states/project";
-import { CREATE_USER_ATTRIBUTE } from "@/src/services/gql/mutations/project-settings";
+import { createAttribute } from "@/src/services/base/project-setting";
 import { CurrentPage, DataTypeEnum } from "@/src/types/shared/general";
 import { ModalButton, ModalEnum } from "@/src/types/shared/modal"
 import { DATA_TYPES, findFreeAttributeName } from "@/src/util/components/projects/projectId/settings/data-schema-helper";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
 import { toPythonFunctionName } from "@/submodules/javascript-functions/python-functions-parser";
 import Dropdown2 from "@/submodules/react-components/components/Dropdown2";
-import { useMutation } from "@apollo/client";
 import { Tooltip } from "@nextui-org/react";
 import { useRouter } from "next/router";
 import { useCallback, useEffect, useState } from "react";
@@ -30,10 +29,8 @@ export default function CreateNewAttributeModal() {
     const [attributeType, setAttributeType] = useState(DATA_TYPES[0]);
     const [duplicateNameExists, setDuplicateNameExists] = useState(false);
 
-    const [createAttributeMut] = useMutation(CREATE_USER_ATTRIBUTE);
-
     const createUserAttribute = useCallback(() => {
-        createAttributeMut({ variables: { projectId: projectId, name: attributeName, dataType: attributeType.value } }).then((res) => {
+        createAttribute(projectId, attributeName, attributeType.value, (res) => {
             const id = res?.data?.createUserAttribute.attributeId;
             if (id) {
                 localStorage.setItem('isNewAttribute', "X");

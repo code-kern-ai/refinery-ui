@@ -12,7 +12,7 @@ export type Heuristic = {
     lastRun: string;
     name: string;
     returnType: string;
-    stat_data: StatData[];
+    statData: StatData[];
     state: string;
     stats: Stat[];
     routerLink: string;

@@ -158,6 +158,7 @@ export function collectSelectionData(attributeId: string, currentSelection: Curr
 export function getTokenData(attributeId: string, attributes: Attribute[], recordRequests: any): any {
     if (!attributes) return null;
     if (attributeId == FULL_RECORD_ID) return null;
+    if (!recordRequests.token) return null;
     for (const att of recordRequests.token.attributes) {
         if (att.attributeId == attributeId) return att;
     }

@@ -1,11 +1,10 @@
 import { selectProjectId } from "@/src/reduxStore/states/project";
-import { ADD_TERM_TO_LOOKUP_LIST, BLACKLIST_TERM, REMOVE_TERM, UPDATE_TERM } from "@/src/services/gql/mutations/lookup-lists";
+import { deleteTermPost, blacklistTermPost, addTermToKnowledgeBasePost, updateTerm } from "@/src/services/base/lookup-lists";
 import { Term, TermsProps } from "@/src/types/components/projects/projectId/lookup-lists";
 import { BLACKLISTED_TERMS_DROPDOWN_OPTIONS, TERMS_DROPDOWN_OPTIONS, isTermUnique } from "@/src/util/components/projects/projectId/lookup-lists-helper";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
 import { jsonCopy } from "@/submodules/javascript-functions/general";
 import Dropdown2 from "@/submodules/react-components/components/Dropdown2";
-import { useMutation } from "@apollo/client";
 import { Tooltip } from "@nextui-org/react";
 import { IconCircleCheckFilled, IconCircleMinus } from "@tabler/icons-react";
 import { useRouter } from "next/router";
@@ -24,14 +23,9 @@ export default function Terms(props: TermsProps) {
     const [newTermName, setNewTermName] = useState('');
     const [newDescription, setNewDescription] = useState('');
 
-    const [addTermsMut] = useMutation(ADD_TERM_TO_LOOKUP_LIST);
-    const [removeTermMut] = useMutation(REMOVE_TERM);
-    const [blacklistTermMut] = useMutation(BLACKLIST_TERM);
-    const [updateTermMut] = useMutation(UPDATE_TERM);
-
-    function addTermToKnowledgeBase() {
+    function addTermToKnowledgeBaseImpl() {
         if (name == '' || !isTermUnique(name, terms)) return;
-        addTermsMut({ variables: { projectId: projectId, value: name, comment: description, knowledgeBaseId: router.query.lookupListId } }).then((res) => {
+        addTermToKnowledgeBasePost(projectId, { value: name, comment: description, knowledgeBaseId: router.query.lookupListId }, (res) => {
             setName("");
             setDescription("");
             props.refetchTerms();
@@ -56,13 +50,13 @@ export default function Terms(props: TermsProps) {
     }
 
     function removeTerm(term: Term) {
-        removeTermMut({ variables: { projectId: projectId, termId: term.id } }).then((res) => {
+        deleteTermPost(projectId, term.id, (res) => {
             props.refetchTerms();
         });
     }
 
     function blacklistTerm(term: Term) {
-        blacklistTermMut({ variables: { projectId: projectId, termId: term.id } }).then((res) => {
+        blacklistTermPost(projectId, term.id, (res) => {
             props.refetchTerms();
         });
     }
@@ -72,7 +66,7 @@ export default function Terms(props: TermsProps) {
         if (open) {
             setEditableTerm(termId);
         } else {
-            updateTermMut({ variables: { projectId: projectId, termId: termId, value: value, comment: comment ?? '' } }).then((res) => {
+            updateTerm(projectId, { termId: termId, value: value, comment: comment ?? '' }, (res) => {
                 props.refetchTerms();
             });
         }
@@ -97,16 +91,16 @@ export default function Terms(props: TermsProps) {
                 <input value={name} type="text" onInput={(e: any) => setName(e.target.value)} onKeyUp={(e: any) => isTermUnique(e.target.value, terms)}
                     onKeyDown={(e: any) => {
                         if (e.key == "Enter") {
-                            addTermToKnowledgeBase();
+                            addTermToKnowledgeBaseImpl();
                         }
                     }} className="h-8 w-96 text-sm border-gray-300 rounded-md placeholder-italic border text-gray-900 pl-4 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100" placeholder="Term" />
                 <input value={description} type="text" onInput={(e: any) => setDescription(e.target.value)} onKeyUp={(e: any) => isTermUnique(e.target.value, terms)}
                     onKeyDown={(e: any) => {
                         if (e.key == "Enter") {
-                            addTermToKnowledgeBase();
+                            addTermToKnowledgeBaseImpl();
                         }
                     }} className="h-8 w-96 text-sm border-gray-300 rounded-md placeholder-italic border text-gray-900 pl-4 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100" placeholder="Description - optional" />
-                <button disabled={name == '' || !isTermUnique(name, terms)} onClick={addTermToKnowledgeBase}
+                <button disabled={name == '' || !isTermUnique(name, terms)} onClick={addTermToKnowledgeBaseImpl}
                     className="bg-indigo-700 flex-shrink-0 text-white text-xs font-semibold px-4 py-2 rounded-md cursor-pointer hover:bg-indigo-800 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed">
                     Add term</button>
             </div>

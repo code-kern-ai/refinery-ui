@@ -1,4 +1,4 @@
-import { selectAttributes, selectAttributesDict, selectLabelingTasksAll, selectVisibleAttributesHeuristics } from "@/src/reduxStore/states/pages/settings";
+import { selectAttributesDict, selectLabelingTasksAll, selectVisibleAttributesHeuristics } from "@/src/reduxStore/states/pages/settings";
 import { selectProjectId } from "@/src/reduxStore/states/project";
 import { attributeCreateSearchGroup, commentsCreateSearchGroup, generateRandomSeed, getBasicGroupItems, getBasicSearchGroup, getBasicSearchItem, labelingTasksCreateSearchGroup, orderByCreateSearchGroup, userCreateSearchGroup } from "@/src/util/components/projects/projectId/data-browser/search-groups-helper";
 import { SearchGroup, Slice, StaticOrderByKeys } from "@/submodules/javascript-functions/enums/enums";
@@ -16,21 +16,21 @@ import { setModalStates } from "@/src/reduxStore/states/modal";
 import { ModalEnum } from "@/src/types/shared/modal";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
 import { DataSliceOperations } from "./DataSliceOperations";
-import { useLazyQuery } from "@apollo/client";
-import { GET_RECORDS_BY_STATIC_SLICE, GET_STATIC_DATA_SLICE_CURRENT_COUNT, SEARCH_RECORDS_EXTENDED } from "@/src/services/gql/queries/data-browser";
 import { getActiveNegateGroupColor, postProcessRecordsExtended } from "@/src/util/components/projects/projectId/data-browser/data-browser-helper";
 import { parseFilterToExtended } from "@/src/util/components/projects/projectId/data-browser/filter-parser-helper";
 import { getRegexFromFilter, updateSearchParameters } from "@/src/util/components/projects/projectId/data-browser/search-parameters";
 import { jsonCopy } from "@/submodules/javascript-functions/general";
 import UserInfoModal from "./modals/UserInfoModal";
 import { getColorForDataType } from "@/src/util/components/projects/projectId/settings/data-schema-helper";
-import { GET_CURRENT_WEAK_SUPERVISION_RUN } from "@/src/services/gql/queries/heuristics";
 import { Status } from "@/src/types/shared/statuses";
 import { postProcessCurrentWeakSupervisionRun } from "@/src/util/components/projects/projectId/heuristics/heuristics-helper";
 import { AttributeVisibility } from "@/src/types/components/projects/projectId/settings/data-schema";
 import { ChevronDownIcon } from "@heroicons/react/20/solid";
 import Dropdown2 from "@/submodules/react-components/components/Dropdown2";
 import { checkActiveGroups, prefillActiveValues } from "@/src/util/components/projects/projectId/data-browser/prefill-values-helper";
+import { getWeakSupervisionRun } from "@/src/services/base/heuristic";
+import { getRecordsByStaticSlice, searchRecordsExtended } from "@/src/services/base/data-browser";
+import { staticDataSlicesCurrentCount } from "@/src/services/base/dataSlices";
 
 const GROUP_SORT_ORDER = 0;
 let GLOBAL_SEARCH_GROUP_COUNT = 0;
@@ -69,11 +69,6 @@ export default function SearchGroups() {
     const [backgroundColors, setBackgroundColors] = useState<string[]>([]);
     const [currentWeakSupervisionRun, setCurrentWeakSupervisionRun] = useState(null);
     const [selectedHeuristicsWS, setSelectedHeuristicsWS] = useState<string[]>([]);
-
-    const [refetchExtendedRecord] = useLazyQuery(SEARCH_RECORDS_EXTENDED, { fetchPolicy: "no-cache" });
-    const [refetchCurrentWeakSupervision] = useLazyQuery(GET_CURRENT_WEAK_SUPERVISION_RUN, { fetchPolicy: "network-only" });
-    const [refetchRecordsStatic] = useLazyQuery(GET_RECORDS_BY_STATIC_SLICE, { fetchPolicy: "network-only" });
-    const [refetchStaticSliceCurrentCount] = useLazyQuery(GET_STATIC_DATA_SLICE_CURRENT_COUNT, { fetchPolicy: "network-only" });
 
     useEffect(() => {
         if (!projectId || !users || !labelingTasks || !attributesSortOrder || !usersMap) return;
@@ -121,13 +116,7 @@ export default function SearchGroups() {
         if (!(activeSlice && activeSlice.static)) {
             dispatch(updateAdditionalDataState('loading', true));
             const refetchTimer = setTimeout(() => {
-                refetchExtendedRecord({
-                    variables: {
-                        projectId: projectId,
-                        filterData: parseFilterToExtended(activeSearchParams, attributes, configuration, labelingTasks, user, fullSearchStore[SearchGroup.DRILL_DOWN]),
-                        offset: 0, limit: 20
-                    }
-                }).then((res) => {
+                searchRecordsExtended(projectId, parseFilterToExtended(activeSearchParams, attributes, configuration, labelingTasks, user, fullSearchStore[SearchGroup.DRILL_DOWN]), 0, 20, (res) => {
                     dispatch(setSearchRecordsExtended(postProcessRecordsExtended(res.data['searchRecordsExtended'], labelingTasks)));
                     dispatch(updateAdditionalDataState('loading', false));
                 });
@@ -143,15 +132,14 @@ export default function SearchGroups() {
         refreshTextHighlightNeeded();
         setHighlightingToRecords();
         if (activeSlice && activeSlice.static) {
-            refetchRecordsStatic({
-                variables: {
-                    sliceId: activeSlice.id,
-                    projectId: projectId,
-                    offset: 0, limit: 20
-                }
-            }).then((res) => {
+            let options: any = {};
+            if (activeSlice.sliceType == Slice.STATIC_DEFAULT || activeSlice.sliceType == Slice.STATIC_OUTLIER) {
+                options.offset = 0;
+                options.limit = 20;
+            }
+            getRecordsByStaticSlice(projectId, activeSlice.id, options, (res) => {
                 dispatch(setSearchRecordsExtended(postProcessRecordsExtended(res.data['recordsByStaticSlice'], labelingTasks)));
-                refetchStaticSliceCurrentCount({ variables: { projectId: projectId, sliceId: activeSlice.id } }).then((res) => {
+                staticDataSlicesCurrentCount(projectId, activeSlice.id, (res) => {
                     if (!res.data) {
                         dispatch(updateAdditionalDataState('staticDataSliceCurrentCount', null));
                         return;
@@ -589,7 +577,7 @@ export default function SearchGroups() {
     }
 
     function refetchCurrentWeakSupervisionAndProcess() {
-        refetchCurrentWeakSupervision({ variables: { projectId: projectId } }).then((res) => {
+        getWeakSupervisionRun(projectId, res => {
             if (res == null) {
                 setCurrentWeakSupervisionRun({ state: Status.NOT_YET_RUN });
             } else {

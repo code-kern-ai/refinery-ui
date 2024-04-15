@@ -1,22 +1,19 @@
 import { selectAllUsers, selectUser, setBricksIntegrator, setComments } from "@/src/reduxStore/states/general";
 import { setAvailableLinks, updateRecordRequests, setSelectedLink, selectRecordRequestsRla, updateUsers, setSettings, selectSettings, setUserDisplayId, selectRecordRequestsRecord, initOnLabelPageDestruction, selectUserDisplayId, selectDisplayUserRole, setDisplayUserRole } from "@/src/reduxStore/states/pages/labeling";
 import { selectProjectId } from "@/src/reduxStore/states/project"
-import { AVAILABLE_LABELING_LINKS, GET_RECORD_LABEL_ASSOCIATIONS, GET_TOKENIZED_RECORD, LINK_LOCKED, REQUEST_HUDDLE_DATA } from "@/src/services/gql/queries/labeling";
 import { LabelingLinkType } from "@/src/types/components/projects/projectId/labeling/labeling-main-component";
 import { UserRole } from "@/src/types/shared/sidebar";
 import { LabelingSuiteManager } from "@/src/util/classes/labeling/manager";
 import { SessionManager } from "@/src/util/classes/labeling/session-manager";
 import { UserManager } from "@/src/util/classes/labeling/user-manager";
 import { DUMMY_HUDDLE_ID, getDefaultLabelingSuiteSettings, parseLabelingLink, prepareRLADataForRole } from "@/src/util/components/projects/projectId/labeling/labeling-main-component-helper";
-import { useLazyQuery } from "@apollo/client";
 import { useRouter } from "next/router";
 import { useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import style from "@/src/styles/components/projects/projectId/labeling.module.css";
 import NavigationBarTop from "./NavigationBarTop";
 import NavigationBarBottom from "./NavigationBarBottom";
-import { GET_ATTRIBUTES_BY_PROJECT_ID, GET_LABELING_TASKS_BY_PROJECT_ID, GET_RECORD_BY_RECORD_ID } from "@/src/services/gql/queries/project-setting";
-import { combineLatest } from "rxjs";
+
 import LabelingSuiteTaskHeader from "../sub-components/LabelingSuiteTaskHeader";
 import LabelingSuiteOverviewTable from "../sub-components/LabelingSuiteOverviewTable";
 import LabelingSuiteLabeling from "../sub-components/LabelingSuiteLabeling";
@@ -24,11 +21,15 @@ import { setAllAttributes, setLabelingTasksAll } from "@/src/reduxStore/states/p
 import { CurrentPage } from "@/src/types/shared/general";
 import { postProcessLabelingTasks, postProcessLabelingTasksSchema } from "@/src/util/components/projects/projectId/settings/labeling-tasks-helper";
 import { CommentDataManager } from "@/src/util/classes/comments";
-import { REQUEST_COMMENTS } from "@/src/services/gql/queries/projects";
 import { CommentType } from "@/src/types/shared/comments";
 import { getEmptyBricksIntegratorConfig } from "@/src/util/shared/bricks-integrator-helper";
 import { LabelingTask } from "@/src/types/components/projects/projectId/settings/labeling-tasks";
 import { useWebsocket } from "@/src/services/base/web-sockets/useWebsocket";
+import { getAllComments } from "@/src/services/base/comment";
+import { getAttributes } from "@/src/services/base/attribute";
+import { getLabelingTasksByProjectId } from "@/src/services/base/project";
+import { getAvailableLinks, getHuddleData, getLinkLocked, getRecordLabelAssociations, getTokenizedRecord } from "@/src/services/base/labeling";
+import { getRecordByRecordId } from "@/src/services/base/project-setting";
 
 const SETTINGS_KEY = 'labelingSettings';
 
@@ -49,16 +50,6 @@ export default function LabelingMainComponent() {
     const [huddleData, setHuddleData] = useState(null);
     const [absoluteWarning, setAbsoluteWarning] = useState(null);
     const [lockedLink, setLockedLink] = useState(false);
-
-    const [refetchHuddleData] = useLazyQuery(REQUEST_HUDDLE_DATA, { fetchPolicy: 'no-cache' });
-    const [refetchAvailableLinks] = useLazyQuery(AVAILABLE_LABELING_LINKS, { fetchPolicy: 'no-cache' });
-    const [refetchTokenizedRecord] = useLazyQuery(GET_TOKENIZED_RECORD, { fetchPolicy: 'no-cache' });
-    const [refetchRecordByRecordId] = useLazyQuery(GET_RECORD_BY_RECORD_ID, { fetchPolicy: 'no-cache' });
-    const [refetchRla] = useLazyQuery(GET_RECORD_LABEL_ASSOCIATIONS, { fetchPolicy: 'network-only' });
-    const [refetchAttributes] = useLazyQuery(GET_ATTRIBUTES_BY_PROJECT_ID, { fetchPolicy: "network-only" });
-    const [refetchLabelingTasksByProjectId] = useLazyQuery(GET_LABELING_TASKS_BY_PROJECT_ID, { fetchPolicy: "network-only" });
-    const [refetchComments] = useLazyQuery(REQUEST_COMMENTS, { fetchPolicy: "no-cache" });
-    const [refetchLinkLocked] = useLazyQuery(LINK_LOCKED, { fetchPolicy: "no-cache" });
 
     useEffect(() => {
         if (!projectId || !router.query) return;
@@ -93,7 +84,7 @@ export default function LabelingMainComponent() {
             dispatch(setDisplayUserRole(user.role));
             return;
         }
-        refetchLinkLocked({ variables: { projectId: projectId, linkRoute: router.asPath } }).then((result) => {
+        getLinkLocked(projectId, { linkRoute: router.asPath }, (result) => {
             const lockedLink = result['data']['linkLocked'];
             if (lockedLink) {
                 setAbsoluteWarning('This link is locked, contact your supervisor to request access');
@@ -160,13 +151,13 @@ export default function LabelingMainComponent() {
             return;
         }
         setTimeout(() => {
-            combineLatest([
-                refetchTokenizedRecord({ variables: { recordId: SessionManager.currentRecordId } }),
-                refetchRecordByRecordId({ variables: { projectId, recordId: SessionManager.currentRecordId } }),
-                refetchRla({ variables: { projectId, recordId: SessionManager.currentRecordId } })
-            ]).subscribe(([tokenized, record, rla]) => {
-                dispatch(updateRecordRequests('token', tokenized.data.tokenizeRecord));
-                dispatch(updateRecordRequests('record', record.data.recordByRecordId));
+            getTokenizedRecord({ recordId: SessionManager.currentRecordId }, (res) => {
+                dispatch(updateRecordRequests('token', res.data.tokenizeRecord));
+            });
+            getRecordByRecordId(projectId, SessionManager.currentRecordId, (res) => {
+                dispatch(updateRecordRequests('record', res.data.recordByRecordId));
+            });
+            getRecordLabelAssociations(projectId, SessionManager.currentRecordId, (rla) => {
                 const rlas = rla['data']?.['recordByRecordId']?.['recordLabelAssociations']['edges'].map(e => e.node);
                 dispatch(updateRecordRequests('rla', prepareRLADataForRole(rlas, user, userDisplayId, userDisplayRole)));
             });
@@ -193,8 +184,8 @@ export default function LabelingMainComponent() {
         CommentDataManager.unregisterCommentRequests(CurrentPage.LABELING);
         CommentDataManager.registerCommentRequests(CurrentPage.LABELING, requests);
         const requestJsonString = CommentDataManager.buildRequestJSON();
-        refetchComments({ variables: { requested: requestJsonString } }).then((res) => {
-            CommentDataManager.parseCommentData(JSON.parse(res.data['getAllComments']));
+        getAllComments(requestJsonString, (res) => {
+            CommentDataManager.parseCommentData(res.data['getAllComments']);
             CommentDataManager.parseToCurrentData(allUsers);
             dispatch(setComments(CommentDataManager.currentDataOrder));
         });
@@ -210,8 +201,8 @@ export default function LabelingMainComponent() {
             router.push(`/projects/${projectId}/labeling/${SessionManager.labelingLinkData.huddleId}?pos=${SessionManager.huddleData.linkData.requestedPos}&type=${SessionManager.huddleData.linkData.linkType}`);
             return;
         }
-        refetchComments({ variables: { requested: requestJsonString } }).then((res) => {
-            CommentDataManager.parseCommentData(JSON.parse(res.data['getAllComments']));
+        getAllComments(requestJsonString, (res) => {
+            CommentDataManager.parseCommentData(res.data['getAllComments']);
             CommentDataManager.parseToCurrentData(allUsers);
             dispatch(setComments(CommentDataManager.currentDataOrder));
         });
@@ -228,8 +219,8 @@ export default function LabelingMainComponent() {
             router.push(`/projects/${projectId}/labeling/${SessionManager.labelingLinkData.huddleId}?pos=${SessionManager.huddleData.linkData.requestedPos}&type=${SessionManager.huddleData.linkData.linkType}`);
             return;
         }
-        refetchComments({ variables: { requested: requestJsonString } }).then((res) => {
-            CommentDataManager.parseCommentData(JSON.parse(res.data['getAllComments']));
+        getAllComments(requestJsonString, (res) => {
+            CommentDataManager.parseCommentData(res.data['getAllComments']);
             CommentDataManager.parseToCurrentData(allUsers);
             dispatch(setComments(CommentDataManager.currentDataOrder));
         });
@@ -237,7 +228,7 @@ export default function LabelingMainComponent() {
     }
 
     function requestHuddleData(huddleId: string) {
-        refetchHuddleData({ variables: { projectId: projectId, huddleId: huddleId, huddleType: SessionManager.labelingLinkData.linkType } }).then((result) => {
+        getHuddleData(projectId, { huddleId: huddleId, huddleType: SessionManager.labelingLinkData.linkType }, (result) => {
             const huddleData = result['data']['requestHuddleData'];
             if (huddleId == DUMMY_HUDDLE_ID) {
                 SessionManager.labelingLinkData.huddleId = huddleData.huddleId;
@@ -274,7 +265,7 @@ export default function LabelingMainComponent() {
     function collectAvailableLinks() {
         if (userDisplayRole?.role == UserRole.ENGINEER) return;
         const heuristicId = SessionManager.labelingLinkData.linkType == LabelingLinkType.HEURISTIC ? SessionManager.labelingLinkData.huddleId : null;
-        refetchAvailableLinks({ variables: { projectId: projectId, assumedRole: user?.role, assumedHeuristicId: heuristicId } }).then((result) => {
+        getAvailableLinks(projectId, user?.role, heuristicId, (result) => {
             const availableLinks = result['data']['availableLinks'];
             dispatch(setAvailableLinks(availableLinks));
             const linkRoute = router.asPath.split("?")[0];
@@ -283,13 +274,13 @@ export default function LabelingMainComponent() {
     }
 
     function refetchAttributesAndProcess() {
-        refetchAttributes({ variables: { projectId: projectId, stateFilter: ['ALL'] } }).then((res) => {
+        getAttributes(projectId, ['ALL'], (res) => {
             dispatch(setAllAttributes(res.data['attributesByProjectId']));
         });
     }
 
     function refetchLabelingTasksAndProcess() {
-        refetchLabelingTasksByProjectId({ variables: { projectId: projectId } }).then((res) => {
+        getLabelingTasksByProjectId(projectId, (res) => {
             const labelingTasks = postProcessLabelingTasks(res['data']['projectByProjectId']['labelingTasks']['edges']);
             const labelingTasksProcessed = postProcessLabelingTasksSchema(labelingTasks);
             dispatch(setLabelingTasksAll(prepareTasksForRole(labelingTasksProcessed, userDisplayRole)));
@@ -323,8 +314,8 @@ export default function LabelingMainComponent() {
         } else if (['payload_finished', 'weak_supervision_finished', 'rla_created', 'rla_deleted'].includes(msgParts[1])) {
             const recordId = SessionManager.currentRecordId ?? record.id;
             if (msgParts[2] == recordId) {
-                refetchRla({ variables: { projectId, recordId: recordId } }).then((result) => {
-                    const rlas = result['data']?.['recordByRecordId']?.['recordLabelAssociations']['edges'].map(e => e.node);
+                getRecordLabelAssociations(projectId, recordId, (rla) => {
+                    const rlas = rla['data']?.['recordByRecordId']?.['recordLabelAssociations']['edges'].map(e => e.node);
                     dispatch(updateRecordRequests('rla', prepareRLADataForRole(rlas, user, userDisplayId, userDisplayRole)));
                 });
             }

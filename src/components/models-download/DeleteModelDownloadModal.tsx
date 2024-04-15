@@ -2,10 +2,9 @@ import { ModalButton, ModalEnum } from "@/src/types/shared/modal";
 import Modal from "../shared/modal/Modal";
 import { useCallback, useEffect, useState } from "react";
 import { removeModelDownloadByName } from "@/src/reduxStore/states/pages/models-downloaded";
-import { useMutation } from "@apollo/client";
-import { MODEL_PROVIDER_DELETE_MODEL } from "@/src/services/gql/mutations/projects";
 import { useDispatch, useSelector } from "react-redux";
 import { selectModal } from "@/src/reduxStore/states/modal";
+import { modelProviderDeleteModel } from "@/src/services/base/misc";
 
 const ABORT_BUTTON = { buttonCaption: 'Delete', useButton: true, disabled: false };
 
@@ -16,10 +15,8 @@ export default function DeleteModelDownloadModal() {
 
     const [abortButton, setAbortButton] = useState<ModalButton>(ABORT_BUTTON);
 
-    const [deleteModelDownload] = useMutation(MODEL_PROVIDER_DELETE_MODEL);
-
     const deleteModel = useCallback(() => {
-        deleteModelDownload({ variables: { modelName: modalDeleteModel.modelName } }).then(() => {
+        modelProviderDeleteModel(modalDeleteModel.modelName, (res) => {
             dispatch(removeModelDownloadByName(modalDeleteModel.modelName));
         });
     }, [modalDeleteModel.modelName]);

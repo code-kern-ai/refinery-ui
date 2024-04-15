@@ -1,11 +1,8 @@
 import { selectHeuristic, setActiveHeuristics } from "@/src/reduxStore/states/pages/heuristics";
 import { selectLabelingTasksAll, setLabelingTasksAll } from "@/src/reduxStore/states/pages/settings";
 import { selectProjectId } from "@/src/reduxStore/states/project";
-import { GET_ACCESS_LINK, GET_HEURISTICS_BY_ID } from "@/src/services/gql/queries/heuristics";
-import { GET_LABELING_TASKS_BY_PROJECT_ID } from "@/src/services/gql/queries/project-setting";
 import { CurrentPage } from "@/src/types/shared/general";
 import { postProcessLabelingTasks, postProcessLabelingTasksSchema } from "@/src/util/components/projects/projectId/settings/labeling-tasks-helper";
-import { useLazyQuery } from "@apollo/client";
 import { useRouter } from "next/router";
 import { useCallback, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -17,11 +14,13 @@ import HeuristicStatistics from "../shared/HeuristicStatistics";
 import CrowdLabelerSettings from "./CrowdLabelerSettings";
 import { postProcessCrowdLabeler } from "@/src/util/components/projects/projectId/heuristics/heuristicId/crowd-labeler-helper";
 import { selectDataSlicesAll, setDataSlices } from "@/src/reduxStore/states/pages/data-browser";
-import { DATA_SLICES } from "@/src/services/gql/queries/data-browser";
-import { REQUEST_COMMENTS } from "@/src/services/gql/queries/projects";
+import { getAllComments } from "@/src/services/base/comment";
 import { CommentDataManager } from "@/src/util/classes/comments";
 import { CommentType } from "@/src/types/shared/comments";
 import { useWebsocket } from "@/src/services/base/web-sockets/useWebsocket";
+import { getDataSlices } from "@/src/services/base/dataSlices";
+import { getLabelingTasksByProjectId } from "@/src/services/base/project";
+import { getAccessLink, getHeuristicByHeuristicId } from "@/src/services/base/heuristic";
 
 
 export default function CrowdLabeler() {
@@ -35,19 +34,11 @@ export default function CrowdLabeler() {
     const dataSlices = useSelector(selectDataSlicesAll);
     const allUsers = useSelector(selectAllUsers);
 
-    const [refetchCurrentHeuristic] = useLazyQuery(GET_HEURISTICS_BY_ID, { fetchPolicy: "network-only" });
-    const [refetchLabelingTasksByProjectId] = useLazyQuery(GET_LABELING_TASKS_BY_PROJECT_ID, { fetchPolicy: "network-only" });
-    const [refetchDataSlicesMut] = useLazyQuery(DATA_SLICES, { fetchPolicy: 'network-only' });
-    const [refetchComments] = useLazyQuery(REQUEST_COMMENTS, { fetchPolicy: "no-cache" });
-    const [refetchAccessLink] = useLazyQuery(GET_ACCESS_LINK, { fetchPolicy: 'network-only' });
-
     useEffect(() => {
         if (!projectId) return;
         if (!router.query.heuristicId) return;
         refetchLabelingTasksAndProcess();
-        refetchDataSlicesMut({ variables: { projectId: projectId, sliceType: "STATIC_DEFAULT" } }).then((res) => {
-            dispatch(setDataSlices(res.data.dataSlices));
-        });
+        getDataSlices(projectId, "STATIC_DEFAULT", (res) => dispatch(setDataSlices(res.data.dataSlices)));
     }, [projectId, router.query.heuristicId]);
 
     useEffect(() => {
@@ -71,15 +62,15 @@ export default function CrowdLabeler() {
         CommentDataManager.unregisterCommentRequests(CurrentPage.CROWD_LABELER);
         CommentDataManager.registerCommentRequests(CurrentPage.CROWD_LABELER, requests);
         const requestJsonString = CommentDataManager.buildRequestJSON();
-        refetchComments({ variables: { requested: requestJsonString } }).then((res) => {
-            CommentDataManager.parseCommentData(JSON.parse(res.data['getAllComments']));
+        getAllComments(requestJsonString, (res) => {
+            CommentDataManager.parseCommentData(res.data['getAllComments']);
             CommentDataManager.parseToCurrentData(allUsers);
             dispatch(setComments(CommentDataManager.currentDataOrder));
         });
     }
 
     function refetchCurrentHeuristicAndProcess() {
-        refetchCurrentHeuristic({ variables: { projectId: projectId, informationSourceId: router.query.heuristicId } }).then((res) => {
+        getHeuristicByHeuristicId(projectId, router.query.heuristicId as string, (res) => {
             const currentHeuristic: any = postProcessCrowdLabeler(res['data']['informationSourceBySourceId'], labelingTasks);
             if (!currentHeuristic.crowdLabelerSettings.accessLinkId) {
                 dispatch(setActiveHeuristics(currentHeuristic));
@@ -90,7 +81,7 @@ export default function CrowdLabeler() {
     }
 
     function refetchLabelingTasksAndProcess() {
-        refetchLabelingTasksByProjectId({ variables: { projectId: projectId } }).then((res) => {
+        getLabelingTasksByProjectId(projectId, (res) => {
             const labelingTasks = postProcessLabelingTasks(res['data']['projectByProjectId']['labelingTasks']['edges']);
             dispatch(setLabelingTasksAll(postProcessLabelingTasksSchema(labelingTasks)));
         });
@@ -98,7 +89,7 @@ export default function CrowdLabeler() {
 
     function refetchAccessLinkAndProcess(currentHeuristic: any) {
         if (!currentHeuristic.crowdLabelerSettings.accessLinkId) return;
-        refetchAccessLink({ variables: { projectId: projectId, linkId: currentHeuristic.crowdLabelerSettings.accessLinkId } }).then((res) => {
+        getAccessLink(projectId, currentHeuristic.crowdLabelerSettings.accessLinkId, (res) => {
             const link = res.data.accessLink;
             const currentHeuristicUpdated = postProcessCrowdLabeler(currentHeuristic, labelingTasks, link);
             dispatch(setActiveHeuristics(currentHeuristicUpdated));

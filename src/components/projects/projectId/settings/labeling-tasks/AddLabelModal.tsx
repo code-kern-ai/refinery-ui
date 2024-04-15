@@ -1,10 +1,9 @@
 import Modal from "@/src/components/shared/modal/Modal";
 import { selectModal, setModalStates } from "@/src/reduxStore/states/modal";
 import { selectProjectId } from "@/src/reduxStore/states/project";
-import { CREATE_LABEL } from "@/src/services/gql/mutations/labeling";
+import { createLabel } from "@/src/services/base/labeling-tasks";
 import { ModalButton, ModalEnum } from "@/src/types/shared/modal";
 import { LabelHelper } from "@/src/util/classes/label-helper";
-import { useMutation } from "@apollo/client";
 import { useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
@@ -19,12 +18,10 @@ export default function AddLabelModal() {
     const [acceptButton, setAcceptButton] = useState<ModalButton>(ACCEPT_BUTTON);
     const [labelName, setLabelName] = useState('');
 
-    const [createLabelMut] = useMutation(CREATE_LABEL);
-
     const addLabel = useCallback(() => {
         const labelColor = LabelHelper.addLabel(modalAddLabel.taskId, labelName);
         dispatch(setModalStates(ModalEnum.ADD_LABEL, { ...modalAddLabel, open: true }));
-        createLabelMut({ variables: { projectId: projectId, labelingTaskId: modalAddLabel.taskId, labelName: labelName, labelColor: labelColor } }).then((res) => {
+        createLabel(projectId, labelName, modalAddLabel.taskId, labelColor, (res) => {
             setLabelName('');
         });
     }, [modalAddLabel, labelName, modalAddLabel.taskId]);

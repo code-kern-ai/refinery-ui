@@ -17,8 +17,6 @@ import { LineBreaksType } from "@/src/types/components/projects/projectId/data-b
 import { jsonCopy } from "@/submodules/javascript-functions/general"
 import { InformationSourceType, LabelSource } from "@/submodules/javascript-functions/enums/enums"
 import { LabelingSuiteManager } from "@/src/util/classes/labeling/manager";
-import { useMutation } from "@apollo/client"
-import { ADD_CLASSIFICATION_LABELS_TO_RECORD, ADD_EXTRACTION_LABEL_TO_RECORD, CREATE_LABEL, DELETE_RECORD_LABEL_ASSOCIATION_BY_ID, REMOVE_GOLD_STAR_ANNOTATION_FOR_TASK, SET_GOLD_STAR_ANNOTATION_FOR_TASK } from "@/src/services/gql/mutations/labeling"
 import { SessionManager } from "@/src/util/classes/labeling/session-manager"
 import { GOLD_STAR_USER_ID } from "@/src/util/components/projects/projectId/labeling/labeling-main-component-helper"
 import { useRouter } from "next/router"
@@ -27,6 +25,8 @@ import { filterRlaDataForUser } from "@/src/util/components/projects/projectId/l
 import { LabelingPageParts } from "@/src/types/components/projects/projectId/labeling/labeling-main-component"
 import style from '@/src/styles/components/projects/projectId/labeling.module.css';
 import { getStoreSnapshotValue } from "@/src/reduxStore/store"
+import { createLabel } from "@/src/services/base/labeling-tasks";
+import { addClassificationLabels, addExtractionLabel, deleteRecordLabelAssociationByIds, removeGoldStar, setGoldStar } from "@/src/services/base/labeling"
 
 const L_VARS = getDefaultLabelingVars();
 
@@ -62,13 +62,6 @@ export default function LabelingSuiteLabeling() {
     const [labelHotkeys, setLabelHotkeys] = useState<HotkeyLookup>({});
 
     const extractionRef = useRef(null);
-
-    const [deleteRlaByIdMut] = useMutation(DELETE_RECORD_LABEL_ASSOCIATION_BY_ID);
-    const [addClassificationLabelToRecordMut] = useMutation(ADD_CLASSIFICATION_LABELS_TO_RECORD);
-    const [addExtractionLabelToRecordMut] = useMutation(ADD_EXTRACTION_LABEL_TO_RECORD);
-    const [createNewLabelMut] = useMutation(CREATE_LABEL);
-    const [setGoldStarMut] = useMutation(SET_GOLD_STAR_ANNOTATION_FOR_TASK);
-    const [removeGoldStarMut] = useMutation(REMOVE_GOLD_STAR_ANNOTATION_FOR_TASK);
 
     useEffect(() => {
         if (!projectId || !attributes || !recordRequests || !user || !settings || !userDisplayRole || !labelingTasks) return;
@@ -268,15 +261,13 @@ export default function LabelingSuiteLabeling() {
     function selectTaskAsGoldStar(taskId: string, userId: string) {
         if (!recordRequests.record.id) return;
         LabelingSuiteManager.somethingLoading = true;
-        setGoldStarMut({ variables: { projectId: projectId, recordId: recordRequests.record.id, goldUserId: userId, labelingTaskId: taskId } }).then(res => {
-        });
+        setGoldStar(projectId, recordRequests.record.id, taskId, userId, () => { });
     }
 
     function removeTaskAsGoldStar(taskId: string) {
         if (!recordRequests.record.id) return;
         LabelingSuiteManager.somethingLoading = true;
-        removeGoldStarMut({ variables: { projectId: projectId, recordId: recordRequests.record.id, labelingTaskId: taskId } }).then(res => {
-        });
+        removeGoldStar(projectId, recordRequests.record.id, taskId, () => { });
     }
 
     function rebuildGoldInfo() {
@@ -445,7 +436,7 @@ export default function LabelingSuiteLabeling() {
     }
 
     function deleteRecordLabelAssociation(rlaId: string) {
-        deleteRlaByIdMut({ variables: { projectId: projectId, recordId: record.id, associationIds: [rlaId] } }).then(res => {
+        deleteRecordLabelAssociationByIds(projectId, record.id, [rlaId], () => {
             dispatch(removeFromRlaById(rlaId));
         });
     }
@@ -460,7 +451,7 @@ export default function LabelingSuiteLabeling() {
         if (existingLabels.length == 1) return;
         const sourceId = SessionManager.getSourceId();
         const asGoldStar = displayUserId == GOLD_STAR_USER_ID ? true : null;
-        addClassificationLabelToRecordMut({ variables: { projectId: projectId, recordId: record.id, labelingTaskId: labelingTaskId, labelId: labelId, asGoldStar: asGoldStar, sourceId: sourceId } }).then((res) => {
+        addClassificationLabels(projectId, record.id, labelingTaskId, labelId, asGoldStar, sourceId, () => {
             if (settings.main.autoNextRecord) {
                 SessionManager.nextRecord();
                 SessionManager.currentRecordId = SessionManager.huddleData.recordIds[SessionManager.huddleData.linkData.requestedPos - 1];
@@ -475,7 +466,7 @@ export default function LabelingSuiteLabeling() {
         const selectionData = collectSelectionData(attributeId, currentSelection, attributes, recordRequests);
         if (!selectionData) return;
         const sourceId = SessionManager.getSourceId();
-        addExtractionLabelToRecordMut({ variables: { projectId: projectId, recordId: record.id, labelingTaskId: labelingTaskId, labelId: labelId, tokenStartIndex: selectionData.startIdx, tokenEndIndex: selectionData.endIdx, value: selectionData.value, sourceId: sourceId } }).then((res) => { });
+        addExtractionLabel(projectId, record.id, labelingTaskId, selectionData.startIdx, selectionData.endIdx, selectionData.value, labelId, null, sourceId, () => { });
     }
 
     const clearSelected = useCallback(() => {
@@ -511,7 +502,7 @@ export default function LabelingSuiteLabeling() {
     }
 
     function addNewLabelToTask(newLabel: string, task: any) {
-        createNewLabelMut({ variables: { projectId: projectId, labelingTaskId: task.id, labelName: newLabel, labelColor: DEFAULT_LABEL_COLOR } }).then((res) => {
+        createLabel(projectId, newLabel, task.id, DEFAULT_LABEL_COLOR, (res) => {
             rebuildLabelLookup();
         });
     }

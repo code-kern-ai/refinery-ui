@@ -5,6 +5,7 @@ import { LabelHelper } from "@/src/util/classes/label-helper";
 let rPos = { pos: 9990 }; //as object to increase in private function
 
 export function postProcessLabelingTasks(labelingTasks: any[]): any[] {
+    if (!labelingTasks) return [];
     const prepareLabelingTasks = labelingTasks.map((labelingTask: any) => {
         const data = labelingTask.node;
         return {
