@@ -363,7 +363,7 @@ function SuggestionsModel(props: SuggestionsProps) {
         <span className="card-title mb-0 label-text flex"><span className="cursor-help underline filtersUnderline">Model</span></span>
     </Tooltip>
         <Dropdown2 options={filteredList && filteredList} hasSearchBar={true} differentTextColor="green" useDifferentTextColor={colorDownloadedModels} valuePropertyPath="configString"
-            selectedOption={(option: any) => props.selectedOption(option.configString)} optionsHaveHoverBox={true} hoverBoxList={hoverBoxList} ignoreDisabledForSearch={true}
+            selectedOption={(option: any) => props.selectedOption(option.configString)} optionsHaveHoverBox={true} hoverBoxList={hoverBoxList}
             searchTextTyped={(option: string) => props.selectedOption(option)}
             filteredOptions={(option: string) => setFilteredList(props.options.filter((val: any) => val.configString.includes(option)))} />
     </>
@@ -382,7 +382,7 @@ function SuggestionsAzure(props: SuggestionsProps) {
     return <><Tooltip content={props.tooltip} placement="right" color="invert">
         <span className="card-title mb-0 label-text flex"><span className="cursor-help underline filtersUnderline">{props.name}</span></span>
     </Tooltip>
-        <Dropdown2 options={filteredList && filteredList} hasSearchBar={true} ignoreDisabledForSearch={true}
+        <Dropdown2 options={filteredList && filteredList} hasSearchBar={true}
             selectedOption={(option: string) => props.selectedOption(option)}
             searchTextTyped={(option: string) => props.selectedOption(option)}
             filteredOptions={(option: string) => setFilteredList(props.options.filter((val: any) => val.includes(option)))} />
