@@ -2,7 +2,7 @@ export type MultilineTooltipProps = {
     tooltipLines: string[];
 };
 
-export type MultilineTooltip = {
+export type MultilineTooltipContent = {
     value: string;
     id: string;
 }
