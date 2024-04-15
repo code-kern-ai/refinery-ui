@@ -159,8 +159,12 @@ export function getTokenData(attributeId: string, attributes: Attribute[], recor
     if (!attributes) return null;
     if (attributeId == FULL_RECORD_ID) return null;
     if (!recordRequests.token) return null;
-    for (const att of recordRequests.token.attributes) {
-        if (att.attributeId == attributeId) return att;
+    try {
+        for (const att of recordRequests.token.attributes) {
+            if (att.attributeId == attributeId) return att;
+        }
+    } catch (e) {
+        return null;
     }
     return null;
 }
