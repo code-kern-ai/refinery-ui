@@ -14,7 +14,7 @@ import { useRouter } from "next/router";
 import { useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux"
 import ExecutionContainer from "./ExecutionContainer";
-import { getPythonFunctionRegExMatch } from "@/submodules/javascript-functions/python-functions-parser";
+import { getPythonFunctionRegExMatch, toPythonFunctionName } from "@/submodules/javascript-functions/python-functions-parser";
 import DangerZone from "@/src/components/shared/danger-zone/DangerZone";
 import { DangerZoneEnum } from "@/src/types/shared/danger-zone";
 import ContainerLogs from "@/src/components/shared/logs/ContainerLogs";
@@ -313,7 +313,7 @@ export default function AttributeCalculation() {
                         </Tooltip>
                         <div className="inline-block" onDoubleClick={() => openName(true)}>
                             {(isNameOpen && currentAttribute.state != AttributeState.USABLE && currentAttribute.state != AttributeState.RUNNING)
-                                ? (<input type="text" value={attributeName} onInput={(e: any) => setAttributeName(e.target.value)}
+                                ? (<input type="text" value={attributeName} onInput={(e: any) => setAttributeName(toPythonFunctionName(e.target.value))}
                                     onBlur={() => openName(false)} onKeyDown={(e) => { if (e.key == 'Enter') openName(false) }}
                                     className="h-8 text-sm border-gray-300 rounded-md placeholder-italic border text-gray-700 pl-4 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100" />)
                                 : (<div className="mr-4 text-sm leading-5 font-medium text-gray-500 inline-block">{currentAttribute.name}</div>)}
