@@ -1,13 +1,13 @@
 import LoadingIcon from "@/src/components/shared/loading/LoadingIcon";
 import { selectHeuristic } from "@/src/reduxStore/states/pages/heuristics";
 import { selectProjectId } from "@/src/reduxStore/states/project";
-import { CREATE_INFORMATION_SOURCE_PAYLOAD, RUN_HEURISTIC_THEN_TRIGGER_WEAK_SUPERVISION } from "@/src/services/gql/mutations/heuristics";
+import { createTask } from "@/src/services/base/heuristic";
+import { runThenWeakSupervision } from "@/src/services/base/weak-supervision";
 import { HeuristicRunButtonsProps } from "@/src/types/components/projects/projectId/heuristics/heuristicId/heuristics-details";
 import { Status } from "@/src/types/shared/statuses";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
 import { dateAsUTCDate } from "@/submodules/javascript-functions/date-parser";
 import { InformationSourceType } from "@/submodules/javascript-functions/enums/enums";
-import { useMutation } from "@apollo/client";
 import { Tooltip } from "@nextui-org/react";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
@@ -19,16 +19,13 @@ export default function HeuristicRunButtons(props: HeuristicRunButtonsProps) {
     const [canStartHeuristic, setCanStartHeuristic] = useState(true);
     const [justClickedRun, setJustClickedRun] = useState(false);
 
-    const [createTaskMut] = useMutation(CREATE_INFORMATION_SOURCE_PAYLOAD);
-    const [runHeuristicAndWeaklySuperviseMut] = useMutation(RUN_HEURISTIC_THEN_TRIGGER_WEAK_SUPERVISION);
-
     useEffect(() => {
         setCanStartHeuristic(checkCanStartHeuristic());
     }, [currentHeuristic]);
 
     function runHeuristic() {
         setJustClickedRun(true);
-        createTaskMut({ variables: { projectId: projectId, informationSourceId: currentHeuristic.id } }).then((res) => {
+        createTask(projectId, currentHeuristic.id, (res) => {
             setJustClickedRun(false);
             if (currentHeuristic.informationSourceType === InformationSourceType.LABELING_FUNCTION) {
                 props.updateDisplayLogWarning(false);
@@ -37,7 +34,7 @@ export default function HeuristicRunButtons(props: HeuristicRunButtonsProps) {
     }
 
     function runHeuristicAndWeaklySupervise() {
-        runHeuristicAndWeaklySuperviseMut({ variables: { projectId: projectId, informationSourceId: currentHeuristic.id, labelingTaskId: currentHeuristic.labelingTaskId } }).then((res) => {
+        runThenWeakSupervision(projectId, currentHeuristic.id, currentHeuristic.labelingTaskId, (res) => {
             setJustClickedRun(false);
             if (currentHeuristic.informationSourceType === InformationSourceType.LABELING_FUNCTION) {
                 props.updateDisplayLogWarning(false);

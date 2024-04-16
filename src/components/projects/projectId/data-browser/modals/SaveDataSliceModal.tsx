@@ -1,16 +1,15 @@
 import Modal from "@/src/components/shared/modal/Modal"
 import { selectUser } from "@/src/reduxStore/states/general";
-import { closeModal, selectModal, setModalStates } from "@/src/reduxStore/states/modal";
-import { extendAllDataSlices, selectActiveSearchParams, selectActiveSlice, selectAdditionalData, selectConfiguration, selectDataSlicesAll, setActiveDataSlice, updateAdditionalDataState } from "@/src/reduxStore/states/pages/data-browser";
+import { selectModal, setModalStates } from "@/src/reduxStore/states/modal";
+import { extendAllDataSlices, selectActiveSearchParams, selectActiveSlice, selectConfiguration, selectDataSlicesAll, setActiveDataSlice, updateAdditionalDataState } from "@/src/reduxStore/states/pages/data-browser";
 import { selectAttributes, selectLabelingTasksAll } from "@/src/reduxStore/states/pages/settings";
 import { selectProjectId } from "@/src/reduxStore/states/project";
-import { CREATE_DATA_SLICE, UPDATE_DATA_SLICE } from "@/src/services/gql/mutations/data-browser";
+import { createDataSlice, updateDataSlice } from "@/src/services/base/data-browser";
 import { DataSlice } from "@/src/types/components/projects/projectId/data-browser/data-browser";
 import { ModalButton, ModalEnum } from "@/src/types/shared/modal"
 import { getRawFilterForSave, parseFilterToExtended } from "@/src/util/components/projects/projectId/data-browser/filter-parser-helper";
 import { getColorStruct } from "@/src/util/components/projects/projectId/heuristics/shared-helper";
 import { SearchGroup } from "@/submodules/javascript-functions/enums/enums";
-import { useMutation } from "@apollo/client";
 import { useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
@@ -31,19 +30,13 @@ export default function SaveDataSliceModal(props: { fullSearch: {} }) {
 
     const [isStatic, setIsStatic] = useState<boolean>(false);
 
-    const [createDataSliceMut] = useMutation(CREATE_DATA_SLICE);
-    const [updateDataSliceMut] = useMutation(UPDATE_DATA_SLICE);
-
     const saveDataSlice = useCallback(() => {
-        createDataSliceMut({
-            variables: {
-                projectId: projectId,
-                name: modalSaveDataSlice.sliceName,
-                static: isStatic,
-                filterRaw: getRawFilterForSave(props.fullSearch),
-                filterData: parseFilterToExtended(activeSearchParams, attributes, configuration, labelingTasks, user, props.fullSearch[SearchGroup.DRILL_DOWN].value)
-            }
-        }).then((res) => {
+        createDataSlice(projectId, {
+            name: modalSaveDataSlice.sliceName,
+            static: isStatic,
+            filterRaw: getRawFilterForSave(props.fullSearch),
+            filterData: parseFilterToExtended(activeSearchParams, attributes, configuration, labelingTasks, user, props.fullSearch[SearchGroup.DRILL_DOWN].value)
+        }, (res) => {
             const id = res["data"]["createDataSlice"]["id"];
             const slice = {
                 id: id, name: modalSaveDataSlice.sliceName, static: isStatic, filterRaw: getRawFilterForSave(props.fullSearch),
@@ -83,15 +76,13 @@ export default function SaveDataSliceModal(props: { fullSearch: {} }) {
 
     const updateSlice = useCallback((sliceId: string) => {
         const finalStatic = isStatic == null ? activeSlice.static : isStatic;
-        updateDataSliceMut({
-            variables: {
-                projectId: projectId,
-                static: finalStatic,
-                dataSliceId: sliceId,
-                filterRaw: getRawFilterForSave(props.fullSearch),
-                filterData: parseFilterToExtended(activeSearchParams, attributes, configuration, labelingTasks, user, props.fullSearch[SearchGroup.DRILL_DOWN].value)
-            }
-        }).then((res) => { });
+
+        updateDataSlice(projectId, {
+            static: finalStatic,
+            dataSliceId: sliceId,
+            filterRaw: getRawFilterForSave(props.fullSearch),
+            filterData: parseFilterToExtended(activeSearchParams, attributes, configuration, labelingTasks, user, props.fullSearch[SearchGroup.DRILL_DOWN].value)
+        }, (res) => { });
     }, [activeSlice, isStatic, props.fullSearch]);
 
     return (<Modal modalName={ModalEnum.SAVE_DATA_SLICE} acceptButton={acceptButton}>

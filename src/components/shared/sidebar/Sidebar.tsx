@@ -8,8 +8,6 @@ import { useState } from 'react';
 import AppSelectionDropdown from '@/submodules/react-components/components/AppSelectionDropdown';
 import { ModalEnum } from '@/src/types/shared/modal';
 import { openModal } from '@/src/reduxStore/states/modal';
-import { useLazyQuery } from '@apollo/client';
-import { GET_HAS_UPDATES } from '@/src/services/gql/queries/config';
 import { IconAlertCircle, IconApi, IconBrandDiscord, IconBulb, IconChartPie, IconClipboard, IconMaximize, IconMinimize, IconTag, IconTriangleSquareCircle, IconUserCircle } from '@tabler/icons-react';
 import { IconSettings } from '@tabler/icons-react';
 import { useRouter } from 'next/router';
@@ -18,6 +16,7 @@ import { CacheEnum, selectCachedValue } from '@/src/reduxStore/states/cachedValu
 import VersionOverviewModal from './VersionOverviewModal';
 import HowToUpdateModal from './HowToUpdateModal';
 import { setProjectIdSampleProject } from '@/src/reduxStore/states/tmp';
+import { getHasUpdates } from '@/src/services/base/misc';
 
 export default function Sidebar() {
     const router = useRouter();
@@ -32,8 +31,6 @@ export default function Sidebar() {
 
     const [isFullScreen, setIsFullScreen] = useState(false);
     const [hasUpdates, setHasUpdates] = useState(false);
-
-    const [refetchHasUpdates] = useLazyQuery(GET_HAS_UPDATES, { fetchPolicy: 'no-cache' });
 
     function openFullScreen() {
         setIsFullScreen(true);
@@ -70,7 +67,7 @@ export default function Sidebar() {
     function requestVersionOverview() {
         dispatch(openModal(ModalEnum.VERSION_OVERVIEW));
         if (versionOverviewData) {
-            refetchHasUpdates().then(res => {
+            getHasUpdates(res => {
                 setHasUpdates(res.data["hasUpdates"]);
             });
         }

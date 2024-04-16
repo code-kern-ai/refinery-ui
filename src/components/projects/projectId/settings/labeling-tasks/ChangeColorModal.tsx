@@ -2,13 +2,12 @@ import Modal from "@/src/components/shared/modal/Modal";
 import { selectModal, setModalStates } from "@/src/reduxStore/states/modal";
 import { selectLabelingTasksAll, setLabelingTasksAll } from "@/src/reduxStore/states/pages/settings";
 import { selectProjectId } from "@/src/reduxStore/states/project";
-import { UPDATE_LABEL_COLOR, UPDATE_LABEL_HOTKEY } from "@/src/services/gql/mutations/project-settings";
+import { updateLabelColorPost, updateLabelHotkey } from "@/src/services/base/labeling-tasks";
 import { LabelColors, LabelType, LabelingTask } from "@/src/types/components/projects/projectId/settings/labeling-tasks";
 import { ModalEnum } from "@/src/types/shared/modal";
 import { LabelHelper } from "@/src/util/classes/label-helper";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
 import { jsonCopy } from "@/submodules/javascript-functions/general";
-import { useMutation } from "@apollo/client";
 import { Tooltip } from "@nextui-org/react";
 import { IconPencil } from "@tabler/icons-react";
 import { useEffect, useState } from "react";
@@ -25,15 +24,15 @@ export default function ChangeColorModal() {
     const [hotKeyError, setHotKeyError] = useState<string>('');
     const [usedHotKeys, setUsedHotKeys] = useState<string[]>([]);
 
-    const [updateLabelColorMut] = useMutation(UPDATE_LABEL_COLOR);
-    const [updateLabelHotKeyMut] = useMutation(UPDATE_LABEL_HOTKEY);
-
     function handleKeyboardEvent(event: KeyboardEvent) {
         if (!modalChangeColor.open) return;
         const changedLabel = LabelHelper.checkAndSetLabelHotkey(event, modalChangeColor.label, usedHotKeys);
         setHotKeyError(LabelHelper.labelHotkeyError);
         if (!LabelHelper.labelHotkeyError) {
-            updateLabelHotKeyMut({ variables: { projectId: projectId, labelingTaskLabelId: changedLabel.id, labelHotkey: changedLabel.hotkey } }).then((res) => {
+            updateLabelHotkey(projectId, {
+                labelingTaskLabelId: modalChangeColor.label.id,
+                labelHotkey: changedLabel.hotkey
+            }, (res) => {
                 const labelingTasksSchemaCopy = jsonCopy(labelingTasksSchema);
                 const labelingTask = labelingTasksSchemaCopy.find((task: LabelingTask) => task.id == modalChangeColor.taskId);
                 const label = labelingTask.labels.find((label: LabelType) => label.id == modalChangeColor.label.id);
@@ -65,7 +64,10 @@ export default function ChangeColorModal() {
 
     function updateLabelColor(newColor: string) {
         LabelHelper.updateLabelColor(modalChangeColor.taskId, modalChangeColor.label.color.name, newColor);
-        updateLabelColorMut({ variables: { projectId: projectId, labelingTaskLabelId: modalChangeColor.label.id, labelColor: newColor } }).then((res) => {
+        updateLabelColorPost(projectId, {
+            labelingTaskLabelId: modalChangeColor.label.id,
+            labelColor: newColor
+        }, (res) => {
             const labelingTasksSchemaCopy = jsonCopy(labelingTasksSchema);
             const labelingTask = labelingTasksSchemaCopy.find((task: LabelingTask) => task.id == modalChangeColor.taskId);
             const label = labelingTask.labels.find((label: LabelType) => label.id == modalChangeColor.label.id);

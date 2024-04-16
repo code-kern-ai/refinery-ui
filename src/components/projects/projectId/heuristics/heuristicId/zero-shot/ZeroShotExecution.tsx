@@ -2,14 +2,11 @@ import { setModalStates } from "@/src/reduxStore/states/modal";
 import { selectHeuristic, setActiveHeuristics } from "@/src/reduxStore/states/pages/heuristics";
 import { selectLabelingTasksAll, selectTextAttributes } from "@/src/reduxStore/states/pages/settings";
 import { selectProjectId } from "@/src/reduxStore/states/project";
-import { RUN_ZERO_SHOT_PROJECT } from "@/src/services/gql/mutations/heuristics";
-import { GET_HEURISTICS_BY_ID, GET_ZERO_SHOT_10_RANDOM_RECORDS } from "@/src/services/gql/queries/heuristics";
 import { ZeroShotExecutionProps } from "@/src/types/components/projects/projectId/heuristics/heuristicId/zero-shot";
 import { ModalEnum } from "@/src/types/shared/modal";
 import { Status } from "@/src/types/shared/statuses";
 import { postProcessZeroShot, postProcessZeroShot10Records } from "@/src/util/components/projects/projectId/heuristics/heuristicId/zero-shot-helper";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants"
-import { useLazyQuery, useMutation } from "@apollo/client";
 import { Tooltip } from "@nextui-org/react"
 import { IconAlertTriangle } from "@tabler/icons-react";
 import { useEffect, useState } from "react";
@@ -17,6 +14,8 @@ import { useDispatch, useSelector } from "react-redux";
 import ViewDetailsZSModal from "./ViewDetailsZSModal";
 import { useRouter } from "next/router";
 import LoadingIcon from "@/src/components/shared/loading/LoadingIcon";
+import { getHeuristicByHeuristicId } from "@/src/services/base/heuristic";
+import { getZeroShot10Records, initZeroShot } from "@/src/services/base/zero-shot";
 
 export default function ZeroShotExecution(props: ZeroShotExecutionProps) {
     const dispatch = useDispatch();
@@ -32,10 +31,6 @@ export default function ZeroShotExecution(props: ZeroShotExecutionProps) {
     const [testerRequestedSomething, setTesterRequestedSomething] = useState(false);
     const [modelFailedMessage, setModelFailedMessage] = useState(null);
     const [noLabelsMessage, setNoLabelsMessage] = useState(null);
-
-    const [refetchZeroShot10Records] = useLazyQuery(GET_ZERO_SHOT_10_RANDOM_RECORDS, { fetchPolicy: 'network-only' });
-    const [runZeroShotMut] = useMutation(RUN_ZERO_SHOT_PROJECT);
-    const [refetchCurrentHeuristic] = useLazyQuery(GET_HEURISTICS_BY_ID, { fetchPolicy: "network-only" });
 
     useEffect(() => {
         if (currentHeuristic) {
@@ -59,7 +54,7 @@ export default function ZeroShotExecution(props: ZeroShotExecutionProps) {
         }
         setTesterRequestedSomething(true);
         setRandomRecordTesterResult(null);
-        refetchZeroShot10Records({ variables: { projectId: projectId, informationSourceId: currentHeuristic.id, labels: JSON.stringify(labels) } }).then((res: any) => {
+        getZeroShot10Records(projectId, currentHeuristic.id, labels, (res) => {
             if (res.errors && res.errors.length > 0) {
                 setModelFailedMessage(true);
                 setTesterRequestedSomething(false);
@@ -77,9 +72,9 @@ export default function ZeroShotExecution(props: ZeroShotExecutionProps) {
         if (!canRunProject) return;
         if (testerRequestedSomething) return;
         setTesterRequestedSomething(true);
-        runZeroShotMut({ variables: { projectId: projectId, informationSourceId: currentHeuristic.id } }).then((res) => {
+        initZeroShot(projectId, currentHeuristic.id, (res) => {
             setTesterRequestedSomething(false);
-            refetchCurrentHeuristic({ variables: { projectId: projectId, informationSourceId: router.query.heuristicId } }).then((res) => {
+            getHeuristicByHeuristicId(projectId, router.query.heuristicId as string, (res) => {
                 dispatch(setActiveHeuristics(postProcessZeroShot(res['data']['informationSourceBySourceId'], labelingTasks, textAttributes)));
             });
         });

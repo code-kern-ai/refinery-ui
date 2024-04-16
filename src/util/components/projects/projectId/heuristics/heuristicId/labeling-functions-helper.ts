@@ -30,7 +30,7 @@ export function postProcessSampleRecordsFromBE(sampleRecords: any) {
 export function postProcessSampleRecords(sampleRecords: any, labelingTasks: LabelingTask[], currentLabelingTaskId: string) {
     const prepareSampleRecords = postProcessSampleRecordsFromBE(sampleRecords);
     prepareSampleRecords.records.forEach((record: any) => {
-        record.fullRecordData = JSON.parse(record.fullRecordData);
+        record.fullRecordData = record.fullRecordData;
         const taskType = labelingTasks.find(lt => lt.id == currentLabelingTaskId)?.taskType;
         if (taskType == LabelingTaskTaskType.MULTICLASS_CLASSIFICATION) {
             const label = record.calculatedLabels.length > 0 ? record.calculatedLabels[1] : '-';

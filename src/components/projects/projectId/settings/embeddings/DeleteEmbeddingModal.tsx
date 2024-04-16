@@ -2,9 +2,8 @@ import Modal from "@/src/components/shared/modal/Modal";
 import { selectModal } from "@/src/reduxStore/states/modal";
 import { removeFromAllEmbeddingsById } from "@/src/reduxStore/states/pages/settings";
 import { selectProjectId } from "@/src/reduxStore/states/project";
-import { DELETE_EMBEDDING, DELETE_FROM_TASK_QUEUE } from "@/src/services/gql/mutations/project-settings";
+import { deleteEmbeddingPost, deleteFromTaskQueue } from "@/src/services/base/embedding";
 import { ModalButton, ModalEnum } from "@/src/types/shared/modal";
-import { useMutation } from "@apollo/client";
 import { useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
@@ -16,18 +15,15 @@ export default function DeleteEmbeddingModal() {
     const projectId = useSelector(selectProjectId);
     const modalDeleteEmbedding = useSelector(selectModal(ModalEnum.DELETE_EMBEDDING));
 
-    const [refetchDeleteEmbedding] = useMutation(DELETE_EMBEDDING);
-    const [refetchDeleteTaskQueue] = useMutation(DELETE_FROM_TASK_QUEUE);
-
     const deleteEmbedding = useCallback(() => {
         const embeddingId = modalDeleteEmbedding.embeddingId;
         if (!embeddingId) return;
         if (modalDeleteEmbedding.isQueuedElement) {
-            refetchDeleteTaskQueue({ variables: { projectId: projectId, taskId: embeddingId } }).then((res) => {
+            deleteFromTaskQueue(projectId, embeddingId, (res) => {
                 dispatch(removeFromAllEmbeddingsById(embeddingId));
             });
         } else {
-            refetchDeleteEmbedding({ variables: { projectId: projectId, embeddingId: embeddingId } }).then((res) => {
+            deleteEmbeddingPost(projectId, embeddingId, (res) => {
                 dispatch(removeFromAllEmbeddingsById(embeddingId));
             });
         }

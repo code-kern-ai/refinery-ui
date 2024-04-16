@@ -2,15 +2,11 @@ import Statuses from "@/src/components/shared/statuses/Statuses";
 import { selectAllLookupLists, setAllLookupLists } from "@/src/reduxStore/states/pages/lookup-lists";
 import { selectAttributes, selectVisibleAttributeAC, setAllAttributes, setLabelingTasksAll, updateAttributeById } from "@/src/reduxStore/states/pages/settings";
 import { selectProjectId } from "@/src/reduxStore/states/project"
-import { UPDATE_ATTRIBUTE } from "@/src/services/gql/mutations/project-settings";
-import { LOOKUP_LISTS_BY_PROJECT_ID } from "@/src/services/gql/queries/lookup-lists";
-import { GET_ATTRIBUTES_BY_PROJECT_ID, GET_ATTRIBUTE_BY_ATTRIBUTE_ID, GET_LABELING_TASKS_BY_PROJECT_ID, GET_PROJECT_TOKENIZATION } from "@/src/services/gql/queries/project-setting";
 import { Attribute, AttributeState } from "@/src/types/components/projects/projectId/settings/data-schema";
 import { CurrentPage, DataTypeEnum } from "@/src/types/shared/general";
 import { postProcessCurrentAttribute } from "@/src/util/components/projects/projectId/settings/attribute-calculation-helper";
 import { ATTRIBUTES_VISIBILITY_STATES, DATA_TYPES, getTooltipVisibilityState } from "@/src/util/components/projects/projectId/settings/data-schema-helper";
 import { copyToClipboard } from "@/submodules/javascript-functions/general";
-import { useLazyQuery, useMutation } from "@apollo/client";
 import { Editor } from "@monaco-editor/react";
 import { Tooltip } from "@nextui-org/react";
 import { IconAlertTriangleFilled, IconArrowLeft, IconCircleCheckFilled } from "@tabler/icons-react";
@@ -26,7 +22,6 @@ import LoadingIcon from "@/src/components/shared/loading/LoadingIcon";
 import { debounceTime, distinctUntilChanged, fromEvent, timer } from "rxjs";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
 import { selectAllUsers, setComments } from "@/src/reduxStore/states/general";
-import { REQUEST_COMMENTS } from "@/src/services/gql/queries/projects";
 import { CommentDataManager } from "@/src/util/classes/comments";
 import { CommentType } from "@/src/types/shared/comments";
 import BricksIntegrator from "@/src/components/shared/bricks-integrator/BricksIntegrator";
@@ -34,6 +29,11 @@ import { AttributeCodeLookup } from "@/src/util/classes/attribute-calculation";
 import Dropdown2 from "@/submodules/react-components/components/Dropdown2";
 import { useWebsocket } from "@/src/services/base/web-sockets/useWebsocket";
 import { postProcessLabelingTasks, postProcessLabelingTasksSchema } from "@/src/util/components/projects/projectId/settings/labeling-tasks-helper";
+import { getAllComments } from "@/src/services/base/comment";
+import { getAttributes } from "@/src/services/base/attribute";
+import { getLookupListsByProjectId } from "@/src/services/base/lookup-lists";
+import { getLabelingTasksByProjectId, getProjectTokenization } from "@/src/services/base/project";
+import { getAttributeByAttributeId, updateAttribute } from "@/src/services/base/project-setting";
 
 const EDITOR_OPTIONS = { theme: 'vs-light', language: 'python', readOnly: false };
 
@@ -59,14 +59,6 @@ export default function AttributeCalculation() {
     const [attributeName, setAttributeName] = useState('');
     const [checkUnsavedChanges, setCheckUnsavedChanges] = useState(false);
 
-    const [refetchAttributes] = useLazyQuery(GET_ATTRIBUTES_BY_PROJECT_ID, { fetchPolicy: "network-only" });
-    const [updateAttributeMut] = useMutation(UPDATE_ATTRIBUTE);
-    const [refetchLookupLists] = useLazyQuery(LOOKUP_LISTS_BY_PROJECT_ID, { fetchPolicy: "no-cache" });
-    const [refetchProjectTokenization] = useLazyQuery(GET_PROJECT_TOKENIZATION, { fetchPolicy: "no-cache" });
-    const [refetchAttributeByAttributeId] = useLazyQuery(GET_ATTRIBUTE_BY_ATTRIBUTE_ID, { fetchPolicy: "no-cache" });
-    const [refetchComments] = useLazyQuery(REQUEST_COMMENTS, { fetchPolicy: "no-cache" });
-    const [refetchLabelingTasksByProjectId] = useLazyQuery(GET_LABELING_TASKS_BY_PROJECT_ID, { fetchPolicy: "network-only" });
-
     useEffect(() => {
         if (!currentAttribute) return;
         if (isInitial == null) setIsInitial(AttributeCodeLookup.isCodeStillTemplate(currentAttribute.sourceCode, currentAttribute.dataType))
@@ -75,7 +67,7 @@ export default function AttributeCalculation() {
     useEffect(() => {
         if (!projectId) return;
         if (!currentAttribute || attributes.length == 0) {
-            refetchAttributes({ variables: { projectId: projectId, stateFilter: ['ALL'] } }).then((res) => {
+            getAttributes(projectId, ['ALL'], (res) => {
                 dispatch(setAllAttributes(res.data['attributesByProjectId']));
                 const currentAttribute = postProcessCurrentAttribute(attributes.find((attribute) => attribute.id === router.query.attributeId));
                 setCurrentAttribute(currentAttribute);
@@ -83,7 +75,7 @@ export default function AttributeCalculation() {
             });
         }
         if (lookupLists.length == 0) {
-            refetchLookupLists({ variables: { projectId: projectId } }).then((res) => {
+            getLookupListsByProjectId(projectId, (res) => {
                 dispatch(setAllLookupLists(res.data['knowledgeBasesByProjectId']));
             });
         }
@@ -146,8 +138,8 @@ export default function AttributeCalculation() {
         CommentDataManager.unregisterCommentRequests(CurrentPage.ATTRIBUTE_CALCULATION);
         CommentDataManager.registerCommentRequests(CurrentPage.ATTRIBUTE_CALCULATION, requests);
         const requestJsonString = CommentDataManager.buildRequestJSON();
-        refetchComments({ variables: { requested: requestJsonString } }).then((res) => {
-            CommentDataManager.parseCommentData(JSON.parse(res.data['getAllComments']));
+        getAllComments(requestJsonString, (res) => {
+            CommentDataManager.parseCommentData(res.data['getAllComments']);
             CommentDataManager.parseToCurrentData(allUsers);
             dispatch(setComments(CommentDataManager.currentDataOrder));
         });
@@ -177,12 +169,12 @@ export default function AttributeCalculation() {
         const attributeNew = { ...currentAttribute };
         attributeNew.name = name;
         attributeNew.saveSourceCode = false;
-        updateAttributeMut({ variables: { projectId: projectId, attributeId: currentAttribute.id, name: attributeNew.name } }).then(() => {
+        updateAttribute(projectId, currentAttribute.id, (res) => {
             setCurrentAttribute(postProcessCurrentAttribute(attributeNew));
             setEditorValue(attributeNew.sourceCode.replace('def ac(record)', 'def ' + attributeNew.name + '(record)'));
             dispatch(updateAttributeById(attributeNew));
             setDuplicateNameExists(false);
-        });
+        }, null, null, attributeNew.name);
     }
 
     function updateVisibility(option: any) {
@@ -191,10 +183,10 @@ export default function AttributeCalculation() {
         attributeNew.visibilityIndex = ATTRIBUTES_VISIBILITY_STATES.findIndex((state) => state.name === option);
         attributeNew.visibilityName = option.name;
         attributeNew.saveSourceCode = false;
-        updateAttributeMut({ variables: { projectId: projectId, attributeId: currentAttribute.id, visibility: attributeNew.visibility } }).then(() => {
+        updateAttribute(projectId, currentAttribute.id, (res) => {
             setCurrentAttribute(postProcessCurrentAttribute(attributeNew));
             dispatch(updateAttributeById(attributeNew));
-        });
+        }, null, null, null, null, attributeNew.visibility);
     }
 
     function updateDataType(option: any) {
@@ -202,10 +194,10 @@ export default function AttributeCalculation() {
         attributeNew.dataType = option.value;
         attributeNew.dataTypeName = option.name;
         attributeNew.saveSourceCode = false;
-        updateAttributeMut({ variables: { projectId: projectId, attributeId: currentAttribute.id, dataType: attributeNew.dataType } }).then(() => {
+        updateAttribute(projectId, currentAttribute.id, (res) => {
             setCurrentAttribute(postProcessCurrentAttribute(attributeNew));
             dispatch(updateAttributeById(attributeNew));
-        });
+        }, attributeNew.dataType);
     }
 
     function openBricksIntegrator() {
@@ -228,12 +220,13 @@ export default function AttributeCalculation() {
             return;
         }
         const finalSourceCode = value.replace(regMatch[0], 'def ac(record)');
-        updateAttributeMut({ variables: { projectId: projectId, attributeId: currentAttribute.id, sourceCode: finalSourceCode, name: attributeNameParam } }).then(() => {
-        });
+        updateAttribute(projectId, currentAttribute.id, (res) => {
+
+        }, null, null, attributeNameParam, finalSourceCode);
     }
 
     function checkProjectTokenization() {
-        refetchProjectTokenization({ variables: { projectId: projectId } }).then((res) => {
+        getProjectTokenization(projectId, (res) => {
             setTokenizationProgress(res.data['projectTokenization']?.progress);
         });
     }
@@ -246,7 +239,7 @@ export default function AttributeCalculation() {
     }
 
     function refetchLabelingTasksAndProcess() {
-        refetchLabelingTasksByProjectId({ variables: { projectId: projectId } }).then((res) => {
+        getLabelingTasksByProjectId(projectId, (res) => {
             const labelingTasks = postProcessLabelingTasks(res['data']['projectByProjectId']['labelingTasks']['edges']);
             dispatch(setLabelingTasksAll(postProcessLabelingTasksSchema(labelingTasks)));
         });
@@ -262,10 +255,10 @@ export default function AttributeCalculation() {
                 currentAttributeCopy.state = AttributeState.RUNNING;
                 setCurrentAttribute(currentAttributeCopy);
             } else {
-                refetchAttributes({ variables: { projectId: projectId, stateFilter: ['ALL'] } }).then((res) => {
+                getAttributes(projectId, ['ALL'], (res) => {
                     dispatch(setAllAttributes(res.data['attributesByProjectId']));
                 });
-                refetchAttributeByAttributeId({ variables: { projectId: projectId, attributeId: currentAttribute?.id } }).then((res) => {
+                getAttributeByAttributeId(projectId, currentAttribute?.id, (res) => {
                     const attribute = res.data['attributeByAttributeId'];
                     if (attribute == null) setCurrentAttribute(null);
                     else setCurrentAttribute(postProcessCurrentAttribute(attribute));
@@ -275,7 +268,7 @@ export default function AttributeCalculation() {
                 }
             }
         } else if (['knowledge_base_updated', 'knowledge_base_deleted', 'knowledge_base_created'].includes(msgParts[1])) {
-            refetchLookupLists({ variables: { projectId: projectId } }).then((res) => {
+            getLookupListsByProjectId(projectId, (res) => {
                 dispatch(setAllLookupLists(res.data['knowledgeBasesByProjectId']));
             });
         } else if (msgParts[1] == 'tokenization' && msgParts[2] == 'docbin') {
@@ -424,7 +417,7 @@ export default function AttributeCalculation() {
 
                 <ExecutionContainer currentAttribute={currentAttribute} tokenizationProgress={tokenizationProgress} checkUnsavedChanges={checkUnsavedChanges}
                     refetchCurrentAttribute={() => {
-                        refetchAttributeByAttributeId({ variables: { projectId: projectId, attributeId: currentAttribute?.id } }).then((res) => {
+                        getAttributeByAttributeId(projectId, currentAttribute?.id, (res) => {
                             const attribute = res.data['attributeByAttributeId'];
                             if (attribute == null) setCurrentAttribute(null);
                             else setCurrentAttribute(postProcessCurrentAttribute(attribute));

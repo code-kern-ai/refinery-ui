@@ -10,9 +10,9 @@ export function postProcessingEmbeddings(embeddings: Embedding[], queuedEmbeddin
     queuedEmbeddings.forEach((task: any) => {
         preparedEmbeddings.push({
             id: task.id,
-            name: task.taskInfo["embedding_name"],
+            name: task.taskInfo.embeddingName,
             custom: false,
-            type: task.taskInfo["type"] == EmbeddingType.ON_ATTRIBUTE ? EmbeddingType.ON_ATTRIBUTE : EmbeddingType.ON_TOKEN,
+            type: task.taskInfo.embeddingType == EmbeddingType.ON_ATTRIBUTE ? EmbeddingType.ON_ATTRIBUTE : EmbeddingType.ON_TOKEN,
             state: EmbeddingState.QUEUED,
             progress: 0,
             dimension: 0,

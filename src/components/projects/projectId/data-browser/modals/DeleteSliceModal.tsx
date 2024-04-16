@@ -2,9 +2,8 @@ import Modal from "@/src/components/shared/modal/Modal";
 import { selectModal } from "@/src/reduxStore/states/modal";
 import { removeFromAllDataSlicesById, setActiveDataSlice, setActiveSearchParams, setIsTextHighlightNeeded, setRecordsInDisplay, setTextHighlight, updateAdditionalDataState } from "@/src/reduxStore/states/pages/data-browser";
 import { selectProjectId } from "@/src/reduxStore/states/project";
-import { DELETE_DATA_SLICE } from "@/src/services/gql/mutations/data-browser";
+import { deleteDataSliceById } from "@/src/services/base/dataSlices";
 import { ModalButton, ModalEnum } from "@/src/types/shared/modal";
-import { useMutation } from "@apollo/client";
 import { useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
@@ -17,10 +16,8 @@ export default function DeleteSliceModal() {
 
     const modalDeleteSlice = useSelector(selectModal(ModalEnum.DELETE_SLICE));
 
-    const [deleteDataSliceMut] = useMutation(DELETE_DATA_SLICE);
-
     const deleteDataSlice = useCallback(() => {
-        deleteDataSliceMut({ variables: { projectId: projectId, dataSliceId: modalDeleteSlice.sliceId } }).then((res) => {
+        deleteDataSliceById(projectId, modalDeleteSlice.sliceId, (res) => {
             dispatch(removeFromAllDataSlicesById(modalDeleteSlice.sliceId));
             dispatch(updateAdditionalDataState('clearFullSearch', true));
             dispatch(setActiveSearchParams([]));

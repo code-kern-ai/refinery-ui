@@ -3,13 +3,12 @@ import Statuses from "@/src/components/shared/statuses/Statuses";
 import { setCurrentPage } from "@/src/reduxStore/states/general";
 import { selectAttributes, updateAttributeById } from "@/src/reduxStore/states/pages/settings";
 import { selectProjectId } from "@/src/reduxStore/states/project";
-import { UPDATE_ATTRIBUTE } from "@/src/services/gql/mutations/project-settings";
+import { updateAttribute } from "@/src/services/base/project-setting";
 import { Attribute, DataSchemaProps } from "@/src/types/components/projects/projectId/settings/data-schema";
 import { CurrentPage } from "@/src/types/shared/general";
 import { ATTRIBUTES_VISIBILITY_STATES, getTooltipVisibilityState } from "@/src/util/components/projects/projectId/settings/data-schema-helper";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
 import Dropdown2 from "@/submodules/react-components/components/Dropdown2";
-import { useMutation } from "@apollo/client";
 import { Tooltip } from "@nextui-org/react";
 import { IconArrowRight, IconCheck, IconX } from "@tabler/icons-react";
 import { useRouter } from "next/router";
@@ -26,8 +25,6 @@ export default function DataSchema(props: DataSchemaProps) {
     const [somethingLoading, setSomethingLoading] = useState(false);
     const [tooltipsArray, setTooltipsArray] = useState<string[]>(null);
 
-    const [updateAttributeMut] = useMutation(UPDATE_ATTRIBUTE);
-
     useEffect(() => {
         setSomethingLoading(attributes.length === 0);
         if (!attributes) return;
@@ -42,19 +39,18 @@ export default function DataSchema(props: DataSchemaProps) {
     function updatePrimaryKey(attribute: Attribute) {
         const attributeNew = { ...attribute };
         attributeNew.isPrimaryKey = !attributeNew.isPrimaryKey;
-        updateAttributeMut({ variables: { projectId: projectId, attributeId: attributeNew.id, isPrimaryKey: attributeNew.isPrimaryKey } }).then(() => {
+        updateAttribute(projectId, attributeNew.id, (res) => {
             dispatch(updateAttributeById(attributeNew));
-        });
+        }, null, attributeNew.isPrimaryKey);
     }
 
     function updateVisibility(option: any, attribute: Attribute) {
-        // const visibility = ATTRIBUTES_VISIBILITY_STATES.find((state) => state.name === option).value;
         const attributeNew = { ...attribute };
         attributeNew.visibility = option.value;
         attributeNew.visibilityIndex = ATTRIBUTES_VISIBILITY_STATES.findIndex((state) => state.name === option.name);
-        updateAttributeMut({ variables: { projectId: projectId, attributeId: attribute.id, visibility: attributeNew.visibility } }).then(() => {
+        updateAttribute(projectId, attributeNew.id, (res) => {
             dispatch(updateAttributeById(attributeNew));
-        });
+        }, null, null, null, null, attributeNew.visibility);
     }
 
     return (<div>

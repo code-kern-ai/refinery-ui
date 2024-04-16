@@ -4,8 +4,8 @@ import { selectModal } from "@/src/reduxStore/states/modal";
 import { setModelsDownloaded } from "@/src/reduxStore/states/pages/models-downloaded";
 import { selectEmbeddings, selectRecommendedEncodersAll, selectRecommendedEncodersDict, selectUsableNonTextAttributes, selectUseableEmbedableAttributes, setAllRecommendedEncodersDict } from "@/src/reduxStore/states/pages/settings";
 import { selectProjectId } from "@/src/reduxStore/states/project";
-import { CREATE_EMBEDDING } from "@/src/services/gql/mutations/project-settings";
-import { GET_MODEL_PROVIDER_INFO } from "@/src/services/gql/queries/projects";
+import { createEmbeddingPost } from "@/src/services/base/embedding";
+import { getModelProviderInfo } from "@/src/services/base/project";
 import { ModelsDownloaded } from "@/src/types/components/models-downloaded/models-downloaded";
 import { Attribute } from "@/src/types/components/projects/projectId/settings/data-schema";
 import { EmbeddingPlatform, EmbeddingType, PlatformType, SuggestionsProps } from "@/src/types/components/projects/projectId/settings/embeddings";
@@ -15,7 +15,6 @@ import { postProcessingModelsDownload } from "@/src/util/components/models-downl
 import { DEFAULT_AZURE_TYPE, GRANULARITY_TYPES_ARRAY, checkIfCreateEmbeddingIsDisabled, platformNamesDict } from "@/src/util/components/projects/projectId/settings/embeddings-helper";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
 import Dropdown2 from "@/submodules/react-components/components/Dropdown2";
-import { useLazyQuery, useMutation } from "@apollo/client";
 import { Tooltip } from "@nextui-org/react";
 import { IconExternalLink } from "@tabler/icons-react";
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -52,8 +51,6 @@ export default function AddNewEmbeddingModal() {
     const [selectedPlatform, setSelectedPlatform] = useState<EmbeddingPlatform>(null);
     const [granularityArray, setGranularityArray] = useState(GRANULARITY_TYPES_ARRAY);
     const [filteredAttributesArray, setFilteredAttributesArray] = useState<Attribute[]>([]);
-
-    const [createEmbeddingMut] = useMutation(CREATE_EMBEDDING);
 
     const gdprText = useRef<HTMLLabelElement>(null);
 
@@ -197,7 +194,7 @@ export default function AddNewEmbeddingModal() {
             config.version = version;
             prepareAzureData();
         }
-        createEmbeddingMut({ variables: { projectId: projectId, attributeId: targetAttribute.id, config: JSON.stringify(config) } }).then((res) => { });
+        createEmbeddingPost(projectId, targetAttribute.id, JSON.stringify(config), (res) => { });
 
     }, [embeddingPlatforms, platform, granularity, model, apiToken, engine, url, version, termsAccepted, modalEmbedding]);
 
@@ -327,14 +324,14 @@ export default function AddNewEmbeddingModal() {
     )
 }
 
+const DUMMY_LIST = []
+
 function SuggestionsModel(props: SuggestionsProps) {
-    const dispatch = useDispatch();
 
-    const [colorDownloadedModels, setColorDownloadedModels] = useState<boolean[]>([]);
-    const [hoverBoxList, setHoverBoxList] = useState<any[]>([]);
-    const [filteredList, setFilteredList] = useState<any[]>([]);
-
-    const [refetchModelsDownload] = useLazyQuery(GET_MODEL_PROVIDER_INFO, { fetchPolicy: 'network-only', nextFetchPolicy: 'cache-first' });
+    const [colorDownloadedModels, setColorDownloadedModels] = useState<boolean[]>(DUMMY_LIST);
+    const [cachedModelInfo, setCachedModelInfo] = useState<any[]>(null);
+    const [hoverBoxList, setHoverBoxList] = useState<any[]>(DUMMY_LIST);
+    const [filteredList, setFilteredList] = useState<any[]>(DUMMY_LIST);
 
     useEffect(() => {
         if (!props.options) return;
@@ -342,18 +339,25 @@ function SuggestionsModel(props: SuggestionsProps) {
     }, [props.options]);
 
     useEffect(() => {
-        if (!filteredList) return;
-        refetchModelsDownload().then((res) => {
-            const modelsDownloaded = postProcessingModelsDownload(res.data['modelProviderInfo']);
-            dispatch(setModelsDownloaded(res.data['modelProviderInfo']));
-            const colorDownloadedModels = filteredList.map((model: any) => {
-                const checkIfModelExists = modelsDownloaded.find((modelDownloaded: ModelsDownloaded) => modelDownloaded.name === model.configString);
-                return checkIfModelExists !== undefined;
-            });
-            setColorDownloadedModels(colorDownloadedModels);
+        //collect on mount (open modal)
+        getModelProviderInfo((res) => {
+            setCachedModelInfo(postProcessingModelsDownload(res.data['modelProviderInfo']));
         });
+    }, [])
+
+    useEffect(() => {
+        if (!filteredList || !cachedModelInfo) return;
+        const colorDownloadedModels = filteredList.map((model: any) => {
+            const checkIfModelExists = cachedModelInfo.find((modelDownloaded: ModelsDownloaded) => modelDownloaded.name === model.configString);
+            return checkIfModelExists !== undefined;
+        });
+        setColorDownloadedModels(colorDownloadedModels);
+    }, [cachedModelInfo, filteredList, props.options]);
+
+    useEffect(() => {
         setHoverBoxList(filteredList.map((model: any) => model.description));
-    }, [filteredList, props.options, props.selectedOption]);
+    }, [filteredList, props.options])
+
 
     return <><Tooltip content={TOOLTIPS_DICT.PROJECT_SETTINGS.EMBEDDINGS.MODEL} placement="right" color="invert">
         <span className="card-title mb-0 label-text flex"><span className="cursor-help underline filtersUnderline">Model</span></span>

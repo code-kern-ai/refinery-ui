@@ -1,16 +1,13 @@
 import { updateLookupListState } from "@/src/reduxStore/states/pages/lookup-lists";
 import { selectProjectId } from "@/src/reduxStore/states/project"
-import { UPDATE_KNOWLEDGE_BASE } from "@/src/services/gql/mutations/lookup-lists";
-import { LOOKUP_LIST_BY_LOOKUP_LIST_ID, TERMS_BY_KNOWLEDGE_BASE_ID } from "@/src/services/gql/queries/lookup-lists";
 import { LookupList, LookupListProperty, Term } from "@/src/types/components/projects/projectId/lookup-lists";
 import { postProcessLookupList, postProcessTerms } from "@/src/util/components/projects/projectId/lookup-lists-helper";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
 import { copyToClipboard } from "@/submodules/javascript-functions/general";
-import { useLazyQuery, useMutation } from "@apollo/client";
 import { Tooltip } from "@nextui-org/react";
 import { IconArrowLeft } from "@tabler/icons-react";
 import { useRouter } from "next/router";
-import { use, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux"
 import LookupListOperations from "./LookupListOperations";
 import DangerZone from "@/src/components/shared/danger-zone/DangerZone";
@@ -18,10 +15,11 @@ import { DangerZoneEnum } from "@/src/types/shared/danger-zone";
 import Terms from "./Terms";
 import { CurrentPage } from "@/src/types/shared/general";
 import { selectAllUsers, setComments } from "@/src/reduxStore/states/general";
-import { REQUEST_COMMENTS } from "@/src/services/gql/queries/projects";
 import { CommentType } from "@/src/types/shared/comments";
 import { CommentDataManager } from "@/src/util/classes/comments";
 import { useWebsocket } from "@/src/services/base/web-sockets/useWebsocket";
+import { getLookupListsByLookupListId, getTermsByLookupListId, updateKnowledgeBase } from "@/src/services/base/lookup-lists";
+import { getAllComments } from "@/src/services/base/comment";
 
 export default function LookupListsDetails() {
     const router = useRouter();
@@ -38,17 +36,12 @@ export default function LookupListsDetails() {
     const [finalSize, setFinalSize] = useState(0);
     const [description, setDescription] = useState('');
 
-    const [refetchCurrentLookupList] = useLazyQuery(LOOKUP_LIST_BY_LOOKUP_LIST_ID, { fetchPolicy: 'network-only', nextFetchPolicy: 'cache-first' });
-    const [refetchTermsLookupList] = useLazyQuery(TERMS_BY_KNOWLEDGE_BASE_ID, { fetchPolicy: 'cache-and-network' });
-    const [updateLookupListMut] = useMutation(UPDATE_KNOWLEDGE_BASE);
-    const [refetchComments] = useLazyQuery(REQUEST_COMMENTS, { fetchPolicy: "no-cache" });
-
     const nameRef = useRef<HTMLInputElement>(null);
     const descriptionRef = useRef<HTMLInputElement>(null);
 
     useEffect(() => {
-        if (!projectId) return;
-        refetchCurrentLookupList({ variables: { projectId: projectId, knowledgeBaseId: router.query.lookupListId } }).then((res) => {
+        if (!projectId || !router.query.lookupListId) return;
+        getLookupListsByLookupListId(projectId, router.query.lookupListId as string, (res) => {
             setLookupList(postProcessLookupList(res.data['knowledgeBaseByKnowledgeBaseId']));
         });
         refetchTerms();
@@ -74,15 +67,15 @@ export default function LookupListsDetails() {
         CommentDataManager.unregisterCommentRequests(CurrentPage.LOOKUP_LISTS_DETAILS);
         CommentDataManager.registerCommentRequests(CurrentPage.LOOKUP_LISTS_DETAILS, requests);
         const requestJsonString = CommentDataManager.buildRequestJSON();
-        refetchComments({ variables: { requested: requestJsonString } }).then((res) => {
-            CommentDataManager.parseCommentData(JSON.parse(res.data['getAllComments']));
+        getAllComments(requestJsonString, (res) => {
+            CommentDataManager.parseCommentData(res.data['getAllComments']);
             CommentDataManager.parseToCurrentData(allUsers);
             dispatch(setComments(CommentDataManager.currentDataOrder));
         });
     }
 
     function refetchTerms() {
-        refetchTermsLookupList({ variables: { projectId: projectId, knowledgeBaseId: router.query.lookupListId } }).then((res) => {
+        getTermsByLookupListId(projectId, router.query.lookupListId as string, (res) => {
             setFinalSize(res.data['termsByKnowledgeBaseId'].length);
             setTerms(postProcessTerms(res.data['termsByKnowledgeBaseId']));
         });
@@ -98,9 +91,7 @@ export default function LookupListsDetails() {
     }
 
     function saveLookupList() {
-        updateLookupListMut({
-            variables: { projectId: projectId, knowledgeBaseId: lookupList.id, name: lookupList.name, description: lookupList.description }
-        }).then((res) => {
+        updateKnowledgeBase(projectId, { knowledgeBaseId: lookupList.id, name: lookupList.name, description: lookupList.description }, (res) => {
             dispatch(updateLookupListState(lookupList.id, { name: lookupList.name, description: lookupList.description }))
         });
     }
@@ -136,7 +127,7 @@ export default function LookupListsDetails() {
     function handleWebsocketNotification(msgParts: string[]) {
         if (msgParts[2] == router.query.lookupListId) {
             if (msgParts[1] == 'knowledge_base_updated') {
-                refetchCurrentLookupList({ variables: { projectId: projectId, knowledgeBaseId: router.query.lookupListId } }).then((res) => {
+                getLookupListsByLookupListId(projectId, router.query.lookupListId as string, (res) => {
                     setLookupList(postProcessLookupList(res.data['knowledgeBaseByKnowledgeBaseId']));
                 });
             } else if (msgParts[1] == 'knowledge_base_deleted') {

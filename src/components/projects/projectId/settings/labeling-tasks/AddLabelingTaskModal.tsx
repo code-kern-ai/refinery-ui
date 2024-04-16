@@ -2,13 +2,12 @@ import Modal from "@/src/components/shared/modal/Modal";
 import { selectModal } from "@/src/reduxStore/states/modal";
 import { selectLabelingTasksAll, selectUsableAttributes } from "@/src/reduxStore/states/pages/settings";
 import { selectProjectId } from "@/src/reduxStore/states/project";
-import { CREATE_LABELING_TASK } from "@/src/services/gql/mutations/project-settings";
+import { createLabelingTask } from "@/src/services/base/labeling-tasks";
 import { LabelingTaskTaskType } from "@/src/types/components/projects/projectId/settings/labeling-tasks";
 import { ModalButton, ModalEnum } from "@/src/types/shared/modal";
 import { isTaskNameUnique } from "@/src/util/components/projects/projectId/settings/labeling-tasks-helper";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
 import Dropdown2 from "@/submodules/react-components/components/Dropdown2";
-import { useMutation } from "@apollo/client";
 import { Tooltip } from "@nextui-org/react";
 import { useCallback, useEffect, useState } from "react";
 import { useSelector } from "react-redux";
@@ -25,8 +24,6 @@ export default function AddLabelingTaskModal() {
     const [targetAttribute, setTargetAttribute] = useState(null);
     const [taskName, setTaskName] = useState('');
 
-    const [createLabelingTaskMut] = useMutation(CREATE_LABELING_TASK);
-
     useEffect(() => {
         setTargetAttribute({ name: 'Full Record', id: null });
     }, [modalAddLabelingTask]);
@@ -36,11 +33,7 @@ export default function AddLabelingTaskModal() {
         if (targetAttribute.name !== 'Full Record') {
             taskTarget = usableAttributes.find((attribute) => attribute.name == targetAttribute.name).id;
         }
-        createLabelingTaskMut({
-            variables: {
-                projectId: projectId, labelingTaskName: taskName, labelingTaskType: LabelingTaskTaskType.MULTICLASS_CLASSIFICATION, labelingTaskTargetId: taskTarget
-            }
-        }).then((res) => {
+        createLabelingTask(projectId, { labelingTaskName: taskName, labelingTaskType: LabelingTaskTaskType.MULTICLASS_CLASSIFICATION, labelingTaskTargetId: taskTarget }, (res) => {
             setTaskName('');
         });
     }, [modalAddLabelingTask, targetAttribute, taskName]);

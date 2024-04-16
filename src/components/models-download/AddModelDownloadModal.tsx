@@ -4,14 +4,13 @@ import { Tooltip } from "@nextui-org/react";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
 import { selectModal, setModalStates } from "@/src/reduxStore/states/modal";
 import { useDispatch, useSelector } from "react-redux";
-import { useMutation } from "@apollo/client";
-import { MODEL_PROVIDER_DOWNLOAD_MODEL } from "@/src/services/gql/mutations/projects";
 import { useCallback, useEffect, useState } from "react";
 import { dateAsUTCDate } from "@/submodules/javascript-functions/date-parser";
 import { extentModelsDownloaded, selectModelsDownloaded } from "@/src/reduxStore/states/pages/models-downloaded";
 import { ModelsDownloaded, ModelsDownloadedStatus } from "@/src/types/components/models-downloaded/models-downloaded";
 import { CacheEnum, selectCachedValue } from "@/src/reduxStore/states/cachedValues";
 import Dropdown2 from "@/submodules/react-components/components/Dropdown2";
+import { modelProviderDownloadModel } from "@/src/services/base/misc";
 
 const ACCEPT_BUTTON = { buttonCaption: 'Accept', useButton: true };
 
@@ -52,10 +51,8 @@ export default function AddModelDownloadModal() {
         setLineSeparatorIndex(filteredList.findIndex((model: any) => !model.description));
     }, [modelsDownloaded, filteredList, modalAddModel, modelsList, modelName]);
 
-    const [downloadModelMut] = useMutation(MODEL_PROVIDER_DOWNLOAD_MODEL);
-
     const addModel = useCallback(() => {
-        downloadModelMut({ variables: { modelName: modelName } }).then((res) => {
+        modelProviderDownloadModel(modelName, (res) => {
             const newModel = {
                 "name": modelName,
                 "date": dateAsUTCDate(new Date()).toLocaleString(),

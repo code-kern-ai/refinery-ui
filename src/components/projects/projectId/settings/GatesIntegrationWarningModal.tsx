@@ -1,8 +1,7 @@
 import Modal from "@/src/components/shared/modal/Modal";
 import { selectProjectId } from "@/src/reduxStore/states/project";
-import { UPDATE_PROJECT_FOR_GATES } from "@/src/services/gql/mutations/project-settings";
+import { updateProjectGates } from "@/src/services/base/project-setting";
 import { ModalButton, ModalEnum } from "@/src/types/shared/modal";
-import { useMutation } from "@apollo/client";
 import { useCallback, useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 
@@ -13,10 +12,8 @@ export default function GatesIntegrationWarningModal() {
 
     const [acceptButton, setAcceptButton] = useState<ModalButton>(ACCEPT_BUTTON);
 
-    const [updateProjectsGatesMut] = useMutation(UPDATE_PROJECT_FOR_GATES);
-
     const updateProjectForGates = useCallback(() => {
-        updateProjectsGatesMut({ variables: { projectId: projectId } })
+        updateProjectGates(projectId, (res) => { });
     }, []);
 
     useEffect(() => {

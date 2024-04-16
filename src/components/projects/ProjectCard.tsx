@@ -9,9 +9,8 @@ import { useRouter } from "next/router";
 import { useDispatch, useSelector } from "react-redux";
 import { NOT_AVAILABLE, UNKNOWN_USER } from "@/src/util/constants";
 import { IconArrowRight, IconX } from "@tabler/icons-react";
-import { useMutation } from "@apollo/client";
-import { DELETE_PROJECT } from "@/src/services/gql/mutations/projects";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
+import { deleteProjectPost } from "@/src/services/base/project";
 
 export default function ProjectCard(props: ProjectCardProps) {
     const router = useRouter();
@@ -21,13 +20,11 @@ export default function ProjectCard(props: ProjectCardProps) {
     const isAdmin = useSelector(selectIsAdmin);
     const user = useSelector(selectUser);
 
-    const [deleteProjectByIdMut] = useMutation(DELETE_PROJECT, { fetchPolicy: "no-cache" });
-
     function adminOpenOrDeleteProject(project: Project) {
         if (!isAdmin) return;
         const deleteInstant = isStringTrue(localStorage.getItem("adminInstantDelete"));
         if (deleteInstant) {
-            deleteProjectByIdMut({ variables: { projectId: project.id } }).then(() => {
+            deleteProjectPost(project.id, (res) => {
                 dispatch(closeModal(ModalEnum.ADMIN_DELETE_PROJECT));
                 dispatch(removeFromAllProjectsById(project.id));
             })

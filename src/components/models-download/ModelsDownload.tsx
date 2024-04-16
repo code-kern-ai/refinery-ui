@@ -1,7 +1,5 @@
 import { selectModelsDownloaded, setModelsDownloaded } from "@/src/reduxStore/states/pages/models-downloaded";
-import { GET_MODEL_PROVIDER_INFO } from "@/src/services/gql/queries/projects";
 import { ModelsDownloaded, ModelsDownloadedStatus } from "@/src/types/components/models-downloaded/models-downloaded";
-import { useLazyQuery } from "@apollo/client";
 import { Tooltip } from "@nextui-org/react";
 import { IconAlertTriangleFilled, IconArrowLeft, IconBan, IconCheckbox, IconCircleCheckFilled, IconExternalLink, IconLoader, IconPlus, IconTrash } from "@tabler/icons-react";
 import { useRouter } from "next/router";
@@ -17,6 +15,7 @@ import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
 import AddModelDownloadModal from "./AddModelDownloadModal";
 import DeleteModelDownloadModal from "./DeleteModelDownloadModal";
 import { useWebsocket } from "@/src/services/base/web-sockets/useWebsocket";
+import { getModelProviderInfo } from "@/src/services/base/project";
 
 export default function ModelsDownload() {
     const router = useRouter();
@@ -26,14 +25,12 @@ export default function ModelsDownload() {
     const isAdmin = useSelector(selectIsAdmin);
     const modelsDownloaded = useSelector(selectModelsDownloaded);
 
-    const [refetchModelsDownload] = useLazyQuery(GET_MODEL_PROVIDER_INFO, { fetchPolicy: 'network-only', nextFetchPolicy: 'cache-first' });
-
     useEffect(() => {
         refetchModels();
     }, []);
 
     function refetchModels() {
-        refetchModelsDownload().then((res) => {
+        getModelProviderInfo((res) => {
             dispatch(setModelsDownloaded(res.data['modelProviderInfo']));
         });
     }

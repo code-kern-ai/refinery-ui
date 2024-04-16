@@ -5,11 +5,8 @@ import { useCallback, useEffect, useState } from "react";
 import { selectEmbeddings, selectUsableNonTextAttributes, setAllAttributes, setAllEmbeddings, setLabelingTasksAll } from "@/src/reduxStore/states/pages/settings";
 import { CurrentPage } from "@/src/types/shared/general";
 import { LabelingTask } from "@/src/types/components/projects/projectId/settings/labeling-tasks";
-import { GET_ATTRIBUTES_BY_PROJECT_ID, GET_EMBEDDING_SCHEMA_BY_PROJECT_ID, GET_LABELING_TASKS_BY_PROJECT_ID } from "@/src/services/gql/queries/project-setting";
-import { useLazyQuery } from "@apollo/client";
 import { postProcessLabelingTasks, postProcessLabelingTasksSchema } from "@/src/util/components/projects/projectId/settings/labeling-tasks-helper";
 import { postProcessHeuristics } from "@/src/util/components/projects/projectId/heuristics/heuristics-helper";
-import { GET_HEURISTICS_OVERVIEW_DATA } from "@/src/services/gql/queries/heuristics";
 import { selectHeuristicsAll, setAllHeuristics } from "@/src/reduxStore/states/pages/heuristics";
 import GridCards from "@/src/components/shared/grid-cards/GridCards";
 import HeuristicsHeader from "./HeuristicsHeader";
@@ -20,10 +17,14 @@ import AddCrowdLabelerModal from "./modals/AddCrowdLabelerModal";
 import { postProcessingEmbeddings } from "@/src/util/components/projects/projectId/settings/embeddings-helper";
 import { CommentType } from "@/src/types/shared/comments";
 import { CommentDataManager } from "@/src/util/classes/comments";
-import { REQUEST_COMMENTS } from "@/src/services/gql/queries/projects";
 import { selectAllUsers, setBricksIntegrator, setComments } from "@/src/reduxStore/states/general";
 import { getEmptyBricksIntegratorConfig } from "@/src/util/shared/bricks-integrator-helper";
 import { useWebsocket } from "@/src/services/base/web-sockets/useWebsocket";
+import { getAllComments } from "@/src/services/base/comment";
+import { getAttributes } from "@/src/services/base/attribute";
+import { getInformationSourcesOverviewData } from "@/src/services/base/heuristic";
+import { getLabelingTasksByProjectId } from "@/src/services/base/project";
+import { getEmbeddings } from "@/src/services/base/embedding";
 
 export function HeuristicsOverview() {
     const dispatch = useDispatch();
@@ -33,14 +34,7 @@ export function HeuristicsOverview() {
     const embeddings = useSelector(selectEmbeddings);
     const attributes = useSelector(selectUsableNonTextAttributes);
     const allUsers = useSelector(selectAllUsers);
-
     const [filteredList, setFilteredList] = useState([]);
-
-    const [refetchLabelingTasksByProjectId] = useLazyQuery(GET_LABELING_TASKS_BY_PROJECT_ID, { fetchPolicy: "network-only" });
-    const [refetchHeuristics] = useLazyQuery(GET_HEURISTICS_OVERVIEW_DATA, { fetchPolicy: "network-only" });
-    const [refetchEmbeddings] = useLazyQuery(GET_EMBEDDING_SCHEMA_BY_PROJECT_ID, { fetchPolicy: "no-cache" });
-    const [refetchAttributes] = useLazyQuery(GET_ATTRIBUTES_BY_PROJECT_ID, { fetchPolicy: "network-only" });
-    const [refetchComments] = useLazyQuery(REQUEST_COMMENTS, { fetchPolicy: "no-cache" });
 
     useEffect(() => {
         if (!projectId || !embeddings || !attributes) return;
@@ -48,7 +42,7 @@ export function HeuristicsOverview() {
         refetchHeuristicsAndProcess();
         refetchEmbeddingsAndProcess();
         if (attributes.length == 0) {
-            refetchAttributes({ variables: { projectId: projectId, stateFilter: ['ALL'] } }).then((res) => {
+            getAttributes(projectId, ['ALL'], (res) => {
                 dispatch(setAllAttributes(res.data['attributesByProjectId']));
             });
         }
@@ -70,22 +64,22 @@ export function HeuristicsOverview() {
         CommentDataManager.unregisterCommentRequests(CurrentPage.HEURISTICS);
         CommentDataManager.registerCommentRequests(CurrentPage.HEURISTICS, requests);
         const requestJsonString = CommentDataManager.buildRequestJSON();
-        refetchComments({ variables: { requested: requestJsonString } }).then((res) => {
-            CommentDataManager.parseCommentData(JSON.parse(res.data['getAllComments']));
+        getAllComments(requestJsonString, (res) => {
+            CommentDataManager.parseCommentData(res.data['getAllComments']);
             CommentDataManager.parseToCurrentData(allUsers);
             dispatch(setComments(CommentDataManager.currentDataOrder));
         });
     }
 
     function refetchLabelingTasksAndProcess() {
-        refetchLabelingTasksByProjectId({ variables: { projectId: projectId } }).then((res) => {
+        getLabelingTasksByProjectId(projectId, (res) => {
             const labelingTasks = postProcessLabelingTasks(res['data']['projectByProjectId']['labelingTasks']['edges']);
             dispatch(setLabelingTasksAll(postProcessLabelingTasksSchema(labelingTasks)));
         });
     }
 
     function refetchHeuristicsAndProcess() {
-        refetchHeuristics({ variables: { projectId: projectId } }).then((res) => {
+        getInformationSourcesOverviewData(projectId, (res) => {
             const heuristics = postProcessHeuristics(res['data']['informationSourcesOverviewData'], projectId);
             dispatch(setAllHeuristics(heuristics));
             setFilteredList(heuristics);
@@ -93,7 +87,7 @@ export function HeuristicsOverview() {
     }
 
     function refetchEmbeddingsAndProcess() {
-        refetchEmbeddings({ variables: { projectId: projectId } }).then((res) => {
+        getEmbeddings(projectId, (res) => {
             const embeddingsFinal = postProcessingEmbeddings(res.data['projectByProjectId']['embeddings']['edges'].map((e) => e['node']), []);
             dispatch(setAllEmbeddings(embeddingsFinal));
         });
