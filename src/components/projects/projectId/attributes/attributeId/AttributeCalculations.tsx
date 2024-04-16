@@ -287,7 +287,7 @@ export default function AttributeCalculation() {
 
     return (projectId && <div className={`bg-white p-4 overflow-y-auto min-h-full h-[calc(100vh-4rem)]`} onScroll={(e: any) => onScrollEvent(e)}>
         {currentAttribute && <div>
-            <div className={`sticky z-40 h-12 ${isHeaderNormal ? 'top-1' : '-top-5'}`}>
+            <div className={`sticky z-50 h-12 ${isHeaderNormal ? 'top-1' : '-top-5'}`}>
                 <div className={`bg-white flex-grow ${isHeaderNormal ? '' : 'shadow'}`}>
                     <div className={`flex-row justify-start items-center inline-block ${isHeaderNormal ? 'p-0' : 'flex py-2'}`} style={{ transition: 'all .25s ease-in-out' }}>
                         <a href={`/refinery/projects/${projectId}/settings`} onClick={(e) => {
@@ -305,7 +305,7 @@ export default function AttributeCalculation() {
             <div className="w-full">
                 <div className={`grid gap-4 ${isHeaderNormal ? 'grid-cols-2' : 'grid-cols-1'}`}>
                     {isHeaderNormal && <div className="flex items-center mt-2">
-                        <Tooltip color="invert" placement="right" content={currentAttribute.state == AttributeState.USABLE || currentAttribute.state == AttributeState.RUNNING ? TOOLTIPS_DICT.ATTRIBUTE_CALCULATION.CANNOT_EDIT_NAME : TOOLTIPS_DICT.ATTRIBUTE_CALCULATION.EDIT_NAME}>
+                        <Tooltip color="invert" placement="bottom" content={currentAttribute.state == AttributeState.USABLE || currentAttribute.state == AttributeState.RUNNING ? TOOLTIPS_DICT.ATTRIBUTE_CALCULATION.CANNOT_EDIT_NAME : TOOLTIPS_DICT.ATTRIBUTE_CALCULATION.EDIT_NAME}>
                             <button onClick={() => openName(true)} disabled={currentAttribute.state == AttributeState.USABLE || currentAttribute.state == AttributeState.RUNNING}
                                 className={`flex-shrink-0 bg-white text-gray-700 text-xs font-semibold mr-3 px-4 py-2 rounded-md border border-gray-300 block float-left hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 ${currentAttribute.state == AttributeState.USABLE || currentAttribute.state == AttributeState.RUNNING}`}>
                                 Edit name
@@ -324,7 +324,7 @@ export default function AttributeCalculation() {
                 <div className="grid grid-cols-2 gap-2 items-center mt-8" style={{ gridTemplateColumns: 'max-content auto' }}>
                     <div className="text-sm leading-5 font-medium text-gray-700">Visibility</div>
                     <Dropdown2 buttonName={currentAttribute.visibilityName} options={ATTRIBUTES_VISIBILITY_STATES} dropdownWidth="w-52" tooltipArrayPlacement="right" tooltipsArray={tooltipsArray}
-                        selectedOption={(option: any) => updateVisibility(option)} disabled={currentAttribute.state == AttributeState.USABLE} dropdownClasses="z-50" />
+                        selectedOption={(option: any) => updateVisibility(option)} disabled={currentAttribute.state == AttributeState.USABLE} dropdownClasses="z-40" />
 
                     <div className="text-sm leading-5 font-medium text-gray-700">Data type</div>
                     <div className="flex flex-row items-center">
@@ -372,7 +372,7 @@ export default function AttributeCalculation() {
                                 if (currentAttribute.state == AttributeState.USABLE) return;
                                 updateNameAndCodeBricksIntegrator(code);
                             }} />
-                        <Tooltip content={TOOLTIPS_DICT.ATTRIBUTE_CALCULATION.AVAILABLE_LIBRARIES} placement="left" color="invert">
+                        <Tooltip content={TOOLTIPS_DICT.ATTRIBUTE_CALCULATION.AVAILABLE_LIBRARIES} placement="bottom" color="invert">
                             <a href="https://github.com/code-kern-ai/refinery-ac-exec-env/blob/dev/requirements.txt"
                                 target="_blank"
                                 className="ml-2 bg-white text-gray-700 text-xs font-semibold  px-4 py-2 rounded-md border border-gray-300 hover:bg-gray-50 focus:outline-none">
