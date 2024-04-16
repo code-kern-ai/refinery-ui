@@ -427,7 +427,10 @@ export default function AttributeCalculation() {
 
                 <div className="mt-8">
                     <div className="text-sm leading-5 font-medium text-gray-700 inline-block">Calculation progress</div>
-                    {currentAttribute.progress == 0 && currentAttribute.state == AttributeState.INITIAL && <div className="bg-white">
+                    {(currentAttribute.progress == 0 || isNaN(currentAttribute.progress)) && currentAttribute.state == AttributeState.INITIAL && <div className="bg-white">
+                        <div className="py-6 text-sm leading-5 font-normal text-gray-500">This attribute was not yet run.</div>
+                    </div>}
+                    {currentAttribute.progress == 0.9 && currentAttribute.state == AttributeState.INITIAL && <div className="bg-white">
                         <div className="py-6 text-sm leading-5 font-normal text-gray-500">This attribute was not yet run.</div>
                     </div>}
                     {currentAttribute.progress < 1 && currentAttribute.state == AttributeState.RUNNING &&
