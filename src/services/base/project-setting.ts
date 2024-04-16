@@ -35,7 +35,7 @@ export function prepareRecordExport(projectId: string, options: {
     exportOptions: string, key: string | null
 }, onResult: (result: any) => void) {
     const finalUrl = `${projectSettingEndpoint}/${projectId}/prepare-record-export`;
-    jsonFetchWrapper(finalUrl, FetchType.POST, onResult, JSON.stringify({ options }));
+    jsonFetchWrapper(finalUrl, FetchType.POST, onResult, JSON.stringify({ "exportOptions": options.exportOptions, "key": options.key }));
 }
 
 export function getRecordByRecordId(projectId: string, recordId: string, onResult: (result: any) => void) {
