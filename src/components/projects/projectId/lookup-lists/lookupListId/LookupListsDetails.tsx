@@ -141,7 +141,7 @@ export default function LookupListsDetails() {
 
     useWebsocket(CurrentPage.LOOKUP_LISTS_DETAILS, handleWebsocketNotification, projectId);
 
-    return (projectId && <div className="bg-white p-4 overflow-y-auto max-h-full" onScroll={(e: any) => onScrollEvent(e)}>
+    return (projectId && <div className="bg-white p-4 overflow-y-auto min-h-full h-[calc(100vh-4rem)]" onScroll={(e: any) => onScrollEvent(e)}>
         {lookupList && <div>
             <div className={`sticky z-40 h-12 ${isHeaderNormal ? 'top-1' : '-top-5'}`}>
                 <div className={`bg-white flex-grow ${isHeaderNormal ? '' : 'shadow'}`}>

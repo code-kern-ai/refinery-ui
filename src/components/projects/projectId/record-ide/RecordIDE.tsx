@@ -172,7 +172,7 @@ export default function RecordIDE() {
     }
 
     return (<>
-        {projectId && <div className={`bg-white grid overflow-hidden ${vertical ? 'grid-cols-2' : 'grid-cols-1'}`}>
+        {projectId && <div className={`bg-white grid overflow-hidden min-h-full h-[calc(100vh-4rem)] ${vertical ? 'grid-cols-2' : 'grid-cols-1'}`}>
             <div className="h-full">
                 <div className="m-3 flex items-center">
                     <span className="mr-4">Editor</span>
@@ -254,10 +254,10 @@ export default function RecordIDE() {
                         See installed libraries
                     </a>
                 </div>
-                {!loading && <div className="ml-2 font-dmMono text-xs whitespace-pre-line overflow-y-auto" style={{ 'maxHeight': vertical ? 'calc(100vh - 125px)' : 'calc(50vh - 125px)' }}>
+                {!loading && <div className="ml-2 font-dmMono text-xs whitespace-pre-line overflow-y-auto" style={{ 'height': vertical ? 'calc(100vh - 150px)' : 'calc(50vh - 150px)' }}>
                     <code>{output}</code>
                 </div>}
-                {loading && <div className="h-full flex justify-center items-center" style={{ 'height': vertical ? 'calc(100vh - 150px)' : 'calc(50vh - 150px)' }}>
+                {loading && <div className="items-center" style={{ 'height': vertical ? 'calc(100vh - 150px)' : 'calc(50vh - 150px)' }}>
                     <LoadingIcon size="lg" />
                 </div>}
             </div>
