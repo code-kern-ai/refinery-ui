@@ -324,7 +324,7 @@ export default function AttributeCalculation() {
                 <div className="grid grid-cols-2 gap-2 items-center mt-8" style={{ gridTemplateColumns: 'max-content auto' }}>
                     <div className="text-sm leading-5 font-medium text-gray-700">Visibility</div>
                     <Dropdown2 buttonName={currentAttribute.visibilityName} options={ATTRIBUTES_VISIBILITY_STATES} dropdownWidth="w-52" tooltipArrayPlacement="right" tooltipsArray={tooltipsArray}
-                        selectedOption={(option: any) => updateVisibility(option)} disabled={currentAttribute.state == AttributeState.USABLE} />
+                        selectedOption={(option: any) => updateVisibility(option)} disabled={currentAttribute.state == AttributeState.USABLE} dropdownClasses="z-50" />
 
                     <div className="text-sm leading-5 font-medium text-gray-700">Data type</div>
                     <div className="flex flex-row items-center">
