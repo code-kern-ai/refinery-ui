@@ -12,7 +12,6 @@ import { Tooltip } from "@nextui-org/react";
 import { IconArrowLeft } from "@tabler/icons-react";
 import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux"
-import style from '@/src/styles/components/projects/projectId/heuristics/heuristics-details.module.css';
 import { useRouter } from "next/router";
 import { getAttributes } from "@/src/services/base/attribute";
 import { getLookupListsByProjectId } from "@/src/services/base/lookup-lists";
@@ -86,7 +85,6 @@ export default function HeuristicsLayout(props: any) {
     }
 
     function changeHeuristic(value: string, property: string) {
-        if (property == HeuristicsProperty.NAME && value == "") return;
         dispatch(updateHeuristicsState(currentHeuristic.id, { [property]: value }))
     }
 
