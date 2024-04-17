@@ -6,7 +6,7 @@ import { AttributeState } from "@/src/types/components/projects/projectId/settin
 import { ModalEnum } from "@/src/types/shared/modal";
 import { postProcessRecordByRecordId } from "@/src/util/components/projects/projectId/settings/attribute-calculation-helper";
 import { Tooltip } from "@nextui-org/react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
 import ConfirmExecutionModal from "./ConfirmExecutionModal";
@@ -26,12 +26,20 @@ export default function ExecutionContainer(props: ExecutionContainerProps) {
     const [checkIfAtLeastRunning, setCheckIfAtLeastRunning] = useState(false);
     const [checkIfAtLeastQueued, setCheckIfAtLeastQueued] = useState(false);
 
+    useEffect(() => {
+        if (props.enableRunButton) {
+            setRunOn10HasError(false);
+            setRequestedSomething(false);
+        }
+    }, [props.enableRunButton]);
+
     function calculateUserAttributeSampleRecords() {
         if (requestedSomething) return;
         setRequestedSomething(true);
         getSampleRecords(projectId, props.currentAttribute.id, (res) => {
             const sampleRecordsFinal = { ...res.data['calculateUserAttributeSampleRecords'] };
             setRequestedSomething(false);
+            props.setEnabledButton(false);
             setRunOn10HasError(sampleRecordsFinal.calculatedAttributes.length > 0 ? false : true);
             if (props.currentAttribute.dataType == 'EMBEDDING_LIST') {
                 sampleRecordsFinal.calculatedAttributesList = sampleRecordsFinal.calculatedAttributes.map((record: string) => JSON.parse(record));

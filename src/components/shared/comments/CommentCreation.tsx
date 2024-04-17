@@ -1,15 +1,19 @@
 import { selectComments } from "@/src/reduxStore/states/general";
 import { selectProjectId } from "@/src/reduxStore/states/project";
+import { selectSelectedComment, setSelectedComment } from "@/src/reduxStore/states/tmp";
 import { CommentCreationProps, CommentType } from "@/src/types/shared/comments";
 import { CommentDataManager } from "@/src/util/classes/comments";
 import { convertTypeToKey } from "@/src/util/shared/comments-helper";
 import Dropdown2 from "@/submodules/react-components/components/Dropdown2";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 
 export function CommentCreation(props: CommentCreationProps) {
+    const dispatch = useDispatch();
+
     const projectId = useSelector(selectProjectId);
     const comments = useSelector(selectComments);
+    const selectedType = useSelector(selectSelectedComment);
 
     const [type, setType] = useState(null);
     const [commentInstance, setCommentInstance] = useState(null);
@@ -22,7 +26,18 @@ export function CommentCreation(props: CommentCreationProps) {
 
     useEffect(() => {
         if (!CommentDataManager.currentCommentTypeOptions) return;
-        setType(CommentDataManager.currentCommentTypeOptions[0]);
+        if (selectedType) {
+            const typeOption = CommentDataManager.currentCommentTypeOptions.find((option) => option.name == selectedType.name);
+            if (typeOption) {
+                setType(typeOption);
+            } else {
+                setType(CommentDataManager.currentCommentTypeOptions[0]);
+                dispatch(setSelectedComment(null));
+            }
+        } else {
+            setType(CommentDataManager.currentCommentTypeOptions[0]);
+            dispatch(setSelectedComment(null));
+        }
     }, [CommentDataManager.currentCommentTypeOptions]);
 
     useEffect(() => {
@@ -82,6 +97,7 @@ export function CommentCreation(props: CommentCreationProps) {
                     setType(option);
                     setCommentInstance(null);
                     setCommentId(null);
+                    dispatch(setSelectedComment(option));
                 }} />
                 <Dropdown2 options={commentIdOptions} buttonName={commentInstance ? commentInstance.name : 'Select Instance'} selectedOption={(option: any) => {
                     setCommentInstance(option);

@@ -7,6 +7,7 @@ export type TmpState = {
     overviewFilters: ProjectOverviewFilters;
     notificationId: string;
     projectIdSampleProject: string;
+    selectedComment: string;
 }
 
 function getInitState(): TmpState {
@@ -15,7 +16,7 @@ function getInitState(): TmpState {
         overviewFilters: null,
         notificationId: null,
         projectIdSampleProject: null,
-
+        selectedComment: null,
     };
 }
 
@@ -52,6 +53,10 @@ const tmpSlice = createSlice({
         setProjectIdSampleProject: (state, action: PayloadAction<string>) => {
             if (action.payload) state.projectIdSampleProject = action.payload;
             else state.projectIdSampleProject = null;
+        },
+        setSelectedComment: (state, action: PayloadAction<string>) => {
+            if (action.payload) state.selectedComment = action.payload;
+            else state.selectedComment = null;
         }
     },
 });
@@ -60,7 +65,8 @@ export const selectSessionData = (state) => state.tmp.sessionData;
 export const selectOverviewFilters = (state) => state.tmp.overviewFilters;
 export const selectNotificationId = (state) => state.tmp.notificationId;
 export const selectProjectIdSampleProject = (state) => state.tmp.projectIdSampleProject;
+export const selectSelectedComment = (state) => state.tmp.selectedComment;
 
-export const { setSessionData, setOverviewFilters, updateOverFilters, setNotificationId, setProjectIdSampleProject } = tmpSlice.actions;
+export const { setSessionData, setOverviewFilters, updateOverFilters, setNotificationId, setProjectIdSampleProject, setSelectedComment } = tmpSlice.actions;
 
 export const tmpReducer = tmpSlice.reducer;

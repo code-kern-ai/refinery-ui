@@ -9,12 +9,15 @@ import Upload from "./Upload";
 import { selectUploadData } from "@/src/reduxStore/states/upload";
 import { IconAlertTriangle } from "@tabler/icons-react";
 import { timer } from "rxjs";
+import { selectModal } from "@/src/reduxStore/states/modal";
 
 const ACCEPT_BUTTON = { buttonCaption: "Upload", closeAfterClick: false, useButton: true, disabled: true };
 
 export default function ModalUpload(props: UploadProps) {
+
     const projects = useSelector(selectAllProjects);
     const uploadFileType = useSelector(selectUploadData).uploadFileType;
+    const modalUpload = useSelector(selectModal(ModalEnum.MODAL_UPLOAD));
 
     const [projectName, setProjectName] = useState<string>("");
     const [isProjectTitleDuplicate, setProjectTitleDuplicate] = useState<boolean>(false);
@@ -47,13 +50,22 @@ export default function ModalUpload(props: UploadProps) {
             tokenizer: props.uploadOptions.tokenizer,
             showBadPasswordMsg: props.uploadOptions.showBadPasswordMsg,
             projectName: projectName,
+            closeModalOnClick: props.uploadOptions.closeModalOnClick,
         });
     }, [projectName, props.uploadOptions, uploadFileType]);
 
     useEffect(() => {
         setAcceptButton({ ...acceptButton, disabled: isFileUploaded && !isProjectTitleDuplicate ? false : true, emitFunction: submitUpload });
-    }, [isFileUploaded, isProjectTitleDuplicate, submitUpload]);
+    }, [isFileUploaded, isProjectTitleDuplicate, submitUpload]); { }
 
+    useEffect(() => {
+        if (!modalUpload.open || isFileUploaded) {
+            setUploadOptions({
+                ...uploadOptions,
+                showBadPasswordMsg: false
+            });
+        }
+    }, [modalUpload.open, isFileUploaded]);
 
     function checkIfProjectNameDuplicate(value: string) {
         setProjectTitleDuplicate(projects.some(project => project.name == value));

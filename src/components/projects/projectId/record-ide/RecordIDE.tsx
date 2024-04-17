@@ -37,6 +37,7 @@ export default function RecordIDE() {
     const [loading, setLoading] = useState(false);
     const [output, setOutput] = useState("");
     const [debounceTimer, setDebounceTimer] = useState(null);
+    const [runCodeAfterLoad, setRunCodeAfterLoad] = useState(false);
 
     const huddleData = JSON.parse(localStorage.getItem("huddleData"));
 
@@ -70,15 +71,23 @@ export default function RecordIDE() {
         if (!projectId || !huddleData || !code) return;
         const shortcutRunIde = (event) => {
             if (event.shiftKey && event.key === "Enter") {
+                event.preventDefault();
                 runRecordIde();
             }
         };
 
-        document.addEventListener('keyup', shortcutRunIde);
+        document.addEventListener('keydown', shortcutRunIde);
         return () => {
-            document.removeEventListener('keyup', shortcutRunIde);
+            document.removeEventListener('keydown', shortcutRunIde);
         };
     }, [projectId, huddleData, code]);
+
+    useEffect(() => {
+        if (runCodeAfterLoad) {
+            runRecordIde();
+            setRunCodeAfterLoad(false);
+        }
+    }, [runCodeAfterLoad]);
 
     function setUpCommentsRequests() {
         const requests = [];
@@ -111,12 +120,13 @@ export default function RecordIDE() {
             }
             setCode(code);
         }
-        runRecordIde();
+        setRunCodeAfterLoad(true);
     }
 
     function saveCodeToLocalStorage() {
         const toSave = { code: caesarCipher(code, PASS_ME) };
         localStorage.setItem("ideCode", JSON.stringify(toSave));
+        setCanLoadFromLocalStorage(true);
     }
 
     function switchView() {

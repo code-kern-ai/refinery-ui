@@ -58,6 +58,7 @@ export default function AttributeCalculation() {
     const [editorValue, setEditorValue] = useState('');
     const [attributeName, setAttributeName] = useState('');
     const [checkUnsavedChanges, setCheckUnsavedChanges] = useState(false);
+    const [enableRunButton, setEnableButton] = useState(false);
 
     useEffect(() => {
         if (!currentAttribute) return;
@@ -403,6 +404,7 @@ export default function AttributeCalculation() {
                         options={editorOptions}
                         onChange={(value) => {
                             setEditorValue(value);
+                            setEnableButton(true);
                         }}
                     />
                 </div>
@@ -415,7 +417,8 @@ export default function AttributeCalculation() {
                 </div>
 
 
-                <ExecutionContainer currentAttribute={currentAttribute} tokenizationProgress={tokenizationProgress} checkUnsavedChanges={checkUnsavedChanges}
+                <ExecutionContainer currentAttribute={currentAttribute} tokenizationProgress={tokenizationProgress} enableRunButton={enableRunButton} checkUnsavedChanges={checkUnsavedChanges}
+                    setEnabledButton={(value: boolean) => setEnableButton(value)}
                     refetchCurrentAttribute={() => {
                         getAttributeByAttributeId(projectId, currentAttribute?.id, (res) => {
                             const attribute = res.data['attributeByAttributeId'];
