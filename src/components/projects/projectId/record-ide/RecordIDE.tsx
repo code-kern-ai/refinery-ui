@@ -37,6 +37,7 @@ export default function RecordIDE() {
     const [loading, setLoading] = useState(false);
     const [output, setOutput] = useState("");
     const [debounceTimer, setDebounceTimer] = useState(null);
+    const [runCodeAfterLoad, setRunCodeAfterLoad] = useState(false);
 
     const huddleData = JSON.parse(localStorage.getItem("huddleData"));
 
@@ -81,6 +82,13 @@ export default function RecordIDE() {
         };
     }, [projectId, huddleData, code]);
 
+    useEffect(() => {
+        if (runCodeAfterLoad) {
+            runRecordIde();
+            setRunCodeAfterLoad(false);
+        }
+    }, [runCodeAfterLoad]);
+
     function setUpCommentsRequests() {
         const requests = [];
         requests.push({ commentType: CommentType.ATTRIBUTE, projectId: projectId });
@@ -112,12 +120,13 @@ export default function RecordIDE() {
             }
             setCode(code);
         }
-        runRecordIde();
+        setRunCodeAfterLoad(true);
     }
 
     function saveCodeToLocalStorage() {
         const toSave = { code: caesarCipher(code, PASS_ME) };
         localStorage.setItem("ideCode", JSON.stringify(toSave));
+        setCanLoadFromLocalStorage(true);
     }
 
     function switchView() {
