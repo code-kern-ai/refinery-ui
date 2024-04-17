@@ -32,9 +32,11 @@ export function CommentCreation(props: CommentCreationProps) {
                 setType(typeOption);
             } else {
                 setType(CommentDataManager.currentCommentTypeOptions[0]);
+                dispatch(setSelectedComment(null));
             }
         } else {
             setType(CommentDataManager.currentCommentTypeOptions[0]);
+            dispatch(setSelectedComment(null));
         }
     }, [CommentDataManager.currentCommentTypeOptions]);
 
