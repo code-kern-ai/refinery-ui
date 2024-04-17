@@ -5,6 +5,8 @@ export type ExecutionContainerProps = {
     tokenizationProgress: number;
     refetchCurrentAttribute: () => void;
     checkUnsavedChanges: boolean;
+    enableRunButton: boolean;
+    setEnabledButton(value: boolean): void;
 }
 
 export type SampleRecord = {
