@@ -70,13 +70,14 @@ export default function RecordIDE() {
         if (!projectId || !huddleData || !code) return;
         const shortcutRunIde = (event) => {
             if (event.shiftKey && event.key === "Enter") {
+                event.preventDefault();
                 runRecordIde();
             }
         };
 
-        document.addEventListener('keyup', shortcutRunIde);
+        document.addEventListener('keydown', shortcutRunIde);
         return () => {
-            document.removeEventListener('keyup', shortcutRunIde);
+            document.removeEventListener('keydown', shortcutRunIde);
         };
     }, [projectId, huddleData, code]);
 
