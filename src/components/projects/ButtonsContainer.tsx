@@ -12,7 +12,7 @@ import SampleProjectsDropdown from "./SampleProjectsDropdown";
 import { CurrentPage, CurrentPageSubKey } from "@/src/types/shared/general";
 import { useWebsocket } from "@/src/services/base/web-sockets/useWebsocket";
 
-const BASE_OPTIONS = { reloadOnFinish: false, deleteProjectOnFail: true, closeModalOnClick: true, isModal: true, navigateToProject: true, showBadPasswordMsg: null };
+const BASE_OPTIONS = { reloadOnFinish: false, deleteProjectOnFail: true, closeModalOnClick: false, isModal: true, navigateToProject: true, showBadPasswordMsg: null };
 
 export default function ButtonsContainer() {
     const router = useRouter();
