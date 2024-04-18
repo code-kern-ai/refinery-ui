@@ -78,7 +78,7 @@ export default function Sidebar() {
             <div className="h-screen flex bg-gray-50 overflow-visible">
                 <div className="flex overflow-visible">
                     <div className="flex flex-col w-20 overflow-visible">
-                        <div className="flex-1 flex flex-col min-h-0 overflow-y-auto bg-kernindigo overflow-initial" style={{ zIndex: 100 }}>
+                        <div className="flex-1 flex flex-col min-h-0 bg-kernindigo overflow-initial" style={{ zIndex: 100 }}>
                             <div className="flex-1 flex flex-col">
                                 <div className="flex-shrink-0 bg-kernindigo pt-4 pb-10 flex items-center justify-center">
                                     <a href='/refinery/projects' onClick={(e: any) => { e.preventDefault(); dispatch(setProjectIdSampleProject(null)); router.push('/projects') }}
@@ -224,7 +224,7 @@ export default function Sidebar() {
                                 <Tooltip placement="right" trigger="hover" color="invert" content={TOOLTIPS_DICT.SIDEBAR.VERSION_OVERVIEW}>
                                     <div onClick={requestVersionOverview} id="refineryVersion"
                                         className="z-50 tooltip tooltip-right cursor-pointer select-none text-white flex items-center mr-1">
-                                        v1.13.0
+                                        v1.14.0
                                         {hasUpdates && <Tooltip placement="right" trigger="hover" color="invert" content={TOOLTIPS_DICT.SIDEBAR.NEWER_VERSION_AVAILABLE} >
                                             <IconAlertCircle className="h-5 w-5 text-yellow-700" />
                                         </Tooltip>}

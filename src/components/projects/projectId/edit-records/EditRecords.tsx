@@ -73,7 +73,7 @@ export default function EditRecords() {
 
     useWebsocket(CurrentPage.EDIT_RECORDS, handleWebsocketNotification, projectId);
 
-    return (<>{projectId && <div className="h-full bg-white flex flex-col">
+    return (<>{projectId && <div className="bg-white flex flex-col min-h-full h-[calc(100vh-4rem)]">
         <NavBarTopEditRecords erdData={erdData} setErdData={(erdData) => setErdData(erdData)} />
         <div className={`grid items-start p-2 gap-2 flex-grow overflow-y-auto auto-rows-max ${erdData.columnClass}`} >
             {erdData.data && <>

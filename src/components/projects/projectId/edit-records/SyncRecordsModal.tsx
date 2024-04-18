@@ -18,13 +18,14 @@ export default function SyncRecordsModal(props: SyncRecordsModalProps) {
     const projectId = useSelector(selectProjectId);
     const syncRecordsModal = useSelector(selectModal(ModalEnum.SYNC_RECORDS));
 
+    const [syncing, setSyncing] = useState(false);
+
     const [acceptButton, setAcceptButton] = useState<ModalButton>(ACCEPT_BUTTON);
 
     const syncChanges = useCallback(() => {
         const erdDataCopy = { ...props.erdData };
-        erdDataCopy.syncing = true;
+        setSyncing(true);
         erdDataCopy.errors = null;
-        props.setErdData(erdDataCopy);
         const changes = jsonCopy(erdDataCopy.cachedRecordChanges);
         for (const key in changes) delete changes[key].display;
         syncEditedRecords(projectId, changes, (res) => {
@@ -37,11 +38,11 @@ export default function SyncRecordsModal(props: SyncRecordsModalProps) {
                 if (tmp) erdDataCopy.errors = tmp.errors;
                 else erdDataCopy.errors = ["Request didn't go through"];
             }
-            erdDataCopy.syncing = false;
+            setSyncing(false);
             props.setErdData(erdDataCopy);
         }, (err) => {
             erdDataCopy.errors = ["Request didn't go through"];
-            erdDataCopy.syncing = false;
+            setSyncing(false);
             props.setErdData(erdDataCopy);
         });
     }, [props.erdData]);
@@ -70,7 +71,7 @@ export default function SyncRecordsModal(props: SyncRecordsModalProps) {
     return (<Modal modalName={ModalEnum.SYNC_RECORDS} acceptButton={acceptButton}>
         {props.erdData && <>
             <h1 className="text-lg text-gray-900 mb-2 text-center inline-flex items-center gap-x-1">Info
-                {props.erdData.syncing ? (<LoadingIcon color="blue" />) : (<IconInfoCircle className="text-blue-400" />)}
+                {syncing ? (<LoadingIcon color="blue" />) : (<IconInfoCircle className="text-blue-400" />)}
             </h1>
             <div className="text-sm text-gray-700 flex flex-col gap-y-2 mb-2 font-medium">
                 <div> {syncRecordsModal.syncModalAmount} changes to be synchronized: </div>

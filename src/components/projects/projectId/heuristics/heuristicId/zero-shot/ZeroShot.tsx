@@ -46,6 +46,9 @@ export default function ZeroShot() {
     const [models, setModels] = useState([]);
     const [confidences, setConfidences] = useState<any[]>(CONFIDENCE_INTERVALS);
 
+    const [initialAttributeSet, setInitialAttributeSet] = useState(false);
+    const [labelingTasksLocal, setLabelingTasksLocal] = useState([]);
+
     useEffect(() => {
         setConfidences(CONFIDENCE_INTERVALS.map((conf) => {
             return { value: conf, label: conf + '%' };
@@ -66,6 +69,23 @@ export default function ZeroShot() {
         if (!labelingTasks) return;
         refetchCurrentHeuristicAndProcess();
     }, [labelingTasks]);
+
+    useEffect(() => {
+        if (!currentHeuristic) return;
+        if (!projectId) return;
+        if (!labelingTasks) return;
+        if (initialAttributeSet === false) {
+            setInitialAttributeSet(true);
+        }
+    }, [currentHeuristic, labelingTasks]);
+
+    useEffect(() => {
+        if (initialAttributeSet === true) {
+            if (textAttributes.length > 0 && labelingTasks.length > 0) {
+                changeZeroShotSettings('attributeId', textAttributes[0].id);
+            }
+        }
+    }, [initialAttributeSet]);
 
     useEffect(() => {
         if (!projectId || allUsers.length == 0) return;
@@ -97,6 +117,7 @@ export default function ZeroShot() {
     function refetchLabelingTasksAndProcess() {
         getLabelingTasksByProjectId(projectId, (res) => {
             const labelingTasks = postProcessLabelingTasks(res['data']['projectByProjectId']['labelingTasks']['edges']);
+            setLabelingTasksLocal(labelingTasks);
             dispatch(setLabelingTasksAll(postProcessLabelingTasksSchema(labelingTasks)));
         });
     }
@@ -175,7 +196,7 @@ export default function ZeroShot() {
                 <div className="relative flex-shrink-0 min-h-16 flex justify-between pb-2">
                     <div className="flex items-center flex-wrap mt-3">
                         <Tooltip content={TOOLTIPS_DICT.ZERO_SHOT.LABELING_TASK} color="invert" placement="top">
-                            <Dropdown2 options={labelingTasks} buttonName={currentHeuristic?.labelingTaskName} selectedOption={(option: any) => saveHeuristic(option)} />
+                            <Dropdown2 options={labelingTasksLocal} buttonName={currentHeuristic?.labelingTaskName} selectedOption={(option: any) => saveHeuristic(option)} />
 
                         </Tooltip>
                         {currentHeuristic.labels?.length == 0 ? (<div className="text-sm font-normal text-gray-500 ml-3">No labels for target task</div>) : <>

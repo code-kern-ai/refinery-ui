@@ -1,5 +1,7 @@
+import MultilineTooltipAutoContent from "@/src/components/shared/multilines-tooltip/MultilineTooltipAuto";
 import { selectHeuristic } from "@/src/reduxStore/states/pages/heuristics"
 import { Stat } from "@/src/types/components/projects/projectId/heuristics/heuristics";
+import { Tooltip } from "@nextui-org/react";
 import { useSelector } from "react-redux"
 
 export default function HeuristicStatistics() {
@@ -9,8 +11,8 @@ export default function HeuristicStatistics() {
         <div className="mt-8">
             <div className="text-sm leading-5 font-medium text-gray-700 inline-block">Statistics</div>
             <div className="mt-1 flex flex-col">
-                <div className="-my-2 -mx-4 overflow-x-auto sm:-mx-6 lg:-mx-8">
-                    <div className="inline-block min-w-full py-2 align-middle md:px-6 lg:px-8">
+                <div className="overflow-x-auto">
+                    <div className="inline-block min-w-full py-2 align-middle">
                         <div className="overflow-hidden shadow ring-1 ring-black ring-opacity-5 md:rounded-lg">
                             <table className="min-w-full border divide-y divide-gray-300">
                                 <thead className="bg-gray-50">
@@ -19,36 +21,58 @@ export default function HeuristicStatistics() {
                                             className="py-2 pl-4 pr-3 text-left text-xs font-medium uppercase tracking-wide text-gray-500 sm:pl-6">
                                             Label</th>
                                         <th scope="col"
-                                            className="px-3 py-2 text-center text-xs font-medium uppercase tracking-wide text-gray-500">
-                                            <span className="tooltip-text-smaller tooltip tooltip-right"
-                                                data-tip="True positives / (True positives + False positives) for the reference data you labeled">Est.
-                                                Precision</span>
+                                            className="px-3 py-2 text-xs font-medium uppercase tracking-wide text-gray-500">
+                                            <div className="flex w-full justify-center">
+                                                <Tooltip
+                                                    content={<MultilineTooltipAutoContent tooltip="True positives / (True positives + False positives)\nfor the reference data you labeled" splitOn="\n" />}
+                                                    color="invert"
+                                                    placement="top">Est. Precision</Tooltip>
+                                            </div>
                                         </th>
                                         {currentHeuristic.returnType == 'YIELD' && <th scope="col"
-                                            className="px-3 py-2 text-center text-xs font-medium uppercase tracking-wide text-gray-500">
-                                            <span className="tooltip-text-smaller tooltip tooltip-right"
-                                                data-tip="True positives / (True positives + False negatives) for the reference data you labeled">Est.
-                                                Recall</span>
+                                            className="px-3 py-2 text-xs font-medium uppercase tracking-wide text-gray-500">
+                                            <div className="flex w-full justify-center">
+                                                <Tooltip
+                                                    content={<MultilineTooltipAutoContent tooltip="True positives / (True positives + False negatives)\nfor the reference data you labeled" splitOn="\n" />}
+                                                    color="invert"
+                                                    placement="top">Est. Recall</Tooltip>
+                                            </div>
                                         </th>}
                                         <th scope="col"
-                                            className="px-3 py-2 text-center text-xs font-medium uppercase tracking-wide text-gray-500">
-                                            <span className="tooltip-text-smaller tooltip tooltip-left"
-                                                data-tip="How many records does this heuristic generally hit?">Coverage</span>
+                                            className="px-3 py-2 text-xs font-medium uppercase tracking-wide text-gray-500">
+                                            <div className="flex w-full justify-center">
+                                                <Tooltip
+                                                    content={<MultilineTooltipAutoContent tooltip="How many records does this\nheuristic generally hit?" splitOn="\n" />}
+                                                    color="invert"
+                                                    placement="top">Coverage</Tooltip>
+                                            </div>
                                         </th>
                                         <th scope="col"
-                                            className="px-3 py-2 text-center text-xs font-medium uppercase tracking-wide text-gray-500">
-                                            <span className="tooltip-text-no-margin tooltip tooltip-left"
-                                                data-tip="How many spans are hit by this heuristic?">Hits</span>
+                                            className="px-3 py-2 text-xs font-medium uppercase tracking-wide text-gray-500">
+                                            <div className="flex w-full justify-center">
+                                                <Tooltip
+                                                    content={<MultilineTooltipAutoContent tooltip="How many spans are hit\nby this heuristic?" splitOn="\n" />}
+                                                    color="invert"
+                                                    placement="top">Hits</Tooltip>
+                                            </div>
                                         </th>
                                         <th scope="col"
-                                            className="px-3 py-2 text-center text-xs font-medium uppercase tracking-wide text-gray-500">
-                                            <span className="tooltip-text-bigger tooltip tooltip-left"
-                                                data-tip="On how many records (or spans) does this heuristic create conflicting expressions to other heuristics?">Conflicts</span>
+                                            className="px-3 py-2 text-xs font-medium uppercase tracking-wide text-gray-500">
+                                            <div className="flex w-full justify-center">
+                                                <Tooltip
+                                                    content={<MultilineTooltipAutoContent tooltip="On how many records (or spans)\ndoes this heuristic create conflicting\nexpressions to other heuristics?" splitOn="\n" />}
+                                                    color="invert"
+                                                    placement="top">Conflicts</Tooltip>
+                                            </div>
                                         </th>
                                         <th scope="col"
-                                            className="px-3 py-2 text-center text-xs font-medium uppercase tracking-wide text-gray-500">
-                                            <span className="tooltip-text-bigger tooltip tooltip-left"
-                                                data-tip="On how many records (or spans) does this heuristic create overlapping expressions to other heuristics?">Overlaps</span>
+                                            className="px-3 py-2 text-xs font-medium uppercase tracking-wide text-gray-500">
+                                            <div className="flex w-full justify-center">
+                                                <Tooltip
+                                                    content={<MultilineTooltipAutoContent tooltip="On how many records (or spans)\ndoes this heuristic create overlapping\nexpressions to other heuristics?" splitOn="\n" />}
+                                                    color="invert"
+                                                    placement="top">Overlaps</Tooltip>
+                                            </div>
                                         </th>
                                     </tr>
                                 </thead>

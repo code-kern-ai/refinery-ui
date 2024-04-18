@@ -14,7 +14,7 @@ import { useRouter } from "next/router";
 import { useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux"
 import ExecutionContainer from "./ExecutionContainer";
-import { getPythonFunctionRegExMatch } from "@/submodules/javascript-functions/python-functions-parser";
+import { getPythonFunctionRegExMatch, toPythonFunctionName } from "@/submodules/javascript-functions/python-functions-parser";
 import DangerZone from "@/src/components/shared/danger-zone/DangerZone";
 import { DangerZoneEnum } from "@/src/types/shared/danger-zone";
 import ContainerLogs from "@/src/components/shared/logs/ContainerLogs";
@@ -58,6 +58,7 @@ export default function AttributeCalculation() {
     const [editorValue, setEditorValue] = useState('');
     const [attributeName, setAttributeName] = useState('');
     const [checkUnsavedChanges, setCheckUnsavedChanges] = useState(false);
+    const [enableRunButton, setEnableButton] = useState(false);
 
     useEffect(() => {
         if (!currentAttribute) return;
@@ -285,9 +286,9 @@ export default function AttributeCalculation() {
 
     useWebsocket(CurrentPage.ATTRIBUTE_CALCULATION, handleWebsocketNotification, projectId);
 
-    return (projectId && <div className="bg-white p-4 overflow-y-auto max-h-full" style={{ width: 'calc(100vw - 95px)', minWidth: '1175px' }} onScroll={(e: any) => onScrollEvent(e)}>
+    return (projectId && <div className={`bg-white p-4 overflow-y-auto min-h-full h-[calc(100vh-4rem)]`} onScroll={(e: any) => onScrollEvent(e)}>
         {currentAttribute && <div>
-            <div className={`sticky z-40 h-12 ${isHeaderNormal ? 'top-1' : '-top-5'}`}>
+            <div className={`sticky z-50 h-12 ${isHeaderNormal ? 'top-1' : '-top-5'}`}>
                 <div className={`bg-white flex-grow ${isHeaderNormal ? '' : 'shadow'}`}>
                     <div className={`flex-row justify-start items-center inline-block ${isHeaderNormal ? 'p-0' : 'flex py-2'}`} style={{ transition: 'all .25s ease-in-out' }}>
                         <a href={`/refinery/projects/${projectId}/settings`} onClick={(e) => {
@@ -305,7 +306,7 @@ export default function AttributeCalculation() {
             <div className="w-full">
                 <div className={`grid gap-4 ${isHeaderNormal ? 'grid-cols-2' : 'grid-cols-1'}`}>
                     {isHeaderNormal && <div className="flex items-center mt-2">
-                        <Tooltip color="invert" placement="right" content={currentAttribute.state == AttributeState.USABLE || currentAttribute.state == AttributeState.RUNNING ? TOOLTIPS_DICT.ATTRIBUTE_CALCULATION.CANNOT_EDIT_NAME : TOOLTIPS_DICT.ATTRIBUTE_CALCULATION.EDIT_NAME}>
+                        <Tooltip color="invert" placement="bottom" content={currentAttribute.state == AttributeState.USABLE || currentAttribute.state == AttributeState.RUNNING ? TOOLTIPS_DICT.ATTRIBUTE_CALCULATION.CANNOT_EDIT_NAME : TOOLTIPS_DICT.ATTRIBUTE_CALCULATION.EDIT_NAME}>
                             <button onClick={() => openName(true)} disabled={currentAttribute.state == AttributeState.USABLE || currentAttribute.state == AttributeState.RUNNING}
                                 className={`flex-shrink-0 bg-white text-gray-700 text-xs font-semibold mr-3 px-4 py-2 rounded-md border border-gray-300 block float-left hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 ${currentAttribute.state == AttributeState.USABLE || currentAttribute.state == AttributeState.RUNNING}`}>
                                 Edit name
@@ -313,7 +314,7 @@ export default function AttributeCalculation() {
                         </Tooltip>
                         <div className="inline-block" onDoubleClick={() => openName(true)}>
                             {(isNameOpen && currentAttribute.state != AttributeState.USABLE && currentAttribute.state != AttributeState.RUNNING)
-                                ? (<input type="text" value={attributeName} onInput={(e: any) => setAttributeName(e.target.value)}
+                                ? (<input type="text" value={attributeName} onInput={(e: any) => setAttributeName(toPythonFunctionName(e.target.value))}
                                     onBlur={() => openName(false)} onKeyDown={(e) => { if (e.key == 'Enter') openName(false) }}
                                     className="h-8 text-sm border-gray-300 rounded-md placeholder-italic border text-gray-700 pl-4 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100" />)
                                 : (<div className="mr-4 text-sm leading-5 font-medium text-gray-500 inline-block">{currentAttribute.name}</div>)}
@@ -324,7 +325,7 @@ export default function AttributeCalculation() {
                 <div className="grid grid-cols-2 gap-2 items-center mt-8" style={{ gridTemplateColumns: 'max-content auto' }}>
                     <div className="text-sm leading-5 font-medium text-gray-700">Visibility</div>
                     <Dropdown2 buttonName={currentAttribute.visibilityName} options={ATTRIBUTES_VISIBILITY_STATES} dropdownWidth="w-52" tooltipArrayPlacement="right" tooltipsArray={tooltipsArray}
-                        selectedOption={(option: any) => updateVisibility(option)} disabled={currentAttribute.state == AttributeState.USABLE} />
+                        selectedOption={(option: any) => updateVisibility(option)} disabled={currentAttribute.state == AttributeState.USABLE} dropdownClasses="z-40" />
 
                     <div className="text-sm leading-5 font-medium text-gray-700">Data type</div>
                     <div className="flex flex-row items-center">
@@ -372,7 +373,7 @@ export default function AttributeCalculation() {
                                 if (currentAttribute.state == AttributeState.USABLE) return;
                                 updateNameAndCodeBricksIntegrator(code);
                             }} />
-                        <Tooltip content={TOOLTIPS_DICT.ATTRIBUTE_CALCULATION.AVAILABLE_LIBRARIES} placement="left" color="invert">
+                        <Tooltip content={TOOLTIPS_DICT.ATTRIBUTE_CALCULATION.AVAILABLE_LIBRARIES} placement="bottom" color="invert">
                             <a href="https://github.com/code-kern-ai/refinery-ac-exec-env/blob/dev/requirements.txt"
                                 target="_blank"
                                 className="ml-2 bg-white text-gray-700 text-xs font-semibold  px-4 py-2 rounded-md border border-gray-300 hover:bg-gray-50 focus:outline-none">
@@ -403,6 +404,7 @@ export default function AttributeCalculation() {
                         options={editorOptions}
                         onChange={(value) => {
                             setEditorValue(value);
+                            setEnableButton(true);
                         }}
                     />
                 </div>
@@ -415,7 +417,8 @@ export default function AttributeCalculation() {
                 </div>
 
 
-                <ExecutionContainer currentAttribute={currentAttribute} tokenizationProgress={tokenizationProgress} checkUnsavedChanges={checkUnsavedChanges}
+                <ExecutionContainer currentAttribute={currentAttribute} tokenizationProgress={tokenizationProgress} enableRunButton={enableRunButton} checkUnsavedChanges={checkUnsavedChanges}
+                    setEnabledButton={(value: boolean) => setEnableButton(value)}
                     refetchCurrentAttribute={() => {
                         getAttributeByAttributeId(projectId, currentAttribute?.id, (res) => {
                             const attribute = res.data['attributeByAttributeId'];
@@ -427,7 +430,10 @@ export default function AttributeCalculation() {
 
                 <div className="mt-8">
                     <div className="text-sm leading-5 font-medium text-gray-700 inline-block">Calculation progress</div>
-                    {currentAttribute.progress == 0 && currentAttribute.state == AttributeState.INITIAL && <div className="bg-white">
+                    {(currentAttribute.progress == 0 || isNaN(currentAttribute.progress)) && currentAttribute.state == AttributeState.INITIAL && <div className="bg-white">
+                        <div className="py-6 text-sm leading-5 font-normal text-gray-500">This attribute was not yet run.</div>
+                    </div>}
+                    {currentAttribute.progress == 0.9 && currentAttribute.state == AttributeState.INITIAL && <div className="bg-white">
                         <div className="py-6 text-sm leading-5 font-normal text-gray-500">This attribute was not yet run.</div>
                     </div>}
                     {currentAttribute.progress < 1 && currentAttribute.state == AttributeState.RUNNING &&

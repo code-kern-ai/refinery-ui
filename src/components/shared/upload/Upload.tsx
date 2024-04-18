@@ -14,7 +14,7 @@ import { extendAllProjects, removeFromAllProjectsById, selectAllProjects, select
 import { UPLOAD_TOKENIZERS } from "@/src/util/constants";
 import { UploadHelper, ZIP_TYPE } from "@/src/util/classes/upload-helper";
 import CryptedField from "../crypted-field/CryptedField";
-import { closeModal } from "@/src/reduxStore/states/modal";
+import { closeModal, selectModal } from "@/src/reduxStore/states/modal";
 import { ModalEnum } from "@/src/types/shared/modal";
 import Dropdown2 from "@/submodules/react-components/components/Dropdown2";
 import { useWebsocket } from "@/src/services/base/web-sockets/useWebsocket";
@@ -191,7 +191,7 @@ export default function Upload(props: UploadProps) {
                         setSelectedFile(null);
                         setSubmitted(false);
                         dispatch(setImportOptions(""));
-                        if (props.uploadOptions.isModal) {
+                        if (props.uploadOptions.isModal && props.uploadOptions.closeModalOnClick) {
                             dispatch(closeModal(ModalEnum.MODAL_UPLOAD));
                             if (props.closeModalEvent) props.closeModalEvent();
                         }
@@ -212,6 +212,7 @@ export default function Upload(props: UploadProps) {
             if (props.uploadOptions && props.uploadOptions.reloadOnFinish) location.reload();
             else setUploadStarted(false);
             router.push('/projects/' + UploadHelper.getProjectId() + '/settings');
+            dispatch(closeModal(ModalEnum.MODAL_UPLOAD));
         }
     }
 

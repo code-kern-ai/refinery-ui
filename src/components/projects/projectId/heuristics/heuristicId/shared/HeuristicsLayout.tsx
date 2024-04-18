@@ -12,7 +12,6 @@ import { Tooltip } from "@nextui-org/react";
 import { IconArrowLeft } from "@tabler/icons-react";
 import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux"
-import style from '@/src/styles/components/projects/projectId/heuristics/heuristics-details.module.css';
 import { useRouter } from "next/router";
 import { getAttributes } from "@/src/services/base/attribute";
 import { getLookupListsByProjectId } from "@/src/services/base/lookup-lists";
@@ -86,7 +85,6 @@ export default function HeuristicsLayout(props: any) {
     }
 
     function changeHeuristic(value: string, property: string) {
-        if (property == HeuristicsProperty.NAME && value == "") return;
         dispatch(updateHeuristicsState(currentHeuristic.id, { [property]: value }))
     }
 
@@ -102,8 +100,8 @@ export default function HeuristicsLayout(props: any) {
         });
     }
 
-    return (projectId && <div className={`bg-white p-4 overflow-y-auto max-h-full ${style.widthSize}`} onScroll={onScrollEvent}>
-        {currentHeuristic && <div>
+    return (projectId && <div className={`bg-white p-4 overflow-y-auto min-h-full h-[calc(100vh-4rem)] w-[calc(100vw-5rem)]`} onScroll={onScrollEvent}>
+        {currentHeuristic && <>
             <div className={`sticky z-40 h-12 ${isHeaderNormal ? 'top-1' : '-top-5'}`}>
                 <div className={`bg-white flex-grow ${isHeaderNormal ? '' : 'shadow'}`}>
                     <div className={`flex-row justify-start items-center inline-block ${isHeaderNormal ? 'p-0' : 'flex py-2'}`} style={{ transition: 'all .25s ease-in-out' }}>
@@ -133,7 +131,7 @@ export default function HeuristicsLayout(props: any) {
                     </div>
                 </div>
             </div>
-            <div className="w-full overflow-hidden">
+            <div className="w-full">
                 <div className={`grid gap-4 ${isHeaderNormal ? 'grid-cols-2' : 'grid-cols-1'}`}>
                     {isHeaderNormal && <div className="flex items-start mt-2">
                         <Tooltip color="invert" placement="bottom" content={TOOLTIPS_DICT.HEURISTICS.EDIT_NAME}>
@@ -197,7 +195,7 @@ export default function HeuristicsLayout(props: any) {
                 </div>}
                 {props.children}
             </div>
-        </div>}
+        </>}
     </div>
     )
 }
