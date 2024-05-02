@@ -64,6 +64,7 @@ module.exports = {
     },
     screens: {
       "xs": "450px",
+      'small': { 'raw': '(max-height: 1200px)' },
       ...defaultTheme.screens,
     }
   },

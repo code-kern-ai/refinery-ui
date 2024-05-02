@@ -7,7 +7,7 @@ import { selectAllProjects } from '@/src/reduxStore/states/project';
 import { ModalButton, ModalEnum } from '@/src/types/shared/modal';
 import { closeModal, openModal } from '@/src/reduxStore/states/modal';
 import Modal from '../shared/modal/Modal';
-import { IconAlertTriangle, IconFishHook, IconMessageCircle, IconNews } from '@tabler/icons-react';
+import { IconAlertTriangle, IconFishHook, IconMessageCircle, IconNews, IconQuestionMark, IconScreenshot } from '@tabler/icons-react';
 import { setSearchGroupsStore } from '@/src/reduxStore/states/pages/data-browser';
 import { selectProjectIdSampleProject, setProjectIdSampleProject } from '@/src/reduxStore/states/tmp';
 import { createSampleProject } from '@/src/services/base/project';
@@ -93,7 +93,7 @@ export default function SampleProjectsDropdown() {
                 leaveFrom="transform opacity-100 scale-100"
                 leaveTo="transform opacity-0 scale-95"
             >
-                <Menu.Items className="absolute w-max z-10 mt-2 origin-top-left rounded-md ml-6 bg-white shadow-sm ring-1 ring-black ring-opacity-5 focus:outline-none">
+                <Menu.Items className="absolute w-max z-10 mt-2 small:max-h-72 small:overflow-y-auto origin-top-left rounded-md ml-6 bg-white shadow-sm ring-1 ring-black ring-opacity-5 focus:outline-none">
                     <div className="py-1">
                         <Menu.Item>
                             {({ active }) => (
@@ -102,8 +102,10 @@ export default function SampleProjectsDropdown() {
                                     onClick={() => {
                                         importSampleProject("Clickbait", "Clickbait");
                                     }}>
-                                    <IconFishHook className="h-5 w-5 inline-block" />
-                                    <span className="ml-2">Clickbait</span>
+                                    <div className="flex flex-row items-center">
+                                        <IconFishHook className="h-5 w-5 inline-block" />
+                                        <span className="ml-2">Clickbait</span>
+                                    </div>
                                     <div className="mt-2">Binary classification for detecting nudging articles.</div>
                                 </a>
                             )}
@@ -126,8 +128,10 @@ export default function SampleProjectsDropdown() {
                                     onClick={() => {
                                         importSampleProject("Conversational AI", "Conversational AI");
                                     }}>
-                                    <IconMessageCircle className="h-5 w-5 inline-block" />
-                                    <span className="ml-2">Conversational AI</span>
+                                    <div className="flex flex-row items-center">
+                                        <IconMessageCircle className="h-5 w-5 inline-block" />
+                                        <span className="ml-2">Conversational AI</span>
+                                    </div>
                                     <div className="mt-2">Detecting intent within conversational lines.</div>
                                 </a>
                             )}
@@ -150,8 +154,10 @@ export default function SampleProjectsDropdown() {
                                     onClick={() => {
                                         importSampleProject("AG News", "AG News");
                                     }}>
-                                    <IconNews className="h-5 w-5 inline-block" />
-                                    <span className="ml-2">AG News</span>
+                                    <div className="flex flex-row items-center">
+                                        <IconNews className="h-5 w-5 inline-block" />
+                                        <span className="ml-2">AG News</span>
+                                    </div>
                                     <div className="mt-2">Modelling topics of headline news.</div>
                                 </a>
                             )}
@@ -164,6 +170,36 @@ export default function SampleProjectsDropdown() {
                                         importSampleProject("AG News - initial", "AG News - initial");
                                     }}>
                                     <span>Initial (only contains the initial data set and labels.)</span>
+                                </a>
+                            )}
+                        </Menu.Item>
+                        <Menu.Item>
+                            {({ active }) => (
+                                <a key="sample-project-6" style={{ borderBottom: '1px dashed #e2e8f0' }}
+                                    className={`opacity-100 cursor-pointer text-gray-900 block px-3 py-2 text-sm ${active ? "bg-kernindigo text-white" : ""}`}
+                                    onClick={() => {
+                                        importSampleProject("Global Guard [References]", "Global Guard [References]");
+                                    }}>
+                                    <div className="flex flex-row items-center">
+                                        <IconScreenshot className="h-5 w-5 inline-block" />
+                                        <span className="ml-2">DEV Global Guard [References]</span>
+                                    </div>
+                                    <div className="mt-2">References right after the wizard went through.</div>
+                                </a>
+                            )}
+                        </Menu.Item>
+                        <Menu.Item>
+                            {({ active }) => (
+                                <a key="sample-project-6" style={{ borderBottom: '1px solid #e2e8f0' }}
+                                    className={`opacity-100 cursor-pointer text-gray-900 block px-3 py-2 text-sm ${active ? "bg-kernindigo text-white" : ""}`}
+                                    onClick={() => {
+                                        importSampleProject("Global Guard [Questions]", "Global Guard [Questions]");
+                                    }}>
+                                    <div className="flex flex-row items-center">
+                                        <IconQuestionMark className="h-5 w-5 inline-block" />
+                                        <span className="ml-2">DEV Global Guard [Questions]</span>
+                                    </div>
+                                    <div className="mt-2">Questions right after the wizard went through.</div>
                                 </a>
                             )}
                         </Menu.Item>
