@@ -93,7 +93,7 @@ export default function SampleProjectsDropdown() {
                 leaveFrom="transform opacity-100 scale-100"
                 leaveTo="transform opacity-0 scale-95"
             >
-                <Menu.Items className="absolute w-max z-10 mt-2 origin-top-left rounded-md ml-6 bg-white shadow-sm ring-1 ring-black ring-opacity-5 focus:outline-none">
+                <Menu.Items className="absolute w-max z-10 mt-2 small:max-h-72 small:overflow-y-auto origin-top-left rounded-md ml-6 bg-white shadow-sm ring-1 ring-black ring-opacity-5 focus:outline-none">
                     <div className="py-1">
                         <Menu.Item>
                             {({ active }) => (
