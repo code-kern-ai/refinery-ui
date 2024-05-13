@@ -200,6 +200,7 @@ export default function SearchGroups() {
     useEffect(() => {
         if (!currentWeakSupervisionRun) return;
         if (currentWeakSupervisionRun.state == Status.NOT_YET_RUN) return;
+        if (!currentWeakSupervisionRun.selectedInformationSources) return;
         setSelectedHeuristicsWS(currentWeakSupervisionRun.selectedInformationSources.split(','));
     }, [currentWeakSupervisionRun]);
 
