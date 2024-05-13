@@ -1,6 +1,4 @@
-import { ApolloProvider } from '@apollo/client'
 import type { AppProps } from 'next/app'
-import client from '../services/gql/apollo-client'
 import '../styles/tailwind.css'
 import Head from 'next/head'
 import Layout from '../components/shared/layout/Layout'
@@ -24,13 +22,11 @@ export default function App({ Component, pageProps }: AppProps) {
     </Head>
 
     <Provider store={store}>
-      <ApolloProvider client={client}>
-        <GlobalStoreDataComponent>
-          <Layout {...pageProps}>
-            <Component {...pageProps} />
-          </Layout>
-        </GlobalStoreDataComponent>
-      </ApolloProvider>
+      <GlobalStoreDataComponent>
+        <Layout {...pageProps}>
+          <Component {...pageProps} />
+        </Layout>
+      </GlobalStoreDataComponent>
     </Provider>
   </>
 }
