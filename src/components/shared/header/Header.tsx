@@ -80,7 +80,7 @@ export default function Header() {
                 </div>) : (<></>)}
                 <div className="flex items-center">
                     {currentPage == CurrentPage.PROJECTS || currentPage == CurrentPage.USERS ? (<div className="ml-4 text-gray-500 text-sm font-normal">
-                        {!organizationInactive && <> Welcome, <span className="font-bold text-gray-900">{user?.firstName}</span>! See your projects at <span className="font-bold text-gray-900">{organization?.name}</span>.</>}
+                        {!organizationInactive && <> Welcome, <span className="font-bold text-gray-900">{user?.firstName}</span>! See your projects below at <span className="font-bold text-gray-900">{organization?.name}</span>.</>}
                         {organizationInactive && <> Welcome, <span className="font-bold text-gray-900">{user?.firstName}</span>! {!isManaged ? 'Switch to your main account to continue labeling...' : 'You are currently on the waitlist.'}
                         </>}
                     </div>) : (<></>)}

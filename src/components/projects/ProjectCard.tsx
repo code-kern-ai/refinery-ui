@@ -13,7 +13,6 @@ import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
 import { deleteProjectPost } from "@/src/services/base/project";
 
 export default function ProjectCard(props: ProjectCardProps) {
-    console.log("Reached ProjectCard.tsx")
     const router = useRouter();
     const dispatch = useDispatch();
 
