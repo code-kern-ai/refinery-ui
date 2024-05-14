@@ -8,7 +8,7 @@ import { SessionManager } from "@/src/util/classes/labeling/session-manager";
 import { UserManager } from "@/src/util/classes/labeling/user-manager";
 import { DUMMY_HUDDLE_ID, getDefaultLabelingSuiteSettings, parseLabelingLink, prepareRLADataForRole } from "@/src/util/components/projects/projectId/labeling/labeling-main-component-helper";
 import { useRouter } from "next/router";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import style from "@/src/styles/components/projects/projectId/labeling.module.css";
 import NavigationBarTop from "./NavigationBarTop";
@@ -50,6 +50,8 @@ export default function LabelingMainComponent() {
     const [huddleData, setHuddleData] = useState(null);
     const [absoluteWarning, setAbsoluteWarning] = useState(null);
     const [lockedLink, setLockedLink] = useState(false);
+
+    const hasRequestedHuddleData = useRef(false);
 
     useEffect(() => {
         if (!projectId || !router.query) return;
@@ -150,18 +152,20 @@ export default function LabelingMainComponent() {
             dispatch(updateRecordRequests('rla', null));
             return;
         }
-        setTimeout(() => {
-            getTokenizedRecord({ recordId: SessionManager.currentRecordId }, (res) => {
-                dispatch(updateRecordRequests('token', res.data.tokenizeRecord));
-            });
-            getRecordByRecordId(projectId, SessionManager.currentRecordId, (res) => {
-                dispatch(updateRecordRequests('record', res.data.recordByRecordId));
-            });
-            getRecordLabelAssociations(projectId, SessionManager.currentRecordId, (rla) => {
-                const rlas = rla['data']?.['recordByRecordId']?.['recordLabelAssociations']['edges'].map(e => e.node);
-                dispatch(updateRecordRequests('rla', prepareRLADataForRole(rlas, user, userDisplayId, userDisplayRole)));
-            });
-        }, 100);
+        if (SessionManager.currentRecordId !== null) {
+            setTimeout(() => {
+                getTokenizedRecord({ recordId: SessionManager.currentRecordId }, (res) => {
+                    dispatch(updateRecordRequests('token', res.data.tokenizeRecord));
+                });
+                getRecordByRecordId(projectId, SessionManager.currentRecordId, (res) => {
+                    dispatch(updateRecordRequests('record', res.data.recordByRecordId));
+                });
+                getRecordLabelAssociations(projectId, SessionManager.currentRecordId, (rla) => {
+                    const rlas = rla['data']?.['recordByRecordId']?.['recordLabelAssociations']['edges'].map(e => e.node);
+                    dispatch(updateRecordRequests('rla', prepareRLADataForRole(rlas, user, userDisplayId, userDisplayRole)));
+                });
+            }, 100);
+        }
     }, [SessionManager.currentRecordId, user]);
 
     useEffect(() => {
@@ -228,6 +232,8 @@ export default function LabelingMainComponent() {
     }
 
     function requestHuddleData(huddleId: string) {
+        if (hasRequestedHuddleData.current === true) return;
+        hasRequestedHuddleData.current = true;
         getHuddleData(projectId, { huddleId: huddleId, huddleType: SessionManager.labelingLinkData.linkType }, (result) => {
             const huddleData = result['data']['requestHuddleData'];
             if (huddleId == DUMMY_HUDDLE_ID) {
@@ -259,6 +265,7 @@ export default function LabelingMainComponent() {
             SessionManager.jumpToPosition(pos);
             dispatch(setDisplayUserRole(user.role));
             router.push(`/projects/${projectId}/labeling/${SessionManager.huddleData.linkData.huddleId}?pos=${SessionManager.huddleData.linkData.requestedPos}&type=${SessionManager.huddleData.linkData.linkType}`);
+            hasRequestedHuddleData.current = false;
         });
     }
 
