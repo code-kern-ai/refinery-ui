@@ -21,7 +21,7 @@ import HeuristicStatistics from "../shared/HeuristicStatistics";
 import DangerZone from "@/src/components/shared/danger-zone/DangerZone";
 import { DangerZoneEnum } from "@/src/types/shared/danger-zone";
 import { getPythonClassName, getPythonClassRegExMatch } from "@/submodules/javascript-functions/python-functions-parser";
-import { CurrentPage } from "@/src/types/shared/general";
+import { CurrentPage } from "@/submodules/react-components/hooks/web-socket/web-sockets-helper";
 import { selectAllUsers, setBricksIntegrator, setLabelsBricksIntegrator, setComments } from "@/src/reduxStore/states/general";
 import { CommentType } from "@/src/types/shared/comments";
 import { CommentDataManager } from "@/src/util/classes/comments";
@@ -30,7 +30,7 @@ import { InformationSourceCodeLookup, InformationSourceExamples } from "@/src/ut
 import { getInformationSourceTemplate } from "@/src/util/components/projects/projectId/heuristics/heuristics-helper";
 import Dropdown2 from "@/submodules/react-components/components/Dropdown2";
 import LoadingIcon from "@/src/components/shared/loading/LoadingIcon";
-import { useWebsocket } from "@/src/services/base/web-sockets/useWebsocket";
+import { useWebsocket } from "@/submodules/react-components/hooks/web-socket/useWebsocket";
 import { getAllComments } from "@/src/services/base/comment";
 import { getLabelingTasksByProjectId } from "@/src/services/base/project";
 import { getHeuristicByHeuristicId, getPayloadByPayloadId, updateHeuristicPost } from "@/src/services/base/heuristic";

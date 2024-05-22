@@ -12,11 +12,11 @@ import { useDispatch, useSelector } from "react-redux";
 import style from '@/src/styles/components/projects/projectId/model-callbacks.module.css';
 import { ModalEnum } from "@/src/types/shared/modal";
 import { openModal, selectModal } from "@/src/reduxStore/states/modal";
-import { CurrentPage } from "@/src/types/shared/general";
+import { CurrentPage } from "@/submodules/react-components/hooks/web-socket/web-sockets-helper";
 import GridCards from "@/src/components/shared/grid-cards/GridCards";
 import DeleteModelCallBacksModal from "./DeleteModelCallbacksModal";
 import Dropdown2 from "@/submodules/react-components/components/Dropdown2";
-import { useWebsocket } from "@/src/services/base/web-sockets/useWebsocket";
+import { useWebsocket } from "@/submodules/react-components/hooks/web-socket/useWebsocket";
 import { getLabelingTasksByProjectId } from "@/src/services/base/project";
 import { getModelCallbacksOverviewData } from "@/src/services/base/heuristic";
 

@@ -1,7 +1,7 @@
 import { selectInactiveOrganization, selectIsDemo, selectIsManaged, selectUser, setComments } from "@/src/reduxStore/states/general"
 import { selectAllProjects, setAllProjects } from "@/src/reduxStore/states/project";
 import { Project, ProjectStatistics } from "@/src/types/components/projects/projects-list";
-import { CurrentPage } from "@/src/types/shared/general";
+import { CurrentPage } from "@/submodules/react-components/hooks/web-socket/web-sockets-helper";
 import { percentRoundString } from "@/submodules/javascript-functions/general";
 import { useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -14,7 +14,7 @@ import { setAllAttributes, setAllEmbeddings, setLabelingTasksAll } from "@/src/r
 import { setOverviewFilters } from "@/src/reduxStore/states/tmp";
 import { setDataSlices, setFullSearchStore, setSearchGroupsStore } from "@/src/reduxStore/states/pages/data-browser";
 import { SearchGroup } from "@/submodules/javascript-functions/enums/enums";
-import { useWebsocket } from "@/src/services/base/web-sockets/useWebsocket";
+import { useWebsocket } from "@/submodules/react-components/hooks/web-socket/useWebsocket";
 import { getAllProjects } from "@/src/services/base/project";
 import { addUserToOrganization, createOrganization, getCanCreateLocalOrg, getOverviewStats } from "@/src/services/base/organization";
 

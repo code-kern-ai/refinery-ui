@@ -20,11 +20,11 @@ import { ExportHelper } from "@/src/util/classes/export";
 import { downloadFile } from "@/src/services/base/s3-service";
 import { downloadByteDataNoStringify } from "@/submodules/javascript-functions/export";
 import { timer } from "rxjs";
-import { CurrentPage } from "@/src/types/shared/general";
+import { CurrentPage } from "@/submodules/react-components/hooks/web-socket/web-sockets-helper";
 import { selectUser } from "@/src/reduxStore/states/general";
 import CryptedField from "../crypted-field/CryptedField";
 import { extendArrayElementsByUniqueId } from "@/submodules/javascript-functions/id-prep";
-import { useWebsocket } from "@/src/services/base/web-sockets/useWebsocket";
+import { useWebsocket } from "@/submodules/react-components/hooks/web-socket/useWebsocket";
 import { getRecordExportFromData } from "@/src/services/base/project";
 import { getLastRecordExportCredentials, prepareRecordExport } from "@/src/services/base/project-setting";
 

@@ -10,10 +10,10 @@ import { useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import NewPersonalToken from "./NewPersonalTokenModal";
 import DeletePersonalToken from "./DeletePersonalTokenModal";
-import { CurrentPage } from "@/src/types/shared/general";
+import { CurrentPage } from "@/submodules/react-components/hooks/web-socket/web-sockets-helper";
 import { useRouter } from "next/router";
 import { selectIsAdmin } from "@/src/reduxStore/states/general";
-import { useWebsocket } from "@/src/services/base/web-sockets/useWebsocket";
+import { useWebsocket } from "@/submodules/react-components/hooks/web-socket/useWebsocket";
 import { getAccessTokens } from "@/src/services/base/project";
 
 export default function ProjectAdmin() {

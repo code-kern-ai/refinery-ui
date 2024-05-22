@@ -9,13 +9,13 @@ import LoadingIcon from "../shared/loading/LoadingIcon";
 import { openModal, setModalStates } from "@/src/reduxStore/states/modal";
 import { ModalEnum } from "@/src/types/shared/modal";
 import { selectIsAdmin, selectIsManaged } from "@/src/reduxStore/states/general";
-import { CurrentPage } from "@/src/types/shared/general";
 import { timer } from "rxjs";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
 import AddModelDownloadModal from "./AddModelDownloadModal";
 import DeleteModelDownloadModal from "./DeleteModelDownloadModal";
-import { useWebsocket } from "@/src/services/base/web-sockets/useWebsocket";
+import { useWebsocket } from "@/submodules/react-components/hooks/web-socket/useWebsocket";
 import { getModelProviderInfo } from "@/src/services/base/project";
+import { CurrentPage } from "@/submodules/react-components/hooks/web-socket/web-sockets-helper";
 
 export default function ModelsDownload() {
     const router = useRouter();

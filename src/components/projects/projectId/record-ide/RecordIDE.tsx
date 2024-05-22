@@ -7,7 +7,7 @@ import { getAllComments } from "@/src/services/base/comment";
 import { getRecordIDE } from "@/src/services/base/record-ide";
 import { LabelingLinkType } from "@/src/types/components/projects/projectId/labeling/labeling-main-component";
 import { CommentType } from "@/src/types/shared/comments";
-import { CurrentPage } from "@/src/types/shared/general";
+import { CurrentPage } from "@/submodules/react-components/hooks/web-socket/web-sockets-helper";
 import { CommentDataManager } from "@/src/util/classes/comments";
 import { DEFAULT_CODE, PASS_ME, caesarCipher } from "@/src/util/components/projects/projectId/record-ide/record-ide-helper";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";

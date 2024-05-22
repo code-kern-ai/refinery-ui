@@ -9,10 +9,10 @@ import { postProcessLabelingTasks, postProcessLabelingTasksSchema } from "@/src/
 import { selectAllUsers, selectUser, setComments } from "@/src/reduxStore/states/general";
 import DataBrowserRecords from "./DataBrowserRecords";
 import { postProcessingEmbeddings } from "@/src/util/components/projects/projectId/settings/embeddings-helper";
-import { CurrentPage } from "@/src/types/shared/general";
+import { CurrentPage } from "@/submodules/react-components/hooks/web-socket/web-sockets-helper";
 import { CommentType } from "@/src/types/shared/comments";
 import { CommentDataManager } from "@/src/util/classes/comments";
-import { useWebsocket } from "@/src/services/base/web-sockets/useWebsocket";
+import { useWebsocket } from "@/submodules/react-components/hooks/web-socket/useWebsocket";
 import { getAllComments } from "@/src/services/base/comment";
 import { getAttributes } from "@/src/services/base/attribute";
 import { getDataSlices, getUniqueValuesByAttributes } from "@/src/services/base/dataSlices";

@@ -1,10 +1,10 @@
 import { selectBricksIntegratorAttributes, selectBricksIntegratorEmbeddings, selectBricksIntegratorLabels, selectBricksIntegratorLanguages, selectBricksIntegratorLookupLists, setAttributesBricksIntegrator, setEmbeddingsBricksIntegrator, setLabelingTasksBricksIntegrator, setLabelsBricksIntegrator, setLanguagesBricksIntegrator, setLookupListsBricksIntegrator } from "@/src/reduxStore/states/general";
 import { selectLabelingTasksAll } from "@/src/reduxStore/states/pages/settings";
 import { selectProjectId } from "@/src/reduxStore/states/project";
-import { useWebsocket } from "@/src/services/base/web-sockets/useWebsocket";
+import { useWebsocket } from "@/submodules/react-components/hooks/web-socket/useWebsocket";
 import { LabelingTaskTarget, LabelingTaskTaskType } from "@/src/types/components/projects/projectId/settings/labeling-tasks";
 import { BricksVariableType, VariableSelectProps } from "@/src/types/shared/bricks-integrator";
-import { CurrentPage, CurrentPageSubKey } from "@/src/types/shared/general";
+import { CurrentPage, CurrentPageSubKey } from "@/submodules/react-components/hooks/web-socket/web-sockets-helper";
 import { BricksCodeParser } from "@/src/util/classes/bricks-integrator/bricks-integrator";
 import { BricksVariableComment, isCommentTrue } from "@/src/util/classes/bricks-integrator/comment-lookup";
 import { postProcessingAttributes } from "@/src/util/components/projects/projectId/settings/data-schema-helper";

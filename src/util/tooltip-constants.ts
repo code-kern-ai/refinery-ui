@@ -1,4 +1,4 @@
-import { CurrentPage } from "../types/shared/general";
+import { CurrentPage } from "@/submodules/react-components/hooks/web-socket/web-sockets-helper";
 
 export const TOOLTIPS_DICT = {
     ['GENERAL']: {

@@ -1,5 +1,5 @@
 import { selectProjectId } from '@/src/reduxStore/states/project';
-import { CurrentPage } from '@/src/types/shared/general';
+import { CurrentPage } from "@/submodules/react-components/hooks/web-socket/web-sockets-helper";
 import { useCallback, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import ProjectOverviewHeader from './ProjectOverviewHeader';
@@ -25,7 +25,7 @@ import { selectAllUsers, selectIsManaged, setComments } from '@/src/reduxStore/s
 import { IconUsers } from '@tabler/icons-react';
 import { CommentType } from '@/src/types/shared/comments';
 import { CommentDataManager } from '@/src/util/classes/comments';
-import { useWebsocket } from '@/src/services/base/web-sockets/useWebsocket';
+import { useWebsocket } from '@/submodules/react-components/hooks/web-socket/useWebsocket';
 import { getAllComments } from '@/src/services/base/comment';
 import { getConfidenceDistribution, getConfusionMatrix, getGeneralProjectStats, getInterAnnotatorMatrix, getLabelDistribution, getLabelingTasksByProjectId, getRatsTokenization } from '@/src/services/base/project';
 import { getAttributes } from '@/src/services/base/attribute';

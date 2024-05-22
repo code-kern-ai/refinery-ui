@@ -9,8 +9,8 @@ import { useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux"
 import ModalUpload from "../shared/upload/ModalUpload";
 import SampleProjectsDropdown from "./SampleProjectsDropdown";
-import { CurrentPage, CurrentPageSubKey } from "@/src/types/shared/general";
-import { useWebsocket } from "@/src/services/base/web-sockets/useWebsocket";
+import { CurrentPage, CurrentPageSubKey } from "@/submodules/react-components/hooks/web-socket/web-sockets-helper";
+import { useWebsocket } from "@/submodules/react-components/hooks/web-socket/useWebsocket";
 
 const BASE_OPTIONS = { reloadOnFinish: false, deleteProjectOnFail: true, closeModalOnClick: false, isModal: true, navigateToProject: true, showBadPasswordMsg: null };
 

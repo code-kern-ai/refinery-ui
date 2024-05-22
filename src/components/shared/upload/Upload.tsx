@@ -7,7 +7,7 @@ import { selectUploadData, setImportOptions } from "@/src/reduxStore/states/uplo
 import { ProjectStatus } from "@/src/types/components/projects/projects-list";
 import { timer } from "rxjs";
 import { uploadFile } from "@/src/services/base/s3-service";
-import { CurrentPage, CurrentPageSubKey } from "@/src/types/shared/general";
+import { CurrentPage, CurrentPageSubKey } from "@/submodules/react-components/hooks/web-socket/web-sockets-helper";
 import { jsonCopy } from "@/submodules/javascript-functions/general";
 import { useRouter } from "next/router";
 import { extendAllProjects, removeFromAllProjectsById, selectAllProjects, selectProjectId } from "@/src/reduxStore/states/project";
@@ -17,7 +17,7 @@ import CryptedField from "../crypted-field/CryptedField";
 import { closeModal, selectModal } from "@/src/reduxStore/states/modal";
 import { ModalEnum } from "@/src/types/shared/modal";
 import Dropdown2 from "@/submodules/react-components/components/Dropdown2";
-import { useWebsocket } from "@/src/services/base/web-sockets/useWebsocket";
+import { useWebsocket } from "@/submodules/react-components/hooks/web-socket/useWebsocket";
 import { getUploadCredentialsAndId, getUploadTaskById, deleteProjectPost, createProjectPost, updateProjectTokenizer, updateProjectStatus } from "@/src/services/base/project";
 
 export default function Upload(props: UploadProps) {

@@ -5,7 +5,7 @@ import { selectIsAdmin, selectIsDemo, selectIsManaged, selectOrganization, setAl
 import { getUserAvatarUri } from "@/submodules/javascript-functions/general";
 import { setActiveProject } from "./states/project";
 import { getIsDemo, getIsManaged } from "../services/base/data-fetch";
-import { WebSocketsService } from "../services/base/web-sockets/WebSocketsService";
+import { WebSocketsService } from "../../submodules/react-components/hooks/web-socket/WebSocketsService";
 import { timer } from "rxjs";
 import { RouteManager } from "../services/base/route-manager";
 import { CacheEnum, setCache } from "./states/cachedValues";

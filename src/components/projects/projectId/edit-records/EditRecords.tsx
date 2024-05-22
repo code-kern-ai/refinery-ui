@@ -5,7 +5,8 @@ import { selectSessionData } from "@/src/reduxStore/states/tmp";
 import { Fragment, useCallback, useEffect, useState } from "react";
 import { buildAccessKey, createDefaultEditRecordComponentData } from "@/src/util/components/projects/projectId/edit-records-helper";
 import style from '@/src/styles/components/projects/projectId/edit-records.module.css';
-import { CurrentPage, DataTypeEnum } from "@/src/types/shared/general";
+import { DataTypeEnum } from "@/src/types/shared/general";
+import { CurrentPage } from "@/submodules/react-components/hooks/web-socket/web-sockets-helper";
 import { IconAlertCircle, IconAlertTriangle, IconAlertTriangleFilled, IconBallpen, IconBallpenOff } from "@tabler/icons-react";
 import { Tooltip } from "@nextui-org/react";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
@@ -13,7 +14,7 @@ import EditField from "./EditField";
 import { useRouter } from "next/router";
 import { ModalEnum } from "@/src/types/shared/modal";
 import { openModal } from "@/src/reduxStore/states/modal";
-import { useWebsocket } from "@/src/services/base/web-sockets/useWebsocket";
+import { useWebsocket } from "@/submodules/react-components/hooks/web-socket/useWebsocket";
 import { scrollElementIntoView } from "@/submodules/javascript-functions/scrollHelper";
 
 export default function EditRecords() {

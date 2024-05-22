@@ -1,7 +1,7 @@
 import LabelingMainComponent from "@/src/components/projects/projectId/labeling/sessionId/main-component/LabelingMainComponent";
 import { selectUser, setCurrentPage, setDisplayIconComments } from "@/src/reduxStore/states/general";
 import { selectProjectId } from "@/src/reduxStore/states/project";
-import { CurrentPage } from "@/src/types/shared/general";
+import { CurrentPage } from "@/submodules/react-components/hooks/web-socket/web-sockets-helper";
 import { SessionManager } from "@/src/util/classes/labeling/session-manager";
 import { DUMMY_HUDDLE_ID, guessLinkType } from "@/src/util/components/projects/projectId/labeling/labeling-main-component-helper";
 import { useRouter } from "next/router";

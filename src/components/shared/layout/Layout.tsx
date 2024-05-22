@@ -14,10 +14,10 @@ import SizeWarningModal from "./SizeWarningModal";
 import { closeModal, openModal } from "@/src/reduxStore/states/modal";
 import { ModalEnum } from "@/src/types/shared/modal";
 import { postProcessNotificationsUser } from "@/src/util/shared/notification-center-helper";
-import { useWebsocket } from "@/src/services/base/web-sockets/useWebsocket";
+import { useWebsocket } from "@/submodules/react-components/hooks/web-socket/useWebsocket";
 import { useRouter } from "next/router";
 import { selectProjectId } from "@/src/reduxStore/states/project";
-import { CurrentPage } from "@/src/types/shared/general";
+import { CurrentPage } from "@/submodules/react-components/hooks/web-socket/web-sockets-helper";
 import { getNotificationsByUser } from "@/src/services/base/notification";
 import { getAllActiveAdminMessages } from "@/src/services/base/organization";
 

@@ -4,7 +4,7 @@ import { closeModal, openModal, setModalStates } from "@/src/reduxStore/states/m
 import { selectAttributes, selectEmbeddings } from "@/src/reduxStore/states/pages/settings";
 import { selectProjectId } from "@/src/reduxStore/states/project";
 import { Embedding, EmbeddingState, EmbeddingType } from "@/src/types/components/projects/projectId/settings/embeddings";
-import { CurrentPage, CurrentPageSubKey } from "@/src/types/shared/general";
+import { CurrentPage, CurrentPageSubKey } from "@/submodules/react-components/hooks/web-socket/web-sockets-helper";
 import { ModalEnum } from "@/src/types/shared/modal";
 import { DATA_TYPES, getColorForDataType } from "@/src/util/components/projects/projectId/settings/data-schema-helper";
 import { Tooltip } from "@nextui-org/react";
@@ -16,7 +16,7 @@ import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
 import AddNewEmbeddingModal from "./AddNewEmbeddingModal";
 import FilterAttributesModal from "./FilterAttributesModal";
 import DeleteEmbeddingModal from "./DeleteEmbeddingModal";
-import { useWebsocket } from "@/src/services/base/web-sockets/useWebsocket";
+import { useWebsocket } from "@/submodules/react-components/hooks/web-socket/useWebsocket";
 
 
 export default function Embeddings(props: { refetchEmbeddings: () => void }) {

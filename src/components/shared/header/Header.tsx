@@ -1,5 +1,5 @@
 import { selectCurrentPage, selectDisplayIconComments, selectIsDemo, selectIsManaged, selectOrganization, selectUser, setNotifications } from "@/src/reduxStore/states/general";
-import { CurrentPage } from "@/src/types/shared/general";
+import { CurrentPage } from "@/submodules/react-components/hooks/web-socket/web-sockets-helper";
 import { UserRole } from "@/src/types/shared/sidebar";
 import { Tooltip } from "@nextui-org/react";
 import { useEffect, useState } from "react";
