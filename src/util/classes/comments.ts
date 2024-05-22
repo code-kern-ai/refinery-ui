@@ -1,8 +1,9 @@
 import { CommentRequest, CommentType } from "@/src/types/shared/comments";
 import { commentRequestToKey, commentTypeOrder, commentTypeToString, getUserNameFromId, parseKey } from "../shared/comments-helper";
-import { CurrentPage, User } from "@/src/types/shared/general";
+import { User } from "@/src/types/shared/general";
 import { timer } from "rxjs";
 import { getUserAvatarUri } from "@/submodules/javascript-functions/general";
+import { CurrentPage } from "@/submodules/react-components/hooks/web-socket/constants";
 
 export class CommentDataManager {
     public static commentRequests: Map<Object, CommentRequest[]> = new Map<CurrentPage, CommentRequest[]>();
