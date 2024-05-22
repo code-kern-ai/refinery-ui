@@ -17,9 +17,9 @@ import { postProcessNotificationsUser } from "@/src/util/shared/notification-cen
 import { useWebsocket } from "@/submodules/react-components/hooks/web-socket/useWebsocket";
 import { useRouter } from "next/router";
 import { selectProjectId } from "@/src/reduxStore/states/project";
-import { CurrentPage } from "@/submodules/react-components/hooks/web-socket/web-sockets-helper";
 import { getNotificationsByUser } from "@/src/services/base/notification";
 import { getAllActiveAdminMessages } from "@/src/services/base/organization";
+import { Application, CurrentPage } from "@/submodules/react-components/hooks/web-socket/constants";
 
 const MIN_WIDTH = 1250;
 
@@ -107,7 +107,7 @@ export default function Layout({ children }) {
         }
     }, [user?.id, notificationsState, projectId]);
 
-    useWebsocket(CurrentPage.NOTIFICATION_CENTER, handleWebsocketNotification);
+    useWebsocket(Application.REFINERY, CurrentPage.NOTIFICATION_CENTER, handleWebsocketNotification);
 
     return (
         <>

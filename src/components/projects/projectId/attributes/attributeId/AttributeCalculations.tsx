@@ -4,7 +4,6 @@ import { selectAttributes, selectVisibleAttributeAC, setAllAttributes, setLabeli
 import { selectProjectId } from "@/src/reduxStore/states/project"
 import { Attribute, AttributeState } from "@/src/types/components/projects/projectId/settings/data-schema";
 import { DataTypeEnum } from "@/src/types/shared/general";
-import { CurrentPage } from "@/submodules/react-components/hooks/web-socket/web-sockets-helper";
 import { postProcessCurrentAttribute } from "@/src/util/components/projects/projectId/settings/attribute-calculation-helper";
 import { ATTRIBUTES_VISIBILITY_STATES, DATA_TYPES, getTooltipVisibilityState } from "@/src/util/components/projects/projectId/settings/data-schema-helper";
 import { copyToClipboard } from "@/submodules/javascript-functions/general";
@@ -35,6 +34,7 @@ import { getAttributes } from "@/src/services/base/attribute";
 import { getLookupListsByProjectId } from "@/src/services/base/lookup-lists";
 import { getLabelingTasksByProjectId, getProjectTokenization } from "@/src/services/base/project";
 import { getAttributeByAttributeId, updateAttribute } from "@/src/services/base/project-setting";
+import { Application, CurrentPage } from "@/submodules/react-components/hooks/web-socket/constants";
 
 const EDITOR_OPTIONS = { theme: 'vs-light', language: 'python', readOnly: false };
 
@@ -285,7 +285,7 @@ export default function AttributeCalculation() {
         }
     }, [projectId, currentAttribute]);
 
-    useWebsocket(CurrentPage.ATTRIBUTE_CALCULATION, handleWebsocketNotification, projectId);
+    useWebsocket(Application.REFINERY, CurrentPage.ATTRIBUTE_CALCULATION, handleWebsocketNotification, projectId);
 
     return (projectId && <div className={`bg-white p-4 overflow-y-auto min-h-full h-[calc(100vh-4rem)]`} onScroll={(e: any) => onScrollEvent(e)}>
         {currentAttribute && <div>

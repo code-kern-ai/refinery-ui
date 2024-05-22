@@ -21,7 +21,6 @@ import HeuristicStatistics from "../shared/HeuristicStatistics";
 import DangerZone from "@/src/components/shared/danger-zone/DangerZone";
 import { DangerZoneEnum } from "@/src/types/shared/danger-zone";
 import { getPythonClassName, getPythonClassRegExMatch } from "@/submodules/javascript-functions/python-functions-parser";
-import { CurrentPage } from "@/submodules/react-components/hooks/web-socket/web-sockets-helper";
 import { selectAllUsers, setBricksIntegrator, setLabelsBricksIntegrator, setComments } from "@/src/reduxStore/states/general";
 import { CommentType } from "@/src/types/shared/comments";
 import { CommentDataManager } from "@/src/util/classes/comments";
@@ -35,6 +34,7 @@ import { getAllComments } from "@/src/services/base/comment";
 import { getLabelingTasksByProjectId } from "@/src/services/base/project";
 import { getHeuristicByHeuristicId, getPayloadByPayloadId, updateHeuristicPost } from "@/src/services/base/heuristic";
 import { getEmbeddings } from "@/src/services/base/embedding";
+import { Application, CurrentPage } from "@/submodules/react-components/hooks/web-socket/constants";
 
 export default function ActiveLearning() {
     const dispatch = useDispatch();
@@ -204,7 +204,7 @@ export default function ActiveLearning() {
         });
     }
 
-    useWebsocket(CurrentPage.ACTIVE_LEARNING, handleWebsocketNotification, projectId);
+    useWebsocket(Application.REFINERY, CurrentPage.ACTIVE_LEARNING, handleWebsocketNotification, projectId);
 
     return (
         <HeuristicsLayout updateSourceCode={(code) => updateSourceCodeToDisplay(code)}>

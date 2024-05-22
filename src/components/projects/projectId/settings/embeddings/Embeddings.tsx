@@ -4,7 +4,6 @@ import { closeModal, openModal, setModalStates } from "@/src/reduxStore/states/m
 import { selectAttributes, selectEmbeddings } from "@/src/reduxStore/states/pages/settings";
 import { selectProjectId } from "@/src/reduxStore/states/project";
 import { Embedding, EmbeddingState, EmbeddingType } from "@/src/types/components/projects/projectId/settings/embeddings";
-import { CurrentPage, CurrentPageSubKey } from "@/submodules/react-components/hooks/web-socket/web-sockets-helper";
 import { ModalEnum } from "@/src/types/shared/modal";
 import { DATA_TYPES, getColorForDataType } from "@/src/util/components/projects/projectId/settings/data-schema-helper";
 import { Tooltip } from "@nextui-org/react";
@@ -17,6 +16,7 @@ import AddNewEmbeddingModal from "./AddNewEmbeddingModal";
 import FilterAttributesModal from "./FilterAttributesModal";
 import DeleteEmbeddingModal from "./DeleteEmbeddingModal";
 import { useWebsocket } from "@/submodules/react-components/hooks/web-socket/useWebsocket";
+import { Application, CurrentPage, CurrentPageSubKey } from "@/submodules/react-components/hooks/web-socket/constants";
 
 
 export default function Embeddings(props: { refetchEmbeddings: () => void }) {
@@ -68,7 +68,8 @@ export default function Embeddings(props: { refetchEmbeddings: () => void }) {
         }
     }, []);
 
-    useWebsocket(CurrentPage.PROJECT_SETTINGS, handleWebsocketNotification, projectId, CurrentPageSubKey.EMBEDDINGS);
+    useWebsocket(Application.REFINERY, CurrentPage.PROJECT_SETTINGS, handleWebsocketNotification, projectId, CurrentPageSubKey.EMBEDDINGS);
+
     return (<div className="mt-8">
         <div className="text-lg leading-6 text-gray-900 font-medium inline-block w-full">
             <label>Embeddings</label>

@@ -9,8 +9,8 @@ import { useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux"
 import ModalUpload from "../shared/upload/ModalUpload";
 import SampleProjectsDropdown from "./SampleProjectsDropdown";
-import { CurrentPage, CurrentPageSubKey } from "@/submodules/react-components/hooks/web-socket/web-sockets-helper";
 import { useWebsocket } from "@/submodules/react-components/hooks/web-socket/useWebsocket";
+import { Application, CurrentPage, CurrentPageSubKey } from "@/submodules/react-components/hooks/web-socket/constants";
 
 const BASE_OPTIONS = { reloadOnFinish: false, deleteProjectOnFail: true, closeModalOnClick: false, isModal: true, navigateToProject: true, showBadPasswordMsg: null };
 
@@ -33,7 +33,7 @@ export default function ButtonsContainer() {
         }
     }, []);
 
-    useWebsocket(CurrentPage.PROJECTS, handleWebsocketNotification, null, CurrentPageSubKey.BUTTONS_CONTAINER);
+    useWebsocket(Application.REFINERY, CurrentPage.PROJECTS, handleWebsocketNotification, null, CurrentPageSubKey.BUTTONS_CONTAINER);
 
     return (
         user && user.role === UserRole.ENGINEER ? (<div>

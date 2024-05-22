@@ -1,6 +1,6 @@
 import { selectCurrentPage } from "@/src/reduxStore/states/general";
 import { AdminMessageLevel, AdminMessagesProps } from "@/src/types/shared/admin-messages";
-import { CurrentPage } from "@/submodules/react-components/hooks/web-socket/web-sockets-helper";
+import { CurrentPage } from "@/submodules/react-components/hooks/web-socket/constants";
 import { IconAlertCircle, IconInfoSquare, IconPoint, IconX } from "@tabler/icons-react";
 import { useSelector } from "react-redux";
 

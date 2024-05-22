@@ -1,7 +1,6 @@
 import { selectHeuristic, setActiveHeuristics } from "@/src/reduxStore/states/pages/heuristics";
 import { selectLabelingTasksAll, setLabelingTasksAll } from "@/src/reduxStore/states/pages/settings";
 import { selectProjectId } from "@/src/reduxStore/states/project";
-import { CurrentPage } from "@/submodules/react-components/hooks/web-socket/web-sockets-helper";
 import { postProcessLabelingTasks, postProcessLabelingTasksSchema } from "@/src/util/components/projects/projectId/settings/labeling-tasks-helper";
 import { useRouter } from "next/router";
 import { useCallback, useEffect } from "react";
@@ -21,6 +20,7 @@ import { useWebsocket } from "@/submodules/react-components/hooks/web-socket/use
 import { getDataSlices } from "@/src/services/base/dataSlices";
 import { getLabelingTasksByProjectId } from "@/src/services/base/project";
 import { getAccessLink, getHeuristicByHeuristicId } from "@/src/services/base/heuristic";
+import { Application, CurrentPage } from "@/submodules/react-components/hooks/web-socket/constants";
 
 
 export default function CrowdLabeler() {
@@ -113,7 +113,7 @@ export default function CrowdLabeler() {
         }
     }, [currentHeuristic, projectId]);
 
-    useWebsocket(CurrentPage.CROWD_LABELER, handleWebsocketNotification, projectId);
+    useWebsocket(Application.REFINERY, CurrentPage.CROWD_LABELER, handleWebsocketNotification, projectId);
 
     return (<HeuristicsLayout>
         {currentHeuristic && <div>

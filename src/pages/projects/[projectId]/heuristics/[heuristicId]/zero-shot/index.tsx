@@ -1,6 +1,6 @@
 import ZeroShot from "@/src/components/projects/projectId/heuristics/heuristicId/zero-shot/ZeroShot";
 import { setCurrentPage, setDisplayIconComments } from "@/src/reduxStore/states/general";
-import { CurrentPage } from "@/submodules/react-components/hooks/web-socket/web-sockets-helper";
+import { CurrentPage } from "@/submodules/react-components/hooks/web-socket/constants";
 import { useEffect } from "react";
 import { useDispatch } from "react-redux";
 

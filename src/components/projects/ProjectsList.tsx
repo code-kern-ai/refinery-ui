@@ -1,7 +1,6 @@
 import { selectInactiveOrganization, selectIsDemo, selectIsManaged, selectUser, setComments } from "@/src/reduxStore/states/general"
 import { selectAllProjects, setAllProjects } from "@/src/reduxStore/states/project";
 import { Project, ProjectStatistics } from "@/src/types/components/projects/projects-list";
-import { CurrentPage } from "@/submodules/react-components/hooks/web-socket/web-sockets-helper";
 import { percentRoundString } from "@/submodules/javascript-functions/general";
 import { useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -17,6 +16,7 @@ import { SearchGroup } from "@/submodules/javascript-functions/enums/enums";
 import { useWebsocket } from "@/submodules/react-components/hooks/web-socket/useWebsocket";
 import { getAllProjects } from "@/src/services/base/project";
 import { addUserToOrganization, createOrganization, getCanCreateLocalOrg, getOverviewStats } from "@/src/services/base/organization";
+import { Application, CurrentPage } from "@/submodules/react-components/hooks/web-socket/constants";
 
 export default function ProjectsList() {
     const dispatch = useDispatch();
@@ -101,7 +101,7 @@ export default function ProjectsList() {
         }
     }, []);
 
-    useWebsocket(CurrentPage.PROJECTS, handleWebsocketNotification);
+    useWebsocket(Application.REFINERY, CurrentPage.PROJECTS, handleWebsocketNotification);
 
     return (
         <div>

@@ -10,7 +10,6 @@ import { openModal, setModalStates } from "@/src/reduxStore/states/modal";
 import { useRouter } from "next/router";
 import { setUploadFileType } from "@/src/reduxStore/states/upload";
 import { UploadFileType } from "@/src/types/shared/upload";
-import { CurrentPage } from "@/submodules/react-components/hooks/web-socket/web-sockets-helper";
 import { Tooltip } from "@nextui-org/react";
 import ProjectMetaData from "./ProjectMetaData";
 import GatesIntegration from "./GatesIntegration";
@@ -34,6 +33,7 @@ import { getAllComments } from "@/src/services/base/comment";
 import { getAttributes, getCheckCompositeKey } from "@/src/services/base/attribute";
 import { getEmbeddings, getRecommendedEncoders } from "@/src/services/base/embedding";
 import { getQueuedTasks } from "@/src/services/base/project-setting";
+import { Application, CurrentPage } from "@/submodules/react-components/hooks/web-socket/constants";
 
 export default function ProjectSettings() {
     const dispatch = useDispatch();
@@ -263,7 +263,7 @@ export default function ProjectSettings() {
         });
     }
 
-    useWebsocket(CurrentPage.PROJECT_SETTINGS, handleWebsocketNotification, project?.id);
+    useWebsocket(Application.REFINERY, CurrentPage.PROJECT_SETTINGS, handleWebsocketNotification, project?.id);
 
     return (<div>
         {project != null && <div className="p-4 bg-gray-100 h-full flex-1 flex flex-col overflow-y-auto">

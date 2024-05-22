@@ -1,5 +1,4 @@
 import { selectProjectId } from '@/src/reduxStore/states/project';
-import { CurrentPage } from "@/submodules/react-components/hooks/web-socket/web-sockets-helper";
 import { useCallback, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import ProjectOverviewHeader from './ProjectOverviewHeader';
@@ -30,6 +29,7 @@ import { getAllComments } from '@/src/services/base/comment';
 import { getConfidenceDistribution, getConfusionMatrix, getGeneralProjectStats, getInterAnnotatorMatrix, getLabelDistribution, getLabelingTasksByProjectId, getRatsTokenization } from '@/src/services/base/project';
 import { getAttributes } from '@/src/services/base/attribute';
 import { getDataSlices } from '@/src/services/base/dataSlices';
+import { Application, CurrentPage } from '@/submodules/react-components/hooks/web-socket/constants';
 
 const PROJECT_STATS_INITIAL_STATE: ProjectStats = getEmptyProjectStats();
 
@@ -240,7 +240,7 @@ export default function ProjectOverview() {
     }, [projectId]);
 
 
-    useWebsocket(CurrentPage.PROJECT_OVERVIEW, handleWebsocketNotification, projectId);
+    useWebsocket(Application.REFINERY, CurrentPage.PROJECT_OVERVIEW, handleWebsocketNotification, projectId);
 
     return (<div>
         {projectId != null && <div className="pt-4 px-4 pb-10 bg-gray-100 flex-1 flex flex-col min-h-full h-[calc(100vh-4rem)] overflow-y-auto">

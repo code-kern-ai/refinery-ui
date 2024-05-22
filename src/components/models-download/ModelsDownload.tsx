@@ -15,7 +15,7 @@ import AddModelDownloadModal from "./AddModelDownloadModal";
 import DeleteModelDownloadModal from "./DeleteModelDownloadModal";
 import { useWebsocket } from "@/submodules/react-components/hooks/web-socket/useWebsocket";
 import { getModelProviderInfo } from "@/src/services/base/project";
-import { CurrentPage } from "@/submodules/react-components/hooks/web-socket/web-sockets-helper";
+import { Application, CurrentPage } from "@/submodules/react-components/hooks/web-socket/constants";
 
 export default function ModelsDownload() {
     const router = useRouter();
@@ -44,7 +44,7 @@ export default function ModelsDownload() {
         }
     }, []);
 
-    useWebsocket(CurrentPage.MODELS_DOWNLOAD, handleWebsocketNotification);
+    useWebsocket(Application.REFINERY, CurrentPage.MODELS_DOWNLOAD, handleWebsocketNotification);
 
     return (<div className="p-4 bg-gray-100 flex-1 flex flex-col h-[calc(100vh-4rem)] overflow-y-auto">
         <div className="flex flex-row items-center">
