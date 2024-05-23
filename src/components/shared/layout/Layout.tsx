@@ -177,7 +177,7 @@ export default function Layout({ children }) {
             </div>
             <AdminMessages
                 adminMessages={activeAdminMessages}
-                setActiveAdminMessages={(activeAdminMessages) => setActiveAdminMessages(activeAdminMessages)}
+                setActiveAdminMessages={setActiveAdminMessages}
                 currentPage={currentPage} />
             <SizeWarningModal minWidth={MIN_WIDTH} />
         </>
