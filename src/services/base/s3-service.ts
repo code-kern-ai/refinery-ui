@@ -1,11 +1,10 @@
 import { UploadState, UploadStates } from "@/src/types/shared/upload";
-import { Observable } from '@apollo/client';
 import { S3 } from 'aws-sdk';
 import { ConfigManager } from "./config";
+import { Observable } from "rxjs";
 
 
 export function uploadFile(credentialsAndUploadIdParsed: any, file: File, filename: string): Observable<UploadState> {
-
     const credentials = credentialsAndUploadIdParsed["Credentials"];
     const uploadTaskId = credentialsAndUploadIdParsed["uploadTaskId"];
     const bucket = credentialsAndUploadIdParsed["bucket"];
@@ -42,7 +41,6 @@ export function uploadFile(credentialsAndUploadIdParsed: any, file: File, filena
                 state: UploadStates.DONE,
                 progress: 100
             })
-            subscriber.complete();
         });
         return managedUpload.on('httpUploadProgress', function (progress) {
             subscriber.next({
@@ -78,7 +76,6 @@ export function downloadFile(credentialBlock: any, isStringData: boolean = true)
     }
     return new Observable((subscriber) => {
         s3Client.getObject(getParams, function (err, data) {
-            // Handle any error and exit
             if (err) {
                 subscriber.error(null)
             }
@@ -88,7 +85,6 @@ export function downloadFile(credentialBlock: any, isStringData: boolean = true)
             } else {
                 subscriber.next(data.Body)
             }
-            subscriber.complete();
         });
     });
 

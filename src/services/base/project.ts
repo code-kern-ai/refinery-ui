@@ -10,7 +10,6 @@ export function getProjectByProjectId(projectId: string, onResult: (result: any)
     jsonFetchWrapper(finalUrl, FetchType.GET, onResult);
 }
 
-
 export function getAllProjects(onResult: (result: any) => void) {
     const finalUrl = `${projectEndpoint}/all-projects`;
     jsonFetchWrapper(finalUrl, FetchType.GET, onResult);
