@@ -4,7 +4,7 @@ import { selectModal } from "@/src/reduxStore/states/modal";
 import { selectAttributes } from "@/src/reduxStore/states/pages/settings";
 import { selectProjectId } from "@/src/reduxStore/states/project";
 import { createAttribute } from "@/src/services/base/project-setting";
-import { CurrentPage, DataTypeEnum } from "@/src/types/shared/general";
+import { CurrentPage } from "@/submodules/react-components/hooks/web-socket/constants";
 import { ModalButton, ModalEnum } from "@/src/types/shared/modal"
 import { DATA_TYPES, findFreeAttributeName } from "@/src/util/components/projects/projectId/settings/data-schema-helper";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";

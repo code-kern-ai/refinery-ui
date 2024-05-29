@@ -13,13 +13,13 @@ import LookupListOperations from "./LookupListOperations";
 import DangerZone from "@/src/components/shared/danger-zone/DangerZone";
 import { DangerZoneEnum } from "@/src/types/shared/danger-zone";
 import Terms from "./Terms";
-import { CurrentPage } from "@/src/types/shared/general";
 import { selectAllUsers, setComments } from "@/src/reduxStore/states/general";
 import { CommentType } from "@/src/types/shared/comments";
 import { CommentDataManager } from "@/src/util/classes/comments";
-import { useWebsocket } from "@/src/services/base/web-sockets/useWebsocket";
+import { useWebsocket } from "@/submodules/react-components/hooks/web-socket/useWebsocket";
 import { getLookupListsByLookupListId, getTermsByLookupListId, updateKnowledgeBase } from "@/src/services/base/lookup-lists";
 import { getAllComments } from "@/src/services/base/comment";
+import { Application, CurrentPage } from "@/submodules/react-components/hooks/web-socket/constants";
 
 export default function LookupListsDetails() {
     const router = useRouter();
@@ -139,7 +139,7 @@ export default function LookupListsDetails() {
         }
     }
 
-    useWebsocket(CurrentPage.LOOKUP_LISTS_DETAILS, handleWebsocketNotification, projectId);
+    useWebsocket(Application.REFINERY, CurrentPage.LOOKUP_LISTS_DETAILS, handleWebsocketNotification, projectId);
 
     return (projectId && <div className="bg-white p-4 overflow-y-auto min-h-full h-[calc(100vh-4rem)]" onScroll={(e: any) => onScrollEvent(e)}>
         {lookupList && <div>

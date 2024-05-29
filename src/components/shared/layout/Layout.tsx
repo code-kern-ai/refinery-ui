@@ -7,19 +7,19 @@ import { useDispatch, useSelector } from "react-redux";
 import { selectCurrentPage, selectUser } from "@/src/reduxStore/states/general";
 import { interval } from "rxjs";
 import { setNotificationId } from "@/src/reduxStore/states/tmp";
-import AdminMessages from "../admin-messages/AdminMessages";
-import { AdminMessage } from "@/src/types/shared/admin-messages";
-import { postProcessAdminMessages } from "@/src/util/shared/admin-messages-helper";
+import { AdminMessage } from "@/submodules/react-components/types/admin-messages";
+import { postProcessAdminMessages } from "@/submodules/react-components/helpers/admin-messages-helper";
 import SizeWarningModal from "./SizeWarningModal";
 import { closeModal, openModal } from "@/src/reduxStore/states/modal";
 import { ModalEnum } from "@/src/types/shared/modal";
 import { postProcessNotificationsUser } from "@/src/util/shared/notification-center-helper";
-import { useWebsocket } from "@/src/services/base/web-sockets/useWebsocket";
+import { useWebsocket } from "@/submodules/react-components/hooks/web-socket/useWebsocket";
 import { useRouter } from "next/router";
 import { selectProjectId } from "@/src/reduxStore/states/project";
-import { CurrentPage } from "@/src/types/shared/general";
 import { getNotificationsByUser } from "@/src/services/base/notification";
 import { getAllActiveAdminMessages } from "@/src/services/base/organization";
+import { Application, CurrentPage } from "@/submodules/react-components/hooks/web-socket/constants";
+import AdminMessages from "@/submodules/react-components/components/AdminMessages";
 
 const MIN_WIDTH = 1250;
 
@@ -107,7 +107,7 @@ export default function Layout({ children }) {
         }
     }, [user?.id, notificationsState, projectId]);
 
-    useWebsocket(CurrentPage.NOTIFICATION_CENTER, handleWebsocketNotification);
+    useWebsocket(Application.REFINERY, CurrentPage.NOTIFICATION_CENTER, handleWebsocketNotification);
 
     return (
         <>
@@ -177,7 +177,8 @@ export default function Layout({ children }) {
             </div>
             <AdminMessages
                 adminMessages={activeAdminMessages}
-                setActiveAdminMessages={(activeAdminMessages) => setActiveAdminMessages(activeAdminMessages)} />
+                setActiveAdminMessages={setActiveAdminMessages}
+                currentPage={currentPage} />
             <SizeWarningModal minWidth={MIN_WIDTH} />
         </>
     )

@@ -5,7 +5,7 @@ import { selectAttributes, updateAttributeById } from "@/src/reduxStore/states/p
 import { selectProjectId } from "@/src/reduxStore/states/project";
 import { updateAttribute } from "@/src/services/base/project-setting";
 import { Attribute, DataSchemaProps } from "@/src/types/components/projects/projectId/settings/data-schema";
-import { CurrentPage } from "@/src/types/shared/general";
+import { CurrentPage } from "@/submodules/react-components/hooks/web-socket/constants";
 import { ATTRIBUTES_VISIBILITY_STATES, getTooltipVisibilityState } from "@/src/util/components/projects/projectId/settings/data-schema-helper";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
 import Dropdown2 from "@/submodules/react-components/components/Dropdown2";

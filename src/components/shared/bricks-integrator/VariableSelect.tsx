@@ -1,10 +1,9 @@
 import { selectBricksIntegratorAttributes, selectBricksIntegratorEmbeddings, selectBricksIntegratorLabels, selectBricksIntegratorLanguages, selectBricksIntegratorLookupLists, setAttributesBricksIntegrator, setEmbeddingsBricksIntegrator, setLabelingTasksBricksIntegrator, setLabelsBricksIntegrator, setLanguagesBricksIntegrator, setLookupListsBricksIntegrator } from "@/src/reduxStore/states/general";
 import { selectLabelingTasksAll } from "@/src/reduxStore/states/pages/settings";
 import { selectProjectId } from "@/src/reduxStore/states/project";
-import { useWebsocket } from "@/src/services/base/web-sockets/useWebsocket";
+import { useWebsocket } from "@/submodules/react-components/hooks/web-socket/useWebsocket";
 import { LabelingTaskTarget, LabelingTaskTaskType } from "@/src/types/components/projects/projectId/settings/labeling-tasks";
 import { BricksVariableType, VariableSelectProps } from "@/src/types/shared/bricks-integrator";
-import { CurrentPage, CurrentPageSubKey } from "@/src/types/shared/general";
 import { BricksCodeParser } from "@/src/util/classes/bricks-integrator/bricks-integrator";
 import { BricksVariableComment, isCommentTrue } from "@/src/util/classes/bricks-integrator/comment-lookup";
 import { postProcessingAttributes } from "@/src/util/components/projects/projectId/settings/data-schema-helper";
@@ -18,6 +17,7 @@ import { getAttributes } from "@/src/services/base/attribute";
 import { getLookupListsByProjectId } from "@/src/services/base/lookup-lists";
 import { getLabelingTasksByProjectId } from "@/src/services/base/project";
 import { getEmbeddings } from "@/src/services/base/embedding";
+import { Application, CurrentPage, CurrentPageSubKey } from "@/submodules/react-components/hooks/web-socket/constants";
 
 export default function VariableSelect(props: VariableSelectProps) {
     const dispatch = useDispatch();
@@ -177,7 +177,7 @@ export default function VariableSelect(props: VariableSelectProps) {
         }
     }, [projectId]);
 
-    useWebsocket(CurrentPage.BRICKS_INTEGRATOR, handleWebsocketNotification, projectId, CurrentPageSubKey.VARIABLE_SELECTION);
+    useWebsocket(Application.REFINERY, CurrentPage.BRICKS_INTEGRATOR, handleWebsocketNotification, projectId, CurrentPageSubKey.VARIABLE_SELECTION);
 
     return (<>
         {props.variable && props.variable.values.map((v, index) => (<div key={index} className="col-start-2 flex flex-row flex-nowrap items-center gap-x-2 my-2">

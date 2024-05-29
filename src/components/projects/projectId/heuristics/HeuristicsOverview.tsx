@@ -3,7 +3,6 @@ import { useDispatch, useSelector } from "react-redux";
 import style from '@/src/styles/components/projects/projectId/heuristics/heuristics.module.css';
 import { useCallback, useEffect, useState } from "react";
 import { selectEmbeddings, selectUsableNonTextAttributes, setAllAttributes, setAllEmbeddings, setLabelingTasksAll } from "@/src/reduxStore/states/pages/settings";
-import { CurrentPage } from "@/src/types/shared/general";
 import { LabelingTask } from "@/src/types/components/projects/projectId/settings/labeling-tasks";
 import { postProcessLabelingTasks, postProcessLabelingTasksSchema } from "@/src/util/components/projects/projectId/settings/labeling-tasks-helper";
 import { postProcessHeuristics } from "@/src/util/components/projects/projectId/heuristics/heuristics-helper";
@@ -19,12 +18,13 @@ import { CommentType } from "@/src/types/shared/comments";
 import { CommentDataManager } from "@/src/util/classes/comments";
 import { selectAllUsers, setBricksIntegrator, setComments } from "@/src/reduxStore/states/general";
 import { getEmptyBricksIntegratorConfig } from "@/src/util/shared/bricks-integrator-helper";
-import { useWebsocket } from "@/src/services/base/web-sockets/useWebsocket";
+import { useWebsocket } from "@/submodules/react-components/hooks/web-socket/useWebsocket";
 import { getAllComments } from "@/src/services/base/comment";
 import { getAttributes } from "@/src/services/base/attribute";
 import { getInformationSourcesOverviewData } from "@/src/services/base/heuristic";
 import { getLabelingTasksByProjectId } from "@/src/services/base/project";
 import { getEmbeddings } from "@/src/services/base/embedding";
+import { Application, CurrentPage } from "@/submodules/react-components/hooks/web-socket/constants";
 
 export function HeuristicsOverview() {
     const dispatch = useDispatch();
@@ -106,7 +106,7 @@ export function HeuristicsOverview() {
         }
     }, [projectId]);
 
-    useWebsocket(CurrentPage.HEURISTICS, handleWebsocketNotification, projectId);
+    useWebsocket(Application.REFINERY, CurrentPage.HEURISTICS, handleWebsocketNotification, projectId);
 
     return (projectId && <div className="p-4 bg-gray-100 h-full flex-1 flex flex-col">
         <div className="w-full h-full -mr-4">

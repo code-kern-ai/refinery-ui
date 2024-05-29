@@ -5,14 +5,14 @@ import { IconNotes } from "@tabler/icons-react";
 import { useDispatch, useSelector } from "react-redux";
 import { useCallback, useState } from "react";
 import { selectAllUsers, setAllUsers, setComments } from "@/src/reduxStore/states/general";
-import { CurrentPage, CurrentPageSubKey } from "@/src/types/shared/general";
 import { CommentDataManager } from "@/src/util/classes/comments";
 import { CommentRequest, CommentType } from "@/src/types/shared/comments";
 import { commentRequestToKey } from "@/src/util/shared/comments-helper";
 import { selectProjectId } from "@/src/reduxStore/states/project";
-import { useWebsocket } from "@/src/services/base/web-sockets/useWebsocket";
+import { useWebsocket } from "@/submodules/react-components/hooks/web-socket/useWebsocket";
 import { getAllComments } from "@/src/services/base/comment";
 import { getOrganizationUsers } from "@/src/services/base/organization";
+import { Application, CurrentPage, CurrentPageSubKey } from "@/submodules/react-components/hooks/web-socket/constants";
 
 export default function Comments() {
     const dispatch = useDispatch();
@@ -94,8 +94,8 @@ export default function Comments() {
         setSidebarOpen(prev => !prev);
     }, []);
 
-    useWebsocket(CurrentPage.COMMENTS, handleWebsocketNotificationGlobal, null, CurrentPageSubKey.GLOBAL);
-    useWebsocket(CurrentPage.COMMENTS, handleWebsocketNotification, projectId);
+    useWebsocket(Application.REFINERY, CurrentPage.COMMENTS, handleWebsocketNotificationGlobal, null, CurrentPageSubKey.GLOBAL);
+    useWebsocket(Application.REFINERY, CurrentPage.COMMENTS, handleWebsocketNotification, projectId);
 
     return (<>
         <button className="cursor-pointer inline-block mr-6" onClick={toggleModal}>

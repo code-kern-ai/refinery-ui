@@ -6,7 +6,6 @@ import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { postProcessLabelingTasks, postProcessLabelingTasksSchema } from "@/src/util/components/projects/projectId/settings/labeling-tasks-helper";
 import { selectLabelingTasksAll, selectTextAttributes, setLabelingTasksAll } from "@/src/reduxStore/states/pages/settings";
-import { CurrentPage } from "@/src/types/shared/general";
 import { CONFIDENCE_INTERVALS, parseToSettingsJson, postProcessZeroShot } from "@/src/util/components/projects/projectId/heuristics/heuristicId/zero-shot-helper";
 import { LabelingTaskTarget } from "@/src/types/components/projects/projectId/settings/labeling-tasks";
 import { Tooltip } from "@nextui-org/react";
@@ -25,11 +24,12 @@ import { Status } from "@/src/types/shared/statuses";
 import { CommentType } from "@/src/types/shared/comments";
 import { CommentDataManager } from "@/src/util/classes/comments";
 import Dropdown2 from "@/submodules/react-components/components/Dropdown2";
-import { useWebsocket } from "@/src/services/base/web-sockets/useWebsocket";
+import { useWebsocket } from "@/submodules/react-components/hooks/web-socket/useWebsocket";
 import { getZeroShotRecommendations } from "@/src/services/base/zero-shot";
 import { getAllComments } from "@/src/services/base/comment";
 import { getLabelingTasksByProjectId } from "@/src/services/base/project";
 import { getHeuristicByHeuristicId, updateHeuristicPost } from "@/src/services/base/heuristic";
+import { Application, CurrentPage } from "@/submodules/react-components/hooks/web-socket/constants";
 
 export default function ZeroShot() {
     const dispatch = useDispatch();
@@ -186,7 +186,7 @@ export default function ZeroShot() {
         }
     }, [currentHeuristic]);
 
-    useWebsocket(CurrentPage.ZERO_SHOT, handleWebsocketNotification, projectId);
+    useWebsocket(Application.REFINERY, CurrentPage.ZERO_SHOT, handleWebsocketNotification, projectId);
 
     return (<HeuristicsLayout>
         {currentHeuristic && <div>

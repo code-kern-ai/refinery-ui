@@ -22,7 +22,6 @@ import { SampleRecord } from "@/src/types/components/projects/projectId/heuristi
 import { getPythonFunctionRegExMatch } from "@/submodules/javascript-functions/python-functions-parser";
 import CalculationProgress from "./CalculationProgress";
 import { copyToClipboard } from "@/submodules/javascript-functions/general";
-import { CurrentPage } from "@/src/types/shared/general";
 import { selectAllUsers, setBricksIntegrator, setComments } from "@/src/reduxStore/states/general";
 import { CommentType } from "@/src/types/shared/comments";
 import { CommentDataManager } from "@/src/util/classes/comments";
@@ -33,11 +32,12 @@ import Dropdown2 from "@/submodules/react-components/components/Dropdown2";
 import { Attribute } from "@/src/types/components/projects/projectId/settings/data-schema";
 import LoadingIcon from "@/src/components/shared/loading/LoadingIcon";
 import { parseContainerLogsData } from "@/submodules/javascript-functions/logs-parser";
-import { useWebsocket } from "@/src/services/base/web-sockets/useWebsocket";
+import { useWebsocket } from "@/submodules/react-components/hooks/web-socket/useWebsocket";
 import { getAllComments } from "@/src/services/base/comment";
 import { getLabelingTasksByProjectId } from "@/src/services/base/project";
 import { getHeuristicByHeuristicId, getLabelingFunctionOn10Records, getPayloadByPayloadId, updateHeuristicPost } from "@/src/services/base/heuristic";
 import { getStoreSnapshotValue } from "@/src/reduxStore/store";
+import { Application, CurrentPage } from "@/submodules/react-components/hooks/web-socket/constants";
 
 export default function LabelingFunction() {
     const dispatch = useDispatch();
@@ -217,7 +217,7 @@ export default function LabelingFunction() {
         } else updateHeuristic(labelingTasks, 0, labelingTask);
     }, [projectId, currentHeuristic, labelingTasks])
 
-    useWebsocket(CurrentPage.LABELING_FUNCTION, handleWebsocketNotification, projectId);
+    useWebsocket(Application.REFINERY, CurrentPage.LABELING_FUNCTION, handleWebsocketNotification, projectId);
 
     return (
         <HeuristicsLayout updateSourceCode={(code: string) => updateSourceCodeToDisplay(code)}>

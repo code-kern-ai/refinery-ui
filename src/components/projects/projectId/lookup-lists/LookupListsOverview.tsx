@@ -10,16 +10,16 @@ import { openModal, selectModal } from "@/src/reduxStore/states/modal";
 import { ModalEnum } from "@/src/types/shared/modal";
 import { useRouter } from "next/router";
 import { ACTIONS_DROPDOWN_OPTIONS } from "@/src/util/components/projects/projectId/lookup-lists-helper";
-import { CurrentPage } from "@/src/types/shared/general";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
 import { selectAllUsers, setComments } from "@/src/reduxStore/states/general";
 import { CommentDataManager } from "@/src/util/classes/comments";
 import { CommentType } from "@/src/types/shared/comments";
 import DeleteLookupListsModal from "./DeleteLookupListsModal";
 import Dropdown2 from "@/submodules/react-components/components/Dropdown2";
-import { useWebsocket } from "@/src/services/base/web-sockets/useWebsocket";
+import { useWebsocket } from "@/submodules/react-components/hooks/web-socket/useWebsocket";
 import { getAllComments } from "@/src/services/base/comment";
 import { createKnowledgeBase, getLookupListsByProjectId } from "@/src/services/base/lookup-lists";
+import { Application, CurrentPage } from "@/submodules/react-components/hooks/web-socket/constants";
 
 
 export default function LookupListsOverview() {
@@ -114,7 +114,7 @@ export default function LookupListsOverview() {
         }
     }, [projectId]);
 
-    useWebsocket(CurrentPage.LOOKUP_LISTS_OVERVIEW, handleWebsocketNotification, projectId);
+    useWebsocket(Application.REFINERY, CurrentPage.LOOKUP_LISTS_OVERVIEW, handleWebsocketNotification, projectId);
 
     return (
         projectId ? (

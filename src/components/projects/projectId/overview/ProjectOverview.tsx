@@ -1,5 +1,4 @@
 import { selectProjectId } from '@/src/reduxStore/states/project';
-import { CurrentPage } from '@/src/types/shared/general';
 import { useCallback, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import ProjectOverviewHeader from './ProjectOverviewHeader';
@@ -25,11 +24,12 @@ import { selectAllUsers, selectIsManaged, setComments } from '@/src/reduxStore/s
 import { IconUsers } from '@tabler/icons-react';
 import { CommentType } from '@/src/types/shared/comments';
 import { CommentDataManager } from '@/src/util/classes/comments';
-import { useWebsocket } from '@/src/services/base/web-sockets/useWebsocket';
+import { useWebsocket } from '@/submodules/react-components/hooks/web-socket/useWebsocket';
 import { getAllComments } from '@/src/services/base/comment';
 import { getConfidenceDistribution, getConfusionMatrix, getGeneralProjectStats, getInterAnnotatorMatrix, getLabelDistribution, getLabelingTasksByProjectId, getRatsTokenization } from '@/src/services/base/project';
 import { getAttributes } from '@/src/services/base/attribute';
 import { getDataSlices } from '@/src/services/base/dataSlices';
+import { Application, CurrentPage } from '@/submodules/react-components/hooks/web-socket/constants';
 
 const PROJECT_STATS_INITIAL_STATE: ProjectStats = getEmptyProjectStats();
 
@@ -240,7 +240,7 @@ export default function ProjectOverview() {
     }, [projectId]);
 
 
-    useWebsocket(CurrentPage.PROJECT_OVERVIEW, handleWebsocketNotification, projectId);
+    useWebsocket(Application.REFINERY, CurrentPage.PROJECT_OVERVIEW, handleWebsocketNotification, projectId);
 
     return (<div>
         {projectId != null && <div className="pt-4 px-4 pb-10 bg-gray-100 flex-1 flex flex-col min-h-full h-[calc(100vh-4rem)] overflow-y-auto">

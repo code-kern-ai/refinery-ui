@@ -3,7 +3,7 @@ import { selectAllLookupLists, setAllLookupLists } from "@/src/reduxStore/states
 import { selectAttributes, selectVisibleAttributeAC, setAllAttributes, setLabelingTasksAll, updateAttributeById } from "@/src/reduxStore/states/pages/settings";
 import { selectProjectId } from "@/src/reduxStore/states/project"
 import { Attribute, AttributeState } from "@/src/types/components/projects/projectId/settings/data-schema";
-import { CurrentPage, DataTypeEnum } from "@/src/types/shared/general";
+import { DataTypeEnum } from "@/src/types/shared/general";
 import { postProcessCurrentAttribute } from "@/src/util/components/projects/projectId/settings/attribute-calculation-helper";
 import { ATTRIBUTES_VISIBILITY_STATES, DATA_TYPES, getTooltipVisibilityState } from "@/src/util/components/projects/projectId/settings/data-schema-helper";
 import { copyToClipboard } from "@/submodules/javascript-functions/general";
@@ -27,13 +27,14 @@ import { CommentType } from "@/src/types/shared/comments";
 import BricksIntegrator from "@/src/components/shared/bricks-integrator/BricksIntegrator";
 import { AttributeCodeLookup } from "@/src/util/classes/attribute-calculation";
 import Dropdown2 from "@/submodules/react-components/components/Dropdown2";
-import { useWebsocket } from "@/src/services/base/web-sockets/useWebsocket";
+import { useWebsocket } from "@/submodules/react-components/hooks/web-socket/useWebsocket";
 import { postProcessLabelingTasks, postProcessLabelingTasksSchema } from "@/src/util/components/projects/projectId/settings/labeling-tasks-helper";
 import { getAllComments } from "@/src/services/base/comment";
 import { getAttributes } from "@/src/services/base/attribute";
 import { getLookupListsByProjectId } from "@/src/services/base/lookup-lists";
 import { getLabelingTasksByProjectId, getProjectTokenization } from "@/src/services/base/project";
 import { getAttributeByAttributeId, updateAttribute } from "@/src/services/base/project-setting";
+import { Application, CurrentPage } from "@/submodules/react-components/hooks/web-socket/constants";
 
 const EDITOR_OPTIONS = { theme: 'vs-light', language: 'python', readOnly: false };
 
@@ -284,7 +285,7 @@ export default function AttributeCalculation() {
         }
     }, [projectId, currentAttribute]);
 
-    useWebsocket(CurrentPage.ATTRIBUTE_CALCULATION, handleWebsocketNotification, projectId);
+    useWebsocket(Application.REFINERY, CurrentPage.ATTRIBUTE_CALCULATION, handleWebsocketNotification, projectId);
 
     return (projectId && <div className={`bg-white p-4 overflow-y-auto min-h-full h-[calc(100vh-4rem)]`} onScroll={(e: any) => onScrollEvent(e)}>
         {currentAttribute && <div>

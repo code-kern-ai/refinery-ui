@@ -7,7 +7,6 @@ import { selectProjectId } from '@/src/reduxStore/states/project';
 import style from '@/src/styles/components/projects/projectId/heuristics/heuristics.module.css';
 import { Heuristic, HeuristicsHeaderProps } from '@/src/types/components/projects/projectId/heuristics/heuristics';
 import { LabelingTask } from '@/src/types/components/projects/projectId/settings/labeling-tasks';
-import { CurrentPage } from '@/src/types/shared/general';
 import { ModalEnum } from '@/src/types/shared/modal';
 import { Status } from '@/src/types/shared/statuses';
 import { ACTIONS_DROPDOWN_OPTIONS, NEW_HEURISTICS, checkSelectedHeuristics, postProcessCurrentWeakSupervisionRun } from '@/src/util/components/projects/projectId/heuristics/heuristics-helper';
@@ -21,10 +20,11 @@ import { useDispatch, useSelector } from 'react-redux';
 import LastWeakSupervisionModal from './modals/LastWeakSupervisionModal';
 import DeleteHeuristicsModal from './DeleteHeuristicsModal';
 import Dropdown2 from '@/submodules/react-components/components/Dropdown2';
-import { useWebsocket } from '@/src/services/base/web-sockets/useWebsocket';
+import { useWebsocket } from '@/submodules/react-components/hooks/web-socket/useWebsocket';
 import { createTask, getWeakSupervisionRun, setAllHeuristics } from "@/src/services/base/heuristic";
 import { initZeroShot } from "@/src/services/base/zero-shot";
 import { initWeakSupervision } from "@/src/services/base/weak-supervision";
+import { Application, CurrentPage } from "@/submodules/react-components/hooks/web-socket/constants";
 
 
 export default function HeuristicsHeader(props: HeuristicsHeaderProps) {
@@ -155,7 +155,7 @@ export default function HeuristicsHeader(props: HeuristicsHeaderProps) {
         else if (msgParts[1] == 'weak_supervision_finished') setLoadingIconWS(false);
     }, []);
 
-    useWebsocket(CurrentPage.HEURISTICS, handleWebsocketNotification, projectId);
+    useWebsocket(Application.REFINERY, CurrentPage.HEURISTICS, handleWebsocketNotification, projectId);
 
     return (
         <div className="flex-shrink-0 block xl:flex justify-between items-center">

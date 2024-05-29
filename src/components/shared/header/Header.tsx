@@ -1,5 +1,4 @@
 import { selectCurrentPage, selectDisplayIconComments, selectIsDemo, selectIsManaged, selectOrganization, selectUser, setNotifications } from "@/src/reduxStore/states/general";
-import { CurrentPage } from "@/src/types/shared/general";
 import { UserRole } from "@/src/types/shared/sidebar";
 import { Tooltip } from "@nextui-org/react";
 import { useEffect, useState } from "react";
@@ -19,6 +18,7 @@ import Comments from "../comments/Comments";
 import { arrayToDict } from "@/submodules/javascript-functions/general";
 import { getAllProjects } from "@/src/services/base/project";
 import { getNotifications } from "@/src/services/base/notification";
+import { CurrentPage } from "@/submodules/react-components/hooks/web-socket/constants";
 
 export default function Header() {
     const router = useRouter();

@@ -6,10 +6,9 @@ import { selectEmbeddings } from "@/src/reduxStore/states/pages/settings";
 import { selectProjectId } from "@/src/reduxStore/states/project";
 import { getProjectSize, prepareProjectExport } from "@/src/services/base/project-setting";
 import { downloadFile } from "@/src/services/base/s3-service";
-import { useWebsocket } from "@/src/services/base/web-sockets/useWebsocket";
+import { useWebsocket } from "@/submodules/react-components/hooks/web-socket/useWebsocket";
 import { getLastProjectExportCredentials } from '@/src/services/base/project';
 import { DownloadState, ProjectSize } from "@/src/types/components/projects/projectId/settings/project-export";
-import { CurrentPage, CurrentPageSubKey } from "@/src/types/shared/general";
 import { ModalEnum } from "@/src/types/shared/modal";
 import { postProcessingFormGroups } from "@/src/util/components/projects/projectId/settings/project-export-helper";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
@@ -20,6 +19,7 @@ import { IconDownload, IconInfoCircle } from "@tabler/icons-react";
 import { Fragment, useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { timer } from "rxjs";
+import { Application, CurrentPage, CurrentPageSubKey } from "@/submodules/react-components/hooks/web-socket/constants";
 
 export default function ProjectSnapshotExportModal() {
     const dispatch = useDispatch();
@@ -111,7 +111,7 @@ export default function ProjectSnapshotExportModal() {
         }
     }, []);
 
-    useWebsocket(CurrentPage.PROJECT_SETTINGS, handleWebsocketNotification, projectId, CurrentPageSubKey.SNAPSHOT_EXPORT);
+    useWebsocket(Application.REFINERY, CurrentPage.PROJECT_SETTINGS, handleWebsocketNotification, projectId, CurrentPageSubKey.SNAPSHOT_EXPORT);
 
     return (<Modal modalName={ModalEnum.PROJECT_SNAPSHOT} hasOwnButtons={true}>
         <div className="text-lg leading-6 text-gray-900 font-medium text-center">

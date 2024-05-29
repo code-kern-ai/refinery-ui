@@ -9,10 +9,9 @@ import { postProcessLabelingTasks, postProcessLabelingTasksSchema } from "@/src/
 import { selectAllUsers, selectUser, setComments } from "@/src/reduxStore/states/general";
 import DataBrowserRecords from "./DataBrowserRecords";
 import { postProcessingEmbeddings } from "@/src/util/components/projects/projectId/settings/embeddings-helper";
-import { CurrentPage } from "@/src/types/shared/general";
 import { CommentType } from "@/src/types/shared/comments";
 import { CommentDataManager } from "@/src/util/classes/comments";
-import { useWebsocket } from "@/src/services/base/web-sockets/useWebsocket";
+import { useWebsocket } from "@/submodules/react-components/hooks/web-socket/useWebsocket";
 import { getAllComments } from "@/src/services/base/comment";
 import { getAttributes } from "@/src/services/base/attribute";
 import { getDataSlices, getUniqueValuesByAttributes } from "@/src/services/base/dataSlices";
@@ -22,6 +21,7 @@ import { getAllUsersWithRecordCount } from "@/src/services/base/organization";
 import { getEmbeddings } from "@/src/services/base/embedding";
 import { parseFilterToExtended } from "@/src/util/components/projects/projectId/data-browser/filter-parser-helper";
 import { SearchGroup, Slice } from "@/submodules/javascript-functions/enums/enums";
+import { Application, CurrentPage } from "@/submodules/react-components/hooks/web-socket/constants";
 
 const SEARCH_REQUEST = { offset: 0, limit: 20 };
 
@@ -175,7 +175,7 @@ export default function DataBrowser() {
         }
     }, [projectId]);
 
-    useWebsocket(CurrentPage.DATA_BROWSER, handleWebsocketNotification, projectId);
+    useWebsocket(Application.REFINERY, CurrentPage.DATA_BROWSER, handleWebsocketNotification, projectId);
 
     return (<>
         {projectId && <div className="flex flex-row h-full">

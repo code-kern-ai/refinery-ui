@@ -18,18 +18,18 @@ import LabelingSuiteTaskHeader from "../sub-components/LabelingSuiteTaskHeader";
 import LabelingSuiteOverviewTable from "../sub-components/LabelingSuiteOverviewTable";
 import LabelingSuiteLabeling from "../sub-components/LabelingSuiteLabeling";
 import { setAllAttributes, setLabelingTasksAll } from "@/src/reduxStore/states/pages/settings";
-import { CurrentPage } from "@/src/types/shared/general";
 import { postProcessLabelingTasks, postProcessLabelingTasksSchema } from "@/src/util/components/projects/projectId/settings/labeling-tasks-helper";
 import { CommentDataManager } from "@/src/util/classes/comments";
 import { CommentType } from "@/src/types/shared/comments";
 import { getEmptyBricksIntegratorConfig } from "@/src/util/shared/bricks-integrator-helper";
 import { LabelingTask } from "@/src/types/components/projects/projectId/settings/labeling-tasks";
-import { useWebsocket } from "@/src/services/base/web-sockets/useWebsocket";
+import { useWebsocket } from "@/submodules/react-components/hooks/web-socket/useWebsocket";
 import { getAllComments } from "@/src/services/base/comment";
 import { getAttributes } from "@/src/services/base/attribute";
 import { getLabelingTasksByProjectId } from "@/src/services/base/project";
 import { getAvailableLinks, getHuddleData, getLinkLocked, getRecordLabelAssociations, getTokenizedRecord } from "@/src/services/base/labeling";
 import { getRecordByRecordId } from "@/src/services/base/project-setting";
+import { Application, CurrentPage } from "@/submodules/react-components/hooks/web-socket/constants";
 
 const SETTINGS_KEY = 'labelingSettings';
 
@@ -337,7 +337,7 @@ export default function LabelingMainComponent() {
         }
     }, [record, SessionManager.currentRecordId]);
 
-    useWebsocket(CurrentPage.LABELING, handleWebsocketNotification, projectId);
+    useWebsocket(Application.REFINERY, CurrentPage.LABELING, handleWebsocketNotification, projectId);
 
     return (<div className={`h-full bg-white flex flex-col ${LabelingSuiteManager.somethingLoading ? style.wait : ''}`}>
         <NavigationBarTop absoluteWarning={absoluteWarning} lockedLink={lockedLink} />

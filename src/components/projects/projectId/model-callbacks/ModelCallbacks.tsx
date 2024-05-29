@@ -12,13 +12,13 @@ import { useDispatch, useSelector } from "react-redux";
 import style from '@/src/styles/components/projects/projectId/model-callbacks.module.css';
 import { ModalEnum } from "@/src/types/shared/modal";
 import { openModal, selectModal } from "@/src/reduxStore/states/modal";
-import { CurrentPage } from "@/src/types/shared/general";
 import GridCards from "@/src/components/shared/grid-cards/GridCards";
 import DeleteModelCallBacksModal from "./DeleteModelCallbacksModal";
 import Dropdown2 from "@/submodules/react-components/components/Dropdown2";
-import { useWebsocket } from "@/src/services/base/web-sockets/useWebsocket";
+import { useWebsocket } from "@/submodules/react-components/hooks/web-socket/useWebsocket";
 import { getLabelingTasksByProjectId } from "@/src/services/base/project";
 import { getModelCallbacksOverviewData } from "@/src/services/base/heuristic";
+import { Application, CurrentPage } from "@/submodules/react-components/hooks/web-socket/constants";
 
 
 export default function ModelCallbacks() {
@@ -113,7 +113,7 @@ export default function ModelCallbacks() {
         }
     }, []);
 
-    useWebsocket(CurrentPage.MODEL_CALLBACKS, handleWebsocketNotification, projectId);
+    useWebsocket(Application.REFINERY, CurrentPage.MODEL_CALLBACKS, handleWebsocketNotification, projectId);
 
     return (projectId && <div className="p-4 bg-gray-100 h-full flex-1 flex flex-col">
         <div className="w-full h-full">

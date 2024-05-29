@@ -1,6 +1,6 @@
 import LabelingMainComponent from "@/src/components/projects/projectId/labeling/sessionId/main-component/LabelingMainComponent";
 import { setCurrentPage, setDisplayIconComments } from "@/src/reduxStore/states/general";
-import { CurrentPage } from "@/src/types/shared/general";
+import { CurrentPage } from "@/submodules/react-components/hooks/web-socket/constants";
 import { useEffect } from "react";
 import { useDispatch } from "react-redux";
 

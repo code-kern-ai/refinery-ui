@@ -5,7 +5,7 @@ import { selectSessionData } from "@/src/reduxStore/states/tmp";
 import { Fragment, useCallback, useEffect, useState } from "react";
 import { buildAccessKey, createDefaultEditRecordComponentData } from "@/src/util/components/projects/projectId/edit-records-helper";
 import style from '@/src/styles/components/projects/projectId/edit-records.module.css';
-import { CurrentPage, DataTypeEnum } from "@/src/types/shared/general";
+import { DataTypeEnum } from "@/src/types/shared/general";
 import { IconAlertCircle, IconAlertTriangle, IconAlertTriangleFilled, IconBallpen, IconBallpenOff } from "@tabler/icons-react";
 import { Tooltip } from "@nextui-org/react";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
@@ -13,8 +13,9 @@ import EditField from "./EditField";
 import { useRouter } from "next/router";
 import { ModalEnum } from "@/src/types/shared/modal";
 import { openModal } from "@/src/reduxStore/states/modal";
-import { useWebsocket } from "@/src/services/base/web-sockets/useWebsocket";
+import { useWebsocket } from "@/submodules/react-components/hooks/web-socket/useWebsocket";
 import { scrollElementIntoView } from "@/submodules/javascript-functions/scrollHelper";
+import { Application, CurrentPage } from "@/submodules/react-components/hooks/web-socket/constants";
 
 export default function EditRecords() {
     const dispatch = useDispatch();
@@ -71,7 +72,7 @@ export default function EditRecords() {
         setAlertLastVisible(Date.now());
     }, [alertLastVisible]);
 
-    useWebsocket(CurrentPage.EDIT_RECORDS, handleWebsocketNotification, projectId);
+    useWebsocket(Application.REFINERY, CurrentPage.EDIT_RECORDS, handleWebsocketNotification, projectId);
 
     return (<>{projectId && <div className="bg-white flex flex-col min-h-full h-[calc(100vh-4rem)]">
         <NavBarTopEditRecords erdData={erdData} setErdData={(erdData) => setErdData(erdData)} />
