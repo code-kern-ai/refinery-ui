@@ -224,7 +224,7 @@ export default function Sidebar() {
                                 <Tooltip placement="right" trigger="hover" color="invert" content={TOOLTIPS_DICT.SIDEBAR.VERSION_OVERVIEW}>
                                     <div onClick={requestVersionOverview} id="refineryVersion"
                                         className="z-50 tooltip tooltip-right cursor-pointer select-none text-white flex items-center mr-1">
-                                        v1.14.0
+                                        v1.15.0
                                         {hasUpdates && <Tooltip placement="right" trigger="hover" color="invert" content={TOOLTIPS_DICT.SIDEBAR.NEWER_VERSION_AVAILABLE} >
                                             <IconAlertCircle className="h-5 w-5 text-yellow-700" />
                                         </Tooltip>}
