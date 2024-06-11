@@ -11,6 +11,7 @@ import { ModelsDownloaded, ModelsDownloadedStatus } from "@/src/types/components
 import { CacheEnum, selectCachedValue } from "@/src/reduxStore/states/cachedValues";
 import Dropdown2 from "@/submodules/react-components/components/Dropdown2";
 import { modelProviderDownloadModel } from "@/src/services/base/misc";
+import { PlatformType } from "@/src/types/components/projects/projectId/settings/embeddings";
 
 const ACCEPT_BUTTON = { buttonCaption: 'Accept', useButton: true };
 
@@ -29,7 +30,7 @@ export default function AddModelDownloadModal() {
 
     useEffect(() => {
         if (!modelsList) return;
-        setFilteredList(modelsList);
+        setFilteredList(modelsList.filter((model: any) => model.platform !== PlatformType.OPEN_AI));
     }, [modelsList]);
 
     useEffect(() => {
