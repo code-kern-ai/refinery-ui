@@ -284,7 +284,7 @@ export default function LabelingFunction() {
                                 selectedOption={(option: any) => setSelectedAttribute(option)} />
                         </div>
                         <Tooltip content={selectedAttribute == null ? TOOLTIPS_DICT.LABELING_FUNCTION.SELECT_ATTRIBUTE : TOOLTIPS_DICT.LABELING_FUNCTION.RUN_ON_10} color="invert" placement="left">
-                            <button disabled={selectedAttribute == null} onClick={executeLabelingFunctionOn10Records}
+                            <button disabled={selectedAttribute == null || runOn10IsRunning} onClick={executeLabelingFunctionOn10Records}
                                 className="bg-white text-gray-700 text-xs font-semibold px-4 py-2 rounded-md border border-gray-300 hover:bg-gray-50 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed">
                                 Run on 10
                             </button>
