@@ -91,7 +91,7 @@ export default function ZeroShotExecution(props: ZeroShotExecutionProps) {
                     {testerRequestedSomething && <div className="m-1"> <LoadingIcon color="indigo" /></div>}
                     <Tooltip content={TOOLTIPS_DICT.ZERO_SHOT.EXECUTE_10_RECORDS} color="invert" placement="top">
                         <button onClick={runZeroShot10RecordTest}
-                            className="bg-white text-gray-700 text-xs font-semibold px-4 py-2 rounded-md border border-gray-300 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                            className="bg-white text-gray-700 text-xs font-semibold px-4 py-2 rounded-md border border-gray-300 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
                             Run on 10
                         </button>
                     </Tooltip>
