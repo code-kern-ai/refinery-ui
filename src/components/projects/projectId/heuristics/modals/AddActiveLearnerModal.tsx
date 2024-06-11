@@ -9,6 +9,7 @@ import { ModalButton, ModalEnum } from "@/src/types/shared/modal";
 import { embeddingRelevant } from "@/src/util/components/projects/projectId/heuristics/heuristicId/labeling-functions-helper";
 import { DEFAULT_DESCRIPTION, getFunctionName, getInformationSourceTemplate, getRouterLinkHeuristic } from "@/src/util/components/projects/projectId/heuristics/heuristics-helper";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
+import { capitalizeFirstForClassName } from "@/submodules/javascript-functions/case-types-parser";
 import Dropdown2 from "@/submodules/react-components/components/Dropdown2";
 import { Tooltip } from "@nextui-org/react";
 import { useRouter } from "next/router";
@@ -89,7 +90,7 @@ export default function AddActiveLeanerModal() {
                     <span className="cursor-help card-title mb-0 label-text text-left"><span className="underline filtersUnderline">Class name</span></span>
                 </div>
             </Tooltip>
-            <input placeholder="Enter a class name..." value={name} onChange={(e: any) => setName(e.target.value)}
+            <input placeholder="Enter a class name..." value={name} onChange={(e: any) => setName(capitalizeFirstForClassName(e.target.value))}
                 className="h-9 w-full text-sm border-gray-300 rounded-md placeholder-italic border text-gray-900 pl-4 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100" />
             <Tooltip content={TOOLTIPS_DICT.HEURISTICS.ENTER_DESCRIPTION} color="invert" placement="right">
                 <div className="justify-self-start">

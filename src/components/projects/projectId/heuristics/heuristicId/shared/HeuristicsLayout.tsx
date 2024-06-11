@@ -16,6 +16,8 @@ import { useRouter } from "next/router";
 import { getAttributes } from "@/src/services/base/attribute";
 import { getLookupListsByProjectId } from "@/src/services/base/lookup-lists";
 import { updateHeuristicPost } from "@/src/services/base/heuristic";
+import { toPythonFunctionName } from "@/submodules/javascript-functions/python-functions-parser";
+import { capitalizeFirstForClassName } from "@/submodules/javascript-functions/case-types-parser";
 
 export default function HeuristicsLayout(props: any) {
     const router = useRouter();
@@ -85,7 +87,11 @@ export default function HeuristicsLayout(props: any) {
     }
 
     function changeHeuristic(value: string, property: string) {
-        dispatch(updateHeuristicsState(currentHeuristic.id, { [property]: value }))
+        let finalValue = value;
+        if (property == HeuristicsProperty.NAME) {
+            finalValue = currentHeuristic.informationSourceType == InformationSourceType.LABELING_FUNCTION ? toPythonFunctionName(value) : currentHeuristic.informationSourceType == InformationSourceType.ACTIVE_LEARNING ? capitalizeFirstForClassName(value) : value;
+        }
+        dispatch(updateHeuristicsState(currentHeuristic.id, { [property]: finalValue }))
     }
 
     function refetchAttributesAndProcess() {
