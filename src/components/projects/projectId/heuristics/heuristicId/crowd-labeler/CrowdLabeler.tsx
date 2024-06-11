@@ -121,7 +121,7 @@ export default function CrowdLabeler() {
                 <>
                     <div className="overflow-hidden bg-white">
                         <div className="relative py-8 pr-4">
-                            <div className="absolute top-0 bottom-0 left-3/4 hidden w-screen bg-gray-50 lg:block"></div>
+                            <div className="absolute top-2 bottom-0 left-3/4 hidden w-screen bg-gray-50 lg:block"></div>
                             <div className="mx-auto max-w-prose text-base lg:grid lg:max-w-none lg:grid-cols-2 lg:gap-8">
                                 <div>
                                     <h2 className="text-lg font-semibold text-indigo-600">Integrating crowd labelers</h2>
