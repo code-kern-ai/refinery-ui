@@ -6,7 +6,7 @@ import { useRouter } from "next/router";
 import { useCallback, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import HeuristicsLayout from "../shared/HeuristicsLayout";
-import { selectAllUsers, selectAnnotators, setComments } from "@/src/reduxStore/states/general";
+import { selectAllUsers, selectAnnotators, selectOrganizationId, setComments } from "@/src/reduxStore/states/general";
 import DangerZone from "@/src/components/shared/danger-zone/DangerZone";
 import { DangerZoneEnum } from "@/src/types/shared/danger-zone";
 import HeuristicStatistics from "../shared/HeuristicStatistics";
@@ -113,7 +113,8 @@ export default function CrowdLabeler() {
         }
     }, [currentHeuristic, projectId]);
 
-    useWebsocket(Application.REFINERY, CurrentPage.CROWD_LABELER, handleWebsocketNotification, projectId);
+    const orgId = useSelector(selectOrganizationId);
+    useWebsocket(orgId, Application.REFINERY, CurrentPage.CROWD_LABELER, handleWebsocketNotification, projectId);
 
     return (<HeuristicsLayout>
         {currentHeuristic && <div>

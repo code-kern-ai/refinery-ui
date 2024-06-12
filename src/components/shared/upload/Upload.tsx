@@ -19,6 +19,7 @@ import Dropdown2 from "@/submodules/react-components/components/Dropdown2";
 import { useWebsocket } from "@/submodules/react-components/hooks/web-socket/useWebsocket";
 import { getUploadCredentialsAndId, getUploadTaskById, deleteProjectPost, createProjectPost, updateProjectTokenizer, updateProjectStatus } from "@/src/services/base/project";
 import { Application, CurrentPage, CurrentPageSubKey } from "@/submodules/react-components/hooks/web-socket/constants";
+import { selectOrganizationId } from "@/src/reduxStore/states/general";
 
 export default function Upload(props: UploadProps) {
     const router = useRouter();
@@ -244,8 +245,9 @@ export default function Upload(props: UploadProps) {
         if (findProjectName) setIsProjectTitleDuplicate(true);
         else setIsProjectTitleDuplicate(false);
     }
-    useWebsocket(Application.REFINERY, CurrentPage.PROJECTS, handleWebsocketNotification, null, CurrentPageSubKey.FILE_UPLOAD);
-    useWebsocket(Application.REFINERY, CurrentPage.UPLOAD_RECORDS, handleWebsocketNotification, UploadHelper.getProjectId());
+    const orgId = useSelector(selectOrganizationId);
+    useWebsocket(orgId, Application.REFINERY, CurrentPage.PROJECTS, handleWebsocketNotification, null, CurrentPageSubKey.FILE_UPLOAD);
+    useWebsocket(orgId, Application.REFINERY, CurrentPage.UPLOAD_RECORDS, handleWebsocketNotification, UploadHelper.getProjectId());
 
     return <>
         {props.uploadOptions && <section className={`${!props.uploadOptions.isModal ? 'p-4' : ''}`}>

@@ -20,6 +20,7 @@ import { Fragment, useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { timer } from "rxjs";
 import { Application, CurrentPage, CurrentPageSubKey } from "@/submodules/react-components/hooks/web-socket/constants";
+import { selectOrganizationId } from "@/src/reduxStore/states/general";
 
 export default function ProjectSnapshotExportModal() {
     const dispatch = useDispatch();
@@ -111,7 +112,8 @@ export default function ProjectSnapshotExportModal() {
         }
     }, []);
 
-    useWebsocket(Application.REFINERY, CurrentPage.PROJECT_SETTINGS, handleWebsocketNotification, projectId, CurrentPageSubKey.SNAPSHOT_EXPORT);
+    const orgId = useSelector(selectOrganizationId);
+    useWebsocket(orgId, Application.REFINERY, CurrentPage.PROJECT_SETTINGS, handleWebsocketNotification, projectId, CurrentPageSubKey.SNAPSHOT_EXPORT);
 
     return (<Modal modalName={ModalEnum.PROJECT_SNAPSHOT} hasOwnButtons={true}>
         <div className="text-lg leading-6 text-gray-900 font-medium text-center">

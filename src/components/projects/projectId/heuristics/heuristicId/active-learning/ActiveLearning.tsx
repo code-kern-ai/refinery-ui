@@ -21,7 +21,7 @@ import HeuristicStatistics from "../shared/HeuristicStatistics";
 import DangerZone from "@/src/components/shared/danger-zone/DangerZone";
 import { DangerZoneEnum } from "@/src/types/shared/danger-zone";
 import { getPythonClassName, getPythonClassRegExMatch } from "@/submodules/javascript-functions/python-functions-parser";
-import { selectAllUsers, setBricksIntegrator, setLabelsBricksIntegrator, setComments } from "@/src/reduxStore/states/general";
+import { selectAllUsers, setBricksIntegrator, setLabelsBricksIntegrator, setComments, selectOrganizationId } from "@/src/reduxStore/states/general";
 import { CommentType } from "@/src/types/shared/comments";
 import { CommentDataManager } from "@/src/util/classes/comments";
 import BricksIntegrator from "@/src/components/shared/bricks-integrator/BricksIntegrator";
@@ -204,7 +204,8 @@ export default function ActiveLearning() {
         });
     }
 
-    useWebsocket(Application.REFINERY, CurrentPage.ACTIVE_LEARNING, handleWebsocketNotification, projectId);
+    const orgId = useSelector(selectOrganizationId);
+    useWebsocket(orgId, Application.REFINERY, CurrentPage.ACTIVE_LEARNING, handleWebsocketNotification, projectId);
 
     return (
         <HeuristicsLayout updateSourceCode={(code) => updateSourceCodeToDisplay(code)}>

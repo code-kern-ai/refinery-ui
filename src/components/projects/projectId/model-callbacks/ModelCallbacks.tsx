@@ -19,6 +19,7 @@ import { useWebsocket } from "@/submodules/react-components/hooks/web-socket/use
 import { getLabelingTasksByProjectId } from "@/src/services/base/project";
 import { getModelCallbacksOverviewData } from "@/src/services/base/heuristic";
 import { Application, CurrentPage } from "@/submodules/react-components/hooks/web-socket/constants";
+import { selectOrganizationId } from "@/src/reduxStore/states/general";
 
 
 export default function ModelCallbacks() {
@@ -113,7 +114,8 @@ export default function ModelCallbacks() {
         }
     }, []);
 
-    useWebsocket(Application.REFINERY, CurrentPage.MODEL_CALLBACKS, handleWebsocketNotification, projectId);
+    const orgId = useSelector(selectOrganizationId);
+    useWebsocket(orgId, Application.REFINERY, CurrentPage.MODEL_CALLBACKS, handleWebsocketNotification, projectId);
 
     return (projectId && <div className="p-4 bg-gray-100 h-full flex-1 flex flex-col">
         <div className="w-full h-full">

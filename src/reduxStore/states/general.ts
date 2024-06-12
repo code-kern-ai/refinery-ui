@@ -164,6 +164,7 @@ export const selectIsManaged = (state) => state.general.isManaged;
 export const selectIsDemo = (state) => state.general.isDemo;
 export const selectIsAdmin = (state) => state.general.isAdmin;
 export const selectOrganization = (state) => state.general.organization;
+export const selectOrganizationId = (state) => state.general.organization?.id;
 export const selectInactiveOrganization = (state) => state.general.organizationInactive;
 export const selectAllUsers = (state) => state.general.users.all;
 export const selectEngineers = (state) => state.general.users.engineers;

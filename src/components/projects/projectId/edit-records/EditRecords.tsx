@@ -16,6 +16,7 @@ import { openModal } from "@/src/reduxStore/states/modal";
 import { useWebsocket } from "@/submodules/react-components/hooks/web-socket/useWebsocket";
 import { scrollElementIntoView } from "@/submodules/javascript-functions/scrollHelper";
 import { Application, CurrentPage } from "@/submodules/react-components/hooks/web-socket/constants";
+import { selectOrganizationId } from "@/src/reduxStore/states/general";
 
 export default function EditRecords() {
     const dispatch = useDispatch();
@@ -72,7 +73,8 @@ export default function EditRecords() {
         setAlertLastVisible(Date.now());
     }, [alertLastVisible]);
 
-    useWebsocket(Application.REFINERY, CurrentPage.EDIT_RECORDS, handleWebsocketNotification, projectId);
+    const orgId = useSelector(selectOrganizationId);
+    useWebsocket(orgId, Application.REFINERY, CurrentPage.EDIT_RECORDS, handleWebsocketNotification, projectId);
 
     return (<>{projectId && <div className="bg-white flex flex-col min-h-full h-[calc(100vh-4rem)]">
         <NavBarTopEditRecords erdData={erdData} setErdData={(erdData) => setErdData(erdData)} />

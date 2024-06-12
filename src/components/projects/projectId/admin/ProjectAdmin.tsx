@@ -11,7 +11,7 @@ import { useDispatch, useSelector } from "react-redux";
 import NewPersonalToken from "./NewPersonalTokenModal";
 import DeletePersonalToken from "./DeletePersonalTokenModal";
 import { useRouter } from "next/router";
-import { selectIsAdmin } from "@/src/reduxStore/states/general";
+import { selectIsAdmin, selectOrganizationId } from "@/src/reduxStore/states/general";
 import { useWebsocket } from "@/submodules/react-components/hooks/web-socket/useWebsocket";
 import { getAccessTokens } from "@/src/services/base/project";
 import { Application, CurrentPage } from "@/submodules/react-components/hooks/web-socket/constants";
@@ -53,7 +53,9 @@ export default function ProjectAdmin() {
         }
     }, [accessTokens]);
 
-    useWebsocket(Application.REFINERY, CurrentPage.ADMIN_PAGE, handleWebsocketNotification, projectId);
+
+    const orgId = useSelector(selectOrganizationId);
+    useWebsocket(orgId, Application.REFINERY, CurrentPage.ADMIN_PAGE, handleWebsocketNotification, projectId);
 
     return (<>
         {accessTokens && <div className="p-4 bg-gray-100 h-full overflow-y-auto flex-1 flex flex-col">

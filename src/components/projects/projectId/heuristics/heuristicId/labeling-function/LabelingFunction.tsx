@@ -22,7 +22,7 @@ import { SampleRecord } from "@/src/types/components/projects/projectId/heuristi
 import { getPythonFunctionRegExMatch } from "@/submodules/javascript-functions/python-functions-parser";
 import CalculationProgress from "./CalculationProgress";
 import { copyToClipboard } from "@/submodules/javascript-functions/general";
-import { selectAllUsers, setBricksIntegrator, setComments } from "@/src/reduxStore/states/general";
+import { selectAllUsers, selectOrganizationId, setBricksIntegrator, setComments } from "@/src/reduxStore/states/general";
 import { CommentType } from "@/src/types/shared/comments";
 import { CommentDataManager } from "@/src/util/classes/comments";
 import BricksIntegrator from "@/src/components/shared/bricks-integrator/BricksIntegrator";
@@ -217,7 +217,8 @@ export default function LabelingFunction() {
         } else updateHeuristic(labelingTasks, 0, labelingTask);
     }, [projectId, currentHeuristic, labelingTasks])
 
-    useWebsocket(Application.REFINERY, CurrentPage.LABELING_FUNCTION, handleWebsocketNotification, projectId);
+    const orgId = useSelector(selectOrganizationId);
+    useWebsocket(orgId, Application.REFINERY, CurrentPage.LABELING_FUNCTION, handleWebsocketNotification, projectId);
 
     return (
         <HeuristicsLayout updateSourceCode={(code: string) => updateSourceCodeToDisplay(code)}>

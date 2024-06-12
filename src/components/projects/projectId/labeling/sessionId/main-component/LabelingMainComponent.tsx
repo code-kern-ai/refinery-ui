@@ -1,4 +1,4 @@
-import { selectAllUsers, selectUser, setBricksIntegrator, setComments } from "@/src/reduxStore/states/general";
+import { selectAllUsers, selectOrganizationId, selectUser, setBricksIntegrator, setComments } from "@/src/reduxStore/states/general";
 import { setAvailableLinks, updateRecordRequests, setSelectedLink, selectRecordRequestsRla, updateUsers, setSettings, selectSettings, setUserDisplayId, selectRecordRequestsRecord, initOnLabelPageDestruction, selectUserDisplayId, selectDisplayUserRole, setDisplayUserRole } from "@/src/reduxStore/states/pages/labeling";
 import { selectProjectId } from "@/src/reduxStore/states/project"
 import { LabelingLinkType } from "@/src/types/components/projects/projectId/labeling/labeling-main-component";
@@ -337,7 +337,8 @@ export default function LabelingMainComponent() {
         }
     }, [record, SessionManager.currentRecordId]);
 
-    useWebsocket(Application.REFINERY, CurrentPage.LABELING, handleWebsocketNotification, projectId);
+    const orgId = useSelector(selectOrganizationId);
+    useWebsocket(orgId, Application.REFINERY, CurrentPage.LABELING, handleWebsocketNotification, projectId);
 
     return (<div className={`h-full bg-white flex flex-col ${LabelingSuiteManager.somethingLoading ? style.wait : ''}`}>
         <NavigationBarTop absoluteWarning={absoluteWarning} lockedLink={lockedLink} />

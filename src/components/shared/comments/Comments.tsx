@@ -4,7 +4,7 @@ import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
 import { IconNotes } from "@tabler/icons-react";
 import { useDispatch, useSelector } from "react-redux";
 import { useCallback, useState } from "react";
-import { selectAllUsers, setAllUsers, setComments } from "@/src/reduxStore/states/general";
+import { selectAllUsers, selectOrganizationId, setAllUsers, setComments } from "@/src/reduxStore/states/general";
 import { CommentDataManager } from "@/src/util/classes/comments";
 import { CommentRequest, CommentType } from "@/src/types/shared/comments";
 import { commentRequestToKey } from "@/src/util/shared/comments-helper";
@@ -94,8 +94,9 @@ export default function Comments() {
         setSidebarOpen(prev => !prev);
     }, []);
 
-    useWebsocket(Application.REFINERY, CurrentPage.COMMENTS, handleWebsocketNotificationGlobal, null, CurrentPageSubKey.GLOBAL);
-    useWebsocket(Application.REFINERY, CurrentPage.COMMENTS, handleWebsocketNotification, projectId);
+    const orgId = useSelector(selectOrganizationId);
+    useWebsocket(orgId, Application.REFINERY, CurrentPage.COMMENTS, handleWebsocketNotificationGlobal, null, CurrentPageSubKey.GLOBAL);
+    useWebsocket(orgId, Application.REFINERY, CurrentPage.COMMENTS, handleWebsocketNotification, projectId);
 
     return (<>
         <button className="cursor-pointer inline-block mr-6" onClick={toggleModal}>

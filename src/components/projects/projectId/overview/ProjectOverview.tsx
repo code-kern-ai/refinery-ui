@@ -20,7 +20,7 @@ import ConfusionMatrixBarChart from './charts/ConfusionMatrixBarChart';
 import LoadingIcon from '@/src/components/shared/loading/LoadingIcon';
 import { addUserName, parseOverviewSettingsToDict } from '@/src/util/components/projects/projectId/project-overview/charts-helper';
 import InterAnnotatorBarChart from './charts/InterAnnotatorBarChart';
-import { selectAllUsers, selectIsManaged, setComments } from '@/src/reduxStore/states/general';
+import { selectAllUsers, selectIsManaged, selectOrganizationId, setComments } from '@/src/reduxStore/states/general';
 import { IconUsers } from '@tabler/icons-react';
 import { CommentType } from '@/src/types/shared/comments';
 import { CommentDataManager } from '@/src/util/classes/comments';
@@ -240,7 +240,8 @@ export default function ProjectOverview() {
     }, [projectId]);
 
 
-    useWebsocket(Application.REFINERY, CurrentPage.PROJECT_OVERVIEW, handleWebsocketNotification, projectId);
+    const orgId = useSelector(selectOrganizationId);
+    useWebsocket(orgId, Application.REFINERY, CurrentPage.PROJECT_OVERVIEW, handleWebsocketNotification, projectId);
 
     return (<div>
         {projectId != null && <div className="pt-4 px-4 pb-10 bg-gray-100 flex-1 flex flex-col min-h-full h-[calc(100vh-4rem)] overflow-y-auto">

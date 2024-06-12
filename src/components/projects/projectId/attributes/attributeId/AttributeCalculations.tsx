@@ -21,7 +21,7 @@ import ContainerLogs from "@/src/components/shared/logs/ContainerLogs";
 import LoadingIcon from "@/src/components/shared/loading/LoadingIcon";
 import { debounceTime, distinctUntilChanged, fromEvent, timer } from "rxjs";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
-import { selectAllUsers, setComments } from "@/src/reduxStore/states/general";
+import { selectAllUsers, selectOrganizationId, setComments } from "@/src/reduxStore/states/general";
 import { CommentDataManager } from "@/src/util/classes/comments";
 import { CommentType } from "@/src/types/shared/comments";
 import BricksIntegrator from "@/src/components/shared/bricks-integrator/BricksIntegrator";
@@ -285,7 +285,8 @@ export default function AttributeCalculation() {
         }
     }, [projectId, currentAttribute]);
 
-    useWebsocket(Application.REFINERY, CurrentPage.ATTRIBUTE_CALCULATION, handleWebsocketNotification, projectId);
+    const orgId = useSelector(selectOrganizationId);
+    useWebsocket(orgId, Application.REFINERY, CurrentPage.ATTRIBUTE_CALCULATION, handleWebsocketNotification, projectId);
 
     return (projectId && <div className={`bg-white p-4 overflow-y-auto min-h-full h-[calc(100vh-4rem)]`} onScroll={(e: any) => onScrollEvent(e)}>
         {currentAttribute && <div>

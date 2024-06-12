@@ -4,7 +4,7 @@ import { Fragment, useCallback, useEffect, useState } from "react";
 import { NotificationLevel } from "@/src/types/shared/notification-center";
 import { IconAlertTriangleFilled, IconCircleCheckFilled, IconInfoCircleFilled } from "@tabler/icons-react";
 import { useDispatch, useSelector } from "react-redux";
-import { selectCurrentPage, selectUser } from "@/src/reduxStore/states/general";
+import { selectCurrentPage, selectOrganizationId, selectUser } from "@/src/reduxStore/states/general";
 import { interval } from "rxjs";
 import { setNotificationId } from "@/src/reduxStore/states/tmp";
 import { AdminMessage } from "@/submodules/react-components/types/admin-messages";
@@ -107,7 +107,8 @@ export default function Layout({ children }) {
         }
     }, [user?.id, notificationsState, projectId]);
 
-    useWebsocket(Application.REFINERY, CurrentPage.NOTIFICATION_CENTER, handleWebsocketNotification);
+    const orgId = useSelector(selectOrganizationId);
+    useWebsocket(orgId, Application.REFINERY, CurrentPage.NOTIFICATION_CENTER, handleWebsocketNotification);
 
     return (
         <>
