@@ -141,7 +141,7 @@ export default function DataBrowser() {
         const currentRecordIds = parsedRecordData?.map((record) => record.id);
         if (!currentRecordIds || currentRecordIds.length == 0) return;
         getRecordComments(projectId, currentRecordIds, (res) => {
-            dispatch(setRecordComments(res.data['recordComments']));
+            dispatch(setRecordComments(res.data['getRecordComments']));
         });
     }
 
