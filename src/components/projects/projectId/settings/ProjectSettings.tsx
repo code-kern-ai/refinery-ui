@@ -13,7 +13,7 @@ import { UploadFileType } from "@/src/types/shared/upload";
 import { Tooltip } from "@nextui-org/react";
 import ProjectMetaData from "./ProjectMetaData";
 import GatesIntegration from "./GatesIntegration";
-import { selectAllUsers, selectIsManaged, setBricksIntegrator, setComments } from "@/src/reduxStore/states/general";
+import { selectAllUsers, selectIsManaged, selectOrganizationId, setBricksIntegrator, setComments } from "@/src/reduxStore/states/general";
 import Embeddings from "./embeddings/Embeddings";
 import { postProcessingEmbeddings, postProcessingRecommendedEncoders } from "@/src/util/components/projects/projectId/settings/embeddings-helper";
 import { AttributeState } from "@/src/types/components/projects/projectId/settings/data-schema";
@@ -263,7 +263,8 @@ export default function ProjectSettings() {
         });
     }
 
-    useWebsocket(Application.REFINERY, CurrentPage.PROJECT_SETTINGS, handleWebsocketNotification, project?.id);
+    const orgId = useSelector(selectOrganizationId);
+    useWebsocket(orgId, Application.REFINERY, CurrentPage.PROJECT_SETTINGS, handleWebsocketNotification, project?.id);
 
     return (<div>
         {project != null && <div className="p-4 bg-gray-100 h-full flex-1 flex flex-col overflow-y-auto">

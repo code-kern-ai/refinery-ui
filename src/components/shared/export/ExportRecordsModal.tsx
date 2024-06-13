@@ -20,7 +20,7 @@ import { ExportHelper } from "@/src/util/classes/export";
 import { downloadFile } from "@/src/services/base/s3-service";
 import { downloadByteDataNoStringify } from "@/submodules/javascript-functions/export";
 import { timer } from "rxjs";
-import { selectUser } from "@/src/reduxStore/states/general";
+import { selectOrganizationId, selectUser } from "@/src/reduxStore/states/general";
 import CryptedField from "../crypted-field/CryptedField";
 import { extendArrayElementsByUniqueId } from "@/submodules/javascript-functions/id-prep";
 import { useWebsocket } from "@/submodules/react-components/hooks/web-socket/useWebsocket";
@@ -235,7 +235,8 @@ export default function ExportRecordsModal(props: ExportProps) {
         if (somethingToRerequest) fetchSetupData(true);
     }, [user, projectId]);
 
-    useWebsocket(Application.REFINERY, CurrentPage.EXPORT, handleWebsocketNotification, projectId);
+    const orgId = useSelector(selectOrganizationId);
+    useWebsocket(orgId, Application.REFINERY, CurrentPage.EXPORT, handleWebsocketNotification, projectId);
 
     return (<Modal modalName={ModalEnum.EXPORT_RECORDS} hasOwnButtons={true}>
         <div className="flex flex-grow justify-center text-lg leading-6 text-gray-900 font-medium mb-2">Export record data </div>

@@ -13,7 +13,7 @@ import LookupListOperations from "./LookupListOperations";
 import DangerZone from "@/src/components/shared/danger-zone/DangerZone";
 import { DangerZoneEnum } from "@/src/types/shared/danger-zone";
 import Terms from "./Terms";
-import { selectAllUsers, setComments } from "@/src/reduxStore/states/general";
+import { selectAllUsers, selectOrganizationId, setComments } from "@/src/reduxStore/states/general";
 import { CommentType } from "@/src/types/shared/comments";
 import { CommentDataManager } from "@/src/util/classes/comments";
 import { useWebsocket } from "@/submodules/react-components/hooks/web-socket/useWebsocket";
@@ -139,7 +139,8 @@ export default function LookupListsDetails() {
         }
     }
 
-    useWebsocket(Application.REFINERY, CurrentPage.LOOKUP_LISTS_DETAILS, handleWebsocketNotification, projectId);
+    const orgId = useSelector(selectOrganizationId);
+    useWebsocket(orgId, Application.REFINERY, CurrentPage.LOOKUP_LISTS_DETAILS, handleWebsocketNotification, projectId);
 
     return (projectId && <div className="bg-white p-4 overflow-y-auto min-h-full h-[calc(100vh-4rem)]" onScroll={(e: any) => onScrollEvent(e)}>
         {lookupList && <div>

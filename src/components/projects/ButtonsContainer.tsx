@@ -1,4 +1,4 @@
-import { selectUser } from "@/src/reduxStore/states/general"
+import { selectOrganizationId, selectUser } from "@/src/reduxStore/states/general"
 import { openModal } from "@/src/reduxStore/states/modal";
 import { setUploadFileType } from "@/src/reduxStore/states/upload";
 import { ModalEnum } from "@/src/types/shared/modal";
@@ -33,7 +33,8 @@ export default function ButtonsContainer() {
         }
     }, []);
 
-    useWebsocket(Application.REFINERY, CurrentPage.PROJECTS, handleWebsocketNotification, null, CurrentPageSubKey.BUTTONS_CONTAINER);
+    const orgId = useSelector(selectOrganizationId);
+    useWebsocket(orgId, Application.REFINERY, CurrentPage.PROJECTS, handleWebsocketNotification, null, CurrentPageSubKey.BUTTONS_CONTAINER);
 
     return (
         user && user.role === UserRole.ENGINEER ? (<div>

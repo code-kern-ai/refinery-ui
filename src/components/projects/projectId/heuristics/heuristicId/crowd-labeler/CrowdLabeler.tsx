@@ -6,7 +6,7 @@ import { useRouter } from "next/router";
 import { useCallback, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import HeuristicsLayout from "../shared/HeuristicsLayout";
-import { selectAllUsers, selectAnnotators, setComments } from "@/src/reduxStore/states/general";
+import { selectAllUsers, selectAnnotators, selectOrganizationId, setComments } from "@/src/reduxStore/states/general";
 import DangerZone from "@/src/components/shared/danger-zone/DangerZone";
 import { DangerZoneEnum } from "@/src/types/shared/danger-zone";
 import HeuristicStatistics from "../shared/HeuristicStatistics";
@@ -113,7 +113,8 @@ export default function CrowdLabeler() {
         }
     }, [currentHeuristic, projectId]);
 
-    useWebsocket(Application.REFINERY, CurrentPage.CROWD_LABELER, handleWebsocketNotification, projectId);
+    const orgId = useSelector(selectOrganizationId);
+    useWebsocket(orgId, Application.REFINERY, CurrentPage.CROWD_LABELER, handleWebsocketNotification, projectId);
 
     return (<HeuristicsLayout>
         {currentHeuristic && <div>
@@ -121,7 +122,7 @@ export default function CrowdLabeler() {
                 <>
                     <div className="overflow-hidden bg-white">
                         <div className="relative py-8 pr-4">
-                            <div className="absolute top-0 bottom-0 left-3/4 hidden w-screen bg-gray-50 lg:block"></div>
+                            <div className="absolute top-2 bottom-0 left-3/4 hidden w-screen bg-gray-50 lg:block"></div>
                             <div className="mx-auto max-w-prose text-base lg:grid lg:max-w-none lg:grid-cols-2 lg:gap-8">
                                 <div>
                                     <h2 className="text-lg font-semibold text-indigo-600">Integrating crowd labelers</h2>

@@ -1,4 +1,4 @@
-import { selectInactiveOrganization, selectIsDemo, selectIsManaged, selectUser, setComments } from "@/src/reduxStore/states/general"
+import { selectInactiveOrganization, selectIsDemo, selectIsManaged, selectOrganizationId, selectUser, setComments } from "@/src/reduxStore/states/general"
 import { selectAllProjects, setAllProjects } from "@/src/reduxStore/states/project";
 import { Project, ProjectStatistics } from "@/src/types/components/projects/projects-list";
 import { percentRoundString } from "@/submodules/javascript-functions/general";
@@ -101,7 +101,8 @@ export default function ProjectsList() {
         }
     }, []);
 
-    useWebsocket(Application.REFINERY, CurrentPage.PROJECTS, handleWebsocketNotification);
+    const orgId = useSelector(selectOrganizationId);
+    useWebsocket(orgId, Application.REFINERY, CurrentPage.PROJECTS, handleWebsocketNotification);
 
     return (
         <div>

@@ -1,5 +1,5 @@
 import { Loading } from "@nextui-org/react";
-import { selectIsManaged } from '@/src/reduxStore/states/general';
+import { selectIsManaged, selectOrganizationId } from '@/src/reduxStore/states/general';
 import { openModal, selectModal } from '@/src/reduxStore/states/modal';
 import { selectHeuristicsAll, setHeuristicType } from '@/src/reduxStore/states/pages/heuristics';
 import { selectLabelingTasksAll } from '@/src/reduxStore/states/pages/settings';
@@ -155,7 +155,8 @@ export default function HeuristicsHeader(props: HeuristicsHeaderProps) {
         else if (msgParts[1] == 'weak_supervision_finished') setLoadingIconWS(false);
     }, []);
 
-    useWebsocket(Application.REFINERY, CurrentPage.HEURISTICS, handleWebsocketNotification, projectId);
+    const orgId = useSelector(selectOrganizationId);
+    useWebsocket(orgId, Application.REFINERY, CurrentPage.HEURISTICS, handleWebsocketNotification, projectId);
 
     return (
         <div className="flex-shrink-0 block xl:flex justify-between items-center">

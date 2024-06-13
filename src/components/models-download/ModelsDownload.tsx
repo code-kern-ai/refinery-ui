@@ -8,7 +8,7 @@ import { useDispatch, useSelector } from "react-redux";
 import LoadingIcon from "../shared/loading/LoadingIcon";
 import { openModal, setModalStates } from "@/src/reduxStore/states/modal";
 import { ModalEnum } from "@/src/types/shared/modal";
-import { selectIsAdmin, selectIsManaged } from "@/src/reduxStore/states/general";
+import { selectIsAdmin, selectIsManaged, selectOrganizationId } from "@/src/reduxStore/states/general";
 import { timer } from "rxjs";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
 import AddModelDownloadModal from "./AddModelDownloadModal";
@@ -44,7 +44,8 @@ export default function ModelsDownload() {
         }
     }, []);
 
-    useWebsocket(Application.REFINERY, CurrentPage.MODELS_DOWNLOAD, handleWebsocketNotification);
+    const orgId = useSelector(selectOrganizationId);
+    useWebsocket(orgId, Application.REFINERY, CurrentPage.MODELS_DOWNLOAD, handleWebsocketNotification);
 
     return (<div className="p-4 bg-gray-100 flex-1 flex flex-col h-[calc(100vh-4rem)] overflow-y-auto">
         <div className="flex flex-row items-center">

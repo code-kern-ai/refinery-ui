@@ -11,7 +11,7 @@ import { ModalEnum } from "@/src/types/shared/modal";
 import { useRouter } from "next/router";
 import { ACTIONS_DROPDOWN_OPTIONS } from "@/src/util/components/projects/projectId/lookup-lists-helper";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
-import { selectAllUsers, setComments } from "@/src/reduxStore/states/general";
+import { selectAllUsers, selectOrganizationId, setComments } from "@/src/reduxStore/states/general";
 import { CommentDataManager } from "@/src/util/classes/comments";
 import { CommentType } from "@/src/types/shared/comments";
 import DeleteLookupListsModal from "./DeleteLookupListsModal";
@@ -114,7 +114,8 @@ export default function LookupListsOverview() {
         }
     }, [projectId]);
 
-    useWebsocket(Application.REFINERY, CurrentPage.LOOKUP_LISTS_OVERVIEW, handleWebsocketNotification, projectId);
+    const orgId = useSelector(selectOrganizationId);
+    useWebsocket(orgId, Application.REFINERY, CurrentPage.LOOKUP_LISTS_OVERVIEW, handleWebsocketNotification, projectId);
 
     return (
         projectId ? (

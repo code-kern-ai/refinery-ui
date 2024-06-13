@@ -22,7 +22,7 @@ import { SampleRecord } from "@/src/types/components/projects/projectId/heuristi
 import { getPythonFunctionRegExMatch } from "@/submodules/javascript-functions/python-functions-parser";
 import CalculationProgress from "./CalculationProgress";
 import { copyToClipboard } from "@/submodules/javascript-functions/general";
-import { selectAllUsers, setBricksIntegrator, setComments } from "@/src/reduxStore/states/general";
+import { selectAllUsers, selectOrganizationId, setBricksIntegrator, setComments } from "@/src/reduxStore/states/general";
 import { CommentType } from "@/src/types/shared/comments";
 import { CommentDataManager } from "@/src/util/classes/comments";
 import BricksIntegrator from "@/src/components/shared/bricks-integrator/BricksIntegrator";
@@ -56,6 +56,8 @@ export default function LabelingFunction() {
     const [isInitialLf, setIsInitialLf] = useState<boolean>(null);  //null as add state to differentiate between initial, not and unchecked
     const [checkUnsavedChanges, setCheckUnsavedChanges] = useState(false);
     const [runOn10IsRunning, setRunOn10IsRunning] = useState(false);
+    const [justClickedRun, setJustClickedRun] = useState(false);
+    const [canStartHeuristic, setCanStartHeuristic] = useState(true);
 
     useEffect(() => {
         if (!projectId) return;
@@ -198,7 +200,6 @@ export default function LabelingFunction() {
     }, [currentHeuristic]);
 
 
-
     const setValueToLabelingTask = useCallback((value: string) => {
         const labelingTask = labelingTasks.find(a => a.id == value);
         const updateHeuristic = (labelingTasks: any[], maxI: number, task?: any) => {
@@ -217,7 +218,8 @@ export default function LabelingFunction() {
         } else updateHeuristic(labelingTasks, 0, labelingTask);
     }, [projectId, currentHeuristic, labelingTasks])
 
-    useWebsocket(Application.REFINERY, CurrentPage.LABELING_FUNCTION, handleWebsocketNotification, projectId);
+    const orgId = useSelector(selectOrganizationId);
+    useWebsocket(orgId, Application.REFINERY, CurrentPage.LABELING_FUNCTION, handleWebsocketNotification, projectId);
 
     return (
         <HeuristicsLayout updateSourceCode={(code: string) => updateSourceCodeToDisplay(code)}>
@@ -284,12 +286,12 @@ export default function LabelingFunction() {
                                 selectedOption={(option: any) => setSelectedAttribute(option)} />
                         </div>
                         <Tooltip content={selectedAttribute == null ? TOOLTIPS_DICT.LABELING_FUNCTION.SELECT_ATTRIBUTE : TOOLTIPS_DICT.LABELING_FUNCTION.RUN_ON_10} color="invert" placement="left">
-                            <button disabled={selectedAttribute == null} onClick={executeLabelingFunctionOn10Records}
+                            <button disabled={selectedAttribute == null || runOn10IsRunning || justClickedRun || !canStartHeuristic} onClick={executeLabelingFunctionOn10Records}
                                 className="bg-white text-gray-700 text-xs font-semibold px-4 py-2 rounded-md border border-gray-300 hover:bg-gray-50 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed">
                                 Run on 10
                             </button>
                         </Tooltip>
-                        <HeuristicRunButtons updateDisplayLogWarning={val => setDisplayLogWarning(val)} runOn10IsRunning={runOn10IsRunning} />
+                        <HeuristicRunButtons updateDisplayLogWarning={val => setDisplayLogWarning(val)} runOn10IsRunning={runOn10IsRunning} justClickedRun={(justClickedRun) => setJustClickedRun(justClickedRun)} checkCanStartHeuristic={(val) => setCanStartHeuristic(val)} />
                     </div>
                 </div>
                 {sampleRecords && sampleRecords.records.length > 0 && !sampleRecords.codeHasErrors && <>

@@ -12,7 +12,7 @@ export default function UsersList() {
     const annotators = useSelector(selectAnnotators);
     const experts = useSelector(selectExperts);
 
-    return <div className="bg-slate-50 h-screen overflow-y-auto">
+    return <div className="bg-slate-50 ">
         {/* Intentionally commented */}
         {/* {!isManaged && <div>
             <div className="mt-10 mx-auto px-4 sm:px-6 lg:px-8 pb-12">
@@ -180,7 +180,7 @@ export default function UsersList() {
         </div>} */}
         {!organizationInactive && isManaged && <div>
             <div className="mx-auto mt-8 pb-12 px-4 sm:px-6">
-                <div className="grid grid-cols-1 gap-8 pb-12">
+                <div className="grid grid-cols-1 gap-8">
                     <div className="space-y-5 sm:space-y-4">
                         <h3 className="text-3xl font-bold tracking-tight sm:text-4xl">Engineering team</h3>
                         <p className="text-gray-900">Administers the project and works on programmatic tasks such as

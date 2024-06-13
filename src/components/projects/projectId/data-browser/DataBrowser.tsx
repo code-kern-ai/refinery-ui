@@ -6,7 +6,7 @@ import { expandRecordList, selectActiveSearchParams, selectActiveSlice, selectCo
 import { postProcessRecordsExtended, postProcessUniqueValues, postProcessUsersCount } from "@/src/util/components/projects/projectId/data-browser/data-browser-helper";
 import { selectAttributes, selectLabelingTasksAll, setAllAttributes, setAllEmbeddings, setLabelingTasksAll } from "@/src/reduxStore/states/pages/settings";
 import { postProcessLabelingTasks, postProcessLabelingTasksSchema } from "@/src/util/components/projects/projectId/settings/labeling-tasks-helper";
-import { selectAllUsers, selectUser, setComments } from "@/src/reduxStore/states/general";
+import { selectAllUsers, selectOrganizationId, selectUser, setComments } from "@/src/reduxStore/states/general";
 import DataBrowserRecords from "./DataBrowserRecords";
 import { postProcessingEmbeddings } from "@/src/util/components/projects/projectId/settings/embeddings-helper";
 import { CommentType } from "@/src/types/shared/comments";
@@ -141,7 +141,7 @@ export default function DataBrowser() {
         const currentRecordIds = parsedRecordData?.map((record) => record.id);
         if (!currentRecordIds || currentRecordIds.length == 0) return;
         getRecordComments(projectId, currentRecordIds, (res) => {
-            dispatch(setRecordComments(res.data['recordComments']));
+            dispatch(setRecordComments(res.data['getRecordComments']));
         });
     }
 
@@ -175,7 +175,8 @@ export default function DataBrowser() {
         }
     }, [projectId]);
 
-    useWebsocket(Application.REFINERY, CurrentPage.DATA_BROWSER, handleWebsocketNotification, projectId);
+    const orgId = useSelector(selectOrganizationId);
+    useWebsocket(orgId, Application.REFINERY, CurrentPage.DATA_BROWSER, handleWebsocketNotification, projectId);
 
     return (<>
         {projectId && <div className="flex flex-row h-full">

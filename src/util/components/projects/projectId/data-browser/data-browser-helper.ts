@@ -181,10 +181,8 @@ export function getInformationSourceTextById(sourceId: string, labelingTasks: La
 
 export function postProcessRecordComments(comments: any) {
     if (!comments) return;
-    const commentsParsed = tryParseJSON(comments);
-    if (!commentsParsed) return;
-    const recordComments = { ...comments };
-    commentsParsed.forEach(e => {
+    const recordComments = {};
+    comments.forEach(e => {
         if (!recordComments[e.record_id]) recordComments[e.record_id] = [];
         recordComments[e.record_id].push(e);
     });

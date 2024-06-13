@@ -13,7 +13,7 @@ import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
 import { jsonCopy } from "@/submodules/javascript-functions/general";
 import { ZeroShotSettings } from "@/src/types/components/projects/projectId/heuristics/heuristicId/zero-shot";
 import LoadingIcon from "@/src/components/shared/loading/LoadingIcon";
-import { selectAllUsers, selectIsManaged, setComments } from "@/src/reduxStore/states/general";
+import { selectAllUsers, selectIsManaged, selectOrganizationId, setComments } from "@/src/reduxStore/states/general";
 import { IconArrowAutofitDown } from "@tabler/icons-react";
 import Playground from "./Playground";
 import HeuristicStatistics from "../shared/HeuristicStatistics";
@@ -186,7 +186,8 @@ export default function ZeroShot() {
         }
     }, [currentHeuristic]);
 
-    useWebsocket(Application.REFINERY, CurrentPage.ZERO_SHOT, handleWebsocketNotification, projectId);
+    const orgId = useSelector(selectOrganizationId);
+    useWebsocket(orgId, Application.REFINERY, CurrentPage.ZERO_SHOT, handleWebsocketNotification, projectId);
 
     return (<HeuristicsLayout>
         {currentHeuristic && <div>

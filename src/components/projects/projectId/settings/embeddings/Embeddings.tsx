@@ -1,5 +1,5 @@
 import LoadingIcon from "@/src/components/shared/loading/LoadingIcon";
-import { selectIsManaged } from "@/src/reduxStore/states/general";
+import { selectIsManaged, selectOrganizationId } from "@/src/reduxStore/states/general";
 import { closeModal, openModal, setModalStates } from "@/src/reduxStore/states/modal";
 import { selectAttributes, selectEmbeddings } from "@/src/reduxStore/states/pages/settings";
 import { selectProjectId } from "@/src/reduxStore/states/project";
@@ -68,7 +68,8 @@ export default function Embeddings(props: { refetchEmbeddings: () => void }) {
         }
     }, []);
 
-    useWebsocket(Application.REFINERY, CurrentPage.PROJECT_SETTINGS, handleWebsocketNotification, projectId, CurrentPageSubKey.EMBEDDINGS);
+    const orgId = useSelector(selectOrganizationId);
+    useWebsocket(orgId, Application.REFINERY, CurrentPage.PROJECT_SETTINGS, handleWebsocketNotification, projectId, CurrentPageSubKey.EMBEDDINGS);
 
     return (<div className="mt-8">
         <div className="text-lg leading-6 text-gray-900 font-medium inline-block w-full">

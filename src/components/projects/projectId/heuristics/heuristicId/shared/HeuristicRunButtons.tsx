@@ -21,21 +21,28 @@ export default function HeuristicRunButtons(props: HeuristicRunButtonsProps) {
 
     useEffect(() => {
         setCanStartHeuristic(checkCanStartHeuristic());
+        props.checkCanStartHeuristic(checkCanStartHeuristic());
     }, [currentHeuristic]);
 
     function runHeuristic() {
         setJustClickedRun(true);
+        props.justClickedRun(true);
         createTask(projectId, currentHeuristic.id, (res) => {
             setJustClickedRun(false);
+            props.justClickedRun(false);
             if (currentHeuristic.informationSourceType === InformationSourceType.LABELING_FUNCTION) {
                 props.updateDisplayLogWarning(false);
+
             }
         });
     }
 
     function runHeuristicAndWeaklySupervise() {
+        setJustClickedRun(true);
+        props.justClickedRun(true);
         runThenWeakSupervision(projectId, currentHeuristic.id, currentHeuristic.labelingTaskId, (res) => {
             setJustClickedRun(false);
+            props.justClickedRun(false);
             if (currentHeuristic.informationSourceType === InformationSourceType.LABELING_FUNCTION) {
                 props.updateDisplayLogWarning(false);
             }
