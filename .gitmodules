@@ -1,6 +1,6 @@
 [submodule "submodules/javascript-functions"]
 	path = submodules/javascript-functions
-	url = git@github.com:code-kern-ai/submodule-javascript-functions.git
+	url = https://github.com/code-kern-ai/submodule-javascript-functions.git
 [submodule "submodules/react-components"]
 	path = submodules/react-components
-	url = git@github.com:code-kern-ai/submodule-react-components.git
+	url = https://github.com/code-kern-ai/submodule-react-components.git
