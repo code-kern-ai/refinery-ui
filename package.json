@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@headlessui/react": "^1.7.18",
+    "@headlessui/tailwindcss": "^0.2.1",
     "@heroicons/react": "^2.0.17",
     "@monaco-editor/react": "^4.5.1",
     "@nextui-org/react": "^1.0.0-beta.13",

@@ -4,3 +4,6 @@
 [submodule "submodules/react-components"]
 	path = submodules/react-components
 	url = git@github.com:code-kern-ai/submodule-react-components.git
+[submodule "submodules/tailwind-config"]
+	path = submodules/tailwind-config
+	url = git@github.com:code-kern-ai/submodule-tailwind-config.git
