@@ -84,7 +84,7 @@ export default function ChangeColorModal() {
     return (<Modal modalName={ModalEnum.CHANGE_COLOR}>
         {modalChangeColor.label && <div>
             <div className="self-center flex flex-row flex-nowrap items-center justify-center">
-                <p className="mr-2 font-bold">Label:</p>
+                <p className="mr-2 font-medium">Label:</p>
                 <Tooltip content={TOOLTIPS_DICT.PROJECT_SETTINGS.LABELING_TASK.RENAME_LABEL} color="invert" placement="bottom">
                     <span onClick={() => {
                         dispatch(setModalStates(ModalEnum.CHANGE_COLOR, { ...modalChangeColor, open: false }));

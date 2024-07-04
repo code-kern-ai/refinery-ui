@@ -126,7 +126,7 @@ export default function CrowdLabeler() {
                             <div className="mx-auto max-w-prose text-base lg:grid lg:max-w-none lg:grid-cols-2 lg:gap-8">
                                 <div>
                                     <h2 className="text-lg font-semibold text-indigo-600">Integrating crowd labelers</h2>
-                                    <h3 className="mt-2 text-3xl font-bold leading-8 tracking-tight text-gray-900 sm:text-4xl">
+                                    <h3 className="mt-2 text-3xl font-semibold leading-8 tracking-tight text-gray-900 sm:text-4xl">
                                         How it works</h3>
                                 </div>
                             </div>

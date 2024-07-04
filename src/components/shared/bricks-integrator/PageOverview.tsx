@@ -22,11 +22,11 @@ export default function PageOverview(props: PageOverviewProps) {
             {config.api.requesting ? (<LoadingIcon />) : (<>
                 {config.api.data && config.api.moduleId >= 0 && <>
                     {config.extendedIntegrator ? (<div className="grid grid-cols-2  gap-x-2 gap-y-2 items-center" style={{ gridTemplateColumns: 'max-content max-content' }}>
-                        <div className="font-bold">Module Name</div>
+                        <div className="font-semibold">Module Name</div>
                         <label>{config.api.data.data.attributes.name}</label>
-                        <div className="font-bold">Description</div>
+                        <div className="font-semibold">Description</div>
                         <label style={{ maxWidth: '25rem' }}>{config.api.data.data.attributes.description}</label>
-                        <div className="font-bold">Bricks Link</div>
+                        <div className="font-semibold">Bricks Link</div>
                         <a href={config.api.data.data.attributes.bricksLink} target="_blank"><span className="underline cursor-pointer">{config.api.data.data.attributes.name}</span></a>
                         <div className="col-start-1 col-span-full">
                             <div className="flex flex-row justify-between cursor-pointer items-center" onClick={() => {
@@ -34,22 +34,22 @@ export default function PageOverview(props: PageOverviewProps) {
                                 configCopy.extendedIntegratorOverviewAddInfoOpen = !configCopy.extendedIntegratorOverviewAddInfoOpen;
                                 dispatch(setBricksIntegrator(configCopy));
                             }}>
-                                <label className="text-base font-bold text-gray-900 cursor-pointer underline">Details</label>
+                                <label className="text-base font-semibold text-gray-900 cursor-pointer underline">Details</label>
                                 <IconChevronsDown className={`w-6 h-6 ${config.extendedIntegratorOverviewAddInfoOpen ? style.rotateTransform : null}`} />
                             </div>
                         </div>
                         <div className={`contents ${config.extendedIntegratorOverviewAddInfoOpen ? '' : 'hidden'}`}>
-                            <div className="font-bold">Github Issue Link</div>
+                            <div className="font-semibold">Github Issue Link</div>
                             <a href={config.api.data.data.attributes.issueLink} target="_blank"><span className="underline cursor-pointer">#{config.api.data.data.attributes.issueId}</span></a>
-                            <div className="font-bold">Min Refinery Version</div>
+                            <div className="font-semibold">Min Refinery Version</div>
                             <label>{config.api.data.data.attributes.minRefineryVersion}</label>
-                            <div className="font-bold">Grouping</div>
+                            <div className="font-semibold">Grouping</div>
                             <label>{config.api.data.data.attributes.partOfGroupText}</label>
-                            <div className="font-bold">Execution Type</div>
+                            <div className="font-semibold">Execution Type</div>
                             <label>{config.api.data.data.attributes.executionType}</label>
-                            <div className="font-bold">Module Type</div>
+                            <div className="font-semibold">Module Type</div>
                             <label>{config.api.data.data.attributes.moduleType}</label>
-                            <div className="font-bold">Data Type</div>
+                            <div className="font-semibold">Data Type</div>
                             <label>{config.api.data.data.attributes.integratorInputs?.refineryDataType}</label>
                         </div>
                         <div className="col-start-1 col-span-full">
@@ -58,7 +58,7 @@ export default function PageOverview(props: PageOverviewProps) {
                                 configCopy.overviewCodeOpen = !configCopy.overviewCodeOpen;
                                 dispatch(setBricksIntegrator(configCopy));
                             }}>
-                                <label className="text-base font-bold text-gray-900 cursor-pointer"><span className="underline">Source Code</span>
+                                <label className="text-base font-semibold text-gray-900 cursor-pointer"><span className="underline">Source Code</span>
                                     <span className="text-sm font-normal">&nbsp;(guided integration through tab integration)</span></label>
                                 <IconChevronsDown className={`w-6 h-6 ${config.overviewCodeOpen ? style.rotateTransform : null}`} />
                             </div>
@@ -73,17 +73,17 @@ export default function PageOverview(props: PageOverviewProps) {
                             </div>
                         </div>
                     </div>) : (<div className="grid grid-cols-2 gap-x-2 gap-y-2 items-center" style={{ gridTemplateColumns: 'max-content max-content' }}>
-                        <div className="font-bold">Module Id</div>
+                        <div className="font-semibold">Module Id</div>
                         <label>{config.api.data.data.id}</label>
-                        <div className="font-bold">Module Name</div>
+                        <div className="font-semibold">Module Name</div>
                         <label>{config.api.data.data.attributes.name}</label>
-                        <div className="font-bold">Description</div>
+                        <div className="font-semibold">Description</div>
                         <label style={{ maxWidth: '25rem' }}>{config.api.data.data.attributes.description}</label>
-                        <div className="font-bold">Execution Type</div>
+                        <div className="font-semibold">Execution Type</div>
                         <label>{config.api.data.data.attributes.executionType}</label>
-                        <div className="font-bold">Module Type</div>
+                        <div className="font-semibold">Module Type</div>
                         <label>{config.api.data.data.attributes.moduleType}</label>
-                        <div className="font-bold">Link</div>
+                        <div className="font-semibold">Link</div>
                         <a href={config.api.data.data.attributes.link} target="_blank"><span className="underline cursor-pointer">{config.api.data.data.attributes.name}</span></a>
                         <div className="col-start-1 col-span-full">
                             <div className="flex flex-row justify-between cursor-pointer items-center" onClick={() => {
@@ -91,7 +91,7 @@ export default function PageOverview(props: PageOverviewProps) {
                                 configCopy.overviewCodeOpen = !configCopy.overviewCodeOpen;
                                 dispatch(setBricksIntegrator(configCopy));
                             }}>
-                                <label className="text-base font-bold text-gray-900 cursor-pointer"><span className="underline">Source Code</span>
+                                <label className="text-base font-semibold text-gray-900 cursor-pointer"><span className="underline">Source Code</span>
                                     <span className="text-sm font-normal">&nbsp;(guided integration through tabvintegration)</span></label>
                                 <IconChevronsDown className={`w-6 h-6 ${config.overviewCodeOpen ? style.rotateTransform : null}`} />
                             </div>

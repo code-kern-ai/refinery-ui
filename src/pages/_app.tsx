@@ -1,5 +1,6 @@
 import type { AppProps } from 'next/app'
 import '../styles/tailwind.css'
+import '@/submodules/tailwind-config/global.css'
 import Head from 'next/head'
 import Layout from '../components/shared/layout/Layout'
 import { Provider } from 'react-redux'

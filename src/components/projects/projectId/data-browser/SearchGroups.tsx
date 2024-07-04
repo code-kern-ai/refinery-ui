@@ -595,7 +595,7 @@ export default function SearchGroups() {
                     <ChevronDownIcon className="text-gray-700" />
                 </div>
                 <div className="flex flex-col">
-                    <div className="font-bold truncate" style={{ maxWidth: '20rem' }}>
+                    <div className="font-semibold truncate" style={{ maxWidth: '20rem' }}>
                         {searchGroupsStore[group.key].name}
                         {searchGroupsStore[group.key].nameAdd != '' && <label className="font-normal ml-2">{searchGroupsStore[group.key].nameAdd}</label>}
                     </div>
@@ -755,7 +755,7 @@ export default function SearchGroups() {
                                 </div>
                             </div>
 
-                            <div className="mt-2 font-bold">Heuristics</div>
+                            <div className="mt-2 font-semibold">Heuristics</div>
                             {fullSearchStore[group.key].groupElements['heuristics'] && fullSearchStore[group.key].groupElements['heuristics'].length == 0 ? (<div className="text-sm text-gray-400">No heuristics associated with this task</div>) : (<div className="flex flex-col">
                                 <div className="flex items-center cursor-pointer border-t border-t-gray-300 border-b border-b-gray-300" onClick={() => updateIsDifferent(group.key, fullSearchStore[group.key].groupElements['isWithDifferentResults'])}>
                                     <div style={{ backgroundColor: fullSearchStore[group.key].groupElements['isWithDifferentResults']?.color, borderColor: fullSearchStore[group.key].groupElements['isWithDifferentResults']?.color }}

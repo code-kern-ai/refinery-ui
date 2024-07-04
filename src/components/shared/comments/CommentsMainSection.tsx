@@ -137,16 +137,16 @@ export default function CommentsMainSection(props: CommentMainSectionProps) {
                                 <div className='cursor-pointer' onClick={flipCommentPosition}>
                                     <IconArrowLeft size={24}
                                         strokeWidth={2}
-                                        className='text-gray-700 font-bold cursor-pointer' />
+                                        className='text-gray-700 font-semibold cursor-pointer' />
                                 </div>
                             </Tooltip> : <Tooltip content={TOOLTIPS_DICT.GENERAL.MOVE_COMMENT_RIGHT} color="invert">
                                 <div className='cursor-pointer' onClick={flipCommentPosition}>
                                     <IconArrowRight size={24}
                                         strokeWidth={2}
-                                        className='text-gray-700 font-bold cursor-pointer' />
+                                        className='text-gray-700 font-semibold cursor-pointer' />
                                 </div>
                             </Tooltip>}
-                            <div className="text-base flex m-auto font-bold leading-6 text-gray-900 cursor-pointer" onClick={() => openAllComments(!allOpen)}>
+                            <div className="text-base flex m-auto font-semibold leading-6 text-gray-900 cursor-pointer" onClick={() => openAllComments(!allOpen)}>
                                 <Tooltip content={allOpen ? TOOLTIPS_DICT.GENERAL.CLOSE_ALL : TOOLTIPS_DICT.GENERAL.OPEN_ALL} contentColor="invert" hideArrow={true} placement='bottom'
                                     css={{ color: '#6B7280', border: '1px solid #6B7280', backgroundColor: '#F3F4F6', textAlign: 'center' }}>
                                     Comments

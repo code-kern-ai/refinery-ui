@@ -127,7 +127,7 @@ export default function HeaderDisplay(props: HeaderDisplayProps) {
         <table className="min-w-full">
             <tbody className="bg-white divide-y divide-gray-200">
                 {props.displayData && props.displayData.map((task, i) => (<tr key={task.id} className={`${i % 2 == 0 ? 'bg-white' : 'bg-gray-50'}`}>
-                    <td className={`font-bold py-2 pl-4 pr-3 text-sm text-gray-500 sm:pl-6 whitespace-nowrap ${shouldHighlightOn(tmpHighlightIds, [task.id]) ? settings.main.hoverGroupBackgroundColorClass : ''}`}>
+                    <td className={`font-semibold py-2 pl-4 pr-3 text-sm text-gray-500 sm:pl-6 whitespace-nowrap ${shouldHighlightOn(tmpHighlightIds, [task.id]) ? settings.main.hoverGroupBackgroundColorClass : ''}`}>
                         {task.name}
                     </td>
                     <td className={`pl-3 py-2 text-sm text-gray-500 w-full ${i == 0 ? 'pr-8' : 'pr-3'}`}>
@@ -149,7 +149,7 @@ export default function HeaderDisplay(props: HeaderDisplayProps) {
                     </td>
                 </tr>))}
                 {settings.task.alwaysShowQuickButtons && (<tr className={props.displayData.length % 2 == 0 ? 'bg-white' : 'bg-gray-50'}>
-                    <td className="font-bold py-2 pl-4 pr-3 text-sm text-gray-500 sm:pl-6">Quick buttons</td>
+                    <td className="font-semibold py-2 pl-4 pr-3 text-sm text-gray-500 sm:pl-6">Quick buttons</td>
                     <td className="px-3 py-2 text-sm text-gray-500 w-full">
                         <QuickButtons labelSettingsLabel={labelSettingsLabel} setAllLabelDisplaySetting={(val, attribute) => setAllLabelDisplaySetting(val, null, attribute)} />
                     </td>

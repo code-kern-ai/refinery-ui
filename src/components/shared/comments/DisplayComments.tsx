@@ -51,7 +51,7 @@ export default function DisplayComments(props: DisplayCommentsProps) {
                                         <IconDotsVertical
                                             size={24}
                                             strokeWidth={2}
-                                            className='text-gray-700 font-bold' />
+                                            className='text-gray-700 font-semibold' />
                                     </span>
                                 </Menu.Button>
                                 <Transition
@@ -80,7 +80,7 @@ export default function DisplayComments(props: DisplayCommentsProps) {
                                                     >
                                                         <div className="flex flex-row items-center">
                                                             <IconEdit
-                                                                className={`font-bold h-5 w-5 ${active ? 'text-gray-900' : 'text-gray-700'}`} />
+                                                                className={`font-semibold h-5 w-5 ${active ? 'text-gray-900' : 'text-gray-700'}`} />
                                                             <span className="ml-2">Edit</span>
                                                         </div>
                                                     </a>
@@ -98,10 +98,10 @@ export default function DisplayComments(props: DisplayCommentsProps) {
                                                     >
                                                         <div className="flex flex-row items-center">
                                                             {!comment.is_private && <><IconEyeOff
-                                                                className={`font-bold h-5 w-5 ${active ? 'text-gray-900' : 'text-gray-700'}`} />
+                                                                className={`font-semibold h-5 w-5 ${active ? 'text-gray-900' : 'text-gray-700'}`} />
                                                                 <span className="ml-2">Private</span></>}
                                                             {comment.is_private && <><IconEye
-                                                                className={`font-bold h-5 w-5 ${active ? 'text-gray-900' : 'text-gray-700'}`} />
+                                                                className={`font-semibold h-5 w-5 ${active ? 'text-gray-900' : 'text-gray-700'}`} />
                                                                 <span className="ml-2">Public</span></>}
                                                         </div>
                                                     </a>
@@ -116,7 +116,7 @@ export default function DisplayComments(props: DisplayCommentsProps) {
                                                     >
                                                         <div className="flex flex-row items-center">
                                                             <IconTrash
-                                                                className={`font-bold h-5 w-5 ${active ? 'text-gray-900' : 'text-gray-700'}`} />
+                                                                className={`font-semibold h-5 w-5 ${active ? 'text-gray-900' : 'text-gray-700'}`} />
                                                             <span className="ml-2">Delete</span>
                                                         </div>
                                                     </a>

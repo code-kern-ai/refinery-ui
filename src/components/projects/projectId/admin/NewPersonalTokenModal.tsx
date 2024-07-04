@@ -59,7 +59,7 @@ export default function NewPersonalToken(props: PersonalTokenModalProps) {
     return (<Modal modalName={ModalEnum.NEW_PERSONAL_TOKEN} hasOwnButtons={true}>
         <div className="flex flex-grow justify-center text-lg leading-6 text-gray-900 font-medium">Add a personal access token </div>
         <div className="flex flex-row justify-center items-center mb-2">
-            <div className="text-gray-500 text-xs font-bold">This token is created only once and can not be restored. Please keep it safe.</div>
+            <div className="text-gray-500 text-xs font-semibold">This token is created only once and can not be restored. Please keep it safe.</div>
         </div>
         <div className="grid grid-cols-2 gap-2 items-center max-w-sm" style={{ gridTemplateColumns: 'max-content auto' }}>
             <Tooltip content={TOOLTIPS_DICT.ADMIN_PAGE.EXPIRATION_TIME} color="invert" placement="right">

@@ -88,10 +88,10 @@ export default function SaveDataSliceModal(props: { fullSearch: {} }) {
     return (<Modal modalName={ModalEnum.SAVE_DATA_SLICE} acceptButton={acceptButton}>
         <div className="flex flex-grow justify-center text-lg leading-6 text-gray-900 font-medium">Data slice creation</div>
         <div className="mb-2 flex flex-grow justify-center text-sm">Save or update the current filter settings as a data slice</div>
-        <p className="pt-4 text-left">You have two choices.
-            <label className="block font-bold mt-2">Dynamic:</label>
+        <p className="pt-4 text-left text-sm">You have two choices.
+            <label className="block font-semibold mt-2">Dynamic:</label>
             Stores the current filter critera and is reapplied whenever the data slice is selected.
-            <label className="block font-bold mt-2 ">Static:</label>
+            <label className="block font-semibold mt-2 ">Static:</label>
             Used for visualization filters and scope of work for annotators & domain experts. Stores the current records provided by your filter.
             These are limited to 10,000 records and can be refreshed if necessary.
         </p>

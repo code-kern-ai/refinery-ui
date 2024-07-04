@@ -40,7 +40,7 @@ export default function UsersList() {
                             <div className='md:h-44'>
                                 <div>
                                     <p className="mt-8">
-                                        <span className="text-4xl font-bold tracking-tight text-gray-900">For
+                                        <span className="text-4xl font-semibold tracking-tight text-gray-900">For
                                             free</span>
                                     </p>
                                     <p className="mt-2">
@@ -79,7 +79,7 @@ export default function UsersList() {
                                 <div>
                                     <p className="mt-8">
                                         <span className="text-base font-medium text-gray-500">Starting at</span>
-                                        <span className="text-4xl font-bold tracking-tight text-gray-900"> 300€
+                                        <span className="text-4xl font-semibold tracking-tight text-gray-900"> 300€
                                         </span>
                                         <span className="text-base font-medium text-gray-500">/mo.</span>
                                     </p>
@@ -133,7 +133,7 @@ export default function UsersList() {
                             <div className='md:h-44'>
                                 <div>
                                     <p className="mt-8">
-                                        <span className="text-4xl font-bold tracking-tight text-gray-900">3000€
+                                        <span className="text-4xl font-semibold tracking-tight text-gray-900">3000€
                                         </span>
                                         <span className="text-base font-medium text-gray-500">/mo.</span>
                                     </p>
@@ -182,7 +182,7 @@ export default function UsersList() {
             <div className="mx-auto mt-8 pb-12 px-4 sm:px-6">
                 <div className="grid grid-cols-1 gap-8">
                     <div className="space-y-5 sm:space-y-4">
-                        <h3 className="text-3xl font-bold tracking-tight sm:text-4xl">Engineering team</h3>
+                        <h3 className="text-2xl font-semibold tracking-tight sm:text-4xl">Engineering team</h3>
                         <p className="text-gray-900">Administers the project and works on programmatic tasks such as
                             labeling automation or filter settings.</p>
                         <p className="text-gray-500">They have access to all features of the application, including
@@ -210,7 +210,7 @@ export default function UsersList() {
                         </div>
                     </div>
                     <div className="mt-4 space-y-5 sm:space-y-4">
-                        <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">Domain experts team</h2>
+                        <h2 className="text-2xl font-semibold tracking-tight sm:text-4xl">Domain experts team</h2>
                         <p className="text-gray-900">Working on reference manual labels, which can be used by the
                             engineering team to estimate the data quality.</p>
                         <p className="text-gray-500">They have access to the labeling view only.</p>
@@ -243,7 +243,7 @@ export default function UsersList() {
                         </div>
                     </div>
                     <div className="mt-4 space-y-5 sm:space-y-4">
-                        <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">Annotator team</h2>
+                        <h2 className="text-2xl font-semibold tracking-tight sm:text-4xl">Annotator team</h2>
                         <p className="text-gray-900">Working on manual labels as if they were heuristics. They can
                             be switched on/off by the engineering team, so that the engineers can in- or exclude
                             them during weak supervision.</p>

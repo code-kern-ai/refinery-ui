@@ -32,7 +32,7 @@ export default function PasteLookupListModal() {
     }, [inputArea, inputSplit]);
 
     return (<Modal modalName={ModalEnum.PASTE_LOOKUP_LIST} acceptButton={acceptButton}>
-        <h1 className="text-lg text-gray-900 mb-2 font-bold text-center">Paste your terms</h1>
+        <h1 className="text-lg text-gray-900 mb-2 font-semibold text-center">Paste your terms</h1>
         <div className="grid justify-center items-center gap-x-2 gap-y-1 justify-items-start" style={{ gridTemplateColumns: 'max-content min-content' }}>
             <span>Split On</span>
             <input value={inputSplit} type="text" onInput={(e: any) => setInputSplit(e.target.value)}
