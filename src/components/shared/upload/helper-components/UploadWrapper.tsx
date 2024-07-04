@@ -69,7 +69,7 @@ export default function UploadWrapper(props: UploadWrapperProps) {
                     it blank, we&apos;ll use default settings
                 </label>
                 <div>
-                    <textarea value={importOptions} ref={textareaRef} className="shadow mt-1 p-4 text-sm w-full placeholder-indigo rounded-md" rows={3}
+                    <textarea value={importOptions} ref={textareaRef} className="shadow mt-1 p-4 text-sm w-full placeholder-indigo rounded-md border-gray-300" rows={3}
                         placeholder={`E.g. for uncommon CSV ${'\n'} sep=${'\\'}t ${'\n'} lineterminator=${'\\'}r`}
                         onChange={() => dispatch(setImportOptions(textareaRef.current?.value))}></textarea>
                 </div>

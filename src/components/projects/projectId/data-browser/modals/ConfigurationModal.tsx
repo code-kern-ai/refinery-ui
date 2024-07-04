@@ -57,7 +57,7 @@ export default function ConfigurationModal() {
         <div className="mb-2">
             <fieldset className="space-y-5">
                 <div className="relative flex items-start text-left">
-                    <div className="flex items-center h-5">
+                    <div className="flex items-center h-6">
                         <input id="comments" type="checkbox" onChange={(e) => {
                             toggleConfigurationOption('highlightText');
                         }} checked={configuration.highlightText}
@@ -69,7 +69,7 @@ export default function ConfigurationModal() {
                     </div>
                 </div>
                 <div className="relative flex items-start text-left">
-                    <div className="flex items-center h-5">
+                    <div className="flex items-center h-6">
                         <input id="comments" type="checkbox" onChange={() => toggleConfigurationOption('weakSupervisionRelated')} checked={configuration.weakSupervisionRelated}
                             className="focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300 rounded cursor-pointer" />
                     </div>
@@ -79,7 +79,7 @@ export default function ConfigurationModal() {
                     </div>
                 </div>
                 <div className="relative flex items-start text-left">
-                    <div className="flex items-center h-5">
+                    <div className="flex items-center h-6">
                         <input id="comments" type="checkbox" onChange={toggleLineBreaks} checked={configuration.lineBreaks != LineBreaksType.NORMAL}
                             className="focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300 rounded cursor-pointer" />
                     </div>
@@ -89,7 +89,7 @@ export default function ConfigurationModal() {
                     </div>
                 </div>
                 {configuration.lineBreaks != LineBreaksType.NORMAL && <div className="px-10">
-                    <div className="flex flex-row items-start mt-2 text-left">
+                    <div className="flex flex-row items-center mt-2 text-left">
                         <input type="radio" checked={configuration.lineBreaks == LineBreaksType.IS_PRE_WRAP} onChange={toggleLineBreaksPreWrap} name="lineBreaks" id="preWrap"
                             className="focus:ring-blue-500 h-6 w-4 text-blue-600 border-gray-200 cursor-pointer" />
                         <label htmlFor="preWrap" className="ml-1 block text-sm font-medium text-gray-700 cursor-pointer">
@@ -97,7 +97,7 @@ export default function ConfigurationModal() {
                             <p className="text-gray-500 text-sm cursor-pointer">Preserves whitespace and line breaks </p>
                         </label>
                     </div>
-                    <div className="flex flex-row items-start mt-2 text-left">
+                    <div className="flex flex-row items-center mt-2 text-left">
                         <input type="radio" checked={configuration.lineBreaks == LineBreaksType.IS_PRE_LINE} onChange={toggleLineBreaksPreWrap} name="lineBreaks" id="preLine"
                             className="focus:ring-blue-500 h-6 w-4 text-blue-600 border-gray-200 cursor-pointer" />
                         <label htmlFor="preLine" className="ml-1 block text-sm font-medium text-gray-700 cursor-pointer">
@@ -108,12 +108,12 @@ export default function ConfigurationModal() {
                 </div>}
             </fieldset>
             <div className="mt-3 text-sm text-gray-900 text-left">Select which separator you want to use for the IN operator</div>
-            <div className="flex flex-row items-start mt-2 text-left">
+            <div className="flex flex-row items-center mt-2 text-left">
                 <input type="radio" checked={configuration.separator == ','} onChange={toggleSeparator} name="comma" id="comma"
                     className="focus:ring-blue-500 h-6 w-4 text-blue-600 border-gray-200 cursor-pointer" />
                 <label htmlFor="comma" className="ml-1 block text-sm font-medium text-gray-700 cursor-pointer">Comma(,)</label>
             </div>
-            <div className="flex flex-row items-start mt-2 text-left">
+            <div className="flex flex-row items-center mt-2 text-left">
                 <input type="radio" checked={configuration.separator == '-'} onChange={toggleSeparator} name="dash" id="dash"
                     className="focus:ring-blue-500 h-6 w-4 text-blue-600 border-gray-200 cursor-pointer" />
                 <label htmlFor="dash" className="ml-1 block text-sm font-medium text-gray-700 cursor-pointer">Dash(-)</label>

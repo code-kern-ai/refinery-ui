@@ -53,7 +53,7 @@ export default function ProjectMetaData() {
                                     e.preventDefault();
                                     updateProjectNameAndDescription();
                                 }
-                            }} className="appearance-none rounded w-full text-sm py-2 px-3 text-gray-700 leading-tight focus:outline-none"
+                            }} className="appearance-none rounded w-full text-sm py-2 px-3 text-gray-700 leading-tight border-0 focus:outline-none"
                         />
                         <textarea rows={2} placeholder={project.description} value={projectDescription} onChange={(e) => setProjectDescription(e.target.value)}
                             onKeyDown={(e) => {

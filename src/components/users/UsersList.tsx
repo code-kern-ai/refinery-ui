@@ -12,7 +12,7 @@ export default function UsersList() {
     const annotators = useSelector(selectAnnotators);
     const experts = useSelector(selectExperts);
 
-    return <div className="bg-slate-50 ">
+    return <div className="bg-gray-100">
         {/* Intentionally commented */}
         {/* {!isManaged && <div>
             <div className="mt-10 mx-auto px-4 sm:px-6 lg:px-8 pb-12">

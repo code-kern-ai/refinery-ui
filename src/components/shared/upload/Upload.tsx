@@ -279,8 +279,8 @@ export default function Upload(props: UploadProps) {
                 {isProjectTitleEmpty && (<div className="text-red-700 text-xs mt-2">Project title is required</div>)}
                 <div className="form-control mt-6">
                     <label className="text-gray-500 text-sm font-normal">Project description <em>- optional</em></label>
-                    <textarea value={projectDescription} onInput={(e: any) => setProjectDescription(e.target.value)}
-                        className="h-9 w-full border-gray-300 rounded-md leading-8 placeholder-italic border text-gray-900 pl-4 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100" placeholder="Enter some description here..."></textarea>
+                    <input value={projectDescription} onInput={(e: any) => setProjectDescription(e.target.value)} type="text"
+                        className="h-9 w-full border-gray-300 rounded-md leading-8 placeholder-italic border text-gray-900 pl-4 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100" placeholder="Enter some description here..." />
                 </div>
                 <div className="form-control mt-6">
                     <label className="text-gray-500 text-sm font-normal">
