@@ -23,7 +23,7 @@ export default function HeuristicRunButtons(props: HeuristicRunButtonsProps) {
         setCanStartHeuristic(checkCanStartHeuristic());
         if (!props.checkCanStartHeuristic) return;
         props.checkCanStartHeuristic(checkCanStartHeuristic());
-    }, [currentHeuristic]);
+    }, [currentHeuristic, props.checkCanStartHeuristic]);
 
     function runHeuristic() {
         setJustClickedRun(true);
