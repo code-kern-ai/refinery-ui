@@ -49,7 +49,7 @@ export default function LabelingInfoTableModal(props: LabelingInfoTableModalProp
     }
 
     return (<Modal modalName={ModalEnum.LABELING_INFO_TABLE}>
-        <h1 className="text-lg text-gray-900 text-center font-bold">Info</h1>
+        <h1 className="text-lg text-gray-900 text-center font-medium">Info</h1>
         {props.dataToDisplay[0] && <div className="flex flex-col items-center">
             <div className="flex flex-row gap-x-2 items-center">
                 <div className="text-gray-500 my-2 text-center mb-2">

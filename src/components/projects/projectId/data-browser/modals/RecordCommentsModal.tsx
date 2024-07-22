@@ -11,7 +11,7 @@ export default function RecordCommentsModal() {
         {modalComments && modalComments.commentsData && modalComments.commentsData.map((comment, index) => (
             <div className="break-words" key={comment.comment}>
                 <div className="flex flex-grow justify-between gap-8">
-                    <p style={{ minWidth: '100px' }} className="font-bold">Comment {index + 1}</p>
+                    <p style={{ minWidth: '100px' }} className="font-medium">Comment {index + 1}</p>
                     <p className="text-gray-500">{comment.comment}</p>
                 </div></div>
         ))}

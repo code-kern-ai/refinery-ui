@@ -27,7 +27,7 @@ export default function DataSliceInfoModal() {
     }
 
     return (<Modal modalName={ModalEnum.DATA_SLICE_INFO}>
-        <div className="flex flex-grow justify-center mb-4 font-bold">Slice information</div>
+        <div className="flex flex-grow justify-center mb-4 font-medium">Slice information</div>
         {modalSliceInfo.sliceInfo && Object.entries(modalSliceInfo.sliceInfo).map(([key, value]: any) => (
             <Fragment key={key}>
                 {key == "Link" ? (<div>
@@ -45,7 +45,7 @@ export default function DataSliceInfoModal() {
                             View as expert
                         </button>
                     </Tooltip>
-                </div>) : (<div className="flex flex-grow justify-between gap-8">
+                </div>) : (<div className="flex flex-grow justify-between gap-8 text-sm">
                     <p>{key}</p>
                     <p>{value}</p>
                 </div>)}

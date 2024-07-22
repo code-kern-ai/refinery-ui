@@ -75,7 +75,7 @@ export default function Embeddings(props: { refetchEmbeddings: () => void }) {
         <div className="text-lg leading-6 text-gray-900 font-medium inline-block w-full">
             <label>Embeddings</label>
             <div className="mt-1">
-                <div className="text-sm leading-5 font-medium text-gray-700 inline-block">You can enrich your records
+                <div className="text-sm leading-5 font-normal text-gray-500 inline-block">You can enrich your records
                     with
                     embeddings, e.g. to use them for vector search or active transfer learning.</div>
                 <div className="inline-block min-w-full align-middle">

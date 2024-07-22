@@ -61,25 +61,25 @@ export default function BricksIntegratorModal(props: BricksIntegratorModalProps)
                     <div className="flex flex-row items-start mt-2 text-left">
                         <input type="radio" checked={config.querySourceSelectionRemote} onChange={() => toggleLocation(true)} name="lineBreaks" id="remote"
                             className="focus:ring-blue-500 h-5 w-4 text-blue-600 border-gray-200 cursor-pointer" />
-                        <label htmlFor="remote" className="text-sm font-bold text-gray-900 cursor-pointer ml-2">Remote</label>
+                        <label htmlFor="remote" className="text-sm font-semibold text-gray-900 cursor-pointer ml-2">Remote</label>
                     </div>
                     <div className="flex flex-row items-start mt-2 text-left">
                         <input type="radio" checked={!config.querySourceSelectionRemote} onChange={() => toggleLocation(false)} name="lineBreaks" id="local"
                             className="focus:ring-blue-500 h-5 w-4 text-blue-600 border-gray-200 cursor-pointer" />
-                        <label htmlFor="local" className="text-sm font-bold text-gray-900 cursor-pointer ml-2">Local</label>
+                        <label htmlFor="local" className="text-sm font-semibold text-gray-900 cursor-pointer ml-2">Local</label>
                     </div>
                 </div>
                 {!config.querySourceSelectionRemote && <>
                     <div className="flex flex-row flex-wrap justify-center w-full gap-x-2 gap-y-2 my-1">
                         <div className="flex flex-row gap-x-2 items-center">
-                            <label className="text-sm font-bold text-gray-900">Strapi Port</label>
+                            <label className="text-sm font-semibold text-gray-900">Strapi Port</label>
                             <input type="number" step="1" style={{ outline: 'none', boxShadow: 'none' }}
                                 className="h-9 w-16 text-sm border-gray-300 rounded-md placeholder-italic border text-gray-900 pl-4 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100"
                                 value={config.querySourceSelectionLocalStrapiPort} autoComplete="off"
                                 onInput={(e) => updateFieldConfig(e, 'querySourceSelectionLocalStrapiPort')} />
                         </div>
                         <div className="flex flex-row gap-x-2 items-center">
-                            <label className="text-sm font-bold text-gray-900">Bricks Port</label>
+                            <label className="text-sm font-semibold text-gray-900">Bricks Port</label>
                             <input type="number" step="1" style={{ outline: 'none', boxShadow: 'none' }}
                                 className="h-9 w-20 text-sm border-gray-300 rounded-md placeholder-italic border text-gray-900 pl-4 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100"
                                 value={config.querySourceSelectionLocalBricksPort} autoComplete="off"
@@ -87,7 +87,7 @@ export default function BricksIntegratorModal(props: BricksIntegratorModalProps)
                         </div>
                     </div>
                     <div className="flex flex-row gap-x-2 items-center mx-4">
-                        <label className="text-sm font-bold text-gray-900 whitespace-nowrap">Strapi Token</label>
+                        <label className="text-sm font-semibold text-gray-900 whitespace-nowrap">Strapi Token</label>
                         <input type="text" style={{ outline: 'none', boxShadow: 'none' }}
                             className="h-9 w-full text-sm border-gray-300 rounded-md placeholder-italic border text-gray-900 pl-4 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100"
                             value={config.querySourceSelectionLocalStrapiToken} autoComplete="off"

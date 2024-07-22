@@ -295,7 +295,7 @@ export default function ProjectOverview() {
                             {/* {!isManaged && <div className="overflow-hidden h-80 rounded-lg bg-indigo-700 shadow-xl lg:grid lg:grid-cols-2 lg:gap-4">
                                 <div className="px-6 pt-10 pb-12 sm:px-12 sm:pt-12 lg:py-12 lg:pr-0 xl:py-16 xl:px-16">
                                     <div className="lg:self-center">
-                                        <h2 className="text-3xl font-bold tracking-tight text-white sm:text-4xl">
+                                        <h2 className="text-3xl font-semibold tracking-tight text-white sm:text-4xl">
                                             <span className="block">Do you require multi-user analytics?</span>
                                         </h2>
                                         <p className="mt-4 text-lg leading-6 text-indigo-200">Our open-source <span

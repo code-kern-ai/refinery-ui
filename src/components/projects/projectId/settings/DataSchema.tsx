@@ -59,7 +59,7 @@ export default function DataSchema(props: DataSchemaProps) {
             {props.isAcOrTokenizationRunning ? <LoadingIcon /> : null}
         </div>
         <div className="mt-1">
-            <div className="text-sm leading-5 font-medium text-gray-700 inline-block">
+            <div className="text-sm leading-5 font-normal text-gray-500 inline-block">
                 This schema holds the data structure of your project.
                 It contains the attributes uploaded on project creation and the added calculated attributes.
             </div>

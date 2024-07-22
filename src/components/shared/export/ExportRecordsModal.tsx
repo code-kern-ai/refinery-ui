@@ -306,7 +306,7 @@ export default function ExportRecordsModal(props: ExportProps) {
                 }} />
         </div>}
         {prepareErrors.length > 0 && <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mt-2">
-            <strong className="font-bold">Errors Detected!</strong>
+            <strong className="font-semibold">Errors Detected!</strong>
             <pre className="text-sm">{prepareErrors.join("\n")}</pre>
         </div>}
         <CryptedField label="Encrypt zip file with password" keyChange={(key: string) => setKey(key)} />

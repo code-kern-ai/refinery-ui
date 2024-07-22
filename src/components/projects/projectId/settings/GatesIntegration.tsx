@@ -29,7 +29,7 @@ export default function GatesIntegration() {
             <Statuses page="gates-integrator" status={gatesIntegrationData?.status} />
         </div>
         <div className="mt-1">
-            <div className="text-sm leading-5 font-medium text-gray-700 inline-block">
+            <div className="text-sm leading-5 font-normal text-gray-500 inline-block">
                 Gates is the inference API for refinery.
                 {gatesIntegrationData?.status === GatesIntegratorStatus.READY && <span> This project is ready to be used with Gates. You can switch to the <a href={gatesLink}><span
                     className="underline cursor-pointer">Gates App</span></a> to configure and run

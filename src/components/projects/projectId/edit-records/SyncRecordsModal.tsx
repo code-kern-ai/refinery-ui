@@ -76,11 +76,11 @@ export default function SyncRecordsModal(props: SyncRecordsModalProps) {
             <div className="text-sm text-gray-700 flex flex-col gap-y-2 mb-2 font-medium">
                 <div> {syncRecordsModal.syncModalAmount} changes to be synchronized: </div>
                 <div className="grid gap-px p-px bg-gray-200 rounded-lg" style={{ gridTemplateColumns: 'minmax(auto,100px) max-content minmax(auto,300px) minmax(auto,300px) 50px' }}>
-                    <span className="bg-white font-bold h-full w-full inline-flex items-center justify-center">Record
+                    <span className="bg-white font-semibold h-full w-full inline-flex items-center justify-center">Record
                         ({props.erdData.data?.attributes[0].name})</span>
-                    <span className="bg-white font-bold h-full w-full inline-flex items-center justify-center">Attribute</span>
-                    <span className="bg-white font-bold h-full w-full inline-flex items-center justify-center">Old value</span>
-                    <span className="bg-white font-bold h-full w-full inline-flex items-center justify-center">New value</span>
+                    <span className="bg-white font-semibold h-full w-full inline-flex items-center justify-center">Attribute</span>
+                    <span className="bg-white font-semibold h-full w-full inline-flex items-center justify-center">Old value</span>
+                    <span className="bg-white font-semibold h-full w-full inline-flex items-center justify-center">New value</span>
                     <span className="bg-white h-full w-full"></span>
 
                     {Object.entries(props.erdData.cachedRecordChanges).map(([key, value]: any) => (<Fragment key={key}>
@@ -96,7 +96,7 @@ export default function SyncRecordsModal(props: SyncRecordsModalProps) {
             </div>
             {props.erdData.errors && <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative flex flex-col">
                 <div className="self-center flex flex-row flex-nowrap items-center -mt-1 mb-1">
-                    <strong className="font-bold">Errors while syncing changes</strong>
+                    <strong className="font-semibold">Errors while syncing changes</strong>
                     <IconAlertTriangleFilled className="h-5 w-5 text-red-400" />
                 </div>
                 {props.erdData.errors.map((error, index) => <div key={error} className="text-sm overflow-x-auto m-auto" style={{ maxWidth: '600px' }}>

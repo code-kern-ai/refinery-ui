@@ -91,7 +91,7 @@ export default function LabelingTasks() {
             Labeling tasks
         </div>
         <div className="mt-1">
-            <div className="text-sm leading-5 font-medium text-gray-700 inline-block">Define what kind of things you
+            <div className="text-sm leading-5 font-normal text-gray-500 inline-block">Define what kind of things you
                 want to
                 label. We currently support classifications and extractions.</div>
 

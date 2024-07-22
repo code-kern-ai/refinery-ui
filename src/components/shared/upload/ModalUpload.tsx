@@ -73,7 +73,7 @@ export default function ModalUpload(props: UploadProps) {
 
     return (
         <Modal modalName={ModalEnum.MODAL_UPLOAD} acceptButton={acceptButton}>
-            <h1 className="flex flex-grow justify-center text-lg text-gray-900 font-bold">{title}</h1>
+            <h1 className="flex flex-grow justify-center text-lg text-gray-900 font-medium">{title}</h1>
             <div className="text-sm text-gray-500 mb-4 text-center">
                 {subTitle}
             </div>

@@ -1,5 +1,6 @@
 import type { AppProps } from 'next/app'
 import '../styles/tailwind.css'
+import '@/submodules/tailwind-config/global.css'
 import Head from 'next/head'
 import Layout from '../components/shared/layout/Layout'
 import { Provider } from 'react-redux'
@@ -18,7 +19,6 @@ export default function App({ Component, pageProps }: AppProps) {
     <Head>
       <title>Kern AI - refinery</title>
       <meta name="viewport" content="initial-scale=1.0, width=device-width" />
-      <link rel="icon" type="image/x-icon" href="/refinery/images/refinery-favicon.ico"></link>
     </Head>
 
     <Provider store={store}>

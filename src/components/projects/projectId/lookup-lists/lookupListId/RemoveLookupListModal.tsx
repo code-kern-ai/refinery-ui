@@ -33,7 +33,7 @@ export default function RemoveLookupListModal() {
     const [abortButton, setAbortButton] = useState<ModalButton>(ABORT_BUTTON);
 
     return (<Modal modalName={ModalEnum.REMOVE_LOOKUP_LIST} abortButton={abortButton}>
-        <h1 className="text-lg text-gray-900 mb-2 font-bold text-center">Remove your terms</h1>
+        <h1 className="text-lg text-gray-900 mb-2 font-semibold text-center">Remove your terms</h1>
         <div className="grid justify-center items-center gap-x-2 gap-y-1 justify-items-start" style={{ gridTemplateColumns: 'max-content min-content' }}>
             <span>Split On</span>
             <input value={inputSplit} type="text" onInput={(e: any) => setInputSplit(e.target.value)}

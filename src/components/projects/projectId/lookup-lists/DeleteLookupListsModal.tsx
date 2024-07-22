@@ -40,7 +40,7 @@ export default function DeleteLookupListsModal(props: DeleteLookupListsModalProp
         <div className="text-sm text-gray-500 my-2 flex flex-col">
             <span>Are you sure you want to delete selected lookup {props.countSelected <= 1 ? 'list' : 'lists'}?</span>
             <span>Currently selected {props.countSelected <= 1 ? 'is' : 'are'}:</span>
-            <span className="whitespace-pre-line font-bold">{props.selectionList}</span>
+            <span className="whitespace-pre-line font-semibold">{props.selectionList}</span>
         </div>
     </Modal>)
 }

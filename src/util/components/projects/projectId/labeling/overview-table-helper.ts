@@ -149,7 +149,7 @@ export function canDeleteRla(rla, user, userDisplayRole): boolean {
 export function getEmptyHeaderHover() {
     //holds dummy group as first element to not use a main group
     return {
-        class: 'bg-gray-200 font-bold',
+        class: 'bg-gray-200 font-semibold',
         typeCollection: ['Type'],
         taskCollection: ['Task'],
         labelCollection: ['Label'],
