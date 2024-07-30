@@ -96,7 +96,7 @@ export default function RenameLabelModal() {
         <Modal modalName={ModalEnum.RENAME_LABEL} acceptButton={acceptButtonRename}>
             {renameLabelData && modalRenameLabel.label && <div className="flex flex-col gap-y-2">
                 <div className="self-center flex flex-row flex-nowrap items-center justify-center">
-                    <p className="mr-2 font-bold">Change label name:</p><span
+                    <p className="mr-2 font-medium">Change label name:</p><span
                         className={`border rounded-md py-1 px-2 text-sm font-medium shadow-sm  text-center ${modalRenameLabel.label.color?.backgroundColor} ${modalRenameLabel.label.color?.textColor} ${modalRenameLabel.label.color?.borderColor} ${modalRenameLabel.label.color?.hoverColor}`}>{modalRenameLabel.label.name}</span>
                     <Tooltip content={TOOLTIPS_DICT.PROJECT_SETTINGS.LABELING_TASK.INFO_RENAME_LABEL} color="invert" placement="top" className="ml-2">
                         <IconInfoCircleFilled className="h-6 w-6 text-blue-500" />
@@ -114,7 +114,7 @@ export default function RenameLabelModal() {
                     </div>
                     {renameLabelData?.checkResults?.errors?.length > 0 && <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative flex flex-col">
                         <div className="self-center flex flex-row flex-nowrap items-center -mt-1 mb-1">
-                            <strong className="font-bold">Errors detected</strong>
+                            <strong className="font-medium">Errors detected</strong>
                             <IconAlertTriangleFilled className="h-5 w-5 text-red-400" />
                         </div>
                         {renameLabelData?.checkResults?.errors.map((error: any) => (
@@ -123,7 +123,7 @@ export default function RenameLabelModal() {
                     </div>}
                     {renameLabelData?.checkResults?.infos.length > 0 && <div className="bg-blue-100 border border-blue-400 text-blue-700 px-4 py-3 rounded relative flex flex-col">
                         <div className="self-center flex flex-row flex-nowrap items-center -mt-1 mb-1">
-                            <strong className="font-bold">Information</strong>
+                            <strong className="font-medium">Information</strong>
                             <IconInfoCircleFilled className="h-5 w-5 text-blue-400" />
                         </div>
                         {renameLabelData?.checkResults?.infos.map((info: any) => (
@@ -132,7 +132,7 @@ export default function RenameLabelModal() {
                     </div>}
                     {renameLabelData?.checkResults?.warnings?.length > 0 && <div className="bg-yellow-100 border border-yellow-400 text-yellow-700 px-4 py-3 rounded relative flex flex-col">
                         <div className="self-center flex flex-row flex-nowrap items-center -mt-1 mb-1">
-                            <strong className="font-bold">Warning</strong>
+                            <strong className="font-medium">Warning</strong>
                             <IconAlertTriangleFilled className="h-5 w-5 text-yellow-400" />
                         </div>
                         <div className="self-center">
@@ -161,23 +161,23 @@ export default function RenameLabelModal() {
                                 <div className={`flex flex-col p-2 ${warning.open ? '' : 'hidden'}`}>
                                     {warning.key == 'KNOWLEDGE_BASE' && <div>
                                         <div className="flex flex-row">
-                                            <span className="mr-2 font-bold text-sm">Current name:</span>
+                                            <span className="mr-2 font-medium text-sm">Current name:</span>
                                             <span className="text-sm">{warning.old}</span>
                                         </div>
                                         <div className="flex flex-row">
-                                            <span className="mr-2 font-bold text-sm">New name:</span>
+                                            <span className="mr-2 font-medium text-sm">New name:</span>
                                             <span className="text-sm">{warning.new}</span>
                                         </div></div>}
                                     {warning.key == 'HEURISTIC' && <div className="flex flex-col gap-y-2">
                                         <span className="text-sm">
                                             <Tooltip content={TOOLTIPS_DICT.PROJECT_SETTINGS.LABELING_TASK.OPEN_HEURISTICS} placement="right" color="invert">
                                                 <a href={'../heuristics/' + warning.id} target="_blank"
-                                                    className="cursor-pointer underline font-bold">
+                                                    className="cursor-pointer underline font-medium">
                                                     Current source code:</a>
                                             </Tooltip>
                                         </span>
                                         <Highlight text={warning.oldParsed} searchFor={warning.old_highlighting} />
-                                        <span className="text-sm font-bold text-left">Suggested changes:</span>
+                                        <span className="text-sm font-medium text-left">Suggested changes:</span>
                                         <Highlight text={warning.newParsed} searchFor={warning.new_highlighting} />
                                     </div>}
                                     <button onClick={() => handleLabelRenameWarning(warning)}

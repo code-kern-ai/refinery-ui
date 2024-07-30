@@ -38,7 +38,7 @@ export default function PageSearch(props: PageSearchProps) {
                         configCopy.extendedIntegratorGroupFilterOpen = !configCopy.extendedIntegratorGroupFilterOpen;
                         dispatch(setBricksIntegrator(configCopy));
                     }}>
-                        <label className="text-base font-bold text-gray-900 cursor-pointer">Group Filter</label>
+                        <label className="text-base font-semibold text-gray-900 cursor-pointer">Group Filter</label>
                         <IconChevronsDown className={`w-6 h-6 ${config.extendedIntegratorGroupFilterOpen ? style.rotateTransform : null}`} />
                     </div>
                     <div className={`flex flex-col w-full my-2 ${config.extendedIntegratorGroupFilterOpen ? '' : 'hidden'}`}>
@@ -48,7 +48,7 @@ export default function PageSearch(props: PageSearchProps) {
                                     <input type="radio" checked={filterValue.active} onChange={() => props.setGroupActive(filterValue.key)} name={filterValue.name + ' (' + filterValue.countInGroup + ')'}
                                         className="focus:ring-blue-500 h-4 w-4 text-blue-600 border-gray-200 cursor-pointer" />
                                     <label htmlFor={filterValue.name + ' (' + filterValue.countInGroup + ')'}
-                                        className="text-sm font-bold text-gray-900 cursor-pointer">{filterValue.name + ' (' + filterValue.countInGroup + ')'}</label>
+                                        className="text-sm font-semibold text-gray-900 cursor-pointer">{filterValue.name + ' (' + filterValue.countInGroup + ')'}</label>
                                 </div>))}
                         </div>
                     </div>
@@ -74,7 +74,7 @@ export default function PageSearch(props: PageSearchProps) {
                             className={`text-left group flex flex-row items-center cursor-pointer select-none rounded-xl p-3 hover:bg-gray-100 relative ${!result.searchVisible || !result.groupVisible ? 'hidden' : ''}`} id="option-1" role="option">
                             <SVGIcon icon={result.attributes.tablerIcon} size={24} strokeWidth={2} color={"black"} />
                             <div className="ml-2 flex-auto">
-                                <p className="text-sm font-bold text-gray-700">{result.attributes.name}</p>
+                                <p className="text-sm font-semibold text-gray-700">{result.attributes.name}</p>
                                 <p className="text-sm text-gray-500">{result.attributes.description}</p>
                             </div>
                         </li>))}

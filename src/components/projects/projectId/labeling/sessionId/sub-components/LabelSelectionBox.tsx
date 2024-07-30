@@ -143,7 +143,7 @@ export default function LabelSelectionBox(props: LabelSelectionBoxProps) {
             {props.activeTasks && props.activeTasks.map((task, index) => <Fragment key={task.task.id}>
                 <div className={`flex flex-grow flex-row justify-center p-2 ${index != 0 ? 'border-t borders-gray' : null}`}>
                     <label className="mr-1 text-sm">Task:</label>
-                    <label className="italic font-bold text-sm truncate pr-0.5" style={{ maxWidth: '12rem' }}>{task.task.name}</label>
+                    <label className="italic font-semibold text-sm truncate pr-0.5" style={{ maxWidth: '12rem' }}>{task.task.name}</label>
                 </div>
                 <div className="flex flex-row gap-x-1 flex-nowrap p-2.5 border borders-gray">
                     <input onClick={(e: any) => e.target.focus()} type="text" value={newLabelDict[task.task.id] ?? ''} onChange={(e) => {

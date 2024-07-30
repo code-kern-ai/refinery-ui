@@ -69,7 +69,7 @@ export default function PageIntegration(props: PageIntegrationProps) {
         {config && <div className={`flex flex-col gap-y-2 justify-center items-center my-4 ${config.page != IntegratorPage.INTEGRATION ? 'hidden' : ''}`}>
             {BricksCodeParser?.errors.length > 0 && <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative flex flex-col">
                 <div className="self-center flex flex-row flex-nowrap items-center -mt-1 mb-1">
-                    <strong className="font-bold">Couldn&apos;t parse code</strong>
+                    <strong className="font-semibold">Couldn&apos;t parse code</strong>
                     <IconAlertTriangle className="ml-1 w-5 h-5 text-red-400" />
                 </div>
                 <pre className="text-sm overflow-x-auto whitespace-pre-wrap">{BricksCodeParser.errors.join("\n")}</pre>
@@ -78,7 +78,7 @@ export default function PageIntegration(props: PageIntegrationProps) {
                 {BricksCodeParser.expected.labelWarning ? (
                     <div className="bg-yellow-100 border border-yellow-400 text-yellow-700 px-4 py-3 rounded relative flex flex-col gap-y-2">
                         <div className="self-center flex flex-row flex-nowrap items-center -mt-1">
-                            <strong className="font-bold">Warning</strong>
+                            <strong className="font-semibold">Warning</strong>
                             <IconAlertTriangle className="ml-1 w-5 h-5 text-yellow-400" />
                         </div>
                         <label className="text-sm -mt-1">Your selected task doesn&apos;t have all necessary labels:</label>
@@ -110,7 +110,7 @@ export default function PageIntegration(props: PageIntegrationProps) {
                     </div>
                 ) : (<div className="bg-blue-100 border border-blue-400 text-blue-700 px-4 py-3 rounded relative flex flex-col gap-y-2 w-4/5">
                     <div className="self-center flex flex-row flex-nowrap items-center -mt-1">
-                        <strong className="font-bold">Information</strong>
+                        <strong className="font-semibold">Information</strong>
                         <IconInfoCircle className="ml-1 w-5 h-5 text-blue-400" />
                     </div>
                     <label className="text-sm -mt-1">All necessary labels found in task:</label>
@@ -135,7 +135,7 @@ export default function PageIntegration(props: PageIntegrationProps) {
 
             {BricksCodeParser.globalComments && BricksCodeParser.globalComments.length > 0 && <div className="bg-blue-100 border border-blue-400 text-blue-700 px-4 py-3 rounded relative flex flex-col">
                 <div className="self-center flex flex-row flex-nowrap items-center -mt-1 mb-1">
-                    <strong className="font-bold">Information</strong>
+                    <strong className="font-semibold">Information</strong>
                     <IconInfoCircle className="ml-1 w-5 h-5 text-blue-400" />
                 </div>
                 <div className="flex flex-col" style={{ maxWidth: '30rem' }}>
@@ -144,7 +144,7 @@ export default function PageIntegration(props: PageIntegrationProps) {
             </div>}
             {BricksCodeParser?.variables.length == 0 ? (<label>Nothing to parse, code can be used without changes</label>) : (
                 <div className="grid grid-cols-3 gap-x-2 gap-y-2 items-center text-left pb-4 px-4" style={{ gridTemplateColumns: 'max-content max-content max-content' }}>
-                    <label className="font-bold col-start-1">{props.functionType} name</label>
+                    <label className="font-semibold col-start-1">{props.functionType} name</label>
                     <div className="contents">
                         <input className="h-9 w-full text-sm border-gray-300 rounded-md placeholder-italic border text-gray-900 pl-4 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100" type="text"
                             value={BricksCodeParser.functionName} onChange={(e: any) => onInputFunctionName(e)} />
@@ -155,7 +155,7 @@ export default function PageIntegration(props: PageIntegrationProps) {
                         </Tooltip>}
                     </div>
                     {BricksCodeParser.labelingTaskName && <Fragment>
-                        <label className="font-bold col-start-1">Labeling Task</label>
+                        <label className="font-semibold col-start-1">Labeling Task</label>
                         <Dropdown2 options={labelingTasks} buttonName={BricksCodeParser.labelingTaskName}
                             selectedOption={(option: any) => {
                                 BricksCodeParser.labelingTaskName = option.name;
@@ -166,8 +166,8 @@ export default function PageIntegration(props: PageIntegrationProps) {
                         </Tooltip>
                     </Fragment>}
 
-                    <label className="font-bold">Variable</label>
-                    <label className="font-bold">Value</label>
+                    <label className="font-semibold">Variable</label>
+                    <label className="font-semibold">Value</label>
                     <label></label>
                     {BricksCodeParser.variables.map((v, index) => (<Fragment key={v.baseName}>
                         <div>
@@ -190,8 +190,8 @@ export default function PageIntegration(props: PageIntegrationProps) {
                         </div>
                     </Fragment>))}
                     {BricksCodeParser.expected.labelMappingActive && <Fragment>
-                        <label className="font-bold col-start-1">Bricks label</label>
-                        <label className="font-bold">Refinery label</label>
+                        <label className="font-semibold col-start-1">Bricks label</label>
+                        <label className="font-semibold">Refinery label</label>
                         {BricksCodeParser.expected.expectedTaskLabels.map((l, index) => (<div key={l.label} className="contents">
                             <label className="text-sm col-start-1">{l.label}</label>
                             <Dropdown2 options={BricksCodeParser.expected.availableLabels} buttonName={l.mappedLabel ? l.mappedLabel : 'Ignore'}
@@ -216,7 +216,7 @@ export default function PageIntegration(props: PageIntegrationProps) {
                     configCopy.integratorCodeOpen = !configCopy.integratorCodeOpen;
                     dispatch(setBricksIntegrator(configCopy));
                 }}>
-                    <label className="text-base font-bold text-gray-900 cursor-pointer underline">Final Code</label>
+                    <label className="text-base font-semibold text-gray-900 cursor-pointer underline">Final Code</label>
                     <IconChevronsDown className={`w-6 h-6 ${config.integratorCodeOpen ? style.rotateTransform : null}`} />
                 </div>
                 <div className={`flex flex-col mt-1 items-center ${config.integratorCodeOpen ? '' : 'hidden'}`}>
@@ -231,7 +231,7 @@ export default function PageIntegration(props: PageIntegrationProps) {
                     configCopy.integratorParseOpen = !configCopy.integratorParseOpen;
                     dispatch(setBricksIntegrator(configCopy));
                 }}>
-                    <label className="text-base font-bold text-gray-900 cursor-pointer">Final Json</label>
+                    <label className="text-base font-semibold text-gray-900 cursor-pointer">Final Json</label>
                     <IconChevronsDown className={`w-6 h-6 ${config.integratorParseOpen ? style.rotateTransform : null}`} />
                 </div>
                 <div className={`flex flex-col mt-1 items-center ${config.integratorParseOpen ? '' : 'hidden'}`}>

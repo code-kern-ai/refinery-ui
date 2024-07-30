@@ -21,7 +21,7 @@ export default function ViewRecordDetailsModal(props: ViewRecordDetailsModalProp
                     <RecordDisplay
                         attributes={attributes}
                         record={modalViewRecordDetails.record} />
-                    <div className="text-sm leading-5 text-left text-gray-900 font-bold">Calculated value</div>
+                    <div className="text-sm leading-5 text-left text-gray-900 font-medium">Calculated value</div>
                     <div className="text-sm leading-5 text-left text-gray-500 font-normal">
                         {props.currentAttribute.dataType != DataTypeEnum.EMBEDDING_LIST ? <span>
                             {props.sampleRecords.calculatedAttributes[modalViewRecordDetails.recordIdx]}

@@ -216,7 +216,7 @@ export default function SampleProjectsDropdown() {
                 </Menu.Items>
             </Transition>
             <Modal modalName={ModalEnum.SAMPLE_PROJECT_TITLE} acceptButton={acceptButton}>
-                <h1 className="flex flex-grow justify-center text-lg text-gray-900 font-bold">Enter project title</h1>
+                <h1 className="flex flex-grow justify-center text-lg text-gray-900 font-medium">Enter project title</h1>
                 <div className="text-sm text-gray-500 mb-4 text-center">
                     Please enter a custom title for the sample project
                 </div>

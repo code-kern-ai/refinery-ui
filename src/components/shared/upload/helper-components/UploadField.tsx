@@ -56,7 +56,7 @@ export default function UploadField(props: UploadFieldProps) {
                 <div className="flex items-center justify-between">
                     <div className="flex flex-grow items-center overflow-x-hidden">
                         <div  {...getRootProps()} onClick={() => fileUpload.current?.click()}
-                            className={`w-full border-4 border-dashed rounded-lg h-36 my-6 cursor-pointer ${file || props.uploadStarted ? 'bg-white' : 'border-slate-400'}`} style={{ 'pointerEvents': props.uploadStarted ? 'none' : 'auto' }}>
+                            className={`w-full border border-dashed rounded-lg h-36 my-6 cursor-pointer ${file || props.uploadStarted ? 'bg-white' : 'border-slate-400'}`} style={{ 'pointerEvents': props.uploadStarted ? 'none' : 'auto' }}>
                             <IconDatabase className="h-9 w-8 m-auto block text-gray-500 mt-6" />
                             {file == null && !props.uploadStarted ? (<div className="text-gray-600 text-sm font-medium text-center mb-6">
                                 <button className="text-indigo-700 mt-1">Click to select a file</button>

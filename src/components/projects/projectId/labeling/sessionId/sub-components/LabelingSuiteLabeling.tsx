@@ -544,7 +544,7 @@ export default function LabelingSuiteLabeling() {
         {recordRequests.record && !lVars.loading && lVars.loopAttributes && SessionManager.currentRecordId !== "deleted" && <div className="grid w-full border md:rounded-lg items-center" style={{ gridTemplateColumns: 'max-content max-content 40px auto' }}>
             {lVars.loopAttributes.map((attribute, i) => (<Fragment key={attribute.id}>
                 {lVars.taskLookup[attribute.id].lookup.map((task, j) => (<Fragment key={j}>
-                    <div className={`font-dmMono text-sm font-bold text-gray-500 py-2 pl-4 pr-3 sm:pl-6 col-start-1 h-full ${i % 2 == 0 ? 'bg-white' : 'bg-gray-50'}`}>
+                    <div className={`font-dmMono text-sm font-semibold text-gray-500 py-2 pl-4 pr-3 sm:pl-6 col-start-1 h-full ${i % 2 == 0 ? 'bg-white' : 'bg-gray-50'}`}>
                         {j == 0 ? attribute.name : ''}
                     </div>
                     {settings.labeling.showTaskNames && user.role != UserRole.ANNOTATOR && userDisplayRole != UserRole.ANNOTATOR && <div className={`col-start-2 pr-3 py-1.5 h-full flex ${i % 2 == 0 ? 'bg-white' : 'bg-gray-50'}`}>

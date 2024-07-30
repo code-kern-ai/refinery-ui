@@ -38,29 +38,29 @@ export default function LabelSettingsBox(props: LabelSettingsBoxProps) {
         {props.labelSettingsLabel && <div className="pt-2">
             <div className="flex flex-row justify-center pb-2">
                 <label className="mr-1 text-sm">Label:</label>
-                <label className="italic font-bold text-sm truncate pr-0.5" style={{ maxWidth: '12rem' }}>{props.labelSettingsLabel.name}</label>
+                <label className="italic font-semibold text-sm truncate pr-0.5" style={{ maxWidth: '12rem' }}>{props.labelSettingsLabel.name}</label>
             </div>
             <div className="flex flex-row flex-no-wrap gap-x-2 p-2.5 borders-gray border-t">
                 <Tooltip content={TOOLTIPS_DICT.LABELING.INFO_LABEL_BOX} color="invert" placement="top" onClick={() => dispatch(setModalStates(ModalEnum.INFO_LABEL_BOX, { open: true, labelSettingsLabel: props.labelSettingsLabel }))}>
                     <IconInfoCircle className="h-6 w-6 text-gray-700" />
                 </Tooltip>
                 <div className="flex flex-row flex-nowrap items-center gap-x-1 cursor-pointer">
-                    <span className="font-bold text-sm text-gray-500">M</span>
+                    <span className="font-semibold text-sm text-gray-500">M</span>
                     <input className="h-4 w-4 cursor-pointer" type="checkbox" onChange={() => toggleLabelDisplaySetting('showManual')}
                         checked={settings.task[projectId][props.labelSettingsLabel.taskId][props.labelSettingsLabel.id].showManual} />
                 </div>
                 <div className="flex flex-row flex-nowrap items-center gap-x-1 cursor-pointer">
-                    <span className="font-bold text-sm text-gray-500">WS</span>
+                    <span className="font-semibold text-sm text-gray-500">WS</span>
                     <input className="h-4 w-4 cursor-pointer" type="checkbox" onChange={() => toggleLabelDisplaySetting('showWeakSupervision')}
                         checked={settings.task[projectId][props.labelSettingsLabel.taskId][props.labelSettingsLabel.id].showWeakSupervision} />
                 </div>
                 <div className="flex flex-row flex-nowrap items-center gap-x-1 cursor-pointer">
-                    <span className="font-bold text-sm text-gray-500">MC</span>
+                    <span className="font-semibold text-sm text-gray-500">MC</span>
                     <input className="h-4 w-4 cursor-pointer" type="checkbox" onChange={() => toggleLabelDisplaySetting('showModel')}
                         checked={settings.task[projectId][props.labelSettingsLabel.taskId][props.labelSettingsLabel.id].showModel} />
                 </div>
                 <div className="flex flex-row flex-nowrap items-center gap-x-1 cursor-pointer">
-                    <span className="font-bold text-sm text-gray-500">H</span>
+                    <span className="font-semibold text-sm text-gray-500">H</span>
                     <input className="h-4 w-4 cursor-pointer" type="checkbox" onChange={() => toggleLabelDisplaySetting('showHeuristics')}
                         checked={settings.task[projectId][props.labelSettingsLabel.taskId][props.labelSettingsLabel.id].showHeuristics} />
                 </div>

@@ -18,7 +18,7 @@ export default function ViewDetailsLFModal(props: ViewDetailsLFModalProps) {
                 <RecordDisplay
                     attributes={attributes}
                     record={props.sampleRecords.records[modalSampleRecord.currentRecordIdx]} />
-                <div className="text-sm leading-5 text-left text-gray-900 font-bold">
+                <div className="text-sm leading-5 text-left text-gray-900 font-medium">
                     Label data
                     <div className="flex items-center justify-start">
                         {Object.entries(props.sampleRecords.records[modalSampleRecord.currentRecordIdx].calculatedLabelsResult).map(([key, value]: any) => (

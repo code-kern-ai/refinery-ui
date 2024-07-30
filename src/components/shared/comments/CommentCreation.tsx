@@ -124,10 +124,10 @@ export function CommentCreation(props: CommentCreationProps) {
                 </div>
                 <div className="flex flex-row items-start mt-2 text-left">
                     <input type="checkbox" checked={isPrivateComment} onChange={(e) => setIsPrivateComment(e.target.checked)} name="privateComment" id="privateComment"
-                        className="h-6 w-4 border-gray-200 cursor-pointer" />
+                        className="h-6 w-4 border-gray-200 cursor-pointer mt-1.5" />
                     <label htmlFor="privateComment" className="ml-1 block text-sm font-medium text-gray-700 cursor-pointer">
                         <span>Private comment</span>
-                        <p className="text-gray-500 text-sm cursor-pointer">If ticked, this will not be shown to any other member in your team. </p>
+                        <p className="text-gray-500 text-xs cursor-pointer">If ticked, this will not be shown to any other member in your team. </p>
                     </label>
                 </div>
             </div>

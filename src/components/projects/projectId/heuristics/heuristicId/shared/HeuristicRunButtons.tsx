@@ -21,8 +21,9 @@ export default function HeuristicRunButtons(props: HeuristicRunButtonsProps) {
 
     useEffect(() => {
         setCanStartHeuristic(checkCanStartHeuristic());
+        if (!props.checkCanStartHeuristic) return;
         props.checkCanStartHeuristic(checkCanStartHeuristic());
-    }, [currentHeuristic]);
+    }, [currentHeuristic, props.checkCanStartHeuristic]);
 
     function runHeuristic() {
         setJustClickedRun(true);
