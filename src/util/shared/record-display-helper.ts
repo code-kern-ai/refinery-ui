@@ -23,14 +23,16 @@ export function postProcessRecord(record: any, attributes: Attribute[]) {
 
 export function postProcessAttributes(attributes: Attribute[]) {
     const prepareAttributes = jsonCopy(attributes);
-    if (!attributes[0].hasOwnProperty('key')) {
-        prepareAttributes.forEach((attribute, index) => {
-            if (attribute.id !== null) {
-                attribute.key = attribute.id;
-            } else {
-                throw new Error("Cant find attribute id in attribute object");
-            }
-        });
+    if (attributes && attributes.length > 0) {
+        if (!attributes[0].hasOwnProperty('key')) {
+            prepareAttributes.forEach((attribute, index) => {
+                if (attribute.id !== null) {
+                    attribute.key = attribute.id;
+                } else {
+                    throw new Error("Cant find attribute id in attribute object");
+                }
+            });
+        }
     }
     return prepareAttributes;
 }
