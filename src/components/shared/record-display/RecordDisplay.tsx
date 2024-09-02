@@ -44,7 +44,7 @@ export function RecordDisplay(props: any) {
                         )}
                     </div>))}
                 </div>) : (<>
-                    {(configuration.highlightText && isTextHighlightNeeded[attribute.key]) ? (<Highlight text={preparedRecord.data[attributesDict[attribute.key].name].toString()}
+                    {(configuration.highlightText && isTextHighlightNeeded[attribute.key]) ? (<Highlight text={preparedRecord.data[attributesDict[attribute.key].name]?.toString()}
                         additionalClasses={[configuration.lineBreaks == LineBreaksType.NORMAL ? '' : (configuration.lineBreaks == LineBreaksType.IS_PRE_WRAP ? 'whitespace-pre-wrap' : 'whitespace-pre-line')]}
                         searchForExtended={textHighlight[attribute.key]} />) : (<span className={configuration && configuration.lineBreaks != LineBreaksType.NORMAL ? (configuration.lineBreaks == LineBreaksType.IS_PRE_WRAP ? 'whitespace-pre-wrap' : 'whitespace-pre-line') : ''}>
                             {preparedRecord.data[attributesDict[attribute.key].name] != null && preparedRecord.data[attributesDict[attribute.key].name] !== '' ? preparedRecord.data[attributesDict[attribute.key].name] : <NotPresentInRecord />}
