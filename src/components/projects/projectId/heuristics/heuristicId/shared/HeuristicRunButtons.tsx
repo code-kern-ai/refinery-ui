@@ -27,10 +27,10 @@ export default function HeuristicRunButtons(props: HeuristicRunButtonsProps) {
 
     function runHeuristic() {
         setJustClickedRun(true);
-        props.justClickedRun(true);
+        if (props.justClickedRun) props.justClickedRun(true);
         createTask(projectId, currentHeuristic.id, (res) => {
             setJustClickedRun(false);
-            props.justClickedRun(false);
+            if (props.justClickedRun) props.justClickedRun(false);
             if (currentHeuristic.informationSourceType === InformationSourceType.LABELING_FUNCTION) {
                 props.updateDisplayLogWarning(false);
 
@@ -40,10 +40,10 @@ export default function HeuristicRunButtons(props: HeuristicRunButtonsProps) {
 
     function runHeuristicAndWeaklySupervise() {
         setJustClickedRun(true);
-        props.justClickedRun(true);
+        if (props.justClickedRun) props.justClickedRun(true);
         runThenWeakSupervision(projectId, currentHeuristic.id, currentHeuristic.labelingTaskId, (res) => {
             setJustClickedRun(false);
-            props.justClickedRun(false);
+            if (props.justClickedRun) props.justClickedRun(false);
             if (currentHeuristic.informationSourceType === InformationSourceType.LABELING_FUNCTION) {
                 props.updateDisplayLogWarning(false);
             }
