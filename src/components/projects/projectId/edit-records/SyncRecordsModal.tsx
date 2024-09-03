@@ -73,7 +73,9 @@ export default function SyncRecordsModal(props: SyncRecordsModalProps) {
             <h1 className="text-lg text-gray-900 mb-2 text-center inline-flex items-center gap-x-1">Info
                 {syncing ? (<LoadingIcon color="blue" />) : (<IconInfoCircle className="text-blue-400" />)}
             </h1>
-            <div className="text-sm text-gray-700 flex flex-col gap-y-2 mb-2 font-medium">
+            <div className="text-sm text-gray-700 flex flex-col gap-y-2 mb-2 font-medium" style={{
+                maxHeight: 'calc(100vh - 250px)', overflowY: 'auto'
+            }}>
                 <div> {syncRecordsModal.syncModalAmount} changes to be synchronized: </div>
                 <div className="grid gap-px p-px bg-gray-200 rounded-lg" style={{ gridTemplateColumns: 'minmax(auto,100px) max-content minmax(auto,300px) minmax(auto,300px) 50px' }}>
                     <span className="bg-white font-semibold h-full w-full inline-flex items-center justify-center">Record
