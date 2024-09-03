@@ -509,6 +509,8 @@ export default function SearchGroups() {
         const fullSearchCopy = jsonCopy(fullSearchStore);
         const formControlsIdx = fullSearchCopy[SearchGroup.ORDER_STATEMENTS].groupElements['orderBy'].find((el) => el['orderByKey'] == StaticOrderByKeys.RANDOM);
         formControlsIdx['seedString'] = value ?? generateRandomSeed();
+        formControlsIdx['active'] = true;
+        formControlsIdx['color'] = getActiveNegateGroupColor(formControlsIdx);
         dispatch(setFullSearchStore(fullSearchCopy));
         updateSearchParams(fullSearchCopy);
     }
