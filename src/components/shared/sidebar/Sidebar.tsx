@@ -106,7 +106,7 @@ export default function Sidebar() {
                                             </Tooltip>
                                         </div>}
                                         {user.role === UserRole.ENGINEER && <div
-                                            className="flex items-center justify-center overflow-visible mt-10 2xl:mt-12">
+                                            className="flex items-center justify-center overflow-visible mt-9 2xl:mt-12">
                                             <Tooltip placement="right" trigger="hover" color="invert" content={TOOLTIPS_DICT.SIDEBAR.DATA_BROWSER} className={`${project.numDataScaleUploaded == 0 ? 'pointer-events-none cursor-not-allowed' : 'cursor-pointer'}`}>
                                                 <div className={`relative z-50`}>
                                                     <a href={`/refinery/projects/${project.id}/data-browser`} onClick={(e: any) => { e.preventDefault(); router.push(`/projects/${project.id}/data-browser`) }}
@@ -116,7 +116,7 @@ export default function Sidebar() {
                                                 </div>
                                             </Tooltip>
                                         </div>}
-                                        <div className={`flex items-center justify-center overflow-visible ${user?.role == 'ENGINEER' ? 'mt-10 2xl:mt-12' : ''}`}>
+                                        <div className={`flex items-center justify-center overflow-visible ${user?.role == 'ENGINEER' ? 'mt-9 2xl:mt-12' : ''}`}>
                                             <Tooltip placement="right" trigger="hover" color="invert" content={TOOLTIPS_DICT.SIDEBAR.LABELING} className={`${project.numDataScaleUploaded == 0 ? 'pointer-events-none cursor-not-allowed' : 'cursor-pointer'}`}>
                                                 <div className={`relative z-50`}>
                                                     <a href={`/refinery/projects/${project.id}/labeling`} onClick={(e: any) => { e.preventDefault(); router.push(`/projects/${project.id}/labeling`) }}
@@ -127,7 +127,7 @@ export default function Sidebar() {
                                             </Tooltip>
                                         </div>
                                         {user.role === UserRole.ENGINEER && <div
-                                            className="flex items-center justify-center overflow-visible mt-10 2xl:mt-12">
+                                            className="flex items-center justify-center overflow-visible mt-9 2xl:mt-12">
                                             <Tooltip placement="right" trigger="hover" color="invert" content={TOOLTIPS_DICT.SIDEBAR.HEURISTICS} className={`${project.numDataScaleUploaded == 0 ? 'pointer-events-none cursor-not-allowed' : 'cursor-pointer'}`}>
                                                 <div className={`relative z-50`}>
                                                     <a href={`/refinery/projects/${project.id}/heuristics`} onClick={(e: any) => { e.preventDefault(); router.push(`/projects/${project.id}/heuristics`) }}
@@ -138,7 +138,7 @@ export default function Sidebar() {
                                             </Tooltip>
                                         </div>}
                                         {user.role === UserRole.ENGINEER && <div
-                                            className="flex items-center justify-center overflow-visible mt-10 2xl:mt-12">
+                                            className="flex items-center justify-center overflow-visible mt-9 2xl:mt-12">
                                             <Tooltip placement="right" trigger="hover" color="invert" content={TOOLTIPS_DICT.SIDEBAR.SETTINGS}>
                                                 <div className={`relative z-50`}>
                                                     <a href={`/refinery/projects/${project.id}/settings`} onClick={(e: any) => { e.preventDefault(); router.push(`/projects/${project.id}/settings`) }}
@@ -149,7 +149,7 @@ export default function Sidebar() {
                                             </Tooltip>
                                         </div>}
                                         {(isAdmin && isManaged) && <div
-                                            className="flex items-center justify-center overflow-visible mt-10 2xl:mt-12">
+                                            className="flex items-center justify-center overflow-visible mt-9 2xl:mt-12">
                                             <Tooltip placement="right" trigger="hover" color="invert" content={TOOLTIPS_DICT.SIDEBAR.ADMIN} className={`${project.numDataScaleUploaded == 0 ? 'pointer-events-none cursor-not-allowed' : 'cursor-pointer'}`}>
                                                 <div className={`relative z-50 opacity-100 cursor-pointer`}>
                                                     <a href={`/refinery/projects/${project.id}/admin`} onClick={(e: any) => { e.preventDefault(); router.push(`/projects/${project.id}/admin`) }}
@@ -177,7 +177,7 @@ export default function Sidebar() {
                                             </Tooltip>
                                         </div>}
                                     </>}
-                                    <div className={`flex items-center justify-center overflow-visible ${isManaged ? (project?.id !== undefined ? 'mt-6' : '') : 'mt-10 2xl:mt-12'}`}>
+                                    <div className={`flex items-center justify-center overflow-visible ${isManaged ? (project?.id !== undefined ? 'mt-6' : '') : 'mt-9 2xl:mt-12'}`}>
                                         <Tooltip placement="right" trigger="hover" color="invert" content={TOOLTIPS_DICT.SIDEBAR.API} className="relative z-50">
                                             <a href="https://github.com/code-kern-ai/kern-python" target="_blank"
                                                 rel="noopener noreferrer" className="circle text-white">
@@ -187,7 +187,7 @@ export default function Sidebar() {
                                     </div>
                                 </div>
 
-                                {user.role === UserRole.ENGINEER && !isManaged && <div className="flex items-center justify-center overflow-visible mt-10 2xl:mt-12">
+                                {user.role === UserRole.ENGINEER && !isManaged && <div className="flex items-center justify-center overflow-visible mt-9 2xl:mt-12">
                                     <Tooltip placement="right" trigger="hover" color="invert" content={TOOLTIPS_DICT.SIDEBAR.JOIN_OUR_COMMUNITY}>
                                         <div className="relative z-50">
                                             <a href="https://discord.com/invite/qf4rGCEphW" target="_blank" rel="noopener noreferrer"
@@ -198,7 +198,7 @@ export default function Sidebar() {
                                     </Tooltip>
                                 </div>}
                             </div>
-                            {!isFullScreen && <div className="flex items-center justify-center mt-10 2xl:mt-12">
+                            {!isFullScreen && <div className="flex items-center justify-center mt-9 2xl:mt-12">
                                 <Tooltip placement="right" trigger="hover" color="invert" content={TOOLTIPS_DICT.SIDEBAR.MAXIMIZE_SCREEN}>
                                     <button onClick={openFullScreen}
                                         className="z-50 cursor-pointer">
@@ -207,7 +207,7 @@ export default function Sidebar() {
                                 </Tooltip>
                             </div>}
 
-                            {isFullScreen && <div className="flex items-center justify-center mt-10 2xl:mt-12">
+                            {isFullScreen && <div className="flex items-center justify-center mt-9 2xl:mt-12">
                                 <Tooltip placement="right" trigger="hover" color="invert" content={TOOLTIPS_DICT.SIDEBAR.MINIMIZE_SCREEN}>
                                     <button onClick={closeFullScreen}
                                         className="z-50 cursor-pointer">
@@ -220,7 +220,7 @@ export default function Sidebar() {
                                 <AppSelectionDropdown cockpit={true} gates={true}></AppSelectionDropdown>
                             </div>}
 
-                            <div className="flex-shrink-0 flex pt-3 pb-10 justify-center">
+                            <div className="flex-shrink-0 flex pt-3 justify-center">
                                 <Tooltip placement="right" trigger="hover" color="invert" content={TOOLTIPS_DICT.SIDEBAR.VERSION_OVERVIEW}>
                                     <div onClick={requestVersionOverview} id="refineryVersion"
                                         className="z-50 tooltip tooltip-right cursor-pointer select-none text-white flex items-center mr-1">
