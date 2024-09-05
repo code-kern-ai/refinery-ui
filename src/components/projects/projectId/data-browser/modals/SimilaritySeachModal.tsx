@@ -61,7 +61,7 @@ export default function SimilaritySearchModal() {
     useEffect(() => {
         setAcceptButton({ ...ACCEPT_BUTTON, emitFunction: requestSimilaritySearch, disabled: selectedEmbedding == null });
         setSecondAcceptButton({ ...SECOND_ACCEPT_BUTTON, emitFunction: requestSimilaritySearchWithoutFilter, useButton: filterAttributesSS, disabled: selectedEmbedding == null });
-    }, [modalSS, selectedEmbedding, filterAttributesSS]);
+    }, [modalSS, selectedEmbedding, filterAttributesSS, filterAttributesForm]);
 
     const [acceptButton, setAcceptButton] = useState<ModalButton>(ACCEPT_BUTTON);
     const [secondAcceptButton, setSecondAcceptButton] = useState<ModalButton>(SECOND_ACCEPT_BUTTON);

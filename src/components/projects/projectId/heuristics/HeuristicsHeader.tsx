@@ -176,10 +176,15 @@ export default function HeuristicsHeader(props: HeuristicsHeaderProps) {
             </div>
             <div className="grid grid-cols-1 gap-4 xs:flex xs:gap-0 flex-row items-center mt-2 xl:mt-0">
                 {labelingTasks && labelingTasks.length > 0 ? (<Tooltip content={TOOLTIPS_DICT.HEURISTICS.ENABLED_NEW_HEURISTIC} color="invert" placement="top">
+                    <Dropdown2 options={NEW_HEURISTICS} buttonName="New heuristic" tooltipsArray={[null, null]}
+                        disabledOptions={[false, false]}
+                        selectedOption={(option: string) => executeOption(option)} buttonClasses={`${style.actionsHeight} text-xs whitespace-nowrap`} dropdownClasses="mr-3" dropdownItemsWidth='w-40' dropdownWidth='w-32'
+                        iconsArray={['IconCode', 'IconBolt']} useFillForIcons={[false, true]} />
+                    {/* removed zero shot & crowd labeler from NEW_HEURISTICS => needs matching arrays 
                     <Dropdown2 options={NEW_HEURISTICS} buttonName="New heuristic" tooltipsArray={[null, null, null, isManaged ? null : 'Only available for managed projects']}
                         disabledOptions={[false, false, !(labelingTasks && labelingTasks.length > 0), !isManaged]}
                         selectedOption={(option: string) => executeOption(option)} buttonClasses={`${style.actionsHeight} text-xs whitespace-nowrap`} dropdownClasses="mr-3" dropdownItemsWidth='w-40' dropdownWidth='w-32'
-                        iconsArray={['IconCode', 'IconBolt', 'IconSparkles', 'IconUsers']} useFillForIcons={[false, true, true, false]} />
+                        iconsArray={['IconCode', 'IconBolt', 'IconSparkles', 'IconUsers']} useFillForIcons={[false, true, true, false]} /> */}
                 </Tooltip>) : (<Tooltip content={TOOLTIPS_DICT.HEURISTICS.DISABLED_NEW_HEURISTIC} color="invert">
                     <button type="button" disabled={true}
                         className="mr-3 inline-flex items-center justify-center w-full rounded-md border border-gray-300 shadow-sm px-4 py-1.5 bg-white text-xs font-medium text-gray-700 opacity-50 cursor-not-allowed focus:ring-offset-2 focus:ring-offset-gray-400"
