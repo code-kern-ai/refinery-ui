@@ -19,7 +19,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import LastWeakSupervisionModal from './modals/LastWeakSupervisionModal';
 import DeleteHeuristicsModal from './DeleteHeuristicsModal';
-import Dropdown2 from '@/submodules/react-components/components/Dropdown2';
+import KernDropdown from '@/submodules/react-components/components/KernDropdown';
 import { useWebsocket } from '@/submodules/react-components/hooks/web-socket/useWebsocket';
 import { createTask, getWeakSupervisionRun, setAllHeuristics } from "@/src/services/base/heuristic";
 import { initZeroShot } from "@/src/services/base/zero-shot";
@@ -176,12 +176,12 @@ export default function HeuristicsHeader(props: HeuristicsHeaderProps) {
             </div>
             <div className="grid grid-cols-1 gap-4 xs:flex xs:gap-0 flex-row items-center mt-2 xl:mt-0">
                 {labelingTasks && labelingTasks.length > 0 ? (<Tooltip content={TOOLTIPS_DICT.HEURISTICS.ENABLED_NEW_HEURISTIC} color="invert" placement="top">
-                    <Dropdown2 options={NEW_HEURISTICS} buttonName="New heuristic" tooltipsArray={[null, null]}
+                    <KernDropdown options={NEW_HEURISTICS} buttonName="New heuristic" tooltipsArray={[null, null]}
                         disabledOptions={[false, false]}
                         selectedOption={(option: string) => executeOption(option)} buttonClasses={`${style.actionsHeight} text-xs whitespace-nowrap`} dropdownClasses="mr-3" dropdownItemsWidth='w-40' dropdownWidth='w-32'
                         iconsArray={['IconCode', 'IconBolt']} useFillForIcons={[false, true]} />
                     {/* removed zero shot & crowd labeler from NEW_HEURISTICS => needs matching arrays 
-                    <Dropdown2 options={NEW_HEURISTICS} buttonName="New heuristic" tooltipsArray={[null, null, null, isManaged ? null : 'Only available for managed projects']}
+                    <KernDropdown options={NEW_HEURISTICS} buttonName="New heuristic" tooltipsArray={[null, null, null, isManaged ? null : 'Only available for managed projects']}
                         disabledOptions={[false, false, !(labelingTasks && labelingTasks.length > 0), !isManaged]}
                         selectedOption={(option: string) => executeOption(option)} buttonClasses={`${style.actionsHeight} text-xs whitespace-nowrap`} dropdownClasses="mr-3" dropdownItemsWidth='w-40' dropdownWidth='w-32'
                         iconsArray={['IconCode', 'IconBolt', 'IconSparkles', 'IconUsers']} useFillForIcons={[false, true, true, false]} /> */}
@@ -200,7 +200,7 @@ export default function HeuristicsHeader(props: HeuristicsHeaderProps) {
                 </Tooltip>)}
 
                 {heuristics && heuristics.length > 0 ? (
-                    <Dropdown2 options={ACTIONS_DROPDOWN_OPTIONS} buttonName="Actions" disabledOptions={[false, false, heuristics.every((checked) => !checked.selected), heuristics.every((checked) => !checked.selected)]}
+                    <KernDropdown options={ACTIONS_DROPDOWN_OPTIONS} buttonName="Actions" disabledOptions={[false, false, heuristics.every((checked) => !checked.selected), heuristics.every((checked) => !checked.selected)]}
                         selectedOption={(option: string) => executeOption(option)} dropdownClasses="mr-3" buttonClasses={`${style.actionsHeight} text-xs`} dropdownItemsWidth='w-40' dropdownWidth='w-32'
                         iconsArray={['IconSquareCheck', 'IconSquare', 'IconPlayerPlayFilled', 'IconTrash']} />
                 ) : (

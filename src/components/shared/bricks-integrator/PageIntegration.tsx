@@ -11,7 +11,7 @@ import style from '@/src/styles/shared/bricks-integrator.module.css';
 import { Fragment, useEffect } from "react";
 import { selectLabelingTasksAll } from "@/src/reduxStore/states/pages/settings";
 import { selectProjectId } from "@/src/reduxStore/states/project";
-import Dropdown2 from "@/submodules/react-components/components/Dropdown2";
+import KernDropdown from "@/submodules/react-components/components/KernDropdown";
 import { createLabels, createTaskAndLabels } from "@/src/services/base/project-setting";
 
 export default function PageIntegration(props: PageIntegrationProps) {
@@ -156,7 +156,7 @@ export default function PageIntegration(props: PageIntegrationProps) {
                     </div>
                     {BricksCodeParser.labelingTaskName && <Fragment>
                         <label className="font-semibold col-start-1">Labeling Task</label>
-                        <Dropdown2 options={labelingTasks} buttonName={BricksCodeParser.labelingTaskName}
+                        <KernDropdown options={labelingTasks} buttonName={BricksCodeParser.labelingTaskName}
                             selectedOption={(option: any) => {
                                 BricksCodeParser.labelingTaskName = option.name;
                                 props.selectDifferentTask(option.id);
@@ -194,7 +194,7 @@ export default function PageIntegration(props: PageIntegrationProps) {
                         <label className="font-semibold">Refinery label</label>
                         {BricksCodeParser.expected.expectedTaskLabels.map((l, index) => (<div key={l.label} className="contents">
                             <label className="text-sm col-start-1">{l.label}</label>
-                            <Dropdown2 options={BricksCodeParser.expected.availableLabels} buttonName={l.mappedLabel ? l.mappedLabel : 'Ignore'}
+                            <KernDropdown options={BricksCodeParser.expected.availableLabels} buttonName={l.mappedLabel ? l.mappedLabel : 'Ignore'}
                                 selectedOption={(option: any) => {
                                     BricksCodeParser.expected.expectedTaskLabels[index].mappedLabel = option.name;
                                     const configCopy = BricksCodeParser.replaceVariables(jsonCopy(config), props.executionTypeFilter, null, props.forIde);

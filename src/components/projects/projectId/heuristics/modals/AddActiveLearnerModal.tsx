@@ -10,7 +10,7 @@ import { embeddingRelevant } from "@/src/util/components/projects/projectId/heur
 import { DEFAULT_DESCRIPTION, getFunctionName, getInformationSourceTemplate, getRouterLinkHeuristic } from "@/src/util/components/projects/projectId/heuristics/heuristics-helper";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
 import { capitalizeFirstForClassName } from "@/submodules/javascript-functions/case-types-parser";
-import Dropdown2 from "@/submodules/react-components/components/Dropdown2";
+import KernDropdown from "@/submodules/react-components/components/KernDropdown";
 import { Tooltip } from "@nextui-org/react";
 import { useRouter } from "next/router";
 import { useCallback, useEffect, useState } from "react";
@@ -83,7 +83,7 @@ export default function AddActiveLeanerModal() {
                     <span className="cursor-help card-title mb-0 label-text text-left"><span className="underline filtersUnderline">Labeling task</span></span>
                 </div>
             </Tooltip>
-            <Dropdown2 options={labelingTasks} buttonName={labelingTask?.name} selectedOption={(option: any) => setLabelingTask(option)} disabled={labelingTasks?.length == 0} />
+            <KernDropdown options={labelingTasks} buttonName={labelingTask?.name} selectedOption={(option: any) => setLabelingTask(option)} disabled={labelingTasks?.length == 0} />
 
             <Tooltip content={TOOLTIPS_DICT.HEURISTICS.ENTER_CLASS_NAME} color="invert" placement="right">
                 <div className="justify-self-start">
@@ -104,7 +104,7 @@ export default function AddActiveLeanerModal() {
                     <span className="cursor-help card-title mb-0 label-text text-left"><span className="underline filtersUnderline">Embedding</span></span>
                 </div>
             </Tooltip>
-            <Dropdown2 options={embeddingsFiltered} buttonName={embedding ? embedding.name : ''} selectedOption={(option: any) => setEmbedding(option)} disabled={embeddingsFiltered.length == 0} />
+            <KernDropdown options={embeddingsFiltered} buttonName={embedding ? embedding.name : ''} selectedOption={(option: any) => setEmbedding(option)} disabled={embeddingsFiltered.length == 0} />
 
         </div>
     </Modal>

@@ -11,7 +11,7 @@ import { parseToSettingsJson } from "@/src/util/components/projects/projectId/he
 import { buildFullLink, parseLinkFromText } from "@/src/util/shared/link-parser-helper";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
 import { copyToClipboard } from "@/submodules/javascript-functions/general";
-import Dropdown2 from "@/submodules/react-components/components/Dropdown2";
+import KernDropdown from "@/submodules/react-components/components/KernDropdown";
 import { Tooltip } from "@nextui-org/react";
 import { IconLock, IconLockOpen, IconTrash } from "@tabler/icons-react";
 import { useRouter } from "next/router";
@@ -89,7 +89,7 @@ export default function CrowdLabelerSettings() {
                 <div className="flex items-center flex-wrap mt-3">
                     <div className="text-sm leading-5 font-medium text-gray-700 inline-block mr-2">Editor</div>
                     <Tooltip content={TOOLTIPS_DICT.LABELING_FUNCTION.LABELING_TASK} color="invert" placement="top">
-                        <Dropdown2 options={labelingTasks} buttonName={currentHeuristic?.labelingTaskName} selectedOption={(option: any) => saveHeuristic(option)} />
+                        <KernDropdown options={labelingTasks} buttonName={currentHeuristic?.labelingTaskName} selectedOption={(option: any) => saveHeuristic(option)} />
 
                     </Tooltip>
                     {currentHeuristic.labels?.length == 0 ? (<div className="text-sm font-normal text-gray-500 ml-3">No labels for target task</div>) : <>
@@ -108,13 +108,13 @@ export default function CrowdLabelerSettings() {
             <div className="flex items-center">
                 <Tooltip content={TOOLTIPS_DICT.CROWD_LABELER.SELECT_ANNOTATOR} color="invert" placement="right">
 
-                    <Dropdown2 options={annotators} buttonName={annotatorsDict[currentHeuristic?.crowdLabelerSettings?.annotatorId]?.mail ?? 'Select annotator'}
+                    <KernDropdown options={annotators} buttonName={annotatorsDict[currentHeuristic?.crowdLabelerSettings?.annotatorId]?.mail ?? 'Select annotator'}
                         disabled={annotators.length == 0} selectedOption={(option) => changeSettings('annotatorId', option)} valuePropertyPath="mail" />
 
                 </Tooltip>
                 <p className="px-2"> is going to work on slice </p>
                 <Tooltip content={TOOLTIPS_DICT.CROWD_LABELER.SELECT_DATA_SLICE} color="invert" placement="right">
-                    <Dropdown2 options={dataSlices} buttonName={dataSlicesDict[currentHeuristic?.crowdLabelerSettings?.dataSliceId]?.name ?? 'Select data slice'}
+                    <KernDropdown options={dataSlices} buttonName={dataSlicesDict[currentHeuristic?.crowdLabelerSettings?.dataSliceId]?.name ?? 'Select data slice'}
                         disabled={dataSlices.length == 0} selectedOption={(option) => changeSettings('dataSliceId', option.name)} />
 
                 </Tooltip>

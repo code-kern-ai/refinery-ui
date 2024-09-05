@@ -7,7 +7,7 @@ import { LabelingTaskTaskType } from "@/src/types/components/projects/projectId/
 import { ModalButton, ModalEnum } from "@/src/types/shared/modal";
 import { isTaskNameUnique } from "@/src/util/components/projects/projectId/settings/labeling-tasks-helper";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
-import Dropdown2 from "@/submodules/react-components/components/Dropdown2";
+import KernDropdown from "@/submodules/react-components/components/KernDropdown";
 import { Tooltip } from "@nextui-org/react";
 import { useCallback, useEffect, useState } from "react";
 import { useSelector } from "react-redux";
@@ -51,7 +51,7 @@ export default function AddLabelingTaskModal() {
             <Tooltip content={TOOLTIPS_DICT.PROJECT_SETTINGS.LABELING_TASK.TARGET_ATTRIBUTE} placement="right" color="invert">
                 <span className="card-title mb-0 label-text flex"><span className="cursor-help underline filtersUnderline">Target Attribute</span></span>
             </Tooltip>
-            <Dropdown2 options={usableAttributes} buttonName={targetAttribute ? targetAttribute.name : 'Choose'} selectedOption={(option: any) => setTargetAttribute(option)} />
+            <KernDropdown options={usableAttributes} buttonName={targetAttribute ? targetAttribute.name : 'Choose'} selectedOption={(option: any) => setTargetAttribute(option)} />
             <Tooltip content={TOOLTIPS_DICT.PROJECT_SETTINGS.LABELING_TASK.NAME_LABELING_TASK} placement="right" color="invert">
                 <span className="card-title mb-0 label-text flex"><span className="cursor-help underline filtersUnderline">Name</span></span>
             </Tooltip>

@@ -14,7 +14,7 @@ import { postProcessingModelsDownload } from "@/src/util/components/models-downl
 import { getRouterLinkHeuristic } from "@/src/util/components/projects/projectId/heuristics/heuristics-helper";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
 import { InformationSourceType } from "@/submodules/javascript-functions/enums/enums";
-import Dropdown2 from "@/submodules/react-components/components/Dropdown2";
+import KernDropdown from "@/submodules/react-components/components/KernDropdown";
 import { Tooltip } from "@nextui-org/react";
 import { useRouter } from "next/router";
 import { useCallback, useEffect, useState } from "react";
@@ -129,7 +129,7 @@ export default function AddZeroShotModal() {
                     <span className="cursor-help card-title mb-0 label-text text-left"><span className="underline filtersUnderline">Target task</span></span>
                 </div>
             </Tooltip>
-            <Dropdown2 options={labelingTasksClassification} buttonName={labelingTask} disabled={labelingTasksClassification.length == 0} selectedOption={(option: any) => {
+            <KernDropdown options={labelingTasksClassification} buttonName={labelingTask} disabled={labelingTasksClassification.length == 0} selectedOption={(option: any) => {
                 let optionCopy = option.name;
                 if (option.indexOf('Full Record - ') == 0) {
                     optionCopy = option.substring('Full Record - '.length);
@@ -147,14 +147,14 @@ export default function AddZeroShotModal() {
                     <span className="cursor-help card-title mb-0 label-text text-left"><span className="underline filtersUnderline">Attribute</span></span>
                 </div>
             </Tooltip>
-                <Dropdown2 options={attributes} buttonName={attribute ? attribute.name : 'Select attribute'} selectedOption={(option: any) => setAttribute(option)} disabled={attributes.length == 0} />
+                <KernDropdown options={attributes} buttonName={attribute ? attribute.name : 'Select attribute'} selectedOption={(option: any) => setAttribute(option)} disabled={attributes.length == 0} />
             </>}
             <Tooltip content={TOOLTIPS_DICT.HEURISTICS.CHOOSE_MODEL} color="invert" placement="right">
                 <div className="justify-self-start">
                     <span className="cursor-help card-title mb-0 label-text text-left"><span className="underline filtersUnderline">Model</span></span>
                 </div>
             </Tooltip>
-            <Dropdown2 options={filteredList && filteredList} hasSearchBar={true} optionsHaveLink={true} optionsHaveHoverBox={true} valuePropertyPath="configString"
+            <KernDropdown options={filteredList && filteredList} hasSearchBar={true} optionsHaveLink={true} optionsHaveHoverBox={true} valuePropertyPath="configString"
                 useDifferentTextColor={colorDownloadedModels} differentTextColor="green" ignoreDisabledForSearch={true}
                 linkList={filteredList && filteredList.map(model => model.link)}
                 selectedOption={(option: any) => setModel(option.configString)}

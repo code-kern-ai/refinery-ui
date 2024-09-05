@@ -15,7 +15,7 @@ import { UploadHelper, ZIP_TYPE } from "@/src/util/classes/upload-helper";
 import CryptedField from "../crypted-field/CryptedField";
 import { closeModal, selectModal } from "@/src/reduxStore/states/modal";
 import { ModalEnum } from "@/src/types/shared/modal";
-import Dropdown2 from "@/submodules/react-components/components/Dropdown2";
+import KernDropdown from "@/submodules/react-components/components/KernDropdown";
 import { useWebsocket } from "@/submodules/react-components/hooks/web-socket/useWebsocket";
 import { getUploadCredentialsAndId, getUploadTaskById, deleteProjectPost, createProjectPost, updateProjectTokenizer, updateProjectStatus } from "@/src/services/base/project";
 import { Application, CurrentPage, CurrentPageSubKey } from "@/submodules/react-components/hooks/web-socket/constants";
@@ -289,7 +289,7 @@ export default function Upload(props: UploadProps) {
                                 className="underline cursor-pointer">documentation</span></a> for further
                         details.
                     </label>
-                    <Dropdown2 buttonName={tokenizer} options={prepareTokenizedValues} disabledOptions={prepareTokenizedValues.map((tokenizer: any) => tokenizer.disabled)}
+                    <KernDropdown buttonName={tokenizer} options={prepareTokenizedValues} disabledOptions={prepareTokenizedValues.map((tokenizer: any) => tokenizer.disabled)}
                         selectedOption={(option) => setTokenizer(option.name)} dropdownItemsClasses="max-h-80 overflow-y-auto" />
                 </div>
                 <UploadWrapper uploadStarted={uploadStarted} doingSomething={doingSomething} progressState={progressState} submitted={submitted} isFileCleared={selectedFile == null}

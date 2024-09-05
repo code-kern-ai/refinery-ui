@@ -26,7 +26,7 @@ import { CommentDataManager } from "@/src/util/classes/comments";
 import { CommentType } from "@/src/types/shared/comments";
 import BricksIntegrator from "@/src/components/shared/bricks-integrator/BricksIntegrator";
 import { AttributeCodeLookup } from "@/src/util/classes/attribute-calculation";
-import Dropdown2 from "@/submodules/react-components/components/Dropdown2";
+import KernDropdown from "@/submodules/react-components/components/KernDropdown";
 import { useWebsocket } from "@/submodules/react-components/hooks/web-socket/useWebsocket";
 import { postProcessLabelingTasks, postProcessLabelingTasksSchema } from "@/src/util/components/projects/projectId/settings/labeling-tasks-helper";
 import { getAllComments } from "@/src/services/base/comment";
@@ -326,13 +326,13 @@ export default function AttributeCalculation() {
                 {duplicateNameExists && <div className="text-red-700 text-xs mt-2">Attribute name exists</div>}
                 <div className="grid grid-cols-2 gap-2 items-center mt-8" style={{ gridTemplateColumns: 'max-content auto' }}>
                     <div className="text-sm leading-5 font-medium text-gray-700">Visibility</div>
-                    <Dropdown2 buttonName={currentAttribute.visibilityName} options={ATTRIBUTES_VISIBILITY_STATES} dropdownWidth="w-52" tooltipArrayPlacement="right" tooltipsArray={tooltipsArray}
+                    <KernDropdown buttonName={currentAttribute.visibilityName} options={ATTRIBUTES_VISIBILITY_STATES} dropdownWidth="w-52" tooltipArrayPlacement="right" tooltipsArray={tooltipsArray}
                         selectedOption={(option: any) => updateVisibility(option)} disabled={currentAttribute.state == AttributeState.USABLE} dropdownClasses="z-40" />
 
                     <div className="text-sm leading-5 font-medium text-gray-700">Data type</div>
                     <div className="flex flex-row items-center">
                         <Tooltip color="invert" placement="right" content={currentAttribute.state == AttributeState.USABLE || currentAttribute.state == AttributeState.RUNNING ? TOOLTIPS_DICT.ATTRIBUTE_CALCULATION.CANNOT_EDIT_DATATYPE : TOOLTIPS_DICT.ATTRIBUTE_CALCULATION.EDIT_DATATYPE}>
-                            <Dropdown2 buttonName={currentAttribute.dataTypeName} options={DATA_TYPES} dropdownWidth="w-52"
+                            <KernDropdown buttonName={currentAttribute.dataTypeName} options={DATA_TYPES} dropdownWidth="w-52"
                                 selectedOption={(option: any) => updateDataType(option)} disabled={currentAttribute.state == AttributeState.USABLE} dropdownClasses="z-30" />
                         </Tooltip>
                         {currentAttribute.dataType == DataTypeEnum.EMBEDDING_LIST && <div className="text-gray-700 text-sm ml-3">Only useable for similarity search</div>}

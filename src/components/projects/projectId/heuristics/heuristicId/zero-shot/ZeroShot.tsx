@@ -23,7 +23,7 @@ import CalculationProgress from "./CalculationProgress";
 import { Status } from "@/src/types/shared/statuses";
 import { CommentType } from "@/src/types/shared/comments";
 import { CommentDataManager } from "@/src/util/classes/comments";
-import Dropdown2 from "@/submodules/react-components/components/Dropdown2";
+import KernDropdown from "@/submodules/react-components/components/KernDropdown";
 import { useWebsocket } from "@/submodules/react-components/hooks/web-socket/useWebsocket";
 import { getZeroShotRecommendations } from "@/src/services/base/zero-shot";
 import { getAllComments } from "@/src/services/base/comment";
@@ -197,7 +197,7 @@ export default function ZeroShot() {
                 <div className="relative flex-shrink-0 min-h-16 flex justify-between pb-2">
                     <div className="flex items-center flex-wrap mt-3">
                         <Tooltip content={TOOLTIPS_DICT.ZERO_SHOT.LABELING_TASK} color="invert" placement="top">
-                            <Dropdown2 options={labelingTasksLocal} buttonName={currentHeuristic?.labelingTaskName} selectedOption={(option: any) => saveHeuristic(option)} />
+                            <KernDropdown options={labelingTasksLocal} buttonName={currentHeuristic?.labelingTaskName} selectedOption={(option: any) => saveHeuristic(option)} />
 
                         </Tooltip>
                         {currentHeuristic.labels?.length == 0 ? (<div className="text-sm font-normal text-gray-500 ml-3">No labels for target task</div>) : <>
@@ -227,17 +227,17 @@ export default function ZeroShot() {
                     </div>) : (<div className="font-normal inline-flex items-center">Model Downloading <LoadingIcon /></div>)}
                     <div className="font-normal">Required model confidence</div>
                     <Tooltip content={TOOLTIPS_DICT.ZERO_SHOT.INPUT_ATTRIBUTE} color="invert" placement="top">
-                        <Dropdown2 options={textAttributes} buttonName={currentHeuristic.zeroShotSettings.attributeName} disabled={currentHeuristic.zeroShotSettings.attributeSelectDisabled}
+                        <KernDropdown options={textAttributes} buttonName={currentHeuristic.zeroShotSettings.attributeName} disabled={currentHeuristic.zeroShotSettings.attributeSelectDisabled}
                             selectedOption={(option: any) => {
                                 changeZeroShotSettings('attributeId', option.id);
                             }} />
                     </Tooltip>
                     <Tooltip content={TOOLTIPS_DICT.ZERO_SHOT.MODEL} color="invert" placement="top">
-                        <Dropdown2 options={models} buttonName={currentHeuristic?.zeroShotSettings?.targetConfig} valuePropertyPath="configString"
+                        <KernDropdown options={models} buttonName={currentHeuristic?.zeroShotSettings?.targetConfig} valuePropertyPath="configString"
                             selectedOption={(option: any) => changeZeroShotSettings('targetConfig', option.configString)} />
                     </Tooltip>
                     <Tooltip content={TOOLTIPS_DICT.ZERO_SHOT.CONFIDENCE} color="invert" placement="top">
-                        <Dropdown2 options={confidences} buttonName={(currentHeuristic.zeroShotSettings.minConfidence * 100) + '%'} selectedOption={(option: any) => {
+                        <KernDropdown options={confidences} buttonName={(currentHeuristic.zeroShotSettings.minConfidence * 100) + '%'} selectedOption={(option: any) => {
                             changeZeroShotSettings('minConfidence', option.value);
                         }} />
                     </Tooltip>

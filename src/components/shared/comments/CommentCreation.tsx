@@ -4,7 +4,7 @@ import { selectSelectedComment, setSelectedComment } from "@/src/reduxStore/stat
 import { CommentCreationProps, CommentType } from "@/src/types/shared/comments";
 import { CommentDataManager } from "@/src/util/classes/comments";
 import { convertTypeToKey } from "@/src/util/shared/comments-helper";
-import Dropdown2 from "@/submodules/react-components/components/Dropdown2";
+import KernDropdown from "@/submodules/react-components/components/KernDropdown";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
@@ -93,13 +93,13 @@ export function CommentCreation(props: CommentCreationProps) {
                 style={{ gridTemplateColumns: '40% 56%' }}>
                 <div className="font-normal">Type</div>
                 <div className="font-normal">Instance</div>
-                <Dropdown2 options={CommentDataManager.currentCommentTypeOptions ?? []} buttonName={type ? type.name : 'Select Type'} selectedOption={(option: any) => {
+                <KernDropdown options={CommentDataManager.currentCommentTypeOptions ?? []} buttonName={type ? type.name : 'Select Type'} selectedOption={(option: any) => {
                     setType(option);
                     setCommentInstance(null);
                     setCommentId(null);
                     dispatch(setSelectedComment(option));
                 }} />
-                <Dropdown2 options={commentIdOptions} buttonName={commentInstance ? commentInstance.name : 'Select Instance'} selectedOption={(option: any) => {
+                <KernDropdown options={commentIdOptions} buttonName={commentInstance ? commentInstance.name : 'Select Instance'} selectedOption={(option: any) => {
                     setCommentInstance(option);
                     setCommentId(option.id);
                 }} />

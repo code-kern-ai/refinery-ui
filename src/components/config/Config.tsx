@@ -3,7 +3,7 @@ import { selectOrganization, setOrganization } from "@/src/reduxStore/states/gen
 import { ConfigManager } from "@/src/services/base/config";
 import { Configuration, LocalConfig } from "@/src/types/components/config/config"
 import { snakeCaseToCamelCase } from "@/submodules/javascript-functions/case-types-parser";
-import Dropdown2 from "@/submodules/react-components/components/Dropdown2";
+import KernDropdown from "@/submodules/react-components/components/KernDropdown";
 import { IconPlus, IconTrash } from "@tabler/icons-react";
 import { useEffect, useState } from "react"
 import { useSelector, useDispatch } from "react-redux";
@@ -174,7 +174,7 @@ export default function Config() {
             </div>
             {localConfig.spacyDownloads && <div className="flex flex-col gap-y-2">
                 {localConfig.spacyDownloads.map((myConfig, index) => <div key={myConfig} className="flex flex-row flex-nowrap gap-x-2 items-center">
-                    <Dropdown2
+                    <KernDropdown
                         options={preparedOptions}
                         buttonName={prepareTokenizedValues.find((tokenizer: any) => tokenizer.configString == myConfig)?.name}
                         selectedOption={(option) => changeConfigString(option, index)}

@@ -7,7 +7,7 @@ import { ModalEnum } from "@/src/types/shared/modal";
 import { EXPIRATION_TIME, READ_WRITE_SCOPE } from "@/src/util/components/projects/projectId/project-admin-helper";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
 import { copyToClipboard } from "@/submodules/javascript-functions/general";
-import Dropdown2 from "@/submodules/react-components/components/Dropdown2";
+import KernDropdown from "@/submodules/react-components/components/KernDropdown";
 import { Tooltip } from "@nextui-org/react";
 import { useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -65,7 +65,7 @@ export default function NewPersonalToken(props: PersonalTokenModalProps) {
             <Tooltip content={TOOLTIPS_DICT.ADMIN_PAGE.EXPIRATION_TIME} color="invert" placement="right">
                 <span className="cursor-help card-title mb-0 label-text flex"><span className="underline filtersUnderline">Expiration time</span></span>
             </Tooltip>
-            <Dropdown2 buttonName={expirationTime.name} options={EXPIRATION_TIME} selectedOption={(option: any) => setExpirationTime(option)} dropdownClasses="w-full" />
+            <KernDropdown buttonName={expirationTime.name} options={EXPIRATION_TIME} selectedOption={(option: any) => setExpirationTime(option)} dropdownClasses="w-full" />
 
 
             <Tooltip content={TOOLTIPS_DICT.ADMIN_PAGE.NAME_TOKEN} color="invert" placement="right">
