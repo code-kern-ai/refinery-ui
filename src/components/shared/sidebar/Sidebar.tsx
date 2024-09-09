@@ -206,7 +206,7 @@ export default function Sidebar() {
                             </div>}
 
                             {isManaged && <div className="flex items-center justify-center mt-4">
-                                <AppSelectionDropdown cockpit={true} cognition={true}></AppSelectionDropdown>
+                                <AppSelectionDropdown cognition={true}></AppSelectionDropdown>
                             </div>}
 
                             <div className="flex-shrink-0 flex pt-3 justify-center">
