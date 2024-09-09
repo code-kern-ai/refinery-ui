@@ -5,7 +5,7 @@ import { selectProjectId } from "@/src/reduxStore/states/project";
 import { createOutlierSlice } from "@/src/services/base/data-browser";
 import { Embedding } from "@/src/types/components/projects/projectId/settings/embeddings";
 import { ModalButton, ModalEnum } from "@/src/types/shared/modal";
-import Dropdown2 from "@/submodules/react-components/components/Dropdown2";
+import KernDropdown from "@/submodules/react-components/components/KernDropdown";
 import { useCallback, useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 
@@ -35,6 +35,6 @@ export default function CreateOutlierSliceModal() {
         {(activeSearchParams.length > 0 || similaritySearch.recordsInDisplay) && <div className="text-red-500 mb-2 flex flex-grow justify-center text-sm">
             Warning: your current filter selection will be removed!</div>}
 
-        <Dropdown2 options={onAttributeEmbeddings} buttonName={selectedEmbedding ? selectedEmbedding.name : 'Select embedding'} selectedOption={(option: any) => setSelectedEmbedding(option)} />
+        <KernDropdown options={onAttributeEmbeddings} buttonName={selectedEmbedding ? selectedEmbedding.name : 'Select embedding'} selectedOption={(option: any) => setSelectedEmbedding(option)} />
     </Modal>)
 }

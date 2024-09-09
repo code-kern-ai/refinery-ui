@@ -7,7 +7,7 @@ import { ComponentType } from "@/src/types/components/projects/projectId/labelin
 import { ModalEnum } from "@/src/types/shared/modal";
 import { COLOR_OPTIONS } from "@/src/util/constants";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
-import Dropdown2 from "@/submodules/react-components/components/Dropdown2";
+import KernDropdown from "@/submodules/react-components/components/KernDropdown";
 import { Tooltip } from "@nextui-org/react";
 import { IconInfoCircle } from "@tabler/icons-react";
 import { Fragment, useEffect, useState } from "react";
@@ -105,7 +105,7 @@ export default function LabelingSettingsModal() {
                     <input className="h-5 w-5 cursor-pointer" type="checkbox" checked={settings?.main.autoNextRecord} onChange={() => changeSetting(ComponentType.MAIN, 'autoNextRecord')} /></span>
                 <Tooltip content={TOOLTIPS_DICT.LABELING.AUTO_NEXT_RECORD} color="invert" placement="top" className="cursor-auto"><IconInfoCircle className="h-5 w-5" /></Tooltip>
                 <span>Hover background</span>
-                <Dropdown2 options={hoverColorOptions} buttonName={settings?.main.hoverGroupBackgroundColor} backgroundColors={hoverColorClassArray}
+                <KernDropdown options={hoverColorOptions} buttonName={settings?.main.hoverGroupBackgroundColor} backgroundColors={hoverColorClassArray}
                     dropdownItemsClasses="max-h-80 overflow-y-auto" buttonCaptionBgColor={settings?.main.hoverGroupBackgroundColorClass}
                     selectedOption={(option: any) => changeSetting(ComponentType.MAIN, 'hoverGroupBackgroundColor', option)} dropdownWidth="w-32" />
                 <Tooltip content={TOOLTIPS_DICT.LABELING.HOVER_BACKGROUND} color="invert" placement="top" className="cursor-auto"><IconInfoCircle className="h-5 w-5" /></Tooltip>

@@ -8,7 +8,7 @@ import { Attribute, DataSchemaProps } from "@/src/types/components/projects/proj
 import { CurrentPage } from "@/submodules/react-components/hooks/web-socket/constants";
 import { ATTRIBUTES_VISIBILITY_STATES, getTooltipVisibilityState } from "@/src/util/components/projects/projectId/settings/data-schema-helper";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
-import Dropdown2 from "@/submodules/react-components/components/Dropdown2";
+import KernDropdown from "@/submodules/react-components/components/KernDropdown";
 import { Tooltip } from "@nextui-org/react";
 import { IconArrowRight, IconCheck, IconX } from "@tabler/icons-react";
 import { useRouter } from "next/router";
@@ -123,7 +123,7 @@ export default function DataSchema(props: DataSchemaProps) {
                                             <Statuses status={attribute.state} page="attributes" initialCaption="Registered" />
                                         </td>
                                         <td className="text-center px-3 py-2 text-sm text-gray-500">
-                                            <Dropdown2 buttonName={ATTRIBUTES_VISIBILITY_STATES[attribute.visibilityIndex].name} options={ATTRIBUTES_VISIBILITY_STATES} dropdownWidth="w-52"
+                                            <KernDropdown buttonName={ATTRIBUTES_VISIBILITY_STATES[attribute.visibilityIndex].name} options={ATTRIBUTES_VISIBILITY_STATES} dropdownWidth="w-52"
                                                 selectedOption={(option: any) => updateVisibility(option, attribute)} tooltipsArray={tooltipsArray} />
                                         </td>
                                         <td className="text-center px-3 py-2 text-sm text-gray-500">

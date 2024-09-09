@@ -15,7 +15,7 @@ import { selectAllUsers, selectOrganizationId, setComments } from "@/src/reduxSt
 import { CommentDataManager } from "@/src/util/classes/comments";
 import { CommentType } from "@/src/types/shared/comments";
 import DeleteLookupListsModal from "./DeleteLookupListsModal";
-import Dropdown2 from "@/submodules/react-components/components/Dropdown2";
+import KernDropdown from "@/submodules/react-components/components/KernDropdown";
 import { useWebsocket } from "@/submodules/react-components/hooks/web-socket/useWebsocket";
 import { getAllComments } from "@/src/services/base/comment";
 import { createKnowledgeBase, getLookupListsByProjectId } from "@/src/services/base/lookup-lists";
@@ -127,7 +127,7 @@ export default function LookupListsOverview() {
                         </div>
                         <div className="grid grid-cols-1 gap-4 xs:flex xs:gap-0 flex-row items-center">
                             {lookupLists && lookupLists.length > 0 ? (
-                                <Dropdown2 options={ACTIONS_DROPDOWN_OPTIONS} buttonName="Actions" disabledOptions={[false, false, checkedLookupLists.every((checked) => !checked)]}
+                                <KernDropdown options={ACTIONS_DROPDOWN_OPTIONS} buttonName="Actions" disabledOptions={[false, false, checkedLookupLists.every((checked) => !checked)]}
                                     selectedOption={(option: any) => executeOption(option)} dropdownClasses="mr-3" buttonClasses={`${style.actionsHeight} text-xs`} dropdownItemsWidth='w-40' dropdownWidth='w-32'
                                     iconsArray={['IconSquareCheck', 'IconSquare', 'IconTrash']} />
                             ) : (

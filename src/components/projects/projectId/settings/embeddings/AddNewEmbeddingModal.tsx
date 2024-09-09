@@ -14,7 +14,7 @@ import { ModalButton, ModalEnum } from "@/src/types/shared/modal";
 import { postProcessingModelsDownload } from "@/src/util/components/models-downloaded/models-downloaded-helper";
 import { DEFAULT_AZURE_TYPE, GRANULARITY_TYPES_ARRAY, checkIfCreateEmbeddingIsDisabled, platformNamesDict } from "@/src/util/components/projects/projectId/settings/embeddings-helper";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
-import Dropdown2 from "@/submodules/react-components/components/Dropdown2";
+import KernDropdown from "@/submodules/react-components/components/KernDropdown";
 import { Tooltip } from "@nextui-org/react";
 import { IconExternalLink } from "@tabler/icons-react";
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -216,12 +216,12 @@ export default function AddNewEmbeddingModal() {
                     <Tooltip content={TOOLTIPS_DICT.PROJECT_SETTINGS.EMBEDDINGS.TARGET_ATTRIBUTE} placement="right" color="invert">
                         <span className="card-title mb-0 label-text flex"><span className="cursor-help underline filtersUnderline">Target Attribute</span></span>
                     </Tooltip>
-                    <Dropdown2 options={useableEmbedableAttributes} buttonName={targetAttribute ? targetAttribute.name : 'Choose'} selectedOption={(option: any) => setTargetAttribute(option)} />
+                    <KernDropdown options={useableEmbedableAttributes} buttonName={targetAttribute ? targetAttribute.name : 'Choose'} selectedOption={(option: any) => setTargetAttribute(option)} />
 
                     <Tooltip content={TOOLTIPS_DICT.PROJECT_SETTINGS.EMBEDDINGS.FILTER_ATTRIBUTES} placement="right" color="invert">
                         <span className="card-title mb-0 label-text flex"><span className="cursor-help underline filtersUnderline">Filter Attributes</span></span>
                     </Tooltip>
-                    <Dropdown2 options={filteredAttributesArray} buttonName={filteredAttributes.length == 0 ? 'None selected' : filteredAttributes.join(', ')} hasCheckboxes={true} hasSelectAll={true}
+                    <KernDropdown options={filteredAttributesArray} buttonName={filteredAttributes.length == 0 ? 'None selected' : filteredAttributes.join(', ')} hasCheckboxes={true} hasSelectAll={true}
                         selectedOption={(option: any) => {
                             const filteredAttributes = [];
                             option.forEach((a: any) => {
@@ -233,7 +233,7 @@ export default function AddNewEmbeddingModal() {
                     <Tooltip content={TOOLTIPS_DICT.PROJECT_SETTINGS.EMBEDDINGS.PLATFORM} placement="right" color="invert">
                         <span className="card-title mb-0 label-text flex"><span className="cursor-help underline filtersUnderline">Platform</span></span>
                     </Tooltip>
-                    <Dropdown2 options={embeddingPlatforms} buttonName={platform ? platform.name : 'Choose'} selectedOption={(option: any) => {
+                    <KernDropdown options={embeddingPlatforms} buttonName={platform ? platform.name : 'Choose'} selectedOption={(option: any) => {
                         setPlatform(option);
                         setSelectedPlatform(option);
                     }} />
@@ -241,7 +241,7 @@ export default function AddNewEmbeddingModal() {
                     <Tooltip content={TOOLTIPS_DICT.PROJECT_SETTINGS.EMBEDDINGS.GRANULARITY} placement="right" color="invert">
                         <span className="card-title mb-0 label-text flex"><span className="cursor-help underline filtersUnderline">Granularity</span></span>
                     </Tooltip>
-                    <Dropdown2 options={granularityArray} buttonName={granularity ? granularity.name : 'Choose'} selectedOption={(option: any) => setGranularity(option)} />
+                    <KernDropdown options={granularityArray} buttonName={granularity ? granularity.name : 'Choose'} selectedOption={(option: any) => setGranularity(option)} />
                     {platform && platform.name == platformNamesDict[PlatformType.HUGGING_FACE] && <SuggestionsModel options={embeddingHandles[targetAttribute]} selectedOption={(model: string) => setModel(model)} />}
                     {platform && platform.name == platformNamesDict[PlatformType.OPEN_AI] && <>
                         <SuggestionsModel options={embeddingHandles[targetAttribute]} selectedOption={(model: string) => setModel(model)} />
@@ -362,7 +362,7 @@ function SuggestionsModel(props: SuggestionsProps) {
     return <><Tooltip content={TOOLTIPS_DICT.PROJECT_SETTINGS.EMBEDDINGS.MODEL} placement="right" color="invert">
         <span className="card-title mb-0 label-text flex"><span className="cursor-help underline filtersUnderline">Model</span></span>
     </Tooltip>
-        <Dropdown2 options={filteredList && filteredList} hasSearchBar={true} differentTextColor="green" useDifferentTextColor={colorDownloadedModels} valuePropertyPath="configString"
+        <KernDropdown options={filteredList && filteredList} hasSearchBar={true} differentTextColor="green" useDifferentTextColor={colorDownloadedModels} valuePropertyPath="configString"
             selectedOption={(option: any) => props.selectedOption(option.configString)} optionsHaveHoverBox={true} hoverBoxList={hoverBoxList} ignoreDisabledForSearch={true}
             searchTextTyped={(option: string) => props.selectedOption(option)}
             filteredOptions={(option: string) => setFilteredList(props.options.filter((val: any) => val.configString.includes(option)))} />
@@ -382,7 +382,7 @@ function SuggestionsAzure(props: SuggestionsProps) {
     return <><Tooltip content={props.tooltip} placement="right" color="invert">
         <span className="card-title mb-0 label-text flex"><span className="cursor-help underline filtersUnderline">{props.name}</span></span>
     </Tooltip>
-        <Dropdown2 options={filteredList && filteredList} hasSearchBar={true} ignoreDisabledForSearch={true}
+        <KernDropdown options={filteredList && filteredList} hasSearchBar={true} ignoreDisabledForSearch={true}
             selectedOption={(option: string) => props.selectedOption(option)}
             searchTextTyped={(option: string) => props.selectedOption(option)}
             filteredOptions={(option: string) => setFilteredList(props.options.filter((val: any) => val.includes(option)))} />

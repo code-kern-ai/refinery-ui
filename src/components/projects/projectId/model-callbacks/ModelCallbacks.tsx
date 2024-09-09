@@ -14,7 +14,7 @@ import { ModalEnum } from "@/src/types/shared/modal";
 import { openModal, selectModal } from "@/src/reduxStore/states/modal";
 import GridCards from "@/src/components/shared/grid-cards/GridCards";
 import DeleteModelCallBacksModal from "./DeleteModelCallbacksModal";
-import Dropdown2 from "@/submodules/react-components/components/Dropdown2";
+import KernDropdown from "@/submodules/react-components/components/KernDropdown";
 import { useWebsocket } from "@/submodules/react-components/hooks/web-socket/useWebsocket";
 import { getLabelingTasksByProjectId } from "@/src/services/base/project";
 import { getModelCallbacksOverviewData } from "@/src/services/base/heuristic";
@@ -136,7 +136,7 @@ export default function ModelCallbacks() {
                 </div>
                 <div className="grid grid-cols-1 gap-4 xs:flex xs:gap-0 flex-row items-center mt-2 xl:mt-0">
                     {modelCallbacks && modelCallbacks.length > 0 ? (
-                        <Dropdown2 options={ACTIONS_DROPDOWN_OPTIONS} buttonName="Actions" disabledOptions={[false, false, modelCallbacks.every((checked) => !checked)]}
+                        <KernDropdown options={ACTIONS_DROPDOWN_OPTIONS} buttonName="Actions" disabledOptions={[false, false, modelCallbacks.every((checked) => !checked)]}
                             iconsArray={['IconSquareCheck', 'IconSquare', 'IconTrash']}
                             selectedOption={(option: string) => executeOption(option)} dropdownClasses="mr-3" buttonClasses={`${style.actionsHeight} text-xs`} />
                     ) : (

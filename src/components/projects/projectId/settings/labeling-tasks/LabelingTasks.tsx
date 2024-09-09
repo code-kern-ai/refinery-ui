@@ -17,7 +17,7 @@ import DeleteLabelingTaskModal from "./DeleteLabelingTaskModal";
 import DeleteLabelModal from "./DeleteLabelModal";
 import AddLabelModal from "./AddLabelModal";
 import ChangeColorModal from "./ChangeColorModal";
-import Dropdown2 from "@/submodules/react-components/components/Dropdown2";
+import KernDropdown from "@/submodules/react-components/components/KernDropdown";
 import { updateLabelingTask } from "@/src/services/base/labeling-tasks";
 
 export default function LabelingTasks() {
@@ -130,7 +130,7 @@ export default function LabelingTasks() {
                                                 className="h-8 w-full text-sm border-gray-300 rounded-md placeholder-italic border text-gray-900 pl-4 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100" />}
                                     </td>
                                     <td className="whitespace-nowrap text-center px-3 py-2 text-sm text-gray-500">
-                                        <Dropdown2 options={labelingTasksDropdownArray} buttonName={labelingTaskToString(task.taskType)}
+                                        <KernDropdown options={labelingTasksDropdownArray} buttonName={labelingTaskToString(task.taskType)}
                                             disabledOptions={[false, task.targetName === 'Full Record', false]} dropdownWidth="w-60" dropdownItemsClasses="w-60"
                                             selectedOption={(option: any) => updateLabelingTaskType(task, index, labelingTaskFromString(option.name))} />
                                     </td>

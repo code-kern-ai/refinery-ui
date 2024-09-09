@@ -9,7 +9,7 @@ import { BricksVariableComment, isCommentTrue } from "@/src/util/classes/bricks-
 import { postProcessingAttributes } from "@/src/util/components/projects/projectId/settings/data-schema-helper";
 import { postProcessLabelingTasks } from "@/src/util/components/projects/projectId/settings/labeling-tasks-helper";
 import { getIsoCodes } from "@/src/util/shared/bricks-integrator-helper";
-import Dropdown2 from "@/submodules/react-components/components/Dropdown2";
+import KernDropdown from "@/submodules/react-components/components/KernDropdown";
 import { IconPlus, IconTrash } from "@tabler/icons-react";
 import { useCallback, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -183,7 +183,7 @@ export default function VariableSelect(props: VariableSelectProps) {
     return (<>
         {props.variable && props.variable.values.map((v, index) => (<div key={index} className="col-start-2 flex flex-row flex-nowrap items-center gap-x-2 my-2">
             {props.variable.type == BricksVariableType.ATTRIBUTE &&
-                <Dropdown2 options={attributes} buttonName={props.variable.values[index] ? props.variable.values[index] : 'Select attribute'}
+                <KernDropdown options={attributes} buttonName={props.variable.values[index] ? props.variable.values[index] : 'Select attribute'}
                     selectedOption={(option: any) => {
                         const propsCopy = { ...props };
                         propsCopy.variable.values[index] = option.name;
@@ -192,7 +192,7 @@ export default function VariableSelect(props: VariableSelectProps) {
                 />
             }
             {props.variable.type == BricksVariableType.LANGUAGE &&
-                <Dropdown2 options={languages} buttonName={props.variable.values[index] ? props.variable.values[index] : 'Select language'}
+                <KernDropdown options={languages} buttonName={props.variable.values[index] ? props.variable.values[index] : 'Select language'}
                     selectedOption={(option: any) => {
                         const propsCopy = { ...props };
                         propsCopy.variable.values[index] = option.name;
@@ -201,7 +201,7 @@ export default function VariableSelect(props: VariableSelectProps) {
                 />
             }
             {props.variable.type == BricksVariableType.EMBEDDING &&
-                <Dropdown2 options={embeddings} buttonName={props.variable.values[index] ? props.variable.values[index] : 'Select embedding'} dropdownItemsWidth='w-max' dropdownWidth='w-72'
+                <KernDropdown options={embeddings} buttonName={props.variable.values[index] ? props.variable.values[index] : 'Select embedding'} dropdownItemsWidth='w-max' dropdownWidth='w-72'
                     selectedOption={(option: any) => {
                         const propsCopy = { ...props };
                         propsCopy.variable.values[index] = option.name;
@@ -210,7 +210,7 @@ export default function VariableSelect(props: VariableSelectProps) {
                 />
             }
             {props.variable.type == BricksVariableType.LOOKUP_LIST &&
-                <Dropdown2 options={lookupLists ?? []} buttonName={props.variable.values[index] ? props.variable.values[index] : 'Select lookup list'}
+                <KernDropdown options={lookupLists ?? []} buttonName={props.variable.values[index] ? props.variable.values[index] : 'Select lookup list'}
                     selectedOption={(option: any) => {
                         const propsCopy = { ...props };
                         propsCopy.variable.values[index] = option.name;
@@ -219,7 +219,7 @@ export default function VariableSelect(props: VariableSelectProps) {
                 />
             }
             {props.variable.type == BricksVariableType.LABEL &&
-                <Dropdown2 options={labels} buttonName={props.variable.values[index] ? props.variable.values[index] : 'Select label'} dropdownWidth="w-max"
+                <KernDropdown options={labels} buttonName={props.variable.values[index] ? props.variable.values[index] : 'Select label'} dropdownWidth="w-max"
                     selectedOption={(option: any) => {
                         const propsCopy = { ...props };
                         propsCopy.variable.values[index] = option.name;
@@ -228,7 +228,7 @@ export default function VariableSelect(props: VariableSelectProps) {
                 />
             }
             {props.variable.type == BricksVariableType.LABELING_TASK &&
-                <Dropdown2 options={labelingTasks} buttonName={props.variable.values[index] ? props.variable.values[index] : 'Select task'}
+                <KernDropdown options={labelingTasks} buttonName={props.variable.values[index] ? props.variable.values[index] : 'Select task'}
                     selectedOption={(option: any) => {
                         const propsCopy = { ...props };
                         propsCopy.variable.values[index] = option.name;
@@ -238,7 +238,7 @@ export default function VariableSelect(props: VariableSelectProps) {
             }
 
             {props.variable.type == BricksVariableType.GENERIC_CHOICE &&
-                <Dropdown2 options={props.variable.allowedValues} buttonName={props.variable.values[index] ? props.variable.values[index] : 'Select option'}
+                <KernDropdown options={props.variable.allowedValues} buttonName={props.variable.values[index] ? props.variable.values[index] : 'Select option'}
                     selectedOption={(option: any) => {
                         const propsCopy = { ...props };
                         propsCopy.variable.values[index] = option;

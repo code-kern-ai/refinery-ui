@@ -13,7 +13,7 @@ import { filterAttributesSSGroup, getPlaceholderText, prepareAttFilter, prepareF
 import { checkDecimalPatterns, getAttributeType, getFilterIntegrationOperatorTooltip } from "@/src/util/components/projects/projectId/data-browser/search-operators-helper";
 import { getColorForDataType } from "@/src/util/components/projects/projectId/settings/data-schema-helper";
 import { extendArrayElementsByUniqueId } from "@/submodules/javascript-functions/id-prep";
-import Dropdown2 from "@/submodules/react-components/components/Dropdown2";
+import KernDropdown from "@/submodules/react-components/components/KernDropdown";
 import { IconPlus, IconTrash } from "@tabler/icons-react";
 import { useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -154,7 +154,7 @@ export default function SimilaritySearchModal() {
         <div className="flex flex-grow justify-center text-lg leading-6 text-gray-900 font-medium">Select embedding for similarity search </div>
         {(activeSearchParams.length > 0 || similaritySearch.recordsInDisplay) && <div className="text-red-500 mb-2 flex flex-grow justify-center text-sm">Warning: your current filter selection will be removed!</div>}
 
-        <Dropdown2 options={onAttributeEmbeddings} buttonName={selectedEmbedding ? selectedEmbedding.name : 'Select embedding'} selectedOption={(value) => setSelectedEmbedding(value)} dropdownClasses="my-2" />
+        <KernDropdown options={onAttributeEmbeddings} buttonName={selectedEmbedding ? selectedEmbedding.name : 'Select embedding'} selectedOption={(value) => setSelectedEmbedding(value)} dropdownClasses="my-2" />
 
         {filterAttributesSS && filterAttributesSS.length > 0 && <div className="flex flex-col justify-start mt-4">
             <div className="pr-2 bg-white text-md font-medium text-gray-900">Filter attributes</div>
@@ -175,17 +175,17 @@ export default function SimilaritySearchModal() {
                     <div className="flex-grow mr-2.5 flex flex-col  mt-2 ">
                         <div className="flex-grow flex flex-row flex-wrap gap-1">
                             <div style={{ width: '50%' }}>
-                                <Dropdown2 options={filterAttributesSS} buttonName={form.name} backgroundColors={colorsAttributes}
+                                <KernDropdown options={filterAttributesSS} buttonName={form.name} backgroundColors={colorsAttributes}
                                     selectedOption={(option: any) => setFilterDropdownVal(option, index, 'name')} fontClass="font-dmMono" />
                             </div>
                             <div style={{ width: '49%' }}>
-                                <Dropdown2 options={operatorsDict[form.name]} buttonName={form.operator} tooltipsArray={tooltipsDict[form.operator]} tooltipArrayPlacement="left"
+                                <KernDropdown options={operatorsDict[form.name]} buttonName={form.operator} tooltipsArray={tooltipsDict[form.operator]} tooltipArrayPlacement="left"
                                     selectedOption={(option: any) => setFilterDropdownVal(option, index, 'operator')} fontClass="font-dmMono" />
                             </div>
                         </div>
                         {uniqueValuesDict[form['name']] && form['operator'] != '' && form['operator'] == 'EQUAL' ? (
                             <div className="w-full mt-2">
-                                <Dropdown2 options={uniqueValuesDict[form['name']]} buttonName={form['searchValue'] ? form['searchValue'] : 'Select value'}
+                                <KernDropdown options={uniqueValuesDict[form['name']]} buttonName={form['searchValue'] ? form['searchValue'] : 'Select value'}
                                     selectedOption={(option: string) => setFilterDropdownVal(option, index, 'searchValue')} fontClass="font-dmMono" />
                             </div>
                         ) : (<div className="my-2 flex-grow flex flex-row items-center">

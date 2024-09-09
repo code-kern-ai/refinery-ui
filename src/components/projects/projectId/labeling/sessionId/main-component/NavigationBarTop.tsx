@@ -10,7 +10,7 @@ import { IconArrowLeft, IconArrowRight, IconCircle, IconStar } from "@tabler/ico
 import { useRouter } from "next/router";
 import { useDispatch, useSelector } from "react-redux";
 import style from '@/src/styles/components/projects/projectId/labeling.module.css';
-import Dropdown2 from "@/submodules/react-components/components/Dropdown2";
+import KernDropdown from "@/submodules/react-components/components/KernDropdown";
 import { useEffect } from "react";
 import { parseLinkFromText } from "@/src/util/shared/link-parser-helper";
 import { getAvailableLinks } from "@/src/services/base/labeling";
@@ -104,7 +104,7 @@ export default function NavigationBarTop(props: NavigationBarTopProps) {
 
                     </>) : (<div className="flex justify-center items-center overflow-visible">
                         <span className="mr-2"> Available Tasks:</span>
-                        <Dropdown2 options={availableLinks && availableLinks.length > 0 ? availableLinks : ['No links available']} disabled={availableLinks?.length == 0 || props.lockedLink}
+                        <KernDropdown options={availableLinks && availableLinks.length > 0 ? availableLinks : ['No links available']} disabled={availableLinks?.length == 0 || props.lockedLink}
                             buttonName={selectedLink ? selectedLink.name : 'Select slice'} selectedOption={(option: any) => dropdownSelectLink(option)} />
                     </div>)}
                 </div>

@@ -9,7 +9,7 @@ import { dateAsUTCDate } from "@/submodules/javascript-functions/date-parser";
 import { extentModelsDownloaded, selectModelsDownloaded } from "@/src/reduxStore/states/pages/models-downloaded";
 import { ModelsDownloaded, ModelsDownloadedStatus } from "@/src/types/components/models-downloaded/models-downloaded";
 import { CacheEnum, selectCachedValue } from "@/src/reduxStore/states/cachedValues";
-import Dropdown2 from "@/submodules/react-components/components/Dropdown2";
+import KernDropdown from "@/submodules/react-components/components/KernDropdown";
 import { modelProviderDownloadModel } from "@/src/services/base/misc";
 import { PlatformType } from "@/src/types/components/projects/projectId/settings/embeddings";
 
@@ -79,7 +79,7 @@ export default function AddModelDownloadModal() {
                 <Tooltip content={TOOLTIPS_DICT.MODELS_DOWNLOAD.MODEL} placement="right" color="invert">
                     <span className="card-title mb-0 label-text flex"><span className="cursor-help underline filtersUnderline">Name</span></span>
                 </Tooltip>
-                <Dropdown2 options={filteredList && filteredList} useDifferentTextColor={colorDownloadedModels} differentTextColor="green" valuePropertyPath="configString"
+                <KernDropdown options={filteredList && filteredList} useDifferentTextColor={colorDownloadedModels} differentTextColor="green" valuePropertyPath="configString"
                     hasSearchBar={true} dropdownItemsClasses="max-h-96 overflow-y-auto" ignoreDisabledForSearch={true}
                     selectedOption={(option: any) => {
                         setModelName(option.configString);

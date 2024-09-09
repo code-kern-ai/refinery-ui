@@ -9,7 +9,7 @@ import { ModalButton, ModalEnum } from "@/src/types/shared/modal"
 import { DATA_TYPES, findFreeAttributeName } from "@/src/util/components/projects/projectId/settings/data-schema-helper";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
 import { toPythonFunctionName } from "@/submodules/javascript-functions/python-functions-parser";
-import Dropdown2 from "@/submodules/react-components/components/Dropdown2";
+import KernDropdown from "@/submodules/react-components/components/KernDropdown";
 import { Tooltip } from "@nextui-org/react";
 import { useRouter } from "next/router";
 import { useCallback, useEffect, useState } from "react";
@@ -73,7 +73,7 @@ export default function CreateNewAttributeModal() {
             <Tooltip content={TOOLTIPS_DICT.PROJECT_SETTINGS.SELECT_ATTRIBUTE_TYPE} color="invert" placement="right">
                 <span className="cursor-help card-title mb-0 label-text font-normal"><span className="underline filtersUnderline">Attribute type</span></span>
             </Tooltip>
-            <Dropdown2 buttonName={attributeType ? attributeType.name : 'Select type'} options={DATA_TYPES} selectedOption={(option: any) => setAttributeType(option)} />
+            <KernDropdown buttonName={attributeType ? attributeType.name : 'Select type'} options={DATA_TYPES} selectedOption={(option: any) => setAttributeType(option)} />
         </div>
         {duplicateNameExists && <div className="text-red-700 text-xs mt-2">Attribute name exists</div>}
         {attributeType.name == 'Embedding List' && <div className="border border-gray-300 text-xs text-gray-500 p-2.5 rounded-lg text-justify mt-2 max-w-2xl">
