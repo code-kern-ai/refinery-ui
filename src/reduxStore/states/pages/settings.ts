@@ -25,7 +25,6 @@ type SettingsState = {
     labelingTasks: {
         all: LabelingTask[];
     },
-    gatesIntegration: any;
 }
 
 function getInitState(): SettingsState {
@@ -46,7 +45,6 @@ function getInitState(): SettingsState {
         labelingTasks: {
             all: null
         },
-        gatesIntegration: null
     };
 }
 
@@ -124,10 +122,6 @@ const settingsSlice = createSlice({
                 };
             }
         },
-        setGatesIntegration(state, action: PayloadAction<any>) {
-            if (action.payload) state.gatesIntegration = action.payload;
-            else state.gatesIntegration = null;
-        }
     }
 });
 
@@ -137,7 +131,6 @@ export const selectUseableEmbedableAttributes = (state) => state.settings.attrib
 export const selectUsableNonTextAttributes = (state) => state.settings.attributes.useableNonTextAttributes;
 export const selectUsableAttributes = (state) => state.settings.attributes.usableAttributes;
 export const selectTextAttributes = (state) => state.settings.attributes.usableTextAttributes;
-export const selectGatesIntegration = (state) => state.settings.gatesIntegration;
 
 export const selectEmbeddings = (state) => state.settings.embeddings.all;
 export const selectEmbeddingsFiltered = (state) => state.settings.embeddings.filtered;
@@ -156,5 +149,5 @@ export const selectVisibleAttributeAC = createSelector([selectUsableAttributesFi
 export const selectVisibleAttributesHeuristics = createSelector([selectUsableAttributesFiltered], (a): any => a ? a.filter((a) => a.visibility != AttributeVisibility.HIDE) : null);
 export const selectOnAttributeEmbeddings = createSelector([selectEmbeddings], (a): any => a ? a.filter((embedding) => embedding.type == EmbeddingType.ON_ATTRIBUTE && embedding.state == Status.FINISHED) : null);
 
-export const { setAllAttributes, extendAllAttributes, removeFromAllAttributesById, updateAttributeById, setAllEmbeddings, setFilteredEmbeddings, removeFromAllEmbeddingsById, setAllRecommendedEncodersDict, setRecommendedEncodersAll, setLabelingTasksAll, removeFromAllLabelingTasksById, removeLabelFromLabelingTask, setGatesIntegration } = settingsSlice.actions;
+export const { setAllAttributes, extendAllAttributes, removeFromAllAttributesById, updateAttributeById, setAllEmbeddings, setFilteredEmbeddings, removeFromAllEmbeddingsById, setAllRecommendedEncodersDict, setRecommendedEncodersAll, setLabelingTasksAll, removeFromAllLabelingTasksById, removeLabelFromLabelingTask } = settingsSlice.actions;
 export const settingsReducer = settingsSlice.reducer;
