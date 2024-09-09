@@ -259,12 +259,5 @@ export const TOOLTIPS_DICT = {
         'LABEL_ASSOCIATIONS': 'Has label associations',
         'STOP_EDIT': 'Stop editing record',
         'EDIT_RECORD': 'Editing record',
-    },
-    [CurrentPage.ADMIN_PAGE]: {
-        'NEW_ACCESS_TOKEN': 'Create a new personal access token',
-        'EXPIRATION_TIME': 'Choose expiration time of your token',
-        'NAME_TOKEN': 'Name of your token',
-        'VALUE_TOKEN': 'Value of the token',
-        'TOKEN_COPIED': 'Copied'
     }
 }
