@@ -617,8 +617,6 @@ export default function LabelingSuiteLabeling() {
                                                 {rlaLabel.icon && <div className="mr-1">
                                                     {rlaLabel.icon == InformationSourceType.LABELING_FUNCTION && <IconCode size={20} strokeWidth={1.5} />}
                                                     {rlaLabel.icon == InformationSourceType.ACTIVE_LEARNING && <IconBolt size={20} strokeWidth={1.5} />}
-                                                    {rlaLabel.icon == InformationSourceType.ZERO_SHOT && <IconSparkles size={20} strokeWidth={1.5} />}
-                                                    {rlaLabel.icon == InformationSourceType.CROWD_LABELER && <IconUsers size={20} strokeWidth={1.5} />}
                                                     {rlaLabel.icon == LabelSourceHover.MODEL_CALLBACK && <IconBolt size={20} strokeWidth={1.5} />}
                                                     {rlaLabel.icon == LabelSourceHover.WEAK_SUPERVISION && <IconAssembly size={20} strokeWidth={1.5} />}
                                                 </div>}

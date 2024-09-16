@@ -94,8 +94,6 @@ export function getLabelSourceOrder(source: LabelSource, isType?: InformationSou
                 case InformationSourceType.LABELING_FUNCTION: return 30;
                 case InformationSourceType.ACTIVE_LEARNING: return 31;
                 case InformationSourceType.PRE_COMPUTED: return 32;
-                case InformationSourceType.ZERO_SHOT: return 33;
-                case InformationSourceType.CROWD_LABELER: return 34;
                 default: return 35;
             }
         default: return 9999;

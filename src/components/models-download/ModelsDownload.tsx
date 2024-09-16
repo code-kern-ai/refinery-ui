@@ -68,9 +68,6 @@ export default function ModelsDownload() {
                                     Name</th>
                                 <th scope="col"
                                     className="px-3 py-2 text-center text-xs font-medium uppercase tracking-wide text-gray-500">
-                                    Zero-shot</th>
-                                <th scope="col"
-                                    className="px-3 py-2 text-center text-xs font-medium uppercase tracking-wide text-gray-500">
                                     Revision</th>
                                 <th scope="col"
                                     className="px-3 py-2 text-center text-xs font-medium uppercase tracking-wide text-gray-500">
@@ -94,15 +91,6 @@ export default function ModelsDownload() {
                                 <tr key={model.name} className={`${index % 2 != 0 ? 'bg-gray-50' : 'bg-white'}`}>
                                     <td className="text-center px-3 py-2 text-sm text-gray-500">
                                         <span className="inline-block mr-2">{model.name}</span>
-                                    </td>
-                                    <td className="text-center px-3 py-2 text-sm text-gray-500">
-                                        <div className="flex justify-center">
-                                            {model.zeroShotPipeline ? <Tooltip content={TOOLTIPS_DICT.MODELS_DOWNLOAD.USED_ZS} color="invert" placement="top" className="cursor-auto">
-                                                <IconCheckbox className="h-5 w-5"></IconCheckbox>
-                                            </Tooltip> : <Tooltip content={TOOLTIPS_DICT.MODELS_DOWNLOAD.NOT_USED_ZS} color="invert" placement="top" className="cursor-auto">
-                                                <IconBan className="h-5 w-5"></IconBan>
-                                            </Tooltip>}
-                                        </div>
                                     </td>
                                     <td className="text-center px-3 py-2 text-sm text-gray-500">
                                         {model.revision ? model.revision : '-'}

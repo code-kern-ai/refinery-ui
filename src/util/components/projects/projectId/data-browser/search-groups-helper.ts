@@ -212,8 +212,7 @@ function getConfidenceFilter() {
 function labelingTaskHeuristicArray(task: LabelingTask) {
     let array = []
     for (let l of task.informationSources) {
-        if (l.type == InformationSourceType.LABELING_FUNCTION || l.type == InformationSourceType.ACTIVE_LEARNING
-            || l.type == InformationSourceType.ZERO_SHOT || l.type == InformationSourceType.CROWD_LABELER || l.type === undefined) {
+        if (l.type == InformationSourceType.LABELING_FUNCTION || l.type == InformationSourceType.ACTIVE_LEARNING || l.type === undefined) {
             array.push({
                 id: l.id,
                 name: l.name,

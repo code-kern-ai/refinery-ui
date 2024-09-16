@@ -9,7 +9,7 @@ import { WebSocketsService } from "../../submodules/react-components/hooks/web-s
 import { timer } from "rxjs";
 import { RouteManager } from "../services/base/route-manager";
 import { CacheEnum, setCache } from "./states/cachedValues";
-import { postProcessingZeroShotEncoders } from "../util/components/models-downloaded/models-downloaded-helper";
+import { postProcessingEncoders } from "../util/components/models-downloaded/models-downloaded-helper";
 import { checkWhitelistTokenizer } from "../util/components/projects/new-project/new-project-helper";
 import { ConfigManager } from "../services/base/config";
 import postprocessVersionOverview from "../util/shared/sidebar-helper";
@@ -18,7 +18,6 @@ import { setDisplayUserRole } from "./states/pages/labeling";
 import { getProjectByProjectId } from "../services/base/project";
 import { getIsAdmin, getVersionOverview } from "../services/base/misc";
 import { getUserInfo, getOrganization, getOrganizationUsers } from "../services/base/organization";
-import { getZeroShotRecommendations } from "../services/base/zero-shot";
 import { getAllTokenizerOptions, getEmbeddingPlatforms, getRecommendedEncoders } from "../services/base/embedding";
 
 export function GlobalStoreDataComponent(props: React.PropsWithChildren) {
@@ -105,11 +104,8 @@ export function GlobalStoreDataComponent(props: React.PropsWithChildren) {
             getProjectByProjectId(projectId, (res) => {
                 dispatch(setActiveProject(res.data["projectByProjectId"]));
             })
-            getZeroShotRecommendations(projectId, (res) => {
-                dispatch(setCache(CacheEnum.ZERO_SHOT_RECOMMENDATIONS, res.data['zeroShotRecommendations']))
-                getRecommendedEncoders(null, (resEncoders) => {
-                    dispatch(setCache(CacheEnum.MODELS_LIST, postProcessingZeroShotEncoders(res.data['zeroShotRecommendations'], resEncoders.data['recommendedEncoders'])))
-                });
+            getRecommendedEncoders(null, (resEncoders) => {
+                dispatch(setCache(CacheEnum.MODELS_LIST, postProcessingEncoders(resEncoders.data['recommendedEncoders'])))
             });
         }
         else {

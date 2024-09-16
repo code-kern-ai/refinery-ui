@@ -128,28 +128,12 @@ const initialState: Modals = {
     [ModalEnum.ADD_ACTIVE_LEARNER]: {
         open: false
     },
-    [ModalEnum.ADD_ZERO_SHOT]: {
-        open: false
-    },
-    [ModalEnum.ADD_CROWD_LABELER]: {
-        open: false
-    },
     [ModalEnum.LAST_WEAK_SUPERVISION_RUN]: {
         open: false
     },
     [ModalEnum.SAMPLE_RECORDS_LABELING_FUNCTION]: {
         open: false,
         currentRecordIdx: -1,
-    },
-    [ModalEnum.WHY_SO_LONG]: {
-        open: false
-    },
-    [ModalEnum.SAMPLE_RECORDS_ZERO_SHOT]: {
-        open: false,
-        record: null,
-    },
-    [ModalEnum.CANCEL_EXECUTION]: {
-        open: false
     },
     [ModalEnum.DATA_SLICE_INFO]: {
         open: false,

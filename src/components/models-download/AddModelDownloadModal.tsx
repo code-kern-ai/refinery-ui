@@ -25,7 +25,6 @@ export default function AddModelDownloadModal() {
     const [modelName, setModelName] = useState('');
     const [colorDownloadedModels, setColorDownloadedModels] = useState<boolean[]>([]);
     const [hoverBoxList, setHoverBoxList] = useState<any[]>([]);
-    const [lineSeparatorIndex, setLineSeparatorIndex] = useState(-1);
     const [filteredList, setFilteredList] = useState<any[]>(null);
 
     useEffect(() => {
@@ -49,7 +48,6 @@ export default function AddModelDownloadModal() {
             }
         });
         setHoverBoxList(hoverBoxList);
-        setLineSeparatorIndex(filteredList.findIndex((model: any) => !model.description));
     }, [modelsDownloaded, filteredList, modalAddModel, modelsList, modelName]);
 
     const addModel = useCallback(() => {
@@ -83,7 +81,7 @@ export default function AddModelDownloadModal() {
                     hasSearchBar={true} dropdownItemsClasses="max-h-96 overflow-y-auto" ignoreDisabledForSearch={true}
                     selectedOption={(option: any) => {
                         setModelName(option.configString);
-                    }} optionsHaveHoverBox={true} hoverBoxList={hoverBoxList} lineSeparatorIndex={lineSeparatorIndex}
+                    }} optionsHaveHoverBox={true} hoverBoxList={hoverBoxList}
                     searchTextTyped={(option: any) => setModelName(option)}
                     filteredOptions={(option) => {
                         setFilteredList(modelsList.filter((model: any) => model.configString.includes(option)));

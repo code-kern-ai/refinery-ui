@@ -88,8 +88,6 @@ export const TOOLTIPS_DICT = {
         }
     },
     [CurrentPage.MODELS_DOWNLOAD]: {
-        'USED_ZS': 'Can be used for zero-shot',
-        'NOT_USED_ZS': 'Cannot be used for zero-shot',
         'MODEL': 'Name of your Hugging Face model'
     },
     [CurrentPage.PROJECTS]: {
@@ -139,8 +137,6 @@ export const TOOLTIPS_DICT = {
         'NAVIGATE_LOOKUP_LISTS': 'Go to lookup lists overview',
         'LABELING_FUNCTION': 'Labeling function',
         'ACTIVE_LEARNING': 'Active learning',
-        'ZERO_SHOT': 'Zero-shot',
-        'CROWD_LABELING': 'Crowd labeling',
         'CHOOSE_LABELING_TASK': 'Choose a labeling task',
         'ENTER_FUNCTION_NAME': 'Enter a function name',
         'ENTER_DESCRIPTION': 'Enter a description',
@@ -174,29 +170,6 @@ export const TOOLTIPS_DICT = {
         'RUN_ON_10': 'Run on 10 records',
         'CURRENTLY_RUNNING': 'Currently being executed',
         'EXECUTION_TIME': 'Execution time',
-    },
-    [CurrentPage.ZERO_SHOT]: {
-        'LABELING_TASK': 'Select the labeling task',
-        'HOSTED_VERSION': 'Check out our hosted version to use this function',
-        'NAVIGATE_MODELS_DOWNLOADED': 'See which models are downloaded',
-        'INPUT_ATTRIBUTE': 'Select an input attribute',
-        'MODEL': 'Select a model',
-        'CONFIDENCE': 'Minimum confidence required to store predictions',
-        'WHY_SO_LONG': 'Why is this taking so long?',
-        'COMPUTE_TEXT': 'Computes the prediction for your given example text',
-        'CONFIDENCE_TOO_LOW': '< minConfidence -> would be ignored',
-        'EXECUTE_10_RECORDS': 'Execute the zero-shot model on 10 records',
-        'EXECUTE_ALL_RECORDS': 'Execute the zero-shot model on all records',
-        'CANCEL_EXECUTION': 'Cancel the execution',
-        'RUN_ON_10_TEST': 'Run on 10 records test is running',
-    },
-    [CurrentPage.CROWD_LABELER]: {
-        'SELECT_ANNOTATOR': 'Select an annotator',
-        'SELECT_DATA_SLICE': 'Select a data slice',
-        'COPY_TO_CLIPBOARD': 'Copy to clipboard',
-        'LOCK_ACCESS': 'Lock access',
-        'UNLOCK_ACCESS': 'Unlock access',
-        'REMOVE_LINK': 'Remove link',
     },
     [CurrentPage.DATA_BROWSER]: {
         'ONLY_MANAGED': 'Only usable for the managed version',
