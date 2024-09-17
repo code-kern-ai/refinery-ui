@@ -11,18 +11,6 @@ export function addGroupToSearchElement(searchElement, labelingTasks) {
         searchElement.groupElements.forEach(element => {
             element.group = SearchGroup.ATTRIBUTES;
         });
-    } else if (searchElement.groupElements[0].hasOwnProperty('users')) {
-        const saveEl = searchElement.groupElements[0];
-        const newElement = {
-            id: saveEl.id,
-            group: SearchGroup.USER_FILTER,
-            users: saveEl.users,
-            active: saveEl.active,
-            negate: saveEl.negate,
-            name: saveEl.name,
-            nameAdd: ''
-        };
-        searchElement.groupElements = newElement;
     } else if (searchElement.groupElements[0].hasOwnProperty('manualLabels')) {
         const saveEl = searchElement.groupElements[0];
         const newElement = {
@@ -62,7 +50,7 @@ export function addGroupToSearchElement(searchElement, labelingTasks) {
     return searchElement;
 }
 
-export function prefillActiveValues(parse: any, fullSearchStoreCopy: any, usersMap: any) {
+export function prefillActiveValues(parse: any, fullSearchStoreCopy: any) {
     Object.values(parse).forEach((el: any) => {
         if (el[SearchGroup.DRILL_DOWN]) {
             fullSearchStoreCopy[SearchGroup.DRILL_DOWN] = el[SearchGroup.DRILL_DOWN];
@@ -81,18 +69,6 @@ export function prefillActiveValues(parse: any, fullSearchStoreCopy: any, usersM
                         fullSearchStoreCopy[SearchGroup.ATTRIBUTES].groupElements[index].id = groupItem.id;
                         fullSearchStoreCopy[SearchGroup.ATTRIBUTES].groupElements[index].color = getActiveNegateGroupColor(groupItem);
                     }
-                } else if (groupItem.hasOwnProperty('users')) {
-                    groupItem.users.forEach((userItem: any) => {
-                        if (userItem.active && usersMap[userItem.id]) {
-                            const findIdx = fullSearchStoreCopy[SearchGroup.USER_FILTER].groupElements.users.findIndex((item: any) => item.id == userItem.id);
-                            fullSearchStoreCopy[SearchGroup.USER_FILTER].groupElements.users[findIdx].active = true;
-                            fullSearchStoreCopy[SearchGroup.USER_FILTER].groupElements.users[findIdx].negate = userItem.negate;
-                            fullSearchStoreCopy[SearchGroup.USER_FILTER].groupElements.users[findIdx].name = usersMap[userItem.id];
-                            fullSearchStoreCopy[SearchGroup.USER_FILTER].groupElements.users[findIdx].id = userItem.id;
-                            fullSearchStoreCopy[SearchGroup.USER_FILTER].groupElements.users[findIdx].dataTip = usersMap[userItem.id];
-                            fullSearchStoreCopy[SearchGroup.USER_FILTER].groupElements.users[findIdx].color = getActiveNegateGroupColor(userItem);
-                        }
-                    });
                 } else if (groupItem.hasOwnProperty('orderBy')) {
                     groupItem.orderBy.forEach((orderByItem: any) => {
                         if (orderByItem.active) {
@@ -172,9 +148,6 @@ export function checkActiveGroups(group: any, searchGroup: any) {
         if (!value.hasOwnProperty('groupElements')) continue;
         if (Array.isArray(val2.groupElements)) {
             const findActive = val2.groupElements.filter((item: any) => item.active);
-            if (findActive.length > 0) searchGroup[key].isOpen = true;
-        } else if (val2.groupElements.hasOwnProperty('users')) {
-            const findActive = val2.groupElements.users.filter((item: any) => item.active);
             if (findActive.length > 0) searchGroup[key].isOpen = true;
         } else if (val2.groupElements.hasOwnProperty('orderBy')) {
             const findActive = val2.groupElements.orderBy.filter((item: any) => item.active);

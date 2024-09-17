@@ -2,7 +2,7 @@ import { selectAttributesDict, selectLabelingTasksAll, selectVisibleAttributesHe
 import { selectProjectId } from "@/src/reduxStore/states/project";
 import { attributeCreateSearchGroup, commentsCreateSearchGroup, generateRandomSeed, getBasicGroupItems, getBasicSearchGroup, getBasicSearchItem, labelingTasksCreateSearchGroup, orderByCreateSearchGroup, userCreateSearchGroup } from "@/src/util/components/projects/projectId/data-browser/search-groups-helper";
 import { SearchGroup, Slice, StaticOrderByKeys } from "@/submodules/javascript-functions/enums/enums";
-import { IconArrowDown, IconArrowsRandom, IconFilterOff, IconInfoCircle, IconPlus, IconPointerOff, IconTrash } from "@tabler/icons-react";
+import { IconArrowDown, IconArrowsRandom, IconFilterOff, IconPlus, IconPointerOff, IconTrash } from "@tabler/icons-react";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import style from '@/src/styles/components/projects/projectId/data-browser.module.css';
@@ -10,17 +10,14 @@ import { SearchOperator } from "@/src/types/components/projects/projectId/data-b
 import { checkDecimalPatterns, getAttributeType, getSearchOperatorTooltip } from "@/src/util/components/projects/projectId/data-browser/search-operators-helper";
 import { DataTypeEnum } from "@/src/types/shared/general";
 import { selectAllUsers, selectUser } from "@/src/reduxStore/states/general";
-import { selectActiveSearchParams, selectActiveSlice, selectAdditionalData, selectConfiguration, selectDataSlicesAll, selectFullSearchStore, selectIsTextHighlightNeeded, selectRecords, selectSearchGroupsStore, selectSimilaritySearch, selectTextHighlight, selectUniqueValuesDict, selectUsersCount, setActiveDataSlice, setActiveSearchParams, setFullSearchStore, setIsTextHighlightNeeded, setRecordsInDisplay, setSearchGroupsStore, setSearchRecordsExtended, setTextHighlight, updateAdditionalDataState } from "@/src/reduxStore/states/pages/data-browser";
+import { selectActiveSearchParams, selectActiveSlice, selectAdditionalData, selectConfiguration, selectDataSlicesAll, selectFullSearchStore, selectIsTextHighlightNeeded, selectRecords, selectSearchGroupsStore, selectSimilaritySearch, selectTextHighlight, selectUniqueValuesDict, setActiveSearchParams, setFullSearchStore, setIsTextHighlightNeeded, setRecordsInDisplay, setSearchGroupsStore, setSearchRecordsExtended, setTextHighlight, updateAdditionalDataState } from "@/src/reduxStore/states/pages/data-browser";
 import { Tooltip } from "@nextui-org/react";
-import { setModalStates } from "@/src/reduxStore/states/modal";
-import { ModalEnum } from "@/src/types/shared/modal";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
 import { DataSliceOperations } from "./DataSliceOperations";
 import { getActiveNegateGroupColor, postProcessRecordsExtended } from "@/src/util/components/projects/projectId/data-browser/data-browser-helper";
 import { parseFilterToExtended } from "@/src/util/components/projects/projectId/data-browser/filter-parser-helper";
 import { getRegexFromFilter, updateSearchParameters } from "@/src/util/components/projects/projectId/data-browser/search-parameters";
 import { jsonCopy } from "@/submodules/javascript-functions/general";
-import UserInfoModal from "./modals/UserInfoModal";
 import { getColorForDataType } from "@/src/util/components/projects/projectId/settings/data-schema-helper";
 import { Status } from "@/src/types/shared/statuses";
 import { postProcessCurrentWeakSupervisionRun } from "@/src/util/components/projects/projectId/heuristics/heuristics-helper";
@@ -42,7 +39,6 @@ export default function SearchGroups() {
     const attributes = useSelector(selectVisibleAttributesHeuristics);
     const labelingTasks = useSelector(selectLabelingTasksAll);
     const users = useSelector(selectAllUsers);
-    const usersMap = useSelector(selectUsersCount);
     const attributesDict = useSelector(selectAttributesDict);
     const activeSearchParams = useSelector(selectActiveSearchParams);
     const configuration = useSelector(selectConfiguration);
@@ -70,10 +66,10 @@ export default function SearchGroups() {
     const [selectedHeuristicsWS, setSelectedHeuristicsWS] = useState<string[]>([]);
 
     useEffect(() => {
-        if (!projectId || !users || !labelingTasks || !attributesSortOrder || !usersMap) return;
+        if (!projectId || !users || !labelingTasks || !attributesSortOrder) return;
         prepareSearchGroups();
         refetchCurrentWeakSupervisionAndProcess();
-    }, [projectId, users, labelingTasks, attributesSortOrder, usersMap]);
+    }, [projectId, users, labelingTasks, attributesSortOrder]);
 
     useEffect(() => {
         if (!attributes) return;
@@ -168,7 +164,7 @@ export default function SearchGroups() {
     }, [activeSlice, labelingTasks, searchGroupsStore, dataSlices]);
 
     useEffect(() => {
-        if (!activeSlice || !usersMap) return;
+        if (!activeSlice) return;
         if (activeSlice.sliceType == Slice.STATIC_OUTLIER) {
             dispatch(updateAdditionalDataState('clearFullSearch', true));
             return;
@@ -177,8 +173,8 @@ export default function SearchGroups() {
         Object.keys(searchGroupsCopy).forEach((key) => {
             searchGroupsCopy[key].isOpen = false;
         });
-        prepareNewFormGroups(activeSlice.filterRaw, usersMap, searchGroupsCopy);
-    }, [activeSlice, usersMap, recordsInDisplay]);
+        prepareNewFormGroups(activeSlice.filterRaw, searchGroupsCopy);
+    }, [activeSlice, recordsInDisplay]);
 
     useEffect(() => {
         if (recordsInDisplay) {
@@ -227,14 +223,6 @@ export default function SearchGroups() {
             fullSearchCopy[SearchGroup.ATTRIBUTES].groupElements.push(attributeCreateSearchGroup(baseItem, ++GLOBAL_SEARCH_GROUP_COUNT));
         }
 
-        // User Filter
-        const searchGroupUserFilter = getBasicSearchGroup(SearchGroup.USER_FILTER, GROUP_SORT_ORDER + 200);
-        fullSearchCopy[SearchGroup.USER_FILTER] = { groupElements: [] };
-        searchGroupsCopy[SearchGroup.USER_FILTER] = searchGroupUserFilter;
-        for (let baseItem of getBasicGroupItems(searchGroupUserFilter.group, searchGroupUserFilter.key)) {
-            fullSearchCopy[SearchGroup.USER_FILTER].groupElements = userCreateSearchGroup(baseItem, ++GLOBAL_SEARCH_GROUP_COUNT, usersMap);
-        }
-
         // Labeling Tasks
         let count = 0;
         for (let task of labelingTasks) {
@@ -251,7 +239,7 @@ export default function SearchGroups() {
         const searchGroupOrder = getBasicSearchGroup(SearchGroup.ORDER_STATEMENTS, GROUP_SORT_ORDER + 400);
         fullSearchCopy[SearchGroup.ORDER_STATEMENTS] = { groupElements: [] };
         searchGroupsCopy[SearchGroup.ORDER_STATEMENTS] = searchGroupOrder;
-        for (let baseItem of getBasicGroupItems(searchGroupOrder.group, searchGroupUserFilter.key)) {
+        for (let baseItem of getBasicGroupItems(searchGroupOrder.group, searchGroupOrder.key)) {
             fullSearchCopy[SearchGroup.ORDER_STATEMENTS].groupElements = orderByCreateSearchGroup(baseItem, ++GLOBAL_SEARCH_GROUP_COUNT, attributesSortOrder, attributesDict);
         }
 
@@ -276,7 +264,7 @@ export default function SearchGroups() {
         setSearchGroupsOrder(searchGroupsOrderCopy);
     }
 
-    function prepareNewFormGroups(filterRaw: any, usersMap: any, searchGroupsCopy) {
+    function prepareNewFormGroups(filterRaw: any, searchGroupsCopy: any) {
         const parse = JSON.parse(filterRaw);
         const labelingTasksInSlice = Object.keys(parse).filter((el) => el.includes(SearchGroup.LABELING_TASKS));
         const tasksIds = labelingTasksInSlice.map((el) => el.split('_')[2]);
@@ -295,7 +283,7 @@ export default function SearchGroups() {
             const openGroups = checkActiveGroups(parse, searchGroupsCopy);
             dispatch(setSearchGroupsStore(openGroups));
         } else {
-            const prefilledValues = prefillActiveValues(parse, fullSearchStoreCopy, usersMap);
+            const prefilledValues = prefillActiveValues(parse, fullSearchStoreCopy);
             dispatch(setFullSearchStore(prefilledValues));
             const openGroups = checkActiveGroups(fullSearchStoreCopy, searchGroupsCopy);
             dispatch(setSearchGroupsStore(openGroups));
@@ -323,9 +311,7 @@ export default function SearchGroups() {
         }
         groupItemCopy['color'] = getActiveNegateGroupColor(groupItemCopy);
         const fullSearchCopy = jsonCopy(fullSearchStore);
-        if (group.key == SearchGroup.USER_FILTER) {
-            fullSearchCopy[group.key].groupElements['users'][index] = groupItemCopy;
-        } else if (forceValue) { // for the labeling tasks because of the different structure
+        if (forceValue) { // for the labeling tasks because of the different structure
             fullSearchCopy[group.key].groupElements['heuristics'][index] = groupItemCopy;
         } else if (group.key == SearchGroup.ORDER_STATEMENTS) {
             fullSearchCopy[group.key].groupElements['orderBy'][index] = groupItemCopy;
@@ -668,26 +654,6 @@ export default function SearchGroups() {
                             </div>
                         </div>))}
                     </div>}
-                    {searchGroupsStore[group.key].group == SearchGroup.USER_FILTER && <div className="flex flex-row items-center mt-4">
-                        <div className="flex flex-grow">
-                            <div className="flex flex-col">
-                                {fullSearchStore[group.key].groupElements['users'] && fullSearchStore[group.key].groupElements['users'].map((groupItem, index) => (<div key={groupItem.id} className="my-1">
-                                    <div className="form-control flex flex-row flex-nowrap items-center">
-                                        <span className="flex flex-row items-center cursor-pointer" onClick={() => setActiveNegateGroup(groupItem, index, group)}>
-                                            <div style={{ backgroundColor: groupItem.color, borderColor: groupItem.color }}
-                                                className="ml-2 mr-2 h-4 w-4 border-gray-300 border rounded cursor-pointer hover:bg-gray-200">
-                                            </div>
-                                            <span className="text-sm truncate">{groupItem['displayName']}</span>
-                                        </span>
-                                        {usersMap && usersMap[groupItem['id']] && <div><Tooltip content={groupItem['dataTip']} placement="right" color="invert">
-                                            <IconInfoCircle className="ml-1 text-gray-700 h-5 w-5" onClick={() => dispatch(setModalStates(ModalEnum.USER_INFO, { open: true, userInfo: usersMap[groupItem['id']] }))} />
-                                        </Tooltip></div>}
-                                    </div>
-                                </div>))}
-                            </div>
-                        </div>
-                        <UserInfoModal />
-                    </div>}
                     {searchGroupsStore[group.key].group == SearchGroup.LABELING_TASKS && <div className="flex flex-row items-center mt-4">
                         {fullSearchStore[group.key] && <div className="flex-grow flex flex-col">
                             <div>Manually labeled</div>
@@ -799,7 +765,7 @@ export default function SearchGroups() {
                         </div>
                     </div>}
 
-                    {(searchGroupsStore[group.key].group != SearchGroup.ATTRIBUTES && searchGroupsStore[group.key].group != SearchGroup.USER_FILTER && searchGroupsStore[group.key].group != SearchGroup.LABELING_TASKS && searchGroupsStore[group.key].group != SearchGroup.ORDER_STATEMENTS && searchGroupsStore[group.key].group != SearchGroup.COMMENTS) && <p>{'Default :('}</p>}
+                    {(searchGroupsStore[group.key].group != SearchGroup.ATTRIBUTES && searchGroupsStore[group.key].group != SearchGroup.LABELING_TASKS && searchGroupsStore[group.key].group != SearchGroup.ORDER_STATEMENTS && searchGroupsStore[group.key].group != SearchGroup.COMMENTS) && <p>{'Default :('}</p>}
                 </form>
             </div>
         </div >))

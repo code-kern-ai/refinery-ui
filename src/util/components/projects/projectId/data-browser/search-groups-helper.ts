@@ -28,8 +28,6 @@ function getSubTextForGroupKey(group: SearchGroup): string {
     switch (group) {
         case SearchGroup.ATTRIBUTES:
             return 'Filter on attributes of your records';
-        case SearchGroup.USER_FILTER:
-            return 'Filter manual labels by creation user';
         case SearchGroup.LABELING_TASKS:
             return 'Choose from anything related to';
         case SearchGroup.ORDER_STATEMENTS:
@@ -47,8 +45,6 @@ export function getBasicGroupItems(
     switch (group) {
         case SearchGroup.ATTRIBUTES:
             return [getBasicSearchItem(SearchItemType.ATTRIBUTE, groupKey)];
-        case SearchGroup.USER_FILTER:
-            return [getBasicSearchItem(SearchItemType.USER, groupKey)];
         case SearchGroup.LABELING_TASKS:
             return [getBasicSearchItem(SearchItemType.LABELING_TASK, groupKey)];
         case SearchGroup.ORDER_STATEMENTS:
@@ -71,13 +67,6 @@ export function getBasicSearchItem(
                 addText: 'Enter any string',
                 defaultValue: 'Any Attribute',
                 operator: SearchOperator.CONTAINS,
-            };
-        case SearchItemType.USER:
-            return {
-                type: SearchItemType.USER,
-                group: SearchGroup.USER_FILTER,
-                groupKey: groupKey,
-                addText: 'much question, so wow',
             };
         case SearchItemType.LABELING_TASK:
             return {

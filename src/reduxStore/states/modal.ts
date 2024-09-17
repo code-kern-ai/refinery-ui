@@ -137,10 +137,6 @@ const initialState: Modals = {
         open: false,
         sliceId: '',
     },
-    [ModalEnum.USER_INFO]: {
-        open: false,
-        userInfo: null,
-    },
     [ModalEnum.SAVE_DATA_SLICE]: {
         open: false,
         sliceName: '',
