@@ -63,11 +63,6 @@ export function updateAttribute(projectId: string, attributeId: string, onResult
     jsonFetchWrapper(finalUrl, FetchType.POST, onResult, JSON.stringify(convertCamelToSnakeCase({ attributeId, dataType, isPrimaryKey, name, sourceCode, visibility })));
 }
 
-export function updateProjectGates(projectId: string, onResult: (result: any) => void) {
-    const finalUrl = `${projectSettingEndpoint}/${projectId}/update-project-gates`;
-    jsonFetchWrapper(finalUrl, FetchType.POST, onResult);
-}
-
 export function calculateUserAttributeAllRecordsPost(projectId: string, options: {
     attributeId: string
 }, onResult: (result: any) => void) {

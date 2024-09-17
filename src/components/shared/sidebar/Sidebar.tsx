@@ -148,17 +148,6 @@ export default function Sidebar() {
                                                 </div>
                                             </Tooltip>
                                         </div>}
-                                        {(isAdmin && isManaged) && <div
-                                            className="flex items-center justify-center overflow-visible mt-9 2xl:mt-12">
-                                            <Tooltip placement="right" trigger="hover" color="invert" content={TOOLTIPS_DICT.SIDEBAR.ADMIN} className={`${project.numDataScaleUploaded == 0 ? 'pointer-events-none cursor-not-allowed' : 'cursor-pointer'}`}>
-                                                <div className={`relative z-50 opacity-100 cursor-pointer`}>
-                                                    <a href={`/refinery/projects/${project.id}/admin`} onClick={(e: any) => { e.preventDefault(); router.push(`/projects/${project.id}/admin`) }}
-                                                        className={`${project.numDataScaleUploaded == 0 ? 'opacity-50 cursor-not-allowed' : 'opacity-100 cursor-pointer'} circle ${routeColor.admin.active ? 'text-kernpurple' : 'text-white'}`}>
-                                                        <IconUserCircle className="w-6 h-6" />
-                                                    </a>
-                                                </div>
-                                            </Tooltip>
-                                        </div>}
                                         {user.role == UserRole.ENGINEER && <div
                                             className="flex items-center justify-center overflow-visible my-6 text-white">
                                             <svg xmlns="http://www.w3.org/2000/svg" width="100%" height="20px" fill="none"
@@ -217,7 +206,7 @@ export default function Sidebar() {
                             </div>}
 
                             {isManaged && <div className="flex items-center justify-center mt-4">
-                                <AppSelectionDropdown cockpit={true} gates={true}></AppSelectionDropdown>
+                                <AppSelectionDropdown cognition={true}></AppSelectionDropdown>
                             </div>}
 
                             <div className="flex-shrink-0 flex pt-3 justify-center">

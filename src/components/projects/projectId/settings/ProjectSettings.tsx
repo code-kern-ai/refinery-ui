@@ -2,7 +2,7 @@ import { useDispatch, useSelector } from "react-redux";
 import DataSchema from "./DataSchema";
 import { selectProject, setActiveProject } from "@/src/reduxStore/states/project";
 import { useCallback, useEffect, useState } from "react";
-import { selectAttributes, selectEmbeddings, selectGatesIntegration, setAllAttributes, setAllEmbeddings, setAllRecommendedEncodersDict, setGatesIntegration, setLabelingTasksAll, setRecommendedEncodersAll } from "@/src/reduxStore/states/pages/settings";
+import { selectAttributes, selectEmbeddings, setAllAttributes, setAllEmbeddings, setAllRecommendedEncodersDict, setLabelingTasksAll, setRecommendedEncodersAll } from "@/src/reduxStore/states/pages/settings";
 import { timer } from "rxjs";
 import { IconCamera, IconCheck, IconDots, IconPlus, IconUpload } from "@tabler/icons-react";
 import { ModalEnum } from "@/src/types/shared/modal";
@@ -12,7 +12,6 @@ import { setUploadFileType } from "@/src/reduxStore/states/upload";
 import { UploadFileType } from "@/src/types/shared/upload";
 import { Tooltip } from "@nextui-org/react";
 import ProjectMetaData from "./ProjectMetaData";
-import GatesIntegration from "./GatesIntegration";
 import { selectAllUsers, selectIsManaged, selectOrganizationId, setBricksIntegrator, setComments } from "@/src/reduxStore/states/general";
 import Embeddings from "./embeddings/Embeddings";
 import { postProcessingEmbeddings, postProcessingRecommendedEncoders } from "@/src/util/components/projects/projectId/settings/embeddings-helper";
@@ -28,7 +27,7 @@ import ProjectSnapshotExportModal from "./ProjectSnapshotExportModal";
 import { postProcessLabelingTasks, postProcessLabelingTasksSchema } from "@/src/util/components/projects/projectId/settings/labeling-tasks-helper";
 import { getEmptyBricksIntegratorConfig } from "@/src/util/shared/bricks-integrator-helper";
 import { useWebsocket } from "@/submodules/react-components/hooks/web-socket/useWebsocket";
-import { getGatesIntegrationData, getLabelingTasksByProjectId, getProjectByProjectId, getProjectTokenization } from "@/src/services/base/project";
+import { getLabelingTasksByProjectId, getProjectByProjectId, getProjectTokenization } from "@/src/services/base/project";
 import { getAllComments } from "@/src/services/base/comment";
 import { getAttributes, getCheckCompositeKey } from "@/src/services/base/attribute";
 import { getEmbeddings, getRecommendedEncoders } from "@/src/services/base/embedding";
@@ -41,10 +40,8 @@ export default function ProjectSettings() {
 
     const project = useSelector(selectProject);
     const attributes = useSelector(selectAttributes);
-    const isManaged = useSelector(selectIsManaged);
     const embeddings = useSelector(selectEmbeddings);
     const allUsers = useSelector(selectAllUsers);
-    const gatesIntegrationData = useSelector(selectGatesIntegration);
 
     const [pKeyValid, setPKeyValid] = useState<boolean | null>(null);
     const [pKeyCheckTimer, setPKeyCheckTimer] = useState(null);
@@ -56,7 +53,6 @@ export default function ProjectSettings() {
         if (!project) return;
         refetchAttributesAndPostProcess();
         refetchEmbeddingsAndPostProcess();
-        refetchAndSetGatesIntegrationData();
         refetchLabelingTasksAndProcess();
         checkProjectTokenization();
 
@@ -228,33 +224,12 @@ export default function ProjectSettings() {
                 });
                 if (msgParts[2] == 'finished') timer(5000).subscribe(() => checkProjectTokenization());
             }
-        } else if (msgParts[1] == 'gates_integration') {
-            refetchAndSetGatesIntegrationData();
-        } else if (['information_source_deleted', 'information_source_updated'].includes(msgParts[1])) {
-            if (gatesIntegrationData?.missingInformationSources?.includes(msgParts[2])) {
-                refetchAndSetGatesIntegrationData();
-            }
-        } else if (msgParts[1] == 'tokenization' && msgParts[2] == 'docbin' && msgParts[3] == 'state' && msgParts[4] == 'FINISHED') {
-            refetchAndSetGatesIntegrationData();
-        } else if (msgParts[1] == 'embedding' && msgParts[3] == 'state' && msgParts[4] == 'FINISHED') {
-            if (gatesIntegrationData?.missingEmbeddings?.includes(msgParts[2])) {
-                refetchAndSetGatesIntegrationData();
-            }
         } else if (msgParts[1] == 'embedding_deleted') {
-            if (gatesIntegrationData?.missingEmbeddings?.includes(msgParts[2])) {
-                refetchAndSetGatesIntegrationData();
-            }
             refetchEmbeddingsAndPostProcess();
         } else if (['label_created', 'label_deleted', 'labeling_task_deleted', 'labeling_task_updated', 'labeling_task_created'].includes(msgParts[1])) {
             refetchLabelingTasksAndProcess();
         }
-    }, [project, embeddings, gatesIntegrationData, isAcRunning, tokenizationProgress]);
-
-    function refetchAndSetGatesIntegrationData() {
-        getGatesIntegrationData(project.id, (res) => {
-            dispatch(setGatesIntegration(res.data['getGatesIntegrationData']));
-        })
-    }
+    }, [project, embeddings, isAcRunning, tokenizationProgress]);
 
     function refetchLabelingTasksAndProcess() {
         getLabelingTasksByProjectId(project.id, (res) => {
@@ -326,7 +301,6 @@ export default function ProjectSettings() {
 
             <Embeddings refetchEmbeddings={refetchEmbeddingsAndPostProcess} />
             <LabelingTasks />
-            {isManaged && <GatesIntegration />}
             <ProjectMetaData />
             <CreateNewAttributeModal />
             <ProjectSnapshotExportModal ></ProjectSnapshotExportModal>
