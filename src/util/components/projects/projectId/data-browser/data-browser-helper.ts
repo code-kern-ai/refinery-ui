@@ -122,7 +122,7 @@ export function parseRecordData(element, labelingTasks: LabelingTask[]) {
                 };
             }
             element.rla_aggregation[rlaAggParts.key].amount++;
-            if (rlaLine.confidence != null && (rlaLine.source_type == LabelSource.WEAK_SUPERVISION || rlaLine.source_type == LabelSource.MODEL_CALLBACK)) {
+            if (rlaLine.confidence != null && rlaLine.source_type == LabelSource.WEAK_SUPERVISION) {
                 element.rla_aggregation[rlaAggParts.key].confidence.push(rlaLine.confidence);
             }
         }
