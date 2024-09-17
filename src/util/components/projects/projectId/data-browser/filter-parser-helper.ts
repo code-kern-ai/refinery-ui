@@ -206,10 +206,7 @@ function appendBlackAndWhiteListLabelingTaskForConfidence(
     forWeakSupervision: boolean = true
 ): any {
     if (!confidence || !confidence.active) return;
-    let source;
-    if (forWeakSupervision) {
-        source = LabelSource.WEAK_SUPERVISION;
-    }
+    const source = forWeakSupervision ? LabelSource.WEAK_SUPERVISION : undefined;
     let whitelist = {
         SUBQUERY_TYPE: 'WHITELIST',
         SUBQUERIES: [{
@@ -224,7 +221,7 @@ function appendBlackAndWhiteListLabelingTaskForConfidence(
         SUBQUERIES: [],
     };
 
-    const query = forWeakSupervision ? 'SUBQUERY_RLA_CONFIDENCE' : 'SUBQUERY_CALLBACK_CONFIDENCE';
+    const query = forWeakSupervision ? 'SUBQUERY_RLA_CONFIDENCE' : undefined;
     list.SUBQUERIES.push({
         QUERY_TEMPLATE: query,
         VALUES: [confidence.lower * 0.01, confidence.upper * 0.01],
