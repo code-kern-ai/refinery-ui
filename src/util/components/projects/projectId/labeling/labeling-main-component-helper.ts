@@ -139,7 +139,6 @@ export function getDefaultTaskOverviewLabelSettings(): LabelingSuiteTaskHeaderLa
     return {
         showManual: true,
         showWeakSupervision: true,
-        showModel: false,
         showHeuristics: false,
     }
 }

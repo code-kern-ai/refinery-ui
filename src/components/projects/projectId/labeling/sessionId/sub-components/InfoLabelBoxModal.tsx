@@ -32,10 +32,6 @@ export default function InfoLabelBoxModal(props: InfoLabelBoxModalProps) {
                 <span className="text-sm text-gray-500">Weakly supervised labels</span>
                 <span className="cursor-pointer justify-self-center h-5 w-5"><input type="checkbox" onChange={() => props.toggleLabelDisplaySetting('showWeakSupervision')}
                     checked={settings.task[projectId][modalInfo.labelSettingsLabel.taskId][modalInfo.labelSettingsLabel.id].showWeakSupervision} /></span>
-                <span className="text-sm text-gray-500">MC</span>
-                <span className="text-sm text-gray-500">Model callback labels</span>
-                <span className="cursor-pointer justify-self-center h-5 w-5"><input type="checkbox" onChange={() => props.toggleLabelDisplaySetting('showModel')}
-                    checked={settings.task[projectId][modalInfo.labelSettingsLabel.taskId][modalInfo.labelSettingsLabel.id].showModel} /></span>
                 <span className="text-sm text-gray-500">H</span>
                 <span className="text-sm text-gray-500">Heuristic labels</span>
                 <span className="cursor-pointer justify-self-center h-5 w-5"><input type="checkbox" onChange={() => props.toggleLabelDisplaySetting('showHeuristics')}

@@ -43,7 +43,7 @@ export function updateSearchParameters(searchElement, attributes, separator, ful
                 activeParams.push({ splittedText: param, values: { group: p.groupElements.group, orderBy: p.groupElements } });
             }
         } else if (p.groupElements.group == SearchGroup.LABELING_TASKS) {
-            if (!(p.groupElements.active || (p.groupElements['weakSupervisionConfidence'] && p.groupElements['weakSupervisionConfidence'].active) || (p.groupElements['modelCallbackConfidence'] && p.groupElements['modelCallbackConfidence'].active) || p.groupElements['isWithDifferentResults'])) return;
+            if (!(p.groupElements.active || (p.groupElements['weakSupervisionConfidence'] && p.groupElements['weakSupervisionConfidence'].active) || p.groupElements['isWithDifferentResults'])) return;
             param = createSplittedText(updateSearchParamText(p, attributes, separator, fullSearch[SearchGroup.DRILL_DOWN]), fullSearch, p);
             if (!param) return;
             activeParams.push({ splittedText: param, values: { group: p.groupElements.group, values: p.groupElements } });
@@ -150,9 +150,6 @@ function labelingTaskBuildSearchParamText(values, drillDownVal): string {
     tmp = labelingTaskBuildSearchParamTextPart(values.weakSupervisionLabels, 'WS-label', drillDownVal);
     if (tmp) text += (text ? '\nAND ' : '') + ' (' + tmp + ')';
 
-    tmp = labelingTaskBuildSearchParamTextPart(values.modelCallbackLabels, 'MC-label', drillDownVal);
-    if (tmp) text += (text ? '\nAND ' : '') + ' (' + tmp + ')';
-
     tmp = labelingTaskBuildSearchParamTextPart(values.heuristics, 'IS', drillDownVal);
     if (tmp) text += (text ? '\nAND ' : '') + ' (' + tmp + ')';
 
@@ -166,11 +163,6 @@ function labelingTaskBuildSearchParamText(values, drillDownVal): string {
         text += "BETWEEN " + values.weakSupervisionConfidence.lower + "% AND " + values.weakSupervisionConfidence.upper + "%";
     }
 
-    if (values.modelCallbackConfidence && values.modelCallbackConfidence.active) {
-        text += (text ? '\nAND ' : '') + 'MC-Confidence '
-        if (values.modelCallbackConfidence.negate) text += "NOT "
-        text += "BETWEEN " + values.modelCallbackConfidence.lower + "% AND " + values.modelCallbackConfidence.upper + "%";
-    }
     if (values.negate) text = '\nNOT (' + text + ')';
     else text = '\n' + text;
     if (text === '\n') return '';

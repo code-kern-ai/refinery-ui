@@ -49,7 +49,6 @@ export type LabelingSuiteTaskHeaderTaskSettings = {
 export type LabelingSuiteTaskHeaderLabelSettings = {
     showManual: boolean;
     showWeakSupervision: boolean;
-    showModel: boolean;
     showHeuristics: boolean;
 }
 

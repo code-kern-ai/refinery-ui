@@ -140,7 +140,6 @@ export default function HeaderDisplay(props: HeaderDisplayProps) {
                                 {settings.task[projectId] && settings.task[projectId][task.id] && settings.task[projectId][task.id][labelId] && <div className="grid grid-cols-2 gap-0.5">
                                     <div className={`w-2.5 h-2.5 border rounded-full ${settings.task[projectId][task.id][labelId].showManual ? task.labels[labelId].color.backgroundColor : 'bg-white'} ${task.labels[labelId].color.borderColor}`}></div>
                                     <div className={`w-2.5 h-2.5 border rounded-full ${settings.task[projectId][task.id][labelId].showWeakSupervision ? task.labels[labelId].color.backgroundColor : 'bg-white'} ${task.labels[labelId].color.borderColor}`}></div>
-                                    <div className={`w-2.5 h-2.5 border rounded-full ${settings.task[projectId][task.id][labelId].showModel ? task.labels[labelId].color.backgroundColor : 'bg-white'} ${task.labels[labelId].color.borderColor}`}></div>
                                     <div className={`w-2.5 h-2.5 border rounded-full ${settings.task[projectId][task.id][labelId].showHeuristics ? task.labels[labelId].color.backgroundColor : 'bg-white'} ${task.labels[labelId].color.borderColor}`}></div>
                                 </div>}
                                 <div className="truncate" style={{ maxWidth: '260px' }}>{task.labels[labelId].name}</div>

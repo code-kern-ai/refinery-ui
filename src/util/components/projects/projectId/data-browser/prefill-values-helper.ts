@@ -35,11 +35,8 @@ export function addGroupToSearchElement(searchElement, labelingTasks) {
             active: saveEl.active,
             manualLabels: saveEl.manualLabels,
             weakSupervisionLabels: saveEl.weakSupervisionLabels,
-            modelCallbackLabels: saveEl.modelCallbackLabels,
             sortByWeakSupervisionConfidence: saveEl.sortByWeakSupervisionConfidence,
-            sortByModelCallbackConfidence: saveEl.sortByModelCallbackConfidence,
             weakSupervisionConfidence: saveEl.weakSupervisionConfidence,
-            modelCallbackConfidence: saveEl.modelCallbackConfidence,
             heuristics: saveEl.informationSources,
             isWithDifferentResults: saveEl.isWithDifferentResults,
         }
@@ -140,17 +137,6 @@ export function prefillActiveValues(parse: any, fullSearchStoreCopy: any, usersM
                             fullSearchStoreCopy[key].groupElements.weakSupervisionLabels[index].id = weakSupervisionLabel.id;
                         }
                     });
-                } else if (groupItem.hasOwnProperty('modelCallbackLabels')) {
-                    const modelCallbackLabels = groupItem.modelCallbackLabels;
-                    modelCallbackLabels.forEach((modelCallbackLabel: any, index: number) => {
-                        if (modelCallbackLabel.active) {
-                            const key = SearchGroup.LABELING_TASKS + '_' + groupItem.taskId;
-                            fullSearchStoreCopy[key].groupElements.modelCallbackLabels[index].active = true;
-                            fullSearchStoreCopy[key].groupElements.modelCallbackLabels[index].negate = modelCallbackLabel.negate;
-                            fullSearchStoreCopy[key].groupElements.modelCallbackLabels[index].name = modelCallbackLabel.name;
-                            fullSearchStoreCopy[key].groupElements.modelCallbackLabels[index].id = modelCallbackLabel.id;
-                        }
-                    });
                 } else if (groupItem.hasOwnProperty('informationSources') || groupItem.hasOwnProperty('heuristics')) {
                     const heuristics = groupItem.informationSources;
                     heuristics.forEach((heuristic: any, index: number) => {
@@ -201,14 +187,10 @@ export function checkActiveGroups(group: any, searchGroup: any) {
         } else if (val2.groupElements.hasOwnProperty('weakSupervisionLabels')) {
             const findActive = val2.groupElements.weakSupervisionLabels.filter((item: any) => item.active);
             if (findActive.length > 0) searchGroup[key].isOpen = true;
-        } else if (val2.groupElements.hasOwnProperty('modelCallbackLabels')) {
-            const findActive = val2.groupElements.modelCallbackLabels.filter((item: any) => item.active);
-            if (findActive.length > 0) searchGroup[key].isOpen = true;
         } else if (val2.groupElements.hasOwnProperty('heuristics')) {
             const findActive = val2.groupElements.heuristics.filter((item: any) => item.active);
             if (findActive.length > 0) searchGroup[key].isOpen = true;
         } else if ((val2.groupElements.weakSupervisionConfidence && val2.groupElements.weakSupervisionConfidence.active) ||
-            (val2.groupElements.modelCallbackConfidence && val2.groupElements.modelCallbackConfidence.active) ||
             (val2.groupElements.isWithDifferentResults && val2.groupElements.isWithDifferentResults.active)) {
             searchGroup[key].isOpen = true;
         }

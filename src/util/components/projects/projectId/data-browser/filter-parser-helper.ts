@@ -103,11 +103,9 @@ function appendBlackAndWhiteListLabelingTask(appendTo, searchElement, labelingTa
     const labelingTask = labelingTasks.find(l => l.id == searchElement.values.taskId);
     appendTo.push(appendBlackAndWhiteListLabelingTaskForArray(appendTo, searchElement.values.manualLabels, LabelSource.MANUAL, drillDown));
     appendTo.push(appendBlackAndWhiteListLabelingTaskForArray(appendTo, searchElement.values.weakSupervisionLabels, LabelSource.WEAK_SUPERVISION, drillDown));
-    appendTo.push(appendBlackAndWhiteListLabelingTaskForArray(appendTo, searchElement.values.modelCallbackLabels, LabelSource.MODEL_CALLBACK, drillDown));
     appendTo.push(appendBlackAndWhiteListLabelingTaskForArray(appendTo, searchElement.values.heuristics, LabelSource.INFORMATION_SOURCE, drillDown));
     if (labelingTask) {
         appendTo.push(appendBlackAndWhiteListLabelingTaskForConfidence(appendTo, searchElement.values.weakSupervisionConfidence, labelingTask.labels.map(l => l.id), true));
-        appendTo.push(appendBlackAndWhiteListLabelingTaskForConfidence(appendTo, searchElement.values.modelCallbackConfidence, labelingTask.labels.map(l => l.id), false));
     }
 
     if (!appendTo) return;
@@ -208,8 +206,10 @@ function appendBlackAndWhiteListLabelingTaskForConfidence(
     forWeakSupervision: boolean = true
 ): any {
     if (!confidence || !confidence.active) return;
-
-    const source = forWeakSupervision ? LabelSource.WEAK_SUPERVISION : LabelSource.MODEL_CALLBACK;
+    let source;
+    if (forWeakSupervision) {
+        source = LabelSource.WEAK_SUPERVISION;
+    }
     let whitelist = {
         SUBQUERY_TYPE: 'WHITELIST',
         SUBQUERIES: [{

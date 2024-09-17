@@ -168,11 +168,8 @@ export function labelingTasksCreateSearchGroup(item, task: LabelingTask, globalS
         active: false,
         manualLabels: labelingTaskLabelArray(task),
         weakSupervisionLabels: labelingTaskLabelArray(task),
-        modelCallbackLabels: labelingTaskLabelArray(task),
         sortByWeakSupervisionConfidence: getOrderByGroup(StaticOrderByKeys.WEAK_SUPERVISION_CONFIDENCE, false, -1),
-        sortByModelCallbackConfidence: getOrderByGroup(StaticOrderByKeys.MODEL_CALLBACK_CONFIDENCE, false, -1),
         weakSupervisionConfidence: getConfidenceFilter(),
-        modelCallbackConfidence: getConfidenceFilter(),
         heuristics: labelingTaskHeuristicArray(task),
         isWithDifferentResults: isWithDifferentResults(task),
     }
@@ -251,7 +248,6 @@ function orderByArray(attributesSortOrder: any[] = [], attributesDict: any) {
         array.push(getOrderByGroup(attributesDict[attributesSortOrder[i].key].name, true, -1)) //1, //-1 desc, 1 asc     
     }
     array.push(getOrderByGroup(StaticOrderByKeys.WEAK_SUPERVISION_CONFIDENCE, false, -1));
-    array.push(getOrderByGroup(StaticOrderByKeys.MODEL_CALLBACK_CONFIDENCE, false, -1));
     array.push(getOrderByGroup(StaticOrderByKeys.RANDOM, false, -1));
 
     return array;
