@@ -166,7 +166,6 @@ export const TOOLTIPS_DICT = {
     [CurrentPage.DATA_BROWSER]: {
         'ONLY_MANAGED': 'Only usable for the managed version',
         'CLEAR_WS_CONFIDENCE': 'Clear filter for weakly supervised confidence',
-        'CLEAR_MC_CONFIDENCE': 'Clear filter for model callback confidence',
         'CONNECT': 'Connection within atomic filters',
         'SAVE_SLICE': 'Store filters to disk',
         'CONFIGURATION': 'Change the data browser configurations',
