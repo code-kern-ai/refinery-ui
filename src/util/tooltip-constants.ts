@@ -102,12 +102,6 @@ export const TOOLTIPS_DICT = {
         'PASTE_LOOKUP_LIST': 'Paste terms to your lookup list',
         'DELETE_LOOKUP_LIST': 'Delete terms from your lookup list',
     },
-    [CurrentPage.MODEL_CALLBACKS]: {
-        'ADD_LABELING_TASK': 'Add new labeling task',
-        'ENABLE_ACTIONS': 'At least one model callback is needed to enable actions',
-        'NAVIGATE_HEURISTICS': 'Go to heuristics overview',
-        'NAVIGATE_LOOKUP_LISTS': 'Go to lookup lists overview',
-    },
     [CurrentPage.ATTRIBUTE_CALCULATION]: {
         'CANNOT_EDIT_NAME': 'Cannot edit attribute\'s name, attribute is in use',
         'EDIT_NAME': 'Edit your attribute\'s name',
@@ -122,7 +116,6 @@ export const TOOLTIPS_DICT = {
         'ENABLE_ACTIONS': 'At least one lookup list is needed to enable actions',
         'CREATE_LOOKUP_LIST': 'Create a new lookup list',
         'NAVIGATE_HEURISTICS': 'Go to heuristics overview',
-        'NAVIGATE_MODEL_CALLBACKS': 'Go to the model callbacks'
 
     },
     [CurrentPage.PROJECT_OVERVIEW]: {
@@ -133,7 +126,6 @@ export const TOOLTIPS_DICT = {
     },
     [CurrentPage.HEURISTICS]: {
         'ADD_LABELING_TASK': 'Add new labeling task',
-        'NAVIGATE_MODEL_CALLBACKS': 'Go to the model callbacks',
         'NAVIGATE_LOOKUP_LISTS': 'Go to lookup lists overview',
         'LABELING_FUNCTION': 'Labeling function',
         'ACTIVE_LEARNING': 'Active learning',

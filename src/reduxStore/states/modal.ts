@@ -116,9 +116,6 @@ const initialState: Modals = {
     [ModalEnum.REMOVE_LOOKUP_LIST]: {
         open: false
     },
-    [ModalEnum.DELETE_MODEL_CALLBACKS]: {
-        open: false
-    },
     [ModalEnum.DELETE_HEURISTICS]: {
         open: false
     },
