@@ -43,8 +43,6 @@ export default function DeleteElementModal(props: DangerZoneProps) {
                 break;
             case DangerZoneEnum.LABELING_FUNCTION:
             case DangerZoneEnum.ACTIVE_LEARNING:
-            case DangerZoneEnum.ZERO_SHOT:
-            case DangerZoneEnum.CROWD_LABELER:
                 deleteHeuristicById(projectId, props.id, (res) => {
                     setIsDeleting(false);
                 });

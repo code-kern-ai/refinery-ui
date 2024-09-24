@@ -28,8 +28,6 @@ function getSubTextForGroupKey(group: SearchGroup): string {
     switch (group) {
         case SearchGroup.ATTRIBUTES:
             return 'Filter on attributes of your records';
-        case SearchGroup.USER_FILTER:
-            return 'Filter manual labels by creation user';
         case SearchGroup.LABELING_TASKS:
             return 'Choose from anything related to';
         case SearchGroup.ORDER_STATEMENTS:
@@ -47,8 +45,6 @@ export function getBasicGroupItems(
     switch (group) {
         case SearchGroup.ATTRIBUTES:
             return [getBasicSearchItem(SearchItemType.ATTRIBUTE, groupKey)];
-        case SearchGroup.USER_FILTER:
-            return [getBasicSearchItem(SearchItemType.USER, groupKey)];
         case SearchGroup.LABELING_TASKS:
             return [getBasicSearchItem(SearchItemType.LABELING_TASK, groupKey)];
         case SearchGroup.ORDER_STATEMENTS:
@@ -71,13 +67,6 @@ export function getBasicSearchItem(
                 addText: 'Enter any string',
                 defaultValue: 'Any Attribute',
                 operator: SearchOperator.CONTAINS,
-            };
-        case SearchItemType.USER:
-            return {
-                type: SearchItemType.USER,
-                group: SearchGroup.USER_FILTER,
-                groupKey: groupKey,
-                addText: 'much question, so wow',
             };
         case SearchItemType.LABELING_TASK:
             return {
@@ -168,11 +157,8 @@ export function labelingTasksCreateSearchGroup(item, task: LabelingTask, globalS
         active: false,
         manualLabels: labelingTaskLabelArray(task),
         weakSupervisionLabels: labelingTaskLabelArray(task),
-        modelCallbackLabels: labelingTaskLabelArray(task),
         sortByWeakSupervisionConfidence: getOrderByGroup(StaticOrderByKeys.WEAK_SUPERVISION_CONFIDENCE, false, -1),
-        sortByModelCallbackConfidence: getOrderByGroup(StaticOrderByKeys.MODEL_CALLBACK_CONFIDENCE, false, -1),
         weakSupervisionConfidence: getConfidenceFilter(),
-        modelCallbackConfidence: getConfidenceFilter(),
         heuristics: labelingTaskHeuristicArray(task),
         isWithDifferentResults: isWithDifferentResults(task),
     }
@@ -212,8 +198,7 @@ function getConfidenceFilter() {
 function labelingTaskHeuristicArray(task: LabelingTask) {
     let array = []
     for (let l of task.informationSources) {
-        if (l.type == InformationSourceType.LABELING_FUNCTION || l.type == InformationSourceType.ACTIVE_LEARNING
-            || l.type == InformationSourceType.ZERO_SHOT || l.type == InformationSourceType.CROWD_LABELER || l.type === undefined) {
+        if (l.type == InformationSourceType.LABELING_FUNCTION || l.type == InformationSourceType.ACTIVE_LEARNING || l.type === undefined) {
             array.push({
                 id: l.id,
                 name: l.name,
@@ -252,7 +237,6 @@ function orderByArray(attributesSortOrder: any[] = [], attributesDict: any) {
         array.push(getOrderByGroup(attributesDict[attributesSortOrder[i].key].name, true, -1)) //1, //-1 desc, 1 asc     
     }
     array.push(getOrderByGroup(StaticOrderByKeys.WEAK_SUPERVISION_CONFIDENCE, false, -1));
-    array.push(getOrderByGroup(StaticOrderByKeys.MODEL_CALLBACK_CONFIDENCE, false, -1));
     array.push(getOrderByGroup(StaticOrderByKeys.RANDOM, false, -1));
 
     return array;

@@ -11,18 +11,6 @@ export function addGroupToSearchElement(searchElement, labelingTasks) {
         searchElement.groupElements.forEach(element => {
             element.group = SearchGroup.ATTRIBUTES;
         });
-    } else if (searchElement.groupElements[0].hasOwnProperty('users')) {
-        const saveEl = searchElement.groupElements[0];
-        const newElement = {
-            id: saveEl.id,
-            group: SearchGroup.USER_FILTER,
-            users: saveEl.users,
-            active: saveEl.active,
-            negate: saveEl.negate,
-            name: saveEl.name,
-            nameAdd: ''
-        };
-        searchElement.groupElements = newElement;
     } else if (searchElement.groupElements[0].hasOwnProperty('manualLabels')) {
         const saveEl = searchElement.groupElements[0];
         const newElement = {
@@ -35,11 +23,8 @@ export function addGroupToSearchElement(searchElement, labelingTasks) {
             active: saveEl.active,
             manualLabels: saveEl.manualLabels,
             weakSupervisionLabels: saveEl.weakSupervisionLabels,
-            modelCallbackLabels: saveEl.modelCallbackLabels,
             sortByWeakSupervisionConfidence: saveEl.sortByWeakSupervisionConfidence,
-            sortByModelCallbackConfidence: saveEl.sortByModelCallbackConfidence,
             weakSupervisionConfidence: saveEl.weakSupervisionConfidence,
-            modelCallbackConfidence: saveEl.modelCallbackConfidence,
             heuristics: saveEl.informationSources,
             isWithDifferentResults: saveEl.isWithDifferentResults,
         }
@@ -65,7 +50,7 @@ export function addGroupToSearchElement(searchElement, labelingTasks) {
     return searchElement;
 }
 
-export function prefillActiveValues(parse: any, fullSearchStoreCopy: any, usersMap: any) {
+export function prefillActiveValues(parse: any, fullSearchStoreCopy: any) {
     Object.values(parse).forEach((el: any) => {
         if (el[SearchGroup.DRILL_DOWN]) {
             fullSearchStoreCopy[SearchGroup.DRILL_DOWN] = el[SearchGroup.DRILL_DOWN];
@@ -84,18 +69,6 @@ export function prefillActiveValues(parse: any, fullSearchStoreCopy: any, usersM
                         fullSearchStoreCopy[SearchGroup.ATTRIBUTES].groupElements[index].id = groupItem.id;
                         fullSearchStoreCopy[SearchGroup.ATTRIBUTES].groupElements[index].color = getActiveNegateGroupColor(groupItem);
                     }
-                } else if (groupItem.hasOwnProperty('users')) {
-                    groupItem.users.forEach((userItem: any) => {
-                        if (userItem.active && usersMap[userItem.id]) {
-                            const findIdx = fullSearchStoreCopy[SearchGroup.USER_FILTER].groupElements.users.findIndex((item: any) => item.id == userItem.id);
-                            fullSearchStoreCopy[SearchGroup.USER_FILTER].groupElements.users[findIdx].active = true;
-                            fullSearchStoreCopy[SearchGroup.USER_FILTER].groupElements.users[findIdx].negate = userItem.negate;
-                            fullSearchStoreCopy[SearchGroup.USER_FILTER].groupElements.users[findIdx].name = usersMap[userItem.id];
-                            fullSearchStoreCopy[SearchGroup.USER_FILTER].groupElements.users[findIdx].id = userItem.id;
-                            fullSearchStoreCopy[SearchGroup.USER_FILTER].groupElements.users[findIdx].dataTip = usersMap[userItem.id];
-                            fullSearchStoreCopy[SearchGroup.USER_FILTER].groupElements.users[findIdx].color = getActiveNegateGroupColor(userItem);
-                        }
-                    });
                 } else if (groupItem.hasOwnProperty('orderBy')) {
                     groupItem.orderBy.forEach((orderByItem: any) => {
                         if (orderByItem.active) {
@@ -140,17 +113,6 @@ export function prefillActiveValues(parse: any, fullSearchStoreCopy: any, usersM
                             fullSearchStoreCopy[key].groupElements.weakSupervisionLabels[index].id = weakSupervisionLabel.id;
                         }
                     });
-                } else if (groupItem.hasOwnProperty('modelCallbackLabels')) {
-                    const modelCallbackLabels = groupItem.modelCallbackLabels;
-                    modelCallbackLabels.forEach((modelCallbackLabel: any, index: number) => {
-                        if (modelCallbackLabel.active) {
-                            const key = SearchGroup.LABELING_TASKS + '_' + groupItem.taskId;
-                            fullSearchStoreCopy[key].groupElements.modelCallbackLabels[index].active = true;
-                            fullSearchStoreCopy[key].groupElements.modelCallbackLabels[index].negate = modelCallbackLabel.negate;
-                            fullSearchStoreCopy[key].groupElements.modelCallbackLabels[index].name = modelCallbackLabel.name;
-                            fullSearchStoreCopy[key].groupElements.modelCallbackLabels[index].id = modelCallbackLabel.id;
-                        }
-                    });
                 } else if (groupItem.hasOwnProperty('informationSources') || groupItem.hasOwnProperty('heuristics')) {
                     const heuristics = groupItem.informationSources;
                     heuristics.forEach((heuristic: any, index: number) => {
@@ -187,9 +149,6 @@ export function checkActiveGroups(group: any, searchGroup: any) {
         if (Array.isArray(val2.groupElements)) {
             const findActive = val2.groupElements.filter((item: any) => item.active);
             if (findActive.length > 0) searchGroup[key].isOpen = true;
-        } else if (val2.groupElements.hasOwnProperty('users')) {
-            const findActive = val2.groupElements.users.filter((item: any) => item.active);
-            if (findActive.length > 0) searchGroup[key].isOpen = true;
         } else if (val2.groupElements.hasOwnProperty('orderBy')) {
             const findActive = val2.groupElements.orderBy.filter((item: any) => item.active);
             if (findActive.length > 0) searchGroup[key].isOpen = true;
@@ -201,14 +160,10 @@ export function checkActiveGroups(group: any, searchGroup: any) {
         } else if (val2.groupElements.hasOwnProperty('weakSupervisionLabels')) {
             const findActive = val2.groupElements.weakSupervisionLabels.filter((item: any) => item.active);
             if (findActive.length > 0) searchGroup[key].isOpen = true;
-        } else if (val2.groupElements.hasOwnProperty('modelCallbackLabels')) {
-            const findActive = val2.groupElements.modelCallbackLabels.filter((item: any) => item.active);
-            if (findActive.length > 0) searchGroup[key].isOpen = true;
         } else if (val2.groupElements.hasOwnProperty('heuristics')) {
             const findActive = val2.groupElements.heuristics.filter((item: any) => item.active);
             if (findActive.length > 0) searchGroup[key].isOpen = true;
         } else if ((val2.groupElements.weakSupervisionConfidence && val2.groupElements.weakSupervisionConfidence.active) ||
-            (val2.groupElements.modelCallbackConfidence && val2.groupElements.modelCallbackConfidence.active) ||
             (val2.groupElements.isWithDifferentResults && val2.groupElements.isWithDifferentResults.active)) {
             searchGroup[key].isOpen = true;
         }

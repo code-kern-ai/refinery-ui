@@ -92,13 +92,6 @@
     background-repeat: repeat;
 }
 
-.labelOverlayModel {
-    background-color: #ffffff;
-    background-image: repeating-linear-gradient(45deg, #e2e8f0 25%, transparent 25%, transparent 75%, #e2e8f0 75%, #e2e8f0), repeating-linear-gradient(45deg, #e2e8f0 25%, #ffffff 25%, #ffffff 75%, #e2e8f0 75%, #e2e8f0);
-    background-position: 0 0, 10px 10px;
-    background-size: 20px 20px;
-}
-
 .label-text {
     font-size: 0.875rem;
     line-height: 1.25rem;

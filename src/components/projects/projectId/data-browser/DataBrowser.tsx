@@ -2,8 +2,8 @@ import { selectProjectId } from "@/src/reduxStore/states/project"
 import { useDispatch, useSelector } from "react-redux"
 import DataBrowserSidebar from "./DataBrowserSidebar";
 import { useCallback, useEffect, useState } from "react";
-import { expandRecordList, selectActiveSearchParams, selectActiveSlice, selectConfiguration, selectFullSearchStore, selectRecords, setActiveDataSlice, setDataSlices, setRecordComments, setSearchRecordsExtended, setUniqueValuesDict, setUsersMapCount, updateAdditionalDataState } from "@/src/reduxStore/states/pages/data-browser";
-import { postProcessRecordsExtended, postProcessUniqueValues, postProcessUsersCount } from "@/src/util/components/projects/projectId/data-browser/data-browser-helper";
+import { expandRecordList, selectActiveSearchParams, selectActiveSlice, selectConfiguration, selectFullSearchStore, selectRecords, setActiveDataSlice, setDataSlices, setRecordComments, setUniqueValuesDict, updateAdditionalDataState } from "@/src/reduxStore/states/pages/data-browser";
+import { postProcessRecordsExtended, postProcessUniqueValues } from "@/src/util/components/projects/projectId/data-browser/data-browser-helper";
 import { selectAttributes, selectLabelingTasksAll, setAllAttributes, setAllEmbeddings, setLabelingTasksAll } from "@/src/reduxStore/states/pages/settings";
 import { postProcessLabelingTasks, postProcessLabelingTasksSchema } from "@/src/util/components/projects/projectId/settings/labeling-tasks-helper";
 import { selectAllUsers, selectOrganizationId, selectUser, setComments } from "@/src/reduxStore/states/general";
@@ -17,7 +17,6 @@ import { getAttributes } from "@/src/services/base/attribute";
 import { getDataSlices, getUniqueValuesByAttributes } from "@/src/services/base/dataSlices";
 import { getLabelingTasksByProjectId } from "@/src/services/base/project";
 import { getRecordComments, getRecordsByStaticSlice, searchRecordsExtended } from "@/src/services/base/data-browser";
-import { getAllUsersWithRecordCount } from "@/src/services/base/organization";
 import { getEmbeddings } from "@/src/services/base/embedding";
 import { parseFilterToExtended } from "@/src/util/components/projects/projectId/data-browser/filter-parser-helper";
 import { SearchGroup, Slice } from "@/submodules/javascript-functions/enums/enums";
@@ -48,7 +47,6 @@ export default function DataBrowser() {
         refetchDataSlicesAndProcess();
         refetchAttributesAndProcess();
         refetchLabelingTasksAndProcess();
-        refetchUsersCountAndProcess();
         refetchEmbeddingsAndPostProcess();
         refetchUniqueValuesAndProcess();
     }, [projectId, users, user]);
@@ -121,12 +119,6 @@ export default function DataBrowser() {
         getLabelingTasksByProjectId(projectId, (res) => {
             const labelingTasks = postProcessLabelingTasks(res['data']['projectByProjectId']['labelingTasks']['edges']);
             dispatch(setLabelingTasksAll(postProcessLabelingTasksSchema(labelingTasks)));
-        });
-    }
-
-    function refetchUsersCountAndProcess() {
-        getAllUsersWithRecordCount(projectId, (res) => {
-            dispatch(setUsersMapCount(postProcessUsersCount(res.data['allUsersWithRecordCount'], users, user)));
         });
     }
 

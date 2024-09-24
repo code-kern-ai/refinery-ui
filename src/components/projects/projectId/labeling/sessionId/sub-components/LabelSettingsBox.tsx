@@ -55,11 +55,6 @@ export default function LabelSettingsBox(props: LabelSettingsBoxProps) {
                         checked={settings.task[projectId][props.labelSettingsLabel.taskId][props.labelSettingsLabel.id].showWeakSupervision} />
                 </div>
                 <div className="flex flex-row flex-nowrap items-center gap-x-1 cursor-pointer">
-                    <span className="font-semibold text-sm text-gray-500">MC</span>
-                    <input className="h-4 w-4 cursor-pointer" type="checkbox" onChange={() => toggleLabelDisplaySetting('showModel')}
-                        checked={settings.task[projectId][props.labelSettingsLabel.taskId][props.labelSettingsLabel.id].showModel} />
-                </div>
-                <div className="flex flex-row flex-nowrap items-center gap-x-1 cursor-pointer">
                     <span className="font-semibold text-sm text-gray-500">H</span>
                     <input className="h-4 w-4 cursor-pointer" type="checkbox" onChange={() => toggleLabelDisplaySetting('showHeuristics')}
                         checked={settings.task[projectId][props.labelSettingsLabel.taskId][props.labelSettingsLabel.id].showHeuristics} />

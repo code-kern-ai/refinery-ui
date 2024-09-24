@@ -8,10 +8,8 @@ export function postProcessingModelsDownload(modelsDownloaded: ModelsDownloaded[
     });
 }
 
-export function postProcessingZeroShotEncoders(zeroShotModels: ModelsDownloaded[], encoders: ModelsDownloaded[]): any {
+export function postProcessingEncoders(encoders: ModelsDownloaded[]): any {
     const prepareModelsList = encoders.filter((el: any) =>
         el.configString != 'bag-of-characters' && el.configString != 'bag-of-words' && el.configString != 'tf-idf');
-    const zeroShotModelsCopy = [...zeroShotModels];
-    zeroShotModelsCopy.sort((a, b) => a.prio - b.prio);
-    return prepareModelsList.concat(zeroShotModelsCopy);
+    return prepareModelsList.sort((a, b) => a.prio - b.prio);
 }

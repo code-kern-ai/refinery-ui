@@ -27,15 +27,6 @@ export function updateSearchParameters(searchElement, attributes, separator, ful
             if (!p.groupElements.hasComments.active) return;
             param = createSplittedText(updateSearchParamText(p, attributes, separator, fullSearch[SearchGroup.DRILL_DOWN]), fullSearch, p);
             activeParams.push({ splittedText: param, values: p.groupElements });
-        } else if (p.groupElements.group == SearchGroup.USER_FILTER) {
-            const isOneActive = p.groupElements.users.some(i => i.active);
-            for (let i of p.groupElements.users) {
-                if (!i.active) continue;
-                param = createSplittedText(updateSearchParamText(p, attributes, separator, fullSearch[SearchGroup.DRILL_DOWN]), fullSearch, p);
-            }
-            if (isOneActive) {
-                activeParams.push({ splittedText: param, values: { group: p.groupElements.group }, users: p.groupElements.users });
-            }
         } else if (p.groupElements.group == SearchGroup.ORDER_STATEMENTS) {
             for (let i of p.groupElements.orderBy) {
                 if (!i.active) continue;
@@ -43,7 +34,7 @@ export function updateSearchParameters(searchElement, attributes, separator, ful
                 activeParams.push({ splittedText: param, values: { group: p.groupElements.group, orderBy: p.groupElements } });
             }
         } else if (p.groupElements.group == SearchGroup.LABELING_TASKS) {
-            if (!(p.groupElements.active || (p.groupElements['weakSupervisionConfidence'] && p.groupElements['weakSupervisionConfidence'].active) || (p.groupElements['modelCallbackConfidence'] && p.groupElements['modelCallbackConfidence'].active) || p.groupElements['isWithDifferentResults'])) return;
+            if (!(p.groupElements.active || (p.groupElements['weakSupervisionConfidence'] && p.groupElements['weakSupervisionConfidence'].active) || p.groupElements['isWithDifferentResults'])) return;
             param = createSplittedText(updateSearchParamText(p, attributes, separator, fullSearch[SearchGroup.DRILL_DOWN]), fullSearch, p);
             if (!param) return;
             activeParams.push({ splittedText: param, values: { group: p.groupElements.group, values: p.groupElements } });
@@ -131,8 +122,6 @@ function updateSearchParamText(searchElement, attributes, separator, drillDownVa
         if (labelingTaskBuildSearchParamText(searchElementCopy.groupElements, drillDownVal) === '') {
             searchElementCopy.searchText = null;
         }
-    } else if (searchElementCopy.groupElements.group == SearchGroup.USER_FILTER) {
-        searchElementCopy.searchText = userBuildSearchParamText(searchElementCopy.groupElements.users, drillDownVal);
     } else if (searchElementCopy.groupElements.group == SearchGroup.ORDER_STATEMENTS) {
         searchElementCopy.searchText = orderByBuildSearchParamText(searchElementCopy.groupElements);
     } else if (searchElementCopy.groupElements.group == SearchGroup.COMMENTS) {
@@ -150,9 +139,6 @@ function labelingTaskBuildSearchParamText(values, drillDownVal): string {
     tmp = labelingTaskBuildSearchParamTextPart(values.weakSupervisionLabels, 'WS-label', drillDownVal);
     if (tmp) text += (text ? '\nAND ' : '') + ' (' + tmp + ')';
 
-    tmp = labelingTaskBuildSearchParamTextPart(values.modelCallbackLabels, 'MC-label', drillDownVal);
-    if (tmp) text += (text ? '\nAND ' : '') + ' (' + tmp + ')';
-
     tmp = labelingTaskBuildSearchParamTextPart(values.heuristics, 'IS', drillDownVal);
     if (tmp) text += (text ? '\nAND ' : '') + ' (' + tmp + ')';
 
@@ -166,11 +152,6 @@ function labelingTaskBuildSearchParamText(values, drillDownVal): string {
         text += "BETWEEN " + values.weakSupervisionConfidence.lower + "% AND " + values.weakSupervisionConfidence.upper + "%";
     }
 
-    if (values.modelCallbackConfidence && values.modelCallbackConfidence.active) {
-        text += (text ? '\nAND ' : '') + 'MC-Confidence '
-        if (values.modelCallbackConfidence.negate) text += "NOT "
-        text += "BETWEEN " + values.modelCallbackConfidence.lower + "% AND " + values.modelCallbackConfidence.upper + "%";
-    }
     if (values.negate) text = '\nNOT (' + text + ')';
     else text = '\n' + text;
     if (text === '\n') return '';
@@ -199,12 +180,6 @@ function labelingTaskBuildSearchParamTextPart(arr: any[], blockname: string, dri
         if (not_in_values) text += operatorNegative + '(' + not_in_values + ')';
     }
 
-    return text;
-}
-
-function userBuildSearchParamText(values, drillDownVal) {
-    let text = labelingTaskBuildSearchParamTextPart(values, 'User', drillDownVal);
-    if (values.negate) text = 'NOT (' + text + ')';
     return text;
 }
 

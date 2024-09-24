@@ -7,7 +7,7 @@ import { parseUTC } from "@/submodules/javascript-functions/date-parser";
 import { getColorStruct, mapInformationSourceStatsGlobal } from "./shared-helper";
 
 export const ACTIONS_DROPDOWN_OPTIONS = ['Select all', 'Deselect all', 'Run selected', 'Delete selected'];
-export const NEW_HEURISTICS = ['Labeling function', 'Active learning']; // , 'Zero-shot', 'Crowd labeler' removed from UI to prevent usage -> will be fully removed in a future release
+export const NEW_HEURISTICS = ['Labeling function', 'Active learning'];
 
 export function postProcessHeuristics(heuristics: any, projectId: string): Heuristic[] {
     if (!heuristics) return [];
@@ -28,10 +28,6 @@ export function getFunctionName(heuristicType: InformationSourceType) {
             return 'my_labeling_function';
         case InformationSourceType.ACTIVE_LEARNING:
             return 'MyActiveLearner';
-        case InformationSourceType.ZERO_SHOT:
-            return 'Zero Shot module';
-        case InformationSourceType.CROWD_LABELER:
-            return 'Crowd Heuristic';
     }
 }
 
@@ -64,12 +60,6 @@ export function getRouterLinkHeuristic(heuristicType: InformationSourceType, pro
             break;
         case InformationSourceType.ACTIVE_LEARNING:
             startingLink += '/active-learning';
-            break;
-        case InformationSourceType.ZERO_SHOT:
-            startingLink += '/zero-shot';
-            break;
-        case InformationSourceType.CROWD_LABELER:
-            startingLink += '/crowd-labeler';
             break;
     }
     return startingLink;

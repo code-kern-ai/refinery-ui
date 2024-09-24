@@ -26,14 +26,12 @@ export type LabelingSuiteTaskHeaderLabelDisplayData = {
     },
     showHeuristics: boolean;
     showManual: boolean;
-    showModel: boolean;
     showWeakSupervision: boolean;
 }
 
 export type QuickButtonConfig = {
     showManual: string[];
     showWeakSupervision: string[];
-    showModel: string[];
     showHeuristics: string[];
     all: string[];
     nothing: string[];

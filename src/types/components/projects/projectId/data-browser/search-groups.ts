@@ -13,7 +13,6 @@ export type SearchGroupItem = {
 
 export enum SearchItemType {
     ATTRIBUTE = 'ATTRIBUTE',
-    USER = 'USER',
     LABELING_TASK = 'LABELING_TASK',
     ORDER_BY = 'ORDER_BY',
     COMMENTS = 'COMMENTS'

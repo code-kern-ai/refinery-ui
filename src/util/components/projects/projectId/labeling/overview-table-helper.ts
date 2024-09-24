@@ -77,8 +77,6 @@ export function getHoverClassLabel(type: LabelSource): string {
             return "label-overlay-heuristic";
         case LabelSource.WEAK_SUPERVISION:
             return "label-overlay-weak-supervision";
-        case LabelSource.MODEL_CALLBACK:
-            return "label-overlay-model";
         default:
             return "";
     }
@@ -88,14 +86,11 @@ export function getLabelSourceOrder(source: LabelSource, isType?: InformationSou
     switch (source) {
         case LabelSource.MANUAL: return 0;
         case LabelSource.WEAK_SUPERVISION: return 1;
-        case LabelSource.MODEL_CALLBACK: return 2;
         case LabelSource.INFORMATION_SOURCE:
             switch (isType) {
                 case InformationSourceType.LABELING_FUNCTION: return 30;
                 case InformationSourceType.ACTIVE_LEARNING: return 31;
                 case InformationSourceType.PRE_COMPUTED: return 32;
-                case InformationSourceType.ZERO_SHOT: return 33;
-                case InformationSourceType.CROWD_LABELER: return 34;
                 default: return 35;
             }
         default: return 9999;
@@ -189,8 +184,6 @@ export function filterRlaLabelCondition(rla: any, settings, projectId): boolean 
             return rlaSettings.showManual;
         case LabelSource.INFORMATION_SOURCE:
             return rlaSettings.showHeuristics;
-        case LabelSource.MODEL_CALLBACK:
-            return rlaSettings.showModel;
         case LabelSource.WEAK_SUPERVISION:
             return rlaSettings.showWeakSupervision;
         default:

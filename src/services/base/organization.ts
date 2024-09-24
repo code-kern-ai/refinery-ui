@@ -29,11 +29,6 @@ export function getAllActiveAdminMessages(onResult: (result: any) => void) {
     jsonFetchWrapper(finalUrl, FetchType.GET, onResult);
 }
 
-export function getAllUsersWithRecordCount(projectId: string, onResult: (result: any) => void) {
-    const finalUrl = `${organizationEndpoint}/${projectId}/all-users-with-record-count`;
-    jsonFetchWrapper(finalUrl, FetchType.GET, onResult);
-}
-
 export function getCanCreateLocalOrg(onResult: (result: any) => void) {
     const finalUrl = `${organizationEndpoint}/can-create-local-org`;
     jsonFetchWrapper(finalUrl, FetchType.GET, onResult);
