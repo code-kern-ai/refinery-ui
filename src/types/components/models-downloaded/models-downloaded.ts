@@ -5,7 +5,6 @@ export type ModelsDownloaded = {
     revision?: string;
     size?: number;
     status: ModelsDownloadedStatus;
-    zeroShotPipeline?: boolean;
     sizeFormatted?: string;
     parseDate?: string;
     prio?: number;

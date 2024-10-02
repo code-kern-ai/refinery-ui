@@ -39,8 +39,7 @@ export default function QuickButtons(props: QuickButtonsProps) {
     return (<div className="flex flex-row flex-wrap gap-2 items-center">
         <QuickButton attributeName="showManual" caption="Manual" dataTipCaption="manual" hoverClass="labelOverlayManual" setAllLabelDisplaySetting={() => setAllLabelDisplaySetting(true, 'showManual')} />
         <QuickButton attributeName="showWeakSupervision" caption="Weak Supervision" dataTipCaption="weak supervision" hoverClass="labelOverlayWeakSupervision" setAllLabelDisplaySetting={() => setAllLabelDisplaySetting(true, 'showWeakSupervision')} />
-        <QuickButton attributeName="showModel" caption="Model Callback" dataTipCaption="model callback" hoverClass="labelOverlayHeuristic" setAllLabelDisplaySetting={() => setAllLabelDisplaySetting(true, 'showModel')} />
-        <QuickButton attributeName="showHeuristics" caption="Heuristic" dataTipCaption="heuristic" hoverClass="labelOverlayModel" setAllLabelDisplaySetting={() => setAllLabelDisplaySetting(true, 'showHeuristics')} />
+        <QuickButton attributeName="showHeuristics" caption="Heuristic" dataTipCaption="heuristic" hoverClass="labelOverlayHeuristic" setAllLabelDisplaySetting={() => setAllLabelDisplaySetting(true, 'showHeuristics')} />
         <button onClick={() => setAllLabelDisplaySetting(true)}
             className="text-sm font-medium px-2 py-0.5 rounded-md border focus:outline-none cursor-pointer flex flex-row flex-no-wrap gap-x-1 items-center">
             {QUICK_BUTTONS.all && <div className="grid grid-cols-2 gap-0.5">

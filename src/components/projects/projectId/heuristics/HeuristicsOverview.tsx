@@ -11,8 +11,6 @@ import GridCards from "@/src/components/shared/grid-cards/GridCards";
 import HeuristicsHeader from "./HeuristicsHeader";
 import AddLabelingFunctionModal from "./modals/AddLabelingFunctionModal";
 import AddActiveLeanerModal from "./modals/AddActiveLearnerModal";
-import AddZeroShotModal from "./modals/AddZeroShotModal";
-import AddCrowdLabelerModal from "./modals/AddCrowdLabelerModal";
 import { postProcessingEmbeddings } from "@/src/util/components/projects/projectId/settings/embeddings-helper";
 import { CommentType } from "@/src/types/shared/comments";
 import { CommentDataManager } from "@/src/util/classes/comments";
@@ -160,19 +158,6 @@ export function HeuristicsOverview() {
                                     about active learning</a>
                             </div>
                         </div>
-                        <div>
-                            <div className="text-gray-900 text-xl leading-7 font-semibold">Starting with zero-shot</div>
-                            <div className="text-gray-500 text-base leading-6 font-normal mt-3">Zero-shot models are really
-                                great heuristics, as they infer predictions from the label names (and some context). You
-                                might want to use them for your project, but be aware that pulling them can require some
-                                time, since they contain enormous amounts of parameters.</div>
-                            <div
-                                className="text-green-800 hover:text-green-500 text-base leading-6 font-semibold mt-3 cursor-pointer">
-                                <a href="https://docs.kern.ai/refinery/heuristics#zero-shot-classifiers"
-                                    target="_blank">Read
-                                    about zero-shot</a>
-                            </div>
-                        </div>
                     </div>
                 </div>
             ) : (<>
@@ -186,8 +171,6 @@ export function HeuristicsOverview() {
 
             <AddLabelingFunctionModal />
             <AddActiveLeanerModal />
-            <AddZeroShotModal />
-            <AddCrowdLabelerModal />
         </div >
     </div >)
 }

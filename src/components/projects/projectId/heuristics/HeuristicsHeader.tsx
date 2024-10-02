@@ -22,7 +22,6 @@ import DeleteHeuristicsModal from './DeleteHeuristicsModal';
 import KernDropdown from '@/submodules/react-components/components/KernDropdown';
 import { useWebsocket } from '@/submodules/react-components/hooks/web-socket/useWebsocket';
 import { createTask, getWeakSupervisionRun, setAllHeuristics } from "@/src/services/base/heuristic";
-import { initZeroShot } from "@/src/services/base/zero-shot";
 import { initWeakSupervision } from "@/src/services/base/weak-supervision";
 import { Application, CurrentPage } from "@/submodules/react-components/hooks/web-socket/constants";
 
@@ -83,14 +82,6 @@ export default function HeuristicsHeader(props: HeuristicsHeaderProps) {
                 dispatch(setHeuristicType(InformationSourceType.ACTIVE_LEARNING));
                 dispatch(openModal(ModalEnum.ADD_ACTIVE_LEARNER));
                 break;
-            case 'Zero-shot':
-                dispatch(setHeuristicType(InformationSourceType.ZERO_SHOT));
-                dispatch(openModal(ModalEnum.ADD_ZERO_SHOT));
-                break;
-            case 'Crowd labeler':
-                dispatch(setHeuristicType(InformationSourceType.CROWD_LABELER));
-                dispatch(openModal(ModalEnum.ADD_CROWD_LABELER));
-                break;
             case 'Select all':
                 selectHeuristics(true);
                 break;
@@ -110,18 +101,9 @@ export default function HeuristicsHeader(props: HeuristicsHeaderProps) {
     function runSelectedHeuristics() {
         heuristics.forEach((heuristic: Heuristic) => {
             if (heuristic.selected) {
-                runHeuristic(heuristic.informationSourceType, heuristic.id);
+                createTask(projectId, heuristic.id, () => { })
             }
         });
-    }
-
-    function runHeuristic(type: InformationSourceType, id: string) {
-        if (type == InformationSourceType.ZERO_SHOT) {
-            initZeroShot(projectId, id, () => { });
-        } else if (type == InformationSourceType.CROWD_LABELER) {
-        } else {
-            createTask(projectId, id, () => { });
-        }
     }
 
     function selectHeuristics(checked: boolean) {
@@ -180,11 +162,6 @@ export default function HeuristicsHeader(props: HeuristicsHeaderProps) {
                         disabledOptions={[false, false]}
                         selectedOption={(option: string) => executeOption(option)} buttonClasses={`${style.actionsHeight} text-xs whitespace-nowrap`} dropdownClasses="mr-3" dropdownItemsWidth='w-40' dropdownWidth='w-32'
                         iconsArray={['IconCode', 'IconBolt']} useFillForIcons={[false, true]} />
-                    {/* removed zero shot & crowd labeler from NEW_HEURISTICS => needs matching arrays 
-                    <KernDropdown options={NEW_HEURISTICS} buttonName="New heuristic" tooltipsArray={[null, null, null, isManaged ? null : 'Only available for managed projects']}
-                        disabledOptions={[false, false, !(labelingTasks && labelingTasks.length > 0), !isManaged]}
-                        selectedOption={(option: string) => executeOption(option)} buttonClasses={`${style.actionsHeight} text-xs whitespace-nowrap`} dropdownClasses="mr-3" dropdownItemsWidth='w-40' dropdownWidth='w-32'
-                        iconsArray={['IconCode', 'IconBolt', 'IconSparkles', 'IconUsers']} useFillForIcons={[false, true, true, false]} /> */}
                 </Tooltip>) : (<Tooltip content={TOOLTIPS_DICT.HEURISTICS.DISABLED_NEW_HEURISTIC} color="invert">
                     <button type="button" disabled={true}
                         className="mr-3 inline-flex items-center justify-center w-full rounded-md border border-gray-300 shadow-sm px-4 py-1.5 bg-white text-xs font-medium text-gray-700 opacity-50 cursor-not-allowed focus:ring-offset-2 focus:ring-offset-gray-400"
@@ -253,15 +230,6 @@ export default function HeuristicsHeader(props: HeuristicsHeaderProps) {
                             <IconWaveSine size={20} strokeWidth={2} className="text-gray-500" />
                         </button>
                     </Tooltip>)}
-                </div>
-
-                <div className="flex justify-center overflow-visible">
-                    <Tooltip placement="top" content={TOOLTIPS_DICT.HEURISTICS.NAVIGATE_MODEL_CALLBACKS} color="invert">
-                        <a href={`/refinery/projects/${projectId}/model-callbacks`} onClick={(e: any) => { e.preventDefault(); router.push(`/projects/${projectId}/model-callbacks`) }}
-                            className="bg-white text-gray-700 text-xs font-medium mr-3 px-4 py-2 rounded-md border border-gray-300 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-                            Model callbacks
-                        </a>
-                    </Tooltip>
                 </div>
 
                 <div className="flex justify-center overflow-visible">

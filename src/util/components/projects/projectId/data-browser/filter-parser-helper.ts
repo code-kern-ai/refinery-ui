@@ -19,9 +19,6 @@ export function parseFilterToExtended(activeSearchParams, attributes: Attribute[
         } else if (searchElement.values.group == SearchGroup.LABELING_TASKS) {
             appendBlackAndWhiteListLabelingTask(toReturn, searchElement.values, labelingTasks, drillDownVal);
             toReturn = toReturn.filter((el) => el != null);
-        } else if (searchElement.values.group == SearchGroup.USER_FILTER) {
-            toReturn.push(appendBlackAndWhiteListUser(toReturn, searchElement, drillDownVal));
-            toReturn = toReturn.filter((el) => el != null);
         } else if (searchElement.values.group == SearchGroup.ORDER_STATEMENTS) {
             orderBy.ORDER_BY = appendActiveOrderBy(searchElement.values.orderBy, orderBy);
             if (orderBy.ORDER_BY.length > 0) {
@@ -103,11 +100,9 @@ function appendBlackAndWhiteListLabelingTask(appendTo, searchElement, labelingTa
     const labelingTask = labelingTasks.find(l => l.id == searchElement.values.taskId);
     appendTo.push(appendBlackAndWhiteListLabelingTaskForArray(appendTo, searchElement.values.manualLabels, LabelSource.MANUAL, drillDown));
     appendTo.push(appendBlackAndWhiteListLabelingTaskForArray(appendTo, searchElement.values.weakSupervisionLabels, LabelSource.WEAK_SUPERVISION, drillDown));
-    appendTo.push(appendBlackAndWhiteListLabelingTaskForArray(appendTo, searchElement.values.modelCallbackLabels, LabelSource.MODEL_CALLBACK, drillDown));
     appendTo.push(appendBlackAndWhiteListLabelingTaskForArray(appendTo, searchElement.values.heuristics, LabelSource.INFORMATION_SOURCE, drillDown));
     if (labelingTask) {
         appendTo.push(appendBlackAndWhiteListLabelingTaskForConfidence(appendTo, searchElement.values.weakSupervisionConfidence, labelingTask.labels.map(l => l.id), true));
-        appendTo.push(appendBlackAndWhiteListLabelingTaskForConfidence(appendTo, searchElement.values.modelCallbackConfidence, labelingTask.labels.map(l => l.id), false));
     }
 
     if (!appendTo) return;
@@ -208,8 +203,7 @@ function appendBlackAndWhiteListLabelingTaskForConfidence(
     forWeakSupervision: boolean = true
 ): any {
     if (!confidence || !confidence.active) return;
-
-    const source = forWeakSupervision ? LabelSource.WEAK_SUPERVISION : LabelSource.MODEL_CALLBACK;
+    const source = forWeakSupervision ? LabelSource.WEAK_SUPERVISION : undefined;
     let whitelist = {
         SUBQUERY_TYPE: 'WHITELIST',
         SUBQUERIES: [{
@@ -224,7 +218,7 @@ function appendBlackAndWhiteListLabelingTaskForConfidence(
         SUBQUERIES: [],
     };
 
-    const query = forWeakSupervision ? 'SUBQUERY_RLA_CONFIDENCE' : 'SUBQUERY_CALLBACK_CONFIDENCE';
+    const query = forWeakSupervision ? 'SUBQUERY_RLA_CONFIDENCE' : undefined;
     list.SUBQUERIES.push({
         QUERY_TEMPLATE: query,
         VALUES: [confidence.lower * 0.01, confidence.upper * 0.01],
@@ -232,59 +226,6 @@ function appendBlackAndWhiteListLabelingTaskForConfidence(
 
     return JSON.stringify(list);
 }
-
-function appendBlackAndWhiteListUser(appendTo, searchElement, drillDownVal) {
-    return appendBlackAndWhiteListUserForArray(appendTo, searchElement.users, drillDownVal);
-}
-
-function appendBlackAndWhiteListUserForArray(
-    appendTo: string[],
-    array: any[],
-    drillDown: boolean = false
-): any {
-    if (drillDown) {
-        for (const l of array) {
-            appendTo.push(appendBlackAndWhiteListUserForArray(appendTo, [l], false));
-        }
-        return;
-    }
-
-    let whitelist = {
-        SUBQUERY_TYPE: 'WHITELIST',
-        SUBQUERIES: [],
-    };
-    let blacklist = {
-        SUBQUERY_TYPE: 'BLACKLIST',
-        SUBQUERIES: [],
-    };
-    let inValues = [],
-        notInValues = [];
-    for (let c of array) {
-        if (c.active) {
-            if (c.negate) notInValues.push(c.id);
-            else inValues.push(c.id);
-        }
-    }
-
-    if (inValues.length != 0) {
-        whitelist.SUBQUERIES.push({
-            QUERY_TEMPLATE: 'SUBQUERY_RLA_CREATED_BY',
-            VALUES: inValues,
-        });
-    }
-    if (notInValues.length != 0) {
-        blacklist.SUBQUERIES.push({
-            QUERY_TEMPLATE: 'SUBQUERY_RLA_CREATED_BY',
-            VALUES: notInValues,
-        });
-    }
-    if (whitelist.SUBQUERIES.length > 0)
-        return JSON.stringify(whitelist);
-    if (blacklist.SUBQUERIES.length > 0)
-        return JSON.stringify(blacklist);
-    return null;
-}
-
 
 function appendActiveOrderBy(values, orderBy) {
     for (const element of values.orderBy) {

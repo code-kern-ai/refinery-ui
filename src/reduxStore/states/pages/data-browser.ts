@@ -16,7 +16,6 @@ type DataBrowserState = {
         clearFullSearch: boolean;
         canUpdateDynamicSlice: boolean;
     },
-    usersMapCount: any;
     searchRecordsExtended: SearchRecordsExtended;
     similaritySearch: {
         recordsInDisplay: boolean
@@ -48,7 +47,6 @@ function getInitState(): DataBrowserState {
             clearFullSearch: false,
             canUpdateDynamicSlice: false
         },
-        usersMapCount: null,
         searchRecordsExtended: {
             fullCount: 0,
             queryLimit: 0,
@@ -120,10 +118,6 @@ const dataBrowserSlice = createSlice({
                     payload: [dataSliceId, changes]
                 };
             },
-        },
-        setUsersMapCount(state, action: PayloadAction<any>) {
-            if (action.payload) state.usersMapCount = action.payload;
-            else state.usersMapCount = {};
         },
         setSearchRecordsExtended(state, action: PayloadAction<SearchRecordsExtended>) {
             if (action.payload) state.searchRecordsExtended = action.payload;
@@ -223,7 +217,6 @@ const dataBrowserSlice = createSlice({
 export const selectActiveSlice = (state) => state.dataBrowser.active;
 export const selectDataSlices = (state) => state.dataBrowser.all;
 export const selectAdditionalData = (state) => state.dataBrowser.additionalData;
-export const selectUsersCount = (state) => state.dataBrowser.usersMapCount;
 export const selectRecords = (state) => state.dataBrowser.searchRecordsExtended;
 export const selectSimilaritySearch = (state) => state.dataBrowser.similaritySearch;
 export const selectActiveSearchParams = (state) => state.dataBrowser.activeSearchParams;
@@ -239,5 +232,5 @@ export const selectDataSlicesAll = createSelector([selectDataSlices], (d): any =
 export const selectDataSlicesDict = createSelector([selectDataSlicesAll], (a): any => a ? arrayToDict(a, 'id') : null);
 export const selectStaticSlices = createSelector([selectDataSlices], (a): any => a ? a.filter((slice) => slice.sliceType == Slice.STATIC_DEFAULT) : null);
 
-export const { setDataSlices, setActiveDataSlice, removeFromAllDataSlicesById, updateDataSlicesState, setUsersMapCount, setSearchRecordsExtended, setActiveSearchParams, extendAllDataSlices, updateConfigurationState, updateAdditionalDataState, setTextHighlight, setIsTextHighlightNeeded, setRecordComments, setRecordsInDisplay, expandRecordList, setUniqueValuesDict, setFullSearchStore, updateFullSearchState, setSearchGroupsStore } = dataBrowserSlice.actions;
+export const { setDataSlices, setActiveDataSlice, removeFromAllDataSlicesById, updateDataSlicesState, setSearchRecordsExtended, setActiveSearchParams, extendAllDataSlices, updateConfigurationState, updateAdditionalDataState, setTextHighlight, setIsTextHighlightNeeded, setRecordComments, setRecordsInDisplay, expandRecordList, setUniqueValuesDict, setFullSearchStore, updateFullSearchState, setSearchGroupsStore } = dataBrowserSlice.actions;
 export const dataBrowserReducer = dataBrowserSlice.reducer;

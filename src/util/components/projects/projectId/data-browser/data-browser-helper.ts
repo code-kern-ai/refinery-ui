@@ -61,28 +61,6 @@ export function updateSliceInfoHelper(slice: DataSlice, projectId: string, users
     return sliceInfo;
 }
 
-export function postProcessUsersCount(usersCount: any, users: User[], currentUser: User) {
-    const usersMapCount = {}
-    users.forEach((user, index) => {
-        let sum = 0;
-        const userCountFind = usersCount.find(e => e.user.id == user.id);
-        if (!userCountFind) return;
-        const prepareUsersCount = { ...userCountFind };
-        prepareUsersCount.counts = JSON.parse(prepareUsersCount.counts);
-        const userCopy = { ...user };
-        if (prepareUsersCount.counts) prepareUsersCount.counts.forEach(e => {
-            sum += e.count;
-            e.source = labelSourceToString(e.source_type);
-        });
-        userCopy.countSum = sum;
-        userCopy.counts = prepareUsersCount.counts;
-        if (userCopy.countSum > 0 || userCopy.id == currentUser.id) {
-            usersMapCount[userCopy.id] = userCopy;
-        }
-    });
-    return usersMapCount;
-}
-
 export const DATA_BROWSER_TABLE_COLUMN_HEADERS: ColumnData[] = [
     { field: 'type', displayName: 'Type', order: 1 },
     { field: 'task', displayName: 'Task', order: 2 },
@@ -122,7 +100,7 @@ export function parseRecordData(element, labelingTasks: LabelingTask[]) {
                 };
             }
             element.rla_aggregation[rlaAggParts.key].amount++;
-            if (rlaLine.confidence != null && (rlaLine.source_type == LabelSource.WEAK_SUPERVISION || rlaLine.source_type == LabelSource.MODEL_CALLBACK)) {
+            if (rlaLine.confidence != null && rlaLine.source_type == LabelSource.WEAK_SUPERVISION) {
                 element.rla_aggregation[rlaAggParts.key].confidence.push(rlaLine.confidence);
             }
         }

@@ -46,9 +46,6 @@ const initialState: Modals = {
     [ModalEnum.PROJECT_SNAPSHOT]: {
         open: false,
     },
-    [ModalEnum.GATES_INTEGRATION_WARNING]: {
-        open: false,
-    },
     [ModalEnum.FILTERED_ATTRIBUTES]: {
         open: false,
         embeddingId: '',
@@ -116,9 +113,6 @@ const initialState: Modals = {
     [ModalEnum.REMOVE_LOOKUP_LIST]: {
         open: false
     },
-    [ModalEnum.DELETE_MODEL_CALLBACKS]: {
-        open: false
-    },
     [ModalEnum.DELETE_HEURISTICS]: {
         open: false
     },
@@ -128,28 +122,12 @@ const initialState: Modals = {
     [ModalEnum.ADD_ACTIVE_LEARNER]: {
         open: false
     },
-    [ModalEnum.ADD_ZERO_SHOT]: {
-        open: false
-    },
-    [ModalEnum.ADD_CROWD_LABELER]: {
-        open: false
-    },
     [ModalEnum.LAST_WEAK_SUPERVISION_RUN]: {
         open: false
     },
     [ModalEnum.SAMPLE_RECORDS_LABELING_FUNCTION]: {
         open: false,
         currentRecordIdx: -1,
-    },
-    [ModalEnum.WHY_SO_LONG]: {
-        open: false
-    },
-    [ModalEnum.SAMPLE_RECORDS_ZERO_SHOT]: {
-        open: false,
-        record: null,
-    },
-    [ModalEnum.CANCEL_EXECUTION]: {
-        open: false
     },
     [ModalEnum.DATA_SLICE_INFO]: {
         open: false,
@@ -158,10 +136,6 @@ const initialState: Modals = {
     [ModalEnum.DELETE_SLICE]: {
         open: false,
         sliceId: '',
-    },
-    [ModalEnum.USER_INFO]: {
-        open: false,
-        userInfo: null,
     },
     [ModalEnum.SAVE_DATA_SLICE]: {
         open: false,

@@ -6,7 +6,6 @@ export function getQuickButtonConfig(): QuickButtonConfig {
     return {
         showManual: ['bg-green-200', 'bg-gray-200', 'bg-gray-200', 'bg-gray-200'],
         showWeakSupervision: ['bg-gray-200', 'bg-green-200', 'bg-gray-200', 'bg-gray-200'],
-        showModel: ['bg-gray-200', 'bg-gray-200', 'bg-green-200', 'bg-gray-200'],
         showHeuristics: ['bg-gray-200', 'bg-gray-200', 'bg-gray-200', 'bg-green-200'],
         all: ['bg-green-200', 'bg-green-200', 'bg-green-200', 'bg-green-200'],
         nothing: ['bg-white', 'bg-white', 'bg-white', 'bg-white'],
@@ -38,7 +37,6 @@ export function setLabelsForDisplay(task: any, settings: any) {
             color: label.color,
             showHeuristics: taskSettings[label.id].showHeuristics,
             showManual: taskSettings[label.id].showManual,
-            showModel: taskSettings[label.id].showModel,
             showWeakSupervision: taskSettings[label.id].showWeakSupervision,
         }
         labels[label.id] = data;
