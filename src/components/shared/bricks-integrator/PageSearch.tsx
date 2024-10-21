@@ -1,14 +1,11 @@
 import { selectBricksIntegrator, setBricksIntegrator } from "@/src/reduxStore/states/general";
 import { IntegratorPage, PageSearchProps } from "@/src/types/shared/bricks-integrator";
-import { IconAlertCircle, IconBrandGithub, IconChevronsDown, IconLoader, IconSearch } from "@tabler/icons-react";
+import { IconAlertCircle, IconBrandGithub, IconChevronsDown, IconSearch } from "@tabler/icons-react";
 import { useDispatch, useSelector } from "react-redux"
 import LoadingIcon from "../loading/LoadingIcon";
 import { useState } from "react";
 import style from '@/src/styles/shared/bricks-integrator.module.css';
 import { jsonCopy } from "@/submodules/javascript-functions/general";
-import * as TablerIcons from '@tabler/icons-react';
-import { getIconName } from "@/src/util/shared/bricks-integrator-helper";
-
 export default function PageSearch(props: PageSearchProps) {
     const dispatch = useDispatch();
 
@@ -72,7 +69,6 @@ export default function PageSearch(props: PageSearchProps) {
                     {config.search.results.map((result: any, i: number) => (
                         <li key={result.id} onClick={() => props.selectSearchResult(result.id)}
                             className={`text-left group flex flex-row items-center cursor-pointer select-none rounded-xl p-3 hover:bg-gray-100 relative ${!result.searchVisible || !result.groupVisible ? 'hidden' : ''}`} id="option-1" role="option">
-                            <SVGIcon icon={result.attributes.tablerIcon} size={24} strokeWidth={2} color={"black"} />
                             <div className="ml-2 flex-auto">
                                 <p className="text-sm font-semibold text-gray-700">{result.attributes.name}</p>
                                 <p className="text-sm text-gray-500">{result.attributes.description}</p>
@@ -82,28 +78,4 @@ export default function PageSearch(props: PageSearchProps) {
             </div>
         </div>}
     </>)
-}
-
-function SVGIcon({ icon, size, strokeWidth, color }) {
-    const Icon = TablerIcons['Icon' + icon];
-    if (Icon) {
-        return (
-            <Icon
-                size={size}
-                strokeWidth={strokeWidth}
-                color={color}
-            />
-        )
-    } else {
-        const Icon = TablerIcons['Icon' + getIconName(icon)];
-        if (Icon) {
-            return (
-                <Icon
-                    size={size}
-                    strokeWidth={strokeWidth}
-                    color={color}
-                />
-            )
-        }
-    }
 }
