@@ -213,9 +213,9 @@ export default function ExportRecordsModal(props: ExportProps) {
         let keyToSend = key;
         if (!keyToSend) keyToSend = null;
         prepareRecordExport(projectId, { exportOptions: jsonString, key: keyToSend }, (res) => {
-            if (res.data['prepareRecordExport'] != "") {
+            if (!res.data) {
                 ExportHelper.error.push("Something went wrong in the backend:");
-                ExportHelper.error.push(res.data['prepareRecordExport']);
+                ExportHelper.error.push(res.error);
                 setPrepareErrors(ExportHelper.error);
             }
             setDownloadState(DownloadState.DOWNLOAD);
