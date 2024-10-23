@@ -68,6 +68,7 @@ export type Color = {
 export type HeuristicsHeaderProps = {
     filterList: (labelingTask: LabelingTask) => void;
     refetch: () => void;
+    tokenizationProgress: number;
 }
 
 export type CurrentWeakSupervision = {

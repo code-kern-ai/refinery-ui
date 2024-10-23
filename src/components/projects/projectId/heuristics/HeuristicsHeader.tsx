@@ -44,7 +44,6 @@ export default function HeuristicsHeader(props: HeuristicsHeaderProps) {
     const [currentWeakSupervisionRun, setCurrentWeakSupervisionRun] = useState(null);
     const [loadingIconWS, setLoadingIconWS] = useState(false);
 
-
     useEffect(() => {
         if (!heuristics) return;
         setAreHeuristicsSelected(checkSelectedHeuristics(heuristics, false));
@@ -201,7 +200,8 @@ export default function HeuristicsHeader(props: HeuristicsHeaderProps) {
                         {areValidHeuristicsSelected ? (
                             <Tooltip content={TOOLTIPS_DICT.HEURISTICS.WEAK_SUPERVISION} color="invert" placement="top">
                                 <button onClick={startWeakSupervision}
-                                    className="bg-indigo-700 flex items-center text-white text-xs font-semibold mr-3 px-4 py-2 rounded-md border hover:bg-indigo-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                                    disabled={props.tokenizationProgress < 1}
+                                    className="bg-indigo-700 flex items-center text-white text-xs font-semibold mr-3 px-4 py-2 rounded-md border hover:bg-indigo-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed">
                                     Weak supervision
                                 </button>
                             </Tooltip>

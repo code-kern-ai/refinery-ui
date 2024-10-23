@@ -20,9 +20,10 @@ import { useWebsocket } from "@/submodules/react-components/hooks/web-socket/use
 import { getAllComments } from "@/src/services/base/comment";
 import { getAttributes } from "@/src/services/base/attribute";
 import { getInformationSourcesOverviewData } from "@/src/services/base/heuristic";
-import { getLabelingTasksByProjectId } from "@/src/services/base/project";
+import { getLabelingTasksByProjectId, getProjectTokenization } from "@/src/services/base/project";
 import { getEmbeddings } from "@/src/services/base/embedding";
 import { Application, CurrentPage } from "@/submodules/react-components/hooks/web-socket/constants";
+import { timer } from "rxjs";
 
 export function HeuristicsOverview() {
     const dispatch = useDispatch();
@@ -33,12 +34,15 @@ export function HeuristicsOverview() {
     const attributes = useSelector(selectUsableNonTextAttributes);
     const allUsers = useSelector(selectAllUsers);
     const [filteredList, setFilteredList] = useState([]);
+    const [tokenizationProgress, setTokenizationProgress] = useState(null);
+
 
     useEffect(() => {
         if (!projectId || !embeddings || !attributes) return;
         refetchLabelingTasksAndProcess();
         refetchHeuristicsAndProcess();
         refetchEmbeddingsAndProcess();
+        checkProjectTokenization();
         if (attributes.length == 0) {
             getAttributes(projectId, ['ALL'], (res) => {
                 dispatch(setAllAttributes(res.data['attributesByProjectId']));
@@ -91,6 +95,12 @@ export function HeuristicsOverview() {
         });
     }
 
+    function checkProjectTokenization() {
+        getProjectTokenization(projectId, (res) => {
+            setTokenizationProgress(res.data['projectTokenization']?.progress);
+        });
+    }
+
     const handleWebsocketNotification = useCallback((msgParts: string[]) => {
         if (['labeling_task_updated', 'labeling_task_created'].includes(msgParts[1])) {
             refetchLabelingTasksAndProcess();
@@ -102,6 +112,17 @@ export function HeuristicsOverview() {
         } else if (msgParts[1] == 'embedding_deleted' || (msgParts[1] == 'embedding' && msgParts[3] == 'state')) {
             refetchEmbeddingsAndProcess();
         }
+
+        if (msgParts[1] == 'tokenization') {
+            if (msgParts[3] == 'progress') {
+                setTokenizationProgress(Number(msgParts[4]));
+            } else if (msgParts[3] == 'state') {
+                if (msgParts[4] == 'IN_PROGRESS') setTokenizationProgress(0);
+                else if (msgParts[4] == 'FINISHED') {
+                    timer(5000).subscribe(() => checkProjectTokenization());
+                }
+            }
+        }
     }, [projectId]);
 
     const orgId = useSelector(selectOrganizationId);
@@ -109,7 +130,7 @@ export function HeuristicsOverview() {
 
     return (projectId && <div className="p-4 bg-gray-100 h-full flex-1 flex flex-col">
         <div className="w-full h-full -mr-4">
-            <HeuristicsHeader refetch={refetchHeuristicsAndProcess}
+            <HeuristicsHeader refetch={refetchHeuristicsAndProcess} tokenizationProgress={tokenizationProgress}
                 filterList={(labelingTask: LabelingTask) => setFilteredList(labelingTask != null ? heuristics.filter((heuristic) => heuristic.labelingTaskId === labelingTask.id) : heuristics)} />
 
             {heuristics && heuristics.length == 0 ? (
