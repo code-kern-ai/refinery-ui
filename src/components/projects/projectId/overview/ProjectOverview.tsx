@@ -108,7 +108,6 @@ export default function ProjectOverview() {
     function getProjectStats() {
         const projectStatsCopy = { ...projectStats };
         projectStatsCopy.generalLoading = true;
-        projectStatsCopy.interAnnotatorLoading = true;
         setProjectStats(projectStatsCopy);
         const labelingTaskId = overviewFilters.labelingTask?.id;
         const dataSliceFindId = overviewFilters.dataSlice?.id;

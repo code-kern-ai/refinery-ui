@@ -5,9 +5,6 @@ export type ProjectStats = {
     general: {};
     generalPercent: {};
     generalStats: {};
-    interAnnotatorLoading: boolean;
-    interAnnotator: string;
-    interAnnotatorStat: number | string;
     tooltipsArray?: any;
 };
 
@@ -27,7 +24,6 @@ export enum CardStatsEnum {
     MANUAL = "MANUAL",
     WEAK_SUPERVISION = "WEAK_SUPERVISION",
     INFORMATION_SOURCE = "INFORMATION_SOURCE",
-    INTER_ANNOTATOR = "INTER_ANNOTATOR",
 }
 
 export type ProjectOverviewFilters = {

@@ -36,7 +36,7 @@ export default function ProjectOverviewHeader() {
 
     return (
         <nav className="flex" aria-label="Breadcrumb">
-            <ol role="list" className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-1 items-center">
+            <ol role="list" className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-1 items-center">
                 <li>
                     <div className="flex items-center">
                         <Tooltip placement="bottom" trigger="hover" color="invert" content={TOOLTIPS_DICT.PROJECT_OVERVIEW.TARGET_TYPE} className="relative z-10 cursor-auto">

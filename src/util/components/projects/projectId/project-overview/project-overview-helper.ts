@@ -15,9 +15,6 @@ export function getEmptyProjectStats(): ProjectStats {
             [LabelSource.MANUAL]: NOT_AVAILABLE
         },
         generalStats: {},
-        interAnnotatorLoading: false,
-        interAnnotator: NOT_AVAILABLE,
-        interAnnotatorStat: -1,
         tooltipsArray: []
     }
 }
