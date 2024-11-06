@@ -1,18 +1,8 @@
 import { LabelDistribution } from "@/src/types/components/projects/projectId/project-overview/charts";
 import { CardStatsEnum, ProjectStats } from "@/src/types/components/projects/projectId/project-overview/project-overview";
 import { NOT_AVAILABLE } from "@/src/util/constants";
-import { displayGraphsTypeToString } from "@/submodules/javascript-functions/enums/enum-functions";
-import { DisplayGraphs, LabelSource } from "@/submodules/javascript-functions/enums/enums";
+import { LabelSource } from "@/submodules/javascript-functions/enums/enums";
 import { percentRoundString } from "@/submodules/javascript-functions/general";
-
-export function getDisplayGraphValueArray(): [{ value: DisplayGraphs, name: string }] {
-    let toReturn = [];
-    for (const key in DisplayGraphs) {
-        const name = displayGraphsTypeToString(key as DisplayGraphs);
-        if (name) toReturn.push({ value: key as DisplayGraphs, name: name })
-    }
-    return toReturn as [{ value: DisplayGraphs, name: string }];
-}
 
 
 export function getEmptyProjectStats(): ProjectStats {
@@ -84,38 +74,4 @@ function matchAndMergeLabelDistributionData(data): LabelDistribution[] {
         }
     });
     return returnData;
-}
-
-export function postProcessConfusionMatrix(data: string, dataNeedsParse: boolean = true): any {
-    if (!data) return [];
-    const d = dataNeedsParse ? JSON.parse(data) : data;
-
-    return d.map((e) => {
-        return {
-            counts: e.count_absolute,
-            labelIdManual: e.label_name_manual == '@@OUTSIDE@@' ? 'Outside' : e.label_name_manual,
-            labelIdProgrammatic: e.label_name_ws == '@@OUTSIDE@@' ? 'Outside' : e.label_name_ws
-        }
-    });
-}
-
-export function calcInterAnnotatorAvg(interAnnotatorMatrix, projectStats: ProjectStats) {
-    const projectStatsCopy = { ...projectStats }
-    let c = 0;
-    let s = 0;
-    interAnnotatorMatrix.elements.forEach(e => {
-        if (e.userIdA != e.userIdB && e.percent != -1) {
-            c++;
-            s += e.percent;
-        }
-    });
-    if (c) {
-        projectStatsCopy.interAnnotator = Number(c / 2) + " with intersections";
-        projectStatsCopy.interAnnotatorStat = s / c;
-        projectStatsCopy.interAnnotatorStat = percentRoundString(projectStatsCopy.interAnnotatorStat, 2);
-    } else {
-        projectStatsCopy.interAnnotator = "No intersections";
-        projectStatsCopy.interAnnotatorStat = -1;
-    }
-    return projectStatsCopy;
 }

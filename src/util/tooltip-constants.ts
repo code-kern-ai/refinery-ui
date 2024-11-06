@@ -119,7 +119,6 @@ export const TOOLTIPS_DICT = {
 
     },
     [CurrentPage.PROJECT_OVERVIEW]: {
-        'VISUALIZATION': 'Choose the visualizations',
         'TARGET_TYPE': 'Choose the target type',
         'LABELING_TASK': 'Choose the labeling task',
         'STATIC_DATA_SLICE': 'Choose a static data slice',
