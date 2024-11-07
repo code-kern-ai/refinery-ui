@@ -178,7 +178,6 @@ export const TOOLTIPS_DICT = {
     },
     [CurrentPage.LABELING]: {
         'NAVIGATE_TO_DATA_BROWSER': 'Go to the data browser',
-        'NAVIGATE_TO_RECORD_IDE': 'See the programmatic view for your current record',
         'REACH_END': 'If you reached the end, you can select new filters in the browser',
         'CHANGE_SLICES': 'Slices can be changed by the engineer in your team',
         'ARROW_LEFT': 'Arrow left',
@@ -203,15 +202,6 @@ export const TOOLTIPS_DICT = {
         'SET_LABELS_GOLD_STAR': 'Set manual task labels as gold labels',
         'CHOOSE_LABELS': 'Choose from your labels',
         'CREATE_LABEL': 'Create label'
-    },
-    [CurrentPage.RECORD_IDE]: {
-        'GO_TO_LABELING': 'Go to labeling page',
-        'LOAD_STORAGE': 'Load code from local (browser) storage',
-        'SAVE_STORAGE': 'Save code to local (browser) storage',
-        'SWITCH_TO_HORIZONTAL': 'Switch to horizontal view',
-        'SWITCH_TO_VERTICAL': 'Switch to vertical view',
-        'IDX_SESSION': 'Number of the current index in session',
-        'CLEAR_SHELL': 'Clear shell output screen'
     },
     [CurrentPage.EDIT_RECORDS]: {
         'GO_TO_DATA_BROWSER': 'Go to data browser',

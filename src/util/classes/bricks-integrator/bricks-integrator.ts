@@ -159,7 +159,7 @@ export class BricksCodeParser {
             replacedCode = replacedCode.replace(variable.line, variable.replacedLine);
         }
         config.preparedCode = replacedCode;
-        this.extendCodeForRecordIde(config, forIde);
+        // this.extendCodeForRecordIde(config, forIde);
         this.extendCodeForLabelMapping(config, executionTypeFilter);
         config.codeFullyPrepared = this.variables.every(v => v.optional || (v.values.length > 0 && v.values.every(va => va != null)));
         config.canAccept = config.codeFullyPrepared && !this.nameTaken && this.functionName != "";
@@ -357,18 +357,18 @@ export class BricksCodeParser {
         return -1;
     }
 
-    private static extendCodeForRecordIde(config: BricksIntegratorConfig, forIde: string | boolean = false) {
-        if (!forIde) return;
-        if (this.functionName == null || this.functionName == "@@unknown@@") return;
-        const isExtractor = config.api.data.data.attributes.moduleType == "extractor";
-        let printReturn = "\n\nprint(\"Record: \", record) \nprint(\"Result: \", ";
-        if (isExtractor) {
-            printReturn += "[v for v in " + this.functionName + "(record)])"
-        } else {
-            printReturn += this.functionName + "(record))"
-        }
-        config.preparedCode += printReturn;
-    }
+    // private static extendCodeForRecordIde(config: BricksIntegratorConfig, forIde: string | boolean = false) {
+    //     if (!forIde) return;
+    //     if (this.functionName == null || this.functionName == "@@unknown@@") return;
+    //     const isExtractor = config.api.data.data.attributes.moduleType == "extractor";
+    //     let printReturn = "\n\nprint(\"Record: \", record) \nprint(\"Result: \", ";
+    //     if (isExtractor) {
+    //         printReturn += "[v for v in " + this.functionName + "(record)])"
+    //     } else {
+    //         printReturn += this.functionName + "(record))"
+    //     }
+    //     config.preparedCode += printReturn;
+    // }
 
     private static collectGlobalComment(labelingTaskId: string = null, labelingTasks: any[] = null): string[] {
         const lines = this.baseCode.split("\n");
