@@ -24,7 +24,6 @@ import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
 import { selectAllUsers, selectOrganizationId, setComments } from "@/src/reduxStore/states/general";
 import { CommentDataManager } from "@/src/util/classes/comments";
 import { CommentType } from "@/src/types/shared/comments";
-import BricksIntegrator from "@/src/components/shared/bricks-integrator/BricksIntegrator";
 import { AttributeCodeLookup } from "@/src/util/classes/attribute-calculation";
 import KernDropdown from "@/submodules/react-components/components/KernDropdown";
 import { useWebsocket } from "@/submodules/react-components/hooks/web-socket/useWebsocket";
@@ -35,6 +34,7 @@ import { getLookupListsByProjectId } from "@/src/services/base/lookup-lists";
 import { getLabelingTasksByProjectId, getProjectTokenization } from "@/src/services/base/project";
 import { getAttributeByAttributeId, updateAttribute } from "@/src/services/base/project-setting";
 import { Application, CurrentPage } from "@/submodules/react-components/hooks/web-socket/constants";
+import { VisitBricksButton } from "@/src/components/shared/bricks/VisitBricksButton";
 
 const EDITOR_OPTIONS = { theme: 'vs-light', language: 'python', readOnly: false };
 
@@ -53,7 +53,6 @@ export default function AttributeCalculation() {
     const [isNameOpen, setIsNameOpen] = useState(false);
     const [duplicateNameExists, setDuplicateNameExists] = useState(false);
     const [tooltipsArray, setTooltipsArray] = useState<string[]>([]);
-    const [isInitial, setIsInitial] = useState(null);  //null as add state to differentiate between initial, not and unchecked
     const [editorOptions, setEditorOptions] = useState(EDITOR_OPTIONS);
     const [tokenizationProgress, setTokenizationProgress] = useState(0);
     const [editorValue, setEditorValue] = useState('');
@@ -61,10 +60,6 @@ export default function AttributeCalculation() {
     const [checkUnsavedChanges, setCheckUnsavedChanges] = useState(false);
     const [enableRunButton, setEnableButton] = useState(false);
 
-    useEffect(() => {
-        if (!currentAttribute) return;
-        if (isInitial == null) setIsInitial(AttributeCodeLookup.isCodeStillTemplate(currentAttribute.sourceCode, currentAttribute.dataType))
-    }, [currentAttribute]);
 
     useEffect(() => {
         if (!projectId) return;
@@ -202,9 +197,6 @@ export default function AttributeCalculation() {
         }, attributeNew.dataType);
     }
 
-    function openBricksIntegrator() {
-        document.getElementById('bricks-integrator-open-button').click();
-    }
 
     function onScrollEvent(event: any) {
         if (!(event.target instanceof HTMLElement)) return;
@@ -231,13 +223,6 @@ export default function AttributeCalculation() {
         getProjectTokenization(projectId, (res) => {
             setTokenizationProgress(res.data['projectTokenization']?.progress);
         });
-    }
-
-    function updateNameAndCodeBricksIntegrator(code: string) {
-        setEditorValue(code);
-        const regMatch: any = getPythonFunctionRegExMatch(code);
-        updateSourceCode(code, regMatch[2]);
-        setIsInitial(false);
     }
 
     function refetchLabelingTasksAndProcess() {
@@ -368,13 +353,7 @@ export default function AttributeCalculation() {
                 <div className="flex flex-row items-center justify-between my-3">
                     <div className="text-sm leading-5 font-medium text-gray-700 inline-block mr-2">Editor</div>
                     <div className="flex flex-row flex-nowrap">
-                        <BricksIntegrator
-                            moduleTypeFilter="generator,classifier" functionType="Attribute"
-                            nameLookups={attributes.map(a => a.name)}
-                            preparedCode={(code: string) => {
-                                if (currentAttribute.state == AttributeState.USABLE) return;
-                                updateNameAndCodeBricksIntegrator(code);
-                            }} />
+                        <VisitBricksButton urlExtension="generators" tooltipPlacement="left" size="small" />
                         <Tooltip content={TOOLTIPS_DICT.ATTRIBUTE_CALCULATION.AVAILABLE_LIBRARIES} placement="bottom" color="invert">
                             <a href="https://github.com/code-kern-ai/refinery-ac-exec-env/blob/dev/requirements.txt"
                                 target="_blank"
@@ -386,19 +365,6 @@ export default function AttributeCalculation() {
                 </div>
 
                 <div className="border mt-1 relative">
-                    {isInitial && <div
-                        className="absolute top-0 bottom-0 left-0 right-0 bg-gray-200 flex items-center justify-center z-10" style={{ opacity: '0.9' }}>
-                        <div className="flex flex-col gap-2">
-                            <button onClick={openBricksIntegrator}
-                                className="bg-white text-gray-900 text font-semibold px-4 py-2 rounded-md border border-gray-300 hover:bg-gray-50 focus:outline-none">
-                                Search in bricks
-                            </button>
-                            <button onClick={() => setIsInitial(false)}
-                                className="bg-white text-gray-900 text font-semibold px-4 py-2 rounded-md border border-gray-300 hover:bg-gray-50 focus:outline-none">
-                                Start from scratch
-                            </button>
-                        </div>
-                    </div>}
                     <Editor
                         height="400px"
                         defaultLanguage={'python'}

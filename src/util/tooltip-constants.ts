@@ -18,7 +18,6 @@ export const TOOLTIPS_DICT = {
         'MOVE_COMMENT_RIGHT': 'Move comment window right',
         'CLOSE_ALL': 'Close all',
         'OPEN_ALL': 'Open all',
-        'OPEN_BRICKS_INTEGRATOR': 'Open the Bricks integrator',
         'COPIED': 'Copied',
         'OPTIONAL': 'Optional',
         'CLEAR': 'Clear',

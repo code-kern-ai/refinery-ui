@@ -2,13 +2,13 @@ import { useRouter } from "next/router";
 import HeuristicsLayout from "../shared/HeuristicsLayout";
 import { useDispatch, useSelector } from "react-redux";
 import { selectProjectId } from "@/src/reduxStore/states/project";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { selectHeuristic, setActiveHeuristics, updateHeuristicsState } from "@/src/reduxStore/states/pages/heuristics";
 import { postProcessCurrentHeuristic, postProcessLastTaskLogs } from "@/src/util/components/projects/projectId/heuristics/heuristicId/heuristics-details-helper";
 import { Tooltip } from "@nextui-org/react";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
 import { postProcessLabelingTasks, postProcessLabelingTasksSchema } from "@/src/util/components/projects/projectId/settings/labeling-tasks-helper";
-import { selectVisibleAttributesHeuristics, selectLabelingTasksAll, setLabelingTasksAll, SELECT_LABELING_TASKS_ALL_SNAPSHOT_ACCESS } from "@/src/reduxStore/states/pages/settings";
+import { selectVisibleAttributesHeuristics, selectLabelingTasksAll, setLabelingTasksAll } from "@/src/reduxStore/states/pages/settings";
 import HeuristicsEditor from "../shared/HeuristicsEditor";
 import DangerZone from "@/src/components/shared/danger-zone/DangerZone";
 import HeuristicRunButtons from "../shared/HeuristicRunButtons";
@@ -22,10 +22,9 @@ import { SampleRecord } from "@/src/types/components/projects/projectId/heuristi
 import { getPythonFunctionRegExMatch } from "@/submodules/javascript-functions/python-functions-parser";
 import CalculationProgress from "./CalculationProgress";
 import { copyToClipboard } from "@/submodules/javascript-functions/general";
-import { selectAllUsers, selectOrganizationId, setBricksIntegrator, setComments } from "@/src/reduxStore/states/general";
+import { selectAllUsers, selectOrganizationId, setComments } from "@/src/reduxStore/states/general";
 import { CommentType } from "@/src/types/shared/comments";
 import { CommentDataManager } from "@/src/util/classes/comments";
-import BricksIntegrator from "@/src/components/shared/bricks-integrator/BricksIntegrator";
 import { InformationSourceCodeLookup, InformationSourceExamples } from "@/src/util/classes/heuristics";
 import { getInformationSourceTemplate } from "@/src/util/components/projects/projectId/heuristics/heuristics-helper";
 import KernDropdown from "@/submodules/react-components/components/KernDropdown";
@@ -36,8 +35,8 @@ import { useWebsocket } from "@/submodules/react-components/hooks/web-socket/use
 import { getAllComments } from "@/src/services/base/comment";
 import { getLabelingTasksByProjectId } from "@/src/services/base/project";
 import { getHeuristicByHeuristicId, getLabelingFunctionOn10Records, getPayloadByPayloadId, updateHeuristicPost } from "@/src/services/base/heuristic";
-import { getStoreSnapshotValue } from "@/src/reduxStore/store";
 import { Application, CurrentPage } from "@/submodules/react-components/hooks/web-socket/constants";
+import { VisitBricksButton } from "@/src/components/shared/bricks/VisitBricksButton";
 
 export default function LabelingFunction() {
     const dispatch = useDispatch();
@@ -53,7 +52,6 @@ export default function LabelingFunction() {
     const [selectedAttribute, setSelectedAttribute] = useState<Attribute>(null);
     const [sampleRecords, setSampleRecords] = useState<SampleRecord>(null);
     const [displayLogWarning, setDisplayLogWarning] = useState<boolean>(false);
-    const [isInitialLf, setIsInitialLf] = useState<boolean>(null);  //null as add state to differentiate between initial, not and unchecked
     const [checkUnsavedChanges, setCheckUnsavedChanges] = useState(false);
     const [runOn10IsRunning, setRunOn10IsRunning] = useState(false);
     const [justClickedRun, setJustClickedRun] = useState(false);
@@ -73,9 +71,8 @@ export default function LabelingFunction() {
 
     useEffect(() => {
         if (!currentHeuristic) return;
-        if (isInitialLf == null) setIsInitialLf(InformationSourceCodeLookup.isCodeStillTemplate(currentHeuristic.sourceCode) != null);
         refetchTaskByTaskIdAndProcess();
-    }, [currentHeuristic, isInitialLf]);
+    }, [currentHeuristic]);
 
     useEffect(() => {
         if (!projectId || allUsers.length == 0) return;
@@ -199,27 +196,13 @@ export default function LabelingFunction() {
         }
     }, [currentHeuristic]);
 
-
-    const setValueToLabelingTask = useCallback((value: string) => {
-        const labelingTask = labelingTasks.find(a => a.id == value);
-        const updateHeuristic = (labelingTasks: any[], maxI: number, task?: any) => {
-            const labelingTask = task || labelingTasks.find(a => a.id == value);
-            if (!labelingTask && maxI > 0) {
-                setTimeout(() => updateHeuristic(getStoreSnapshotValue(SELECT_LABELING_TASKS_ALL_SNAPSHOT_ACCESS), maxI - 1), 100);
-            } else {
-                updateHeuristicPost(projectId, currentHeuristic.id, labelingTask.id, currentHeuristic.sourceCode, currentHeuristic.description, currentHeuristic.name, (res) => {
-                    dispatch(updateHeuristicsState(currentHeuristic.id, { labelingTaskId: labelingTask.id, labelingTaskName: labelingTask.name, labels: labelingTask.labels }))
-                });
-            }
-        }
-        if (!labelingTask) {
-            //try timeout as this is usually caused by race condition (creating the task+label through the integrator)
-            setTimeout(() => updateHeuristic(getStoreSnapshotValue(SELECT_LABELING_TASKS_ALL_SNAPSHOT_ACCESS), 5), 100);
-        } else updateHeuristic(labelingTasks, 0, labelingTask);
-    }, [projectId, currentHeuristic, labelingTasks])
-
     const orgId = useSelector(selectOrganizationId);
     useWebsocket(orgId, Application.REFINERY, CurrentPage.LABELING_FUNCTION, handleWebsocketNotification, projectId);
+
+    const bricksUrlExtension = useMemo(() => {
+        if (currentHeuristic?.labelingTaskType == 'INFORMATION_EXTRACTION') return 'extractors';
+        return "classifiers"
+    }, [currentHeuristic?.labelingTaskType]);
 
     return (
         <HeuristicsLayout updateSourceCode={(code: string) => updateSourceCodeToDisplay(code)}>
@@ -244,18 +227,7 @@ export default function LabelingFunction() {
                     </div>
                     <div className="flex items-center justify-center flex-shrink-0">
                         <div className="flex flex-row flex-nowrap items-center ml-auto">
-                            <BricksIntegrator
-                                moduleTypeFilter={currentHeuristic.labelingTaskType == 'MULTICLASS_CLASSIFICATION' ? 'classifier' : 'extractor'}
-                                executionTypeFilter="pythonFunction,premium"
-                                functionType="Heuristic"
-                                labelingTaskId={currentHeuristic.labelingTaskId}
-                                preparedCode={(code: string) => {
-                                    updateSourceCode(code);
-                                    setIsInitialLf(false);
-                                }}
-                                newTaskId={(value) => setValueToLabelingTask(value)}
-                            />
-
+                            <VisitBricksButton urlExtension={bricksUrlExtension} tooltipPlacement="left" size="small" />
                             <Tooltip content={TOOLTIPS_DICT.LABELING_FUNCTION.INSTALLED_LIBRARIES} color="invert" placement="left">
                                 <a href="https://github.com/code-kern-ai/refinery-lf-exec-env/blob/dev/requirements.txt"
                                     target="_blank"
@@ -267,9 +239,7 @@ export default function LabelingFunction() {
                     </div>
                 </div>
                 <HeuristicsEditor
-                    isInitial={isInitialLf}
                     updatedSourceCode={(code: string) => updateSourceCode(code)}
-                    setIsInitial={(val: boolean) => setIsInitialLf(val)}
                     setCheckUnsavedChanges={(val: boolean) => setCheckUnsavedChanges(val)} />
 
                 <div className="mt-2 flex flex-grow justify-between items-center float-right">

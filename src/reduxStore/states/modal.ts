@@ -189,9 +189,6 @@ const initialState: Modals = {
     [ModalEnum.EXPORT_RECORDS]: {
         open: false,
     },
-    [ModalEnum.BRICKS_INTEGRATOR]: {
-        open: false
-    },
     [ModalEnum.SIZE_WARNING]: {
         open: false
     }
