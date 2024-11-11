@@ -36,11 +36,11 @@ export default function ProjectOverviewHeader() {
 
     return (
         <nav className="flex" aria-label="Breadcrumb">
-            <ol role="list" className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-1 items-center">
-                <li>
+            <ol role="list" className="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 items-center">
+                <li className="ml-2">
                     <div className="flex items-center">
                         <Tooltip placement="bottom" trigger="hover" color="invert" content={TOOLTIPS_DICT.PROJECT_OVERVIEW.TARGET_TYPE} className="relative z-10 cursor-auto">
-                            <span className={`cursor-help mr-2 underline text-black-800 filtersUnderline`}>Target</span>
+                            <span className='cursor-help mr-2 underline text-black-800 filtersUnderline'>Target</span>
                         </Tooltip>
                         {targetAttributes &&
                             <KernDropdown buttonName={labelingTasks?.length == 0 ? '' : overviewFilters?.targetAttribute?.name} options={labelingTasks?.length == 0 ? [] : targetAttributes} dropdownWidth="w-44"
@@ -53,26 +53,18 @@ export default function ProjectOverviewHeader() {
                     </div>
                 </li>
 
-                <li>
+                <li className="ml-2">
                     <div className="flex items-center">
-                        <svg className="flex-shrink-0 h-5 w-5 text-gray-300" xmlns="http://www.w3.org/2000/svg"
-                            fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
-                            <path d="M5.555 17.776l8-16 .894.448-8 16-.894-.448z" />
-                        </svg>
                         <Tooltip placement="bottom" trigger="hover" color="invert" content={TOOLTIPS_DICT.PROJECT_OVERVIEW.LABELING_TASK} className="relative z-10 cursor-auto">
-                            <span className={`cursor-help mr-2 underline text-black-800 filtersUnderline`}>Labeling task</span>
+                            <span className='cursor-help mr-2 underline text-black-800 filtersUnderline'>Labeling task</span>
                         </Tooltip>
                         {labelingTasks && <KernDropdown buttonName={overviewFilters?.labelingTask?.name} options={labelingTasksFiltered} dropdownWidth="w-44"
                             selectedOption={(option: any) => dispatch(updateOverFilters('labelingTask', option))} />}
                     </div>
                 </li>
 
-                <li>
+                <li className="ml-2">
                     <div className="flex items-center">
-                        <svg className="flex-shrink-0 h-5 w-5 text-gray-300" xmlns="http://www.w3.org/2000/svg"
-                            fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
-                            <path d="M5.555 17.776l8-16 .894.448-8 16-.894-.448z" />
-                        </svg>
                         <Tooltip placement="bottom" color="invert" content={TOOLTIPS_DICT.PROJECT_OVERVIEW.STATIC_DATA_SLICE} className="z-10 relative cursor-auto">
                             <span className={`cursor-help mr-2 underline text-black-800 filtersUnderline`}>Data slice</span>
                         </Tooltip>
