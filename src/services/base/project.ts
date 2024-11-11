@@ -66,11 +66,6 @@ export function getRecordExportFromData(projectId: string, onResult: (result: an
     jsonFetchWrapper(finalUrl, FetchType.GET, onResult);
 }
 
-export function getRatsTokenization(projectId: string, onResult: (result: any) => void) {
-    const finalUrl = `${projectEndpoint}/${projectId}/rats-running`;
-    jsonFetchWrapper(finalUrl, FetchType.GET, onResult);
-}
-
 export function getAccessTokens(projectId: string, onResult: (result: any) => void) {
     const finalUrl = `${projectEndpoint}/${projectId}/access-tokens`;
     jsonFetchWrapper(finalUrl, FetchType.GET, onResult);
