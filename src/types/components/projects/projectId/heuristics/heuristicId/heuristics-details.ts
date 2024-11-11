@@ -7,8 +7,6 @@ export enum HeuristicsProperty {
 export type HeuristicsEditorProps = {
     updatedSourceCode: (code: string) => void;
     embedding?: string;
-    isInitial: boolean;
-    setIsInitial: (val: boolean) => void;
     setCheckUnsavedChanges: (val: boolean) => void;
 }
 

@@ -21,10 +21,9 @@ import HeuristicStatistics from "../shared/HeuristicStatistics";
 import DangerZone from "@/src/components/shared/danger-zone/DangerZone";
 import { DangerZoneEnum } from "@/src/types/shared/danger-zone";
 import { getPythonClassName, getPythonClassRegExMatch } from "@/submodules/javascript-functions/python-functions-parser";
-import { selectAllUsers, setBricksIntegrator, setLabelsBricksIntegrator, setComments, selectOrganizationId } from "@/src/reduxStore/states/general";
+import { selectAllUsers, setComments, selectOrganizationId } from "@/src/reduxStore/states/general";
 import { CommentType } from "@/src/types/shared/comments";
 import { CommentDataManager } from "@/src/util/classes/comments";
-import BricksIntegrator from "@/src/components/shared/bricks-integrator/BricksIntegrator";
 import { InformationSourceCodeLookup, InformationSourceExamples } from "@/src/util/classes/heuristics";
 import { getInformationSourceTemplate } from "@/src/util/components/projects/projectId/heuristics/heuristics-helper";
 import KernDropdown from "@/submodules/react-components/components/KernDropdown";
@@ -35,6 +34,7 @@ import { getLabelingTasksByProjectId } from "@/src/services/base/project";
 import { getHeuristicByHeuristicId, getPayloadByPayloadId, updateHeuristicPost } from "@/src/services/base/heuristic";
 import { getEmbeddings } from "@/src/services/base/embedding";
 import { Application, CurrentPage } from "@/submodules/react-components/hooks/web-socket/constants";
+import { VisitBricksButton } from "@/src/components/shared/bricks/VisitBricksButton";
 
 export default function ActiveLearning() {
     const dispatch = useDispatch();
@@ -49,7 +49,6 @@ export default function ActiveLearning() {
     const allUsers = useSelector(selectAllUsers);
 
     const [lastTaskLogs, setLastTaskLogs] = useState<string[]>([]);
-    const [isInitialAL, setIsInitialAL] = useState<boolean>(null);  //null as add state to differentiate between initial, not and unchecked
     const [checkUnsavedChanges, setCheckUnsavedChanges] = useState(false);
 
     useEffect(() => {
@@ -71,8 +70,6 @@ export default function ActiveLearning() {
         if (!embeddings) return;
         dispatch(setFilteredEmbeddings(embeddings.filter(e => embeddingRelevant(e, attributes, labelingTasks, currentHeuristic.labelingTaskId))));
         refetchTaskByTaskIdAndProcess();
-        if (isInitialAL == null) setIsInitialAL(InformationSourceCodeLookup.isCodeStillTemplate(currentHeuristic.sourceCode.replace(embeddingsFiltered[0]?.name, '@@EMBEDDING@@')) != null)
-
     }, [currentHeuristic]);
 
     useEffect(() => {
@@ -255,23 +252,11 @@ export default function ActiveLearning() {
                         )}
                     </div>
                     <div className="flex flex-row flex-nowrap items-center ml-auto">
-                        <BricksIntegrator
-                            moduleTypeFilter={currentHeuristic.labelingTaskType == 'MULTICLASS_CLASSIFICATION' ? 'classifier' : 'extractor'}
-                            executionTypeFilter="activeLearner"
-                            functionType="Heuristic"
-                            labelingTaskId={currentHeuristic.labelingTaskId}
-                            preparedCode={(code: string) => {
-                                updateSourceCode(code);
-                                setIsInitialAL(false);
-                            }}
-                            newTaskId={(value) => setValueToLabelingTask(value)}
-                        />
+                        <VisitBricksButton tooltipPlacement="left" size="small" />
                     </div>
                 </div>
                 <HeuristicsEditor
-                    isInitial={isInitialAL}
                     updatedSourceCode={(code: string) => updateSourceCode(code)}
-                    setIsInitial={(val) => setIsInitialAL(val)}
                     setCheckUnsavedChanges={(val) => setCheckUnsavedChanges(val)}
                 />
 

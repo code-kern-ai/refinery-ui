@@ -1,4 +1,4 @@
-import { selectAllUsers, selectOrganizationId, selectUser, setBricksIntegrator, setComments } from "@/src/reduxStore/states/general";
+import { selectAllUsers, selectOrganizationId, selectUser, setComments } from "@/src/reduxStore/states/general";
 import { setAvailableLinks, updateRecordRequests, setSelectedLink, selectRecordRequestsRla, updateUsers, setSettings, selectSettings, setUserDisplayId, selectRecordRequestsRecord, initOnLabelPageDestruction, selectUserDisplayId, selectDisplayUserRole, setDisplayUserRole } from "@/src/reduxStore/states/pages/labeling";
 import { selectProjectId } from "@/src/reduxStore/states/project"
 import { LabelingLinkType } from "@/src/types/components/projects/projectId/labeling/labeling-main-component";
@@ -21,7 +21,6 @@ import { setAllAttributes, setLabelingTasksAll } from "@/src/reduxStore/states/p
 import { postProcessLabelingTasks, postProcessLabelingTasksSchema } from "@/src/util/components/projects/projectId/settings/labeling-tasks-helper";
 import { CommentDataManager } from "@/src/util/classes/comments";
 import { CommentType } from "@/src/types/shared/comments";
-import { getEmptyBricksIntegratorConfig } from "@/src/util/shared/bricks-integrator-helper";
 import { LabelingTask } from "@/src/types/components/projects/projectId/settings/labeling-tasks";
 import { useWebsocket } from "@/submodules/react-components/hooks/web-socket/useWebsocket";
 import { getAllComments } from "@/src/services/base/comment";
@@ -68,8 +67,6 @@ export default function LabelingMainComponent() {
             dispatch(setSettings(settingsCopy));
             localStorage.setItem(SETTINGS_KEY, JSON.stringify(settingsCopy));
         }
-
-        dispatch(setBricksIntegrator(getEmptyBricksIntegratorConfig()));
         refetchAttributesAndProcess();
         refetchLabelingTasksAndProcess();
     }, [projectId, router.query]);

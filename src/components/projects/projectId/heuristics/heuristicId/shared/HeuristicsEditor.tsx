@@ -33,11 +33,6 @@ export default function HeuristicsEditor(props: HeuristicsEditorProps) {
         });
         return () => subscription.unsubscribe();
     }, [editorValue, currentHeuristic]);
-
-    function openBricksIntegrator() {
-        document.getElementById('bricks-integrator-open-button').click();
-    }
-
     function hasUnsavedChanges() {
         if (!currentHeuristic) return false;
         return editorValue != currentHeuristic.sourceCodeToDisplay;
@@ -46,19 +41,6 @@ export default function HeuristicsEditor(props: HeuristicsEditorProps) {
     return (
         <>
             <div className="border mt-1 relative">
-                {props.isInitial && <div
-                    className="absolute top-0 bottom-0 left-0 right-0 bg-gray-200 flex items-center justify-center z-10" style={{ opacity: '0.9' }}>
-                    <div className="flex flex-col gap-2">
-                        <button onClick={openBricksIntegrator}
-                            className="bg-white text-gray-900 text font-semibold px-4 py-2 rounded-md border border-gray-300 hover:bg-gray-50 focus:outline-none">
-                            Search in bricks
-                        </button>
-                        <button onClick={() => props.setIsInitial(false)}
-                            className="bg-white text-gray-900 text font-semibold px-4 py-2 rounded-md border border-gray-300 hover:bg-gray-50 focus:outline-none">
-                            Start from scratch
-                        </button>
-                    </div>
-                </div>}
                 <Editor
                     height="400px"
                     defaultLanguage={'python'}

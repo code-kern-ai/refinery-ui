@@ -18,6 +18,7 @@ export default function LabelingRoutingPage() {
     useEffect(() => {
         dispatch(setCurrentPage(CurrentPage.LABELING));
         dispatch(setDisplayIconComments(true));
+        cleanIdeLocalStorage();
     }, []);
 
     useEffect(() => {
@@ -34,4 +35,15 @@ export default function LabelingRoutingPage() {
     return (
         <LabelingMainComponent />
     )
+}
+
+
+// to be removed after v1.18 release
+function cleanIdeLocalStorage() {
+    if (localStorage.getItem("ideCode")) {
+        localStorage.removeItem("ideCode");
+    }
+    if (localStorage.getItem("ideHorizontal")) {
+        localStorage.removeItem("ideHorizontal");
+    }
 }

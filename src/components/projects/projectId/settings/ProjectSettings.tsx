@@ -12,7 +12,7 @@ import { setUploadFileType } from "@/src/reduxStore/states/upload";
 import { UploadFileType } from "@/src/types/shared/upload";
 import { Tooltip } from "@nextui-org/react";
 import ProjectMetaData from "./ProjectMetaData";
-import { selectAllUsers, selectIsManaged, selectOrganizationId, setBricksIntegrator, setComments } from "@/src/reduxStore/states/general";
+import { selectAllUsers, selectOrganizationId, setComments } from "@/src/reduxStore/states/general";
 import Embeddings from "./embeddings/Embeddings";
 import { postProcessingEmbeddings, postProcessingRecommendedEncoders } from "@/src/util/components/projects/projectId/settings/embeddings-helper";
 import { AttributeState } from "@/src/types/components/projects/projectId/settings/data-schema";
@@ -25,7 +25,6 @@ import { CommentDataManager } from "@/src/util/classes/comments";
 import CreateNewAttributeModal from "./CreateNewAttributeModal";
 import ProjectSnapshotExportModal from "./ProjectSnapshotExportModal";
 import { postProcessLabelingTasks, postProcessLabelingTasksSchema } from "@/src/util/components/projects/projectId/settings/labeling-tasks-helper";
-import { getEmptyBricksIntegratorConfig } from "@/src/util/shared/bricks-integrator-helper";
 import { useWebsocket } from "@/submodules/react-components/hooks/web-socket/useWebsocket";
 import { getLabelingTasksByProjectId, getProjectByProjectId, getProjectTokenization } from "@/src/services/base/project";
 import { getAllComments } from "@/src/services/base/comment";
@@ -61,7 +60,6 @@ export default function ProjectSettings() {
             dispatch(setModalStates(ModalEnum.ADD_LABELING_TASK, { open: true }));
             localStorage.removeItem("openModal");
         }
-        dispatch(setBricksIntegrator(getEmptyBricksIntegratorConfig()));
     }, [project]);
 
     useEffect(() => {
