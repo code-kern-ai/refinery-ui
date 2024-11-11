@@ -10,7 +10,6 @@ import { postProcessLabelingTasks, postProcessLabelingTasksSchema } from '@/src/
 import { selectLabelingTasksAll, setAllAttributes, setLabelingTasksAll } from '@/src/reduxStore/states/pages/settings';
 import { setDataSlices } from '@/src/reduxStore/states/pages/data-browser';
 import { selectOverviewFilters } from '@/src/reduxStore/states/tmp';
-import { DisplayGraphs } from '@/submodules/javascript-functions/enums/enums';
 import LabelDistributionBarChart from './charts/LabelDistributionBarChart';
 import { LabelDistribution } from '@/src/types/components/projects/projectId/project-overview/charts';
 import { selectAllUsers, selectOrganizationId, setComments } from '@/src/reduxStore/states/general';
@@ -137,7 +136,7 @@ export default function ProjectOverview() {
             <ProjectOverviewHeader />
             <ProjectOverviewCards projectStats={projectStats} />
             {graphsHaveValues ? (<div>
-                {overviewFilters.graphType.value == DisplayGraphs.LABEL_DISTRIBUTION && <div className="mt-8 grid w-full">
+                <div className="mt-8 grid w-full">
                     <div className="text-lg leading-6 text-gray-900 font-medium inline-block">Label distribution</div>
                     <div className="mt-1 text-sm leading-5 font-medium text-gray-700 inline-block">See the distribution of your manually labeled and weakly supervised records.</div>
                     <div className={`mt-2 w-full h-full shadow ${style.stats} bg-white grid place-items-center flex-grow`}>
@@ -145,7 +144,7 @@ export default function ProjectOverview() {
                             <LabelDistributionBarChart dataInput={labelDistribution} />
                         </div>}
                     </div>
-                </div>}
+                </div>
 
 
             </div>

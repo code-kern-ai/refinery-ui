@@ -1,4 +1,3 @@
-import { DisplayGraphs } from "@/submodules/javascript-functions/enums/enums";
 
 export type ProjectStats = {
     generalLoading: boolean;
@@ -27,7 +26,6 @@ export enum CardStatsEnum {
 }
 
 export type ProjectOverviewFilters = {
-    graphType: { name: string, value: DisplayGraphs };
     targetAttribute: string;
     labelingTask: string;
     dataSlice: string;

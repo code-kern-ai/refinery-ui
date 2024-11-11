@@ -4,7 +4,6 @@ import { selectOverviewFilters, setOverviewFilters, updateOverFilters } from "@/
 import { ProjectOverviewFilters } from "@/src/types/components/projects/projectId/project-overview/project-overview";
 import { LabelingTask } from "@/src/types/components/projects/projectId/settings/labeling-tasks";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
-import { DisplayGraphs } from "@/submodules/javascript-functions/enums/enums";
 import KernDropdown from "@/submodules/react-components/components/KernDropdown";
 import { Tooltip } from "@nextui-org/react";
 import { useEffect, useState } from "react";
@@ -25,7 +24,6 @@ export default function ProjectOverviewHeader() {
         if (!labelingTasks || !targetAttributes || !dataSlices || !targetAttributes[0] || !dataSlices[0]) return;
         const labelingTasksFinal = labelingTasks.find((labelingTask) => labelingTask.targetName === targetAttributes[0].name);
         const overviewFiltersNew: ProjectOverviewFilters = {
-            graphType: { name: "Label Distribution", value: DisplayGraphs.LABEL_DISTRIBUTION },
             targetAttribute: targetAttributes[0],
             labelingTask: labelingTasksFinal,
             dataSlice: dataSlices[0],
