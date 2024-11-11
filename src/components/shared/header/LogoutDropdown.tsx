@@ -1,16 +1,12 @@
 import { Fragment } from 'react'
 import { Menu, Transition } from '@headlessui/react'
 import { useSelector } from 'react-redux'
-import { selectIsManaged, selectUser } from '@/src/reduxStore/states/general'
-import { useRouter } from 'next/router'
+import { selectUser } from '@/src/reduxStore/states/general'
 import { logoutUser } from '@/src/services/base/data-fetch'
 import { combineClassNames } from '@/submodules/javascript-functions/general'
 
 
 export default function LogoutDropdown() {
-    const router = useRouter();
-
-    const isManaged = useSelector(selectIsManaged);
     const user = useSelector(selectUser);
 
     return (
@@ -44,18 +40,6 @@ export default function LogoutDropdown() {
                                 </a>
                             )}
                         </Menu.Item>
-                        {!isManaged && <Menu.Item>
-                            {({ active }) => (
-                                <a onClick={() => router.push('/config')}
-                                    className={combineClassNames(
-                                        active ? 'bg-gray-100 text-gray-900' : 'text-gray-700',
-                                        'block px-4 py-2 text-sm cursor-pointer'
-                                    )}
-                                >
-                                    Config
-                                </a>
-                            )}
-                        </Menu.Item>}
                         <Menu.Item>
                             {({ active }) => (
                                 <a onClick={logoutUser}
