@@ -8,7 +8,7 @@ export class RouteManager {
     public static routeColor = {
         overview: { active: false, checkFor: ['overview'] },
         data: { active: false, checkFor: ['data-browser', 'edit-records'] },
-        labeling: { active: false, checkFor: ['labeling', 'record-ide'] },
+        labeling: { active: false, checkFor: ['labeling'] },
         heuristics: { active: false, checkFor: ['heuristics', 'lookup-lists', 'labeling-function', 'active-learning'] },
         settings: { active: false, checkFor: ['settings', 'attributes', 'upload-records'] },
         admin: { active: false, checkFor: ['admin'] },
