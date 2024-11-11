@@ -26,6 +26,7 @@ export const TOOLTIPS_DICT = {
         'USERS': 'Home page - Users',
         'SHOW_PASSWORD': 'Show password',
         'HIDE_PASSWORD': 'Hide password',
+        'VISIT_BRICKS': "Our ready to be pasted code snippets"
     },
     ['SIDEBAR']: {
         'OVERVIEW': 'Overview',
