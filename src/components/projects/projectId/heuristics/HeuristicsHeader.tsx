@@ -1,5 +1,5 @@
 import { Loading } from "@nextui-org/react";
-import { selectIsManaged, selectOrganizationId } from '@/src/reduxStore/states/general';
+import { selectOrganizationId } from '@/src/reduxStore/states/general';
 import { openModal, selectModal } from '@/src/reduxStore/states/modal';
 import { selectHeuristicsAll, setHeuristicType } from '@/src/reduxStore/states/pages/heuristics';
 import { selectLabelingTasksAll } from '@/src/reduxStore/states/pages/settings';
@@ -30,7 +30,6 @@ export default function HeuristicsHeader(props: HeuristicsHeaderProps) {
     const dispatch = useDispatch();
     const router = useRouter();
 
-    const isManaged = useSelector(selectIsManaged);
     const projectId = useSelector(selectProjectId);
     const heuristics = useSelector(selectHeuristicsAll);
     const labelingTasks = useSelector(selectLabelingTasksAll);

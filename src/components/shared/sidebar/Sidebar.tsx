@@ -1,5 +1,5 @@
 import { selectProject } from '@/src/reduxStore/states/project';
-import { selectIsAdmin, selectIsManaged, selectRouteColor, selectUser } from '@/src/reduxStore/states/general';
+import { selectRouteColor, selectUser } from '@/src/reduxStore/states/general';
 import { UserRole } from '@/src/types/shared/sidebar';
 import Image from 'next/image';
 import { useDispatch, useSelector } from 'react-redux';
@@ -8,13 +8,12 @@ import { useState } from 'react';
 import AppSelectionDropdown from '@/submodules/react-components/components/AppSelectionDropdown';
 import { ModalEnum } from '@/src/types/shared/modal';
 import { openModal } from '@/src/reduxStore/states/modal';
-import { IconAlertCircle, IconApi, IconBrandDiscord, IconBulb, IconChartPie, IconClipboard, IconMaximize, IconMinimize, IconTag, IconTriangleSquareCircle, IconUserCircle } from '@tabler/icons-react';
+import { IconAlertCircle, IconApi, IconBulb, IconChartPie, IconMaximize, IconMinimize, IconTag, IconTriangleSquareCircle } from '@tabler/icons-react';
 import { IconSettings } from '@tabler/icons-react';
 import { useRouter } from 'next/router';
 import { TOOLTIPS_DICT } from '@/src/util/tooltip-constants';
 import { CacheEnum, selectCachedValue } from '@/src/reduxStore/states/cachedValues';
 import VersionOverviewModal from './VersionOverviewModal';
-import HowToUpdateModal from './HowToUpdateModal';
 import { setProjectIdSampleProject } from '@/src/reduxStore/states/tmp';
 import { getHasUpdates } from '@/src/services/base/misc';
 
@@ -24,8 +23,6 @@ export default function Sidebar() {
 
     const user = useSelector(selectUser);
     const project = useSelector(selectProject);
-    const isAdmin = useSelector(selectIsAdmin);
-    const isManaged = useSelector(selectIsManaged);
     const routeColor = useSelector(selectRouteColor);
     const versionOverviewData = useSelector(selectCachedValue(CacheEnum.VERSION_OVERVIEW));
 
@@ -157,16 +154,7 @@ export default function Sidebar() {
                                             </svg>
                                         </div>}
                                     </div>) : (<></>)}
-                                    {user.role == UserRole.ENGINEER && <>
-                                        {!isManaged && <div className={`flex items-center justify-center overflow-visible ${project?.id !== undefined ? 'mt-6' : ''}`}>
-                                            <Tooltip placement="right" trigger="hover" color="invert" content={TOOLTIPS_DICT.SIDEBAR.DOCUMENTATION} className="relative z-50">
-                                                <a href="https://docs.kern.ai/" target="_blank" rel="noopener noreferrer" className="circle text-white">
-                                                    <IconClipboard className="w-6 h-6" />
-                                                </a>
-                                            </Tooltip>
-                                        </div>}
-                                    </>}
-                                    <div className={`flex items-center justify-center overflow-visible ${isManaged ? (project?.id !== undefined ? 'mt-6' : '') : 'mt-9 2xl:mt-12'}`}>
+                                    <div className={`flex items-center justify-center overflow-visible ${project?.id !== undefined ? 'mt-6' : ''}`}>
                                         <Tooltip placement="right" trigger="hover" color="invert" content={TOOLTIPS_DICT.SIDEBAR.API} className="relative z-50">
                                             <a href="https://github.com/code-kern-ai/kern-python" target="_blank"
                                                 rel="noopener noreferrer" className="circle text-white">
@@ -175,17 +163,6 @@ export default function Sidebar() {
                                         </Tooltip>
                                     </div>
                                 </div>
-
-                                {user.role === UserRole.ENGINEER && !isManaged && <div className="flex items-center justify-center overflow-visible mt-9 2xl:mt-12">
-                                    <Tooltip placement="right" trigger="hover" color="invert" content={TOOLTIPS_DICT.SIDEBAR.JOIN_OUR_COMMUNITY}>
-                                        <div className="relative z-50">
-                                            <a href="https://discord.com/invite/qf4rGCEphW" target="_blank" rel="noopener noreferrer"
-                                                className="circle text-white">
-                                                <IconBrandDiscord className="w-6 h-6" />
-                                            </a>
-                                        </div>
-                                    </Tooltip>
-                                </div>}
                             </div>
                             {!isFullScreen && <div className="flex items-center justify-center mt-9 2xl:mt-12">
                                 <Tooltip placement="right" trigger="hover" color="invert" content={TOOLTIPS_DICT.SIDEBAR.MAXIMIZE_SCREEN}>
@@ -205,9 +182,9 @@ export default function Sidebar() {
                                 </Tooltip>
                             </div>}
 
-                            {isManaged && <div className="flex items-center justify-center mt-4">
+                            <div className="flex items-center justify-center mt-4">
                                 <AppSelectionDropdown cognition={true}></AppSelectionDropdown>
-                            </div>}
+                            </div>
 
                             <div className="flex-shrink-0 flex pt-3 justify-center">
                                 <Tooltip placement="right" trigger="hover" color="invert" content={TOOLTIPS_DICT.SIDEBAR.VERSION_OVERVIEW}>
@@ -224,7 +201,6 @@ export default function Sidebar() {
                     </div>
                 </div>
                 <VersionOverviewModal />
-                <HowToUpdateModal />
             </div >
         )
     )

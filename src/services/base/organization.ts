@@ -29,22 +29,6 @@ export function getAllActiveAdminMessages(onResult: (result: any) => void) {
     jsonFetchWrapper(finalUrl, FetchType.GET, onResult);
 }
 
-export function getCanCreateLocalOrg(onResult: (result: any) => void) {
-    const finalUrl = `${organizationEndpoint}/can-create-local-org`;
-    jsonFetchWrapper(finalUrl, FetchType.GET, onResult);
-}
-
-export function createOrganization(name: string, onResult: (result: any) => void) {
-    const finalUrl = `${organizationEndpoint}/create-organization`;
-    const body = { name };
-    jsonFetchWrapper(finalUrl, FetchType.POST, onResult, JSON.stringify(body));
-}
-
-export function addUserToOrganization(userMail: string, organizationName: string, onResult: (result: any) => void) {
-    const finalUrl = `${organizationEndpoint}/add-user-to-organization`;
-    const body = { userMail, organizationName };
-    jsonFetchWrapper(finalUrl, FetchType.POST, onResult, JSON.stringify(convertCamelToSnakeCase(body)));
-}
 
 export function changeOrganization(orgId: string, changes: string, onResult: (result: any) => void) {
     const finalUrl = `${organizationEndpoint}/change-organization`;

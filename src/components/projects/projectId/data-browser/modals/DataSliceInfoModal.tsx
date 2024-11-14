@@ -1,5 +1,4 @@
 import Modal from "@/src/components/shared/modal/Modal";
-import { selectIsManaged } from "@/src/reduxStore/states/general";
 import { closeModal, selectModal } from "@/src/reduxStore/states/modal";
 import { setDisplayUserRole } from "@/src/reduxStore/states/pages/labeling";
 import { ModalEnum } from "@/src/types/shared/modal";
@@ -16,7 +15,6 @@ export default function DataSliceInfoModal() {
     const router = useRouter();
     const dispatch = useDispatch();
 
-    const isManaged = useSelector(selectIsManaged);
     const modalSliceInfo = useSelector(selectModal(ModalEnum.DATA_SLICE_INFO));
 
     function testLink(link) {
@@ -39,12 +37,10 @@ export default function DataSliceInfoModal() {
                                 {value.substring(value.startsWith("https") ? 8 : 7)}</span>
                         </Tooltip>
                     </div>
-                    <Tooltip content={TOOLTIPS_DICT.DATA_BROWSER.ONLY_MANAGED} color="invert" placement="right" className="mt-3">
-                        <button onClick={() => testLink(value + '?pos=1&type=DATA_SLICE')} disabled={!isManaged}
-                            className="opacity-100 w-40 bg-indigo-700 text-white text-xs leading-4 font-semibold px-4 py-2 rounded-md cursor-pointer hover:bg-indigo-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed">
-                            View as expert
-                        </button>
-                    </Tooltip>
+                    <button onClick={() => testLink(value + '?pos=1&type=DATA_SLICE')}
+                        className="opacity-100 w-40 bg-indigo-700 text-white text-xs leading-4 font-semibold px-4 py-2 rounded-md cursor-pointer hover:bg-indigo-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed">
+                        View as expert
+                    </button>
                 </div>) : (<div className="flex flex-grow justify-between gap-8 text-sm">
                     <p>{key}</p>
                     <p>{value}</p>

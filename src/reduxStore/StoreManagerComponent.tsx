@@ -1,10 +1,9 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { useDispatch, useSelector } from "react-redux";
-import { selectIsAdmin, selectIsDemo, selectIsManaged, selectOrganization, setAllUsers, setIsAdmin, setIsDemo, setIsManaged, setOrganization, setRouteColor, setUser } from "./states/general";
+import { selectIsAdmin, selectOrganization, setAllUsers, setIsAdmin, setOrganization, setRouteColor, setUser } from "./states/general";
 import { getUserAvatarUri } from "@/submodules/javascript-functions/general";
 import { setActiveProject } from "./states/project";
-import { getIsDemo, getIsManaged } from "../services/base/data-fetch";
 import { WebSocketsService } from "../../submodules/react-components/hooks/web-socket/WebSocketsService";
 import { timer } from "rxjs";
 import { RouteManager } from "../services/base/route-manager";
@@ -23,23 +22,12 @@ import { getAllTokenizerOptions, getEmbeddingPlatforms, getRecommendedEncoders }
 export function GlobalStoreDataComponent(props: React.PropsWithChildren) {
     const router = useRouter();
     const dispatch = useDispatch();
-
-    const isManaged = useSelector(selectIsManaged);
-    const isDemo = useSelector(selectIsDemo);
     const isAdmin = useSelector(selectIsAdmin);
     const organization = useSelector(selectOrganization);
 
     const [dataLoaded, setDataLoaded] = useState(false);
 
     useEffect(() => {
-        getIsManaged((data) => {
-            dispatch(setIsManaged(data));
-        });
-
-        getIsDemo((data) => {
-            dispatch(setIsDemo(data));
-        });
-
         getIsAdmin((data) => {
             dispatch(setIsAdmin(data.data.isAdmin));
         });
@@ -94,9 +82,9 @@ export function GlobalStoreDataComponent(props: React.PropsWithChildren) {
     }, []);
 
     useEffect(() => {
-        if (isManaged == null || isDemo == null || isAdmin == null) return;
+        if (isAdmin == null) return;
         setDataLoaded(true);
-    }, [isManaged, isDemo, isAdmin]);
+    }, [isAdmin]);
 
     useEffect(() => {
         const projectId = router.query.projectId as string;
@@ -117,9 +105,9 @@ export function GlobalStoreDataComponent(props: React.PropsWithChildren) {
     useEffect(() => {
         if (!ConfigManager.isInit()) return;
         getAllTokenizerOptions((res) => {
-            dispatch(setCache(CacheEnum.TOKENIZER_VALUES, checkWhitelistTokenizer(res.data['languageModels'], isManaged)));
+            dispatch(setCache(CacheEnum.TOKENIZER_VALUES, checkWhitelistTokenizer(res.data['languageModels'])));
         })
-    }, [ConfigManager.isInit(), isManaged]);
+    }, [ConfigManager.isInit()]);
 
     if (!dataLoaded) return <></>;
     return <div>{props.children}</div>;

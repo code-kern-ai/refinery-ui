@@ -66,7 +66,6 @@ export const TOOLTIPS_DICT = {
             'HAS_FILTER_ATTRIBUTES': 'Has filter attributes',
             'NO_FILTER_ATTRIBUTES': 'No filter attributes',
             'GENERATE_EMBEDDING': 'Vectorize your attributes. Integration to Hugging Face available',
-            'HOSTED_VERSION': 'Check out our hosted version to use this function',
             'NAVIGATE_MODELS_DOWNLOADED': 'See which models are downloaded',
             'NOT_YET_ON_QDRANT': 'Embedding is not yet on Qdrant',
         },
@@ -163,7 +162,6 @@ export const TOOLTIPS_DICT = {
         'EXECUTION_TIME': 'Execution time',
     },
     [CurrentPage.DATA_BROWSER]: {
-        'ONLY_MANAGED': 'Only usable for the managed version',
         'CLEAR_WS_CONFIDENCE': 'Clear filter for weakly supervised confidence',
         'CONNECT': 'Connection within atomic filters',
         'SAVE_SLICE': 'Store filters to disk',

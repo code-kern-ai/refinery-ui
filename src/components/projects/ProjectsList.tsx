@@ -1,4 +1,4 @@
-import { selectInactiveOrganization, selectIsDemo, selectIsManaged, selectOrganizationId, selectUser, setComments } from "@/src/reduxStore/states/general"
+import { selectInactiveOrganization, selectOrganizationId, selectUser, setComments } from "@/src/reduxStore/states/general"
 import { selectAllProjects, setAllProjects } from "@/src/reduxStore/states/project";
 import { Project, ProjectStatistics } from "@/src/types/components/projects/projects-list";
 import { percentRoundString } from "@/submodules/javascript-functions/general";
@@ -15,20 +15,17 @@ import { setDataSlices, setFullSearchStore, setSearchGroupsStore } from "@/src/r
 import { SearchGroup } from "@/submodules/javascript-functions/enums/enums";
 import { useWebsocket } from "@/submodules/react-components/hooks/web-socket/useWebsocket";
 import { getAllProjects } from "@/src/services/base/project";
-import { addUserToOrganization, createOrganization, getCanCreateLocalOrg, getOverviewStats } from "@/src/services/base/organization";
+import { getOverviewStats } from "@/src/services/base/organization";
 import { Application, CurrentPage } from "@/submodules/react-components/hooks/web-socket/constants";
 
 export default function ProjectsList() {
     const dispatch = useDispatch();
 
     const organizationInactive = useSelector(selectInactiveOrganization);
-    const isManaged = useSelector(selectIsManaged);
-    const isDemo = useSelector(selectIsDemo);
     const projects = useSelector(selectAllProjects);
     const user = useSelector(selectUser);
 
     const [projectStatisticsById, setProjectStatisticsById] = useState({});
-    const [canCreateOrg, setCanCreateOrg] = useState(false);
     const [dataLoaded, setDataLoaded] = useState(false);
 
     useEffect(() => {
@@ -47,8 +44,6 @@ export default function ProjectsList() {
         if (!organizationInactive) {
             refetchProjectsAndPostProcess();
             refetchStatsAndPostProcess();
-        } else {
-            createDefaultOrg();
         }
     }, [organizationInactive, user]);
 
@@ -72,25 +67,6 @@ export default function ProjectsList() {
                 statsDict[stat.projectId] = stat;
             });
             setProjectStatisticsById(statsDict);
-        });
-    }
-
-    function createDefaultOrg() {
-        if (isManaged || isDemo) {
-            setDataLoaded(true);
-            return;
-        }
-        getCanCreateLocalOrg(res => {
-            const canCreate = res.data["canCreateLocalOrg"]
-            setCanCreateOrg(canCreate);
-            if (!canCreate) return;
-            const localhostOrg = "localhost";
-            createOrganization(localhostOrg, () => {
-                addUserToOrganization(user.mail, localhostOrg, () => {
-                    location.reload();
-                    setDataLoaded(true);
-                });
-            })
         });
     }
 
@@ -126,7 +102,7 @@ export default function ProjectsList() {
                             <main className="mt-16 mx-auto px-4 sm:mt-24 sm:px-6 lg:mt-32">
                                 <div className="lg:grid lg:grid-cols-12 lg:gap-8">
                                     <div className="sm:text-center md:mx-auto lg:col-span-6 lg:text-left">
-                                        {isManaged ? (<div>
+                                        <div>
                                             <div className="text-gray-500 font-semibold text-base uppercase">You&apos;re now on the waitlist!
                                             </div>
                                             <div className="font-extrabold text-gray-900 text-5xl mt-1">
@@ -138,30 +114,12 @@ export default function ProjectsList() {
                                                     className="underline cursor-pointer">here</span></a>.
                                             </div>
                                             <div className="text-gray-500 mt-5">
-                                                In the meantime, feel free to take a look at a product demo or check out our&nbsp;
+                                                In the meantime, feel free to take a look at our&nbsp;
                                                 <a href="https://docs.kern.ai/" target="_blank"><span
                                                     className="underline cursor-pointer">documentation</span></a>. If you have any
                                                 questions, contact us any time.
                                             </div>
-                                        </div>) : (
-                                            <div>
-                                                {canCreateOrg ? (<div className="text-gray-500 font-semibold text-base uppercase">
-                                                    Preparing your account. Please reload the page.
-                                                </div>) : (<div className="text-gray-500 font-semibold text-base uppercase">
-                                                    Maximum number of users reached. Please look into our managed version.</div>)}
-
-                                                <div className="font-normal text-xl text-gray-500 mt-5">
-                                                    {canCreateOrg ? (<span>
-                                                        In the meantime, feel free to take a look at a product demo or check out our
-                                                        <a href="https://docs.kern.ai/" target="_blank"><span
-                                                            className="underline cursor-pointer">documentation</span></a>. If you have
-                                                        any
-                                                        questions, you can reach out to us.
-                                                    </span>) : (<span> If you are interested in working with multiple users take a look at our <a
-                                                        href="./users"><span className="underline cursor-pointer">options</span></a></span>)}
-                                                </div>
-                                            </div>
-                                        )}
+                                        </div>
                                     </div>
                                     <YoutubeIntroduction />
                                 </div>

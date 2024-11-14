@@ -1,38 +1,19 @@
-import { ModalButton, ModalEnum } from "@/src/types/shared/modal";
+import { ModalEnum } from "@/src/types/shared/modal";
 import Modal from "../modal/Modal";
 import { IconAlertCircle, IconArrowRight, IconExternalLink } from "@tabler/icons-react";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import { CacheEnum, selectCachedValue } from "@/src/reduxStore/states/cachedValues";
 import style from '@/src/styles/shared/sidebar.module.css';
 import { VersionOverview } from "@/src/types/shared/sidebar";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
 import { Tooltip } from "@nextui-org/react";
 import LoadingIcon from "../loading/LoadingIcon";
-import { useCallback, useEffect, useState } from "react";
-import { selectIsManaged } from "@/src/reduxStore/states/general";
-import { closeModal, openModal } from "@/src/reduxStore/states/modal";
 
-const ACCEPT_BUTTON = { buttonCaption: "How to update", useButton: true };
 
 export default function VersionOverviewModal() {
-    const dispatch = useDispatch();
-
-    const isManaged = useSelector(selectIsManaged);
     const versionOverviewData = useSelector(selectCachedValue(CacheEnum.VERSION_OVERVIEW));
 
-    const howToUpdate = useCallback(() => {
-        dispatch(closeModal(ModalEnum.VERSION_OVERVIEW));
-        dispatch(openModal(ModalEnum.HOW_TO_UPDATE));
-    }, []);
-
-    useEffect(() => {
-        setAcceptButton({ ...ACCEPT_BUTTON, useButton: !isManaged, emitFunction: howToUpdate });
-    }, [howToUpdate, isManaged]);
-
-    const [acceptButton, setAcceptButton] = useState<ModalButton>(ACCEPT_BUTTON);
-
-
-    return (<Modal modalName={ModalEnum.VERSION_OVERVIEW} acceptButton={acceptButton}>
+    return (<Modal modalName={ModalEnum.VERSION_OVERVIEW}>
         <div className="inline-block justify-center text-lg leading-6 text-gray-900 font-medium">
             Version overview
 
