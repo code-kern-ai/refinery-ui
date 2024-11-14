@@ -18,7 +18,6 @@ export const TOOLTIPS_DICT = {
         'MOVE_COMMENT_RIGHT': 'Move comment window right',
         'CLOSE_ALL': 'Close all',
         'OPEN_ALL': 'Open all',
-        'OPEN_BRICKS_INTEGRATOR': 'Open the Bricks integrator',
         'COPIED': 'Copied',
         'OPTIONAL': 'Optional',
         'CLEAR': 'Clear',
@@ -27,6 +26,7 @@ export const TOOLTIPS_DICT = {
         'USERS': 'Home page - Users',
         'SHOW_PASSWORD': 'Show password',
         'HIDE_PASSWORD': 'Hide password',
+        'VISIT_BRICKS': "Our ready to be pasted code snippets"
     },
     ['SIDEBAR']: {
         'OVERVIEW': 'Overview',
@@ -119,7 +119,6 @@ export const TOOLTIPS_DICT = {
 
     },
     [CurrentPage.PROJECT_OVERVIEW]: {
-        'VISUALIZATION': 'Choose the visualizations',
         'TARGET_TYPE': 'Choose the target type',
         'LABELING_TASK': 'Choose the labeling task',
         'STATIC_DATA_SLICE': 'Choose a static data slice',
@@ -179,7 +178,6 @@ export const TOOLTIPS_DICT = {
     },
     [CurrentPage.LABELING]: {
         'NAVIGATE_TO_DATA_BROWSER': 'Go to the data browser',
-        'NAVIGATE_TO_RECORD_IDE': 'See the programmatic view for your current record',
         'REACH_END': 'If you reached the end, you can select new filters in the browser',
         'CHANGE_SLICES': 'Slices can be changed by the engineer in your team',
         'ARROW_LEFT': 'Arrow left',
@@ -204,15 +202,6 @@ export const TOOLTIPS_DICT = {
         'SET_LABELS_GOLD_STAR': 'Set manual task labels as gold labels',
         'CHOOSE_LABELS': 'Choose from your labels',
         'CREATE_LABEL': 'Create label'
-    },
-    [CurrentPage.RECORD_IDE]: {
-        'GO_TO_LABELING': 'Go to labeling page',
-        'LOAD_STORAGE': 'Load code from local (browser) storage',
-        'SAVE_STORAGE': 'Save code to local (browser) storage',
-        'SWITCH_TO_HORIZONTAL': 'Switch to horizontal view',
-        'SWITCH_TO_VERTICAL': 'Switch to vertical view',
-        'IDX_SESSION': 'Number of the current index in session',
-        'CLEAR_SHELL': 'Clear shell output screen'
     },
     [CurrentPage.EDIT_RECORDS]: {
         'GO_TO_DATA_BROWSER': 'Go to data browser',

@@ -19,11 +19,3 @@ export function logoutUser() {
             window.location.href = data["logout_url"]
         })
 }
-
-export function getBricksIntegrator(url: string, headers: any, onResult: (result: any) => void, onError?: (response: any) => void) {
-    jsonFetchWrapper(url, FetchType.GET, onResult, null, headers, onError);
-}
-
-export function postBricksIntegrator(url: string, headers: any, body: any, onResult: (result: any) => void, onError?: (response: any) => void) {
-    jsonFetchWrapper(url, FetchType.POST, onResult, body, headers, onError);
-}

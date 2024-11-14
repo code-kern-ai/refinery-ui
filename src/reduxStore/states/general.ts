@@ -1,7 +1,3 @@
-import { LookupList } from "@/src/types/components/projects/projectId/lookup-lists";
-import { Attribute } from "@/src/types/components/projects/projectId/settings/data-schema";
-import { Embedding } from "@/src/types/components/projects/projectId/settings/embeddings";
-import { BricksIntegratorConfig } from "@/src/types/shared/bricks-integrator";
 import { CommentData } from "@/src/types/shared/comments";
 import { User } from "@/src/types/shared/general";
 import { NotificationListWrapper } from "@/src/types/shared/notification-center";
@@ -38,14 +34,6 @@ const initialState = {
         all: [],
         displayIcon: false
     },
-    bricksIntegrator: {
-        config: null,
-        attributes: [],
-        languages: [],
-        embeddings: [],
-        labelingTasks: [],
-        labels: [],
-    },
     routeColor: null
 } as {
     user: User;
@@ -65,15 +53,6 @@ const initialState = {
     comments: {
         all: CommentData[];
         displayIcon: boolean;
-    },
-    bricksIntegrator: {
-        config: BricksIntegratorConfig;
-        attributes: Attribute[];
-        languages: { code: string, name: string }[];
-        embeddings: Embedding[];
-        labelingTasks: any[];
-        lookupLists: LookupList[];
-        labels: any[];
     },
     routeColor: any;
 }
@@ -118,34 +97,6 @@ const generalSlice = createSlice({
             if (action.payload) state.comments.all = action.payload;
             else state.comments.all = null;
         },
-        setBricksIntegrator(state, action: PayloadAction<BricksIntegratorConfig>) {
-            if (action.payload) state.bricksIntegrator.config = action.payload;
-            else state.bricksIntegrator.config = null;
-        },
-        setAttributesBricksIntegrator(state, action: PayloadAction<any[]>) {
-            if (action.payload) state.bricksIntegrator.attributes = action.payload;
-            else state.bricksIntegrator.attributes = [];
-        },
-        setLanguagesBricksIntegrator(state, action: PayloadAction<{ code: string, name: string }[]>) {
-            if (action.payload) state.bricksIntegrator.languages = action.payload;
-            else state.bricksIntegrator.languages = [];
-        },
-        setEmbeddingsBricksIntegrator(state, action: PayloadAction<any[]>) {
-            if (action.payload) state.bricksIntegrator.embeddings = action.payload;
-            else state.bricksIntegrator.embeddings = [];
-        },
-        setLabelingTasksBricksIntegrator(state, action: PayloadAction<any[]>) {
-            if (action.payload) state.bricksIntegrator.labelingTasks = action.payload;
-            else state.bricksIntegrator.labelingTasks = [];
-        },
-        setLookupListsBricksIntegrator(state, action: PayloadAction<any[]>) {
-            if (action.payload) state.bricksIntegrator.lookupLists = action.payload;
-            else state.bricksIntegrator.lookupLists = [];
-        },
-        setLabelsBricksIntegrator(state, action: PayloadAction<any[]>) {
-            if (action.payload) state.bricksIntegrator.labels = action.payload;
-            else state.bricksIntegrator.labels = [];
-        },
         setDisplayIconComments(state, action: PayloadAction<boolean>) {
             state.comments.displayIcon = action.payload;
         },
@@ -172,17 +123,10 @@ export const selectAnnotators = (state) => state.general.users.annotators;
 export const selectExperts = (state) => state.general.users.experts;
 export const selectNotifications = (state) => state.general.notifications;
 export const selectComments = (state) => state.general.comments.all;
-export const selectBricksIntegrator = (state) => state.general.bricksIntegrator.config;
-export const selectBricksIntegratorAttributes = (state) => state.general.bricksIntegrator.attributes;
-export const selectBricksIntegratorLanguages = (state) => state.general.bricksIntegrator.languages;
-export const selectBricksIntegratorEmbeddings = (state) => state.general.bricksIntegrator.embeddings;
-export const selectBricksIntegratorLabelingTasks = (state) => state.general.bricksIntegrator.labelingTasks;
-export const selectBricksIntegratorLookupLists = (state) => state.general.bricksIntegrator.lookupLists;
-export const selectBricksIntegratorLabels = (state) => state.general.bricksIntegrator.labels;
 export const selectDisplayIconComments = (state) => state.general.comments.displayIcon;
 export const selectRouteColor = (state) => state.general.routeColor;
 
 export const selectAnnotatorsDict = createSelector([selectAnnotators], (a): any => a ? arrayToDict(a, 'id') : null);
 
-export const { setUser, setCurrentPage, setIsManaged, setIsDemo, setIsAdmin, setOrganization, setAllUsers, setNotifications, setComments, setBricksIntegrator, setAttributesBricksIntegrator, setLanguagesBricksIntegrator, setEmbeddingsBricksIntegrator, setLabelingTasksBricksIntegrator, setLookupListsBricksIntegrator, setLabelsBricksIntegrator, setDisplayIconComments, setRouteColor } = generalSlice.actions;
+export const { setUser, setCurrentPage, setIsManaged, setIsDemo, setIsAdmin, setOrganization, setAllUsers, setNotifications, setComments, setDisplayIconComments, setRouteColor } = generalSlice.actions;
 export const generalReducer = generalSlice.reducer;

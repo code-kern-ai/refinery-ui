@@ -14,8 +14,7 @@ import AddActiveLeanerModal from "./modals/AddActiveLearnerModal";
 import { postProcessingEmbeddings } from "@/src/util/components/projects/projectId/settings/embeddings-helper";
 import { CommentType } from "@/src/types/shared/comments";
 import { CommentDataManager } from "@/src/util/classes/comments";
-import { selectAllUsers, selectOrganizationId, setBricksIntegrator, setComments } from "@/src/reduxStore/states/general";
-import { getEmptyBricksIntegratorConfig } from "@/src/util/shared/bricks-integrator-helper";
+import { selectAllUsers, selectOrganizationId, setComments } from "@/src/reduxStore/states/general";
 import { useWebsocket } from "@/submodules/react-components/hooks/web-socket/useWebsocket";
 import { getAllComments } from "@/src/services/base/comment";
 import { getAttributes } from "@/src/services/base/attribute";
@@ -48,7 +47,6 @@ export function HeuristicsOverview() {
                 dispatch(setAllAttributes(res.data['attributesByProjectId']));
             });
         }
-        dispatch(setBricksIntegrator(getEmptyBricksIntegratorConfig()));
     }, [projectId]);
 
     useEffect(() => {

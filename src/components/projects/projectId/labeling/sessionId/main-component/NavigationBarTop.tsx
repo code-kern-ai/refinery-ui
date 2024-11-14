@@ -38,12 +38,6 @@ export default function NavigationBarTop(props: NavigationBarTopProps) {
         });
     }, [SessionManager.labelingLinkData, userDisplayRole]);
 
-    function goToRecordIde() {
-        const sessionId = router.query.sessionId as string;
-        const pos = router.query.pos as string;
-        router.push(`/projects/${projectId}/record-ide/${sessionId}?pos=${pos}`);
-    }
-
     function previousRecord() {
         SessionManager.previousRecord();
         router.push(`/projects/${projectId}/labeling/${SessionManager.labelingLinkData.huddleId}?pos=${SessionManager.huddleData.linkData.requestedPos}&type=${SessionManager.huddleData.linkData.linkType}`);
@@ -70,15 +64,6 @@ export default function NavigationBarTop(props: NavigationBarTopProps) {
                                 <button onClick={() => router.push(`/projects/${projectId}/data-browser`)}
                                     className="bg-white text-gray-700 text-xs font-semibold mr-3 px-4 py-2 rounded-md border border-gray-300 hover:bg-gray-50 focus:outline-none">
                                     Data browser
-                                </button>
-                            </Tooltip>
-                        </div>
-
-                        <div className="flex justify-center overflow-visible">
-                            <Tooltip content={TOOLTIPS_DICT.LABELING.NAVIGATE_TO_RECORD_IDE} placement="bottom" color="invert">
-                                <button onClick={() => goToRecordIde()}
-                                    className="bg-white text-gray-700 text-xs font-semibold mr-3 px-4 py-2 rounded-md border border-gray-300 hover:bg-gray-50 focus:outline-none">
-                                    Record IDE
                                 </button>
                             </Tooltip>
                         </div>
