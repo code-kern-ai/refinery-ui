@@ -47,7 +47,7 @@ export default function VersionOverviewModal() {
                     <tbody className="divide-y divide-gray-200">
                         {versionOverviewData.map((service: VersionOverview, index: number) => (
                             <tr key={service.service} className={index % 2 != 0 ? 'bg-gray-50' : 'bg-white'}>
-                                <td className="text-left px-3 py-2 text-sm text-gray-500">{service.service}</td>
+                                <td className="text-left px-3 py-2 text-sm text-gray-500 whitespace-nowrap">{service.service}</td>
                                 <td className="text-center px-3 py-2 text-sm text-gray-500">{service.installedVersion}</td>
                                 <td className="text-center px-3 py-2 text-sm text-gray-500">
                                     <div className="flex flex-row items-center justify-center">
@@ -57,7 +57,7 @@ export default function VersionOverviewModal() {
                                         </Tooltip>}
                                     </div>
                                 </td>
-                                <td className="text-center px-3 py-2 text-sm text-gray-500">{service.parseDate}</td>
+                                <td className="text-center px-3 py-2 text-sm text-gray-500 whitespace-nowrap">{service.parseDate}</td>
                                 <td className="text-center px-3 py-2 text-sm text-gray-500">
                                     <a href={service.link} target="_blank" rel="noopener noreferrer" className="h-4 w-4 m-auto block p-0">
                                         <IconExternalLink className="h-4 w-4 m-auto" />
