@@ -3,7 +3,7 @@ import style from "@/src/styles/components/projects/projectId/project-overview.m
 import { useEffect, useRef, useState } from "react";
 import { changeDataStructure, squashData } from "@/src/util/components/projects/projectId/project-overview/charts-helper";
 import { ChartData } from "chart.js";
-import * as d3 from 'd3v4';
+import * as d3 from 'd3';
 
 export default function LabelDistributionBarChart(props: BarChartProps) {
 
@@ -183,11 +183,12 @@ export default function LabelDistributionBarChart(props: BarChartProps) {
             .on("mouseover", function (d) {
                 divTooltip.style("opacity", 1);
             })
-            .on("mousemove", function (d) {
-                divTooltip.style("left", d3.event.pageX + 10 + "px")
-                divTooltip.style("top", d3.event.pageY - 25 + "px")
-                divTooltip.style("display", "inline-block")
-                divTooltip.style("opacity", "0.9");
+            .on("mousemove", function (event) {
+                divTooltip.style("left", (event.pageX + 10) + "px")
+                    .style("top", (event.pageY - 25) + "px")
+                    .style("display", "inline-block")
+                    .style("opacity", "0.9");
+
                 var elements = document.querySelectorAll("#horizontal-grouped-bar :hover");
                 var l = elements.length - 1;
 
