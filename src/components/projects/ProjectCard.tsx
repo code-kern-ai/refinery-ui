@@ -1,4 +1,4 @@
-import { selectIsAdmin, selectIsDemo, selectUser } from "@/src/reduxStore/states/general";
+import { selectIsAdmin, selectUser } from "@/src/reduxStore/states/general";
 import { closeModal, setModalStates } from "@/src/reduxStore/states/modal";
 import { removeFromAllProjectsById } from "@/src/reduxStore/states/project";
 import { Project, ProjectCardProps, ProjectStatus } from "@/src/types/components/projects/projects-list";
@@ -16,7 +16,6 @@ export default function ProjectCard(props: ProjectCardProps) {
     const router = useRouter();
     const dispatch = useDispatch();
 
-    const isDemo = useSelector(selectIsDemo);
     const isAdmin = useSelector(selectIsAdmin);
     const user = useSelector(selectUser);
 
@@ -56,7 +55,7 @@ export default function ProjectCard(props: ProjectCardProps) {
                         <Tooltip content={props.project.user.firstName && props.project.user.lastName ? props.project.user.mail : ''} placement="bottom" color="invert" className="cursor-auto">
                             <span className="text-sm text-gray-900">{props.project.user.firstName && props.project.user.lastName ? props.project.user.firstName + ' ' + props.project.user.lastName : UNKNOWN_USER}</span>
                         </Tooltip>
-                        {!isDemo && isAdmin && <>
+                        {isAdmin && <>
                             <span className="text-sm text-gray-500">on</span>
                             <span className="text-sm text-gray-900 ">{props.project.date}</span>
                             <span className="text-sm text-gray-500">at</span>

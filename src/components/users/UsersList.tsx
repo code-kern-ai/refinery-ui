@@ -1,4 +1,4 @@
-import { selectAnnotators, selectEngineers, selectExperts, selectInactiveOrganization, selectIsManaged } from "@/src/reduxStore/states/general";
+import { selectAnnotators, selectEngineers, selectExperts, selectInactiveOrganization } from "@/src/reduxStore/states/general";
 import { useSelector } from "react-redux"
 import YoutubeIntroduction from "../projects/YoutubeIntroduction";
 import { User } from "@/src/types/shared/general";
@@ -6,179 +6,13 @@ import { IconUsersGroup } from "@tabler/icons-react";
 import { UNKNOWN_USER } from "@/src/util/constants";
 
 export default function UsersList() {
-    const isManaged = useSelector(selectIsManaged);
     const organizationInactive = useSelector(selectInactiveOrganization);
     const engineers = useSelector(selectEngineers);
     const annotators = useSelector(selectAnnotators);
     const experts = useSelector(selectExperts);
 
     return <div className="bg-gray-100">
-        {/* Intentionally commented */}
-        {/* {!isManaged && <div>
-            <div className="mt-10 mx-auto px-4 sm:px-6 lg:px-8 pb-12">
-                <div className="mx-auto">
-                    <div className="max-w-2xl md:mx-auto md:text-center xl:max-w-none">
-                        <h2 className="font-display text-3xl tracking-tight sm:text-4xl md:text-5xl">
-                            Tailored pricing,
-                            fitting your requirements.
-                        </h2>
-                        <p className="mt-6 text-lg tracking-tight text-gray-900">
-                            refinery comes both via managed cloud or as an on-prem enterprise solution. Also,
-                            you can let us manage your crowdlabeling tasks in the managed cloud.
-                        </p>
-                    </div>
-
-                </div>
-
-                <div
-                    className="mt-12 pb-12 space-y-4 sm:mt-16 sm:grid sm:grid-cols-2 sm:gap-6 sm:space-y-0 lg:mx-auto lg:max-w-4xl xl:mx-0 xl:max-w-none xl:grid-cols-3">
-                    <div
-                        className="bg-white divide-y divide-gray-200 rounded-lg shadow-sm border border-gray-200">
-                        <div className="p-6">
-                            <h2 className="text-lg font-medium leading-6 text-gray-900">Open-source</h2>
-                            <p className="mt-4 text-sm text-gray-500">Designed for single-user workflows.</p>
-                            <div className='md:h-44'>
-                                <div>
-                                    <p className="mt-8">
-                                        <span className="text-4xl font-semibold tracking-tight text-gray-900">For
-                                            free</span>
-                                    </p>
-                                    <p className="mt-2">
-                                        <span className="font-small text-gray-500">Install it on your local
-                                            machine.</span>
-                                    </p>
-                                </div>
-                            </div>
-                            <a href="https://github.com/code-kern-ai/refinery" target="_blank"
-                                className="mt-4 block w-full rounded-md border border-gray-800 bg-gray-800 py-2 text-center text-sm font-semibold text-white hover:bg-gray-900">
-                                Go to GitHub
-                            </a>
-                        </div>
-                        <div className="px-6 pt-6 pb-8">
-                            <h3 className="text-sm font-medium text-gray-900">What&apos;s included</h3>
-                            <ul role="list" className="mt-6 space-y-4">
-                                <li className="flex space-x-3">
-                                    <IconCheck className="h-5 w-5 flex-shrink-0 text-green-500" />
-                                    <span className="text-sm text-gray-500">Free forever.</span>
-                                </li>
-                                <li className="flex space-x-3">
-                                    <IconCheck className="h-5 w-5 flex-shrink-0 text-green-500" />
-                                    <span className="text-sm text-gray-500">Ideal for smaller projects, e.g.
-                                        side-projects or Proof-of-Concepts.</span>
-                                </li>
-                            </ul>
-                        </div>
-                    </div>
-
-                    <div
-                        className="bg-white divide-y divide-gray-200 rounded-lg shadow-sm border border-gray-200">
-                        <div className="p-6">
-                            <h2 className="text-lg font-medium leading-6 text-gray-900">Managed cloud</h2>
-                            <p className="mt-4 text-sm text-gray-500">We do all the heavy-lifting for you.</p>
-                            <div className='md:h-44'>
-                                <div>
-                                    <p className="mt-8">
-                                        <span className="text-base font-medium text-gray-500">Starting at</span>
-                                        <span className="text-4xl font-semibold tracking-tight text-gray-900"> 300€
-                                        </span>
-                                        <span className="text-base font-medium text-gray-500">/mo.</span>
-                                    </p>
-                                    <p className="mt-2">
-                                        <span className="font-small text-gray-500">Depending on workload, dedicated
-                                            vs. shared instances, and labeling services.</span>
-                                    </p>
-                                    <span
-                                        className="mt-4 inline-flex items-center rounded-full bg-blue-100 px-3 py-0.5 text-sm font-medium text-blue-800">
-                                        14-day trial
-                                    </span>
-                                </div>
-                            </div>
-                            <a href="https://cal.com/demo-refinery" target="_blank"
-                                className="mt-4 block w-full rounded-md border border-gray-800 bg-gray-800 py-2 text-center text-sm font-semibold text-white hover:bg-gray-900">
-                                Talk to sales
-                            </a>
-                        </div>
-                        <div className="px-6 pt-6 pb-8">
-                            <h3 className="text-sm font-medium text-gray-900">What&apos;s included</h3>
-                            <ul role="list" className="mt-6 space-y-4">
-                                <li className="flex space-x-3">
-                                    <IconCheck className="h-5 w-5 flex-shrink-0 text-green-500" />
-                                    <span className="text-sm text-gray-500">Managed and monitored by us.</span>
-                                </li>
-                                <li className="flex space-x-3">
-                                    <IconCheck className="h-5 w-5 flex-shrink-0 text-green-500" />
-                                    <span className="text-sm text-gray-500">Work together with your team.</span>
-                                </li>
-                                <li className="flex space-x-3">
-                                    <IconCheck className="h-5 w-5 flex-shrink-0 text-green-500" />
-                                    <span className="text-sm text-gray-500">GPU-acceleration of large language model
-                                        (LLM)-services.</span>
-                                </li>
-                                <li className="flex space-x-3">
-                                    <IconCheck className="h-5 w-5 flex-shrink-0 text-green-500" />
-                                    <span className="text-sm text-gray-500">On-demand managed labeling
-                                        services.</span>
-                                </li>
-                            </ul>
-                        </div>
-                    </div>
-
-                    <div
-                        className="bg-white divide-y divide-gray-200 rounded-lg border border-gray-200 shadow-sm">
-                        <div className="p-6">
-                            <h2 className="text-lg font-medium leading-6 text-gray-900">On-premise deployment
-                            </h2>
-                            <p className="mt-4 text-sm text-gray-500">You run refinery, we help you make it a
-                                success.</p>
-                            <div className='md:h-44'>
-                                <div>
-                                    <p className="mt-8">
-                                        <span className="text-4xl font-semibold tracking-tight text-gray-900">3000€
-                                        </span>
-                                        <span className="text-base font-medium text-gray-500">/mo.</span>
-                                    </p>
-                                    <p className="mt-2">
-                                        <span className="font-small text-gray-500">Running on your own
-                                            infrastructure.</span>
-                                    </p>
-                                    <span
-                                        className="mt-4 inline-flex items-center rounded-full bg-green-100 px-3 py-0.5 text-sm font-medium text-green-800">
-                                        Early bird offer
-                                    </span>
-                                </div>
-                            </div>
-                            <a href="https://cal.com/demo-refinery" target="_blank"
-                                className="mt-4 block w-full rounded-md border border-gray-800 bg-gray-800 py-2 text-center text-sm font-semibold text-white hover:bg-gray-900">
-                                Talk to sales
-                            </a>
-                        </div>
-                        <div className="px-6 pt-6 pb-8">
-                            <h3 className="text-sm font-medium text-gray-900">What&apos;s included</h3>
-                            <ul role="list" className="mt-6 space-y-4">
-                                <li className="flex space-x-3">
-                                    <IconCheck className="h-5 w-5 flex-shrink-0 text-green-500" />
-                                    <span className="text-sm text-gray-500">Deployed on your own
-                                        infrastructure.</span>
-                                </li>
-                                <li className="flex space-x-3">
-                                    <IconCheck className="h-5 w-5 flex-shrink-0 text-green-500" />
-                                    <span className="text-sm text-gray-500">Work together with your team.</span>
-                                </li>
-                                <li className="flex space-x-3">
-                                    <IconCheck className="h-5 w-5 flex-shrink-0 text-green-500" />
-                                    <span className="text-sm text-gray-500">Custom API.</span>
-                                </li>
-                                <li className="flex space-x-3">
-                                    <IconCheck className="h-5 w-5 flex-shrink-0 text-green-500" />
-                                    <span className="text-sm text-gray-500">Dedicated engineer support.</span>
-                                </li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>} */}
-        {!organizationInactive && isManaged && <div>
+        {!organizationInactive && <div>
             <div className="mx-auto mt-8 pb-12 px-4 sm:px-6">
                 <div className="grid grid-cols-1 gap-8">
                     <div className="space-y-5 sm:space-y-4">
@@ -277,7 +111,7 @@ export default function UsersList() {
             </div>
         </div>
         }
-        {organizationInactive && isManaged && <div>
+        {organizationInactive && <div>
             <div className="h-screen relative bg-white overflow-hidden">
                 <div className="hidden lg:block lg:absolute lg:inset-0" aria-hidden="true">
                     <svg className="h-screen absolute top-0 left-1/2 transform translate-x-64 -translate-y-8" width="640"

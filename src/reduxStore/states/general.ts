@@ -18,8 +18,6 @@ export type Organization = {
 const initialState = {
     user: null,
     currentPage: '',
-    isManaged: true,
-    isDemo: false,
     isAdmin: false,
     organization: null,
     organizationInactive: null,
@@ -38,8 +36,6 @@ const initialState = {
 } as {
     user: User;
     currentPage: string;
-    isManaged: boolean;
-    isDemo: boolean;
     isAdmin: boolean;
     organization: Organization;
     organizationInactive: boolean;
@@ -67,12 +63,6 @@ const generalSlice = createSlice({
         },
         setCurrentPage(state, action: PayloadAction<string>) {
             state.currentPage = action.payload;
-        },
-        setIsManaged(state, action: PayloadAction<boolean>) {
-            state.isManaged = action.payload;
-        },
-        setIsDemo(state, action: PayloadAction<boolean>) {
-            state.isDemo = action.payload;
         },
         setIsAdmin(state, action: PayloadAction<boolean>) {
             state.isAdmin = action.payload;
@@ -111,8 +101,6 @@ const generalSlice = createSlice({
 //selectors
 export const selectUser = (state) => state.general.user;
 export const selectCurrentPage = (state) => state.general.currentPage;
-export const selectIsManaged = (state) => state.general.isManaged;
-export const selectIsDemo = (state) => state.general.isDemo;
 export const selectIsAdmin = (state) => state.general.isAdmin;
 export const selectOrganization = (state) => state.general.organization;
 export const selectOrganizationId = (state) => state.general.organization?.id;
@@ -128,5 +116,5 @@ export const selectRouteColor = (state) => state.general.routeColor;
 
 export const selectAnnotatorsDict = createSelector([selectAnnotators], (a): any => a ? arrayToDict(a, 'id') : null);
 
-export const { setUser, setCurrentPage, setIsManaged, setIsDemo, setIsAdmin, setOrganization, setAllUsers, setNotifications, setComments, setDisplayIconComments, setRouteColor } = generalSlice.actions;
+export const { setUser, setCurrentPage, setIsAdmin, setOrganization, setAllUsers, setNotifications, setComments, setDisplayIconComments, setRouteColor } = generalSlice.actions;
 export const generalReducer = generalSlice.reducer;

@@ -5,7 +5,7 @@ export class ConfigManager {
     private static config = null;
 
     public static refreshConfig() {
-        jsonFetchWrapper('/config/base_config', FetchType.GET, r => {
+        jsonFetchWrapper(`/config/full_config`, FetchType.GET, r => {
             ConfigManager.config = r;
         });
     }

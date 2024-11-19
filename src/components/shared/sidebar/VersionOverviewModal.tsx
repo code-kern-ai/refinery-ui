@@ -1,38 +1,19 @@
-import { ModalButton, ModalEnum } from "@/src/types/shared/modal";
+import { ModalEnum } from "@/src/types/shared/modal";
 import Modal from "../modal/Modal";
 import { IconAlertCircle, IconArrowRight, IconExternalLink } from "@tabler/icons-react";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import { CacheEnum, selectCachedValue } from "@/src/reduxStore/states/cachedValues";
 import style from '@/src/styles/shared/sidebar.module.css';
 import { VersionOverview } from "@/src/types/shared/sidebar";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
 import { Tooltip } from "@nextui-org/react";
 import LoadingIcon from "../loading/LoadingIcon";
-import { useCallback, useEffect, useState } from "react";
-import { selectIsManaged } from "@/src/reduxStore/states/general";
-import { closeModal, openModal } from "@/src/reduxStore/states/modal";
 
-const ACCEPT_BUTTON = { buttonCaption: "How to update", useButton: true };
 
 export default function VersionOverviewModal() {
-    const dispatch = useDispatch();
-
-    const isManaged = useSelector(selectIsManaged);
     const versionOverviewData = useSelector(selectCachedValue(CacheEnum.VERSION_OVERVIEW));
 
-    const howToUpdate = useCallback(() => {
-        dispatch(closeModal(ModalEnum.VERSION_OVERVIEW));
-        dispatch(openModal(ModalEnum.HOW_TO_UPDATE));
-    }, []);
-
-    useEffect(() => {
-        setAcceptButton({ ...ACCEPT_BUTTON, useButton: !isManaged, emitFunction: howToUpdate });
-    }, [howToUpdate, isManaged]);
-
-    const [acceptButton, setAcceptButton] = useState<ModalButton>(ACCEPT_BUTTON);
-
-
-    return (<Modal modalName={ModalEnum.VERSION_OVERVIEW} acceptButton={acceptButton}>
+    return (<Modal modalName={ModalEnum.VERSION_OVERVIEW}>
         <div className="inline-block justify-center text-lg leading-6 text-gray-900 font-medium">
             Version overview
 
@@ -66,7 +47,7 @@ export default function VersionOverviewModal() {
                     <tbody className="divide-y divide-gray-200">
                         {versionOverviewData.map((service: VersionOverview, index: number) => (
                             <tr key={service.service} className={index % 2 != 0 ? 'bg-gray-50' : 'bg-white'}>
-                                <td className="text-left px-3 py-2 text-sm text-gray-500">{service.service}</td>
+                                <td className="text-left px-3 py-2 text-sm text-gray-500 whitespace-nowrap">{service.service}</td>
                                 <td className="text-center px-3 py-2 text-sm text-gray-500">{service.installedVersion}</td>
                                 <td className="text-center px-3 py-2 text-sm text-gray-500">
                                     <div className="flex flex-row items-center justify-center">
@@ -76,7 +57,7 @@ export default function VersionOverviewModal() {
                                         </Tooltip>}
                                     </div>
                                 </td>
-                                <td className="text-center px-3 py-2 text-sm text-gray-500">{service.parseDate}</td>
+                                <td className="text-center px-3 py-2 text-sm text-gray-500 whitespace-nowrap">{service.parseDate}</td>
                                 <td className="text-center px-3 py-2 text-sm text-gray-500">
                                     <a href={service.link} target="_blank" rel="noopener noreferrer" className="h-4 w-4 m-auto block p-0">
                                         <IconExternalLink className="h-4 w-4 m-auto" />

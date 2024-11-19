@@ -1,6 +1,6 @@
 import LoadingIcon from "@/src/components/shared/loading/LoadingIcon";
-import { selectIsManaged, selectOrganizationId } from "@/src/reduxStore/states/general";
-import { closeModal, openModal, setModalStates } from "@/src/reduxStore/states/modal";
+import { selectOrganizationId } from "@/src/reduxStore/states/general";
+import { openModal, setModalStates } from "@/src/reduxStore/states/modal";
 import { selectAttributes, selectEmbeddings } from "@/src/reduxStore/states/pages/settings";
 import { selectProjectId } from "@/src/reduxStore/states/project";
 import { Embedding, EmbeddingState, EmbeddingType } from "@/src/types/components/projects/projectId/settings/embeddings";
@@ -24,7 +24,6 @@ export default function Embeddings(props: { refetchEmbeddings: () => void }) {
     const router = useRouter();
 
     const attributes = useSelector(selectAttributes);
-    const isManaged = useSelector(selectIsManaged);
     const embeddings = useSelector(selectEmbeddings);
     const projectId = useSelector(selectProjectId);
 
@@ -176,8 +175,8 @@ export default function Embeddings(props: { refetchEmbeddings: () => void }) {
                         Generate embedding
                     </button>
                 </Tooltip>
-                <Tooltip content={!isManaged ? TOOLTIPS_DICT.PROJECT_SETTINGS.EMBEDDINGS.HOSTED_VERSION : TOOLTIPS_DICT.PROJECT_SETTINGS.EMBEDDINGS.NAVIGATE_MODELS_DOWNLOADED} color="invert" placement="right">
-                    <button disabled={!isManaged} onClick={() => router.push('/models-download')}
+                <Tooltip content={TOOLTIPS_DICT.PROJECT_SETTINGS.EMBEDDINGS.NAVIGATE_MODELS_DOWNLOADED} color="invert" placement="right">
+                    <button onClick={() => router.push('/models-download')}
                         className={`"ml-1 inline-block items-center px-2.5 py-1.5 border border-gray-300 shadow-sm text-xs font-semibold rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none cursor-pointer disabled:cursor-not-allowed disabled:opacity-50`}>
                         <IconArrowAutofitDown className="h-5 w-5 inline-block mr-1" />
                         See downloaded models

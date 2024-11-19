@@ -1,4 +1,4 @@
-import { selectCurrentPage, selectDisplayIconComments, selectIsDemo, selectIsManaged, selectOrganization, selectUser, setNotifications } from "@/src/reduxStore/states/general";
+import { selectCurrentPage, selectDisplayIconComments, selectOrganization, selectUser, setNotifications } from "@/src/reduxStore/states/general";
 import { UserRole } from "@/src/types/shared/sidebar";
 import { Tooltip } from "@nextui-org/react";
 import { useEffect, useState } from "react";
@@ -24,8 +24,6 @@ export default function Header() {
     const router = useRouter();
     const dispatch = useDispatch();
 
-    const isDemo = useSelector(selectIsDemo);
-    const isManaged = useSelector(selectIsManaged);
     const currentPage = useSelector(selectCurrentPage);
     const organization = useSelector(selectOrganization);
     const user = useSelector(selectUser);
@@ -72,31 +70,20 @@ export default function Header() {
     return (
         <header className="sticky top-0 z-50 w-full">
             <div className="relative z-10 flex-shrink-0 h-16 bg-white border-b border-gray-200 shadow-sm flex justify-between items-center">
-                {isDemo ? (<div className="absolute top-0 left-0 right-0 bottom-0 flex items-center justify-center pointer-events-none">
-                    <span className="inline-flex items-center px-2 py-0.5 rounded font-medium bg-red-100 text-red-800">
-                        <IconPlayCard className="w-6 h-6 mr-2" />
-                        Demo Playground - Everything will be reset on the hour
-                    </span>
-                </div>) : (<></>)}
                 <div className="flex items-center">
                     {currentPage == CurrentPage.PROJECTS || currentPage == CurrentPage.USERS ? (<div className="ml-4 text-gray-500 text-sm font-normal">
                         {!organizationInactive && <> Welcome, <span className="font-semibold text-gray-900">{user?.firstName}</span>! See your projects at <span className="font-semibold text-gray-900">{organization?.name}</span>.</>}
-                        {organizationInactive && <> Welcome, <span className="font-semibold text-gray-900">{user?.firstName}</span>! {!isManaged ? 'Switch to your main account to continue labeling...' : 'You are currently on the waitlist.'}
+                        {organizationInactive && <> Welcome, <span className="font-semibold text-gray-900">{user?.firstName}</span>! You are currently on the waitlist.
                         </>}
                     </div>) : (<></>)}
                     {currentPage == CurrentPage.NEW_PROJECT && <div className="ml-4 text-gray-500 text-sm font-normal">
                         Add a new project to <span className="font-semibold text-gray-900">{organization?.name}</span>.
                     </div>}
-                    {!(currentPage == CurrentPage.PROJECTS || currentPage == CurrentPage.USERS || currentPage == CurrentPage.NEW_PROJECT || currentPage == CurrentPage.MODELS_DOWNLOAD || currentPage == CurrentPage.CONFIG) && <div className="ml-4 text-gray-700 text-sm font-normal">
+                    {!(currentPage == CurrentPage.PROJECTS || currentPage == CurrentPage.USERS || currentPage == CurrentPage.NEW_PROJECT || currentPage == CurrentPage.MODELS_DOWNLOAD) && <div className="ml-4 text-gray-700 text-sm font-normal">
                         {project?.name} - <span className="text-gray-500 font-normal">{project?.numDataScaleUploaded} records</span>
                     </div>}
                     {currentPage == CurrentPage.MODELS_DOWNLOAD && <div className="ml-4 text-gray-500 text-sm font-normal">
                         Welcome <span className="font-semibold text-gray-900">{user?.firstName}</span>! See your downloaded models.
-                    </div>}
-                    {currentPage == CurrentPage.CONFIG && <div className="ml-4 text-gray-500 text-sm font-normal">
-                        {!organizationInactive && user && <>Welcome, <span className="font-semibold text-gray-900">{user?.firstName}</span>! Change your app configuration <span className="font-semibold text-gray-900">here</span>.</>}
-                        {organizationInactive && <>Welcome, <span className="font-semibold text-gray-900">{user?.firstName}</span>!
-                            {!isManaged ? 'Switch to your main account to continue labeling...' : 'You are currently on the waitlist.'}</>}
                     </div>}
                 </div>
                 <div className="flex flex-row flex-nowrap items-center">
@@ -107,7 +94,7 @@ export default function Header() {
                             </Tooltip>
                         </a>
                     </div>
-                    {(user?.role == UserRole.ENGINEER && isManaged) ? (
+                    {(user?.role == UserRole.ENGINEER) ? (
                         <div className="flex items-center justify-center">
                             <a href="/refinery/users" onClick={(e: any) => { e.preventDefault(); dispatch(setProjectIdSampleProject(null)); router.push(`/users`) }}
                                 className="flex mr-6">

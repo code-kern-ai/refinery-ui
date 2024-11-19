@@ -1,14 +1,14 @@
 import { selectModelsDownloaded, setModelsDownloaded } from "@/src/reduxStore/states/pages/models-downloaded";
 import { ModelsDownloaded, ModelsDownloadedStatus } from "@/src/types/components/models-downloaded/models-downloaded";
 import { Tooltip } from "@nextui-org/react";
-import { IconAlertTriangleFilled, IconArrowLeft, IconBan, IconCheckbox, IconCircleCheckFilled, IconExternalLink, IconLoader, IconPlus, IconTrash } from "@tabler/icons-react";
+import { IconAlertTriangleFilled, IconArrowLeft, IconCircleCheckFilled, IconExternalLink, IconLoader, IconPlus, IconTrash } from "@tabler/icons-react";
 import { useRouter } from "next/router";
 import { useCallback, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import LoadingIcon from "../shared/loading/LoadingIcon";
 import { openModal, setModalStates } from "@/src/reduxStore/states/modal";
 import { ModalEnum } from "@/src/types/shared/modal";
-import { selectIsAdmin, selectIsManaged, selectOrganizationId } from "@/src/reduxStore/states/general";
+import { selectIsAdmin, selectOrganizationId } from "@/src/reduxStore/states/general";
 import { timer } from "rxjs";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
 import AddModelDownloadModal from "./AddModelDownloadModal";
@@ -20,8 +20,6 @@ import { Application, CurrentPage } from "@/submodules/react-components/hooks/we
 export default function ModelsDownload() {
     const router = useRouter();
     const dispatch = useDispatch();
-
-    const isManaged = useSelector(selectIsManaged);
     const isAdmin = useSelector(selectIsAdmin);
     const modelsDownloaded = useSelector(selectModelsDownloaded);
 
@@ -139,7 +137,6 @@ export default function ModelsDownload() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-2 mt-1 align-top">
             <div>
                 <button onClick={() => dispatch(openModal(ModalEnum.ADD_MODEL_DOWNLOAD))}
-                    disabled={!isManaged}
                     className={`mr-1 inline-flex items-center px-2.5 py-2 border border-gray-300 shadow-sm text-xs font-semibold rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none cursor-pointer disabled:cursor-not-allowed disabled:opacity-50`}>
                     <IconPlus className="h-4 w-4 mr-1" />
                     Add new model

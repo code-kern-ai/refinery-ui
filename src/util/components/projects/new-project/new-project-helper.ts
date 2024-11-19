@@ -1,6 +1,6 @@
 import { ConfigManager } from "@/src/services/base/config";
 
-export function checkWhitelistTokenizer(tokenizer: any[], isManaged: boolean) {
+export function checkWhitelistTokenizer(tokenizer: any[]) {
     tokenizer = Array.from(tokenizer);
     const allowedConfigs = ConfigManager.getConfigValue("spacy_downloads");
     for (let i = 0; i < tokenizer.length; i++) {
@@ -23,11 +23,7 @@ export function checkWhitelistTokenizer(tokenizer: any[], isManaged: boolean) {
 
     if (insertPos != -1) {
         tokenizer.splice(insertPos, 0, { disabled: true, name: "-----------------------------------------" });
-        if (isManaged) {
-            tokenizer.splice(insertPos, 0, { disabled: true, name: "if you need the options below feel free to contact us", configString: "email" });
-        } else {
-            tokenizer.splice(insertPos, 0, { disabled: true, name: "add further options on config page" });
-        }
+        tokenizer.splice(insertPos, 0, { disabled: true, name: "if you need the options below feel free to contact us", configString: "email" });
         tokenizer.splice(insertPos, 0, { disabled: true, name: "-----------------------------------------" });
     }
 
