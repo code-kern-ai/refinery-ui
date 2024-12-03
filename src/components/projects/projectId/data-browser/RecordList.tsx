@@ -30,7 +30,7 @@ export default function RecordList(props: RecordListProps) {
             <div className="px-4 py-5 sm:p-6">
                 {recordComments[record.id] && <div className="cursor-pointer absolute top-10 right-4"
                     onClick={() => dispatch(setModalStates(ModalEnum.RECORD_COMMENTS, { commentsData: recordComments[record.id], open: true }))}>
-                    <Tooltip content={TOOLTIPS_DICT.DATA_BROWSER.RECORD_COMMENTS} color="invert" placement="left" className="cursor-auto">
+                    <Tooltip content={TOOLTIPS_DICT.DATA_BROWSER.RECORD_COMMENTS} color="invert" placement="left">
                         <IconNotes className="h-4 w-4" />
                     </Tooltip>
                 </div>}
