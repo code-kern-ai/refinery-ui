@@ -53,6 +53,7 @@ export function downloadFile(credentialBlock: any, isStringData: boolean = true)
 
     const s3Client = new S3Client({
         endpoint: s3Endpoint,
+        forcePathStyle: true,
         region: s3Region,
         credentials: {
             accessKeyId: credentials["AccessKeyId"],
