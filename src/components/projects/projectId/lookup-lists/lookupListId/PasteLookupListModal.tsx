@@ -36,7 +36,7 @@ export default function PasteLookupListModal() {
         <div className="grid justify-center items-center gap-x-2 gap-y-1 justify-items-start" style={{ gridTemplateColumns: 'max-content min-content' }}>
             <span>Split On</span>
             <input value={inputSplit} type="text" onInput={(e: any) => setInputSplit(e.target.value)}
-                className="h-8 w-10 text-sm border-gray-300 rounded-md placeholder-italic border text-gray-900 pl-4 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100" />
+                className="h-8 w-12 text-sm border-gray-300 rounded-md placeholder-italic border text-gray-900 pl-4 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100" />
         </div>
         <div className="mt-3" style={{ maxHeight: '80vh' }}>
             <textarea value={inputArea} onInput={(e: any) => setInputArea(e.target.value)}
