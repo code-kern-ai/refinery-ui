@@ -92,14 +92,13 @@ export function GlobalStoreDataComponent(props: React.PropsWithChildren) {
             getProjectByProjectId(projectId, (res) => {
                 dispatch(setActiveProject(res.data["projectByProjectId"]));
             })
-            getRecommendedEncoders(null, (resEncoders) => {
-                dispatch(setCache(CacheEnum.MODELS_LIST, postProcessingEncoders(resEncoders.data['recommendedEncoders'])))
-            });
         }
         else {
             dispatch(setActiveProject(null));
         }
-
+        getRecommendedEncoders(null, (resEncoders) => {
+            dispatch(setCache(CacheEnum.MODELS_LIST, postProcessingEncoders(resEncoders.data['recommendedEncoders'])))
+        });
     }, [router.query.projectId]);
 
     useEffect(() => {
