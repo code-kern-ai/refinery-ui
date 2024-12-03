@@ -2,7 +2,7 @@ import { useDispatch, useSelector } from "react-redux";
 import HeuristicsLayout from "../shared/HeuristicsLayout";
 import { useRouter } from "next/router";
 import { selectProjectId } from "@/src/reduxStore/states/project";
-import { Fragment, useCallback, useEffect, useState } from "react";
+import { Fragment, useCallback, useEffect, useMemo, useState } from "react";
 import { selectHeuristic, setActiveHeuristics, updateHeuristicsState } from "@/src/reduxStore/states/pages/heuristics";
 import { getClassLine, postProcessCurrentHeuristic, postProcessLastTaskLogs } from "@/src/util/components/projects/projectId/heuristics/heuristicId/heuristics-details-helper";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
@@ -204,6 +204,11 @@ export default function ActiveLearning() {
     const orgId = useSelector(selectOrganizationId);
     useWebsocket(orgId, Application.REFINERY, CurrentPage.ACTIVE_LEARNING, handleWebsocketNotification, projectId);
 
+    const bricksUrlExtension = useMemo(() => {
+        if (currentHeuristic?.labelingTaskType == 'INFORMATION_EXTRACTION') return 'extractors';
+        return "classifiers"
+    }, [currentHeuristic?.labelingTaskType]);
+
     return (
         <HeuristicsLayout updateSourceCode={(code) => updateSourceCodeToDisplay(code)}>
 
@@ -252,7 +257,7 @@ export default function ActiveLearning() {
                         )}
                     </div>
                     <div className="flex flex-row flex-nowrap items-center ml-auto">
-                        <VisitBricksButton tooltipPlacement="left" size="small" />
+                        <VisitBricksButton urlExtension={bricksUrlExtension} tooltipPlacement="left" size="small" />
                     </div>
                 </div>
                 <HeuristicsEditor
