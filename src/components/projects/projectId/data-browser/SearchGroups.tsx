@@ -678,12 +678,12 @@ export default function SearchGroups() {
                             <div className="flex-grow min-w-0 mt-1">
                                 <div className="flex flex-row items-center whitespace-nowrap">
                                     <span className="text-sm mr-0.5 font-dmMono">CONFIDENCE BETWEEN</span>
-                                    <input disabled={fullSearchStore[group.key].groupElements['weakSupervisionLabels'].length == 0}
+                                    <input disabled={fullSearchStore[group.key].groupElements['weakSupervisionLabels'].length == 0} type="number"
                                         onChange={(e) => changeConfidence(e, 'lower', group.key, 'weakSupervisionConfidence')}
                                         value={fullSearchStore[group.key].groupElements['weakSupervisionConfidence'] ? fullSearchStore[group.key].groupElements['weakSupervisionConfidence']['lower'] : 0}
                                         className="h-8 w-11 text-sm border-gray-300 rounded-md placeholder-italic border text-gray-900 pl-2 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100 disabled:opacity-50 disabled:cursor-not-allowed" />
                                     <span className="text-sm mx-0.5 font-dmMono">% AND</span>
-                                    <input disabled={fullSearchStore[group.key].groupElements['weakSupervisionLabels'].length == 0}
+                                    <input disabled={fullSearchStore[group.key].groupElements['weakSupervisionLabels'].length == 0} type="number"
                                         onChange={(e) => changeConfidence(e, 'upper', group.key, 'weakSupervisionConfidence')}
                                         value={fullSearchStore[group.key].groupElements['weakSupervisionConfidence'] ? fullSearchStore[group.key].groupElements['weakSupervisionConfidence']['upper'] : 100}
                                         className="h-8 w-11 text-sm border-gray-300 rounded-md placeholder-italic border text-gray-900 pl-2 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100 disabled:opacity-50 disabled:cursor-not-allowed" />

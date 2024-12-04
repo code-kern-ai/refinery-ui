@@ -159,7 +159,7 @@ export function filterRlaDataForUser(rlaData: any[], user: User, displayUserId: 
 }
 
 export function filterRlaCondition(rla, user, displayUserId, userDisplayRole): boolean {
-    if (user.role != UserRole.ENGINEER || userDisplayRole != UserRole.ENGINEER) return rla.sourceType == LabelSource.MANUAL && rla.createdBy == displayUserId;
+    if (user?.role != UserRole.ENGINEER || userDisplayRole != UserRole.ENGINEER) return rla.sourceType == LabelSource.MANUAL && rla.createdBy == displayUserId;
     if (rla.sourceType != LabelSource.MANUAL) return true;
     if (displayUserId == ALL_USERS_USER_ID) return true;
     if (!!rla.isGoldStar) return displayUserId == GOLD_STAR_USER_ID;
