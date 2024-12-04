@@ -69,6 +69,7 @@ export function downloadFile(credentialBlock: any, isStringData: boolean = true)
     return new Observable((subscriber) => {
         s3Client.send(new GetObjectCommand(getParams)).then(data => {
             const bodyContents = data.Body;
+
             if (isStringData && bodyContents instanceof ReadableStream) {
                 const reader = bodyContents.getReader();
                 reader.read().then(({ done, value }) => {
@@ -76,7 +77,15 @@ export function downloadFile(credentialBlock: any, isStringData: boolean = true)
                     subscriber.next(objectData);
                 });
             } else {
-                subscriber.next(bodyContents);
+                //new sdk can return readableStream or blob 
+                if (bodyContents instanceof ReadableStream) {
+                    bodyContents.transformToByteArray().then((data) => {
+                        subscriber.next(new Blob([data]));
+                    })
+                }
+                else {
+                    subscriber.next(bodyContents);
+                }
             }
         }).catch(err => {
             subscriber.error(null);
