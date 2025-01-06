@@ -74,8 +74,7 @@ export default function Upload(props: UploadProps) {
         if (msgParts[2] != uploadTask.id) return;
         if (msgParts[3] == 'state') {
             if (msgParts[4] == UploadStates.DONE) {
-                getUploadTaskById(projectId, uploadTask.id, (res) => {
-                    const task = res.data['uploadTaskById'];
+                getUploadTaskById(projectId, uploadTask.id, (task) => {
                     handleUploadTaskResult(task);
                 });
             }
@@ -93,8 +92,7 @@ export default function Upload(props: UploadProps) {
             }
         } else if (msgParts[3] == 'progress') {
             if (msgParts[4] == "100") {
-                getUploadTaskById(projectId, uploadTask.id, (res) => {
-                    const task = res.data['uploadTaskById'];
+                getUploadTaskById(projectId, uploadTask.id, (task) => {
                     handleUploadTaskResult(task);
                 });
             }
@@ -182,8 +180,7 @@ export default function Upload(props: UploadProps) {
     function uploadFileToMinio(credentialsAndUploadId: any, fileName: string) {
         setUploadStarted(true);
         setDoingSomething(true);
-        getUploadTaskById(UploadHelper.getProjectId(), credentialsAndUploadId.uploadTaskId, (res) => {
-            const task = res.data['uploadTaskById'];
+        getUploadTaskById(UploadHelper.getProjectId(), credentialsAndUploadId.uploadTaskId, (task) => {
             handleUploadTaskResult(task);
             uploadFile(credentialsAndUploadId, selectedFile, fileName).subscribe((progress) => {
                 setProgressState(progress);
