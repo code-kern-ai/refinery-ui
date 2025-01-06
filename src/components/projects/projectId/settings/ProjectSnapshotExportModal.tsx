@@ -61,8 +61,7 @@ export default function ProjectSnapshotExportModal() {
     }
 
     function requestProjectExportCredentials() {
-        getLastProjectExportCredentials(projectId, (res) => {
-            const projectExportCredentials = res.data['lastProjectExportCredentials'];
+        getLastProjectExportCredentials(projectId, (projectExportCredentials) => {
             if (!projectExportCredentials) setProjectExportCredentials(null);
             else {
                 const credentials = JSON.parse(projectExportCredentials);

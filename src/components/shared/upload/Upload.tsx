@@ -173,8 +173,8 @@ export default function Upload(props: UploadProps) {
     function finishUpUpload(finalFinalName: string, importOptionsPrep: string) {
         let keyToSend = key;
         if (!keyToSend) keyToSend = null;
-        getUploadCredentialsAndId(UploadHelper.getProjectId(), finalFinalName, uploadFileType, importOptionsPrep, UploadType.DEFAULT, keyToSend, (results) => {
-            const credentialsAndUploadId = JSON.parse(JSON.parse(results.data['uploadCredentialsAndId']));
+        getUploadCredentialsAndId(UploadHelper.getProjectId(), finalFinalName, uploadFileType, importOptionsPrep, UploadType.DEFAULT, keyToSend, (res) => {
+            const credentialsAndUploadId = JSON.parse(JSON.parse(res));
             uploadFileToMinio(credentialsAndUploadId, finalFinalName);
         });
     }
