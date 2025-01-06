@@ -117,14 +117,14 @@ export default function Upload(props: UploadProps) {
                 return;
             }
             createProjectPost({ name: projectTitle, description: projectDescription }, (res) => {
-                const project = res.data.createProject['project'];
+                const project = res['project'];
                 dispatch(extendAllProjects(project));
                 UploadHelper.setProjectId(project.id);
                 executeUploadFile();
             })
         } else if (uploadFileType == UploadFileType.PROJECT) {
             createProjectPost({ name: props.uploadOptions.projectName, description: "Created during file upload " + selectedFile?.name }, (res) => {
-                const project = res.data.createProject['project'];
+                const project = res['project'];
                 dispatch(extendAllProjects(project));
                 UploadHelper.setProjectId(project.id);
                 executeUploadFile();
