@@ -12,10 +12,10 @@ export default function postProcessExportRecordData(data: any) {
     let x: any = {
         projectId: data.id,
         name: data.name,
-        labelingTasks: data.labelingTasks.edges.map((edge) => edge.node),
-        informationSources: data.informationSources.edges.map((edge) => edge.node),
-        attributes: data.attributes.edges.map((edge) => edge.node).filter((att) => [Status.UPLOADED, Status.USABLE, Status.AUTOMATICALLY_CREATED].includes(att.state)),
-        dataSlices: data.dataSlices.edges.map((edge) => edge.node),
+        labelingTasks: data.labelingTask,
+        informationSources: data.informationSources,
+        attributes: data.attributes.filter((att) => [Status.UPLOADED, Status.USABLE, Status.AUTOMATICALLY_CREATED].includes(att.state)),
+        dataSlices: data.dataSlices,
     }
     x.dataSlices.forEach(element => {
         if (element.sliceType == Slice.STATIC_OUTLIER) {

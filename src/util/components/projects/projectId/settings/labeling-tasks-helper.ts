@@ -7,24 +7,15 @@ let rPos = { pos: 9990 }; //as object to increase in private function
 export function postProcessLabelingTasks(labelingTasks: any[]): any[] {
     if (!labelingTasks) return [];
     const prepareLabelingTasks = labelingTasks.map((labelingTask: any) => {
-        const data = labelingTask.node;
         return {
-            id: data.id,
-            name: data.name,
-            taskTarget: data.taskTarget,
-            attribute: data.attribute,
-            taskType: data.taskType,
-            labels: !data.labels.edges
-                ? []
-                : data.labels.edges.map((edge) => {
-                    return edge.node;
-                }),
-            informationSources: !data.informationSources.edges
-                ? []
-                : data.informationSources.edges.map((edge) => {
-                    return edge.node;
-                }),
-            relativePosition: data.attribute?.relativePosition ?? rPos.pos++,
+            id: labelingTask.id,
+            name: labelingTask.name,
+            taskTarget: labelingTask.taskTarget,
+            attribute: labelingTask.attribute,
+            taskType: labelingTask.taskType,
+            labels: labelingTask.labels,
+            informationSources: !labelingTask.informationSources,
+            relativePosition: labelingTask.attribute?.relativePosition ?? rPos.pos++,
         };
     }).sort((a, b) => (a.relativePosition - b.relativePosition) || a.name.localeCompare(b.name));
     return prepareLabelingTasks;

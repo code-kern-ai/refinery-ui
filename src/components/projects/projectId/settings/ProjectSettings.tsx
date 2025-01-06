@@ -107,7 +107,7 @@ export default function ProjectSettings() {
                     const copy = { ...task };
                     return copy;
                 })
-                dispatch(setAllEmbeddings(postProcessingEmbeddings(res.data['projectByProjectId']['embeddings']['edges'].map((e) => e['node']), queuedEmbeddings)));
+                dispatch(setAllEmbeddings(postProcessingEmbeddings(res['embeddings'], queuedEmbeddings)));
             });
         });
     }
@@ -165,7 +165,7 @@ export default function ProjectSettings() {
                         const copy = { ...task };
                         return copy;
                     })
-                    const newEMbeddings = postProcessingEmbeddings(res.data['projectByProjectId']['embeddings']['edges'].map((e) => e['node']), queuedEmbeddings);
+                    const newEMbeddings = postProcessingEmbeddings(res['embeddings'], queuedEmbeddings);
                     for (let e of newEMbeddings) {
                         if (e.id == msgParts[2]) {
                             if (msgParts[3] == "state") {
@@ -203,7 +203,7 @@ export default function ProjectSettings() {
             refetchAttributesAndPostProcess();
         } else if (msgParts[1] == 'project_update' && msgParts[2] == project.id) {
             getProjectByProjectId(project.id, (res) => {
-                dispatch(setActiveProject(res.data["projectByProjectId"]));
+                dispatch(setActiveProject(res));
             })
         }
         else if (msgParts[1] == 'calculate_attribute') {
@@ -231,7 +231,7 @@ export default function ProjectSettings() {
 
     function refetchLabelingTasksAndProcess() {
         getLabelingTasksByProjectId(project.id, (res) => {
-            const labelingTasks = postProcessLabelingTasks(res['data']['projectByProjectId']['labelingTasks']['edges']);
+            const labelingTasks = postProcessLabelingTasks(res['labelingTasks']);
             dispatch(setLabelingTasksAll(postProcessLabelingTasksSchema(labelingTasks)));
         });
     }

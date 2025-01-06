@@ -73,7 +73,7 @@ export function HeuristicsOverview() {
 
     function refetchLabelingTasksAndProcess() {
         getLabelingTasksByProjectId(projectId, (res) => {
-            const labelingTasks = postProcessLabelingTasks(res['data']['projectByProjectId']['labelingTasks']['edges']);
+            const labelingTasks = postProcessLabelingTasks(res['labelingTasks']);
             dispatch(setLabelingTasksAll(postProcessLabelingTasksSchema(labelingTasks)));
         });
     }
@@ -88,7 +88,7 @@ export function HeuristicsOverview() {
 
     function refetchEmbeddingsAndProcess() {
         getEmbeddings(projectId, (res) => {
-            const embeddingsFinal = postProcessingEmbeddings(res.data['projectByProjectId']['embeddings']['edges'].map((e) => e['node']), []);
+            const embeddingsFinal = postProcessingEmbeddings(res['embeddings'], []);
             dispatch(setAllEmbeddings(embeddingsFinal));
         });
     }

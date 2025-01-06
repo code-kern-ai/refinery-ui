@@ -88,7 +88,7 @@ export default function ExportRecordsModal(props: ExportProps) {
         enumArraysCopy.set(ExportEnums.LabelSource, enumToArray(LabelSource, { nameFunction: labelSourceToString }));
         if (!force && enumArraysCopy[ExportEnums.Heuristics]) return;
         getRecordExportFromData(projectId, (res) => {
-            const postProcessedRes = postProcessExportRecordData(res['data']['projectByProjectId']);
+            const postProcessedRes = postProcessExportRecordData(res);
             enumArraysCopy.set(ExportEnums.Heuristics, postProcessedRes.informationSources);
             enumArraysCopy.set(ExportEnums.Attributes, postProcessedRes.attributes);
             enumArraysCopy.set(ExportEnums.LabelingTasks, postProcessedRes.labelingTasks);

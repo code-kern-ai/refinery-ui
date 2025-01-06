@@ -117,14 +117,14 @@ export default function DataBrowser() {
 
     function refetchLabelingTasksAndProcess() {
         getLabelingTasksByProjectId(projectId, (res) => {
-            const labelingTasks = postProcessLabelingTasks(res['data']['projectByProjectId']['labelingTasks']['edges']);
+            const labelingTasks = postProcessLabelingTasks(res['labelingTasks']);
             dispatch(setLabelingTasksAll(postProcessLabelingTasksSchema(labelingTasks)));
         });
     }
 
     function refetchEmbeddingsAndPostProcess() {
         getEmbeddings(projectId, (res) => {
-            const embeddings = postProcessingEmbeddings(res.data['projectByProjectId']['embeddings']['edges'].map((e) => e['node']), []);
+            const embeddings = postProcessingEmbeddings(res['embeddings'], []);
             dispatch(setAllEmbeddings(embeddings));
         });
     }

@@ -285,7 +285,7 @@ export default function LabelingMainComponent() {
 
     function refetchLabelingTasksAndProcess() {
         getLabelingTasksByProjectId(projectId, (res) => {
-            const labelingTasks = postProcessLabelingTasks(res['data']['projectByProjectId']['labelingTasks']['edges']);
+            const labelingTasks = postProcessLabelingTasks(res['labelingTasks']);
             const labelingTasksProcessed = postProcessLabelingTasksSchema(labelingTasks);
             dispatch(setLabelingTasksAll(prepareTasksForRole(labelingTasksProcessed, userDisplayRole)));
         });
