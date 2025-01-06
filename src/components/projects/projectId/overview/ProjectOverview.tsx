@@ -99,8 +99,7 @@ export default function ProjectOverview() {
         const dataSliceFindId = overviewFilters.dataSlice?.id;
         const dataSliceId = dataSliceFindId == "@@NO_SLICE@@" ? null : dataSliceFindId;
         getLabelDistribution(projectId, labelingTaskId, dataSliceId, (res) => {
-            if (res['data'] == null) return;
-            setLabelDistribution(postProcessLabelDistribution(res['data']['labelDistribution'], false));
+            setLabelDistribution(postProcessLabelDistribution(res, false));
         });
     }
 
@@ -114,7 +113,7 @@ export default function ProjectOverview() {
 
         getGeneralProjectStats(projectId, labelingTaskId, dataSliceId, (res) => {
             if (res['data'] == null) return;
-            setProjectStats(postProcessingStats(res['data']['generalProjectStats']));
+            setProjectStats(postProcessingStats(res));
         });
     }
 
