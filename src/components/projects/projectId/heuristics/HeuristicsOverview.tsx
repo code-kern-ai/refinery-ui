@@ -95,7 +95,7 @@ export function HeuristicsOverview() {
 
     function checkProjectTokenization() {
         getProjectTokenization(projectId, (res) => {
-            setTokenizationProgress(res.data['projectTokenization']?.progress);
+            setTokenizationProgress(res?.progress);
         });
     }
 
