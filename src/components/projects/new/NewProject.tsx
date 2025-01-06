@@ -19,8 +19,7 @@ export default function NewProject() {
     useEffect(() => {
         dispatch(setUploadFileType(COMPONENT_FILE_TYPE));
         getAllProjects((res) => {
-            const projects = res.data["allProjects"].edges.map((edge: any) => edge.node);
-            dispatch(setAllProjects(projects));
+            dispatch(setAllProjects(res));
         });
     }, []);
 

@@ -49,8 +49,7 @@ export default function ProjectsList() {
 
     function refetchProjectsAndPostProcess() {
         getAllProjects((res) => {
-            const projects = res.data["allProjects"].edges.map((edge: any) => edge.node);
-            dispatch(setAllProjects(projects));
+            dispatch(setAllProjects(res));
             setDataLoaded(true);
         });
     }
