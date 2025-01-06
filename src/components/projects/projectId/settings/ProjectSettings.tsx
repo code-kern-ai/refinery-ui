@@ -136,7 +136,7 @@ export default function ProjectSettings() {
 
     function checkProjectTokenization() {
         getProjectTokenization(project.id, (res) => {
-            setTokenizationProgress(res.data['projectTokenization']?.progress);
+            setTokenizationProgress(res?.progress);
             setIsAcRunning(checkIfAcRunning());
         });
     }
