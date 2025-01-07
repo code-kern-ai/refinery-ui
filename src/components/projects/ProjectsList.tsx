@@ -56,7 +56,7 @@ export default function ProjectsList() {
 
     function refetchStatsAndPostProcess() {
         getOverviewStats((res) => {
-            const stats = res.data["overviewStats"];
+            const stats = res;
             const statsDict = {};
             if (stats == null) return;
             stats.forEach((stat: ProjectStatistics) => {

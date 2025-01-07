@@ -33,19 +33,19 @@ export function GlobalStoreDataComponent(props: React.PropsWithChildren) {
         });
 
         getUserInfo((res) => {
-            const userInfo = { ...res.data["userInfo"] };
-            userInfo.avatarUri = getUserAvatarUri(res.data["userInfo"]);
+            const userInfo = { ...res };
+            userInfo.avatarUri = getUserAvatarUri(res);
             dispatch(setUser(userInfo));
-            dispatch(setDisplayUserRole(res.data["userInfo"].role));
+            dispatch(setDisplayUserRole(res.role));
         });
 
         getOrganization((res) => {
-            if (res.data["userOrganization"]) {
+            if (res?.id) {
                 if (WebSocketsService.getConnectionOpened()) return;
                 WebSocketsService.setConnectionOpened(true);
                 WebSocketsService.initWsNotifications();
                 setDataLoaded(true);
-                dispatch(setOrganization(res.data["userOrganization"]));
+                dispatch(setOrganization(res));
             } else {
                 dispatch(setOrganization(null));
                 timer(60000).subscribe(() => location.reload())
