@@ -231,7 +231,7 @@ export default function ProjectSettings() {
 
     function refetchLabelingTasksAndProcess() {
         getLabelingTasksByProjectId(project.id, (res) => {
-            const labelingTasks = postProcessLabelingTasks(res['labelingTasks']);
+            const labelingTasks = postProcessLabelingTasks(res);
             dispatch(setLabelingTasksAll(postProcessLabelingTasksSchema(labelingTasks)));
         });
     }
