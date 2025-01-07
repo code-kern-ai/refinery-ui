@@ -111,7 +111,7 @@ export default function ProjectOverview() {
         const dataSliceId = dataSliceFindId == "@@NO_SLICE@@" ? null : dataSliceFindId;
 
         getGeneralProjectStats(projectId, labelingTaskId, dataSliceId, (res) => {
-            if (res['data'] == null) return;
+            if (!res) return;
             setProjectStats(postProcessingStats(res));
         });
     }
