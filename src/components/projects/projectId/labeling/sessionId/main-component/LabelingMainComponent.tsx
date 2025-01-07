@@ -186,7 +186,7 @@ export default function LabelingMainComponent() {
         CommentDataManager.registerCommentRequests(CurrentPage.LABELING, requests);
         const requestJsonString = CommentDataManager.buildRequestJSON();
         getAllComments(requestJsonString, (res) => {
-            CommentDataManager.parseCommentData(res.data['getAllComments']);
+            CommentDataManager.parseCommentData(res);
             CommentDataManager.parseToCurrentData(allUsers);
             dispatch(setComments(CommentDataManager.currentDataOrder));
         });
@@ -203,7 +203,7 @@ export default function LabelingMainComponent() {
             return;
         }
         getAllComments(requestJsonString, (res) => {
-            CommentDataManager.parseCommentData(res.data['getAllComments']);
+            CommentDataManager.parseCommentData(res);
             CommentDataManager.parseToCurrentData(allUsers);
             dispatch(setComments(CommentDataManager.currentDataOrder));
         });
@@ -221,7 +221,7 @@ export default function LabelingMainComponent() {
             return;
         }
         getAllComments(requestJsonString, (res) => {
-            CommentDataManager.parseCommentData(res.data['getAllComments']);
+            CommentDataManager.parseCommentData(res);
             CommentDataManager.parseToCurrentData(allUsers);
             dispatch(setComments(CommentDataManager.currentDataOrder));
         });

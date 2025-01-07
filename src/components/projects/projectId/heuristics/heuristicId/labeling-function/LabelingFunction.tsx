@@ -90,7 +90,7 @@ export default function LabelingFunction() {
         CommentDataManager.registerCommentRequests(CurrentPage.LABELING_FUNCTION, requests);
         const requestJsonString = CommentDataManager.buildRequestJSON();
         getAllComments(requestJsonString, (res) => {
-            CommentDataManager.parseCommentData(res.data['getAllComments']);
+            CommentDataManager.parseCommentData(res);
             CommentDataManager.parseToCurrentData(allUsers);
             dispatch(setComments(CommentDataManager.currentDataOrder));
         });
@@ -98,7 +98,7 @@ export default function LabelingFunction() {
 
     function refetchCurrentHeuristicAndProcess() {
         getHeuristicByHeuristicId(projectId, router.query.heuristicId as string, (res) => {
-            dispatch(setActiveHeuristics(postProcessCurrentHeuristic(res['data']['informationSourceBySourceId'], labelingTasks)));
+            dispatch(setActiveHeuristics(postProcessCurrentHeuristic(res, labelingTasks)));
         });
     }
 
@@ -129,7 +129,7 @@ export default function LabelingFunction() {
             return;
         }
         getPayloadByPayloadId(projectId, currentHeuristic.lastPayload.id, (res) => {
-            setLastTaskLogs(postProcessLastTaskLogs((res['data']['payloadByPayloadId'])));
+            setLastTaskLogs(postProcessLastTaskLogs(res));
         });
     }
 
@@ -138,8 +138,8 @@ export default function LabelingFunction() {
         setRunOn10IsRunning(true);
         getLabelingFunctionOn10Records(projectId, currentHeuristic.id, (res) => {
             setRunOn10IsRunning(false);
-            setSampleRecords(postProcessSampleRecords(res['data']['getLabelingFunctionOn10Records'], labelingTasks, currentHeuristic.labelingTaskId));
-            setLastTaskLogs(parseContainerLogsData(res['data']['getLabelingFunctionOn10Records']['containerLogs']))
+            setSampleRecords(postProcessSampleRecords(res, labelingTasks, currentHeuristic.labelingTaskId));
+            setLastTaskLogs(parseContainerLogsData(res['containerLogs']))
         });
     }
 

@@ -51,7 +51,7 @@ export default function LookupListsOverview() {
         CommentDataManager.registerCommentRequests(CurrentPage.LOOKUP_LISTS_OVERVIEW, requests);
         const requestJsonString = CommentDataManager.buildRequestJSON();
         getAllComments(requestJsonString, (res) => {
-            CommentDataManager.parseCommentData(res.data['getAllComments']);
+            CommentDataManager.parseCommentData(res);
             CommentDataManager.parseToCurrentData(allUsers);
             dispatch(setComments(CommentDataManager.currentDataOrder));
         });

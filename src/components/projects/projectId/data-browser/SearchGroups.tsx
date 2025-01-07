@@ -112,7 +112,7 @@ export default function SearchGroups() {
             dispatch(updateAdditionalDataState('loading', true));
             const refetchTimer = setTimeout(() => {
                 searchRecordsExtended(projectId, parseFilterToExtended(activeSearchParams, attributes, configuration, labelingTasks, user, fullSearchStore[SearchGroup.DRILL_DOWN]), 0, 20, (res) => {
-                    dispatch(setSearchRecordsExtended(postProcessRecordsExtended(res.data['searchRecordsExtended'], labelingTasks)));
+                    dispatch(setSearchRecordsExtended(postProcessRecordsExtended(res, labelingTasks)));
                     dispatch(updateAdditionalDataState('loading', false));
                 });
             }, 500);
@@ -133,7 +133,7 @@ export default function SearchGroups() {
                 options.limit = 20;
             }
             getRecordsByStaticSlice(projectId, activeSlice.id, options, (res) => {
-                dispatch(setSearchRecordsExtended(postProcessRecordsExtended(res.data['recordsByStaticSlice'], labelingTasks)));
+                dispatch(setSearchRecordsExtended(postProcessRecordsExtended(res, labelingTasks)));
                 staticDataSlicesCurrentCount(projectId, activeSlice.id, (res) => {
                     if (!res) {
                         dispatch(updateAdditionalDataState('staticDataSliceCurrentCount', null));
@@ -569,7 +569,7 @@ export default function SearchGroups() {
             if (res == null) {
                 setCurrentWeakSupervisionRun({ state: Status.NOT_YET_RUN });
             } else {
-                setCurrentWeakSupervisionRun(postProcessCurrentWeakSupervisionRun(res['data']['currentWeakSupervisionRun']));
+                setCurrentWeakSupervisionRun(postProcessCurrentWeakSupervisionRun(res));
             }
         });
     }

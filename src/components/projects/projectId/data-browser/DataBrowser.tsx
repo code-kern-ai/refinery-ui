@@ -64,12 +64,12 @@ export default function DataBrowser() {
             getRecordsByStaticSlice(projectId, activeSlice.id, {
                 offset: searchRequest.offset, limit: searchRequest.limit
             }, (res) => {
-                dispatch(expandRecordList(postProcessRecordsExtended(res.data['recordsByStaticSlice'], labelingTasks)));
+                dispatch(expandRecordList(postProcessRecordsExtended(res, labelingTasks)));
             });
         } else {
             const filterData = parseFilterToExtended(activeSearchParams, attributes, configuration, labelingTasks, user, fullSearchStore[SearchGroup.DRILL_DOWN])
             searchRecordsExtended(projectId, filterData, searchRequest.offset, searchRequest.limit, (res) => {
-                const parsedRecordData = postProcessRecordsExtended(res.data['searchRecordsExtended'], labelingTasks);
+                const parsedRecordData = postProcessRecordsExtended(res, labelingTasks);
                 dispatch(expandRecordList(parsedRecordData));
                 refetchRecordCommentsAndProcess(parsedRecordData.recordList);
             });
@@ -93,7 +93,7 @@ export default function DataBrowser() {
         CommentDataManager.registerCommentRequests(CurrentPage.DATA_BROWSER, requests);
         const requestJsonString = CommentDataManager.buildRequestJSON();
         getAllComments(requestJsonString, (res) => {
-            CommentDataManager.parseCommentData(res.data['getAllComments']);
+            CommentDataManager.parseCommentData(res);
             CommentDataManager.parseToCurrentData(users);
             dispatch(setComments(CommentDataManager.currentDataOrder));
         });
@@ -133,7 +133,7 @@ export default function DataBrowser() {
         const currentRecordIds = parsedRecordData?.map((record) => record.id);
         if (!currentRecordIds || currentRecordIds.length == 0) return;
         getRecordComments(projectId, currentRecordIds, (res) => {
-            dispatch(setRecordComments(res.data['getRecordComments']));
+            dispatch(setRecordComments(res));
         });
     }
 

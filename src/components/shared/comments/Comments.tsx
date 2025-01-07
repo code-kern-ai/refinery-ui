@@ -45,7 +45,7 @@ export default function Comments() {
         if (somethingToRerequest) {
             const requestJsonString = CommentDataManager.buildRequestJSON();
             getAllComments(requestJsonString, (res) => {
-                CommentDataManager.parseCommentData(res.data['getAllComments']);
+                CommentDataManager.parseCommentData(res);
                 if (allUsers.length == 0) {
                     getOrganizationUsers((res) => {
                         dispatch(setAllUsers(res.data["allUsers"]));
@@ -83,7 +83,7 @@ export default function Comments() {
         if (somethingToRerequest) {
             const requestJsonString = CommentDataManager.buildRequestJSON();
             getAllComments(requestJsonString, (res) => {
-                CommentDataManager.parseCommentData(res.data['getAllComments']);
+                CommentDataManager.parseCommentData(res);
                 CommentDataManager.parseToCurrentData(allUsers);
                 dispatch(setComments(CommentDataManager.currentDataOrder));
             });

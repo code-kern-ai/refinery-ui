@@ -65,7 +65,7 @@ export function HeuristicsOverview() {
         CommentDataManager.registerCommentRequests(CurrentPage.HEURISTICS, requests);
         const requestJsonString = CommentDataManager.buildRequestJSON();
         getAllComments(requestJsonString, (res) => {
-            CommentDataManager.parseCommentData(res.data['getAllComments']);
+            CommentDataManager.parseCommentData(res);
             CommentDataManager.parseToCurrentData(allUsers);
             dispatch(setComments(CommentDataManager.currentDataOrder));
         });
@@ -80,7 +80,7 @@ export function HeuristicsOverview() {
 
     function refetchHeuristicsAndProcess() {
         getInformationSourcesOverviewData(projectId, (res) => {
-            const heuristics = postProcessHeuristics(res['data']['informationSourcesOverviewData'], projectId);
+            const heuristics = postProcessHeuristics(res, projectId);
             dispatch(setAllHeuristics(heuristics));
             setFilteredList(heuristics);
         });

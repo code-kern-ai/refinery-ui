@@ -136,7 +136,7 @@ export default function AttributeCalculation() {
         CommentDataManager.registerCommentRequests(CurrentPage.ATTRIBUTE_CALCULATION, requests);
         const requestJsonString = CommentDataManager.buildRequestJSON();
         getAllComments(requestJsonString, (res) => {
-            CommentDataManager.parseCommentData(res.data['getAllComments']);
+            CommentDataManager.parseCommentData(res);
             CommentDataManager.parseToCurrentData(allUsers);
             dispatch(setComments(CommentDataManager.currentDataOrder));
         });

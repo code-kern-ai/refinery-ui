@@ -88,7 +88,7 @@ export default function ActiveLearning() {
         CommentDataManager.registerCommentRequests(CurrentPage.ACTIVE_LEARNING, requests);
         const requestJsonString = CommentDataManager.buildRequestJSON();
         getAllComments(requestJsonString, (res) => {
-            CommentDataManager.parseCommentData(res.data['getAllComments']);
+            CommentDataManager.parseCommentData(res);
             CommentDataManager.parseToCurrentData(allUsers);
             dispatch(setComments(CommentDataManager.currentDataOrder));
         });
@@ -101,13 +101,13 @@ export default function ActiveLearning() {
             return;
         }
         getPayloadByPayloadId(projectId, currentHeuristic.lastTask.id, (res) => {
-            setLastTaskLogs(postProcessLastTaskLogs((res['data']['payloadByPayloadId'])));
+            setLastTaskLogs(postProcessLastTaskLogs(res));
         });
     }
 
     function refetchCurrentHeuristicAndProcess() {
         getHeuristicByHeuristicId(projectId, router.query.heuristicId as string, (res) => {
-            dispatch(setActiveHeuristics(postProcessCurrentHeuristic(res['data']['informationSourceBySourceId'], labelingTasks)));
+            dispatch(setActiveHeuristics(postProcessCurrentHeuristic(res, labelingTasks)));
         });
     }
 

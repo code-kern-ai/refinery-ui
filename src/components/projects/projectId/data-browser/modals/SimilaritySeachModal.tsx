@@ -45,7 +45,7 @@ export default function SimilaritySearchModal() {
     function getSimilarRecords(hasFilter: boolean = false) {
         const attFilter = hasFilter ? prepareAttFilter(filterAttributesForm, attributes) : null;
         getRecordsBySimilarity(projectId, selectedEmbedding.id, modalSS.recordId, attFilter, null, (res) => {
-            dispatch(setSearchRecordsExtended(postProcessRecordsExtended(res.data['searchRecordsBySimilarity'], labelingTasks)));
+            dispatch(setSearchRecordsExtended(postProcessRecordsExtended(res, labelingTasks)));
             dispatch(setRecordsInDisplay(true));
         });
     }

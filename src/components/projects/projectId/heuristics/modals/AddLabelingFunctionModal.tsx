@@ -32,7 +32,7 @@ export default function AddLabelingFunctionModal() {
         const codeData = getInformationSourceTemplate(matching, heuristicType, '');
         if (!codeData) return;
         createHeuristicPost(projectId, labelingTask.id, codeData.code, name, description, heuristicType, (res) => {
-            let id = res['data']?.['createInformationSource']?.['informationSource']?.['id'];
+            let id = res?.id;
             if (id) {
                 router.push(getRouterLinkHeuristic(heuristicType, projectId, id))
             } else {
