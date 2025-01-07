@@ -37,7 +37,7 @@ export default function ExecutionContainer(props: ExecutionContainerProps) {
         if (requestedSomething) return;
         setRequestedSomething(true);
         getSampleRecords(projectId, props.currentAttribute.id, (res) => {
-            const sampleRecordsFinal = { ...res.data['calculateUserAttributeSampleRecords'] };
+            const sampleRecordsFinal = { ...res };
             setRequestedSomething(false);
             props.setEnabledButton(false);
             setRunOn10HasError(sampleRecordsFinal.calculatedAttributes.length > 0 ? false : true);

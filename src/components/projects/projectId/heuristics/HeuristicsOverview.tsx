@@ -44,7 +44,7 @@ export function HeuristicsOverview() {
         checkProjectTokenization();
         if (attributes.length == 0) {
             getAttributes(projectId, ['ALL'], (res) => {
-                dispatch(setAllAttributes(res.data['attributesByProjectId']));
+                dispatch(setAllAttributes(res));
             });
         }
     }, [projectId]);

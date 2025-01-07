@@ -96,7 +96,7 @@ export default function HeuristicsLayout(props: any) {
 
     function refetchAttributesAndProcess() {
         getAttributes(projectId, ['ALL'], (res) => {
-            dispatch(setAllAttributes(res.data['attributesByProjectId']));
+            dispatch(setAllAttributes(res));
         });
     }
 

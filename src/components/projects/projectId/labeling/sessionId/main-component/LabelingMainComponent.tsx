@@ -279,7 +279,7 @@ export default function LabelingMainComponent() {
 
     function refetchAttributesAndProcess() {
         getAttributes(projectId, ['ALL'], (res) => {
-            dispatch(setAllAttributes(res.data['attributesByProjectId']));
+            dispatch(setAllAttributes(res));
         });
     }
 

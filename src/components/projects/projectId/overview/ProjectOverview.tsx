@@ -77,7 +77,7 @@ export default function ProjectOverview() {
     }
     function refetchAttributesAndProcess() {
         getAttributes(projectId, ['ALL'], (res) => {
-            dispatch(setAllAttributes(res.data['attributesByProjectId']));
+            dispatch(setAllAttributes(res));
         });
     }
 
@@ -90,7 +90,7 @@ export default function ProjectOverview() {
 
     function refetchDataSlicesAndProcess() {
         getDataSlices(projectId, null, (res) => {
-            dispatch(setDataSlices(res.data.dataSlices));
+            dispatch(setDataSlices(res));
         });
     }
 

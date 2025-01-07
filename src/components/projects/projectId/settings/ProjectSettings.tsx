@@ -66,7 +66,7 @@ export default function ProjectSettings() {
         if (!project) return;
         requestPKeyCheck();
         getRecommendedEncoders(project.id, (res) => {
-            const encoderSuggestions = res['data']['recommendedEncoders'].filter(e => e.tokenizers.includes("all") || e.tokenizers.includes(project.tokenizer));
+            const encoderSuggestions = res.filter(e => e.tokenizers.includes("all") || e.tokenizers.includes(project.tokenizer));
             dispatch(setRecommendedEncodersAll(encoderSuggestions as RecommendedEncoder[]));
             dispatch(setAllRecommendedEncodersDict(postProcessingRecommendedEncoders(attributes, project.tokenizer, res['data']['recommendedEncoders'])));
         });
@@ -96,7 +96,7 @@ export default function ProjectSettings() {
 
     function refetchAttributesAndPostProcess() {
         getAttributes(project.id, ['ALL'], (res) => {
-            dispatch(setAllAttributes(res.data['attributesByProjectId']));
+            dispatch(setAllAttributes(res));
         });
     }
 
@@ -119,7 +119,7 @@ export default function ProjectSettings() {
         const tmpTimer = timer(500).subscribe(() => {
             getCheckCompositeKey(project.id, (res) => {
                 setPKeyCheckTimer(null);
-                if (anyPKey()) setPKeyValid(res.data['checkCompositeKey']);
+                if (anyPKey()) setPKeyValid(res);
                 else setPKeyValid(null);
             });
         });
@@ -217,7 +217,7 @@ export default function ProjectSettings() {
                 timer(5000).subscribe(() => checkProjectTokenization());
             } else {
                 getAttributes(project.id, ['ALL'], (res) => {
-                    dispatch(setAllAttributes(res.data['attributesByProjectId']));
+                    dispatch(setAllAttributes(res));
                     setIsAcRunning(checkIfAcRunning());
                 });
                 if (msgParts[2] == 'finished') timer(5000).subscribe(() => checkProjectTokenization());

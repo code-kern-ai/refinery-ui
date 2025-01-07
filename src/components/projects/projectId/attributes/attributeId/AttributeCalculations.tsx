@@ -65,7 +65,7 @@ export default function AttributeCalculation() {
         if (!projectId) return;
         if (!currentAttribute || attributes.length == 0) {
             getAttributes(projectId, ['ALL'], (res) => {
-                dispatch(setAllAttributes(res.data['attributesByProjectId']));
+                dispatch(setAllAttributes(res));
                 const currentAttribute = postProcessCurrentAttribute(attributes.find((attribute) => attribute.id === router.query.attributeId));
                 setCurrentAttribute(currentAttribute);
                 setEditorValue(currentAttribute?.sourceCodeToDisplay);
@@ -243,7 +243,7 @@ export default function AttributeCalculation() {
                 setCurrentAttribute(currentAttributeCopy);
             } else {
                 getAttributes(projectId, ['ALL'], (res) => {
-                    dispatch(setAllAttributes(res.data['attributesByProjectId']));
+                    dispatch(setAllAttributes(res));
                 });
                 getAttributeByAttributeId(projectId, currentAttribute?.id, (res) => {
                     const attribute = res.data['attributeByAttributeId'];

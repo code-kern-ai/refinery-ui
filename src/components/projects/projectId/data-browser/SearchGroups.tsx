@@ -135,12 +135,12 @@ export default function SearchGroups() {
             getRecordsByStaticSlice(projectId, activeSlice.id, options, (res) => {
                 dispatch(setSearchRecordsExtended(postProcessRecordsExtended(res.data['recordsByStaticSlice'], labelingTasks)));
                 staticDataSlicesCurrentCount(projectId, activeSlice.id, (res) => {
-                    if (!res.data) {
+                    if (!res) {
                         dispatch(updateAdditionalDataState('staticDataSliceCurrentCount', null));
                         return;
 
                     }
-                    dispatch(updateAdditionalDataState('staticDataSliceCurrentCount', res['data']['staticDataSlicesCurrentCount']));
+                    dispatch(updateAdditionalDataState('staticDataSliceCurrentCount', res));
                 });
             });
         }

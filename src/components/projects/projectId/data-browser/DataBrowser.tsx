@@ -101,9 +101,9 @@ export default function DataBrowser() {
 
     function refetchDataSlicesAndProcess(dataSliceId?: string) {
         getDataSlices(projectId, null, (res) => {
-            dispatch(setDataSlices(res.data.dataSlices));
+            dispatch(setDataSlices(res));
             if (dataSliceId) {
-                const findSlice = res.data.dataSlices.find((slice) => slice.id == dataSliceId);
+                const findSlice = res.find((slice) => slice.id == dataSliceId);
                 if (findSlice) dispatch(setActiveDataSlice(findSlice));
             }
         });
@@ -111,7 +111,7 @@ export default function DataBrowser() {
 
     function refetchAttributesAndProcess() {
         getAttributes(projectId, ['ALL'], (res) => {
-            dispatch(setAllAttributes(res.data['attributesByProjectId']));
+            dispatch(setAllAttributes(res));
         });
     }
 
@@ -143,7 +143,7 @@ export default function DataBrowser() {
 
     function refetchUniqueValuesAndProcess() {
         getUniqueValuesByAttributes(projectId, (res) => {
-            dispatch(setUniqueValuesDict(postProcessUniqueValues(res.data['uniqueValuesByAttributes'], attributes)));
+            dispatch(setUniqueValuesDict(postProcessUniqueValues(res, attributes)));
         });
     }
 

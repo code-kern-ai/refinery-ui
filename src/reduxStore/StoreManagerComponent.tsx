@@ -57,7 +57,7 @@ export function GlobalStoreDataComponent(props: React.PropsWithChildren) {
             dispatch(setCache(CacheEnum.VERSION_OVERVIEW, postprocessVersionOverview(res.data['versionOverview'])));
         });
         getEmbeddingPlatforms((res) => {
-            dispatch(setCache(CacheEnum.EMBEDDING_PLATFORMS, postProcessingEmbeddingPlatforms(res.data['embeddingPlatforms'], organization)))
+            dispatch(setCache(CacheEnum.EMBEDDING_PLATFORMS, postProcessingEmbeddingPlatforms(res, organization)))
         });
     }, []);
 
@@ -97,14 +97,14 @@ export function GlobalStoreDataComponent(props: React.PropsWithChildren) {
             dispatch(setActiveProject(null));
         }
         getRecommendedEncoders(null, (resEncoders) => {
-            dispatch(setCache(CacheEnum.MODELS_LIST, postProcessingEncoders(resEncoders.data['recommendedEncoders'])))
+            dispatch(setCache(CacheEnum.MODELS_LIST, postProcessingEncoders(resEncoders)))
         });
     }, [router.query.projectId]);
 
     useEffect(() => {
         if (!ConfigManager.isInit()) return;
         getAllTokenizerOptions((res) => {
-            dispatch(setCache(CacheEnum.TOKENIZER_VALUES, checkWhitelistTokenizer(res.data['languageModels'])));
+            dispatch(setCache(CacheEnum.TOKENIZER_VALUES, checkWhitelistTokenizer(res)));
         })
     }, [ConfigManager.isInit()]);
 
