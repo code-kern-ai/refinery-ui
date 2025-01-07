@@ -60,7 +60,7 @@ export default function Header() {
                 userFilter: true,
                 limit: 50
             }, (res) => {
-                dispatch(setNotifications(postProcessNotifications(res.data['notifications'], arrayToDict(res, 'id'), notificationId)));
+                dispatch(setNotifications(postProcessNotifications(res, arrayToDict(res, 'id'), notificationId)));
                 dispatch(openModal(ModalEnum.NOTIFICATION_CENTER));
             });
         });

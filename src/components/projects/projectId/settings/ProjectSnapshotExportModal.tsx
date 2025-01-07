@@ -55,8 +55,8 @@ export default function ProjectSnapshotExportModal() {
 
     function requestProjectSize() {
         getProjectSize(projectId, (res) => {
-            setProjectSize(res.data['projectSize']);
-            setProjectExportArray(postProcessingFormGroups(res.data['projectSize'], embeddings));
+            setProjectSize(res);
+            setProjectExportArray(postProcessingFormGroups(res, embeddings));
         });
     }
 

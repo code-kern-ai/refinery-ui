@@ -37,7 +37,7 @@ export default function SaveDataSliceModal(props: { fullSearch: {} }) {
             filterRaw: getRawFilterForSave(props.fullSearch),
             filterData: parseFilterToExtended(activeSearchParams, attributes, configuration, labelingTasks, user, props.fullSearch[SearchGroup.DRILL_DOWN].value)
         }, (res) => {
-            const id = res["data"]["createDataSlice"]["id"];
+            const id = res?.id;
             const slice = {
                 id: id, name: modalSaveDataSlice.sliceName, static: isStatic, filterRaw: getRawFilterForSave(props.fullSearch),
                 filterData: parseFilterToExtended(activeSearchParams, attributes, configuration, labelingTasks, user, props.fullSearch[SearchGroup.DRILL_DOWN].value), color: getColorStruct(isStatic),

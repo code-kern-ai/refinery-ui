@@ -53,7 +53,7 @@ export default function ExecutionContainer(props: ExecutionContainerProps) {
 
     function recordByRecordId(recordId: string) {
         getRecordByRecordId(projectId, recordId, (res) => {
-            dispatch(setModalStates(ModalEnum.VIEW_RECORD_DETAILS, { record: postProcessRecordByRecordId(res.data['recordByRecordId']) }));
+            dispatch(setModalStates(ModalEnum.VIEW_RECORD_DETAILS, { record: postProcessRecordByRecordId(res) }));
         });
     }
 

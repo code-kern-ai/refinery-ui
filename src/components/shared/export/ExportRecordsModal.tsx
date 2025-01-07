@@ -68,7 +68,7 @@ export default function ExportRecordsModal(props: ExportProps) {
 
     function requestRecordsExportCredentials() {
         getLastRecordExportCredentials(projectId, (res) => {
-            const recordExportCredentials = res.data['lastRecordExportCredentials'];
+            const recordExportCredentials = res;
             if (!recordExportCredentials) setRecordExportCredentials(null);
             else {
                 const credentials = JSON.parse(recordExportCredentials);
@@ -213,7 +213,7 @@ export default function ExportRecordsModal(props: ExportProps) {
         let keyToSend = key;
         if (!keyToSend) keyToSend = null;
         prepareRecordExport(projectId, { exportOptions: jsonString, key: keyToSend }, (res) => {
-            if (!res.data) {
+            if (!res!.ok) {
                 ExportHelper.error.push("Something went wrong in the backend:");
                 ExportHelper.error.push(res.error);
                 setPrepareErrors(ExportHelper.error);

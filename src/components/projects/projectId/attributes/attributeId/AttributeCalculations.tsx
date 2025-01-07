@@ -244,8 +244,7 @@ export default function AttributeCalculation() {
                 getAttributes(projectId, ['ALL'], (res) => {
                     dispatch(setAllAttributes(res));
                 });
-                getAttributeByAttributeId(projectId, currentAttribute?.id, (res) => {
-                    const attribute = res.data['attributeByAttributeId'];
+                getAttributeByAttributeId(projectId, currentAttribute?.id, (attribute) => {
                     if (attribute == null) setCurrentAttribute(null);
                     else setCurrentAttribute(postProcessCurrentAttribute(attribute));
                 });
@@ -387,8 +386,7 @@ export default function AttributeCalculation() {
                 <ExecutionContainer currentAttribute={currentAttribute} tokenizationProgress={tokenizationProgress} enableRunButton={enableRunButton} checkUnsavedChanges={checkUnsavedChanges}
                     setEnabledButton={(value: boolean) => setEnableButton(value)}
                     refetchCurrentAttribute={() => {
-                        getAttributeByAttributeId(projectId, currentAttribute?.id, (res) => {
-                            const attribute = res.data['attributeByAttributeId'];
+                        getAttributeByAttributeId(projectId, currentAttribute?.id, (attribute) => {
                             if (attribute == null) setCurrentAttribute(null);
                             else setCurrentAttribute(postProcessCurrentAttribute(attribute));
                         });

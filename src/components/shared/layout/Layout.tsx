@@ -78,7 +78,7 @@ export default function Layout({ children }) {
 
     function refetchNotificationsAndProcess() {
         getNotificationsByUser((res) => {
-            setNotificationsState(postProcessNotificationsUser(res['data']['notificationsByUserId'], notificationsState));
+            setNotificationsState(postProcessNotificationsUser(res, notificationsState));
         });
     }
 

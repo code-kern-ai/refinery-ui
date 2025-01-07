@@ -103,7 +103,7 @@ export default function ProjectSettings() {
     function refetchEmbeddingsAndPostProcess() {
         getEmbeddings(project.id, (res) => {
             getQueuedTasks(project.id, "EMBEDDING", (queuedTasks) => {
-                const queuedEmbeddings = queuedTasks.data['queuedTasks'].map((task) => {
+                const queuedEmbeddings = queuedTasks?.map((task) => {
                     const copy = { ...task };
                     return copy;
                 })
@@ -161,7 +161,7 @@ export default function ProjectSettings() {
 
             getEmbeddings(project.id, (res) => {
                 getQueuedTasks(project.id, "EMBEDDING", (queuedTasks) => {
-                    const queuedEmbeddings = queuedTasks.data['queuedTasks'].map((task) => {
+                    const queuedEmbeddings = queuedTasks?.map((task) => {
                         const copy = { ...task };
                         return copy;
                     })
