@@ -28,8 +28,8 @@ export function GlobalStoreDataComponent(props: React.PropsWithChildren) {
     const [dataLoaded, setDataLoaded] = useState(false);
 
     useEffect(() => {
-        getIsAdmin((data) => {
-            dispatch(setIsAdmin(data.data.isAdmin));
+        getIsAdmin((isAdmin) => {
+            dispatch(setIsAdmin(isAdmin));
         });
 
         getUserInfo((res) => {
@@ -54,7 +54,7 @@ export function GlobalStoreDataComponent(props: React.PropsWithChildren) {
 
         // Set cache
         getVersionOverview((res) => {
-            dispatch(setCache(CacheEnum.VERSION_OVERVIEW, postprocessVersionOverview(res.data['versionOverview'])));
+            dispatch(setCache(CacheEnum.VERSION_OVERVIEW, postprocessVersionOverview(res)));
         });
         getEmbeddingPlatforms((res) => {
             dispatch(setCache(CacheEnum.EMBEDDING_PLATFORMS, postProcessingEmbeddingPlatforms(res, organization)))

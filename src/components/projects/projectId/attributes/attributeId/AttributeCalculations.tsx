@@ -244,8 +244,9 @@ export default function AttributeCalculation() {
                 getAttributes(projectId, ['ALL'], (res) => {
                     dispatch(setAllAttributes(res));
                 });
+                if (msgParts[2] == 'deleted') return
                 getAttributeByAttributeId(projectId, currentAttribute?.id, (attribute) => {
-                    if (attribute == null) setCurrentAttribute(null);
+                    if (!attribute) setCurrentAttribute(null);
                     else setCurrentAttribute(postProcessCurrentAttribute(attribute));
                 });
                 if (msgParts[2] == "finished") {

@@ -65,7 +65,7 @@ export default function Sidebar() {
         dispatch(openModal(ModalEnum.VERSION_OVERVIEW));
         if (versionOverviewData) {
             getHasUpdates(res => {
-                setHasUpdates(res.data["hasUpdates"]);
+                setHasUpdates(res);
             });
         }
     }

@@ -154,11 +154,10 @@ export default function LabelingMainComponent() {
                     dispatch(updateRecordRequests('token', res));
                 });
                 getRecordByRecordId(projectId, SessionManager.currentRecordId, (res) => {
-                    dispatch(updateRecordRequests('record', res.data.recordByRecordId));
+                    dispatch(updateRecordRequests('record', res));
                 });
                 getRecordLabelAssociations(projectId, SessionManager.currentRecordId, (rla) => {
-                    const rlas = rla['data']?.['recordByRecordId']?.['recordLabelAssociations']['edges'].map(e => e.node);
-                    dispatch(updateRecordRequests('rla', prepareRLADataForRole(rlas, user, userDisplayId, userDisplayRole)));
+                    dispatch(updateRecordRequests('rla', prepareRLADataForRole(rla?.recordLabelAssociations, user, userDisplayId, userDisplayRole)));
                 });
             }, 100);
         }

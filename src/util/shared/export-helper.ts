@@ -10,9 +10,9 @@ let rPos = { pos: 9990 };
 
 export default function postProcessExportRecordData(data: any) {
     let x: any = {
-        projectId: data.id,
+        projectId: data.projectId,
         name: data.name,
-        labelingTasks: data.labelingTask,
+        labelingTasks: data.labelingTasks,
         informationSources: data.informationSources,
         attributes: data.attributes.filter((att) => [Status.UPLOADED, Status.USABLE, Status.AUTOMATICALLY_CREATED].includes(att.state)),
         dataSlices: data.dataSlices,
