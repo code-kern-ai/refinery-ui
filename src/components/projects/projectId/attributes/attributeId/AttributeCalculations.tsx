@@ -27,7 +27,7 @@ import { CommentType } from "@/src/types/shared/comments";
 import { AttributeCodeLookup } from "@/src/util/classes/attribute-calculation";
 import KernDropdown from "@/submodules/react-components/components/KernDropdown";
 import { useWebsocket } from "@/submodules/react-components/hooks/web-socket/useWebsocket";
-import { postProcessLabelingTasks, postProcessLabelingTasksSchema } from "@/src/util/components/projects/projectId/settings/labeling-tasks-helper";
+import { postProcessLabelingTasksSchema } from "@/src/util/components/projects/projectId/settings/labeling-tasks-helper";
 import { getAllComments } from "@/src/services/base/comment";
 import { getAttributes } from "@/src/services/base/attribute";
 import { getLookupListsByProjectId } from "@/src/services/base/lookup-lists";
@@ -227,8 +227,7 @@ export default function AttributeCalculation() {
 
     function refetchLabelingTasksAndProcess() {
         getLabelingTasksByProjectId(projectId, (res) => {
-            const labelingTasks = postProcessLabelingTasks(res);
-            dispatch(setLabelingTasksAll(postProcessLabelingTasksSchema(labelingTasks)));
+            dispatch(setLabelingTasksAll(postProcessLabelingTasksSchema(res)));
         });
     }
 

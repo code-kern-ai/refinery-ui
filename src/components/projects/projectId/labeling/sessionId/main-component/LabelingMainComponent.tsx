@@ -18,7 +18,7 @@ import LabelingSuiteTaskHeader from "../sub-components/LabelingSuiteTaskHeader";
 import LabelingSuiteOverviewTable from "../sub-components/LabelingSuiteOverviewTable";
 import LabelingSuiteLabeling from "../sub-components/LabelingSuiteLabeling";
 import { setAllAttributes, setLabelingTasksAll } from "@/src/reduxStore/states/pages/settings";
-import { postProcessLabelingTasks, postProcessLabelingTasksSchema } from "@/src/util/components/projects/projectId/settings/labeling-tasks-helper";
+import { postProcessLabelingTasksSchema } from "@/src/util/components/projects/projectId/settings/labeling-tasks-helper";
 import { CommentDataManager } from "@/src/util/classes/comments";
 import { CommentType } from "@/src/types/shared/comments";
 import { LabelingTask } from "@/src/types/components/projects/projectId/settings/labeling-tasks";
@@ -282,8 +282,7 @@ export default function LabelingMainComponent() {
 
     function refetchLabelingTasksAndProcess() {
         getLabelingTasksByProjectId(projectId, (res) => {
-            const labelingTasks = postProcessLabelingTasks(res);
-            const labelingTasksProcessed = postProcessLabelingTasksSchema(labelingTasks);
+            const labelingTasksProcessed = postProcessLabelingTasksSchema(res);
             dispatch(setLabelingTasksAll(prepareTasksForRole(labelingTasksProcessed, userDisplayRole)));
         });
     }

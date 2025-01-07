@@ -5,7 +5,7 @@ import { useCallback, useEffect, useState } from "react";
 import { expandRecordList, selectActiveSearchParams, selectActiveSlice, selectConfiguration, selectFullSearchStore, selectRecords, setActiveDataSlice, setDataSlices, setRecordComments, setUniqueValuesDict, updateAdditionalDataState } from "@/src/reduxStore/states/pages/data-browser";
 import { postProcessRecordsExtended, postProcessUniqueValues } from "@/src/util/components/projects/projectId/data-browser/data-browser-helper";
 import { selectAttributes, selectLabelingTasksAll, setAllAttributes, setAllEmbeddings, setLabelingTasksAll } from "@/src/reduxStore/states/pages/settings";
-import { postProcessLabelingTasks, postProcessLabelingTasksSchema } from "@/src/util/components/projects/projectId/settings/labeling-tasks-helper";
+import { postProcessLabelingTasksSchema } from "@/src/util/components/projects/projectId/settings/labeling-tasks-helper";
 import { selectAllUsers, selectOrganizationId, selectUser, setComments } from "@/src/reduxStore/states/general";
 import DataBrowserRecords from "./DataBrowserRecords";
 import { postProcessingEmbeddings } from "@/src/util/components/projects/projectId/settings/embeddings-helper";
@@ -117,8 +117,7 @@ export default function DataBrowser() {
 
     function refetchLabelingTasksAndProcess() {
         getLabelingTasksByProjectId(projectId, (res) => {
-            const labelingTasks = postProcessLabelingTasks(res);
-            dispatch(setLabelingTasksAll(postProcessLabelingTasksSchema(labelingTasks)));
+            dispatch(setLabelingTasksAll(postProcessLabelingTasksSchema(res)));
         });
     }
 

@@ -2,22 +2,6 @@ import { Attribute } from "@/src/types/components/projects/projectId/settings/da
 import { LabelingTask, LabelingTaskTaskType } from "@/src/types/components/projects/projectId/settings/labeling-tasks";
 import { LabelHelper } from "@/src/util/classes/label-helper";
 
-
-export function postProcessLabelingTasks(labelingTasks: any[]): any[] {
-    if (!labelingTasks) return [];
-    const prepareLabelingTasks = labelingTasks.map((data: any) => {
-        return {
-            id: data.id,
-            name: data.name,
-            taskTarget: data.taskTarget,
-            taskType: data.taskType,
-            labels: data.labels,
-            informationSources: data.informationSources,
-        };
-    });
-    return prepareLabelingTasks;
-}
-
 export function postProcessLabelingTasksSchema(labelingTasks: LabelingTask[]): LabelingTask[] {
     const prepareLabelingTasks = [];
     labelingTasks.forEach((task) => {

@@ -6,7 +6,7 @@ import { getEmptyProjectStats, postProcessLabelDistribution, postProcessingStats
 import ProjectOverviewCards from './ProjectOverviewCards';
 import { ProjectStats } from '@/src/types/components/projects/projectId/project-overview/project-overview';
 import style from '@/src/styles/components/projects/projectId/project-overview.module.css';
-import { postProcessLabelingTasks, postProcessLabelingTasksSchema } from '@/src/util/components/projects/projectId/settings/labeling-tasks-helper';
+import { postProcessLabelingTasksSchema } from '@/src/util/components/projects/projectId/settings/labeling-tasks-helper';
 import { selectLabelingTasksAll, setAllAttributes, setLabelingTasksAll } from '@/src/reduxStore/states/pages/settings';
 import { setDataSlices } from '@/src/reduxStore/states/pages/data-browser';
 import { selectOverviewFilters } from '@/src/reduxStore/states/tmp';
@@ -83,8 +83,7 @@ export default function ProjectOverview() {
 
     function refetchLabelingTasksAndProcess() {
         getLabelingTasksByProjectId(projectId, (res) => {
-            const labelingTasks = postProcessLabelingTasks(res);
-            dispatch(setLabelingTasksAll(postProcessLabelingTasksSchema(labelingTasks)));
+            dispatch(setLabelingTasksAll(postProcessLabelingTasksSchema(res)));
         });
     }
 
