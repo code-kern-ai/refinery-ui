@@ -68,7 +68,7 @@ export default function ProjectSettings() {
         getRecommendedEncoders(project.id, (res) => {
             const encoderSuggestions = res.filter(e => e.tokenizers.includes("all") || e.tokenizers.includes(project.tokenizer));
             dispatch(setRecommendedEncodersAll(encoderSuggestions as RecommendedEncoder[]));
-            dispatch(setAllRecommendedEncodersDict(postProcessingRecommendedEncoders(attributes, project.tokenizer, res['data']['recommendedEncoders'])));
+            dispatch(setAllRecommendedEncodersDict(postProcessingRecommendedEncoders(attributes, project.tokenizer, res)));
         });
 
     }, [attributes]);
