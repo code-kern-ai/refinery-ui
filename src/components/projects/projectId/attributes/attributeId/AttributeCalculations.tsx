@@ -227,7 +227,7 @@ export default function AttributeCalculation() {
 
     function refetchLabelingTasksAndProcess() {
         getLabelingTasksByProjectId(projectId, (res) => {
-            const labelingTasks = postProcessLabelingTasks(res['labelingTasks']);
+            const labelingTasks = postProcessLabelingTasks(res);
             dispatch(setLabelingTasksAll(postProcessLabelingTasksSchema(labelingTasks)));
         });
     }
