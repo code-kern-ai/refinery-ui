@@ -42,7 +42,7 @@ export default function LookupListsDetails() {
     useEffect(() => {
         if (!projectId || !router.query.lookupListId) return;
         getLookupListsByLookupListId(projectId, router.query.lookupListId as string, (res) => {
-            setLookupList(postProcessLookupList(res.data['knowledgeBaseByKnowledgeBaseId']));
+            setLookupList(postProcessLookupList(res));
         });
         refetchTerms();
     }, [projectId, router.query.lookupListId]);
@@ -76,8 +76,8 @@ export default function LookupListsDetails() {
 
     function refetchTerms() {
         getTermsByLookupListId(projectId, router.query.lookupListId as string, (res) => {
-            setFinalSize(res.data['termsByKnowledgeBaseId'].length);
-            setTerms(postProcessTerms(res.data['termsByKnowledgeBaseId']));
+            setFinalSize(res.length);
+            setTerms(postProcessTerms(res));
         });
     }
 
@@ -128,7 +128,7 @@ export default function LookupListsDetails() {
         if (msgParts[2] == router.query.lookupListId) {
             if (msgParts[1] == 'knowledge_base_updated') {
                 getLookupListsByLookupListId(projectId, router.query.lookupListId as string, (res) => {
-                    setLookupList(postProcessLookupList(res.data['knowledgeBaseByKnowledgeBaseId']));
+                    setLookupList(postProcessLookupList(res));
                 });
             } else if (msgParts[1] == 'knowledge_base_deleted') {
                 alert('Lookup list was deleted');

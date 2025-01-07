@@ -73,7 +73,7 @@ export default function AttributeCalculation() {
         }
         if (lookupLists.length == 0) {
             getLookupListsByProjectId(projectId, (res) => {
-                dispatch(setAllLookupLists(res.data['knowledgeBasesByProjectId']));
+                dispatch(setAllLookupLists(res));
             });
         }
         refetchLabelingTasksAndProcess();
@@ -256,7 +256,7 @@ export default function AttributeCalculation() {
             }
         } else if (['knowledge_base_updated', 'knowledge_base_deleted', 'knowledge_base_created'].includes(msgParts[1])) {
             getLookupListsByProjectId(projectId, (res) => {
-                dispatch(setAllLookupLists(res.data['knowledgeBasesByProjectId']));
+                dispatch(setAllLookupLists(res));
             });
         } else if (msgParts[1] == 'tokenization' && msgParts[2] == 'docbin') {
             if (msgParts[3] == 'progress') {

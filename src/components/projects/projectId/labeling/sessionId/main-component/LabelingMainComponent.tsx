@@ -83,8 +83,7 @@ export default function LabelingMainComponent() {
             dispatch(setDisplayUserRole(user.role));
             return;
         }
-        getLinkLocked(projectId, { linkRoute: router.asPath }, (result) => {
-            const lockedLink = result['data']['linkLocked'];
+        getLinkLocked(projectId, { linkRoute: router.asPath }, (lockedLink) => {
             if (lockedLink) {
                 setAbsoluteWarning('This link is locked, contact your supervisor to request access');
                 if (router.query.type == LabelingLinkType.HEURISTIC) {
@@ -152,7 +151,7 @@ export default function LabelingMainComponent() {
         if (SessionManager.currentRecordId !== null) {
             setTimeout(() => {
                 getTokenizedRecord({ recordId: SessionManager.currentRecordId }, (res) => {
-                    dispatch(updateRecordRequests('token', res.data.tokenizeRecord));
+                    dispatch(updateRecordRequests('token', res));
                 });
                 getRecordByRecordId(projectId, SessionManager.currentRecordId, (res) => {
                     dispatch(updateRecordRequests('record', res.data.recordByRecordId));
@@ -231,8 +230,7 @@ export default function LabelingMainComponent() {
     function requestHuddleData(huddleId: string) {
         if (hasRequestedHuddleData.current === true) return;
         hasRequestedHuddleData.current = true;
-        getHuddleData(projectId, { huddleId: huddleId, huddleType: SessionManager.labelingLinkData.linkType }, (result) => {
-            const huddleData = result['data']['requestHuddleData'];
+        getHuddleData(projectId, { huddleId: huddleId, huddleType: SessionManager.labelingLinkData.linkType }, (huddleData) => {
             if (huddleId == DUMMY_HUDDLE_ID) {
                 SessionManager.labelingLinkData.huddleId = huddleData.huddleId;
             }
@@ -269,8 +267,7 @@ export default function LabelingMainComponent() {
     function collectAvailableLinks() {
         if (userDisplayRole?.role == UserRole.ENGINEER) return;
         const heuristicId = SessionManager.labelingLinkData.linkType == LabelingLinkType.HEURISTIC ? SessionManager.labelingLinkData.huddleId : null;
-        getAvailableLinks(projectId, user?.role, heuristicId, (result) => {
-            const availableLinks = result['data']['availableLinks'];
+        getAvailableLinks(projectId, user?.role, heuristicId, (availableLinks) => {
             dispatch(setAvailableLinks(availableLinks));
             const linkRoute = router.asPath.split("?")[0];
             dispatch(setSelectedLink(availableLinks.find(link => link.link.split("?")[0] == linkRoute)));
@@ -319,7 +316,7 @@ export default function LabelingMainComponent() {
             const recordId = SessionManager.currentRecordId ?? record.id;
             if (msgParts[2] == recordId) {
                 getRecordLabelAssociations(projectId, recordId, (rla) => {
-                    const rlas = rla['data']?.['recordByRecordId']?.['recordLabelAssociations']['edges'].map(e => e.node);
+                    const rlas = rla?.recordLabelAssociations;
                     dispatch(updateRecordRequests('rla', prepareRLADataForRole(rlas, user, userDisplayId, userDisplayRole)));
                 });
             }

@@ -60,13 +60,13 @@ export default function LookupListsOverview() {
     useEffect(() => {
         if (!projectId) return;
         getLookupListsByProjectId(projectId, (res) => {
-            dispatch(setAllLookupLists(res.data["knowledgeBasesByProjectId"]));
+            dispatch(setAllLookupLists(res));
         });
     }, [projectId]);
 
     function createLookupList() {
         createKnowledgeBase(projectId, (res) => {
-            const lookupList = res.data?.createKnowledgeBase["knowledgeBase"];
+            const lookupList = res?.knowledgeBase;
             dispatch(extendAllLookupLists(lookupList));
             router.push(`/projects/${projectId}/lookup-lists/${lookupList.id}`);
         });
@@ -109,7 +109,7 @@ export default function LookupListsOverview() {
     const handleWebsocketNotification = useCallback((msgParts: string[]) => {
         if (['knowledge_base_updated', 'knowledge_base_deleted', 'knowledge_base_created'].includes(msgParts[1])) {
             getLookupListsByProjectId(projectId, (res) => {
-                dispatch(setAllLookupLists(res.data["knowledgeBasesByProjectId"]));
+                dispatch(setAllLookupLists(res));
             });
         }
     }, [projectId]);

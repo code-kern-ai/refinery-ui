@@ -102,7 +102,7 @@ export default function HeuristicsLayout(props: any) {
 
     function refetchLookupListsAndProcess() {
         getLookupListsByProjectId(projectId, (res) => {
-            dispatch(setAllLookupLists(res.data['knowledgeBasesByProjectId']));
+            dispatch(setAllLookupLists(res));
         });
     }
 
