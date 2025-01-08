@@ -83,7 +83,7 @@ export default function Layout({ children }) {
     }
 
     function refetchAdminMessagesAndProcess() {
-        getAllActiveAdminMessages((res) => setActiveAdminMessages(postProcessAdminMessages(res['data']['allActiveAdminMessages'])));
+        getAllActiveAdminMessages((res) => setActiveAdminMessages(postProcessAdminMessages(res)));
     }
 
     function unsubscribeDeletionTimer(deletionTimer) {
