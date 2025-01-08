@@ -63,9 +63,7 @@ export function GlobalStoreDataComponent(props: React.PropsWithChildren) {
 
     useEffect(() => {
         if (!organization) return;
-        getOrganizationUsers((res) => {
-            dispatch(setAllUsers(res.data["allUsers"]));
-        });
+        getOrganizationUsers((res) => dispatch(setAllUsers(res)));
     }, [organization]);
 
     useEffect(() => {

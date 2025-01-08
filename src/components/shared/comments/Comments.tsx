@@ -48,8 +48,8 @@ export default function Comments() {
                 CommentDataManager.parseCommentData(res);
                 if (allUsers.length == 0) {
                     getOrganizationUsers((res) => {
-                        dispatch(setAllUsers(res.data["allUsers"]));
-                        CommentDataManager.parseToCurrentData(res.data["allUsers"]);
+                        dispatch(setAllUsers(res));
+                        CommentDataManager.parseToCurrentData(res);
                     });
                 } else {
                     CommentDataManager.parseToCurrentData(allUsers);
