@@ -56,16 +56,8 @@ export default function ProjectsList() {
 
     function refetchStatsAndPostProcess() {
         getOverviewStats((res) => {
-            const stats = res;
-            const statsDict = {};
-            if (stats == null) return;
-            stats.forEach((stat: ProjectStatistics) => {
-                const statCopy = { ...stat };
-                stat.manuallyLabeled = percentRoundString(statCopy.numDataScaleManual / statCopy.numDataScaleUploaded, 2);
-                stat.weaklySupervised = percentRoundString(statCopy.numDataScaleProgrammatical / statCopy.numDataScaleUploaded, 2);
-                statsDict[stat.projectId] = stat;
-            });
-            setProjectStatisticsById(statsDict);
+            if (res == null) return;
+            setProjectStatisticsById(res);
         });
     }
 
