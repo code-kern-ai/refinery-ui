@@ -8,7 +8,7 @@ import { useState } from 'react';
 import AppSelectionDropdown from '@/submodules/react-components/components/AppSelectionDropdown';
 import { ModalEnum } from '@/src/types/shared/modal';
 import { openModal } from '@/src/reduxStore/states/modal';
-import { IconAlertCircle, IconApi, IconBulb, IconChartPie, IconMaximize, IconMinimize, IconTag, IconTriangleSquareCircle } from '@tabler/icons-react';
+import { IconAlertCircle, IconBulb, IconChartPie, IconMaximize, IconMinimize, IconTag, IconTriangleSquareCircle } from '@tabler/icons-react';
 import { IconSettings } from '@tabler/icons-react';
 import { useRouter } from 'next/router';
 import { TOOLTIPS_DICT } from '@/src/util/tooltip-constants';
@@ -154,14 +154,6 @@ export default function Sidebar() {
                                             </svg>
                                         </div>}
                                     </div>) : (<></>)}
-                                    <div className={`flex items-center justify-center overflow-visible ${project?.id !== undefined ? 'mt-6' : ''}`}>
-                                        <Tooltip placement="right" trigger="hover" color="invert" content={TOOLTIPS_DICT.SIDEBAR.API} className="relative z-50">
-                                            <a href="https://github.com/code-kern-ai/kern-python" target="_blank"
-                                                rel="noopener noreferrer" className="circle text-white">
-                                                <IconApi className="w-6 h-6" />
-                                            </a>
-                                        </Tooltip>
-                                    </div>
                                 </div>
                             </div>
                             {!isFullScreen && <div className="flex items-center justify-center mt-9 2xl:mt-12">
