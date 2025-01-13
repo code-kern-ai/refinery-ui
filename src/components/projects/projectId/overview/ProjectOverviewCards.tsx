@@ -1,4 +1,4 @@
-import LoadingIcon from "@/src/components/shared/loading/LoadingIcon";
+import LoadingIcon from "@/submodules/react-components/components/LoadingIcon";
 import MultilineTooltip from "@/src/components/shared/multilines-tooltip/MultilineTooltip";
 import { selectProjectId } from "@/src/reduxStore/states/project";
 import { CardStats, CardStatsEnum, ProjectOverviewCardsProps } from "@/src/types/components/projects/projectId/project-overview/project-overview";

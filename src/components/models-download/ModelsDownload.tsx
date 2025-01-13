@@ -1,11 +1,10 @@
 import { selectModelsDownloaded, setModelsDownloaded } from "@/src/reduxStore/states/pages/models-downloaded";
-import { ModelsDownloaded, ModelsDownloadedStatus } from "@/src/types/components/models-downloaded/models-downloaded";
 import { Tooltip } from "@nextui-org/react";
 import { IconAlertTriangleFilled, IconArrowLeft, IconCircleCheckFilled, IconExternalLink, IconLoader, IconPlus, IconTrash } from "@tabler/icons-react";
 import { useRouter } from "next/router";
-import { useCallback, useEffect } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import LoadingIcon from "../shared/loading/LoadingIcon";
+import LoadingIcon from "../../../submodules/react-components/components/LoadingIcon";
 import { openModal, setModalStates } from "@/src/reduxStore/states/modal";
 import { ModalEnum } from "@/src/types/shared/modal";
 import { selectIsAdmin, selectOrganizationId } from "@/src/reduxStore/states/general";
@@ -16,6 +15,8 @@ import DeleteModelDownloadModal from "./DeleteModelDownloadModal";
 import { useWebsocket } from "@/submodules/react-components/hooks/web-socket/useWebsocket";
 import { getModelProviderInfo } from "@/src/services/base/project";
 import { Application, CurrentPage } from "@/submodules/react-components/hooks/web-socket/constants";
+import { MODELS_DOWNLOAD_TABLE_COLUMNS, prepareTableBodyModelsDownload } from "@/src/util/table-preparations/models-download";
+import KernTable from "@/submodules/react-components/components/kern-table/KernTable";
 
 export default function ModelsDownload() {
     const router = useRouter();
@@ -23,9 +24,20 @@ export default function ModelsDownload() {
     const isAdmin = useSelector(selectIsAdmin);
     const modelsDownloaded = useSelector(selectModelsDownloaded);
 
+    const [preparedValues, setPreparedValues] = useState([]);
+
     useEffect(() => {
         refetchModels();
     }, []);
+
+    useEffect(() => {
+        if (!modelsDownloaded) return;
+        setPreparedValues(prepareTableBodyModelsDownload(modelsDownloaded, openDeleteModal, isAdmin));
+    }, [modelsDownloaded]);
+
+    function openDeleteModal(model) {
+        dispatch(setModalStates(ModalEnum.DELETE_MODEL_DOWNLOAD, { modelName: model.name, open: true }));
+    }
 
     function refetchModels() {
         getModelProviderInfo((res) => {
@@ -58,7 +70,7 @@ export default function ModelsDownload() {
         <div className="mt-1">
             <div className="inline-block min-w-full align-middle">
                 <div className="overflow-hidden shadow ring-1 ring-black ring-opacity-5 md:rounded-lg">
-                    <table className="min-w-full divide-y divide-gray-300">
+                    {/* <table className="min-w-full divide-y divide-gray-300">
                         <thead className="bg-gray-50">
                             <tr>
                                 <th scope="col"
@@ -130,7 +142,12 @@ export default function ModelsDownload() {
                                 </tr>
                             ))}
                         </tbody>
-                    </table>
+                    </table> */}
+
+                    <KernTable
+                        headers={MODELS_DOWNLOAD_TABLE_COLUMNS}
+                        values={preparedValues}
+                    />
                 </div>
             </div>
         </div>

@@ -27,7 +27,7 @@ import { CommentDataManager } from "@/src/util/classes/comments";
 import { InformationSourceCodeLookup, InformationSourceExamples } from "@/src/util/classes/heuristics";
 import { getInformationSourceTemplate } from "@/src/util/components/projects/projectId/heuristics/heuristics-helper";
 import KernDropdown from "@/submodules/react-components/components/KernDropdown";
-import LoadingIcon from "@/src/components/shared/loading/LoadingIcon";
+import LoadingIcon from "@/submodules/react-components/components/LoadingIcon";
 import { useWebsocket } from "@/submodules/react-components/hooks/web-socket/useWebsocket";
 import { getAllComments } from "@/src/services/base/comment";
 import { getLabelingTasksByProjectId } from "@/src/services/base/project";

@@ -1,4 +1,4 @@
-import LoadingIcon from "@/src/components/shared/loading/LoadingIcon";
+import LoadingIcon from "@/submodules/react-components/components/LoadingIcon";
 import ModalUpload from "@/src/components/shared/upload/ModalUpload";
 import { openModal } from "@/src/reduxStore/states/modal";
 import { selectProjectId } from "@/src/reduxStore/states/project";

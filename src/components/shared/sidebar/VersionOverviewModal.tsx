@@ -7,11 +7,21 @@ import style from '@/src/styles/shared/sidebar.module.css';
 import { VersionOverview } from "@/src/types/shared/sidebar";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
 import { Tooltip } from "@nextui-org/react";
-import LoadingIcon from "../loading/LoadingIcon";
+import LoadingIcon from "../../../../submodules/react-components/components/LoadingIcon";
+import { useEffect, useState } from "react";
+import KernTable from "@/submodules/react-components/components/kern-table/KernTable";
+import { prepareTableBodyVersionOverview, VERSION_OVERVIEW_TABLE_COLUMNS } from "@/src/util/table-preparations/version-overview";
 
 
 export default function VersionOverviewModal() {
     const versionOverviewData = useSelector(selectCachedValue(CacheEnum.VERSION_OVERVIEW));
+
+    const [preparedValues, setPreparedValues] = useState([]);
+
+    useEffect(() => {
+        if (!versionOverviewData) return;
+        setPreparedValues(prepareTableBodyVersionOverview(versionOverviewData));
+    }, [versionOverviewData]);
 
     return (<Modal modalName={ModalEnum.VERSION_OVERVIEW}>
         <div className="inline-block justify-center text-lg leading-6 text-gray-900 font-medium">
@@ -24,49 +34,10 @@ export default function VersionOverviewModal() {
         </div>
         {versionOverviewData ? (<div className="inline-block min-w-full align-middle mt-3">
             <div className={`overflow-hidden shadow ring-1 ring-black ring-opacity-5 md:rounded-lg ${style.scrollableSize}`}>
-                <table className="min-w-full divide-y divide-gray-300">
-                    <thead className="bg-gray-50">
-                        <tr>
-                            <th scope="col"
-                                className="px-3 py-2 text-left text-xs font-medium uppercase tracking-wide text-gray-500">
-                                Service</th>
-                            <th scope="col"
-                                className="px-3 py-2 text-center text-xs font-medium uppercase tracking-wide text-gray-500">
-                                Installed version</th>
-                            <th scope="col"
-                                className="px-3 py-2 text-center text-xs font-medium uppercase tracking-wide text-gray-500">
-                                Remote version</th>
-                            <th scope="col"
-                                className="px-3 py-2 text-center text-xs font-medium uppercase tracking-wide text-gray-500">
-                                Last checked</th>
-                            <th scope="col"
-                                className="px-3 py-2 text-center text-xs font-medium uppercase tracking-wide text-gray-500">
-                                Link</th>
-                        </tr>
-                    </thead>
-                    <tbody className="divide-y divide-gray-200">
-                        {versionOverviewData.map((service: VersionOverview, index: number) => (
-                            <tr key={service.service} className={index % 2 != 0 ? 'bg-gray-50' : 'bg-white'}>
-                                <td className="text-left px-3 py-2 text-sm text-gray-500 whitespace-nowrap">{service.service}</td>
-                                <td className="text-center px-3 py-2 text-sm text-gray-500">{service.installedVersion}</td>
-                                <td className="text-center px-3 py-2 text-sm text-gray-500">
-                                    <div className="flex flex-row items-center justify-center">
-                                        <div className="mr-2">{service.remoteVersion}</div>
-                                        {service.remoteHasNewer && <Tooltip placement="right" trigger="hover" color="invert" content={TOOLTIPS_DICT.SIDEBAR.NEWER_VERSION_AVAILABLE} className="cursor-auto">
-                                            <IconAlertCircle className="h-5 w-5 text-yellow-700" />
-                                        </Tooltip>}
-                                    </div>
-                                </td>
-                                <td className="text-center px-3 py-2 text-sm text-gray-500 whitespace-nowrap">{service.parseDate}</td>
-                                <td className="text-center px-3 py-2 text-sm text-gray-500">
-                                    <a href={service.link} target="_blank" rel="noopener noreferrer" className="h-4 w-4 m-auto block p-0">
-                                        <IconExternalLink className="h-4 w-4 m-auto" />
-                                    </a>
-                                </td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
+                <KernTable
+                    headers={VERSION_OVERVIEW_TABLE_COLUMNS}
+                    values={preparedValues}
+                />
             </div>
         </div>) : (<LoadingIcon />)}
     </Modal>)

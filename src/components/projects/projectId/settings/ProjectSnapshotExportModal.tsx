@@ -1,5 +1,5 @@
 import CryptedField from "@/src/components/shared/crypted-field/CryptedField";
-import LoadingIcon from "@/src/components/shared/loading/LoadingIcon";
+import LoadingIcon from "@/submodules/react-components/components/LoadingIcon";
 import Modal from "@/src/components/shared/modal/Modal";
 import { closeModal, selectModal } from "@/src/reduxStore/states/modal";
 import { selectEmbeddings } from "@/src/reduxStore/states/pages/settings";

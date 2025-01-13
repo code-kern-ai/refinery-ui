@@ -1,4 +1,4 @@
-import LoadingIcon from "@/src/components/shared/loading/LoadingIcon"
+import LoadingIcon from "@/submodules/react-components/components/LoadingIcon"
 import { selectUser } from "@/src/reduxStore/states/general"
 import { removeFromRlaById, selectDisplayUserRole, selectHoverGroupDict, selectRecordRequests, selectRecordRequestsRecord, selectSettings, selectTmpHighlightIds, selectUserDisplayId, setActiveTokenSelection, setHoverGroupDict, tmpAddHighlightIds } from "@/src/reduxStore/states/pages/labeling"
 import { selectLabelingTasksAll, selectVisibleAttributesLabeling } from "@/src/reduxStore/states/pages/settings"
