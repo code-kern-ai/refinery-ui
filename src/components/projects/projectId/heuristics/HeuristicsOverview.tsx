@@ -87,7 +87,7 @@ export function HeuristicsOverview() {
 
     function refetchEmbeddingsAndProcess() {
         getEmbeddings(projectId, (res) => {
-            const embeddingsFinal = postProcessingEmbeddings(res['embeddings'], []);
+            const embeddingsFinal = postProcessingEmbeddings(res, []);
             dispatch(setAllEmbeddings(embeddingsFinal));
         });
     }

@@ -107,7 +107,7 @@ export default function ProjectSettings() {
                     const copy = { ...task };
                     return copy;
                 })
-                dispatch(setAllEmbeddings(postProcessingEmbeddings(res['embeddings'], queuedEmbeddings)));
+                dispatch(setAllEmbeddings(postProcessingEmbeddings(res, queuedEmbeddings)));
             });
         });
     }
@@ -165,7 +165,7 @@ export default function ProjectSettings() {
                         const copy = { ...task };
                         return copy;
                     })
-                    const newEMbeddings = postProcessingEmbeddings(res['embeddings'], queuedEmbeddings);
+                    const newEMbeddings = postProcessingEmbeddings(res, queuedEmbeddings);
                     for (let e of newEMbeddings) {
                         if (e.id == msgParts[2]) {
                             if (msgParts[3] == "state") {

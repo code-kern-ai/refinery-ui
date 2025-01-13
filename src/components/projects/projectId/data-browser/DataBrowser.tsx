@@ -123,7 +123,7 @@ export default function DataBrowser() {
 
     function refetchEmbeddingsAndPostProcess() {
         getEmbeddings(projectId, (res) => {
-            const embeddings = postProcessingEmbeddings(res['embeddings'], []);
+            const embeddings = postProcessingEmbeddings(res, []);
             dispatch(setAllEmbeddings(embeddings));
         });
     }

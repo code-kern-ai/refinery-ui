@@ -127,7 +127,7 @@ export default function ActiveLearning() {
 
     function refetchEmbeddingsAndPostProcess() {
         getEmbeddings(projectId, (res) => {
-            const embeddings = postProcessingEmbeddings(res['embeddings'], []);
+            const embeddings = postProcessingEmbeddings(res, []);
             dispatch(setAllEmbeddings(embeddings));
         });
     }
