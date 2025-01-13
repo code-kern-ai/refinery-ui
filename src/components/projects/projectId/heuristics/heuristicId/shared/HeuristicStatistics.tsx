@@ -1,11 +1,20 @@
 import MultilineTooltipAutoContent from "@/src/components/shared/multilines-tooltip/MultilineTooltipAuto";
 import { selectHeuristic } from "@/src/reduxStore/states/pages/heuristics"
 import { Stat } from "@/src/types/components/projects/projectId/heuristics/heuristics";
+import { HEURISTICS_STATISTICS_TABLE_COLUMNS, prepareTableBodyHeuristicStatistics } from "@/src/util/table-preparations/heuristic-statistics";
+import KernTable from "@/submodules/react-components/components/kern-table/KernTable";
 import { Tooltip } from "@nextui-org/react";
+import { useEffect, useState } from "react";
 import { useSelector } from "react-redux"
 
 export default function HeuristicStatistics() {
     const currentHeuristic = useSelector(selectHeuristic);
+
+    const [preparedValues, setPreparedValues] = useState([]);
+
+    useEffect(() => {
+        setPreparedValues(prepareTableBodyHeuristicStatistics(currentHeuristic.stats));
+    }, []);
 
     return (
         <div className="mt-8">
@@ -14,7 +23,7 @@ export default function HeuristicStatistics() {
                 <div className="overflow-x-auto">
                     <div className="inline-block min-w-full py-2 align-middle">
                         <div className="overflow-hidden shadow ring-1 ring-black ring-opacity-5 md:rounded-lg">
-                            <table className="min-w-full border divide-y divide-gray-300">
+                            {/* <table className="min-w-full border divide-y divide-gray-300">
                                 <thead className="bg-gray-50">
                                     <tr>
                                         <th scope="col"
@@ -103,7 +112,12 @@ export default function HeuristicStatistics() {
                                         </td>
                                     </tr>))}
                                 </tbody>
-                            </table>
+                            </table> */}
+
+                            <KernTable
+                                headers={HEURISTICS_STATISTICS_TABLE_COLUMNS}
+                                values={preparedValues}
+                            />
                         </div>
                     </div>
                 </div >
