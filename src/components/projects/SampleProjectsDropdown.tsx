@@ -40,7 +40,7 @@ export default function SampleProjectsDropdown() {
         dispatch(setSearchGroupsStore({}));
         createSampleProject({ name: projectNameFinal, projectType: projectTypeFinal }, (res) => {
             dispatch(closeModal(ModalEnum.SAMPLE_PROJECT_TITLE));
-            const projectId = res['project'].id;
+            const projectId = res?.id;
             dispatch(setProjectIdSampleProject(projectId));
         });
     }, [projects, projectNameInput, projectTypeInput, router]);

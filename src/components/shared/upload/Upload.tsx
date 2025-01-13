@@ -172,8 +172,7 @@ export default function Upload(props: UploadProps) {
         let keyToSend = key;
         if (!keyToSend) keyToSend = null;
         getUploadCredentialsAndId(UploadHelper.getProjectId(), finalFinalName, uploadFileType, importOptionsPrep, UploadType.DEFAULT, keyToSend, (res) => {
-            const credentialsAndUploadId = JSON.parse(JSON.parse(res));
-            uploadFileToMinio(credentialsAndUploadId, finalFinalName);
+            uploadFileToMinio(res, finalFinalName);
         });
     }
 

@@ -66,9 +66,8 @@ export default function LookupListsOverview() {
 
     function createLookupList() {
         createKnowledgeBase(projectId, (res) => {
-            const lookupList = res?.knowledgeBase;
-            dispatch(extendAllLookupLists(lookupList));
-            router.push(`/projects/${projectId}/lookup-lists/${lookupList.id}`);
+            dispatch(extendAllLookupLists(res));
+            router.push(`/projects/${projectId}/lookup-lists/${res?.id}`);
         });
     }
 
