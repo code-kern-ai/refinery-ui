@@ -29,11 +29,6 @@ export function getLabelingFunctionOn10Records(projectId: string, heuristicId: s
     jsonFetchWrapper(finalUrl, FetchType.GET, onResult);
 }
 
-export function getAccessLink(projectId: string, linkId: string, onResult: (result: any) => void) {
-    const finalUrl = `${heuristicEndpoint}/${projectId}/access-link?link_id=${linkId}`;
-    jsonFetchWrapper(finalUrl, FetchType.GET, onResult);
-}
-
 export function toggleHeuristicById(projectId: string, heuristicId: string, onResult: (result: any) => void) {
     const finalUrl = `${heuristicEndpoint}/${projectId}/${heuristicId}/toggle-heuristic`;
     jsonFetchWrapper(finalUrl, FetchType.POST, onResult);

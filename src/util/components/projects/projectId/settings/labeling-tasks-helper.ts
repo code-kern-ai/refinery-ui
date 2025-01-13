@@ -1,34 +1,6 @@
 import { Attribute } from "@/src/types/components/projects/projectId/settings/data-schema";
-import { LabelingTask, LabelingTaskTarget, LabelingTaskTaskType } from "@/src/types/components/projects/projectId/settings/labeling-tasks";
+import { LabelingTask, LabelingTaskTaskType } from "@/src/types/components/projects/projectId/settings/labeling-tasks";
 import { LabelHelper } from "@/src/util/classes/label-helper";
-
-let rPos = { pos: 9990 }; //as object to increase in private function
-
-export function postProcessLabelingTasks(labelingTasks: any[]): any[] {
-    if (!labelingTasks) return [];
-    const prepareLabelingTasks = labelingTasks.map((labelingTask: any) => {
-        const data = labelingTask.node;
-        return {
-            id: data.id,
-            name: data.name,
-            taskTarget: data.taskTarget,
-            attribute: data.attribute,
-            taskType: data.taskType,
-            labels: !data.labels.edges
-                ? []
-                : data.labels.edges.map((edge) => {
-                    return edge.node;
-                }),
-            informationSources: !data.informationSources.edges
-                ? []
-                : data.informationSources.edges.map((edge) => {
-                    return edge.node;
-                }),
-            relativePosition: data.attribute?.relativePosition ?? rPos.pos++,
-        };
-    }).sort((a, b) => (a.relativePosition - b.relativePosition) || a.name.localeCompare(b.name));
-    return prepareLabelingTasks;
-}
 
 export function postProcessLabelingTasksSchema(labelingTasks: LabelingTask[]): LabelingTask[] {
     const prepareLabelingTasks = [];
@@ -37,8 +9,6 @@ export function postProcessLabelingTasksSchema(labelingTasks: LabelingTask[]): L
         LabelHelper.labelingTaskColors.set(task.id, task.labels.map((label) => label.color));
         task.labels = task.labels.map((label) => LabelHelper.extendLabelForColor({ ...label }));
         task.nameOpen = false;
-        task.targetId = task.taskTarget == LabelingTaskTarget.ON_ATTRIBUTE ? task.attribute.id : "";
-        task.targetName = task.taskTarget == LabelingTaskTarget.ON_ATTRIBUTE ? task.attribute.name : "Full Record";
         LabelHelper.labelMap.set(task.id, task.labels);
         prepareLabelingTasks.push(task);
     });

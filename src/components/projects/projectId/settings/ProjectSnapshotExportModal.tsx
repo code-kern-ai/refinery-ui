@@ -55,14 +55,13 @@ export default function ProjectSnapshotExportModal() {
 
     function requestProjectSize() {
         getProjectSize(projectId, (res) => {
-            setProjectSize(res.data['projectSize']);
-            setProjectExportArray(postProcessingFormGroups(res.data['projectSize'], embeddings));
+            setProjectSize(res);
+            setProjectExportArray(postProcessingFormGroups(res, embeddings));
         });
     }
 
     function requestProjectExportCredentials() {
-        getLastProjectExportCredentials(projectId, (res) => {
-            const projectExportCredentials = res.data['lastProjectExportCredentials'];
+        getLastProjectExportCredentials(projectId, (projectExportCredentials) => {
             if (!projectExportCredentials) setProjectExportCredentials(null);
             else {
                 const credentials = JSON.parse(projectExportCredentials);

@@ -8,7 +8,7 @@ import { getClassLine, postProcessCurrentHeuristic, postProcessLastTaskLogs } fr
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
 import { Tooltip } from "@nextui-org/react";
 import { selectEmbeddings, selectEmbeddingsFiltered, selectLabelingTasksAll, selectVisibleAttributesHeuristics, setAllEmbeddings, setFilteredEmbeddings, setLabelingTasksAll } from "@/src/reduxStore/states/pages/settings";
-import { postProcessLabelingTasks, postProcessLabelingTasksSchema } from "@/src/util/components/projects/projectId/settings/labeling-tasks-helper";
+import { postProcessLabelingTasksSchema } from "@/src/util/components/projects/projectId/settings/labeling-tasks-helper";
 import { postProcessingEmbeddings } from "@/src/util/components/projects/projectId/settings/embeddings-helper";
 import { embeddingRelevant } from "@/src/util/components/projects/projectId/heuristics/heuristicId/labeling-functions-helper";
 import { Embedding } from "@/src/types/components/projects/projectId/settings/embeddings";
@@ -88,7 +88,7 @@ export default function ActiveLearning() {
         CommentDataManager.registerCommentRequests(CurrentPage.ACTIVE_LEARNING, requests);
         const requestJsonString = CommentDataManager.buildRequestJSON();
         getAllComments(requestJsonString, (res) => {
-            CommentDataManager.parseCommentData(res.data['getAllComments']);
+            CommentDataManager.parseCommentData(res);
             CommentDataManager.parseToCurrentData(allUsers);
             dispatch(setComments(CommentDataManager.currentDataOrder));
         });
@@ -101,13 +101,13 @@ export default function ActiveLearning() {
             return;
         }
         getPayloadByPayloadId(projectId, currentHeuristic.lastTask.id, (res) => {
-            setLastTaskLogs(postProcessLastTaskLogs((res['data']['payloadByPayloadId'])));
+            setLastTaskLogs(postProcessLastTaskLogs(res));
         });
     }
 
     function refetchCurrentHeuristicAndProcess() {
         getHeuristicByHeuristicId(projectId, router.query.heuristicId as string, (res) => {
-            dispatch(setActiveHeuristics(postProcessCurrentHeuristic(res['data']['informationSourceBySourceId'], labelingTasks)));
+            dispatch(setActiveHeuristics(postProcessCurrentHeuristic(res, labelingTasks)));
         });
     }
 
@@ -121,14 +121,13 @@ export default function ActiveLearning() {
 
     function refetchLabelingTasksAndProcess() {
         getLabelingTasksByProjectId(projectId, (res) => {
-            const labelingTasks = postProcessLabelingTasks(res['data']['projectByProjectId']['labelingTasks']['edges']);
-            dispatch(setLabelingTasksAll(postProcessLabelingTasksSchema(labelingTasks)));
+            dispatch(setLabelingTasksAll(postProcessLabelingTasksSchema(res)));
         });
     }
 
     function refetchEmbeddingsAndPostProcess() {
         getEmbeddings(projectId, (res) => {
-            const embeddings = postProcessingEmbeddings(res.data['projectByProjectId']['embeddings']['edges'].map((e) => e['node']), []);
+            const embeddings = postProcessingEmbeddings(res, []);
             dispatch(setAllEmbeddings(embeddings));
         });
     }

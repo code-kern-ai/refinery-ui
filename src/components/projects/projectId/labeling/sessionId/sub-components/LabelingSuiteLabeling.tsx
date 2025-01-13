@@ -170,7 +170,7 @@ export default function LabelingSuiteLabeling() {
             attribute: null,
         };
         for (const task of labelingTasks) {
-            const attributeKey = task.attribute ? task.attribute.id : FULL_RECORD_ID;
+            const attributeKey = task.targetId || FULL_RECORD_ID;
             const taskCopy = { ...task };
             taskCopy.displayLabels = task.labels.slice(0, settings.labeling.showNLabelButton);
             lVarsCopy.taskLookup[attributeKey].lookup.push({
@@ -427,7 +427,7 @@ export default function LabelingSuiteLabeling() {
         if (task.taskType == LabelingTaskTaskType.MULTICLASS_CLASSIFICATION) {
             addLabelToTask(task.id, labelId);
         } else {
-            addLabelToSelection(task.attribute.id, task.id, labelId);
+            addLabelToSelection(task.targetId, task.id, labelId);
         }
         if (settings.labeling.closeLabelBoxAfterLabel) {
             setActiveTasksFuncRef.current([]);

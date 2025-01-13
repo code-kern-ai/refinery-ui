@@ -96,13 +96,13 @@ export default function HeuristicsLayout(props: any) {
 
     function refetchAttributesAndProcess() {
         getAttributes(projectId, ['ALL'], (res) => {
-            dispatch(setAllAttributes(res.data['attributesByProjectId']));
+            dispatch(setAllAttributes(res));
         });
     }
 
     function refetchLookupListsAndProcess() {
         getLookupListsByProjectId(projectId, (res) => {
-            dispatch(setAllLookupLists(res.data['knowledgeBasesByProjectId']));
+            dispatch(setAllLookupLists(res));
         });
     }
 

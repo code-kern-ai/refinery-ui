@@ -18,7 +18,7 @@ import LabelingSuiteTaskHeader from "../sub-components/LabelingSuiteTaskHeader";
 import LabelingSuiteOverviewTable from "../sub-components/LabelingSuiteOverviewTable";
 import LabelingSuiteLabeling from "../sub-components/LabelingSuiteLabeling";
 import { setAllAttributes, setLabelingTasksAll } from "@/src/reduxStore/states/pages/settings";
-import { postProcessLabelingTasks, postProcessLabelingTasksSchema } from "@/src/util/components/projects/projectId/settings/labeling-tasks-helper";
+import { postProcessLabelingTasksSchema } from "@/src/util/components/projects/projectId/settings/labeling-tasks-helper";
 import { CommentDataManager } from "@/src/util/classes/comments";
 import { CommentType } from "@/src/types/shared/comments";
 import { LabelingTask } from "@/src/types/components/projects/projectId/settings/labeling-tasks";
@@ -83,8 +83,7 @@ export default function LabelingMainComponent() {
             dispatch(setDisplayUserRole(user.role));
             return;
         }
-        getLinkLocked(projectId, { linkRoute: router.asPath }, (result) => {
-            const lockedLink = result['data']['linkLocked'];
+        getLinkLocked(projectId, { linkRoute: router.asPath }, (lockedLink) => {
             if (lockedLink) {
                 setAbsoluteWarning('This link is locked, contact your supervisor to request access');
                 if (router.query.type == LabelingLinkType.HEURISTIC) {
@@ -152,14 +151,13 @@ export default function LabelingMainComponent() {
         if (SessionManager.currentRecordId !== null) {
             setTimeout(() => {
                 getTokenizedRecord({ recordId: SessionManager.currentRecordId }, (res) => {
-                    dispatch(updateRecordRequests('token', res.data.tokenizeRecord));
+                    dispatch(updateRecordRequests('token', res));
                 });
                 getRecordByRecordId(projectId, SessionManager.currentRecordId, (res) => {
-                    dispatch(updateRecordRequests('record', res.data.recordByRecordId));
+                    dispatch(updateRecordRequests('record', res));
                 });
                 getRecordLabelAssociations(projectId, SessionManager.currentRecordId, (rla) => {
-                    const rlas = rla['data']?.['recordByRecordId']?.['recordLabelAssociations']['edges'].map(e => e.node);
-                    dispatch(updateRecordRequests('rla', prepareRLADataForRole(rlas, user, userDisplayId, userDisplayRole)));
+                    dispatch(updateRecordRequests('rla', prepareRLADataForRole(rla?.recordLabelAssociations, user, userDisplayId, userDisplayRole)));
                 });
             }, 100);
         }
@@ -186,7 +184,7 @@ export default function LabelingMainComponent() {
         CommentDataManager.registerCommentRequests(CurrentPage.LABELING, requests);
         const requestJsonString = CommentDataManager.buildRequestJSON();
         getAllComments(requestJsonString, (res) => {
-            CommentDataManager.parseCommentData(res.data['getAllComments']);
+            CommentDataManager.parseCommentData(res);
             CommentDataManager.parseToCurrentData(allUsers);
             dispatch(setComments(CommentDataManager.currentDataOrder));
         });
@@ -203,7 +201,7 @@ export default function LabelingMainComponent() {
             return;
         }
         getAllComments(requestJsonString, (res) => {
-            CommentDataManager.parseCommentData(res.data['getAllComments']);
+            CommentDataManager.parseCommentData(res);
             CommentDataManager.parseToCurrentData(allUsers);
             dispatch(setComments(CommentDataManager.currentDataOrder));
         });
@@ -221,7 +219,7 @@ export default function LabelingMainComponent() {
             return;
         }
         getAllComments(requestJsonString, (res) => {
-            CommentDataManager.parseCommentData(res.data['getAllComments']);
+            CommentDataManager.parseCommentData(res);
             CommentDataManager.parseToCurrentData(allUsers);
             dispatch(setComments(CommentDataManager.currentDataOrder));
         });
@@ -231,8 +229,7 @@ export default function LabelingMainComponent() {
     function requestHuddleData(huddleId: string) {
         if (hasRequestedHuddleData.current === true) return;
         hasRequestedHuddleData.current = true;
-        getHuddleData(projectId, { huddleId: huddleId, huddleType: SessionManager.labelingLinkData.linkType }, (result) => {
-            const huddleData = result['data']['requestHuddleData'];
+        getHuddleData(projectId, { huddleId: huddleId, huddleType: SessionManager.labelingLinkData.linkType }, (huddleData) => {
             if (huddleId == DUMMY_HUDDLE_ID) {
                 SessionManager.labelingLinkData.huddleId = huddleData.huddleId;
             }
@@ -269,8 +266,7 @@ export default function LabelingMainComponent() {
     function collectAvailableLinks() {
         if (userDisplayRole?.role == UserRole.ENGINEER) return;
         const heuristicId = SessionManager.labelingLinkData.linkType == LabelingLinkType.HEURISTIC ? SessionManager.labelingLinkData.huddleId : null;
-        getAvailableLinks(projectId, user?.role, heuristicId, (result) => {
-            const availableLinks = result['data']['availableLinks'];
+        getAvailableLinks(projectId, user?.role, heuristicId, (availableLinks) => {
             dispatch(setAvailableLinks(availableLinks));
             const linkRoute = router.asPath.split("?")[0];
             dispatch(setSelectedLink(availableLinks.find(link => link.link.split("?")[0] == linkRoute)));
@@ -279,14 +275,13 @@ export default function LabelingMainComponent() {
 
     function refetchAttributesAndProcess() {
         getAttributes(projectId, ['ALL'], (res) => {
-            dispatch(setAllAttributes(res.data['attributesByProjectId']));
+            dispatch(setAllAttributes(res));
         });
     }
 
     function refetchLabelingTasksAndProcess() {
         getLabelingTasksByProjectId(projectId, (res) => {
-            const labelingTasks = postProcessLabelingTasks(res['data']['projectByProjectId']['labelingTasks']['edges']);
-            const labelingTasksProcessed = postProcessLabelingTasksSchema(labelingTasks);
+            const labelingTasksProcessed = postProcessLabelingTasksSchema(res);
             dispatch(setLabelingTasksAll(prepareTasksForRole(labelingTasksProcessed, userDisplayRole)));
         });
     }
@@ -319,7 +314,7 @@ export default function LabelingMainComponent() {
             const recordId = SessionManager.currentRecordId ?? record.id;
             if (msgParts[2] == recordId) {
                 getRecordLabelAssociations(projectId, recordId, (rla) => {
-                    const rlas = rla['data']?.['recordByRecordId']?.['recordLabelAssociations']['edges'].map(e => e.node);
+                    const rlas = rla?.recordLabelAssociations;
                     dispatch(updateRecordRequests('rla', prepareRLADataForRole(rlas, user, userDisplayId, userDisplayRole)));
                 });
             }

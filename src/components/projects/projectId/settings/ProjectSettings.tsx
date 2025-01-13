@@ -24,7 +24,7 @@ import { CommentType } from "@/src/types/shared/comments";
 import { CommentDataManager } from "@/src/util/classes/comments";
 import CreateNewAttributeModal from "./CreateNewAttributeModal";
 import ProjectSnapshotExportModal from "./ProjectSnapshotExportModal";
-import { postProcessLabelingTasks, postProcessLabelingTasksSchema } from "@/src/util/components/projects/projectId/settings/labeling-tasks-helper";
+import { postProcessLabelingTasksSchema } from "@/src/util/components/projects/projectId/settings/labeling-tasks-helper";
 import { useWebsocket } from "@/submodules/react-components/hooks/web-socket/useWebsocket";
 import { getLabelingTasksByProjectId, getProjectByProjectId, getProjectTokenization } from "@/src/services/base/project";
 import { getAllComments } from "@/src/services/base/comment";
@@ -66,9 +66,9 @@ export default function ProjectSettings() {
         if (!project) return;
         requestPKeyCheck();
         getRecommendedEncoders(project.id, (res) => {
-            const encoderSuggestions = res['data']['recommendedEncoders'].filter(e => e.tokenizers.includes("all") || e.tokenizers.includes(project.tokenizer));
+            const encoderSuggestions = res.filter(e => e.tokenizers.includes("all") || e.tokenizers.includes(project.tokenizer));
             dispatch(setRecommendedEncodersAll(encoderSuggestions as RecommendedEncoder[]));
-            dispatch(setAllRecommendedEncodersDict(postProcessingRecommendedEncoders(attributes, project.tokenizer, res['data']['recommendedEncoders'])));
+            dispatch(setAllRecommendedEncodersDict(postProcessingRecommendedEncoders(attributes, project.tokenizer, res)));
         });
 
     }, [attributes]);
@@ -88,7 +88,7 @@ export default function ProjectSettings() {
         CommentDataManager.registerCommentRequests(CurrentPage.PROJECT_SETTINGS, requests);
         const requestJsonString = CommentDataManager.buildRequestJSON();
         getAllComments(requestJsonString, (res) => {
-            CommentDataManager.parseCommentData(res.data['getAllComments']);
+            CommentDataManager.parseCommentData(res);
             CommentDataManager.parseToCurrentData(allUsers);
             dispatch(setComments(CommentDataManager.currentDataOrder));
         });
@@ -96,18 +96,18 @@ export default function ProjectSettings() {
 
     function refetchAttributesAndPostProcess() {
         getAttributes(project.id, ['ALL'], (res) => {
-            dispatch(setAllAttributes(res.data['attributesByProjectId']));
+            dispatch(setAllAttributes(res));
         });
     }
 
     function refetchEmbeddingsAndPostProcess() {
         getEmbeddings(project.id, (res) => {
             getQueuedTasks(project.id, "EMBEDDING", (queuedTasks) => {
-                const queuedEmbeddings = queuedTasks.data['queuedTasks'].map((task) => {
+                const queuedEmbeddings = queuedTasks?.map((task) => {
                     const copy = { ...task };
                     return copy;
                 })
-                dispatch(setAllEmbeddings(postProcessingEmbeddings(res.data['projectByProjectId']['embeddings']['edges'].map((e) => e['node']), queuedEmbeddings)));
+                dispatch(setAllEmbeddings(postProcessingEmbeddings(res, queuedEmbeddings)));
             });
         });
     }
@@ -119,7 +119,7 @@ export default function ProjectSettings() {
         const tmpTimer = timer(500).subscribe(() => {
             getCheckCompositeKey(project.id, (res) => {
                 setPKeyCheckTimer(null);
-                if (anyPKey()) setPKeyValid(res.data['checkCompositeKey']);
+                if (anyPKey()) setPKeyValid(res);
                 else setPKeyValid(null);
             });
         });
@@ -136,7 +136,7 @@ export default function ProjectSettings() {
 
     function checkProjectTokenization() {
         getProjectTokenization(project.id, (res) => {
-            setTokenizationProgress(res.data['projectTokenization']?.progress);
+            setTokenizationProgress(res?.progress);
             setIsAcRunning(checkIfAcRunning());
         });
     }
@@ -161,11 +161,11 @@ export default function ProjectSettings() {
 
             getEmbeddings(project.id, (res) => {
                 getQueuedTasks(project.id, "EMBEDDING", (queuedTasks) => {
-                    const queuedEmbeddings = queuedTasks.data['queuedTasks'].map((task) => {
+                    const queuedEmbeddings = queuedTasks?.map((task) => {
                         const copy = { ...task };
                         return copy;
                     })
-                    const newEMbeddings = postProcessingEmbeddings(res.data['projectByProjectId']['embeddings']['edges'].map((e) => e['node']), queuedEmbeddings);
+                    const newEMbeddings = postProcessingEmbeddings(res, queuedEmbeddings);
                     for (let e of newEMbeddings) {
                         if (e.id == msgParts[2]) {
                             if (msgParts[3] == "state") {
@@ -203,7 +203,7 @@ export default function ProjectSettings() {
             refetchAttributesAndPostProcess();
         } else if (msgParts[1] == 'project_update' && msgParts[2] == project.id) {
             getProjectByProjectId(project.id, (res) => {
-                dispatch(setActiveProject(res.data["projectByProjectId"]));
+                dispatch(setActiveProject(res));
             })
         }
         else if (msgParts[1] == 'calculate_attribute') {
@@ -217,7 +217,7 @@ export default function ProjectSettings() {
                 timer(5000).subscribe(() => checkProjectTokenization());
             } else {
                 getAttributes(project.id, ['ALL'], (res) => {
-                    dispatch(setAllAttributes(res.data['attributesByProjectId']));
+                    dispatch(setAllAttributes(res));
                     setIsAcRunning(checkIfAcRunning());
                 });
                 if (msgParts[2] == 'finished') timer(5000).subscribe(() => checkProjectTokenization());
@@ -231,8 +231,7 @@ export default function ProjectSettings() {
 
     function refetchLabelingTasksAndProcess() {
         getLabelingTasksByProjectId(project.id, (res) => {
-            const labelingTasks = postProcessLabelingTasks(res['data']['projectByProjectId']['labelingTasks']['edges']);
-            dispatch(setLabelingTasksAll(postProcessLabelingTasksSchema(labelingTasks)));
+            dispatch(setLabelingTasksAll(postProcessLabelingTasksSchema(res)));
         });
     }
 

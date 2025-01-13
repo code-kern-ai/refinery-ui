@@ -21,7 +21,7 @@ export default function DeleteRecordModal() {
     const deleteRecord = useCallback(() => {
         const recordId = record.id;
         deleteRecordById(projectId, recordId, (r) => {
-            if (r['data']['deleteRecord']) {
+            if (r) {
                 SessionManager.setCurrentRecordDeleted();
                 dispatch(updateRecordRequests('record', null));
                 LabelingSuiteManager.somethingLoading = false;

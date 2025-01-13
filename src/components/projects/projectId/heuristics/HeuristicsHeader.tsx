@@ -60,7 +60,7 @@ export default function HeuristicsHeader(props: HeuristicsHeaderProps) {
             if (res == null) {
                 setCurrentWeakSupervisionRun({ state: Status.NOT_YET_RUN });
             } else {
-                setCurrentWeakSupervisionRun(postProcessCurrentWeakSupervisionRun(res['data']['currentWeakSupervisionRun']));
+                setCurrentWeakSupervisionRun(postProcessCurrentWeakSupervisionRun(res));
             }
         });
     }

@@ -74,8 +74,7 @@ export default function Upload(props: UploadProps) {
         if (msgParts[2] != uploadTask.id) return;
         if (msgParts[3] == 'state') {
             if (msgParts[4] == UploadStates.DONE) {
-                getUploadTaskById(projectId, uploadTask.id, (res) => {
-                    const task = res.data['uploadTaskById'];
+                getUploadTaskById(projectId, uploadTask.id, (task) => {
                     handleUploadTaskResult(task);
                 });
             }
@@ -93,8 +92,7 @@ export default function Upload(props: UploadProps) {
             }
         } else if (msgParts[3] == 'progress') {
             if (msgParts[4] == "100") {
-                getUploadTaskById(projectId, uploadTask.id, (res) => {
-                    const task = res.data['uploadTaskById'];
+                getUploadTaskById(projectId, uploadTask.id, (task) => {
                     handleUploadTaskResult(task);
                 });
             }
@@ -117,14 +115,14 @@ export default function Upload(props: UploadProps) {
                 return;
             }
             createProjectPost({ name: projectTitle, description: projectDescription }, (res) => {
-                const project = res.data.createProject['project'];
+                const project = res['project'];
                 dispatch(extendAllProjects(project));
                 UploadHelper.setProjectId(project.id);
                 executeUploadFile();
             })
         } else if (uploadFileType == UploadFileType.PROJECT) {
             createProjectPost({ name: props.uploadOptions.projectName, description: "Created during file upload " + selectedFile?.name }, (res) => {
-                const project = res.data.createProject['project'];
+                const project = res['project'];
                 dispatch(extendAllProjects(project));
                 UploadHelper.setProjectId(project.id);
                 executeUploadFile();
@@ -173,17 +171,15 @@ export default function Upload(props: UploadProps) {
     function finishUpUpload(finalFinalName: string, importOptionsPrep: string) {
         let keyToSend = key;
         if (!keyToSend) keyToSend = null;
-        getUploadCredentialsAndId(UploadHelper.getProjectId(), finalFinalName, uploadFileType, importOptionsPrep, UploadType.DEFAULT, keyToSend, (results) => {
-            const credentialsAndUploadId = JSON.parse(JSON.parse(results.data['uploadCredentialsAndId']));
-            uploadFileToMinio(credentialsAndUploadId, finalFinalName);
+        getUploadCredentialsAndId(UploadHelper.getProjectId(), finalFinalName, uploadFileType, importOptionsPrep, UploadType.DEFAULT, keyToSend, (res) => {
+            uploadFileToMinio(res, finalFinalName);
         });
     }
 
     function uploadFileToMinio(credentialsAndUploadId: any, fileName: string) {
         setUploadStarted(true);
         setDoingSomething(true);
-        getUploadTaskById(UploadHelper.getProjectId(), credentialsAndUploadId.uploadTaskId, (res) => {
-            const task = res.data['uploadTaskById'];
+        getUploadTaskById(UploadHelper.getProjectId(), credentialsAndUploadId.uploadTaskId, (task) => {
             handleUploadTaskResult(task);
             uploadFile(credentialsAndUploadId, selectedFile, fileName).subscribe((progress) => {
                 setProgressState(progress);

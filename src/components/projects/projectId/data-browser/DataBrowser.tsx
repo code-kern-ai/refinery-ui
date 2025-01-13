@@ -5,7 +5,7 @@ import { useCallback, useEffect, useState } from "react";
 import { expandRecordList, selectActiveSearchParams, selectActiveSlice, selectConfiguration, selectFullSearchStore, selectRecords, setActiveDataSlice, setDataSlices, setRecordComments, setUniqueValuesDict, updateAdditionalDataState } from "@/src/reduxStore/states/pages/data-browser";
 import { postProcessRecordsExtended, postProcessUniqueValues } from "@/src/util/components/projects/projectId/data-browser/data-browser-helper";
 import { selectAttributes, selectLabelingTasksAll, setAllAttributes, setAllEmbeddings, setLabelingTasksAll } from "@/src/reduxStore/states/pages/settings";
-import { postProcessLabelingTasks, postProcessLabelingTasksSchema } from "@/src/util/components/projects/projectId/settings/labeling-tasks-helper";
+import { postProcessLabelingTasksSchema } from "@/src/util/components/projects/projectId/settings/labeling-tasks-helper";
 import { selectAllUsers, selectOrganizationId, selectUser, setComments } from "@/src/reduxStore/states/general";
 import DataBrowserRecords from "./DataBrowserRecords";
 import { postProcessingEmbeddings } from "@/src/util/components/projects/projectId/settings/embeddings-helper";
@@ -64,12 +64,12 @@ export default function DataBrowser() {
             getRecordsByStaticSlice(projectId, activeSlice.id, {
                 offset: searchRequest.offset, limit: searchRequest.limit
             }, (res) => {
-                dispatch(expandRecordList(postProcessRecordsExtended(res.data['recordsByStaticSlice'], labelingTasks)));
+                dispatch(expandRecordList(postProcessRecordsExtended(res, labelingTasks)));
             });
         } else {
             const filterData = parseFilterToExtended(activeSearchParams, attributes, configuration, labelingTasks, user, fullSearchStore[SearchGroup.DRILL_DOWN])
             searchRecordsExtended(projectId, filterData, searchRequest.offset, searchRequest.limit, (res) => {
-                const parsedRecordData = postProcessRecordsExtended(res.data['searchRecordsExtended'], labelingTasks);
+                const parsedRecordData = postProcessRecordsExtended(res, labelingTasks);
                 dispatch(expandRecordList(parsedRecordData));
                 refetchRecordCommentsAndProcess(parsedRecordData.recordList);
             });
@@ -93,7 +93,7 @@ export default function DataBrowser() {
         CommentDataManager.registerCommentRequests(CurrentPage.DATA_BROWSER, requests);
         const requestJsonString = CommentDataManager.buildRequestJSON();
         getAllComments(requestJsonString, (res) => {
-            CommentDataManager.parseCommentData(res.data['getAllComments']);
+            CommentDataManager.parseCommentData(res);
             CommentDataManager.parseToCurrentData(users);
             dispatch(setComments(CommentDataManager.currentDataOrder));
         });
@@ -101,9 +101,9 @@ export default function DataBrowser() {
 
     function refetchDataSlicesAndProcess(dataSliceId?: string) {
         getDataSlices(projectId, null, (res) => {
-            dispatch(setDataSlices(res.data.dataSlices));
+            dispatch(setDataSlices(res));
             if (dataSliceId) {
-                const findSlice = res.data.dataSlices.find((slice) => slice.id == dataSliceId);
+                const findSlice = res.find((slice) => slice.id == dataSliceId);
                 if (findSlice) dispatch(setActiveDataSlice(findSlice));
             }
         });
@@ -111,20 +111,19 @@ export default function DataBrowser() {
 
     function refetchAttributesAndProcess() {
         getAttributes(projectId, ['ALL'], (res) => {
-            dispatch(setAllAttributes(res.data['attributesByProjectId']));
+            dispatch(setAllAttributes(res));
         });
     }
 
     function refetchLabelingTasksAndProcess() {
         getLabelingTasksByProjectId(projectId, (res) => {
-            const labelingTasks = postProcessLabelingTasks(res['data']['projectByProjectId']['labelingTasks']['edges']);
-            dispatch(setLabelingTasksAll(postProcessLabelingTasksSchema(labelingTasks)));
+            dispatch(setLabelingTasksAll(postProcessLabelingTasksSchema(res)));
         });
     }
 
     function refetchEmbeddingsAndPostProcess() {
         getEmbeddings(projectId, (res) => {
-            const embeddings = postProcessingEmbeddings(res.data['projectByProjectId']['embeddings']['edges'].map((e) => e['node']), []);
+            const embeddings = postProcessingEmbeddings(res, []);
             dispatch(setAllEmbeddings(embeddings));
         });
     }
@@ -133,7 +132,7 @@ export default function DataBrowser() {
         const currentRecordIds = parsedRecordData?.map((record) => record.id);
         if (!currentRecordIds || currentRecordIds.length == 0) return;
         getRecordComments(projectId, currentRecordIds, (res) => {
-            dispatch(setRecordComments(res.data['getRecordComments']));
+            dispatch(setRecordComments(res));
         });
     }
 
@@ -143,7 +142,7 @@ export default function DataBrowser() {
 
     function refetchUniqueValuesAndProcess() {
         getUniqueValuesByAttributes(projectId, (res) => {
-            dispatch(setUniqueValuesDict(postProcessUniqueValues(res.data['uniqueValuesByAttributes'], attributes)));
+            dispatch(setUniqueValuesDict(postProcessUniqueValues(res, attributes)));
         });
     }
 

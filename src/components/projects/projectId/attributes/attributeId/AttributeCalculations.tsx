@@ -27,7 +27,7 @@ import { CommentType } from "@/src/types/shared/comments";
 import { AttributeCodeLookup } from "@/src/util/classes/attribute-calculation";
 import KernDropdown from "@/submodules/react-components/components/KernDropdown";
 import { useWebsocket } from "@/submodules/react-components/hooks/web-socket/useWebsocket";
-import { postProcessLabelingTasks, postProcessLabelingTasksSchema } from "@/src/util/components/projects/projectId/settings/labeling-tasks-helper";
+import { postProcessLabelingTasksSchema } from "@/src/util/components/projects/projectId/settings/labeling-tasks-helper";
 import { getAllComments } from "@/src/services/base/comment";
 import { getAttributes } from "@/src/services/base/attribute";
 import { getLookupListsByProjectId } from "@/src/services/base/lookup-lists";
@@ -65,7 +65,7 @@ export default function AttributeCalculation() {
         if (!projectId) return;
         if (!currentAttribute || attributes.length == 0) {
             getAttributes(projectId, ['ALL'], (res) => {
-                dispatch(setAllAttributes(res.data['attributesByProjectId']));
+                dispatch(setAllAttributes(res));
                 const currentAttribute = postProcessCurrentAttribute(attributes.find((attribute) => attribute.id === router.query.attributeId));
                 setCurrentAttribute(currentAttribute);
                 setEditorValue(currentAttribute?.sourceCodeToDisplay);
@@ -73,7 +73,7 @@ export default function AttributeCalculation() {
         }
         if (lookupLists.length == 0) {
             getLookupListsByProjectId(projectId, (res) => {
-                dispatch(setAllLookupLists(res.data['knowledgeBasesByProjectId']));
+                dispatch(setAllLookupLists(res));
             });
         }
         refetchLabelingTasksAndProcess();
@@ -136,7 +136,7 @@ export default function AttributeCalculation() {
         CommentDataManager.registerCommentRequests(CurrentPage.ATTRIBUTE_CALCULATION, requests);
         const requestJsonString = CommentDataManager.buildRequestJSON();
         getAllComments(requestJsonString, (res) => {
-            CommentDataManager.parseCommentData(res.data['getAllComments']);
+            CommentDataManager.parseCommentData(res);
             CommentDataManager.parseToCurrentData(allUsers);
             dispatch(setComments(CommentDataManager.currentDataOrder));
         });
@@ -221,14 +221,13 @@ export default function AttributeCalculation() {
 
     function checkProjectTokenization() {
         getProjectTokenization(projectId, (res) => {
-            setTokenizationProgress(res.data['projectTokenization']?.progress);
+            setTokenizationProgress(res?.progress);
         });
     }
 
     function refetchLabelingTasksAndProcess() {
         getLabelingTasksByProjectId(projectId, (res) => {
-            const labelingTasks = postProcessLabelingTasks(res['data']['projectByProjectId']['labelingTasks']['edges']);
-            dispatch(setLabelingTasksAll(postProcessLabelingTasksSchema(labelingTasks)));
+            dispatch(setLabelingTasksAll(postProcessLabelingTasksSchema(res)));
         });
     }
 
@@ -243,11 +242,11 @@ export default function AttributeCalculation() {
                 setCurrentAttribute(currentAttributeCopy);
             } else {
                 getAttributes(projectId, ['ALL'], (res) => {
-                    dispatch(setAllAttributes(res.data['attributesByProjectId']));
+                    dispatch(setAllAttributes(res));
                 });
-                getAttributeByAttributeId(projectId, currentAttribute?.id, (res) => {
-                    const attribute = res.data['attributeByAttributeId'];
-                    if (attribute == null) setCurrentAttribute(null);
+                if (msgParts[2] == 'deleted') return
+                getAttributeByAttributeId(projectId, currentAttribute?.id, (attribute) => {
+                    if (!attribute) setCurrentAttribute(null);
                     else setCurrentAttribute(postProcessCurrentAttribute(attribute));
                 });
                 if (msgParts[2] == "finished") {
@@ -256,7 +255,7 @@ export default function AttributeCalculation() {
             }
         } else if (['knowledge_base_updated', 'knowledge_base_deleted', 'knowledge_base_created'].includes(msgParts[1])) {
             getLookupListsByProjectId(projectId, (res) => {
-                dispatch(setAllLookupLists(res.data['knowledgeBasesByProjectId']));
+                dispatch(setAllLookupLists(res));
             });
         } else if (msgParts[1] == 'tokenization' && msgParts[2] == 'docbin') {
             if (msgParts[3] == 'progress') {
@@ -388,8 +387,7 @@ export default function AttributeCalculation() {
                 <ExecutionContainer currentAttribute={currentAttribute} tokenizationProgress={tokenizationProgress} enableRunButton={enableRunButton} checkUnsavedChanges={checkUnsavedChanges}
                     setEnabledButton={(value: boolean) => setEnableButton(value)}
                     refetchCurrentAttribute={() => {
-                        getAttributeByAttributeId(projectId, currentAttribute?.id, (res) => {
-                            const attribute = res.data['attributeByAttributeId'];
+                        getAttributeByAttributeId(projectId, currentAttribute?.id, (attribute) => {
                             if (attribute == null) setCurrentAttribute(null);
                             else setCurrentAttribute(postProcessCurrentAttribute(attribute));
                         });

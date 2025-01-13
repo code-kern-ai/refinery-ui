@@ -29,13 +29,12 @@ export default function SyncRecordsModal(props: SyncRecordsModalProps) {
         const changes = jsonCopy(erdDataCopy.cachedRecordChanges);
         for (const key in changes) delete changes[key].display;
         syncEditedRecords(projectId, changes, (res) => {
-            const tmp = res?.data?.editRecords;
-            if (tmp?.ok) {
+            if (res) {
                 erdDataCopy.data.records = jsonCopy(erdDataCopy.displayRecords);
                 erdDataCopy.cachedRecordChanges = {};
                 dispatch(setModalStates(ModalEnum.SYNC_RECORDS, { syncModalAmount: Object.keys(erdDataCopy.cachedRecordChanges).length }));
             } else {
-                if (tmp) erdDataCopy.errors = tmp.errors;
+                if (res) erdDataCopy.errors = JSON.parse(res);
                 else erdDataCopy.errors = ["Request didn't go through"];
             }
             setSyncing(false);

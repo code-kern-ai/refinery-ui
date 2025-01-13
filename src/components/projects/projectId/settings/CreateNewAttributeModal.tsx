@@ -31,7 +31,7 @@ export default function CreateNewAttributeModal() {
 
     const createUserAttribute = useCallback(() => {
         createAttribute(projectId, attributeName, attributeType.value, (res) => {
-            const id = res?.data?.createUserAttribute.attributeId;
+            const id = res?.attributeId;
             if (id) {
                 localStorage.setItem('isNewAttribute', "X");
                 dispatch(setCurrentPage(CurrentPage.ATTRIBUTE_CALCULATION));
