@@ -8,7 +8,7 @@ import { selectOnAttributeEmbeddings } from "@/src/reduxStore/states/pages/setti
 import KernDropdown from "@/submodules/react-components/components/KernDropdown";
 import { Embedding } from "@/src/types/components/projects/projectId/settings/embeddings";
 
-export default function RecordIDE() {
+export default function PlaygroundPage() {
     const dispatch = useDispatch();
     const router = useRouter();
     const projectId = useSelector(selectProjectId);
