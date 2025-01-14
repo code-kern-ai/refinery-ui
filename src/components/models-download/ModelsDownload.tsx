@@ -41,7 +41,7 @@ export default function ModelsDownload() {
 
     function refetchModels() {
         getModelProviderInfo((res) => {
-            dispatch(setModelsDownloaded(res.data['modelProviderInfo']));
+            dispatch(setModelsDownloaded(res));
         });
     }
 

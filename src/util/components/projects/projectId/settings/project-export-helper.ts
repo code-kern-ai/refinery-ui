@@ -29,7 +29,7 @@ export function postProcessingFormGroups(projectSize: any, embeddings: Embedding
             moveRight: getMoveRight(element.table),
             name: element.table,
             desc: hasGdpr ? null : element.description,
-            sizeNumber: element.byteSize,
+            sizeNumber: parseFloat(element.byteSize),
             sizeReadable: element.byteReadable,
         };
         projectExportArray.push(group);

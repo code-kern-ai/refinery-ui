@@ -48,11 +48,6 @@ export function getProjectSize(projectId: string, onResult: (result: any) => voi
     jsonFetchWrapper(finalUrl, FetchType.GET, onResult);
 }
 
-export function createLabels(projectId: string, labelingTaskId: string, labels: string[], onResult: (result: any) => void) {
-    const finalUrl = `${projectSettingEndpoint}/${projectId}/create-labels`;
-    jsonFetchWrapper(finalUrl, FetchType.POST, onResult, JSON.stringify({ labelingTaskId, labels }));
-}
-
 export function createAttribute(projectId: string, name: string, dataType: string, onResult: (result: any) => void) {
     const finalUrl = `${projectSettingEndpoint}/${projectId}/create-attribute`;
     jsonFetchWrapper(finalUrl, FetchType.POST, onResult, JSON.stringify(convertCamelToSnakeCase({ name, dataType })));
@@ -67,12 +62,5 @@ export function calculateUserAttributeAllRecordsPost(projectId: string, options:
     attributeId: string
 }, onResult: (result: any) => void) {
     const finalUrl = `${projectSettingEndpoint}/${projectId}/calculate-user-attribute-all-records`;
-    jsonFetchWrapper(finalUrl, FetchType.POST, onResult, JSON.stringify(convertCamelToSnakeCase(options)));
-}
-
-export function createTaskAndLabels(projectId: string, options: {
-    labelingTaskName: string, labelingTaskType: string, labelingTaskTargetId: string, labels: string[]
-}, onResult: (result: any) => void) {
-    const finalUrl = `${projectSettingEndpoint}/${projectId}/create-task-and-labels`;
     jsonFetchWrapper(finalUrl, FetchType.POST, onResult, JSON.stringify(convertCamelToSnakeCase(options)));
 }

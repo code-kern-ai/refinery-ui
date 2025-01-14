@@ -58,8 +58,7 @@ export default function RenameLabelModal() {
     const [acceptButtonRename, setAcceptButtonRename] = useState<ModalButton>(ACCEPT_BUTTON);
 
     function checkRenameLabel() {
-        getCheckRenameLabel(projectId, modalRenameLabel.label.id, renameLabelData.newLabelName, res => {
-            const result = res.data['checkRenameLabel'];
+        getCheckRenameLabel(projectId, modalRenameLabel.label.id, renameLabelData.newLabelName, result => {
             const renameLabelDataCopy = { ...renameLabelData };
             result.warnings.forEach(e => {
                 e.open = false;

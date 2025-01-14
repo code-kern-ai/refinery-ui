@@ -28,24 +28,24 @@ export function GlobalStoreDataComponent(props: React.PropsWithChildren) {
     const [dataLoaded, setDataLoaded] = useState(false);
 
     useEffect(() => {
-        getIsAdmin((data) => {
-            dispatch(setIsAdmin(data.data.isAdmin));
+        getIsAdmin((isAdmin) => {
+            dispatch(setIsAdmin(isAdmin));
         });
 
         getUserInfo((res) => {
-            const userInfo = { ...res.data["userInfo"] };
-            userInfo.avatarUri = getUserAvatarUri(res.data["userInfo"]);
+            const userInfo = { ...res };
+            userInfo.avatarUri = getUserAvatarUri(res);
             dispatch(setUser(userInfo));
-            dispatch(setDisplayUserRole(res.data["userInfo"].role));
+            dispatch(setDisplayUserRole(res.role));
         });
 
         getOrganization((res) => {
-            if (res.data["userOrganization"]) {
+            if (res?.id) {
                 if (WebSocketsService.getConnectionOpened()) return;
                 WebSocketsService.setConnectionOpened(true);
                 WebSocketsService.initWsNotifications();
                 setDataLoaded(true);
-                dispatch(setOrganization(res.data["userOrganization"]));
+                dispatch(setOrganization(res));
             } else {
                 dispatch(setOrganization(null));
                 timer(60000).subscribe(() => location.reload())
@@ -54,18 +54,16 @@ export function GlobalStoreDataComponent(props: React.PropsWithChildren) {
 
         // Set cache
         getVersionOverview((res) => {
-            dispatch(setCache(CacheEnum.VERSION_OVERVIEW, postprocessVersionOverview(res.data['versionOverview'])));
+            dispatch(setCache(CacheEnum.VERSION_OVERVIEW, postprocessVersionOverview(res)));
         });
         getEmbeddingPlatforms((res) => {
-            dispatch(setCache(CacheEnum.EMBEDDING_PLATFORMS, postProcessingEmbeddingPlatforms(res.data['embeddingPlatforms'], organization)))
+            dispatch(setCache(CacheEnum.EMBEDDING_PLATFORMS, postProcessingEmbeddingPlatforms(res, organization)))
         });
     }, []);
 
     useEffect(() => {
         if (!organization) return;
-        getOrganizationUsers((res) => {
-            dispatch(setAllUsers(res.data["allUsers"]));
-        });
+        getOrganizationUsers((res) => dispatch(setAllUsers(res)));
     }, [organization]);
 
     useEffect(() => {
@@ -90,21 +88,21 @@ export function GlobalStoreDataComponent(props: React.PropsWithChildren) {
         const projectId = router.query.projectId as string;
         if (projectId) {
             getProjectByProjectId(projectId, (res) => {
-                dispatch(setActiveProject(res.data["projectByProjectId"]));
+                dispatch(setActiveProject(res));
             })
         }
         else {
             dispatch(setActiveProject(null));
         }
         getRecommendedEncoders(null, (resEncoders) => {
-            dispatch(setCache(CacheEnum.MODELS_LIST, postProcessingEncoders(resEncoders.data['recommendedEncoders'])))
+            dispatch(setCache(CacheEnum.MODELS_LIST, postProcessingEncoders(resEncoders)))
         });
     }, [router.query.projectId]);
 
     useEffect(() => {
         if (!ConfigManager.isInit()) return;
         getAllTokenizerOptions((res) => {
-            dispatch(setCache(CacheEnum.TOKENIZER_VALUES, checkWhitelistTokenizer(res.data['languageModels'])));
+            dispatch(setCache(CacheEnum.TOKENIZER_VALUES, checkWhitelistTokenizer(res)));
         })
     }, [ConfigManager.isInit()]);
 

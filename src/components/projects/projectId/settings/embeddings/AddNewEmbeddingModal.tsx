@@ -341,7 +341,7 @@ function SuggestionsModel(props: SuggestionsProps) {
     useEffect(() => {
         //collect on mount (open modal)
         getModelProviderInfo((res) => {
-            setCachedModelInfo(postProcessingModelsDownload(res.data['modelProviderInfo']));
+            setCachedModelInfo(postProcessingModelsDownload(res));
         });
     }, [])
 

@@ -51,7 +51,7 @@ export default function LookupListsOverview() {
         CommentDataManager.registerCommentRequests(CurrentPage.LOOKUP_LISTS_OVERVIEW, requests);
         const requestJsonString = CommentDataManager.buildRequestJSON();
         getAllComments(requestJsonString, (res) => {
-            CommentDataManager.parseCommentData(res.data['getAllComments']);
+            CommentDataManager.parseCommentData(res);
             CommentDataManager.parseToCurrentData(allUsers);
             dispatch(setComments(CommentDataManager.currentDataOrder));
         });
@@ -60,15 +60,14 @@ export default function LookupListsOverview() {
     useEffect(() => {
         if (!projectId) return;
         getLookupListsByProjectId(projectId, (res) => {
-            dispatch(setAllLookupLists(res.data["knowledgeBasesByProjectId"]));
+            dispatch(setAllLookupLists(res));
         });
     }, [projectId]);
 
     function createLookupList() {
         createKnowledgeBase(projectId, (res) => {
-            const lookupList = res.data?.createKnowledgeBase["knowledgeBase"];
-            dispatch(extendAllLookupLists(lookupList));
-            router.push(`/projects/${projectId}/lookup-lists/${lookupList.id}`);
+            dispatch(extendAllLookupLists(res));
+            router.push(`/projects/${projectId}/lookup-lists/${res?.id}`);
         });
     }
 
@@ -109,7 +108,7 @@ export default function LookupListsOverview() {
     const handleWebsocketNotification = useCallback((msgParts: string[]) => {
         if (['knowledge_base_updated', 'knowledge_base_deleted', 'knowledge_base_created'].includes(msgParts[1])) {
             getLookupListsByProjectId(projectId, (res) => {
-                dispatch(setAllLookupLists(res.data["knowledgeBasesByProjectId"]));
+                dispatch(setAllLookupLists(res));
             });
         }
     }, [projectId]);

@@ -52,8 +52,7 @@ export default function Header() {
 
     function openModalAndRefetchNotifications() {
         getAllProjects((res) => {
-            const projects = res.data["allProjects"].edges.map((edge: any) => edge.node);
-            dispatch(setAllProjects(projects));
+            dispatch(setAllProjects(res));
             getNotifications({
                 projectFilter: [],
                 levelFilter: [],
@@ -61,7 +60,7 @@ export default function Header() {
                 userFilter: true,
                 limit: 50
             }, (res) => {
-                dispatch(setNotifications(postProcessNotifications(res.data['notifications'], arrayToDict(projects, 'id'), notificationId)));
+                dispatch(setNotifications(postProcessNotifications(res, arrayToDict(res, 'id'), notificationId)));
                 dispatch(openModal(ModalEnum.NOTIFICATION_CENTER));
             });
         });

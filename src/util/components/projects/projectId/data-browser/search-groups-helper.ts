@@ -152,7 +152,7 @@ export function labelingTasksCreateSearchGroup(item, task: LabelingTask, globalS
         group: item.group,
         groupKey: item.groupKey,
         type: item.type,
-        taskTarget: task.taskTarget == LabelingTaskTarget.ON_ATTRIBUTE ? task.attribute.name : 'Full Record',
+        taskTarget: task.targetName,
         taskId: task.id,
         active: false,
         manualLabels: labelingTaskLabelArray(task),

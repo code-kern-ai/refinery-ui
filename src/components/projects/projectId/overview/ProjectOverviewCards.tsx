@@ -16,7 +16,6 @@ const CARDS_DATA = [
 export default function ProjectOverviewCards(props: ProjectOverviewCardsProps) {
     const router = useRouter();
     const projectId = useSelector(selectProjectId);
-
     return (<div>
         <dl className="mt-5 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {CARDS_DATA.map((card: CardStats) => (

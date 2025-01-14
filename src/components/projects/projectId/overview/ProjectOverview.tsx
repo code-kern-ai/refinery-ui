@@ -6,7 +6,7 @@ import { getEmptyProjectStats, postProcessLabelDistribution, postProcessingStats
 import ProjectOverviewCards from './ProjectOverviewCards';
 import { ProjectStats } from '@/src/types/components/projects/projectId/project-overview/project-overview';
 import style from '@/src/styles/components/projects/projectId/project-overview.module.css';
-import { postProcessLabelingTasks, postProcessLabelingTasksSchema } from '@/src/util/components/projects/projectId/settings/labeling-tasks-helper';
+import { postProcessLabelingTasksSchema } from '@/src/util/components/projects/projectId/settings/labeling-tasks-helper';
 import { selectLabelingTasksAll, setAllAttributes, setLabelingTasksAll } from '@/src/reduxStore/states/pages/settings';
 import { setDataSlices } from '@/src/reduxStore/states/pages/data-browser';
 import { selectOverviewFilters } from '@/src/reduxStore/states/tmp';
@@ -70,27 +70,26 @@ export default function ProjectOverview() {
         CommentDataManager.registerCommentRequests(CurrentPage.PROJECT_OVERVIEW, requests);
         const requestJsonString = CommentDataManager.buildRequestJSON();
         getAllComments(requestJsonString, (res) => {
-            CommentDataManager.parseCommentData(res.data['getAllComments']);
+            CommentDataManager.parseCommentData(res);
             CommentDataManager.parseToCurrentData(allUsers);
             dispatch(setComments(CommentDataManager.currentDataOrder));
         });
     }
     function refetchAttributesAndProcess() {
         getAttributes(projectId, ['ALL'], (res) => {
-            dispatch(setAllAttributes(res.data['attributesByProjectId']));
+            dispatch(setAllAttributes(res));
         });
     }
 
     function refetchLabelingTasksAndProcess() {
         getLabelingTasksByProjectId(projectId, (res) => {
-            const labelingTasks = postProcessLabelingTasks(res['data']['projectByProjectId']['labelingTasks']['edges']);
-            dispatch(setLabelingTasksAll(postProcessLabelingTasksSchema(labelingTasks)));
+            dispatch(setLabelingTasksAll(postProcessLabelingTasksSchema(res)));
         });
     }
 
     function refetchDataSlicesAndProcess() {
         getDataSlices(projectId, null, (res) => {
-            dispatch(setDataSlices(res.data.dataSlices));
+            dispatch(setDataSlices(res));
         });
     }
 
@@ -99,8 +98,7 @@ export default function ProjectOverview() {
         const dataSliceFindId = overviewFilters.dataSlice?.id;
         const dataSliceId = dataSliceFindId == "@@NO_SLICE@@" ? null : dataSliceFindId;
         getLabelDistribution(projectId, labelingTaskId, dataSliceId, (res) => {
-            if (res['data'] == null) return;
-            setLabelDistribution(postProcessLabelDistribution(res['data']['labelDistribution'], false));
+            setLabelDistribution(postProcessLabelDistribution(res, false));
         });
     }
 
@@ -113,8 +111,8 @@ export default function ProjectOverview() {
         const dataSliceId = dataSliceFindId == "@@NO_SLICE@@" ? null : dataSliceFindId;
 
         getGeneralProjectStats(projectId, labelingTaskId, dataSliceId, (res) => {
-            if (res['data'] == null) return;
-            setProjectStats(postProcessingStats(res['data']['generalProjectStats']));
+            if (!res) return;
+            setProjectStats(postProcessingStats(res));
         });
     }
 

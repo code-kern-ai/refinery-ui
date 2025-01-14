@@ -68,7 +68,7 @@ export default function ExportRecordsModal(props: ExportProps) {
 
     function requestRecordsExportCredentials() {
         getLastRecordExportCredentials(projectId, (res) => {
-            const recordExportCredentials = res.data['lastRecordExportCredentials'];
+            const recordExportCredentials = res;
             if (!recordExportCredentials) setRecordExportCredentials(null);
             else {
                 const credentials = JSON.parse(recordExportCredentials);
@@ -88,7 +88,7 @@ export default function ExportRecordsModal(props: ExportProps) {
         enumArraysCopy.set(ExportEnums.LabelSource, enumToArray(LabelSource, { nameFunction: labelSourceToString }));
         if (!force && enumArraysCopy[ExportEnums.Heuristics]) return;
         getRecordExportFromData(projectId, (res) => {
-            const postProcessedRes = postProcessExportRecordData(res['data']['projectByProjectId']);
+            const postProcessedRes = postProcessExportRecordData(res);
             enumArraysCopy.set(ExportEnums.Heuristics, postProcessedRes.informationSources);
             enumArraysCopy.set(ExportEnums.Attributes, postProcessedRes.attributes);
             enumArraysCopy.set(ExportEnums.LabelingTasks, postProcessedRes.labelingTasks);
@@ -213,9 +213,9 @@ export default function ExportRecordsModal(props: ExportProps) {
         let keyToSend = key;
         if (!keyToSend) keyToSend = null;
         prepareRecordExport(projectId, { exportOptions: jsonString, key: keyToSend }, (res) => {
-            if (!res.data) {
+            if (!res?.prepared) {
                 ExportHelper.error.push("Something went wrong in the backend:");
-                ExportHelper.error.push(res.error);
+                ExportHelper.error.push(res.message);
                 setPrepareErrors(ExportHelper.error);
             }
             setDownloadState(DownloadState.DOWNLOAD);

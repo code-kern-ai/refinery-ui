@@ -4,7 +4,7 @@ import style from '@/src/styles/components/projects/projectId/heuristics/heurist
 import { useCallback, useEffect, useState } from "react";
 import { selectEmbeddings, selectUsableNonTextAttributes, setAllAttributes, setAllEmbeddings, setLabelingTasksAll } from "@/src/reduxStore/states/pages/settings";
 import { LabelingTask } from "@/src/types/components/projects/projectId/settings/labeling-tasks";
-import { postProcessLabelingTasks, postProcessLabelingTasksSchema } from "@/src/util/components/projects/projectId/settings/labeling-tasks-helper";
+import { postProcessLabelingTasksSchema } from "@/src/util/components/projects/projectId/settings/labeling-tasks-helper";
 import { postProcessHeuristics } from "@/src/util/components/projects/projectId/heuristics/heuristics-helper";
 import { selectHeuristicsAll, setAllHeuristics } from "@/src/reduxStore/states/pages/heuristics";
 import GridCards from "@/src/components/shared/grid-cards/GridCards";
@@ -44,7 +44,7 @@ export function HeuristicsOverview() {
         checkProjectTokenization();
         if (attributes.length == 0) {
             getAttributes(projectId, ['ALL'], (res) => {
-                dispatch(setAllAttributes(res.data['attributesByProjectId']));
+                dispatch(setAllAttributes(res));
             });
         }
     }, [projectId]);
@@ -65,7 +65,7 @@ export function HeuristicsOverview() {
         CommentDataManager.registerCommentRequests(CurrentPage.HEURISTICS, requests);
         const requestJsonString = CommentDataManager.buildRequestJSON();
         getAllComments(requestJsonString, (res) => {
-            CommentDataManager.parseCommentData(res.data['getAllComments']);
+            CommentDataManager.parseCommentData(res);
             CommentDataManager.parseToCurrentData(allUsers);
             dispatch(setComments(CommentDataManager.currentDataOrder));
         });
@@ -73,14 +73,13 @@ export function HeuristicsOverview() {
 
     function refetchLabelingTasksAndProcess() {
         getLabelingTasksByProjectId(projectId, (res) => {
-            const labelingTasks = postProcessLabelingTasks(res['data']['projectByProjectId']['labelingTasks']['edges']);
-            dispatch(setLabelingTasksAll(postProcessLabelingTasksSchema(labelingTasks)));
+            dispatch(setLabelingTasksAll(postProcessLabelingTasksSchema(res)));
         });
     }
 
     function refetchHeuristicsAndProcess() {
         getInformationSourcesOverviewData(projectId, (res) => {
-            const heuristics = postProcessHeuristics(res['data']['informationSourcesOverviewData'], projectId);
+            const heuristics = postProcessHeuristics(res, projectId);
             dispatch(setAllHeuristics(heuristics));
             setFilteredList(heuristics);
         });
@@ -88,14 +87,14 @@ export function HeuristicsOverview() {
 
     function refetchEmbeddingsAndProcess() {
         getEmbeddings(projectId, (res) => {
-            const embeddingsFinal = postProcessingEmbeddings(res.data['projectByProjectId']['embeddings']['edges'].map((e) => e['node']), []);
+            const embeddingsFinal = postProcessingEmbeddings(res, []);
             dispatch(setAllEmbeddings(embeddingsFinal));
         });
     }
 
     function checkProjectTokenization() {
         getProjectTokenization(projectId, (res) => {
-            setTokenizationProgress(res.data['projectTokenization']?.progress);
+            setTokenizationProgress(res?.progress);
         });
     }
 

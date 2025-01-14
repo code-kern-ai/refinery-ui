@@ -38,9 +38,9 @@ export default function LookupListOperations(props: LookupListOperationsProps) {
         setDownloadMessage(DownloadState.PREPARATION);
         getExportLookupList(projectId, router.query.lookupListId, (res) => {
             setDownloadMessage(DownloadState.DOWNLOAD);
-            const downloadContent = JSON.parse(res.data['exportKnowledgeBase']);
+            const downloadContent = JSON.parse(res);
             downloadByteData(downloadContent, 'lookup_list.json');
-            const timerTime = Math.max(2000, res.data['exportKnowledgeBase'].length * 0.0001);
+            const timerTime = Math.max(2000, res.length * 0.0001);
             timer(timerTime).subscribe(() => setDownloadMessage(DownloadState.NONE));
         });
     }

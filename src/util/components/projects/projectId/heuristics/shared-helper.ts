@@ -30,9 +30,9 @@ function convertStatDataGlobal(data = null) {
     }
 }
 
-export function mapInformationSourceStats(edges) {
-    if (edges.length) {
-        return edges.map((wrapper) => {
+export function mapInformationSourceStats(sourceStatistics) {
+    if (sourceStatistics.length) {
+        return sourceStatistics.map((wrapper) => {
             return convertStatData(wrapper['node'])
         })
     } else {

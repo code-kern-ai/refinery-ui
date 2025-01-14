@@ -7,7 +7,7 @@ import { selectHeuristic, setActiveHeuristics, updateHeuristicsState } from "@/s
 import { postProcessCurrentHeuristic, postProcessLastTaskLogs } from "@/src/util/components/projects/projectId/heuristics/heuristicId/heuristics-details-helper";
 import { Tooltip } from "@nextui-org/react";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
-import { postProcessLabelingTasks, postProcessLabelingTasksSchema } from "@/src/util/components/projects/projectId/settings/labeling-tasks-helper";
+import { postProcessLabelingTasksSchema } from "@/src/util/components/projects/projectId/settings/labeling-tasks-helper";
 import { selectVisibleAttributesHeuristics, selectLabelingTasksAll, setLabelingTasksAll } from "@/src/reduxStore/states/pages/settings";
 import HeuristicsEditor from "../shared/HeuristicsEditor";
 import DangerZone from "@/src/components/shared/danger-zone/DangerZone";
@@ -90,7 +90,7 @@ export default function LabelingFunction() {
         CommentDataManager.registerCommentRequests(CurrentPage.LABELING_FUNCTION, requests);
         const requestJsonString = CommentDataManager.buildRequestJSON();
         getAllComments(requestJsonString, (res) => {
-            CommentDataManager.parseCommentData(res.data['getAllComments']);
+            CommentDataManager.parseCommentData(res);
             CommentDataManager.parseToCurrentData(allUsers);
             dispatch(setComments(CommentDataManager.currentDataOrder));
         });
@@ -98,14 +98,13 @@ export default function LabelingFunction() {
 
     function refetchCurrentHeuristicAndProcess() {
         getHeuristicByHeuristicId(projectId, router.query.heuristicId as string, (res) => {
-            dispatch(setActiveHeuristics(postProcessCurrentHeuristic(res['data']['informationSourceBySourceId'], labelingTasks)));
+            dispatch(setActiveHeuristics(postProcessCurrentHeuristic(res, labelingTasks)));
         });
     }
 
     function refetchLabelingTasksAndProcess() {
         getLabelingTasksByProjectId(projectId, (res) => {
-            const labelingTasks = postProcessLabelingTasks(res['data']['projectByProjectId']['labelingTasks']['edges']);
-            dispatch(setLabelingTasksAll(postProcessLabelingTasksSchema(labelingTasks)));
+            dispatch(setLabelingTasksAll(postProcessLabelingTasksSchema(res)));
         });
     }
 
@@ -129,7 +128,7 @@ export default function LabelingFunction() {
             return;
         }
         getPayloadByPayloadId(projectId, currentHeuristic.lastPayload.id, (res) => {
-            setLastTaskLogs(postProcessLastTaskLogs((res['data']['payloadByPayloadId'])));
+            setLastTaskLogs(postProcessLastTaskLogs(res));
         });
     }
 
@@ -138,8 +137,8 @@ export default function LabelingFunction() {
         setRunOn10IsRunning(true);
         getLabelingFunctionOn10Records(projectId, currentHeuristic.id, (res) => {
             setRunOn10IsRunning(false);
-            setSampleRecords(postProcessSampleRecords(res['data']['getLabelingFunctionOn10Records'], labelingTasks, currentHeuristic.labelingTaskId));
-            setLastTaskLogs(parseContainerLogsData(res['data']['getLabelingFunctionOn10Records']['containerLogs']))
+            setSampleRecords(postProcessSampleRecords(res, labelingTasks, currentHeuristic.labelingTaskId));
+            setLastTaskLogs(parseContainerLogsData(res['containerLogs']))
         });
     }
 

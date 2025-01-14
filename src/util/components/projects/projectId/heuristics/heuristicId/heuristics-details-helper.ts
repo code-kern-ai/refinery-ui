@@ -12,7 +12,7 @@ export function postProcessCurrentHeuristic(heuristic: Heuristic, labelingTasks:
     prepareHeuristic.labelSource = LabelSource.INFORMATION_SOURCE;
     prepareHeuristic.informationSourceType = InformationSourceType[heuristic['type']];
     prepareHeuristic.selected = heuristic['isSelected'];
-    prepareHeuristic.stats = mapInformationSourceStats(heuristic['sourceStatistics']['edges']);
+    prepareHeuristic.stats = mapInformationSourceStats(heuristic['sourceStatistics']);
     prepareHeuristic.stats.forEach((stat) => {
         stat.color = getColorStruct(stat.color);
     });
