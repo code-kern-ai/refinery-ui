@@ -8,6 +8,7 @@ import { Embedding } from "@/src/types/components/projects/projectId/settings/em
 import { ModalEnum } from "@/src/types/shared/modal";
 import { openModal } from "@/src/reduxStore/states/modal";
 import CreateExecutionModal from "./CreateExecutionModal";
+import { getSearchResults } from "@/src/services/base/playground";
 
 
 export default function QuestionPlayground() {
@@ -20,6 +21,12 @@ export default function QuestionPlayground() {
     const [output, setOutput] = useState("");
     const [selectedEmbedding, setSelectedEmbedding] = useState<Embedding>(null);
     const [question, setQuestion] = useState("");
+
+    function getSearchResultsPost() {
+        getSearchResults(projectId, selectedEmbedding.id, question, (result) => {
+            console.log(result);
+        });
+    }
 
     return <>
         {projectId && <div className={`bg-white grid overflow-hidden min-h-full h-[calc(100vh-4rem)] grid-cols-2`}>
@@ -37,7 +44,7 @@ export default function QuestionPlayground() {
                     <button
                         className={`ml-2 bg-green-100 border border-green-400 text-green-700 text-xs font-semibold px-4 py-2 rounded-md cursor-pointer opacity-100 hover:bg-green-200 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50`}
                         onClick={() => dispatch(openModal(ModalEnum.PLAYGROUND_EXECUTION))}>Create execution</button>
-                    <button disabled={!question || loading || !selectedEmbedding} onClick={() => { }}
+                    <button disabled={!question || loading || !selectedEmbedding} onClick={getSearchResultsPost}
                         className="ml-auto w-44 bg-white text-gray-700 text-xs font-semibold px-4 py-2 rounded-md border border-gray-300 hover:bg-gray-50 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed">
                         Search
                     </button>
