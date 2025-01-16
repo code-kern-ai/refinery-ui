@@ -4,10 +4,49 @@ import { BACKEND_BASE_URI } from "./_settings";
 export const playgroundEndpoint = `${BACKEND_BASE_URI}/api/v1/playground`;
 
 export function getSearchResults(projectId: string, embeddingId: string, question: string, onResult: (result: any) => void) {
-    const finalUrl = `${playgroundEndpoint}/${projectId}/question-playground`;
+    const finalUrl = `${playgroundEndpoint}/${projectId}/search`;
     const body = {
         embeddingId: embeddingId,
         question: question,
     }
     jsonFetchWrapper(finalUrl, FetchType.POST, onResult, JSON.stringify(body));
+}
+
+
+export function createEvaluationSet(projectId: string, question: string, recordIds: string[], onResult: (result: any) => void) {
+    const finalUrl = `${playgroundEndpoint}/${projectId}/evaluation-sets`;
+    const body = {
+        question: question,
+        recordIds: recordIds
+    }
+    jsonFetchWrapper(finalUrl, FetchType.POST, onResult, JSON.stringify(body));
+}
+
+export function getEvaluationSets(projectId: string, onResult: (result: any) => void) {
+    const finalUrl = `${playgroundEndpoint}/${projectId}/evaluation-sets`;
+    jsonFetchWrapper(finalUrl, FetchType.GET, onResult);
+}
+
+export function getEvaluationSetById(projectId: string, evaluationSetId: string, onResult: (result: any) => void) {
+    const finalUrl = `${playgroundEndpoint}/${projectId}/evaluation-sets/${evaluationSetId}`;
+    jsonFetchWrapper(finalUrl, FetchType.GET, onResult);
+}
+
+export function createEvaluationGroups(projectId: string, matchingSetIds: string[], name: string, onResult: (result: any) => void) {
+    const finalUrl = `${playgroundEndpoint}/${projectId}/evaluation-groups`;
+    const body = {
+        matchingSetIds: matchingSetIds,
+        name: name
+    }
+    jsonFetchWrapper(finalUrl, FetchType.POST, onResult, JSON.stringify(body));
+}
+
+export function getEvaluationGroups(projectId: string, onResult: (result: any) => void) {
+    const finalUrl = `${playgroundEndpoint}/${projectId}/evaluation-groups`;
+    jsonFetchWrapper(finalUrl, FetchType.GET, onResult);
+}
+
+export function getEvaluationGroupById(projectId: string, groupId: string, onResult: (result: any) => void) {
+    const finalUrl = `${playgroundEndpoint}/${projectId}/evaluation-groups/${groupId}`;
+    jsonFetchWrapper(finalUrl, FetchType.GET, onResult);
 }

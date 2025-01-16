@@ -47,7 +47,10 @@ export default function CreateExecutionModal() {
                     <div>Records</div>
                 </div>
                 {!loading && <div className="ml-2 font-dmMono text-xs whitespace-pre-line overflow-y-auto">
-                    <code>{output}</code>
+                    {/* <code>{output}</code> */}
+                    {/* <RecordDisplay
+                        attributes={attributes}
+                        record={record} /> */}
                 </div>}
                 {loading && <div className="items-center">
                     <LoadingIcon size="lg" />
