@@ -188,7 +188,10 @@ const initialState: Modals = {
     },
     [ModalEnum.SIZE_WARNING]: {
         open: false
-    }
+    },
+    [ModalEnum.PLAYGROUND_EXECUTION]: {
+        open: false,
+    },
 };
 
 const modalSlice = createSlice({
