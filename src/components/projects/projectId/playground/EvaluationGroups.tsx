@@ -1,12 +1,13 @@
-import { openModal } from "@/src/reduxStore/states/modal";
+import { openModal, setModalStates } from "@/src/reduxStore/states/modal";
 import CreateEvaluationGroupModal from "./CreateEvaluationGroupModal";
 import { ModalEnum } from "@/src/types/shared/modal";
 import { useDispatch, useSelector } from "react-redux";
 import { selectProjectId } from "@/src/reduxStore/states/project";
 import { useEffect, useState } from "react";
-import { getEvaluationGroups } from "@/src/services/base/playground";
+import { getEvaluationGroups, getEvaluationSetById } from "@/src/services/base/playground";
 import { EvaluationGroup } from "@/src/types/components/projects/projectId/settings/playground";
 import { parseUTC } from "@/submodules/javascript-functions/date-parser";
+import ViewEvaluationGroupModal from "./ViewEvaluationGroupModal";
 
 export function EvaluationGroups() {
     const dispatch = useDispatch();
@@ -60,12 +61,13 @@ export function EvaluationGroups() {
                             <td className="text-center px-3 py-2 text-sm text-gray-500">{parseUTC(group.createdAt)}</td>
                             <td className="text-center px-3 py-2 text-sm text-gray-500">{group.createdBy}</td>
                             <td className="text-center px-3 py-2 text-sm text-gray-500">
-                                {/* <button onClick={() => {
-                                    dispatch(setModalStates(ModalEnum.VIEW_EVALUATION_SET, { open: true, recordIdx: index }));
-                                    recordByRecordId(set.recordIds[index]);
+                                <button onClick={() => {
+                                    getEvaluationSetById(projectId, group.evaluationSetIds[index], (res) => {
+                                        dispatch(setModalStates(ModalEnum.VIEW_EVALUATION_GROUP, { open: true, set: res }));
+                                    });
                                 }} className="bg-white text-gray-700 text-xs font-semibold px-4 py-1 rounded border border-gray-300 cursor-pointer hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 inline-block">
                                     View
-                                </button> */}
+                                </button>
                             </td>
                         </tr>
                     ))}
@@ -74,5 +76,6 @@ export function EvaluationGroups() {
 
         </div>}
         <CreateEvaluationGroupModal />
+        <ViewEvaluationGroupModal />
     </>
 }

@@ -198,6 +198,9 @@ const initialState: Modals = {
     [ModalEnum.EVALUATION_GROUP]: {
         open: false,
     },
+    [ModalEnum.VIEW_EVALUATION_GROUP]: {
+        open: false,
+    },
 };
 
 const modalSlice = createSlice({
