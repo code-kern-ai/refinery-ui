@@ -189,7 +189,7 @@ const initialState: Modals = {
     [ModalEnum.SIZE_WARNING]: {
         open: false
     },
-    [ModalEnum.PLAYGROUND_EXECUTION]: {
+    [ModalEnum.EXECUTION_SET]: {
         open: false,
     },
 };
