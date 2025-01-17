@@ -50,3 +50,8 @@ export function getEvaluationGroupById(projectId: string, groupId: string, onRes
     const finalUrl = `${playgroundEndpoint}/${projectId}/evaluation-groups/${groupId}`;
     jsonFetchWrapper(finalUrl, FetchType.GET, onResult);
 }
+
+export function recordSearchContains(projectId: string, query: string, offset: number, limit: number, onResult: (result: any) => void) {
+    const finalUrl = `${playgroundEndpoint}/${projectId}/record-search-contains`;
+    jsonFetchWrapper(finalUrl, FetchType.POST, onResult, JSON.stringify({ query, limit, offset }));
+}

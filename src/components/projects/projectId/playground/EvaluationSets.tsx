@@ -3,11 +3,21 @@ import { ModalEnum } from "@/src/types/shared/modal";
 import { useDispatch, useSelector } from "react-redux";
 import { selectProjectId } from "@/src/reduxStore/states/project";
 import CreateEvaluationSetModal from "./CreateEvaluationSetModal";
+import { useEffect, useState } from "react";
+import { getEvaluationSets } from "@/src/services/base/playground";
 
 export function EvaluationSets() {
     const dispatch = useDispatch();
 
     const projectId = useSelector(selectProjectId);
+    const [evaluationSets, setEvaluationSets] = useState([]);
+
+    useEffect(() => {
+        if (!projectId) return;
+        getEvaluationSets(projectId, (res) => {
+            setEvaluationSets(res);
+        });
+    }, [projectId]);
 
     return <>
         {projectId != null && <div className="p-4 bg-gray-100 h-full flex-1 flex flex-col overflow-y-auto">

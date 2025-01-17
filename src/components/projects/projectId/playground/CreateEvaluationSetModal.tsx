@@ -2,12 +2,8 @@ import Modal from "@/src/components/shared/modal/Modal";
 import { RecordDisplay } from "@/src/components/shared/record-display/RecordDisplay";
 import { selectVisibleAttributesDataBrowser } from "@/src/reduxStore/states/pages/settings";
 import { selectProjectId } from "@/src/reduxStore/states/project";
-import { searchRecordsExtended } from "@/src/services/base/data-browser";
-import { createEvaluationSet } from "@/src/services/base/playground";
+import { createEvaluationSet, recordSearchContains } from "@/src/services/base/playground";
 import { ModalButton, ModalEnum } from "@/src/types/shared/modal";
-import { postProcessRecordsExtended } from "@/src/util/components/projects/projectId/data-browser/data-browser-helper";
-import { parseFilterToExtended } from "@/src/util/components/projects/projectId/data-browser/filter-parser-helper";
-import { useConsoleLog } from "@/submodules/react-components/hooks/useConsoleLog";
 import { useCallback, useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 
@@ -38,26 +34,21 @@ export default function CreateEvaluationSetModal() {
 
 
     useEffect(() => {
-        const filterData = parseFilterToExtended([], [], [], [], null, false)
-        searchRecordsExtended(projectId, filterData, searchRequest.offset, searchRequest.limit, (res) => {
-            setRecordList(postProcessRecordsExtended(res, []).recordList);
+        recordSearchContains(projectId, search, searchRequest.offset, searchRequest.limit, (res) => {
+            setRecordList(res);
         });
-    }, []);
+    }, [search, searchRequest, projectId]);
 
     const refetchMoreRecords = useCallback((e: any) => {
-        if (e.target.offsetHeight + e.target.scrollTop >= e.target.scrollHeight) {
-            setSearchRequest({ ...searchRequest, offset: searchRequest.offset + searchRequest.limit });
-            const filterData = parseFilterToExtended([], [], [], [], null, false)
-            searchRecordsExtended(projectId, filterData, searchRequest.offset + searchRequest.limit, searchRequest.limit, (res) => {
-                setRecordList([...recordList, ...postProcessRecordsExtended(res, []).recordList]);
-            });
-        }
+        // if (e.target.offsetHeight + e.target.scrollTop >= e.target.scrollHeight) {
+        //     setSearchRequest({ ...searchRequest, offset: searchRequest.offset + searchRequest.limit });
+        //     recordSearchContains(projectId, search, searchRequest.offset + searchRequest.limit, searchRequest.limit, (res) => {
+        //         setRecordList([...recordList, ...res]);
+        //     });
+        // }
     }, [recordList, searchRequest, projectId]);
 
-    useConsoleLog(recordList)
-
-
-    return <Modal modalName={ModalEnum.EVALUATION_SET} acceptButton={acceptButton}>
+    return <Modal modalName={ModalEnum.EVALUATION_SET} acceptButton={acceptButton} className="md:max-w-6xl">
         <div className="h-full">
             <div className="flex flex-grow justify-center text-lg leading-6 text-gray-900 font-medium">Create new execution</div>
             <div className={`bg-white grid overflow-hidden min-h-full grid-cols-2`} style={{ height: 'calc(100vh - 200px)', overflowY: 'scroll' }} onScroll={(e: any) => refetchMoreRecords(e)}>
@@ -73,7 +64,7 @@ export default function CreateEvaluationSetModal() {
                     <div className="flex items-center">
                         <span className="mr-4">Selected results</span>
                     </div>
-                    {selectedRecords && selectedRecords.map((record, index) => (<div key={record.id} className="bg-white overflow-hidden shadow rounded-lg border mb-4 pb-4 relative">
+                    {selectedRecords && selectedRecords.map((record, index) => (<div key={record.id} className="bg-white overflow-hidden shadow rounded-lg border p-2 relative">
                         <RecordDisplay
                             attributes={attributes}
                             record={record}
@@ -93,7 +84,7 @@ export default function CreateEvaluationSetModal() {
                             className="w-full h-10 p-2 line-height-textarea border rounded-md border-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100" />
                         <div>Records</div>
                     </div>
-                    {recordList && recordList.map((record, index) => (<div key={record.id} className="bg-white overflow-hidden shadow rounded-lg border mb-4 pb-4 relative">
+                    {recordList && recordList.map((record, index) => (<div key={record.id} className="bg-white overflow-hidden shadow rounded-lg border m-4 p-2 relative">
                         <RecordDisplay
                             attributes={attributes}
                             record={record}
