@@ -50,7 +50,7 @@ export default function CreateEvaluationSetModal() {
 
     return <Modal modalName={ModalEnum.EVALUATION_SET} acceptButton={acceptButton} className="md:max-w-6xl">
         <div className="h-full">
-            <div className="flex flex-grow justify-center text-lg leading-6 text-gray-900 font-medium">Create new execution</div>
+            <div className="flex flex-grow justify-center text-lg leading-6 text-gray-900 font-medium">Create new evaluation set</div>
             <div className={`bg-white grid overflow-hidden min-h-full grid-cols-2`} style={{ height: 'calc(100vh - 200px)', overflowY: 'scroll' }} onScroll={(e: any) => refetchMoreRecords(e)}>
                 <div className="flex flex-col gap-y-2 m-3 h-full">
                     <div className="flex items-center">
