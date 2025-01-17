@@ -14,7 +14,7 @@ import { useSelector } from "react-redux";
 const ACCEPT_BUTTON = { buttonCaption: 'Create', useButton: true };
 const SEARCH_REQUEST = { offset: 0, limit: 20 };
 
-export default function CreateExecutionModal() {
+export default function CreateEvaluationSetModal() {
     const projectId = useSelector(selectProjectId);
     const attributes = useSelector(selectVisibleAttributesDataBrowser);
 
@@ -25,7 +25,7 @@ export default function CreateExecutionModal() {
     const [recordList, setRecordList] = useState<any[]>([]);
     const [selectedRecords, setSelectedRecords] = useState<any[]>([]);
 
-    const createExecution = useCallback(() => {
+    const createEvaluationSetPost = useCallback(() => {
         createEvaluationSet(projectId, question, selectedRecords.map((record) => record.id), (res) => {
             setQuestion("");
             setSelectedRecords([]);
@@ -33,8 +33,8 @@ export default function CreateExecutionModal() {
     }, [question, selectedRecords, projectId]);
 
     useEffect(() => {
-        setAcceptButton({ ...acceptButton, emitFunction: createExecution, disabled: selectedRecords.length === 0 || question === "" });
-    }, [createExecution]);
+        setAcceptButton({ ...acceptButton, emitFunction: createEvaluationSetPost, disabled: selectedRecords.length === 0 || question === "" });
+    }, [createEvaluationSetPost, selectedRecords, question]);
 
 
     useEffect(() => {
@@ -57,7 +57,7 @@ export default function CreateExecutionModal() {
     useConsoleLog(recordList)
 
 
-    return <Modal modalName={ModalEnum.EXECUTION_SET} acceptButton={acceptButton}>
+    return <Modal modalName={ModalEnum.EVALUATION_SET} acceptButton={acceptButton}>
         <div className="h-full">
             <div className="flex flex-grow justify-center text-lg leading-6 text-gray-900 font-medium">Create new execution</div>
             <div className={`bg-white grid overflow-hidden min-h-full grid-cols-2`} style={{ height: 'calc(100vh - 200px)', overflowY: 'scroll' }} onScroll={(e: any) => refetchMoreRecords(e)}>

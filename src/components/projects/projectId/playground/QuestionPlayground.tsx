@@ -3,8 +3,8 @@ import { useState } from "react";
 import { useSelector } from "react-redux"
 import style from '@/src/styles/components/projects/projectId/playground.module.css';
 import { PlaygroundSearch } from "./PlaygroundSearch";
-import { ExecutionSets } from "./ExecutionSets";
-import { ExecutionGroups } from "./ExecutionGroups";
+import { EvaluationSets } from "./EvaluationSets";
+import { EvaluationGroups } from "./EvaluationGroups";
 
 const PLAYGROUND_TABS = ['Playground', 'Sets', 'Groups'];
 
@@ -26,7 +26,7 @@ export default function QuestionPlayground() {
             </div>
         </div>}
         {openTab == 0 && <PlaygroundSearch />}
-        {openTab == 1 && <ExecutionSets />}
-        {openTab == 2 && <ExecutionGroups />}
+        {openTab == 1 && <EvaluationSets />}
+        {openTab == 2 && <EvaluationGroups />}
     </>
 }
