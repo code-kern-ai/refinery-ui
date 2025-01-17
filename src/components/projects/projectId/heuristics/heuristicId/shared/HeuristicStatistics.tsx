@@ -11,7 +11,7 @@ export default function HeuristicStatistics() {
 
     useEffect(() => {
         setPreparedValues(prepareTableBodyHeuristicStatistics(currentHeuristic.stats));
-    }, []);
+    }, [currentHeuristic]);
 
     return (
         <div className="mt-8">

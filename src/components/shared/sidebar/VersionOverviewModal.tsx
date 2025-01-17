@@ -1,12 +1,9 @@
 import { ModalEnum } from "@/src/types/shared/modal";
 import Modal from "../modal/Modal";
-import { IconAlertCircle, IconArrowRight, IconExternalLink } from "@tabler/icons-react";
+import { IconArrowRight } from "@tabler/icons-react";
 import { useSelector } from "react-redux";
 import { CacheEnum, selectCachedValue } from "@/src/reduxStore/states/cachedValues";
 import style from '@/src/styles/shared/sidebar.module.css';
-import { VersionOverview } from "@/src/types/shared/sidebar";
-import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
-import { Tooltip } from "@nextui-org/react";
 import LoadingIcon from "../../../../submodules/react-components/components/LoadingIcon";
 import { useEffect, useState } from "react";
 import KernTable from "@/submodules/react-components/components/kern-table/KernTable";
