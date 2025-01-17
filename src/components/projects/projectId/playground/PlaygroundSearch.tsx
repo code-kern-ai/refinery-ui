@@ -6,22 +6,29 @@ import { Embedding } from "@/src/types/components/projects/projectId/settings/em
 import KernDropdown from "@/submodules/react-components/components/KernDropdown";
 import { useState } from "react";
 import { useSelector } from "react-redux";
+import { RecordDisplay } from "@/src/components/shared/record-display/RecordDisplay";
+import { selectVisibleAttributesDataBrowser } from "@/src/reduxStore/states/pages/settings";
+
 
 export function PlaygroundSearch() {
     const projectId = useSelector(selectProjectId);
     const onAttributeEmbeddings = useSelector(selectOnAttributeEmbeddings);
+    const attributes = useSelector(selectVisibleAttributesDataBrowser);
 
     const [loading, setLoading] = useState(false);
     const [selectedEmbedding, setSelectedEmbedding] = useState<Embedding>(null);
     const [question, setQuestion] = useState("");
+    const [searchResults, setSearchResults] = useState([]);
 
     function getSearchResultsPost() {
+        setLoading(true);
         getSearchResults(projectId, selectedEmbedding.id, question, (result) => {
-            console.log(result);
+            setLoading(false);
+            setSearchResults(result);
         });
     }
 
-    return <div className={`grid overflow-hidden min-h-full grid-cols-2`}>
+    return <div className={`grid overflow-hidden h-full grid-cols-2`}>
         <div className="flex flex-col gap-y-2 m-3 h-full">
             <div className="flex items-center">
                 <span className="mr-4">Playground</span>
@@ -42,11 +49,15 @@ export function PlaygroundSearch() {
         </div>
         <div className={`h-full border-gray-300 border-l`}>
             <div className="flex flex-row m-3 items-center">
-                <span className="mr-4">Records</span>
+                <span className="mr-4"><span>{searchResults.length > 0 ? searchResults.length + " " : ""}</span>Records</span>
             </div>
             {!loading && <div className="ml-2 font-dmMono text-xs whitespace-pre-line overflow-y-auto">
+                {searchResults.map((result, index) => <div key={index} className="flex flex-col gap-x-3 bg-white rounded-md border border-gray-300 py-2 px-3 m-2">
+                    <RecordDisplay record={result} attributes={attributes} />
+                </div>)}
+
             </div>}
-            {loading && <div className="items-center">
+            {loading && <div className="flex w-full justify-center items-center mt-4">
                 <LoadingIcon size="lg" />
             </div>}
         </div>
