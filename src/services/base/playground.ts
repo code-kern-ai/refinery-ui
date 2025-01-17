@@ -32,10 +32,10 @@ export function getEvaluationSetById(projectId: string, evaluationSetId: string,
     jsonFetchWrapper(finalUrl, FetchType.GET, onResult);
 }
 
-export function createEvaluationGroups(projectId: string, matchingSetIds: string[], name: string, onResult: (result: any) => void) {
+export function createEvaluationGroups(projectId: string, evaluationSetIds: string[], name: string, onResult: (result: any) => void) {
     const finalUrl = `${playgroundEndpoint}/${projectId}/evaluation-groups`;
     const body = {
-        matchingSetIds: matchingSetIds,
+        evaluationSetIds: evaluationSetIds,
         name: name
     }
     jsonFetchWrapper(finalUrl, FetchType.POST, onResult, JSON.stringify(body));
