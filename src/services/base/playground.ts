@@ -3,7 +3,7 @@ import { BACKEND_BASE_URI } from "./_settings";
 
 export const playgroundEndpoint = `${BACKEND_BASE_URI}/api/v1/playground`;
 
-export function getSearchResults(projectId: string, embeddingId: string, question: string, limit: Int16Array, onResult: (result: any) => void) {
+export function getSearchResults(projectId: string, embeddingId: string, question: string, limit: number, onResult: (result: any) => void) {
     const finalUrl = `${playgroundEndpoint}/${projectId}/search`;
     const body = {
         embeddingId: embeddingId,
