@@ -1,4 +1,4 @@
-import LoadingIcon from "@/src/components/shared/loading/LoadingIcon";
+import LoadingIcon from "@/submodules/react-components/components/LoadingIcon";
 import { selectOrganizationId } from "@/src/reduxStore/states/general";
 import { openModal, setModalStates } from "@/src/reduxStore/states/modal";
 import { selectAttributes, selectEmbeddings } from "@/src/reduxStore/states/pages/settings";

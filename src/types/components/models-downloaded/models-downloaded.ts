@@ -1,3 +1,5 @@
+import { ModelsDownloadedStatus } from "@/submodules/javascript-functions/enums/enums";
+
 export type ModelsDownloaded = {
     date: string;
     link?: string;
@@ -9,10 +11,3 @@ export type ModelsDownloaded = {
     parseDate?: string;
     prio?: number;
 };
-
-export enum ModelsDownloadedStatus {
-    FINISHED = 'finished',
-    DOWNLOADING = 'downloading',
-    INITIALIZING = 'initializing',
-    FAILED = 'failed',
-}

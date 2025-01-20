@@ -18,7 +18,7 @@ import { getPythonFunctionRegExMatch, toPythonFunctionName } from "@/submodules/
 import DangerZone from "@/src/components/shared/danger-zone/DangerZone";
 import { DangerZoneEnum } from "@/src/types/shared/danger-zone";
 import ContainerLogs from "@/src/components/shared/logs/ContainerLogs";
-import LoadingIcon from "@/src/components/shared/loading/LoadingIcon";
+import LoadingIcon from "@/submodules/react-components/components/LoadingIcon";
 import { debounceTime, distinctUntilChanged, fromEvent, timer } from "rxjs";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
 import { selectAllUsers, selectOrganizationId, setComments } from "@/src/reduxStore/states/general";
