@@ -8,6 +8,7 @@ import { useSelector } from "react-redux";
 import { RecordDisplay } from "@/src/components/shared/record-display/RecordDisplay";
 import { selectVisibleAttributesDataBrowser } from "@/src/reduxStore/states/pages/settings";
 import LoadingIcon from "@/submodules/react-components/components/LoadingIcon";
+import { IconChevronRight } from '@tabler/icons-react'
 
 
 export function PlaygroundSearch() {
@@ -41,11 +42,19 @@ export function PlaygroundSearch() {
                 value={question}
             ></textarea>
             <div className="flex items-center justify-between">
-                <div>Limit
-                    <input className="ml-2 w-14 bg-white text-gray-700 text-xs font-semibold px-2 py-2 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100"
-                        onChange={(event: any) => { setLimit(Number(event.target.value)); }}
-                        value={limit}>
-                    </input>
+                <div className="flex items-center gap-x-2 justify-between">
+                    <button onClick={() => { }}
+                        className="flex items-center bg-white text-gray-700 text-xs font-semibold px-3 py-2 rounded-md border border-gray-300 hover:bg-gray-50 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed">
+                        Meta
+                        <span><IconChevronRight className="ml-1 h-4 w-4 text-gray-500" /></span>
+                    </button>
+                    <div className="flex items-center gap-x-2">
+                        <span>Limit</span>
+                        <input className="w-14 bg-white text-gray-700 text-xs font-semibold px-2 py-2 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100"
+                            onChange={(event: any) => { setLimit(Number(event.target.value)); }}
+                            value={limit}>
+                        </input>
+                    </div>
                 </div>
                 <button disabled={!question || loading || !selectedEmbedding} onClick={getSearchResultsPost}
                     className="ml-auto w-44 bg-white text-gray-700 text-xs font-semibold px-4 py-2 rounded-md border border-gray-300 hover:bg-gray-50 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed">
@@ -55,11 +64,12 @@ export function PlaygroundSearch() {
 
         </div>
         <div className={`h-full border-gray-300 border-l`}>
-            <div className="flex flex-row m-2 items-center">
-                <span className="mr-4"><span>{searchResults.length > 0 ? searchResults.length + " " : ""}</span>Records</span>
+            <div className="flex flex-row mx-4 my-1 items-center">
+                <span className="mr-4"><span>{searchResults.length > 0 ? searchResults.length + " " : ""}</span>Record{searchResults.length > 1 ? "s" : ""}</span>
             </div>
-            {!loading && (searchResults?.length > 0 ? <div className="ml-2 font-dmMono text-xs whitespace-pre-line overflow-y-auto">
+            {!loading && (searchResults?.length > 0 ? <div className="relative ml-2 font-dmMono text-xs whitespace-pre-line overflow-y-auto">
                 {searchResults.map((result, index) => <div key={index} className="flex flex-col gap-x-3 bg-white rounded-md border border-gray-300 py-2 px-3 m-2">
+                    <div className="absolute right-4 text-gray-500 text-xs">{result?.score.toFixed(3)}</div>
                     <RecordDisplay record={result} attributes={attributes} />
                 </div>)}
 
