@@ -58,14 +58,14 @@ export function PlaygroundSearch() {
             <div className="flex flex-row m-2 items-center">
                 <span className="mr-4"><span>{searchResults.length > 0 ? searchResults.length + " " : ""}</span>Records</span>
             </div>
-            {!loading && searchResults?.length > 0 ? <div className="ml-2 font-dmMono text-xs whitespace-pre-line overflow-y-auto">
+            {!loading && (searchResults?.length > 0 ? <div className="ml-2 font-dmMono text-xs whitespace-pre-line overflow-y-auto">
                 {searchResults.map((result, index) => <div key={index} className="flex flex-col gap-x-3 bg-white rounded-md border border-gray-300 py-2 px-3 m-2">
                     <RecordDisplay record={result} attributes={attributes} />
                 </div>)}
 
             </div> : <div className="text-sm inline-block font-normal text-gray-500 italic mx-3">
                 No records searched yet.
-            </div>}
+            </div>)}
             {loading && <div className="flex w-full justify-center items-center mt-4">
                 <LoadingIcon size="lg" />
             </div>}
