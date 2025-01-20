@@ -11,14 +11,17 @@ export default function ViewEvaluationSetsModal() {
     const attributes = useSelector(selectVisibleAttributesHeuristics);
 
     return (<>
-        {modalViewEvaluationSets.open && modalViewEvaluationSets.record && <>
+        {modalViewEvaluationSets.open && modalViewEvaluationSets.records && <>
             <Modal modalName={ModalEnum.VIEW_EVALUATION_SET}>
                 <h1 className="text-lg text-gray-900 mb-2 text-center">View details</h1>
 
                 <div className={`overflow-y-auto max-height-modal text-sm text-gray-500 my-2 ${style.scrollableSize}`}>
-                    <RecordDisplay
-                        attributes={attributes}
-                        record={modalViewEvaluationSets.record} />
+                    {modalViewEvaluationSets.records.map((record, index) => {
+                        return <RecordDisplay
+                            key={index}
+                            attributes={attributes}
+                            record={record} />
+                    })}
                 </div>
             </Modal>
         </>}

@@ -194,12 +194,14 @@ const initialState: Modals = {
     },
     [ModalEnum.VIEW_EVALUATION_SET]: {
         open: false,
+        records: []
     },
     [ModalEnum.EVALUATION_GROUP]: {
         open: false,
     },
     [ModalEnum.VIEW_EVALUATION_GROUP]: {
         open: false,
+        sets: []
     },
 };
 
