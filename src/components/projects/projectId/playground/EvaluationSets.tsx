@@ -4,8 +4,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { selectProjectId } from "@/src/reduxStore/states/project";
 import CreateEvaluationSetModal from "./CreateEvaluationSetModal";
 import { useEffect, useState } from "react";
-import { getEvaluationSets } from "@/src/services/base/playground";
-import { getRecordByRecordId } from "@/src/services/base/project-setting";
+import { getEvaluationSetById, getEvaluationSets } from "@/src/services/base/playground";
+import { getProjectSize, getRecordByRecordId, getRecordsBatch } from "@/src/services/base/project-setting";
 import { postProcessRecordByRecordId } from "@/src/util/components/projects/projectId/settings/attribute-calculation-helper";
 import ViewEvaluationSetsModal from "./ViewEvaluationSetsModal";
 import KernTable from "@/submodules/react-components/components/kern-table/KernTable";
@@ -27,17 +27,17 @@ export function EvaluationSets() {
 
     useEffect(() => {
         if (!evaluationSets) return;
-        setPreparedValues(prepareTableBodyEvaluationSets(evaluationSets, viewRecordsModal));
+        setPreparedValues(prepareTableBodyEvaluationSets(evaluationSets, viewEvalSetRecordsModal));
     }, [evaluationSets]);
 
-    function viewRecordsModal(recordIds: string[]) {
+    function viewEvalSetRecordsModal(evaluationSets: any[]) {
         let recordsArr = [];
-        recordIds.forEach((recordId) => {
-            getRecordByRecordId(projectId, recordId, (res) => {
-                recordsArr = [...recordsArr, postProcessRecordByRecordId(res)];
-                dispatch(setModalStates(ModalEnum.VIEW_EVALUATION_SET, { open: true, records: recordsArr }));
+        getRecordsBatch(projectId, { recordIds: evaluationSets }, (recordsBatch) => {
+            recordsBatch.forEach((record) => {
+                recordsArr = [...recordsArr, postProcessRecordByRecordId(record)];
             });
-        });
+            dispatch(setModalStates(ModalEnum.VIEW_EVALUATION_SET, { open: true, records: recordsArr }));
+        })
     }
 
     return <>
