@@ -5,7 +5,7 @@ import { useCallback, useEffect, useState } from "react";
 import { selectModal } from "@/src/reduxStore/states/modal";
 import { useDispatch, useSelector } from "react-redux";
 import { removeFromAllAttributesById } from "@/src/reduxStore/states/pages/settings";
-import LoadingIcon from "../loading/LoadingIcon";
+import LoadingIcon from "../../../../submodules/react-components/components/LoadingIcon";
 import { selectProjectId } from "@/src/reduxStore/states/project";
 import { removeFromAllLookupListById } from "@/src/reduxStore/states/pages/lookup-lists";
 import { useRouter } from "next/router";

@@ -7,11 +7,12 @@ import { useDispatch, useSelector } from "react-redux";
 import { useCallback, useEffect, useState } from "react";
 import { dateAsUTCDate } from "@/submodules/javascript-functions/date-parser";
 import { extentModelsDownloaded, selectModelsDownloaded } from "@/src/reduxStore/states/pages/models-downloaded";
-import { ModelsDownloaded, ModelsDownloadedStatus } from "@/src/types/components/models-downloaded/models-downloaded";
+import { ModelsDownloaded } from "@/src/types/components/models-downloaded/models-downloaded";
 import { CacheEnum, selectCachedValue } from "@/src/reduxStore/states/cachedValues";
 import KernDropdown from "@/submodules/react-components/components/KernDropdown";
 import { modelProviderDownloadModel } from "@/src/services/base/misc";
 import { PlatformType } from "@/src/types/components/projects/projectId/settings/embeddings";
+import { ModelsDownloadedStatus } from "@/submodules/javascript-functions/enums/enums";
 
 const ACCEPT_BUTTON = { buttonCaption: 'Accept', useButton: true };
 

@@ -1,7 +1,7 @@
 import { UploadFieldProps, UploadStates } from "@/src/types/shared/upload";
 import { formatBytes } from "@/submodules/javascript-functions/general";
 import { useEffect, useRef, useState } from "react";
-import LoadingIcon from "../../loading/LoadingIcon";
+import LoadingIcon from "../../../../../submodules/react-components/components/LoadingIcon";
 import { IconDatabase } from "@tabler/icons-react";
 import { UploadHelper } from "@/src/util/classes/upload-helper";
 import { useDropzone } from 'react-dropzone';

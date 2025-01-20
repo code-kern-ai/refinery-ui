@@ -29,7 +29,7 @@ import { InformationSourceCodeLookup, InformationSourceExamples } from "@/src/ut
 import { getInformationSourceTemplate } from "@/src/util/components/projects/projectId/heuristics/heuristics-helper";
 import KernDropdown from "@/submodules/react-components/components/KernDropdown";
 import { Attribute } from "@/src/types/components/projects/projectId/settings/data-schema";
-import LoadingIcon from "@/src/components/shared/loading/LoadingIcon";
+import LoadingIcon from "@/submodules/react-components/components/LoadingIcon";
 import { parseContainerLogsData } from "@/submodules/javascript-functions/logs-parser";
 import { useWebsocket } from "@/submodules/react-components/hooks/web-socket/useWebsocket";
 import { getAllComments } from "@/src/services/base/comment";

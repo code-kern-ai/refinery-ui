@@ -15,7 +15,7 @@ import { IconDownload } from "@tabler/icons-react";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
 import { Tooltip } from "@nextui-org/react";
 import { DownloadState } from "@/src/types/components/projects/projectId/settings/project-export";
-import LoadingIcon from "../loading/LoadingIcon";
+import LoadingIcon from "../../../../submodules/react-components/components/LoadingIcon";
 import { ExportHelper } from "@/src/util/classes/export";
 import { downloadFile } from "@/src/services/base/s3-service";
 import { downloadByteDataNoStringify } from "@/submodules/javascript-functions/export";

@@ -7,7 +7,7 @@ import { Slice } from '@/submodules/javascript-functions/enums/enums';
 import { Tooltip } from '@nextui-org/react';
 import { IconAdjustments, IconAlertTriangleFilled, IconChartCircles, IconFilter, IconFilterOff, IconTriangleFilled } from '@tabler/icons-react';
 import { useDispatch, useSelector } from 'react-redux';
-import LoadingIcon from '@/src/components/shared/loading/LoadingIcon';
+import LoadingIcon from '@/submodules/react-components/components/LoadingIcon';
 import { selectVisibleAttributesHeuristics } from '@/src/reduxStore/states/pages/settings';
 import RecordList from './RecordList';
 import { useRouter } from 'next/router';

@@ -1,4 +1,3 @@
-import LoadingIcon from "@/src/components/shared/loading/LoadingIcon";
 import { selectOnAttributeEmbeddings } from "@/src/reduxStore/states/pages/settings";
 import { selectProjectId } from "@/src/reduxStore/states/project";
 import { getSearchResults } from "@/src/services/base/playground";
@@ -8,6 +7,7 @@ import { useState } from "react";
 import { useSelector } from "react-redux";
 import { RecordDisplay } from "@/src/components/shared/record-display/RecordDisplay";
 import { selectVisibleAttributesDataBrowser } from "@/src/reduxStore/states/pages/settings";
+import LoadingIcon from "@/submodules/react-components/components/LoadingIcon";
 
 
 export function PlaygroundSearch() {
