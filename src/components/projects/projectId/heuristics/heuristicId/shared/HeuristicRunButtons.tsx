@@ -1,4 +1,4 @@
-import LoadingIcon from "@/src/components/shared/loading/LoadingIcon";
+import LoadingIcon from "@/submodules/react-components/components/LoadingIcon";
 import { selectHeuristic } from "@/src/reduxStore/states/pages/heuristics";
 import { selectProjectId } from "@/src/reduxStore/states/project";
 import { createTask } from "@/src/services/base/heuristic";

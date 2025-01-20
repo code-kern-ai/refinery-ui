@@ -1,4 +1,4 @@
-import LoadingIcon from "@/src/components/shared/loading/LoadingIcon";
+import LoadingIcon from "@/submodules/react-components/components/LoadingIcon";
 import Statuses from "@/src/components/shared/statuses/Statuses";
 import { setCurrentPage } from "@/src/reduxStore/states/general";
 import { selectAttributes, updateAttributeById } from "@/src/reduxStore/states/pages/settings";
