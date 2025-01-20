@@ -1,20 +1,46 @@
 import { selectProjectId } from "@/src/reduxStore/states/project"
-import { useState } from "react";
-import { useSelector } from "react-redux"
+import { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux"
 import style from '@/src/styles/components/projects/projectId/playground.module.css';
 import { PlaygroundSearch } from "./PlaygroundSearch";
 import { EvaluationSets } from "./EvaluationSets";
 import { EvaluationGroups } from "./EvaluationGroups";
+import EvaluationRuns from "./EvaluationRuns";
+import { getAttributes } from "@/src/services/base/attribute";
+import { setAllAttributes, setAllEmbeddings } from "@/src/reduxStore/states/pages/settings";
+import { getEmbeddings } from "@/src/services/base/embedding";
+import { postProcessingEmbeddings } from "@/src/util/components/projects/projectId/settings/embeddings-helper";
 
-const PLAYGROUND_TABS = ['Playground', 'Sets', 'Groups'];
+const PLAYGROUND_TABS = ['Playground', 'Sets', 'Groups', 'Runs'];
 
 export default function QuestionPlayground() {
+    const dispatch = useDispatch();
+
     const projectId = useSelector(selectProjectId);
 
     const [openTab, setOpenTab] = useState(0);
 
+    useEffect(() => {
+        if (!projectId) return;
+        refetchAttributesAndProcess();
+        refetchEmbeddingsAndPostProcess();
+    }, [projectId]);
+
     function toggleTabs(index: number) {
         setOpenTab(index);
+    }
+
+    function refetchAttributesAndProcess() {
+        getAttributes(projectId, ['ALL'], (res) => {
+            dispatch(setAllAttributes(res));
+        });
+    }
+
+    function refetchEmbeddingsAndPostProcess() {
+        getEmbeddings(projectId, (res) => {
+            const embeddings = postProcessingEmbeddings(res, []);
+            dispatch(setAllEmbeddings(embeddings));
+        });
     }
 
     return <>
@@ -28,5 +54,6 @@ export default function QuestionPlayground() {
         {openTab == 0 && <PlaygroundSearch />}
         {openTab == 1 && <EvaluationSets />}
         {openTab == 2 && <EvaluationGroups />}
+        {openTab == 3 && <EvaluationRuns />}
     </>
 }

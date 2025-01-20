@@ -56,3 +56,17 @@ export function recordSearchContains(projectId: string, query: string, offset: n
     const finalUrl = `${playgroundEndpoint}/${projectId}/record-search-contains`;
     jsonFetchWrapper(finalUrl, FetchType.POST, onResult, JSON.stringify({ query, limit, offset }));
 }
+
+export function getEvaluationRuns(projectId: string, onResult: (result: any) => void) {
+    const finalUrl = `${playgroundEndpoint}/${projectId}/evaluation-runs`;
+    jsonFetchWrapper(finalUrl, FetchType.GET, onResult);
+}
+
+export function createEvaluationRun(projectId, embeddingId: string, evaluationGroupId: string, onResult: (result: any) => void) {
+    const finalUrl = `${playgroundEndpoint}/${projectId}/evaluation-runs`;
+    const body = {
+        embeddingId: embeddingId,
+        evaluationGroupId: evaluationGroupId
+    }
+    jsonFetchWrapper(finalUrl, FetchType.POST, onResult, JSON.stringify(body));
+}
