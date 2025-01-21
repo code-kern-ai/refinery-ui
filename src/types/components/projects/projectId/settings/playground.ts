@@ -26,3 +26,10 @@ export type EvaluationRun = {
     results: any;
     metaInfo: any;
 }
+
+export enum EvaluationRunState {
+    INITIATED = 'INITIATED',
+    RUNNING = 'RUNNING',
+    SUCCESS = 'SUCCESS',
+    FAILED = 'FAILED',
+}

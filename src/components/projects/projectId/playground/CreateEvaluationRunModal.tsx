@@ -34,15 +34,11 @@ export default function CreateEvaluationRunModal({ evaluationGroups }) {
     return <Modal modalName={ModalEnum.EVALUATION_RUN} acceptButton={acceptButton}>
         <div className="h-full">
             <div className="flex flex-grow justify-center text-lg leading-6 text-gray-900 font-medium">Create new evaluation run</div>
-            <div className={`bg-white grid min-h-full gap-2 items-center`}>
-                <div className="flex items-center">
-                    <span className="mr-3">Embedding</span>
-                    <KernDropdown dropdownWidth={"w-full"} options={onAttributeEmbeddings} buttonName={selectedEmbedding ? selectedEmbedding.name : 'Select embedding'} selectedOption={(value) => setSelectedEmbedding(value)} dropdownClasses="my-2" />
-                </div>
-                <div className="flex items-center">
-                    <span className="mr-3">Evaluation group</span>
-                    <KernDropdown dropdownWidth={"w-full"} options={evaluationGroups} buttonName={evaluationGroup ? evaluationGroup.name : 'Select group'} selectedOption={(value) => setEvaluationGroup(value)} dropdownClasses="my-2" />
-                </div>
+            <div className={`bg-white grid min-h-full gap-2 items-center`} style={{ gridTemplateColumns: 'max-content auto' }}>
+                <span className="mr-3">Embedding</span>
+                <KernDropdown dropdownWidth={"w-full"} options={onAttributeEmbeddings} buttonName={selectedEmbedding ? selectedEmbedding.name : 'Select embedding'} selectedOption={(value) => setSelectedEmbedding(value)} dropdownClasses="my-2" />
+                <span className="mr-3">Evaluation group</span>
+                <KernDropdown dropdownWidth={"w-full"} options={evaluationGroups} buttonName={evaluationGroup ? evaluationGroup.name : 'Select group'} selectedOption={(value) => setEvaluationGroup(value)} dropdownClasses="my-2" />
             </div>
         </div>
     </Modal>

@@ -25,7 +25,7 @@ export function prepareTableBodyEvaluationRun(evaluationRuns, usersDict, embeddi
             },
             {
                 type: 'Component',
-                component: 'EvaluationRunState',
+                component: 'EvaluationRunStateCell',
                 value: run.state
             },
             {
