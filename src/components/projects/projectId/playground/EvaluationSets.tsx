@@ -3,13 +3,17 @@ import { ModalEnum } from "@/src/types/shared/modal";
 import { useDispatch, useSelector } from "react-redux";
 import { selectProjectId } from "@/src/reduxStore/states/project";
 import CreateEvaluationSetModal from "./CreateEvaluationSetModal";
-import { useEffect, useState } from "react";
-import { getEvaluationSetById, getEvaluationSets } from "@/src/services/base/playground";
-import { getProjectSize, getRecordByRecordId, getRecordsBatch } from "@/src/services/base/project-setting";
+import { useEffect, useState, useRef, useLayoutEffect, useCallback } from "react";
+import { getEvaluationSets } from "@/src/services/base/playground";
+import { getRecordsBatch } from "@/src/services/base/project-setting";
 import { postProcessRecordByRecordId } from "@/src/util/components/projects/projectId/settings/attribute-calculation-helper";
 import ViewEvaluationSetsModal from "./ViewEvaluationSetsModal";
+import DeleteEvaluationSetsModal from "./DeleteEvaluationSetsModal";
 import KernTable from "@/submodules/react-components/components/kern-table/KernTable";
 import { EVALUATION_SETS_TABLE_HEADER, prepareTableBodyEvaluationSets } from "@/src/util/table-preparations/evaluation-sets";
+import KernButton from "@/submodules/react-components/components/kern-button/KernButton";
+import { IconMinus } from "@tabler/icons-react";
+
 
 export function EvaluationSets() {
     const dispatch = useDispatch();
@@ -17,6 +21,13 @@ export function EvaluationSets() {
     const projectId = useSelector(selectProjectId);
     const [evaluationSets, setEvaluationSets] = useState([]);
     const [preparedValues, setPreparedValues] = useState([]);
+    const [preparedHeaders, setPreparedHeaders] = useState(EVALUATION_SETS_TABLE_HEADER);
+    const [selectedEvaluationSets, setSelectedEvaluationSets] = useState(new Set<string>());
+    const [checked, setChecked] = useState(false);
+    const [indeterminate, setIndeterminate] = useState(false);
+
+    const checkbox = useRef<boolean>(null);
+
 
     useEffect(() => {
         if (!projectId) return;
@@ -25,10 +36,37 @@ export function EvaluationSets() {
         });
     }, [projectId]);
 
+    useLayoutEffect(() => {
+        if (!selectedEvaluationSets || !evaluationSets) return;
+        const isIndeterminate = selectedEvaluationSets.size > 0 && selectedEvaluationSets.size < evaluationSets.length;
+        setChecked(selectedEvaluationSets.size === evaluationSets.length);
+        setIndeterminate(isIndeterminate);
+
+        if (checkbox.current !== null) {
+            checkbox.current.indeterminate = isIndeterminate;
+        }
+    }, [selectedEvaluationSets, evaluationSets]);
+
     useEffect(() => {
         if (!evaluationSets) return;
-        setPreparedValues(prepareTableBodyEvaluationSets(evaluationSets, viewEvalSetRecordsModal));
-    }, [evaluationSets]);
+        setPreparedValues(prepareTableBodyEvaluationSets(evaluationSets, selectedEvaluationSets, setSelectedEvaluationSets, viewEvalSetRecordsModal));
+    }, [evaluationSets, selectedEvaluationSets, setSelectedEvaluationSets]);
+
+    useEffect(() => {
+        setPreparedHeaders(preparedHeaders.map((header) => {
+            if (header.id === "checkboxes") {
+                return { ...header, hasCheckboxes: true, checked: checked, onChange: toggleAll };
+            }
+            return header;
+        }))
+    }, [checked, evaluationSets, selectedEvaluationSets])
+
+    function toggleAll() {
+        if (checked || indeterminate) setSelectedEvaluationSets(new Set<string>());
+        else setSelectedEvaluationSets(new Set<string>(evaluationSets.map(x => x.id)));
+        setChecked(!checked && !indeterminate)
+        setIndeterminate(false)
+    }
 
     function viewEvalSetRecordsModal(evaluationSets: any[]) {
         let recordsArr = [];
@@ -45,7 +83,7 @@ export function EvaluationSets() {
             <div className="text-lg leading-6 text-gray-900 font-medium w-full flex items-center">
                 <div>
                     <label>Evaluation sets</label>
-                    <div className="mt-1">
+                    <div className="my-1">
                         <div className="text-sm leading-5 font-normal text-gray-500 inline-block">You can create your evaluation sets and use them for creating evaluation groups.</div>
                     </div>
                 </div>
@@ -53,16 +91,30 @@ export function EvaluationSets() {
                     className={`ml-auto bg-green-100 border border-green-400 text-green-700 text-xs font-semibold px-4 py-2 rounded-md cursor-pointer opacity-100 hover:bg-green-200 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50`}
                     onClick={() => dispatch(openModal(ModalEnum.EVALUATION_SET))}>Create evaluation set</button>
             </div >
-            <KernTable
-                headers={EVALUATION_SETS_TABLE_HEADER}
-                values={preparedValues}
-                config={{
-                    addBorder: true
-                }}
-            />
-
+            {evaluationSets &&
+                <KernTable
+                    headers={preparedHeaders}
+                    values={preparedValues}
+                    config={{
+                        addBorder: true
+                    }}
+                />
+            }
+            {selectedEvaluationSets.size > 0 &&
+                <div className='pt-4'>
+                    <KernButton
+                        text={"Delete all selected"}
+                        icon={IconMinus}
+                        iconColor='red'
+                        onClick={() => {
+                            dispatch(setModalStates(ModalEnum.DELETE_EVALUATION_SET, { open: true, evaluationSetIds: Array.from(selectedEvaluationSets) }));
+                        }}
+                    />
+                </div>
+            }
         </div>}
         <CreateEvaluationSetModal />
         <ViewEvaluationSetsModal />
+        <DeleteEvaluationSetsModal />
     </>
 }
