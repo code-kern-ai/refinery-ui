@@ -28,7 +28,7 @@ export function prepareTableBodyEvaluationSets(evaluationSets, selectedEvaluatio
             },
             {
                 type: 'text',
-                value: usersDict[set.createdBy].firstName + ' ' + usersDict[set.createdBy].lastName
+                value: usersDict[set.createdBy]?.firstName + ' ' + usersDict[set.createdBy]?.lastName
             },
             {
                 type: 'Component',
