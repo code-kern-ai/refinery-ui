@@ -87,7 +87,7 @@ function TemplatePrompt(props: TemplatePromptProps) {
                         disabled={props.disabled}
                         className={`${props.inverseColor ? "bg-slate-50" : ""} w-full text-sm text-gray-700 border border-transparent hover:border-gray-200 rounded-lg align-top`}
                     />
-                    {props.type == "SYSTEM" && <> <label className="mt-1 text-xs text-gray-500">Included prompt extension:</label>
+                    {props.type == "SYSTEM" && <> <label className="mt-1 text-xs text-gray-500">This will always be appended to your system prompt:</label>
 
                         <textarea
                             value="You must only output valid JSON. If there is not yet a schema defined for the JSON output, please put everything into a single value under the key 'result' - otherwise stick to the schema that has been provided already."

@@ -4,7 +4,7 @@ import { Fragment, useCallback, useEffect, useMemo, useState } from "react";
 import { useSelector } from "react-redux";
 import { selectModal } from "@/src/reduxStore/states/modal";
 import { selectAttributes, selectAttributesDict, updateAttributeById } from "@/src/reduxStore/states/pages/settings";
-import { IconPlayCardStar, IconPlayerPlay, IconRefresh, IconTerminal } from "@tabler/icons-react";
+import { IconHandClick, IconPlayCardStar, IconPlayerPlay, IconRefresh, IconTerminal } from "@tabler/icons-react";
 import LLMResponseConfig from "../LLMResponseConfig";
 import { AttributeState, LLMConfig } from "@/src/types/components/projects/projectId/settings/data-schema";
 import useRefFor from "@/submodules/react-components/hooks/useRefFor";
@@ -35,10 +35,11 @@ export default function LLMPlaygroundModal() {
     const recordDataRef = useRefFor(recordData);
     const [llmAnswer, setLlmAnswer] = useState<any>(null);
 
-    const get1RandomRecords = useCallback(() => {
-        const dummyFilter = [];
-        dummyFilter.push(JSON.stringify({ ORDER_BY: ["RANDOM"], "ORDER_DIRECTION": [generateRandomSeed()] }));
-        searchRecordsExtended(projectId, dummyFilter, 0, 1, (res) => {
+    const [inputRunningId, setInputRunningId] = useState<string>('');
+    const inputRunningIdRef = useRefFor(inputRunningId);
+
+    const searchAndSetWithFilter = useCallback((filter) => {
+        searchRecordsExtended(projectId, filter, 0, 1, (res) => {
             if (res && res.recordList) {
                 const parsedData = res.recordList.map((record) => {
                     const parsed = JSON.parse(record.recordData);
@@ -47,14 +48,33 @@ export default function LLMPlaygroundModal() {
                 setRecordData(parsedData);
             }
         });
-    }, []);
+    }, [projectId]);
+
+    const get1RandomRecords = useCallback(() => {
+        const dummyFilter = [];
+        dummyFilter.push(JSON.stringify({ ORDER_BY: ["RANDOM"], "ORDER_DIRECTION": [generateRandomSeed()] }));
+        searchAndSetWithFilter(dummyFilter);
+    }, [searchAndSetWithFilter]);
+
+    const getByRunningId = useCallback(() => {
+        if (!recordData || inputRunningIdRef.current.length == 0) return;
+        const dummyFilter = [];
+        dummyFilter.push(JSON.stringify(
+            { RELATION: "NONE", NEGATION: false, TARGET_TABLE: "RECORD", TARGET_COLUMN: "DATA", OPERATOR: "EQUAL", VALUES: ["running_id", Number(inputRunningIdRef.current)] }));
+        searchAndSetWithFilter(dummyFilter);
+    }, [searchAndSetWithFilter]);
 
     const testConfigurationForRecordId = useCallback(() => {
         if (!recordDataRef.current || recordDataRef.current?.length == 0) return;
         const record = recordDataRef.current[0];
-        console.log("testing with record", record.id);
-        setLlmAnswer("This could be your answer" + JSON.stringify(record, null, 2));
+        console.log("testing with record", record.id, fullLlmConfigRef.current);
+        setLlmAnswer("This could be your answer");
     }, []);
+
+    useEffect(() => {
+        if (!recordData || recordData?.length == 0) return;
+        setInputRunningId(recordData[0].running_id);
+    }, [recordData]);
 
     useEffect(() => {
         if (modal.open) {
@@ -92,9 +112,18 @@ export default function LLMPlaygroundModal() {
             </div>
             <div className="text-left">
                 {recordData && <div className="">
-                    <div className="flex flex-row gap-x-2">
+                    <div className="flex flex-row gap-x-2 items-center">
                         <label className="block font-bold text-gray-900">Sample Record</label>
-                        <KernButton icon={IconRefresh} size="small" onClick={get1RandomRecords} />
+                        <KernButton icon={IconRefresh} text="Get Random" size="small" onClick={get1RandomRecords} />
+
+                        <input
+                            type="number"
+                            value={inputRunningId}
+                            onChange={(e) => setInputRunningId(e.target.value)}
+                            onFocus={(e) => e.target.select()}
+                            className="w-16 h-full text-right text-sm text-gray-900 border border-gray-200 rounded-lg align-top"
+                        />
+                        <KernButton icon={IconHandClick} text="Get by running_id" size="small" onClick={getByRunningId} />
                     </div>
                     <div className="grid grid-cols-2 gap-2 text-sm max-h-52 overflow-y-auto" style={{ gridTemplateColumns: `max-content auto` }}>
                         {recordKeys.map((rk) => <Fragment key={rk.name}>
