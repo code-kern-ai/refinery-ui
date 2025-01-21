@@ -51,9 +51,19 @@ export default function QuestionPlayground() {
                 </div>)}
             </div>
         </div>}
-        {openTab == 0 && <PlaygroundSearch />}
-        {openTab == 1 && <EvaluationSets />}
-        {openTab == 2 && <EvaluationGroups />}
-        {openTab == 3 && <EvaluationRuns />}
+        <>
+            <div style={{ display: openTab === 0 ? 'block' : 'none' }}>
+                <PlaygroundSearch />
+            </div>
+            <div style={{ display: openTab === 1 ? 'block' : 'none' }}>
+                <EvaluationSets />
+            </div>
+            <div style={{ display: openTab === 2 ? 'block' : 'none' }}>
+                <EvaluationGroups />
+            </div>
+            <div style={{ display: openTab === 3 ? 'block' : 'none' }}>
+                <EvaluationRuns />
+            </div>
+        </>
     </>
 }
