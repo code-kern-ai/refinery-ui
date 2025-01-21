@@ -24,7 +24,7 @@ const DISPLAY_STATES = [AttributeState.AUTOMATICALLY_CREATED, AttributeState.UPL
 
 const TEMPLATE_EXAMPLES = {
     REASONED_CLICKBAIT: {
-        templatePrompt: "You are running your own information network and need to ensure no clickbait news articles are published. To ensure your answer can be validated always provide a reason and your final result being either 'yes' or 'no'.",
+        templatePrompt: "You are running your own information network and need to ensure no clickbait news articles are published. To ensure your answer can be validated always provide a reason and your final result being either 'yes' or 'no'. JSON Schema {\"reason\": <reasoning>, \"result\":<yes or no>}",
         questionPrompt: "News article: '{{headline}}'"
     }
 }
@@ -52,6 +52,11 @@ export default function LLMPlaygroundModal() {
     const searchAndSetWithFilter = useCallback((filter) => {
         searchRecordsExtended(projectId, filter, 0, 1, (res) => {
             if (res && res.recordList) {
+                if (res.recordList.length == 0) {
+                    console.warn("No records found -> using random instead");
+                    get1RandomRecords();
+                    return;
+                }
                 const parsedData = res.recordList.map((record) => {
                     const parsed = JSON.parse(record.recordData);
                     return ({ ...parsed.data, id: parsed.id });
@@ -132,6 +137,7 @@ export default function LLMPlaygroundModal() {
                             value={inputRunningId}
                             onChange={(e) => setInputRunningId(e.target.value)}
                             onFocus={(e) => e.target.select()}
+                            onKeyDown={(e) => e.key === 'Enter' && getByRunningId()}
                             className="w-16 h-full text-right text-sm text-gray-900 border border-gray-200 rounded-lg align-top"
                         />
                         <KernButton icon={IconHandClick} text="Get by running_id" size="small" onClick={getByRunningId} />
@@ -139,7 +145,7 @@ export default function LLMPlaygroundModal() {
                     <div className="grid grid-cols-2 gap-2 text-sm max-h-52 overflow-y-auto" style={{ gridTemplateColumns: `max-content auto` }}>
                         {recordKeys.map((rk) => <Fragment key={rk.name}>
                             <label className="block font-bold text-gray-900">{rk.name}</label>
-                            {recordData.map((record) => rk.dataType == DataTypeEnum.EMBEDDING_LIST ? <div className="flex flex-col divide-y divide-gray-200">
+                            {recordData.map((record) => rk.dataType == DataTypeEnum.EMBEDDING_LIST ? <div key={record.running_id} className="flex flex-col divide-y divide-gray-200">
                                 {record[rk.name].map((li, idx) => <span key={idx} className="text-gray-700">{li}</span>)}
                             </div> : <span key={record.running_id} className="text-gray-700">{record[rk.name]}</span>)}
                         </Fragment>)}
