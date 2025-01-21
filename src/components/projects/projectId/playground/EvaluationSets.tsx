@@ -39,7 +39,7 @@ export function EvaluationSets() {
     useLayoutEffect(() => {
         if (!selectedEvaluationSets || !evaluationSets) return;
         const isIndeterminate = selectedEvaluationSets.size > 0 && selectedEvaluationSets.size < evaluationSets.length;
-        setChecked(selectedEvaluationSets.size === evaluationSets.length);
+        setChecked(selectedEvaluationSets.size > 0 && selectedEvaluationSets.size === evaluationSets.length);
         setIndeterminate(isIndeterminate);
 
         if (checkbox.current !== null) {
@@ -60,6 +60,14 @@ export function EvaluationSets() {
             return header;
         }))
     }, [checked, evaluationSets, selectedEvaluationSets])
+
+    const refetchEvaluationSets = useCallback(() => {
+        getEvaluationSets(projectId, (res) => {
+            setEvaluationSets(res);
+            setSelectedEvaluationSets(new Set<string>());
+        });
+
+    }, [projectId]);
 
     function toggleAll() {
         if (checked || indeterminate) setSelectedEvaluationSets(new Set<string>());
@@ -113,8 +121,8 @@ export function EvaluationSets() {
                 </div>
             }
         </div>}
-        <CreateEvaluationSetModal />
+        <CreateEvaluationSetModal refetchEvaluationSets={refetchEvaluationSets} />
         <ViewEvaluationSetsModal />
-        <DeleteEvaluationSetsModal />
+        <DeleteEvaluationSetsModal refetchEvaluationSets={refetchEvaluationSets} />
     </>
 }

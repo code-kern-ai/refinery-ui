@@ -9,7 +9,10 @@ import { selectProjectId } from "@/src/reduxStore/states/project";
 
 const ABORT_BUTTON = { buttonCaption: "Delete", useButton: true, disabled: false };
 
-export default function DeleteEvaluationSetsModal() {
+type DeleteEvaluationSetsModalProps = {
+    refetchEvaluationSets: () => void;
+};
+export default function DeleteEvaluationSetsModal(props: DeleteEvaluationSetsModalProps) {
     const dispatch = useDispatch();
 
     const [abortButton, setAbortButton] = useState<ModalButton>(ABORT_BUTTON);
@@ -18,7 +21,7 @@ export default function DeleteEvaluationSetsModal() {
 
     const deleteEvaluationSets = useCallback(() => {
         deleteEvaluationSetsPost(projectId, modalDeleteEvaluationSet.evaluationSetIds, (res) => {
-
+            props.refetchEvaluationSets();
         });
     }, [modalDeleteEvaluationSet]);
 
