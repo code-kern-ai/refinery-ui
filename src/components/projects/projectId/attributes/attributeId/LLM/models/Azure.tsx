@@ -1,13 +1,6 @@
-import { IconPlus, IconX } from "@tabler/icons-react";
-import { useEffect, useRef, useState } from "react";
-// import EnvVarCreationModal from "@/src/components/EnvironmentVariables/Variables/CreationModal";
-// import { EnvironmentVariable, getAllOrgEnvironmentVariables, getEnvironmentVariables, getOrgEnvironmentVariables } from "@/src/services/environmentVariable";
-// import { useSelector } from "react-redux";
-// import { selectActiveProjectId } from "@/src/reduxStore/states/project";
-// import { InputWithSlider } from "@/src/components/Common/InputWithSlider";
+import { IconX } from "@tabler/icons-react";
+import { useEffect, useState } from "react";
 import { LocalStorageDropdown } from "@/submodules/react-components/components/LocalStorageDropdown";
-// import KernDropdown from "@/submodules/react-components/components/KernDropdown";
-// import KernButton from "@/src/components/Common/ButtonComponents/KernButton";
 import { InputWithSlider } from "../InputWithSlider";
 
 type LLmProps = {
@@ -15,8 +8,6 @@ type LLmProps = {
     setLlmConfig: (llmConfig: any) => void;
     onlyEssential?: boolean;
     projectId?: string;
-    // defaultScope?: any;
-    // allowScopeChange?: boolean
     disabled?: boolean;
 }
 
@@ -26,7 +17,6 @@ export default function Azure(props: LLmProps) {
 
     useEffect(() => {
         if (props.llmConfig.model) {
-            // const newMaxLength = Math.min(props.llmConfig.maxLength, maxLengths[props.llmConfig.model]);
             props.setLlmConfig({ ...props.llmConfig, maxLength: props.llmConfig.maxLength });
         }
     }, [props.llmConfig.model])

@@ -1,11 +1,5 @@
-import { IconPlus, IconX } from "@tabler/icons-react";
+import { IconX } from "@tabler/icons-react";
 import { useEffect, useState } from "react";
-// import EnvVarCreationModal from "@/src/components/EnvironmentVariables/Variables/CreationModal";
-// import { EnvironmentVariable, getAllOrgEnvironmentVariables, getOrgEnvironmentVariables } from "@/src/services/environmentVariable";
-import { useSelector } from "react-redux";
-// import { selectActiveProjectId } from "@/src/reduxStore/states/project";
-// import { InputWithSlider } from "@/src/components/Common/InputWithSlider";
-// import KernButton from "@/src/components/Common/ButtonComponents/KernButton";
 import KernDropdown from "@/submodules/react-components/components/KernDropdown";
 import { InputWithSlider } from "../InputWithSlider";
 
@@ -15,8 +9,6 @@ interface LLmProps {
     setLlmConfig: (llmConfig: any) => void;
     onlyEssential?: boolean;
     projectId?: string;
-    // defaultScope?: any;
-    // allowScopeChange?: boolean;
     isVision?: boolean;
     disabled?: boolean;
 }
@@ -148,16 +140,6 @@ export default function OpenAI(props: LLmProps) {
                     />
                 </div>
             </>}
-
-            {/* <EnvVarCreationModal
-                environmentVariables={environmentVariables}
-                setEnvironmentVariables={setEnvironmentVariables}
-                open={openEnvironmentVariableCreationModal}
-                setOpen={setOpenEnvironmentVariableCreationModal}
-                defaultScope={props.defaultScope}
-                allowScopeChange={props.allowScopeChange}
-                projectId={projectId ?? props.projectId}
-            /> */}
         </div>
     )
 }
