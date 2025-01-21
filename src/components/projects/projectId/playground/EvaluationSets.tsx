@@ -13,12 +13,17 @@ import KernTable from "@/submodules/react-components/components/kern-table/KernT
 import { EVALUATION_SETS_TABLE_HEADER, prepareTableBodyEvaluationSets } from "@/src/util/table-preparations/evaluation-sets";
 import KernButton from "@/submodules/react-components/components/kern-button/KernButton";
 import { IconMinus } from "@tabler/icons-react";
+import { selectAllUsers } from "@/src/reduxStore/states/general";
+import { arrayToDict } from "@/submodules/javascript-functions/general";
 
 
 export function EvaluationSets() {
     const dispatch = useDispatch();
 
     const projectId = useSelector(selectProjectId);
+    const users = useSelector(selectAllUsers);
+    const usersDict = arrayToDict(users, 'id');
+
     const [evaluationSets, setEvaluationSets] = useState([]);
     const [preparedValues, setPreparedValues] = useState([]);
     const [preparedHeaders, setPreparedHeaders] = useState(EVALUATION_SETS_TABLE_HEADER);
@@ -26,7 +31,7 @@ export function EvaluationSets() {
     const [checked, setChecked] = useState(false);
     const [indeterminate, setIndeterminate] = useState(false);
 
-    const checkbox = useRef<boolean>(null);
+    const checkbox = useRef<any>(null);
 
 
     useEffect(() => {
@@ -49,7 +54,7 @@ export function EvaluationSets() {
 
     useEffect(() => {
         if (!evaluationSets) return;
-        setPreparedValues(prepareTableBodyEvaluationSets(evaluationSets, selectedEvaluationSets, setSelectedEvaluationSets, viewEvalSetRecordsModal));
+        setPreparedValues(prepareTableBodyEvaluationSets(evaluationSets, selectedEvaluationSets, setSelectedEvaluationSets, usersDict, viewEvalSetRecordsModal));
     }, [evaluationSets, selectedEvaluationSets, setSelectedEvaluationSets]);
 
     useEffect(() => {

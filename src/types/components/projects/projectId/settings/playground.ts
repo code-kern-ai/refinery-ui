@@ -15,3 +15,14 @@ export type EvaluationGroup = {
     projectId: string;
     name: string;
 }
+
+export type EvaluationRun = {
+    id: string;
+    evaluationGroupId: string;
+    createdBy: string;
+    createdAt: string;
+    embeddingId: string;
+    state: string;
+    results: any;
+    metaInfo: any;
+}

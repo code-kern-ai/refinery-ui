@@ -1,6 +1,6 @@
 import { selectOnAttributeEmbeddings } from "@/src/reduxStore/states/pages/settings";
 import { selectProjectId } from "@/src/reduxStore/states/project";
-import { getSearchResults } from "@/src/services/base/playground";
+import { createEvaluationSet, getSearchResults } from "@/src/services/base/playground";
 import { Embedding } from "@/src/types/components/projects/projectId/settings/embeddings";
 import KernDropdown from "@/submodules/react-components/components/KernDropdown";
 import { useState } from "react";
@@ -9,9 +9,12 @@ import { RecordDisplay } from "@/src/components/shared/record-display/RecordDisp
 import { selectVisibleAttributesDataBrowser } from "@/src/reduxStore/states/pages/settings";
 import LoadingIcon from "@/submodules/react-components/components/LoadingIcon";
 import { IconChevronRight } from '@tabler/icons-react'
+import { useRouter } from "next/router";
 
 
 export function PlaygroundSearch() {
+    const router = useRouter();
+
     const projectId = useSelector(selectProjectId);
     const onAttributeEmbeddings = useSelector(selectOnAttributeEmbeddings);
     const attributes = useSelector(selectVisibleAttributesDataBrowser);
@@ -28,6 +31,10 @@ export function PlaygroundSearch() {
             setLoading(false);
             setSearchResults(result);
         });
+    }
+
+    function createSetFromRecords() {
+        createEvaluationSet(projectId, question, searchResults.map((record) => record.id), (result) => { });
     }
 
     return <div className={`grid overflow-hidden h-full grid-cols-2`}>
@@ -66,6 +73,9 @@ export function PlaygroundSearch() {
         <div className={`h-full border-gray-300 border-l`}>
             <div className="flex flex-row mx-4 my-1 items-center">
                 <span className="mr-4"><span>{searchResults.length > 0 ? searchResults.length + " " : ""}</span>Record{searchResults.length > 1 ? "s" : ""}</span>
+                <button disabled={searchResults.length === 0 || selectedEmbedding === null || question === "" || loading}
+                    className={`ml-auto bg-green-100 border border-green-400 text-green-700 text-xs font-semibold px-4 py-2 rounded-md cursor-pointer opacity-100 hover:bg-green-200 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50`}
+                    onClick={createSetFromRecords}>Create set from saved records</button>
             </div>
             {!loading && (searchResults?.length > 0 ? <div className="relative ml-2 font-dmMono text-xs whitespace-pre-line overflow-y-auto">
                 {searchResults.map((result, index) => <div key={index} className="flex flex-col gap-x-3 bg-white rounded-md border border-gray-300 py-2 px-3 m-2">
