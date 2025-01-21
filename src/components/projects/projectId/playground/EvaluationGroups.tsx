@@ -3,7 +3,7 @@ import CreateEvaluationGroupModal from "./CreateEvaluationGroupModal";
 import { ModalEnum } from "@/src/types/shared/modal";
 import { useDispatch, useSelector } from "react-redux";
 import { selectProjectId } from "@/src/reduxStore/states/project";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { getEvaluationGroups, getEvaluationSetsByGroupId } from "@/src/services/base/playground";
 import ViewEvaluationGroupModal from "./ViewEvaluationGroupModal";
 import KernTable from "@/submodules/react-components/components/kern-table/KernTable";
@@ -16,11 +16,15 @@ export function EvaluationGroups() {
 
     const [evaluationGroups, setEvaluationGroups] = useState([]);
     const [preparedValues, setPreparedValues] = useState([]);
+    const isFetchingEvalGroups = useRef(false);
 
     useEffect(() => {
         if (!projectId) return;
+        if (isFetchingEvalGroups.current) return;
+        isFetchingEvalGroups.current = true
         getEvaluationGroups(projectId, (res) => {
             setEvaluationGroups(res);
+            isFetchingEvalGroups.current = false
         });
     }, [projectId]);
 
