@@ -81,8 +81,8 @@ export function EvaluationGroups() {
     }, [projectId]);
 
     function toggleAll() {
-        if (checked || indeterminate) selectedEvaluationGroups(new Set<string>());
-        else selectedEvaluationGroups(new Set<string>(evaluationGroups.map(x => x.id)));
+        if (checked || indeterminate) setSelectedEvaluationGroups(new Set<string>());
+        else setSelectedEvaluationGroups(new Set<string>(evaluationGroups.map(x => x.id)));
         setChecked(!checked && !indeterminate)
         setIndeterminate(false)
     }
