@@ -2,7 +2,7 @@ import { parseUTC } from "@/submodules/javascript-functions/date-parser";
 
 export const EVALUATION_SETS_TABLE_HEADER = [{ column: 'Question', id: 'question' }, { column: 'Created At', id: 'createdAt' }, { column: 'Created By', id: 'createdBy' }, { column: 'Records', id: 'records' }];
 
-export function prepareTableBodyEvaluationSets(evaluationSets, openModal) {
+export function prepareTableBodyEvaluationSets(evaluationSets, usersDict, openModal) {
     let finalData = [];
     evaluationSets.forEach((set) => {
         const currentRow = [
@@ -16,7 +16,7 @@ export function prepareTableBodyEvaluationSets(evaluationSets, openModal) {
             },
             {
                 type: 'text',
-                value: set.createdBy
+                value: usersDict[set.createdBy].firstName + ' ' + usersDict[set.createdBy].lastName
             },
             {
                 type: 'Component',

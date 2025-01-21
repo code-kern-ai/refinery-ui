@@ -10,11 +10,16 @@ import { postProcessRecordByRecordId } from "@/src/util/components/projects/proj
 import ViewEvaluationSetsModal from "./ViewEvaluationSetsModal";
 import KernTable from "@/submodules/react-components/components/kern-table/KernTable";
 import { EVALUATION_SETS_TABLE_HEADER, prepareTableBodyEvaluationSets } from "@/src/util/table-preparations/evaluation-sets";
+import { arrayToDict } from "@/submodules/javascript-functions/general";
+import { selectAllUsers } from "@/src/reduxStore/states/general";
 
 export function EvaluationSets() {
     const dispatch = useDispatch();
 
     const projectId = useSelector(selectProjectId);
+    const users = useSelector(selectAllUsers);
+    const usersDict = arrayToDict(users, 'id');
+
     const [evaluationSets, setEvaluationSets] = useState([]);
     const [preparedValues, setPreparedValues] = useState([]);
 
@@ -27,7 +32,7 @@ export function EvaluationSets() {
 
     useEffect(() => {
         if (!evaluationSets) return;
-        setPreparedValues(prepareTableBodyEvaluationSets(evaluationSets, viewEvalSetRecordsModal));
+        setPreparedValues(prepareTableBodyEvaluationSets(evaluationSets, usersDict, viewEvalSetRecordsModal));
     }, [evaluationSets]);
 
     function viewEvalSetRecordsModal(evaluationSets: any[]) {

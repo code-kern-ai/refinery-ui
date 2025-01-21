@@ -1,8 +1,7 @@
 import Modal from "@/src/components/shared/modal/Modal";
-import { RecordDisplay } from "@/src/components/shared/record-display/RecordDisplay";
-import { selectOnAttributeEmbeddings, selectVisibleAttributesDataBrowser } from "@/src/reduxStore/states/pages/settings";
+import { selectOnAttributeEmbeddings } from "@/src/reduxStore/states/pages/settings";
 import { selectProjectId } from "@/src/reduxStore/states/project";
-import { createEvaluationGroups, createEvaluationRun, createEvaluationSet, getEvaluationGroups, getEvaluationRuns, getEvaluationSets, recordSearchContains } from "@/src/services/base/playground";
+import { createEvaluationRun } from "@/src/services/base/playground";
 import { Embedding } from "@/src/types/components/projects/projectId/settings/embeddings";
 import { EvaluationGroup } from "@/src/types/components/projects/projectId/settings/playground";
 import { ModalButton, ModalEnum } from "@/src/types/shared/modal";
@@ -12,14 +11,13 @@ import { useSelector } from "react-redux";
 
 const ACCEPT_BUTTON = { buttonCaption: 'Create', useButton: true };
 
-export default function CreateEvaluationRunModal() {
+export default function CreateEvaluationRunModal({ evaluationGroups }) {
     const projectId = useSelector(selectProjectId);
     const onAttributeEmbeddings = useSelector(selectOnAttributeEmbeddings);
 
     const [acceptButton, setAcceptButton] = useState<ModalButton>(ACCEPT_BUTTON);
     const [selectedEmbedding, setSelectedEmbedding] = useState<Embedding>(null);
     const [evaluationGroup, setEvaluationGroup] = useState<EvaluationGroup>(null);
-    const [evaluationGroups, setEvaluationGroups] = useState([]);
 
     const createEvaluationRunPost = useCallback(() => {
         createEvaluationRun(projectId, selectedEmbedding.id, evaluationGroup.id, (res) => {
@@ -31,14 +29,6 @@ export default function CreateEvaluationRunModal() {
     useEffect(() => {
         setAcceptButton({ ...acceptButton, emitFunction: createEvaluationRunPost, disabled: !selectedEmbedding || !evaluationGroup });
     }, [selectedEmbedding, evaluationGroup]);
-
-    useEffect(() => {
-        if (!projectId) return;
-        getEvaluationGroups(projectId, (res) => {
-            setEvaluationGroups(res);
-        });
-    }, [projectId]);
-
 
 
     return <Modal modalName={ModalEnum.EVALUATION_RUN} acceptButton={acceptButton}>

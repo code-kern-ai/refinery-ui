@@ -8,11 +8,15 @@ import { getEvaluationGroups, getEvaluationSetById } from "@/src/services/base/p
 import ViewEvaluationGroupModal from "./ViewEvaluationGroupModal";
 import KernTable from "@/submodules/react-components/components/kern-table/KernTable";
 import { EVALUATION_GROUPS_TABLE_HEADER, prepareTableBodyEvaluationGroups } from "@/src/util/table-preparations/evaluation-groups";
+import { selectAllUsers } from "@/src/reduxStore/states/general";
+import { arrayToDict } from "@/submodules/javascript-functions/general";
 
 export function EvaluationGroups() {
     const dispatch = useDispatch();
 
     const projectId = useSelector(selectProjectId);
+    const users = useSelector(selectAllUsers);
+    const usersDict = arrayToDict(users, 'id');
 
     const [evaluationGroups, setEvaluationGroups] = useState([]);
     const [preparedValues, setPreparedValues] = useState([]);
@@ -26,7 +30,7 @@ export function EvaluationGroups() {
 
     useEffect(() => {
         if (!evaluationGroups) return;
-        setPreparedValues(prepareTableBodyEvaluationGroups(evaluationGroups, viewSetsModal));
+        setPreparedValues(prepareTableBodyEvaluationGroups(evaluationGroups, usersDict, viewSetsModal));
     }, [evaluationGroups]);
 
     function viewSetsModal(setIds: string[]) {

@@ -3,11 +3,47 @@ import CreateEvaluationRunModal from "./CreateEvaluationRunModal";
 import { openModal } from "@/src/reduxStore/states/modal";
 import { useDispatch, useSelector } from "react-redux";
 import { selectProjectId } from "@/src/reduxStore/states/project";
+import KernTable from "@/submodules/react-components/components/kern-table/KernTable";
+import { EVALUATION_RUN_TABLE_HEADER, prepareTableBodyEvaluationRun } from "@/src/util/table-preparations/evaluation-runs";
+import { useEffect, useState } from "react";
+import { getEvaluationGroups, getEvaluationRuns } from "@/src/services/base/playground";
+import { selectAllUsers } from "@/src/reduxStore/states/general";
+import { arrayToDict } from "@/submodules/javascript-functions/general";
+import { selectOnAttributeEmbeddings } from "@/src/reduxStore/states/pages/settings";
 
 export default function EvaluationRuns() {
     const dispatch = useDispatch();
 
     const projectId = useSelector(selectProjectId);
+    const users = useSelector(selectAllUsers);
+    const usersDict = arrayToDict(users, 'id');
+    const onAttributeEmbeddings = useSelector(selectOnAttributeEmbeddings);
+    const embeddingsDict = arrayToDict(onAttributeEmbeddings, 'id');
+
+    const [preparedValues, setPreparedValues] = useState([]);
+    const [evaluationRuns, setEvaluationRuns] = useState([]);
+    const [evaluationGroups, setEvaluationGroups] = useState([]);
+    const [evaluationDict, setEvaluationDict] = useState(null);
+
+    useEffect(() => {
+        if (!projectId) return;
+        getEvaluationRuns(projectId, (res) => {
+            setEvaluationRuns(res);
+        });
+        getEvaluationGroups(projectId, (res) => {
+            setEvaluationGroups(res);
+            setEvaluationDict(arrayToDict(res, 'id'));
+        });
+    }, [projectId]);
+
+    useEffect(() => {
+        if (!evaluationRuns || !evaluationDict) return;
+        setPreparedValues(prepareTableBodyEvaluationRun(evaluationRuns, usersDict, embeddingsDict, evaluationDict, navigateToDetails));
+    }, [evaluationRuns, evaluationDict]);
+
+    function navigateToDetails(evaluationRunId: string) {
+
+    }
 
     return <>
         {projectId != null && <div className="p-4 bg-gray-100 h-full flex-1 flex flex-col overflow-y-auto">
@@ -22,14 +58,14 @@ export default function EvaluationRuns() {
                     className={`ml-auto bg-green-100 border border-green-400 text-green-700 text-xs font-semibold px-4 py-2 rounded-md cursor-pointer opacity-100 hover:bg-green-200 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50`}
                     onClick={() => dispatch(openModal(ModalEnum.EVALUATION_RUN))}>Create evaluation run</button>
             </div >
-            {/* <KernTable
-                   headers={EVALUATION_GROUPS_TABLE_HEADER}
-                   values={preparedValues}
-                   config={{
-                       addBorder: true
-                   }}
-               /> */}
+            <KernTable
+                headers={EVALUATION_RUN_TABLE_HEADER}
+                values={preparedValues}
+                config={{
+                    addBorder: true
+                }}
+            />
         </div>}
-        <CreateEvaluationRunModal />
+        <CreateEvaluationRunModal evaluationGroups={evaluationGroups} />
     </>
 }
