@@ -1,3 +1,4 @@
+import { EvaluationRunState } from "@/src/types/components/projects/projectId/settings/playground";
 import { parseUTC } from "@/submodules/javascript-functions/date-parser";
 
 export const EVALUATION_RUN_TABLE_HEADER = [{ column: "Embedding", id: "embedding" }, { column: "Evaluation group", id: "evaluationGroup" }, { column: 'Created At', id: 'createdAt' }, { column: 'Created By', id: 'createdBy' }, { column: "State", id: "state" }, { column: "Run details", id: "runDetails" }];
@@ -32,6 +33,7 @@ export function prepareTableBodyEvaluationRun(evaluationRuns, usersDict, embeddi
                 type: 'Component',
                 component: 'ViewCell',
                 onClick: () => navigateToDetails(run.id),
+                disabled: run.state !== EvaluationRunState.SUCCESS
             }
 
         ];

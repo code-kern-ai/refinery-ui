@@ -91,3 +91,8 @@ export function createEvaluationRun(projectId, embeddingId: string, evaluationGr
     }
     jsonFetchWrapper(finalUrl, FetchType.POST, onResult, JSON.stringify(body));
 }
+
+export function getEvaluationRunById(projectId: string, evaluationRunId: string, onResult: (result: any) => void) {
+    const finalUrl = `${playgroundEndpoint}/${projectId}/evaluation-runs/${evaluationRunId}`;
+    jsonFetchWrapper(finalUrl, FetchType.GET, onResult);
+}

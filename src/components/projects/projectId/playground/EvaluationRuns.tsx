@@ -10,9 +10,11 @@ import { getEvaluationGroups, getEvaluationRuns } from "@/src/services/base/play
 import { selectAllUsers } from "@/src/reduxStore/states/general";
 import { arrayToDict } from "@/submodules/javascript-functions/general";
 import { selectOnAttributeEmbeddings } from "@/src/reduxStore/states/pages/settings";
+import { useRouter } from "next/router";
 
 export default function EvaluationRuns() {
     const dispatch = useDispatch();
+    const router = useRouter();
 
     const projectId = useSelector(selectProjectId);
     const users = useSelector(selectAllUsers);
@@ -47,7 +49,7 @@ export default function EvaluationRuns() {
     }, [evaluationRuns, evaluationDict, embeddingsDict]);
 
     function navigateToDetails(evaluationRunId: string) {
-
+        router.push(`/projects/${projectId}/playground/${evaluationRunId}`);
     }
 
     return <>
