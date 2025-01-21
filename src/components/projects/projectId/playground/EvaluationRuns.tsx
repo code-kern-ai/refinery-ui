@@ -18,12 +18,12 @@ export default function EvaluationRuns() {
     const users = useSelector(selectAllUsers);
     const usersDict = arrayToDict(users, 'id');
     const onAttributeEmbeddings = useSelector(selectOnAttributeEmbeddings);
-    const embeddingsDict = arrayToDict(onAttributeEmbeddings, 'id');
 
     const [preparedValues, setPreparedValues] = useState([]);
     const [evaluationRuns, setEvaluationRuns] = useState([]);
     const [evaluationGroups, setEvaluationGroups] = useState([]);
     const [evaluationDict, setEvaluationDict] = useState(null);
+    const [embeddingsDict, setEmbeddingsDict] = useState(null);
 
     useEffect(() => {
         if (!projectId) return;
@@ -37,9 +37,14 @@ export default function EvaluationRuns() {
     }, [projectId]);
 
     useEffect(() => {
-        if (!evaluationRuns || !evaluationDict) return;
+        if (!onAttributeEmbeddings || onAttributeEmbeddings.length == 0) return;
+        setEmbeddingsDict(arrayToDict(onAttributeEmbeddings, 'id'));
+    }, [onAttributeEmbeddings]);
+
+    useEffect(() => {
+        if (!evaluationRuns || !evaluationDict || !embeddingsDict) return;
         setPreparedValues(prepareTableBodyEvaluationRun(evaluationRuns, usersDict, embeddingsDict, evaluationDict, navigateToDetails));
-    }, [evaluationRuns, evaluationDict]);
+    }, [evaluationRuns, evaluationDict, embeddingsDict]);
 
     function navigateToDetails(evaluationRunId: string) {
 
