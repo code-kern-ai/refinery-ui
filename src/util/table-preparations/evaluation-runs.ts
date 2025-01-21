@@ -9,7 +9,7 @@ export function prepareTableBodyEvaluationRun(evaluationRuns, usersDict, embeddi
         const currentRow = [
             {
                 type: 'text',
-                value: embeddingsDict[run.embeddingId].name
+                value: embeddingsDict[run.embeddingId]?.name
             },
             {
                 type: 'text',
