@@ -1,19 +1,23 @@
+import { openModal, setModalStates } from "@/src/reduxStore/states/modal";
+import { ModalEnum } from "@/src/types/shared/modal";
 import { selectOnAttributeEmbeddings } from "@/src/reduxStore/states/pages/settings";
 import { selectProjectId } from "@/src/reduxStore/states/project";
 import { createEvaluationSet, getSearchResults } from "@/src/services/base/playground";
 import { Embedding } from "@/src/types/components/projects/projectId/settings/embeddings";
 import KernDropdown from "@/submodules/react-components/components/KernDropdown";
 import { useState } from "react";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { RecordDisplay } from "@/src/components/shared/record-display/RecordDisplay";
 import { selectVisibleAttributesDataBrowser } from "@/src/reduxStore/states/pages/settings";
 import LoadingIcon from "@/submodules/react-components/components/LoadingIcon";
-import { IconChevronRight } from '@tabler/icons-react'
+import { IconChevronRight, IconChevronDown } from '@tabler/icons-react'
 import { useRouter } from "next/router";
+import PlaygroundSearchMetaFilterModal from "./PlaygroundSearchMetaFilterModal";
 
 
 export function PlaygroundSearch() {
     const router = useRouter();
+    const dispatch = useDispatch();
 
     const projectId = useSelector(selectProjectId);
     const onAttributeEmbeddings = useSelector(selectOnAttributeEmbeddings);
@@ -24,7 +28,7 @@ export function PlaygroundSearch() {
     const [question, setQuestion] = useState("");
     const [searchResults, setSearchResults] = useState([]);
     const [limit, setLimit] = useState(10);
-
+    const [toggleMetaFilter, setToggleMetaFilter] = useState(false);
     function getSearchResultsPost() {
         setLoading(true);
         getSearchResults(projectId, selectedEmbedding.id, question, limit, (result) => {
@@ -50,10 +54,13 @@ export function PlaygroundSearch() {
             ></textarea>
             <div className="flex items-center justify-between">
                 <div className="flex items-center gap-x-2 justify-between">
-                    <button onClick={() => { }}
+                    <button onClick={() => dispatch(openModal(ModalEnum.EVALUATION_META_FILTER_APPLY))} disabled={!selectedEmbedding}
                         className="flex items-center bg-white text-gray-700 text-xs font-semibold px-3 py-2 rounded-md border border-gray-300 hover:bg-gray-50 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed">
                         Meta
-                        <span><IconChevronRight className="ml-1 h-4 w-4 text-gray-500" /></span>
+                        <span><IconChevronRight className="ml-1 h-4 w-4 text-gray-500" style={{
+                            transform: toggleMetaFilter ? 'rotate(90deg)' : 'rotate(0deg)',
+                            transition: 'transform 0.1s ease'
+                        }} /></span>
                     </button>
                     <div className="flex items-center gap-x-2">
                         <span>Limit</span>
@@ -90,5 +97,6 @@ export function PlaygroundSearch() {
                 <LoadingIcon size="lg" />
             </div>}
         </div>
+        <PlaygroundSearchMetaFilterModal selectedEmbedding={selectedEmbedding} />
     </div >
 }
