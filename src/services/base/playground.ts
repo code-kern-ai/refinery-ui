@@ -28,6 +28,11 @@ export function getEvaluationSets(projectId: string, onResult: (result: any) => 
     jsonFetchWrapper(finalUrl, FetchType.GET, onResult);
 }
 
+export function getEvaluationSetsByGroupId(projectId: string, evaluationGroupId: string, onResult: (result: any) => void) {
+    const finalUrl = `${playgroundEndpoint}/${projectId}/evaluation-sets-by-group/${evaluationGroupId}`;
+    jsonFetchWrapper(finalUrl, FetchType.GET, onResult);
+}
+
 export function getEvaluationSetById(projectId: string, evaluationSetId: string, onResult: (result: any) => void) {
     const finalUrl = `${playgroundEndpoint}/${projectId}/evaluation-sets/${evaluationSetId}`;
     jsonFetchWrapper(finalUrl, FetchType.GET, onResult);

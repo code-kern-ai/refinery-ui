@@ -21,7 +21,7 @@ export function prepareTableBodyEvaluationGroups(evaluationGroups, openModal) {
             {
                 type: 'Component',
                 component: 'ViewCell',
-                onClick: () => openModal(group.evaluationSetIds),
+                onClick: () => openModal(group.id),
             }
         ];
         finalData.push(currentRow);

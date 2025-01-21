@@ -15,7 +15,7 @@ export default function ViewEvaluationGroupModal() {
 
                 <div className={`overflow-y-auto max-height-modal text-sm text-gray-500 my-2 ${style.scrollableSize}`}>
                     {modalViewEvaluationGroup.sets.map((set, index) => {
-                        return <div>Question: {set.question}</div>
+                        return <div key={index}>Question: {set.question}</div>
                     })}
                 </div>
             </Modal>

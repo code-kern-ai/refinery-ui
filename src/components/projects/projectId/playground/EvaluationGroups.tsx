@@ -4,7 +4,7 @@ import { ModalEnum } from "@/src/types/shared/modal";
 import { useDispatch, useSelector } from "react-redux";
 import { selectProjectId } from "@/src/reduxStore/states/project";
 import { useEffect, useState } from "react";
-import { getEvaluationGroups, getEvaluationSetById } from "@/src/services/base/playground";
+import { getEvaluationGroups, getEvaluationSetsByGroupId } from "@/src/services/base/playground";
 import ViewEvaluationGroupModal from "./ViewEvaluationGroupModal";
 import KernTable from "@/submodules/react-components/components/kern-table/KernTable";
 import { EVALUATION_GROUPS_TABLE_HEADER, prepareTableBodyEvaluationGroups } from "@/src/util/table-preparations/evaluation-groups";
@@ -29,13 +29,11 @@ export function EvaluationGroups() {
         setPreparedValues(prepareTableBodyEvaluationGroups(evaluationGroups, viewSetsModal));
     }, [evaluationGroups]);
 
-    function viewSetsModal(setIds: string[]) {
+    function viewSetsModal(groupId: string) {
         let setsArr = [];
-        setIds.forEach((setId) => {
-            getEvaluationSetById(projectId, setId, (res) => {
-                setsArr = [...setsArr, res];
-                dispatch(setModalStates(ModalEnum.VIEW_EVALUATION_GROUP, { open: true, sets: setsArr }));
-            });
+        getEvaluationSetsByGroupId(projectId, groupId, (res) => {
+            setsArr = res;
+            dispatch(setModalStates(ModalEnum.VIEW_EVALUATION_GROUP, { open: true, sets: setsArr }));
         });
     }
 
