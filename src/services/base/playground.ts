@@ -30,6 +30,7 @@ export function deleteEvaluationSetsPost(projectId: string, evaluationSetIds: st
     }
     jsonFetchWrapper(finalUrl, FetchType.DELETE, onResult, JSON.stringify(body));
 }
+
 export function getEvaluationSets(projectId: string, onResult: (result: any) => void) {
     const finalUrl = `${playgroundEndpoint}/${projectId}/evaluation-sets`;
     jsonFetchWrapper(finalUrl, FetchType.GET, onResult);
@@ -52,6 +53,14 @@ export function createEvaluationGroups(projectId: string, evaluationSetIds: stri
         name: name
     }
     jsonFetchWrapper(finalUrl, FetchType.POST, onResult, JSON.stringify(body));
+}
+
+export function deleteEvaluationGroupsPost(projectId: string, evaluationGroupIds: string[], onResult: (result: any) => void) {
+    const finalUrl = `${playgroundEndpoint}/${projectId}/evaluation-groups`;
+    const body = {
+        evaluationGroupIds: evaluationGroupIds
+    }
+    jsonFetchWrapper(finalUrl, FetchType.DELETE, onResult, JSON.stringify(body));
 }
 
 export function getEvaluationGroups(projectId: string, onResult: (result: any) => void) {

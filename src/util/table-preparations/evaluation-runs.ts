@@ -13,7 +13,7 @@ export function prepareTableBodyEvaluationRun(evaluationRuns, usersDict, embeddi
             },
             {
                 type: 'text',
-                value: evaluationGroupsDict[run.evaluationGroupId].name
+                value: evaluationGroupsDict[run.evaluationGroupId]?.name
             },
             {
                 type: 'text',
@@ -21,7 +21,7 @@ export function prepareTableBodyEvaluationRun(evaluationRuns, usersDict, embeddi
             },
             {
                 type: 'text',
-                value: usersDict[run.createdBy].firstName + ' ' + usersDict[run.createdBy].lastName
+                value: usersDict[run.createdBy]?.firstName + ' ' + usersDict[run.createdBy]?.lastName
             },
             {
                 type: 'Component',

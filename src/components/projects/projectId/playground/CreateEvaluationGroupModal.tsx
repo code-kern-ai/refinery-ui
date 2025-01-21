@@ -9,7 +9,11 @@ import { useSelector } from "react-redux";
 
 const ACCEPT_BUTTON = { buttonCaption: 'Create', useButton: true };
 
-export default function CreateEvaluationGroupModal() {
+type CreateEvaluationGroupModalProps = {
+    refetchEvaluationGroups: () => void;
+}
+
+export default function CreateEvaluationGroupModal(props: CreateEvaluationGroupModalProps) {
     const projectId = useSelector(selectProjectId);
     const attributes = useSelector(selectVisibleAttributesDataBrowser);
 
@@ -23,6 +27,7 @@ export default function CreateEvaluationGroupModal() {
         createEvaluationGroups(projectId, selectedSets.map((set) => set.id), name, (res) => {
             setName("");
             setSelectedSets([]);
+            props.refetchEvaluationGroups();
         });
     }, [name, selectedSets, projectId]);
 
