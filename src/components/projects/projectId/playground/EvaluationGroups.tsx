@@ -102,7 +102,7 @@ export function EvaluationGroups() {
             </div >
             {evaluationGroups.length > 0 ?
                 <KernTable
-                    headers={EVALUATION_GROUPS_TABLE_HEADER}
+                    headers={preparedHeaders}
                     values={preparedValues}
                     config={{
                         addBorder: true
