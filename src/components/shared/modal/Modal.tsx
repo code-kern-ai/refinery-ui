@@ -104,7 +104,7 @@ export default function Modal(props: any) {
 
         if (button.closeAfterClick) setOpen(false);
     }
-
+    const modalWidth = props.modalWidth ? props.modalWidth : "sm:w-full sm:max-w-2xl";
 
     return (
         <Transition.Root show={modal.open} as={Fragment}>
@@ -132,7 +132,7 @@ export default function Modal(props: any) {
                             leaveFrom="opacity-100 translate-y-0 sm:scale-100"
                             leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
                         >
-                            <Dialog.Panel className="relative transform rounded-lg bg-white px-4 pt-5 pb-4 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-2xl sm:p-6 modal-width">
+                            <Dialog.Panel className={"relative transform rounded-lg bg-white px-4 pt-5 pb-4 text-left shadow-xl transition-all sm:my-8 sm:p-6 modal-width " + modalWidth}>
                                 <div className="mt-3 text-center sm:mt-0">
                                     <div>{props.children}</div>
                                 </div>

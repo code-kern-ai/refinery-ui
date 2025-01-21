@@ -34,7 +34,6 @@ import { getLabelingTasksByProjectId, getProjectTokenization } from "@/src/servi
 import { getAttributeByAttributeId, updateAttribute } from "@/src/services/base/project-setting";
 import { Application, CurrentPage } from "@/submodules/react-components/hooks/web-socket/constants";
 import { VisitBricksButton } from "@/src/components/shared/bricks/VisitBricksButton";
-import LLMResponsePlayground from "./LLMResponsePlayground";
 import LLMResponseConfig from "./LLMResponseConfig";
 import useDebounce from "@/submodules/react-components/hooks/useHooks/useDebounce";
 import useRefFor from "@/submodules/react-components/hooks/useRefFor";
@@ -392,7 +391,7 @@ export default function AttributeCalculation() {
                 </div>
                 {
                     currentAttribute.dataType == DataTypeEnum.LLM_RESPONSE &&
-                    <LLMResponseConfig fullLlmConfig={additionalConfigTmp} setFullLlmConfig={setAdditionalConfigTmp} />
+                    <LLMResponseConfig attributeId={currentAttribute?.id} fullLlmConfig={additionalConfigTmp} setFullLlmConfig={setAdditionalConfigTmp} />
                 }
 
 
