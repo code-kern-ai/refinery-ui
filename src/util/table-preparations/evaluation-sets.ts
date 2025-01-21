@@ -1,7 +1,7 @@
 import { parseUTC } from "@/submodules/javascript-functions/date-parser";
 
-export const EVALUATION_SETS_TABLE_HEADER = [{ column: "", id: "checkboxes", hasCheckboxes: true, checked: false }, { column: 'Question', id: 'question' }, { column: 'Created At', id: 'createdAt' }, { column: 'Created By', id: 'createdBy' }, { column: 'Records', id: 'records' }];
-
+export const EVALUATION_SETS_TABLE_HEADER = [{ column: "", id: "checkboxes", hasCheckboxes: true, checked: false }, { column: 'Question', id: 'question' }, { column: 'Created At', id: 'createdAt' }, { column: 'Created By', id: 'createdBy' }, { column: 'Records', id: 'records' }, { column: "View", id: 'viewRecords' }];
+const MAX_QUESTION_SHOW = 100;
 export function prepareTableBodyEvaluationSets(evaluationSets, selectedEvaluationSets, setSelectedEvaluationSets, usersDict, openModal) {
     let finalData = [];
     evaluationSets.forEach((set) => {
@@ -20,7 +20,7 @@ export function prepareTableBodyEvaluationSets(evaluationSets, selectedEvaluatio
             },
             {
                 type: 'text',
-                value: set.question
+                value: set.question.length > MAX_QUESTION_SHOW ? set.question.slice(0, MAX_QUESTION_SHOW) + '...' : set.question
             },
             {
                 type: 'text',
@@ -31,10 +31,14 @@ export function prepareTableBodyEvaluationSets(evaluationSets, selectedEvaluatio
                 value: usersDict[set.createdBy]?.firstName + ' ' + usersDict[set.createdBy]?.lastName
             },
             {
+                type: 'text',
+                value: Number(set.recordIds?.length)
+            },
+            {
                 type: 'Component',
                 component: 'ViewCell',
                 onClick: () => openModal(set.recordIds),
-            }
+            },
         ];
         finalData.push(currentRow);
     });
