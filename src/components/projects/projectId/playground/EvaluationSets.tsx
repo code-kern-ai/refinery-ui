@@ -30,9 +30,7 @@ export function EvaluationSets() {
     const [selectedEvaluationSets, setSelectedEvaluationSets] = useState(new Set<string>());
     const [checked, setChecked] = useState(false);
     const [indeterminate, setIndeterminate] = useState(false);
-
     const checkbox = useRef<any>(null);
-
 
     useEffect(() => {
         if (!projectId) return;
@@ -71,14 +69,13 @@ export function EvaluationSets() {
             setEvaluationSets(res);
             setSelectedEvaluationSets(new Set<string>());
         });
-
     }, [projectId]);
 
     function toggleAll() {
         if (checked || indeterminate) setSelectedEvaluationSets(new Set<string>());
         else setSelectedEvaluationSets(new Set<string>(evaluationSets.map(x => x.id)));
-        setChecked(!checked && !indeterminate)
-        setIndeterminate(false)
+        setChecked(!checked && !indeterminate);
+        setIndeterminate(false);
     }
 
     function viewEvalSetRecordsModal(evaluationSets: any[]) {

@@ -78,7 +78,6 @@ export function EvaluationGroups() {
             setEvaluationGroups(res);
             setSelectedEvaluationGroups(new Set<string>());
         });
-
     }, [projectId]);
 
     function toggleAll() {
@@ -87,9 +86,6 @@ export function EvaluationGroups() {
         setChecked(!checked && !indeterminate)
         setIndeterminate(false)
     }
-
-
-
 
     return <>
         {projectId != null && <div className="p-4 bg-gray-100 h-full flex-1 flex flex-col overflow-y-auto">
