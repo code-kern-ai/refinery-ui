@@ -211,6 +211,9 @@ const initialState: Modals = {
     },
     [ModalEnum.EVALUATION_RUN]: {
         open: false,
+    },
+    [ModalEnum.EVALUATION_META_FILTER_APPLY]: {
+        open: false,
     }
 };
 
