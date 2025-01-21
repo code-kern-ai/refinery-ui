@@ -16,9 +16,20 @@ import { searchRecordsExtended } from "@/src/services/base/data-browser";
 import { generateRandomSeed } from "@/src/util/components/projects/projectId/data-browser/search-groups-helper";
 import KernButton from "@/submodules/react-components/components/kern-button/KernButton";
 import { DataTypeEnum } from "@/src/types/shared/general";
+import { capitalizeFirst } from "@/submodules/javascript-functions/case-types-parser";
 
 const ACCEPT_BUTTON = { buttonCaption: "Use current values for attribute", useButton: true };
-const displayStates = [AttributeState.AUTOMATICALLY_CREATED, AttributeState.UPLOADED, AttributeState.USABLE]
+const DISPLAY_STATES = [AttributeState.AUTOMATICALLY_CREATED, AttributeState.UPLOADED, AttributeState.USABLE]
+
+
+const TEMPLATE_EXAMPLES = {
+    REASONED_CLICKBAIT: {
+        templatePrompt: "You are running your own information network and need to ensure no clickbait news articles are published. To ensure your answer can be validated always provide a reason and your final result being either 'yes' or 'no'.",
+        questionPrompt: "News article: '{{headline}}'"
+    }
+}
+const TEMPLATE_OPTIONS = Object.keys(TEMPLATE_EXAMPLES).map((key) => ({ name: capitalizeFirst(key), value: key }));
+
 
 export default function LLMPlaygroundModal() {
     const projectId = useSelector(selectProjectId);
@@ -100,11 +111,11 @@ export default function LLMPlaygroundModal() {
 
     const recordKeys = useMemo(() => {
         if (!attributes) return [];
-        return attributes.filter(a => displayStates.includes(a.state)).map(a => ({ name: a.name, dataType: a.dataType }));
+        return attributes.filter(a => DISPLAY_STATES.includes(a.state)).map(a => ({ name: a.name, dataType: a.dataType }));
     }, [attributes])
 
     return (<Modal modalName={ModalEnum.LLM_PLAYGROUND} acceptButton={acceptButton} modalWidth="ml-10 w-full max-w-[calc(100vw-15rem)]">
-        <div className="pr-5 max-h-[calc(100vh-15rem)] overflow-y-auto">
+        <div className="pl-2 pr-5 max-h-[calc(100vh-15rem)] overflow-y-auto">
             <div className="flex flex-row items-center justify-center">
                 <span className="text-lg flex flex-row gap-x-2 text-gray-900 font-medium items-center">
                     LLM Playground <IconPlayCardStar className="h-6 w-6" />
@@ -134,7 +145,14 @@ export default function LLMPlaygroundModal() {
                         </Fragment>)}
                     </div>
                 </div>}
-
+                <div className="my-2">
+                    <KernDropdown
+                        buttonName="Load config template"
+                        options={TEMPLATE_OPTIONS}
+                        dropdownWidth="w-52"
+                        selectedOption={(option) => setFullLlmConfig(p => ({ ...p, ...TEMPLATE_EXAMPLES[option.value] }))}
+                    />
+                </div>
                 {fullLlmConfig && <div className="mt-2 flex flex-row flex-nowrap w-full items-center gap-x-2">
                     <label className="block text-sm font-medium text-gray-900 whitespace-nowrap">Provider</label>
                     <KernDropdown
