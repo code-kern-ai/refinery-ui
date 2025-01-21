@@ -44,7 +44,7 @@ export default function QuestionPlayground() {
     }
 
     return <>
-        {projectId && <><div className={`grid overflow-hidden min-h-full grid-cols-2 p-4`}>
+        {projectId && <><div className={`grid overflow-hidden min-h-full p-4`}>
             <div className={`flex max-w-full overflow-x-auto border-b-2 border-b-gray-200`}>
                 {PLAYGROUND_TABS.map((tab, index) => <div key={tab}>
                     <div className={`cursor-pointer text-sm leading-5 font-medium mr-10 py-5 ${openTab == index ? 'text-indigo-700 ' + style.borderBottom : 'text-gray-500'}`} onClick={() => toggleTabs(index)}>{tab}</div>
