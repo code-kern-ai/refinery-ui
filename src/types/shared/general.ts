@@ -20,4 +20,5 @@ export enum DataTypeEnum {
     FLOAT = "FLOAT",
     BOOLEAN = "BOOLEAN",
     EMBEDDING_LIST = "EMBEDDING_LIST",
+    LLM_RESPONSE = "LLM_RESPONSE"
 }

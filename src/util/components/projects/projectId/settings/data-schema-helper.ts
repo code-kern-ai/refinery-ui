@@ -8,6 +8,7 @@ export const DATA_TYPES = [
     { name: 'Float', value: 'FLOAT' },
     { name: 'Boolean', value: 'BOOLEAN' },
     { name: 'Embedding List', value: 'EMBEDDING_LIST' },
+    { name: 'LLM Response', value: 'LLM_RESPONSE' },
 ];
 
 export const ATTRIBUTES_VISIBILITY_STATES = [

@@ -48,8 +48,19 @@ export class AttributeCodeLookup {
     return [r.text for r in record["str_attribute"].sents]
                     `
                     }
+                    case 'LLM_RESPONSE': return {
+                        code: `                  
+def ac(record):
+    # no post processing of answer
+
+    llm_response = get_llm_response()
+    return llm_response.get("result") or "no result provided"
+                    `
+                    }
                     default: return {
-                        code: ''
+                        code: `def ac(record):
+    return "Hello World"
+                    `
                     }
                 }
             }

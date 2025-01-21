@@ -2,7 +2,7 @@ import Statuses from "@/src/components/shared/statuses/Statuses";
 import { selectAllLookupLists, setAllLookupLists } from "@/src/reduxStore/states/pages/lookup-lists";
 import { selectAttributes, selectVisibleAttributeAC, setAllAttributes, setLabelingTasksAll, updateAttributeById } from "@/src/reduxStore/states/pages/settings";
 import { selectProjectId } from "@/src/reduxStore/states/project"
-import { Attribute, AttributeState } from "@/src/types/components/projects/projectId/settings/data-schema";
+import { Attribute, AttributeState, LLMConfig } from "@/src/types/components/projects/projectId/settings/data-schema";
 import { DataTypeEnum } from "@/src/types/shared/general";
 import { postProcessCurrentAttribute } from "@/src/util/components/projects/projectId/settings/attribute-calculation-helper";
 import { ATTRIBUTES_VISIBILITY_STATES, DATA_TYPES, getTooltipVisibilityState } from "@/src/util/components/projects/projectId/settings/data-schema-helper";
@@ -24,7 +24,6 @@ import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
 import { selectAllUsers, selectOrganizationId, setComments } from "@/src/reduxStore/states/general";
 import { CommentDataManager } from "@/src/util/classes/comments";
 import { CommentType } from "@/src/types/shared/comments";
-import { AttributeCodeLookup } from "@/src/util/classes/attribute-calculation";
 import KernDropdown from "@/submodules/react-components/components/KernDropdown";
 import { useWebsocket } from "@/submodules/react-components/hooks/web-socket/useWebsocket";
 import { postProcessLabelingTasksSchema } from "@/src/util/components/projects/projectId/settings/labeling-tasks-helper";
@@ -35,8 +34,19 @@ import { getLabelingTasksByProjectId, getProjectTokenization } from "@/src/servi
 import { getAttributeByAttributeId, updateAttribute } from "@/src/services/base/project-setting";
 import { Application, CurrentPage } from "@/submodules/react-components/hooks/web-socket/constants";
 import { VisitBricksButton } from "@/src/components/shared/bricks/VisitBricksButton";
+import LLMResponsePlayground from "./LLMResponsePlayground";
+import LLMResponseConfig from "./LLMResponseConfig";
+import useDebounce from "@/submodules/react-components/hooks/useHooks/useDebounce";
+import useRefFor from "@/submodules/react-components/hooks/useRefFor";
+import { simpleDictCompare } from "@/submodules/javascript-functions/validations";
 
 const EDITOR_OPTIONS = { theme: 'vs-light', language: 'python', readOnly: false };
+
+export const LLM_PROVIDER_OPTIONS = [
+    'Open AI',
+    'Azure'
+];
+
 
 export default function AttributeCalculation() {
     const router = useRouter();
@@ -59,7 +69,12 @@ export default function AttributeCalculation() {
     const [attributeName, setAttributeName] = useState('');
     const [checkUnsavedChanges, setCheckUnsavedChanges] = useState(false);
     const [enableRunButton, setEnableButton] = useState(false);
+    const [additionalConfigTmp, setAdditionalConfigTmp] = useState<LLMConfig>(null);
 
+    const currentAttributeRef = useRefFor(currentAttribute);
+    const debouncedConfig = useDebounce(additionalConfigTmp, 500);
+
+    useEffect(() => setAdditionalConfigTmp(currentAttribute?.additionalConfig), [currentAttribute?.additionalConfig])
 
     useEffect(() => {
         if (!projectId) return;
@@ -126,6 +141,19 @@ export default function AttributeCalculation() {
             subscription.unsubscribe();
         }
     }, [editorValue, currentAttribute]);
+
+
+    useEffect(() => {
+        if (!currentAttributeRef.current || !currentAttributeRef.current.additionalConfig || simpleDictCompare(currentAttributeRef.current?.additionalConfig, debouncedConfig)) return;
+        const attributeNew = { ...currentAttribute };
+        attributeNew.additionalConfig = { ...debouncedConfig };
+        updateAttribute(projectId, currentAttribute.id, (res) => {
+            setCurrentAttribute(postProcessCurrentAttribute(attributeNew));
+            dispatch(updateAttributeById(attributeNew));
+        }, null, null, null, null, null, debouncedConfig);
+
+    }, [debouncedConfig])
+
 
     function setUpCommentsRequests() {
         const requests = [];
@@ -320,6 +348,19 @@ export default function AttributeCalculation() {
                                 selectedOption={(option: any) => updateDataType(option)} disabled={currentAttribute.state == AttributeState.USABLE} dropdownClasses="z-30" />
                         </Tooltip>
                         {currentAttribute.dataType == DataTypeEnum.EMBEDDING_LIST && <div className="text-gray-700 text-sm ml-3">Only useable for similarity search</div>}
+                        {currentAttribute.dataType == DataTypeEnum.LLM_RESPONSE && <div className="ml-3 flex flex-row flex-nowrap w-full items-center gap-x-2">
+                            <label className="block text-sm font-medium text-gray-900 whitespace-nowrap">Provider</label>
+                            <KernDropdown
+                                buttonName={additionalConfigTmp?.llmIdentifier ?? 'Select LLM provider'}
+                                options={LLM_PROVIDER_OPTIONS}
+                                dropdownWidth="w-52"
+                                selectedOption={(option) => setAdditionalConfigTmp(p => ({ ...p, llmIdentifier: option }))}
+                            />
+                            <label className="block text-sm font-medium text-gray-900 whitespace-nowrap">Api Key</label>
+
+                            <input type="text" value={additionalConfigTmp?.llmConfig.apiKey || ""} onInput={(e: any) => setAdditionalConfigTmp(p => ({ ...p, llmConfig: { ...additionalConfigTmp.llmConfig, apiKey: e.target.value } }))}
+                                className="h-8 text-sm border-gray-300 rounded-md placeholder-italic w-full border text-gray-700 pl-4 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100" />
+                        </div>}
                     </div>
                     <div className="text-sm leading-5 font-medium text-gray-700 inline-block">Attributes</div>
                     <div className="flex flex-row items-center">
@@ -349,8 +390,15 @@ export default function AttributeCalculation() {
                         ))}
                     </div>
                 </div>
+                {
+                    currentAttribute.dataType == DataTypeEnum.LLM_RESPONSE &&
+                    <LLMResponseConfig fullLlmConfig={additionalConfigTmp} setFullLlmConfig={setAdditionalConfigTmp} />
+                }
+
+
+
                 <div className="flex flex-row items-center justify-between my-3">
-                    <div className="text-sm leading-5 font-medium text-gray-700 inline-block mr-2">Editor</div>
+                    <div className="text-sm leading-5 font-medium text-gray-700 inline-block mr-2">{currentAttribute.dataType == DataTypeEnum.LLM_RESPONSE ? 'Postprocessing' : 'Editor'}</div>
                     <div className="flex flex-row flex-nowrap">
                         <VisitBricksButton urlExtension="generators" tooltipPlacement="left" size="small" />
                         <Tooltip content={TOOLTIPS_DICT.ATTRIBUTE_CALCULATION.AVAILABLE_LIBRARIES} placement="bottom" color="invert">

@@ -4,6 +4,7 @@ import { parseContainerLogsData } from "@/submodules/javascript-functions/logs-p
 import { getPythonFunctionRegExMatch } from "@/submodules/javascript-functions/python-functions-parser";
 import { Record } from "@/src/types/components/projects/projectId/settings/attribute-calculation";
 import { ATTRIBUTES_VISIBILITY_STATES, DATA_TYPES } from "./data-schema-helper";
+import { jsonCopy } from "@/submodules/javascript-functions/general";
 
 export function postProcessCurrentAttribute(attribute: Attribute): Attribute {
     if (!attribute) return null;
@@ -25,6 +26,12 @@ export function postProcessCurrentAttribute(attribute: Attribute): Attribute {
             prepareAttribute.saveSourceCode = false
         }
     }
+
+    if (prepareAttribute.additionalConfig) {
+        prepareAttribute.additionalConfig = jsonCopy(prepareAttribute.additionalConfig);
+        if (!prepareAttribute.additionalConfig.llmConfig.apiKey) prepareAttribute.additionalConfig.llmConfig.apiKey = "";
+    }
+
     return prepareAttribute;
 }
 
