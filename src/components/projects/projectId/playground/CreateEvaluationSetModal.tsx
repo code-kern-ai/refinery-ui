@@ -70,7 +70,7 @@ export default function CreateEvaluationSetModal(props: CreateEvaluationSetsModa
                     <div className="flex items-center">
                         <span className="mr-4">Selected results</span>
                     </div>
-                    {selectedRecords && selectedRecords.map((record, index) => (<div key={record.id} className="bg-white overflow-hidden shadow rounded-lg border p-2 relative">
+                    {selectedRecords && selectedRecords.map((record, index) => (<div key={record.id} className="bg-white overflow-hidden shadow rounded-lg border p-2 relative hover:border-red-400 hover:border-opacity-50 cursor-pointer transition-all duration-200 ease-in-out">
                         <RecordDisplay
                             attributes={attributes}
                             record={record}
@@ -90,7 +90,7 @@ export default function CreateEvaluationSetModal(props: CreateEvaluationSetsModa
                             className="w-full h-10 p-2 line-height-textarea border rounded-md border-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100" />
                         <div>Records</div>
                     </div>
-                    {recordList && recordList.map((record, index) => (<div key={record.id} className="bg-white overflow-hidden shadow rounded-lg border m-4 p-2 relative">
+                    {recordList && recordList.map((record, index) => (<div key={record.id} className="bg-white overflow-hidden shadow rounded-lg border m-4 p-2 relative hover:border-green-400 hover:border-opacity-30 cursor-pointer transition-all duration-200 ease-in-out">
                         <RecordDisplay
                             attributes={attributes}
                             record={record}
