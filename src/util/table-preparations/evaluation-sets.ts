@@ -37,7 +37,7 @@ export function prepareTableBodyEvaluationSets(evaluationSets, selectedEvaluatio
             {
                 type: 'Component',
                 component: 'ViewCell',
-                onClick: () => openModal(set.recordIds),
+                onClick: () => openModal(set.recordIds, set.question),
             },
         ];
         finalData.push(currentRow);

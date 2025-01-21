@@ -13,17 +13,20 @@ export default function ViewEvaluationSetsModal() {
     return (<>
         {modalViewEvaluationSets.open && modalViewEvaluationSets.records && <>
             <Modal modalName={ModalEnum.VIEW_EVALUATION_SET}>
-                <h1 className="text-lg text-gray-900 mb-2 text-center">View details</h1>
-                <div><span className="mr-1">{modalViewEvaluationSets.records.length}</span> Records</div>
-                <div className={`overflow-y-auto max-height-modal text-sm text-gray-500 my-2 ${style.scrollableSize}`}>
-                    {modalViewEvaluationSets.records.map((record, index) =>
-                        <div key={index} className="flex flex-col gap-x-3 bg-white rounded-md border border-gray-300 py-2 px-3 m-2">
-                            <RecordDisplay
-                                key={index}
-                                attributes={attributes}
-                                record={record} />
-                        </div>
-                    )}
+                <h1 className="text-lg text-gray-900 mb-2 text-center">Details</h1>
+                <div className="flex flex-col">
+                    <div className="text-left mb-1">{modalViewEvaluationSets.question}</div>
+                    <div className="text-xs text-gray-600 self-start"><span>{modalViewEvaluationSets.records.length}</span> Records</div>
+                    <div className={`overflow-y-auto max-height-modal text-sm text-gray-500 my-1 ${style.scrollableSize}`}>
+                        {modalViewEvaluationSets.records.map((record, index) =>
+                            <div key={index} className="flex flex-col gap-x-3 bg-white rounded-md border border-gray-300 py-2 px-3 my-1">
+                                <RecordDisplay
+                                    key={index}
+                                    attributes={attributes}
+                                    record={record} />
+                            </div>
+                        )}
+                    </div>
                 </div>
             </Modal>
         </>}

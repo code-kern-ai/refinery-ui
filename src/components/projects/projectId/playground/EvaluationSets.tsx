@@ -78,13 +78,13 @@ export function EvaluationSets() {
         setIndeterminate(false);
     }
 
-    function viewEvalSetRecordsModal(evaluationSets: any[]) {
+    function viewEvalSetRecordsModal(recordIds: any[], question) {
         let recordsArr = [];
-        getRecordsBatch(projectId, { recordIds: evaluationSets }, (recordsBatch) => {
+        getRecordsBatch(projectId, { recordIds: recordIds }, (recordsBatch) => {
             recordsBatch.forEach((record) => {
                 recordsArr = [...recordsArr, postProcessRecordByRecordId(record)];
             });
-            dispatch(setModalStates(ModalEnum.VIEW_EVALUATION_SET, { open: true, records: recordsArr }));
+            dispatch(setModalStates(ModalEnum.VIEW_EVALUATION_SET, { open: true, records: recordsArr, question: question }));
         })
     }
 
