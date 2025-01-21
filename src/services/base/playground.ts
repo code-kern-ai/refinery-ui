@@ -23,8 +23,20 @@ export function createEvaluationSet(projectId: string, question: string, recordI
     jsonFetchWrapper(finalUrl, FetchType.POST, onResult, JSON.stringify(body));
 }
 
+export function deleteEvaluationSetsPost(projectId: string, evaluationSetIds: string[], onResult: (result: any) => void) {
+    const finalUrl = `${playgroundEndpoint}/${projectId}/evaluation-sets`;
+    const body = {
+        evaluationSetIds: evaluationSetIds
+    }
+    jsonFetchWrapper(finalUrl, FetchType.DELETE, onResult, JSON.stringify(body));
+}
 export function getEvaluationSets(projectId: string, onResult: (result: any) => void) {
     const finalUrl = `${playgroundEndpoint}/${projectId}/evaluation-sets`;
+    jsonFetchWrapper(finalUrl, FetchType.GET, onResult);
+}
+
+export function getEvaluationSetsByGroupId(projectId: string, evaluationGroupId: string, onResult: (result: any) => void) {
+    const finalUrl = `${playgroundEndpoint}/${projectId}/evaluation-sets-by-group/${evaluationGroupId}`;
     jsonFetchWrapper(finalUrl, FetchType.GET, onResult);
 }
 

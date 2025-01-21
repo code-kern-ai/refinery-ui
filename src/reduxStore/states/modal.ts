@@ -196,6 +196,9 @@ const initialState: Modals = {
         open: false,
         records: []
     },
+    [ModalEnum.DELETE_EVALUATION_SET]: {
+        open: false
+    },
     [ModalEnum.EVALUATION_GROUP]: {
         open: false,
     },

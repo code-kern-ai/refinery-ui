@@ -4,7 +4,7 @@ import { selectVisibleAttributesDataBrowser } from "@/src/reduxStore/states/page
 import { selectProjectId } from "@/src/reduxStore/states/project";
 import { createEvaluationGroups, createEvaluationSet, getEvaluationSets, recordSearchContains } from "@/src/services/base/playground";
 import { ModalButton, ModalEnum } from "@/src/types/shared/modal";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useSelector } from "react-redux";
 
 const ACCEPT_BUTTON = { buttonCaption: 'Create', useButton: true };
@@ -17,6 +17,7 @@ export default function CreateEvaluationGroupModal() {
     const [name, setName] = useState("");
     const [evaluationSets, setEvaluationSets] = useState([]);
     const [selectedSets, setSelectedSets] = useState([]);
+    const isFetchingEvalSets = useRef(false);
 
     const createEvaluationGroupPost = useCallback(() => {
         createEvaluationGroups(projectId, selectedSets.map((set) => set.id), name, (res) => {
@@ -31,8 +32,11 @@ export default function CreateEvaluationGroupModal() {
 
 
     useEffect(() => {
+        if (isFetchingEvalSets.current) return;
+        isFetchingEvalSets.current = true;
         getEvaluationSets(projectId, (res) => {
             setEvaluationSets(res);
+            isFetchingEvalSets.current = false;
         });
     }, [projectId]);
 

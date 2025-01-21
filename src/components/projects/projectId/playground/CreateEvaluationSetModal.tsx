@@ -1,5 +1,6 @@
 import Modal from "@/src/components/shared/modal/Modal";
 import { RecordDisplay } from "@/src/components/shared/record-display/RecordDisplay";
+import ProjectsPage from "@/src/pages/projects";
 import { selectVisibleAttributesDataBrowser } from "@/src/reduxStore/states/pages/settings";
 import { selectProjectId } from "@/src/reduxStore/states/project";
 import { createEvaluationSet, recordSearchContains } from "@/src/services/base/playground";
@@ -10,7 +11,11 @@ import { useSelector } from "react-redux";
 const ACCEPT_BUTTON = { buttonCaption: 'Create', useButton: true };
 const SEARCH_REQUEST = { offset: 0, limit: 20 };
 
-export default function CreateEvaluationSetModal() {
+type CreateEvaluationSetsModalProps = {
+    refetchEvaluationSets: () => void;
+};
+
+export default function CreateEvaluationSetModal(props: CreateEvaluationSetsModalProps) {
     const projectId = useSelector(selectProjectId);
     const attributes = useSelector(selectVisibleAttributesDataBrowser);
 
@@ -25,6 +30,7 @@ export default function CreateEvaluationSetModal() {
         createEvaluationSet(projectId, question, selectedRecords.map((record) => record.id), (res) => {
             setQuestion("");
             setSelectedRecords([]);
+            props.refetchEvaluationSets();
         });
     }, [question, selectedRecords, projectId]);
 
