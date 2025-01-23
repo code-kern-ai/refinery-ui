@@ -9,6 +9,7 @@ type LLMResponseConfigProps = {
     attributeId: string;
     fullLlmConfig: LLMConfigType;
     setFullLlmConfig: Dispatch<SetStateAction<LLMConfigType>>;
+    disabled?: boolean;
     noPlayground?: boolean;
     keepConfigOpen?: boolean;
     apiKey?: string; //only for playground
@@ -35,6 +36,7 @@ export default function LLMResponseConfig(props: LLMResponseConfigProps) {
                     llmConfig={props.fullLlmConfig.llmConfig}
                     setLlmConfig={(llmConfig) => props.setFullLlmConfig(p => ({ ...p, llmConfig: llmConfig }))}
                     onlyEssential={!fullConfigOpen}
+                    disabled={props.disabled}
                 />
 
                 <TemplatePrompt
@@ -42,12 +44,14 @@ export default function LLMResponseConfig(props: LLMResponseConfigProps) {
                     setQueryTemplatePromptTmp={(tmpl) => props.setFullLlmConfig(p => ({ ...p, templatePrompt: tmpl }))}
                     type="SYSTEM"
                     inverseColor={true}
+                    disabled={props.disabled}
                 />
                 <TemplatePrompt
                     queryTemplatePromptTmp={props.fullLlmConfig.questionPrompt}
                     setQueryTemplatePromptTmp={(tmpl) => props.setFullLlmConfig(p => ({ ...p, questionPrompt: tmpl }))}
                     type="USER"
                     inverseColor={true}
+                    disabled={props.disabled}
                 />
             </div>
         </div>

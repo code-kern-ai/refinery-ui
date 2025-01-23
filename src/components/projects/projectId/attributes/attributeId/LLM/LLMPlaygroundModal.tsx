@@ -3,7 +3,7 @@ import Modal from "@/src/components/shared/modal/Modal";
 import { Fragment, useCallback, useEffect, useMemo, useState } from "react";
 import { useSelector } from "react-redux";
 import { selectModal } from "@/src/reduxStore/states/modal";
-import { selectAttributes, selectAttributesDict, updateAttributeById } from "@/src/reduxStore/states/pages/settings";
+import { selectAttributes, selectAttributesDict } from "@/src/reduxStore/states/pages/settings";
 import { IconHandClick, IconPlayCardStar, IconPlayerPlay, IconRefresh, IconTerminal } from "@tabler/icons-react";
 import LLMResponseConfig from "../LLMResponseConfig";
 import { AttributeState, LLMConfig } from "@/src/types/components/projects/projectId/settings/data-schema";

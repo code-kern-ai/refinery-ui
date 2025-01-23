@@ -355,11 +355,12 @@ export default function AttributeCalculation() {
                                 options={LLM_PROVIDER_OPTIONS}
                                 dropdownWidth="w-52"
                                 selectedOption={(option) => setAdditionalConfigTmp(p => ({ ...p, llmIdentifier: option }))}
+                                disabled={currentAttribute.state == AttributeState.USABLE}
                             />
                             <label className="block text-sm font-medium text-gray-900 whitespace-nowrap">Api Key</label>
 
-                            <input type="text" value={additionalConfigTmp?.llmConfig.apiKey || ""} onInput={(e: any) => setAdditionalConfigTmp(p => ({ ...p, llmConfig: { ...additionalConfigTmp.llmConfig, apiKey: e.target.value } }))}
-                                className="h-8 text-sm border-gray-300 rounded-md placeholder-italic w-full border text-gray-700 pl-4 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100" />
+                            <input type="text" disabled={currentAttribute.state == AttributeState.USABLE} value={additionalConfigTmp?.llmConfig.apiKey || ""} onInput={(e: any) => setAdditionalConfigTmp(p => ({ ...p, llmConfig: { ...additionalConfigTmp.llmConfig, apiKey: e.target.value } }))}
+                                className="h-8 text-sm border-gray-300 rounded-md placeholder-italic w-full border text-gray-700 pl-4 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100 disabled:opacity-50" />
                         </div>}
                     </div>
                     <div className="text-sm leading-5 font-medium text-gray-700 inline-block">Attributes</div>
@@ -392,7 +393,7 @@ export default function AttributeCalculation() {
                 </div>
                 {
                     currentAttribute.dataType == DataTypeEnum.LLM_RESPONSE &&
-                    <LLMResponseConfig attributeId={currentAttribute?.id} fullLlmConfig={additionalConfigTmp} setFullLlmConfig={setAdditionalConfigTmp} apiKey={additionalConfigTmp?.llmConfig.apiKey} />
+                    <LLMResponseConfig disabled={currentAttribute.state == AttributeState.USABLE} attributeId={currentAttribute?.id} fullLlmConfig={additionalConfigTmp} setFullLlmConfig={setAdditionalConfigTmp} apiKey={additionalConfigTmp?.llmConfig.apiKey} />
                 }
 
 
