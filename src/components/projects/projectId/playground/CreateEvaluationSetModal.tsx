@@ -1,15 +1,14 @@
 import Modal from "@/src/components/shared/modal/Modal";
 import { RecordDisplay } from "@/src/components/shared/record-display/RecordDisplay";
-import ProjectsPage from "@/src/pages/projects";
 import { selectOnAttributeEmbeddings, selectVisibleAttributesDataBrowser } from "@/src/reduxStore/states/pages/settings";
 import { selectProjectId } from "@/src/reduxStore/states/project";
-import { getRecordsBySimilarity } from "@/src/services/base/data-browser";
 import { createEvaluationSet, getSearchResults, recordSearchContains } from "@/src/services/base/playground";
 import { Embedding } from "@/src/types/components/projects/projectId/settings/embeddings";
 import { ModalButton, ModalEnum } from "@/src/types/shared/modal";
 import KernButton from "@/submodules/react-components/components/kern-button/KernButton";
 import KernDropdown from "@/submodules/react-components/components/KernDropdown";
-import { IconWand } from "@tabler/icons-react";
+import { Loading } from "@nextui-org/react";
+import { IconPlus, IconWand } from "@tabler/icons-react";
 import { useCallback, useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 
@@ -36,6 +35,7 @@ export default function CreateEvaluationSetModal(props: CreateEvaluationSetsModa
     const [similarityRecordList, setSimilarityRecordList] = useState<any[]>([]);
     const [showSimilarityRecordsList, setShowSimilarityRecordsList] = useState(false);
     const [loading, setLoading] = useState(false);
+    const [addedSimilarityRecords, setAddedSimilarityRecords] = useState<any[]>([]);
 
     const createEvaluationSetPost = useCallback(() => {
         createEvaluationSet(projectId, question, selectedRecords.map((record) => record.id), (res) => {
@@ -103,23 +103,30 @@ export default function CreateEvaluationSetModal(props: CreateEvaluationSetsModa
                             }}
                         />
                         <KernButton
-                            text={"Reset search"}
+                            text={"Reset"}
                             disabled={showSimilarityRecordsList === false}
                             onClick={() => {
                                 setShowSimilarityRecordsList(false)
                             }}
                         />
                         <KernButton
-                            text={"Add all"}
+                            text={"Add all similar"}
+                            icon={IconPlus}
+                            iconColor='green'
                             disabled={showSimilarityRecordsList === false}
                             onClick={() => {
                                 const newSelectedRecordsList = [...selectedRecords, ...similarityRecordList];
                                 const selectedRecordIds = new Set(similarityRecordList.map(record => record.id));
                                 const newRecordList = recordList.filter((item) => !selectedRecordIds.has(item.id));
                                 const newSimilarityRecordList = similarityRecordList.filter((item) => !selectedRecordIds.has(item.id));
+                                setAddedSimilarityRecords(prevRecords => [...prevRecords, ...similarityRecordList]);
                                 setSelectedRecords(newSelectedRecordsList);
                                 setSimilarityRecordList(newSimilarityRecordList);
                                 setRecordList(newRecordList);
+
+                                if (newSimilarityRecordList.length === 0) {
+                                    setShowSimilarityRecordsList(false)
+                                }
                             }}
                         />
                     </div>
@@ -131,13 +138,24 @@ export default function CreateEvaluationSetModal(props: CreateEvaluationSetsModa
                             attributes={attributes}
                             record={record}
                             onClick={() => {
-                                setRecordList([...recordList, record]);
+                                const isInSimilarityRecords = addedSimilarityRecords.some(item => item.id === record.id);
+
+                                if (isInSimilarityRecords) {
+                                    setSimilarityRecordList([...similarityRecordList, record])
+                                } else {
+                                    setRecordList([...recordList, record]);
+                                }
+
                                 const newSelectedRecords = selectedRecords.filter((item) => item.id !== record.id);
                                 setSelectedRecords(newSelectedRecords);
                             }} />
                     </div >))}
                 </div>
-                {showSimilarityRecordsList ? (
+                {loading ? (
+                    <div className="flex justify-center items-center h-full">
+                        <Loading size="md" type="spinner" color="currentColor" />
+                    </div>
+                ) : showSimilarityRecordsList ? (
                     <div className={`h-full border-gray-300 border-l`}>
                         {similarityRecordList && similarityRecordList.map((record, index) => (
                             <div key={record.id} className="bg-purple-100 overflow-hidden shadow rounded-lg border m-4 p-2 relative hover:border-green-400 hover:border-opacity-30 cursor-pointer transition-all duration-200 ease-in-out">
@@ -147,7 +165,12 @@ export default function CreateEvaluationSetModal(props: CreateEvaluationSetsModa
                                     onClick={() => {
                                         setSelectedRecords([...selectedRecords, record]);
                                         const newRecordList = recordList.filter((item) => item.id !== record.id);
-                                        const newSimilarityRecordList = similarityRecordList.filter((item) => item.id !== record.id);
+                                        const newSimilarityRecordList = similarityRecordList.filter((item) => {
+                                            if (item.id === record.id) {
+                                                setAddedSimilarityRecords(prevRecords => [...prevRecords, item]);
+                                            }
+                                            return item.id !== record.id;
+                                        });
                                         setSimilarityRecordList(newSimilarityRecordList);
                                         setRecordList(newRecordList)
                                     }} />
