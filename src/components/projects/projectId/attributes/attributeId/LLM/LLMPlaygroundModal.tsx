@@ -26,8 +26,12 @@ const DISPLAY_STATES = [AttributeState.AUTOMATICALLY_CREATED, AttributeState.UPL
 
 const TEMPLATE_EXAMPLES = {
     REASONED_CLICKBAIT: {
-        templatePrompt: "You are running your own information network and need to ensure no clickbait news articles are published. To ensure your answer can be validated always provide a reason and your final result being either 'yes' or 'no'. JSON Schema {\"reason\": <reasoning>, \"result\":<yes or no>}",
+        templatePrompt: "You are running your own information network and need to ensure no clickbait news articles are published. To ensure your answer can be validated always provide a reason and your final result being either 'yes' or 'no' to the question is this clickbait. JSON Schema {\"reason\": <reasoning>, \"result\":<result>}",
         questionPrompt: "News article: '{{headline}}'"
+    },
+    SHORT_SUMMARY_REFERENCE: {
+        templatePrompt: "Summarize the given text into two short sentences.",
+        questionPrompt: "{{reference}}"
     }
 }
 const TEMPLATE_OPTIONS = Object.keys(TEMPLATE_EXAMPLES).map((key) => ({ name: capitalizeFirst(key), value: key }));
@@ -40,6 +44,7 @@ export default function LLMPlaygroundModal() {
     const modal = useSelector(selectModal(ModalEnum.LLM_PLAYGROUND));
     const modalRef = useRefFor(modal);
 
+    const [playgroundTestRunning, setPlaygroundTestRunning] = useState(false);
     const [acceptButton, setAcceptButton] = useState<ModalButton>(ACCEPT_BUTTON);
     const [fullLlmConfig, setFullLlmConfig] = useState<LLMConfig>(null);
     const fullLlmConfigRef = useRefFor(fullLlmConfig);
@@ -75,7 +80,7 @@ export default function LLMPlaygroundModal() {
     }, [searchAndSetWithFilter]);
 
     const getByRunningId = useCallback(() => {
-        if (!recordData || inputRunningIdRef.current.length == 0) return;
+        if (inputRunningIdRef.current.length == 0) return;
         const dummyFilter = [];
         dummyFilter.push(JSON.stringify(
             { RELATION: "NONE", NEGATION: false, TARGET_TABLE: "RECORD", TARGET_COLUMN: "DATA", OPERATOR: "EQUAL", VALUES: ["running_id", Number(inputRunningIdRef.current)] }));
@@ -84,11 +89,14 @@ export default function LLMPlaygroundModal() {
 
     const testConfigurationForRecordId = useCallback(() => {
         if (!recordDataRef.current || recordDataRef.current?.length == 0) return;
+        setPlaygroundTestRunning(true);
         const recordIds = recordDataRef.current.map((record) => record.id);
-
         runAttributeLlmPlayground(projectId, modalRef.current.attributeId, recordIds, fullLlmConfigRef.current, (res) => {
-            console.log(res);
-            setLlmAnswer(res);
+            let answer = ""
+            for (const id of recordIds) answer += "Answer: " + (res[id] || "No answer found") + "\n";
+            if (res["logs"]) answer += "\n---\nlogs:\n" + res["logs"].join("\n");
+            setLlmAnswer(answer);
+            setPlaygroundTestRunning(false);
         });
     }, []);
 
@@ -181,8 +189,8 @@ export default function LLMPlaygroundModal() {
                 </div>}
                 <LLMResponseConfig attributeId={modal.attributeId} fullLlmConfig={fullLlmConfig} setFullLlmConfig={setFullLlmConfig} noPlayground keepConfigOpen />
                 <div className="h-2"></div>
-                <KernButton text="Test configuration" icon={IconPlayerPlay} size="small" onClick={testConfigurationForRecordId} />
-                {llmAnswer && <div className="border-b border-gray-200 w-full align-top">
+                <KernButton text="Test configuration" icon={IconPlayerPlay} size="small" onClick={testConfigurationForRecordId} loading={playgroundTestRunning} />
+                {llmAnswer && <div className="border-b mb-10 border-gray-200 w-full align-top">
                     <div className="flex gap-x-2">
                         <div className='py-2'>
                             <div className='flex items-center justify-center bg-white h-6 w-6 rounded-lg border border-gray-300'>

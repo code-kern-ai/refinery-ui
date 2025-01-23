@@ -77,14 +77,6 @@ export default function AttributeCalculation() {
 
     useEffect(() => {
         if (!projectId) return;
-        if (!currentAttribute || attributes.length == 0) {
-            getAttributes(projectId, ['ALL'], (res) => {
-                dispatch(setAllAttributes(res));
-                const currentAttribute = postProcessCurrentAttribute(attributes.find((attribute) => attribute.id === router.query.attributeId));
-                setCurrentAttribute(currentAttribute);
-                setEditorValue(currentAttribute?.sourceCodeToDisplay);
-            });
-        }
         if (lookupLists.length == 0) {
             getLookupListsByProjectId(projectId, (res) => {
                 dispatch(setAllLookupLists(res));
@@ -92,7 +84,16 @@ export default function AttributeCalculation() {
         }
         refetchLabelingTasksAndProcess();
         checkProjectTokenization();
-    }, [projectId, attributes, currentAttribute]);
+    }, [projectId, attributes]);
+
+    useEffect(() => {
+        if (currentAttribute || !projectId) return;
+        getAttributeByAttributeId(projectId, router.query.attributeId as string, (attribute) => {
+            const currentAttribute = postProcessCurrentAttribute(attribute);
+            setCurrentAttribute(currentAttribute);
+            setEditorValue(currentAttribute?.sourceCodeToDisplay);
+        });
+    }, [projectId, currentAttribute])
 
     useEffect(() => {
         if (!attributes) return;
