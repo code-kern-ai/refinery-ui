@@ -50,10 +50,15 @@ export default function EvaluationRunDetails() {
             {evaluationRun && evaluationSetsDict && <div>
                 {evaluationRun.results.map((result, index) => <Fragment key={index}>
                     <div className="text-md leading-5 font-normal text-gray-500 my-5"><strong>Question:</strong> {evaluationSetsDict[result.evaluationSetId].question}</div>
-                    <div className="grid grid-cols-3 gap-x-2 border border-gray-300 rounded-md p-2">
-                        <RecordDisplaySearches attributes={attributes} records={result.truePositives} text="True positives" recordsInSet={evaluationSetsDict[result.evaluationSetId].recordIds.length} />
-                        <RecordDisplaySearches attributes={attributes} records={result.falsePositives} text="False positives" recordsInSet={evaluationSetsDict[result.evaluationSetId].recordIds.length} />
-                        <RecordDisplaySearches attributes={attributes} records={result.falseNegatives} text="False negatives" recordsInSet={evaluationSetsDict[result.evaluationSetId].recordIds.length} />
+                    <div className="grid grid-cols-3 gap-x-2">
+                        <RecordDisplaySearches attributes={attributes} records={result.truePositives} text="Matched records"
+                            calculatedValue={result.truePositives.length / evaluationSetsDict[result.evaluationSetId].recordIds.length} />
+                        <RecordDisplaySearches attributes={attributes} records={result.falsePositives} text="Unrelated records"
+                            calculatedValue={result.falsePositives.length / (result.falsePositives.length + result.truePositives.length)} />
+                        <RecordDisplaySearches attributes={attributes} records={result.falseNegatives} text="Missed records"
+                            calculatedValue={result.falseNegatives.length / evaluationSetsDict[result.evaluationSetId].recordIds.length} />
+                    </div>
+                    <div>
                     </div>
                 </Fragment>)}
             </div >}
@@ -62,27 +67,38 @@ export default function EvaluationRunDetails() {
     </>
 }
 
-function RecordDisplaySearches({ attributes, records, text, recordsInSet }) {
-    const calculatePercentage = useMemo(() => percentRoundString(records.length / recordsInSet), [records])
+function RecordDisplaySearches({ attributes, records, text, calculatedValue }) {
     const [showRecords, setShowRecords] = useState(false)
+    const calculatedValueInPercent = percentRoundString(calculatedValue, 2)
 
-    return <div>
-        <div className="flex flex-col gap-y-3 justify-center items-center">
-            <div className="text-center my-2">{text} {calculatePercentage}</div>
-            <button className="text-sm font-normal text-gray-500 underline" onClick={() => setShowRecords(!showRecords)}>{showRecords ? "Hide" : "Show"} records</button>
-        </div>
-
-        {showRecords && <>
-            {records.length > 0 ? <>
-                {records.map((record, index) => <div key={record.id} className="my-2">
-                    <div key={index} className="flex flex-col gap-x-3 bg-white rounded-md border border-gray-300 py-2 px-3 m-2">
-                        <RecordDisplay
-                            key={index}
-                            attributes={attributes}
-                            record={record} />
-                    </div>
-                </div>)}
-            </> : <div className="leading-5 text-center mt-3 text-sm font-normal-text-gray-500 text-gray-500 italic">There are no matching results</div>}
-        </>}
+    return <div className="relative bg-white pt-5 px-4 sm:pt-6 sm:px-6 shadow rounded-lg">
+        <dt>
+            <div className={`absolute rounded-md p-3`}>
+                {/* TODO add icons */}
+            </div>
+            <p className="text-sm font-medium text-gray-500 truncate">{text}</p>
+            <p className="text-md font-medium text-gray-900 truncate0">
+                {calculatedValue} ({calculatedValueInPercent})
+            </p>
+        </dt>
+        <dd className="pb-6 flex items-baseline sm:pb-7">
+            <div className="inset-x-0 bg-gray-50 px-4 py-4 sm:px-6 w-full">
+                <div className="text-sm">
+                    <button className="text-sm font-normal text-gray-500 underline" onClick={() => setShowRecords(!showRecords)}>{showRecords ? "Hide" : "Show"} records</button>
+                </div>
+                {showRecords && <>
+                    {records.length > 0 ? <>
+                        {records.map((record, index) => <div key={record.id} className="my-2">
+                            <div key={index} className="flex flex-col gap-x-3 bg-white rounded-md border border-gray-300 py-2 px-3 m-2">
+                                <RecordDisplay
+                                    key={index}
+                                    attributes={attributes}
+                                    record={record} />
+                            </div>
+                        </div>)}
+                    </> : <div className="leading-5 text-center mt-3 text-sm font-normal-text-gray-500 text-gray-500 italic">There are no matching results</div>}
+                </>}
+            </div>
+        </dd>
     </div>
 }

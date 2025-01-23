@@ -56,5 +56,5 @@ export default function ProjectOverviewCards(props: ProjectOverviewCardsProps) {
             ))
             }
         </dl >
-    </div >);
+    </div>);
 }
