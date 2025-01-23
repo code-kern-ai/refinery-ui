@@ -1,15 +1,13 @@
 import Modal from "@/src/components/shared/modal/Modal";
 import { RecordDisplay } from "@/src/components/shared/record-display/RecordDisplay";
-import ProjectsPage from "@/src/pages/projects";
 import { selectOnAttributeEmbeddings, selectVisibleAttributesDataBrowser } from "@/src/reduxStore/states/pages/settings";
 import { selectProjectId } from "@/src/reduxStore/states/project";
-import { getRecordsBySimilarity } from "@/src/services/base/data-browser";
 import { createEvaluationSet, getSearchResults, recordSearchContains } from "@/src/services/base/playground";
 import { Embedding } from "@/src/types/components/projects/projectId/settings/embeddings";
 import { ModalButton, ModalEnum } from "@/src/types/shared/modal";
 import KernButton from "@/submodules/react-components/components/kern-button/KernButton";
 import KernDropdown from "@/submodules/react-components/components/KernDropdown";
-import { IconWand } from "@tabler/icons-react";
+import { IconPlus, IconWand } from "@tabler/icons-react";
 import { useCallback, useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 
@@ -103,14 +101,16 @@ export default function CreateEvaluationSetModal(props: CreateEvaluationSetsModa
                             }}
                         />
                         <KernButton
-                            text={"Reset search"}
+                            text={"Reset"}
                             disabled={showSimilarityRecordsList === false}
                             onClick={() => {
                                 setShowSimilarityRecordsList(false)
                             }}
                         />
                         <KernButton
-                            text={"Add all"}
+                            text={"Add all similar"}
+                            icon={IconPlus}
+                            iconColor='green'
                             disabled={showSimilarityRecordsList === false}
                             onClick={() => {
                                 const newSelectedRecordsList = [...selectedRecords, ...similarityRecordList];
