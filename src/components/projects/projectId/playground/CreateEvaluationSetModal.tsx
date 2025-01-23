@@ -60,7 +60,9 @@ export default function CreateEvaluationSetModal(props: CreateEvaluationSetsModa
 
     useEffect(() => {
         recordSearchContains(projectId, search, searchRequest.offset, searchRequest.limit, (res) => {
-            setRecordList(res);
+            const selectedRecordIds = new Set(selectedRecords.map(r => r.id));
+            const newRecordList = res.filter((item) => !selectedRecordIds.has(item.id));
+            setRecordList(newRecordList);
         });
     }, [debouncedSearch]);
 
