@@ -7,6 +7,7 @@ import { Embedding } from "@/src/types/components/projects/projectId/settings/em
 import { ModalButton, ModalEnum } from "@/src/types/shared/modal";
 import KernButton from "@/submodules/react-components/components/kern-button/KernButton";
 import KernDropdown from "@/submodules/react-components/components/KernDropdown";
+import { Loading } from "@nextui-org/react";
 import { IconPlus, IconWand } from "@tabler/icons-react";
 import { useCallback, useEffect, useState } from "react";
 import { useSelector } from "react-redux";
@@ -150,7 +151,11 @@ export default function CreateEvaluationSetModal(props: CreateEvaluationSetsModa
                             }} />
                     </div >))}
                 </div>
-                {showSimilarityRecordsList ? (
+                {loading ? (
+                    <div className="flex justify-center items-center h-full">
+                        <Loading size="md" type="spinner" color="currentColor" />
+                    </div>
+                ) : showSimilarityRecordsList ? (
                     <div className={`h-full border-gray-300 border-l`}>
                         {similarityRecordList && similarityRecordList.map((record, index) => (
                             <div key={record.id} className="bg-purple-100 overflow-hidden shadow rounded-lg border m-4 p-2 relative hover:border-green-400 hover:border-opacity-30 cursor-pointer transition-all duration-200 ease-in-out">
