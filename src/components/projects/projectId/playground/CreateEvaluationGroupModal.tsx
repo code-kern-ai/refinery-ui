@@ -21,6 +21,7 @@ export default function CreateEvaluationGroupModal(props: CreateEvaluationGroupM
     const [name, setName] = useState("");
     const [evaluationSets, setEvaluationSets] = useState([]);
     const [selectedSets, setSelectedSets] = useState([]);
+    const [hasCreated, setHasCreated] = useState(false)
     const isFetchingEvalSets = useRef(false);
 
     const createEvaluationGroupPost = useCallback(() => {
@@ -28,6 +29,7 @@ export default function CreateEvaluationGroupModal(props: CreateEvaluationGroupM
             setName("");
             setSelectedSets([]);
             props.refetchEvaluationGroups();
+            setHasCreated(true)
         });
     }, [name, selectedSets, projectId]);
 
@@ -43,7 +45,7 @@ export default function CreateEvaluationGroupModal(props: CreateEvaluationGroupM
             setEvaluationSets(res);
             isFetchingEvalSets.current = false;
         });
-    }, [projectId]);
+    }, [projectId, hasCreated]);
 
 
     return <Modal modalName={ModalEnum.EVALUATION_GROUP} acceptButton={acceptButton} className="md:max-w-6xl">
