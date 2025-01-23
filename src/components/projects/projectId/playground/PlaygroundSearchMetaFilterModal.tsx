@@ -15,20 +15,22 @@ import KernDropdown from "@/submodules/react-components/components/KernDropdown"
 import { IconPlus, IconTrash } from "@tabler/icons-react";
 
 const ACCEPT_BUTTON = { buttonCaption: 'Save', useButton: true };
+const ABORT_BUTTON = { buttonCaption: 'Reset', useButton: true };
 
-
-export default function PlaygroundSearchMetaFilterModal(props: { selectedEmbedding: Embedding }) {
+export default function PlaygroundSearchMetaFilterModal(props: { selectedEmbedding: Embedding, setMetaDataFilter: any }) {
 
     const attributes = useSelector(selectUsableAttributes);
     const embeddings = useSelector(selectEmbeddings);
+    const uniqueValuesDict = useSelector(selectUniqueValuesDict);
+
     const [filterAttributesSS, setFilterAttributesSS] = useState<any>(null);
     const [filterAttributesForm, setFilterAttributesForm] = useState<any>([]);
     const [operatorsDict, setOperatorsDict] = useState<{ [key: string]: string[] }>({});
     const [colorsAttributes, setColorAttributes] = useState<string[]>([]);
-    const uniqueValuesDict = useSelector(selectUniqueValuesDict);
     const [tooltipsDict, setTooltipsDict] = useState<{ [key: string]: string[] }>({});
 
     const [acceptButton, setAcceptButton] = useState<ModalButton>(ACCEPT_BUTTON);
+    const [abortButton, setAbortButton] = useState<ModalButton>(ABORT_BUTTON);
 
     useEffect(() => {
         if (!embeddings || !props.selectedEmbedding) return;
@@ -44,6 +46,28 @@ export default function PlaygroundSearchMetaFilterModal(props: { selectedEmbeddi
         if (!operatorsDict) return;
         initFilterForm();
     }, [operatorsDict]);
+
+    const cancelMetaDataFilter = useCallback(() => {
+        props.setMetaDataFilter(null);
+        initFilterForm();
+    }, []);
+
+    const updateMetaDataFilter = useCallback(() => {
+        const attFilter = prepareAttFilter(filterAttributesForm, attributes, false);
+        props.setMetaDataFilter(attFilter);
+    }, [filterAttributesForm, attributes]);
+
+    useEffect(() => {
+        setAcceptButton({
+            ...acceptButton, disabled: !filterAttributesSS, emitFunction: updateMetaDataFilter
+        });
+    }, [filterAttributesSS, updateMetaDataFilter]);
+
+    useEffect(() => {
+        setAbortButton({
+            ...abortButton, emitFunction: cancelMetaDataFilter
+        });
+    }, [cancelMetaDataFilter]);
 
     function prepareOperatorsAndTooltips() {
         if (!filterAttributesSS) return;
@@ -115,8 +139,9 @@ export default function PlaygroundSearchMetaFilterModal(props: { selectedEmbeddi
     }
 
     return (
-        <Modal modalName={ModalEnum.EVALUATION_META_FILTER_APPLY} acceptButton={acceptButton} className="md:max-w-6xl">
+        <Modal modalName={ModalEnum.EVALUATION_META_FILTER_APPLY} acceptButton={acceptButton} abortButton={abortButton} className="md:max-w-6xl">
             <div className="contents mx-2">
+                {!filterAttributesSS && <div className="text-sm inline-block font-normal text-gray-500 italic mx-3">No filter attributes defined for selected embedding.</div>}
                 {filterAttributesForm && filterAttributesForm.map((form, index) => (<div key={form.id} className="contents mx-2">
                     <div className="flex flex-row items-center rounded-md hover:bg-gray-50 my-2">
                         <div className="flex flex-col">
