@@ -120,6 +120,10 @@ export default function CreateEvaluationSetModal(props: CreateEvaluationSetsModa
                                 setSelectedRecords(newSelectedRecordsList);
                                 setSimilarityRecordList(newSimilarityRecordList);
                                 setRecordList(newRecordList);
+
+                                if (newSimilarityRecordList.length === 0) {
+                                    setShowSimilarityRecordsList(false)
+                                }
                             }}
                         />
                     </div>
