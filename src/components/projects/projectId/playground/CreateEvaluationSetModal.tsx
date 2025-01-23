@@ -7,6 +7,7 @@ import { Embedding } from "@/src/types/components/projects/projectId/settings/em
 import { ModalButton, ModalEnum } from "@/src/types/shared/modal";
 import KernButton from "@/submodules/react-components/components/kern-button/KernButton";
 import KernDropdown from "@/submodules/react-components/components/KernDropdown";
+import useDebounce from "@/submodules/react-components/hooks/useHooks/useDebounce";
 import { Loading } from "@nextui-org/react";
 import { IconPlus, IconWand } from "@tabler/icons-react";
 import { useCallback, useEffect, useState } from "react";
@@ -37,6 +38,8 @@ export default function CreateEvaluationSetModal(props: CreateEvaluationSetsModa
     const [loading, setLoading] = useState(false);
     const [addedSimilarityRecords, setAddedSimilarityRecords] = useState<any[]>([]);
 
+    const debouncedSearch = useDebounce(search, 1000);
+
     const createEvaluationSetPost = useCallback(() => {
         createEvaluationSet(projectId, question, selectedRecords.map((record) => record.id), (res) => {
             setQuestion("");
@@ -49,12 +52,17 @@ export default function CreateEvaluationSetModal(props: CreateEvaluationSetsModa
         setAcceptButton({ ...acceptButton, emitFunction: createEvaluationSetPost, disabled: selectedRecords.length === 0 || question === "" });
     }, [createEvaluationSetPost, selectedRecords, question]);
 
+    useEffect(() => {
+        recordSearchContains(projectId, search, searchRequest.offset, searchRequest.limit, (res) => {
+            setRecordList(res);
+        });
+    }, [searchRequest, projectId]);
 
     useEffect(() => {
         recordSearchContains(projectId, search, searchRequest.offset, searchRequest.limit, (res) => {
             setRecordList(res);
         });
-    }, [search, searchRequest, projectId]);
+    }, [debouncedSearch]);
 
     const refetchMoreRecords = useCallback((e: any) => {
     }, [recordList, searchRequest, projectId]);
