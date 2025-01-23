@@ -391,7 +391,7 @@ export default function AttributeCalculation() {
                 </div>
                 {
                     currentAttribute.dataType == DataTypeEnum.LLM_RESPONSE &&
-                    <LLMResponseConfig attributeId={currentAttribute?.id} fullLlmConfig={additionalConfigTmp} setFullLlmConfig={setAdditionalConfigTmp} />
+                    <LLMResponseConfig attributeId={currentAttribute?.id} fullLlmConfig={additionalConfigTmp} setFullLlmConfig={setAdditionalConfigTmp} apiKey={additionalConfigTmp?.llmConfig.apiKey} />
                 }
 
 

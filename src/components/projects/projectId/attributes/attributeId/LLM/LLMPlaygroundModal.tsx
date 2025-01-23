@@ -17,6 +17,8 @@ import { generateRandomSeed } from "@/src/util/components/projects/projectId/dat
 import KernButton from "@/submodules/react-components/components/kern-button/KernButton";
 import { DataTypeEnum } from "@/src/types/shared/general";
 import { capitalizeFirst } from "@/submodules/javascript-functions/case-types-parser";
+import { runAttributeLlmPlayground } from "@/src/services/base/attribute";
+import { jsonCopy } from "@/submodules/javascript-functions/general";
 
 const ACCEPT_BUTTON = { buttonCaption: "Use current values for attribute", useButton: true };
 const DISPLAY_STATES = [AttributeState.AUTOMATICALLY_CREATED, AttributeState.UPLOADED, AttributeState.USABLE]
@@ -82,9 +84,12 @@ export default function LLMPlaygroundModal() {
 
     const testConfigurationForRecordId = useCallback(() => {
         if (!recordDataRef.current || recordDataRef.current?.length == 0) return;
-        const record = recordDataRef.current[0];
-        console.log("testing with record", record.id, fullLlmConfigRef.current);
-        setLlmAnswer("This could be your answer");
+        const recordIds = recordDataRef.current.map((record) => record.id);
+
+        runAttributeLlmPlayground(projectId, modalRef.current.attributeId, recordIds, fullLlmConfigRef.current, (res) => {
+            console.log(res);
+            setLlmAnswer(res);
+        });
     }, []);
 
     useEffect(() => {
@@ -94,7 +99,9 @@ export default function LLMPlaygroundModal() {
 
     useEffect(() => {
         if (modal.open) {
-            setFullLlmConfig(attributeDict[modal.attributeId]?.additionalConfig);
+            const config = jsonCopy(attributeDict[modal.attributeId]?.additionalConfig);
+            config.llmConfig.apiKey = modal.apiKey;
+            setFullLlmConfig(config);
             get1RandomRecords();
         } else {
             setRecordData(null);

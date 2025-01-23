@@ -11,7 +11,7 @@ type LLMResponseConfigProps = {
     setFullLlmConfig: Dispatch<SetStateAction<LLMConfigType>>;
     noPlayground?: boolean;
     keepConfigOpen?: boolean;
-
+    apiKey?: string; //only for playground
 }
 
 export default function LLMResponseConfig(props: LLMResponseConfigProps) {
@@ -26,7 +26,7 @@ export default function LLMResponseConfig(props: LLMResponseConfigProps) {
                 {!props.keepConfigOpen && <KernButton icon={IconSettings} onClick={() => setConfigOpen((p) => !p)} size="small" />}
                 {configOpen && <KernButton icon={fullConfigOpen ? IconAdjustmentsAlt : IconAdjustmentsOff} onClick={() => setFullConfigOpen((p) => !p)} size="small" />}
 
-                {props.noPlayground ? null : <LLMResponsePlayground attributeId={props.attributeId} />}
+                {props.noPlayground ? null : <LLMResponsePlayground attributeId={props.attributeId} apiKey={props.apiKey} />}
 
             </div>
             <div className={`${configOpen ? 'block' : 'hidden'}`}>

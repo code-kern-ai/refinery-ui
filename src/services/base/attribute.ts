@@ -27,3 +27,8 @@ export function deleteUserAttribute(projectId: string, options: {
     const finalUrl = `${attributeEndpoint}/${projectId}/delete-user-attribute`;
     jsonFetchWrapper(finalUrl, FetchType.DELETE, onResult, JSON.stringify(convertCamelToSnakeCase(options)));
 }
+
+export function runAttributeLlmPlayground(projectId: string, attributeId: string, recordIds: string[], llmConfig: any, onResult: (result: any) => void) {
+    const finalUrl = `${attributeEndpoint}/${projectId}/${attributeId}/run-llm-playground`;
+    jsonFetchWrapper(finalUrl, FetchType.POST, onResult, JSON.stringify({ record_ids: recordIds, llm_config: llmConfig }));
+}
