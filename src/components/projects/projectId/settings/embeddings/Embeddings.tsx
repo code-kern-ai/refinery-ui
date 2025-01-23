@@ -186,7 +186,7 @@ export default function Embeddings(props: { refetchEmbeddings: () => void }) {
                     <button onClick={() => router.push(`/projects/${projectId}/playground`)}
                         className={`"ml-1 inline-block items-center px-2.5 py-1.5 border border-gray-300 shadow-sm text-xs font-semibold rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none cursor-pointer disabled:cursor-not-allowed disabled:opacity-50`}>
                         <IconMessageCircleSearch className="h-5 w-5 inline-block mr-1" />
-                        Playground
+                        Evaluation
                     </button>
                 </Tooltip>
 
