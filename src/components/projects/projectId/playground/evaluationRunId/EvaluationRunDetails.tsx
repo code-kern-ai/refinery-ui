@@ -82,7 +82,7 @@ function RecordDisplaySearches({ attributes, records, text, recordsInSet }) {
                             record={record} />
                     </div>
                 </div>)}
-            </> : <div className="leading-5 text-sm font-normal-text-gray-500 text-gray-500 italic">There are no matching results</div>}
+            </> : <div className="leading-5 text-center mt-3 text-sm font-normal-text-gray-500 text-gray-500 italic">There are no matching results</div>}
         </>}
     </div>
 }
