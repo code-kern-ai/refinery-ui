@@ -26,6 +26,7 @@ export default function EvaluationRuns() {
     const [evaluationGroups, setEvaluationGroups] = useState([]);
     const [evaluationDict, setEvaluationDict] = useState(null);
     const [embeddingsDict, setEmbeddingsDict] = useState(null);
+    const [refetchTrigger, setRefetchTrigger] = useState(false)
 
     useEffect(() => {
         if (!projectId) return;
@@ -36,7 +37,7 @@ export default function EvaluationRuns() {
             setEvaluationGroups(res);
             setEvaluationDict(arrayToDict(res, 'id'));
         });
-    }, [projectId]);
+    }, [projectId, refetchTrigger]);
 
     useEffect(() => {
         if (!onAttributeEmbeddings || onAttributeEmbeddings.length == 0) return;
@@ -78,6 +79,6 @@ export default function EvaluationRuns() {
                 </div>
             }
         </div>}
-        <CreateEvaluationRunModal evaluationGroups={evaluationGroups} />
+        <CreateEvaluationRunModal evaluationGroups={evaluationGroups} setRefetchTrigger={setRefetchTrigger} />
     </>
 }
