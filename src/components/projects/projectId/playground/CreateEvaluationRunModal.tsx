@@ -11,7 +11,7 @@ import { useSelector } from "react-redux";
 
 const ACCEPT_BUTTON = { buttonCaption: 'Create', useButton: true };
 
-export default function CreateEvaluationRunModal({ evaluationGroups }) {
+export default function CreateEvaluationRunModal({ evaluationGroups, setRefetchTrigger }) {
     const projectId = useSelector(selectProjectId);
     const onAttributeEmbeddings = useSelector(selectOnAttributeEmbeddings);
 
@@ -23,13 +23,13 @@ export default function CreateEvaluationRunModal({ evaluationGroups }) {
         createEvaluationRun(projectId, selectedEmbedding.id, evaluationGroup.id, (res) => {
             setEvaluationGroup(null);
             setSelectedEmbedding(null);
+            setRefetchTrigger((prev => !prev));
         });
     }, [evaluationGroup, selectedEmbedding, projectId]);
 
     useEffect(() => {
         setAcceptButton({ ...acceptButton, emitFunction: createEvaluationRunPost, disabled: !selectedEmbedding || !evaluationGroup });
     }, [selectedEmbedding, evaluationGroup]);
-
 
     return <Modal modalName={ModalEnum.EVALUATION_RUN} acceptButton={acceptButton}>
         <div className="h-full">
