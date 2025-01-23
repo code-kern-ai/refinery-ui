@@ -34,6 +34,7 @@ export default function CreateEvaluationSetModal(props: CreateEvaluationSetsModa
     const [similarityRecordList, setSimilarityRecordList] = useState<any[]>([]);
     const [showSimilarityRecordsList, setShowSimilarityRecordsList] = useState(false);
     const [loading, setLoading] = useState(false);
+    const [addedSimilarityRecords, setAddedSimilarityRecords] = useState<any[]>([]);
 
     const createEvaluationSetPost = useCallback(() => {
         createEvaluationSet(projectId, question, selectedRecords.map((record) => record.id), (res) => {
@@ -117,6 +118,7 @@ export default function CreateEvaluationSetModal(props: CreateEvaluationSetsModa
                                 const selectedRecordIds = new Set(similarityRecordList.map(record => record.id));
                                 const newRecordList = recordList.filter((item) => !selectedRecordIds.has(item.id));
                                 const newSimilarityRecordList = similarityRecordList.filter((item) => !selectedRecordIds.has(item.id));
+                                setAddedSimilarityRecords(prevRecords => [...prevRecords, ...similarityRecordList]);
                                 setSelectedRecords(newSelectedRecordsList);
                                 setSimilarityRecordList(newSimilarityRecordList);
                                 setRecordList(newRecordList);
@@ -135,7 +137,14 @@ export default function CreateEvaluationSetModal(props: CreateEvaluationSetsModa
                             attributes={attributes}
                             record={record}
                             onClick={() => {
-                                setRecordList([...recordList, record]);
+                                const isInSimilarityRecords = addedSimilarityRecords.some(item => item.id === record.id);
+
+                                if (isInSimilarityRecords) {
+                                    setSimilarityRecordList([...similarityRecordList, record])
+                                } else {
+                                    setRecordList([...recordList, record]);
+                                }
+
                                 const newSelectedRecords = selectedRecords.filter((item) => item.id !== record.id);
                                 setSelectedRecords(newSelectedRecords);
                             }} />
@@ -151,7 +160,12 @@ export default function CreateEvaluationSetModal(props: CreateEvaluationSetsModa
                                     onClick={() => {
                                         setSelectedRecords([...selectedRecords, record]);
                                         const newRecordList = recordList.filter((item) => item.id !== record.id);
-                                        const newSimilarityRecordList = similarityRecordList.filter((item) => item.id !== record.id);
+                                        const newSimilarityRecordList = similarityRecordList.filter((item) => {
+                                            if (item.id === record.id) {
+                                                setAddedSimilarityRecords(prevRecords => [...prevRecords, item]);
+                                            }
+                                            return item.id !== record.id;
+                                        });
                                         setSimilarityRecordList(newSimilarityRecordList);
                                         setRecordList(newRecordList)
                                     }} />
