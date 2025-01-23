@@ -10,7 +10,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { RecordDisplay } from "@/src/components/shared/record-display/RecordDisplay";
 import { selectVisibleAttributesDataBrowser } from "@/src/reduxStore/states/pages/settings";
 import LoadingIcon from "@/submodules/react-components/components/LoadingIcon";
-import { IconChevronRight, IconChevronDown } from '@tabler/icons-react'
+import { IconFilterOff, IconFilter } from '@tabler/icons-react'
 import { useRouter } from "next/router";
 import PlaygroundSearchMetaFilterModal from "./PlaygroundSearchMetaFilterModal";
 
@@ -26,12 +26,14 @@ export function PlaygroundSearch() {
     const [loading, setLoading] = useState(false);
     const [selectedEmbedding, setSelectedEmbedding] = useState<Embedding>(null);
     const [question, setQuestion] = useState("");
-    const [searchResults, setSearchResults] = useState([]);
+    const [searchResults, setSearchResults] = useState(null);
     const [limit, setLimit] = useState(10);
     const [toggleMetaFilter, setToggleMetaFilter] = useState(false);
+    const [metaDataFilter, setMetaDataFilter] = useState(null);
+
     function getSearchResultsPost() {
         setLoading(true);
-        getSearchResults(projectId, selectedEmbedding.id, question, limit, (result) => {
+        getSearchResults(projectId, selectedEmbedding.id, question, limit, metaDataFilter, (result) => {
             setLoading(false);
             setSearchResults(result);
         });
@@ -57,10 +59,8 @@ export function PlaygroundSearch() {
                     <button onClick={() => dispatch(openModal(ModalEnum.EVALUATION_META_FILTER_APPLY))} disabled={!selectedEmbedding}
                         className="flex items-center bg-white text-gray-700 text-xs font-semibold px-3 py-2 rounded-md border border-gray-300 hover:bg-gray-50 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed">
                         Meta
-                        <span><IconChevronRight className="ml-1 h-4 w-4 text-gray-500" style={{
-                            transform: toggleMetaFilter ? 'rotate(90deg)' : 'rotate(0deg)',
-                            transition: 'transform 0.1s ease'
-                        }} /></span>
+                        {!metaDataFilter ? <span><IconFilterOff className="ml-1 h-4 w-4 text-gray-400" /></span> :
+                            <span><IconFilter className="ml-1 h-4 w-4 text-kernpurple" /></span>}
                     </button>
                     <div className="flex items-center gap-x-2">
                         <span>Limit</span>
@@ -79,24 +79,25 @@ export function PlaygroundSearch() {
         </div>
         <div className={`h-full border-gray-300 border-l`}>
             <div className="flex flex-row mx-4 my-1 items-center">
-                <span className="mr-4"><span>{searchResults.length > 0 ? searchResults.length + " " : ""}</span>Record{searchResults.length > 1 ? "s" : ""}</span>
-                <button disabled={searchResults.length === 0 || selectedEmbedding === null || question === "" || loading}
+                <span className="mr-4"><span>{searchResults?.length > 0 ? searchResults.length + " " : ""}</span>Record{searchResults?.length > 1 ? "s" : ""}</span>
+                <button disabled={searchResults?.length === 0 || selectedEmbedding === null || question === "" || loading}
                     className={`ml-auto bg-green-100 border border-green-400 text-green-700 text-xs font-semibold px-4 py-2 rounded-md cursor-pointer opacity-100 hover:bg-green-200 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50`}
                     onClick={createSetFromRecords}>Create set from saved records</button>
             </div>
-            {!loading && (searchResults?.length > 0 ? <div className="relative ml-2 font-dmMono text-xs whitespace-pre-line overflow-y-auto">
+            {!searchResults && <div className="text-sm inline-block font-normal text-gray-500 italic mx-3">Start by searching for records.</div>}
+            {!loading && searchResults && (searchResults.length > 0 ? <div className="relative ml-2 font-dmMono text-xs whitespace-pre-line overflow-y-auto">
                 {searchResults.map((result, index) => <div key={index} className="flex flex-col gap-x-3 bg-white rounded-md border border-gray-300 py-2 px-3 m-2">
                     <div className="absolute right-4 text-gray-500 text-xs">{result?.score.toFixed(3)}</div>
                     <RecordDisplay record={result} attributes={attributes} />
                 </div>)}
 
             </div> : <div className="text-sm inline-block font-normal text-gray-500 italic mx-3">
-                No records searched yet.
+                No records found.
             </div>)}
             {loading && <div className="flex w-full justify-center items-center mt-4">
                 <LoadingIcon size="lg" />
             </div>}
         </div>
-        <PlaygroundSearchMetaFilterModal selectedEmbedding={selectedEmbedding} />
+        <PlaygroundSearchMetaFilterModal selectedEmbedding={selectedEmbedding} setMetaDataFilter={setMetaDataFilter} />
     </div >
 }
