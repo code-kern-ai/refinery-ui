@@ -120,14 +120,16 @@ export default function LLMPlaygroundModal() {
 
     const copyToAttributeValues = useCallback(() => {
         if (!fullLlmConfigRef.current || !modalRef.current) return;
-        const attributeNew = { ...attributeDict[modalRef.current.attributeId] };
-        attributeNew.additionalConfig = { ...fullLlmConfigRef.current };
-        updateAttribute(projectId, modalRef.current.attributeId, (res) => { }, null, null, null, null, null, attributeNew.additionalConfig);
+        const config = { ...fullLlmConfigRef.current };
+        updateAttribute(projectId, modalRef.current.attributeId, (res) => { }, null, null, null, null, null, config);
     }, []);
 
     useEffect(() => {
-        setAcceptButton({ ...acceptButton, emitFunction: copyToAttributeValues });
-    }, [copyToAttributeValues]);
+        if (!attributeDict || !modal?.attributeId) return;
+        const attribute = attributeDict[modal.attributeId];
+        if (attribute.state == AttributeState.USABLE) setAcceptButton({ ...acceptButton, useButton: false });
+        else setAcceptButton({ ...acceptButton, emitFunction: copyToAttributeValues });
+    }, [copyToAttributeValues, attributeDict, modal?.attributeId]);
 
     const recordKeys = useMemo(() => {
         if (!attributes) return [];
