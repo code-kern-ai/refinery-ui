@@ -5,7 +5,7 @@ import { getAttributes } from "@/src/services/base/attribute"
 import { getEvaluationRunById, getEvaluationSets } from "@/src/services/base/playground"
 import { arrayToDict, percentRoundString } from "@/submodules/javascript-functions/general"
 import { useRouter } from "next/router"
-import { Fragment, useEffect, useMemo, useState } from "react"
+import { Fragment, useEffect, useState } from "react"
 import { useDispatch, useSelector } from "react-redux"
 
 export default function EvaluationRunDetails() {
@@ -17,6 +17,7 @@ export default function EvaluationRunDetails() {
 
     const [evaluationRun, setEvaluationRun] = useState(null)
     const [evaluationSetsDict, setEvaluationSetsDict] = useState(null)
+    const [aggregateResults, setAggregateResults] = useState(null)
 
     useEffect(() => {
         if (!projectId) return;
@@ -33,6 +34,22 @@ export default function EvaluationRunDetails() {
         })
     }, [projectId, router.query.evaluationRunId])
 
+    useEffect(() => {
+        if (!evaluationRun) return;
+        let aggregateResults = {
+            matchedRecords: 0,
+            updatedRecords: 0,
+            missedRecords: 0
+        };
+        evaluationRun.results.forEach((result) => {
+            aggregateResults.matchedRecords += result.truePositives.length;
+            aggregateResults.updatedRecords += result.falsePositives.length;
+            aggregateResults.missedRecords += result.falseNegatives.length;
+        })
+
+        setAggregateResults(aggregateResults)
+    }, [evaluationRun])
+
     function refetchAttributesAndProcess() {
         getAttributes(projectId, ['ALL'], (res) => {
             dispatch(setAllAttributes(res));
@@ -47,18 +64,24 @@ export default function EvaluationRunDetails() {
                     <div className="text-sm leading-5 font-normal text-gray-500 inline-block">You can see the results of the evaluation run</div>
                 </div>
             </div>
+            <div className="text-md leading-5 font-normal text-gray-700 my-5"><strong>Aggregated view for all sets in the evaluation run</strong></div>
+            <div className="grid grid-cols-3 gap-x-2">
+                <RecordDisplaySearchesAggregated text="Matched records" howMany={aggregateResults?.matchedRecords} fromHowMany={aggregateResults?.matchedRecords + aggregateResults?.updatedRecords} />
+                <RecordDisplaySearchesAggregated text="Unrelated records" howMany={aggregateResults?.updatedRecords} fromHowMany={aggregateResults?.matchedRecords + aggregateResults?.updatedRecords} />
+                <RecordDisplaySearchesAggregated text="Missed records" howMany={aggregateResults?.missedRecords} fromHowMany={aggregateResults?.matchedRecords + aggregateResults?.missedRecords} />
+            </div>
+
+            <div className="text-md leading-5 font-normal text-gray-700 mt-5"><strong>Statistics per each set in the evaluation run</strong></div>
             {evaluationRun && evaluationSetsDict && <div>
                 {evaluationRun.results.map((result, index) => <Fragment key={index}>
-                    <div className="text-md leading-5 font-normal text-gray-500 my-5"><strong>Question:</strong> {evaluationSetsDict[result.evaluationSetId].question}</div>
+                    <div className="text-md leading-5 font-normal text-gray-500 my-5"><strong className="underline">Question:</strong> {evaluationSetsDict[result.evaluationSetId].question}</div>
                     <div className="grid grid-cols-3 gap-x-2">
                         <RecordDisplaySearches attributes={attributes} records={result.truePositives} text="Matched records"
-                            calculatedValue={result.truePositives.length / evaluationSetsDict[result.evaluationSetId].recordIds.length} />
+                            howMany={result.truePositives.length} fromHowMany={result.falsePositives.length + result.truePositives.length} />
                         <RecordDisplaySearches attributes={attributes} records={result.falsePositives} text="Unrelated records"
-                            calculatedValue={result.falsePositives.length / (result.falsePositives.length + result.truePositives.length)} />
+                            howMany={result.falsePositives.length} fromHowMany={result.falsePositives.length + result.truePositives.length} />
                         <RecordDisplaySearches attributes={attributes} records={result.falseNegatives} text="Missed records"
-                            calculatedValue={result.falseNegatives.length / evaluationSetsDict[result.evaluationSetId].recordIds.length} />
-                    </div>
-                    <div>
+                            howMany={result.falseNegatives.length} fromHowMany={evaluationSetsDict[result.evaluationSetId].recordIds.length} />
                     </div>
                 </Fragment>)}
             </div >}
@@ -67,22 +90,22 @@ export default function EvaluationRunDetails() {
     </>
 }
 
-function RecordDisplaySearches({ attributes, records, text, calculatedValue }) {
+function RecordDisplaySearches({ attributes, records, text, howMany, fromHowMany }) {
     const [showRecords, setShowRecords] = useState(false)
-    const calculatedValueInPercent = percentRoundString(calculatedValue, 2)
+    const calculatedValueInPercent = percentRoundString(howMany / fromHowMany, 2)
 
-    return <div className="relative bg-white pt-5 px-4 sm:pt-6 sm:px-6 shadow rounded-lg">
+    return <div className="relative bg-white pt-5 px-4 shadow rounded-lg">
         <dt>
             <div className={`absolute rounded-md p-3`}>
                 {/* TODO add icons */}
             </div>
             <p className="text-sm font-medium text-gray-500 truncate">{text}</p>
             <p className="text-md font-medium text-gray-900 truncate0">
-                {calculatedValue} ({calculatedValueInPercent})
+                {howMany} from {fromHowMany} ({calculatedValueInPercent})
             </p>
         </dt>
-        <dd className="pb-6 flex items-baseline sm:pb-7">
-            <div className="inset-x-0 bg-gray-50 px-4 py-4 sm:px-6 w-full">
+        <dd className="pb-4 flex items-baseline">
+            <div className="inset-x-0 bg-gray-50 px-4 py-4 w-full">
                 <div className="text-sm">
                     <button className="text-sm font-normal text-gray-500 underline" onClick={() => setShowRecords(!showRecords)}>{showRecords ? "Hide" : "Show"} records</button>
                 </div>
@@ -100,5 +123,21 @@ function RecordDisplaySearches({ attributes, records, text, calculatedValue }) {
                 </>}
             </div>
         </dd>
+    </div>
+}
+
+function RecordDisplaySearchesAggregated({ text, howMany, fromHowMany }) {
+    const calculatedValueInPercent = percentRoundString(howMany / fromHowMany, 2)
+
+    return <div className="relative bg-white p-4 shadow rounded-lg">
+        <dt>
+            <div className={`absolute rounded-md p-3`}>
+                {/* TODO add icons */}
+            </div>
+            <p className="text-sm font-medium text-gray-500 truncate">{text}</p>
+            <p className="text-md font-medium text-gray-900 truncate0">
+                {howMany} from {fromHowMany} ({calculatedValueInPercent})
+            </p>
+        </dt>
     </div>
 }
