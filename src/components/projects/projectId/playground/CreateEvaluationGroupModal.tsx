@@ -47,6 +47,13 @@ export default function CreateEvaluationGroupModal(props: CreateEvaluationGroupM
         });
     }, [projectId, hasCreated]);
 
+    useEffect(() => {
+        if (!hasCreated) return;
+        setEvaluationSets([]);
+        setSelectedSets([]);
+        setHasCreated(false);
+    }, [hasCreated]);
+
 
     return <Modal modalName={ModalEnum.EVALUATION_GROUP} acceptButton={acceptButton} className="md:max-w-6xl">
         <div className="h-full">

@@ -4,7 +4,7 @@ import { selectProjectId } from "@/src/reduxStore/states/project"
 import { getAttributes } from "@/src/services/base/attribute"
 import { getEvaluationRunById, getEvaluationSets } from "@/src/services/base/playground"
 import { arrayToDict, percentRoundString } from "@/submodules/javascript-functions/general"
-import { IconX } from "@tabler/icons-react"
+import { IconArrowLeft, IconX } from "@tabler/icons-react"
 import { useRouter } from "next/router"
 import { Fragment, useEffect, useState } from "react"
 import { useDispatch, useSelector } from "react-redux"
@@ -59,11 +59,15 @@ export default function EvaluationRunDetails() {
 
     return <>
         {projectId && <div className={`grid overflow-hidden min-h-full p-4`}>
-            <div>
+            <div className="flex items-center gap-2">
+                <button onClick={() => router.back()} className="text-green-800 text-sm font-medium">
+                    <IconArrowLeft className="h-5 w-5 inline-block text-green-800" />
+                    <span className="leading-5">Go back</span>
+                </button>
                 <label className="text-lg leading-6 text-gray-900 font-medium"> Evaluation Run Results</label>
-                <div className="my-1">
-                    <div className="text-sm leading-5 font-normal text-gray-500 inline-block">You can see the results of the evaluation run</div>
-                </div>
+            </div>
+            <div className="my-1">
+                <div className="text-sm leading-5 font-normal text-gray-500 inline-block">You can see the results of the evaluation run</div>
             </div>
             <div className="text-md leading-5 font-normal text-gray-700 my-5"><strong>Aggregated view for all sets in the evaluation run</strong></div>
             <div className="grid grid-cols-3 gap-x-2">
