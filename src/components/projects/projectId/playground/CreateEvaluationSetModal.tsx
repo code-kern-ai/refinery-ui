@@ -54,7 +54,7 @@ export default function CreateEvaluationSetModal(props: CreateEvaluationSetsModa
 
     useEffect(() => {
         recordSearchContains(projectId, search, searchRequest.offset, searchRequest.limit, (res) => {
-            setRecordList(res);
+            setRecordList([...recordList, ...res]);
         });
     }, [searchRequest, projectId]);
 
@@ -67,7 +67,14 @@ export default function CreateEvaluationSetModal(props: CreateEvaluationSetsModa
     }, [debouncedSearch]);
 
     const refetchMoreRecords = useCallback((e: any) => {
+        if (e.target.scrollHeight - e.target.scrollTop === e.target.clientHeight) {
+            setSearchRequest({ ...searchRequest, offset: searchRequest.offset + searchRequest.limit });
+        }
     }, [recordList, searchRequest, projectId]);
+
+    useEffect(() => {
+        setSearchRequest(SEARCH_REQUEST);
+    }, [search]);
 
     function getSimilarRecords() {
         setLoading(true);

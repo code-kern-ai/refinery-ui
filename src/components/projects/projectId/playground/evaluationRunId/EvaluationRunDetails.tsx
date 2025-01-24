@@ -4,7 +4,7 @@ import { selectProjectId } from "@/src/reduxStore/states/project"
 import { getAttributes } from "@/src/services/base/attribute"
 import { getEvaluationRunById, getEvaluationSets } from "@/src/services/base/playground"
 import { arrayToDict, percentRoundString } from "@/submodules/javascript-functions/general"
-import { IconArrowLeft, IconX } from "@tabler/icons-react"
+import { IconArrowLeft, IconCheck, IconX } from "@tabler/icons-react"
 import { useRouter } from "next/router"
 import { Fragment, useEffect, useState } from "react"
 import { useDispatch, useSelector } from "react-redux"
@@ -102,11 +102,11 @@ function RecordDisplaySearches({ attributes, records, text, howMany, fromHowMany
     return <div className="relative bg-white pt-5 px-4 shadow rounded-lg">
         <dt>
             <div className={`flex items-center gap-2`}>
-                {text === "Matched records" && <div className="bg-green-500 p-2 rounded-full flex justify-center items-center">
-                    <IconX className="text-green-900" size={20} stroke={2.5} />
+                {text === "Matched records" && <div className="bg-green-300 p-2 rounded-full flex justify-center items-center">
+                    <IconCheck className="text-green-900" size={20} stroke={2.5} />
                 </div>}
-                {text === "Unrelated records" && <div className="bg-green-500 p-2 rounded-full flex justify-center items-center">
-                    <IconX className="text-red-900" size={20} stroke={2.5} />
+                {text === "Unrelated records" && <div className="bg-green-300 p-2 rounded-full flex justify-center items-center">
+                    <IconX className="text-red-700" size={20} stroke={2.5} />
                 </div>}
                 {text === "Missed records" && <div className="bg-red-500 p-2 rounded-full flex justify-center items-center">
                     <IconX className="text-red-900" size={20} stroke={2.5} />
@@ -148,11 +148,11 @@ function RecordDisplaySearchesAggregated({ text, howMany, fromHowMany }) {
     return <div className="relative bg-white p-4 shadow rounded-lg">
         <dt>
             <div className={`flex items-center gap-2`}>
-                {text === "Matched records" && <div className="bg-green-500 p-2 rounded-full flex justify-center items-center">
-                    <IconX className="text-green-900" size={20} stroke={2.5} />
+                {text === "Matched records" && <div className="bg-green-300 p-2 rounded-full flex justify-center items-center">
+                    <IconCheck className="text-green-900" size={20} stroke={2.5} />
                 </div>}
-                {text === "Unrelated records" && <div className="bg-green-500 p-2 rounded-full flex justify-center items-center">
-                    <IconX className="text-red-900" size={20} stroke={2.5} />
+                {text === "Unrelated records" && <div className="bg-green-300 p-2 rounded-full flex justify-center items-center">
+                    <IconX className="text-red-700" size={20} stroke={2.5} />
                 </div>}
                 {text === "Missed records" && <div className="bg-red-500 p-2 rounded-full flex justify-center items-center">
                     <IconX className="text-red-900" size={20} stroke={2.5} />
