@@ -2,9 +2,8 @@ import Modal from "@/src/components/shared/modal/Modal";
 import { selectModal } from "@/src/reduxStore/states/modal";
 import { ModalButton, ModalEnum } from "@/src/types/shared/modal";
 import { useState, useCallback, useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import { deleteEvaluationSetsPost } from "@/src/services/base/playground";
-
 import { selectProjectId } from "@/src/reduxStore/states/project";
 
 const ABORT_BUTTON = { buttonCaption: "Delete", useButton: true, disabled: false };
@@ -13,8 +12,6 @@ type DeleteEvaluationSetsModalProps = {
     refetchEvaluationSets: () => void;
 };
 export default function DeleteEvaluationSetsModal(props: DeleteEvaluationSetsModalProps) {
-    const dispatch = useDispatch();
-
     const [abortButton, setAbortButton] = useState<ModalButton>(ABORT_BUTTON);
     const projectId = useSelector(selectProjectId);
     const modalDeleteEvaluationSet = useSelector(selectModal(ModalEnum.DELETE_EVALUATION_SET));

@@ -97,3 +97,11 @@ export function getEvaluationRunById(projectId: string, evaluationRunId: string,
     const finalUrl = `${playgroundEndpoint}/${projectId}/evaluation-runs/${evaluationRunId}`;
     jsonFetchWrapper(finalUrl, FetchType.GET, onResult);
 }
+
+export function deleteEvaluationRunsPost(projectId: string, evaluationRunIds: string[], onResult: (result: any) => void) {
+    const finalUrl = `${playgroundEndpoint}/${projectId}/evaluation-runs`;
+    const body = {
+        evaluationRunIds: evaluationRunIds
+    }
+    jsonFetchWrapper(finalUrl, FetchType.DELETE, onResult, JSON.stringify(body));
+}
