@@ -4,6 +4,7 @@ import { selectProjectId } from "@/src/reduxStore/states/project"
 import { getAttributes } from "@/src/services/base/attribute"
 import { getEvaluationRunById, getEvaluationSets } from "@/src/services/base/playground"
 import { arrayToDict, percentRoundString } from "@/submodules/javascript-functions/general"
+import { IconX } from "@tabler/icons-react"
 import { useRouter } from "next/router"
 import { Fragment, useEffect, useState } from "react"
 import { useDispatch, useSelector } from "react-redux"
@@ -77,7 +78,7 @@ export default function EvaluationRunDetails() {
                     <div className="text-md leading-5 font-normal text-gray-500 my-5"><strong className="underline">Question:</strong> {evaluationSetsDict[result.evaluationSetId].question}</div>
                     <div className="grid grid-cols-3 gap-x-2">
                         <RecordDisplaySearches attributes={attributes} records={result.truePositives} text="Matched records"
-                            howMany={result.truePositives.length} fromHowMany={result.falsePositives.length + result.truePositives.length} />
+                            howMany={result.truePositives.length} fromHowMany={evaluationSetsDict[result.evaluationSetId].recordIds.length} />
                         <RecordDisplaySearches attributes={attributes} records={result.falsePositives} text="Unrelated records"
                             howMany={result.falsePositives.length} fromHowMany={result.falsePositives.length + result.truePositives.length} />
                         <RecordDisplaySearches attributes={attributes} records={result.falseNegatives} text="Missed records"
@@ -96,16 +97,27 @@ function RecordDisplaySearches({ attributes, records, text, howMany, fromHowMany
 
     return <div className="relative bg-white pt-5 px-4 shadow rounded-lg">
         <dt>
-            <div className={`absolute rounded-md p-3`}>
-                {/* TODO add icons */}
+            <div className={`flex items-center gap-2`}>
+                {text === "Matched records" && <div className="bg-green-500 p-2 rounded-full flex justify-center items-center">
+                    <IconX className="text-green-900" size={20} stroke={2.5} />
+                </div>}
+                {text === "Unrelated records" && <div className="bg-green-500 p-2 rounded-full flex justify-center items-center">
+                    <IconX className="text-red-900" size={20} stroke={2.5} />
+                </div>}
+                {text === "Missed records" && <div className="bg-red-500 p-2 rounded-full flex justify-center items-center">
+                    <IconX className="text-red-900" size={20} stroke={2.5} />
+                </div>}
+
+                <div>
+                    <p className="text-sm font-medium text-gray-500 truncate">{text}</p>
+                    <p className="text-md font-medium text-gray-900 truncate0">
+                        {howMany}/{fromHowMany} ({calculatedValueInPercent})
+                    </p>
+                </div>
             </div>
-            <p className="text-sm font-medium text-gray-500 truncate">{text}</p>
-            <p className="text-md font-medium text-gray-900 truncate0">
-                {howMany} from {fromHowMany} ({calculatedValueInPercent})
-            </p>
         </dt>
         <dd className="pb-4 flex items-baseline">
-            <div className="inset-x-0 bg-gray-50 px-4 py-4 w-full">
+            <div className="inset-x-0 bg-gray-50 px-4 py-4 w-full" style={{ maxHeight: "500px", overflowY: "auto" }}>
                 <div className="text-sm">
                     <button className="text-sm font-normal text-gray-500 underline" onClick={() => setShowRecords(!showRecords)}>{showRecords ? "Hide" : "Show"} records</button>
                 </div>
@@ -131,13 +143,24 @@ function RecordDisplaySearchesAggregated({ text, howMany, fromHowMany }) {
 
     return <div className="relative bg-white p-4 shadow rounded-lg">
         <dt>
-            <div className={`absolute rounded-md p-3`}>
-                {/* TODO add icons */}
+            <div className={`flex items-center gap-2`}>
+                {text === "Matched records" && <div className="bg-green-500 p-2 rounded-full flex justify-center items-center">
+                    <IconX className="text-green-900" size={20} stroke={2.5} />
+                </div>}
+                {text === "Unrelated records" && <div className="bg-green-500 p-2 rounded-full flex justify-center items-center">
+                    <IconX className="text-red-900" size={20} stroke={2.5} />
+                </div>}
+                {text === "Missed records" && <div className="bg-red-500 p-2 rounded-full flex justify-center items-center">
+                    <IconX className="text-red-900" size={20} stroke={2.5} />
+                </div>}
+
+                <div>
+                    <p className="text-sm font-medium text-gray-500 truncate">{text}</p>
+                    <p className="text-md font-medium text-gray-900 truncate0">
+                        {howMany}/{fromHowMany} ({calculatedValueInPercent})
+                    </p>
+                </div>
             </div>
-            <p className="text-sm font-medium text-gray-500 truncate">{text}</p>
-            <p className="text-md font-medium text-gray-900 truncate0">
-                {howMany} from {fromHowMany} ({calculatedValueInPercent})
-            </p>
         </dt>
     </div>
 }
