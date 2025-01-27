@@ -71,7 +71,7 @@ export default function EvaluationRunDetails() {
             </div>
             <div className="text-md leading-5 font-normal text-gray-700 my-5"><strong>Aggregated view for all sets in the evaluation run</strong></div>
             <div className="grid grid-cols-3 gap-x-2">
-                <RecordDisplaySearchesAggregated text="Matched records" howMany={aggregateResults?.matchedRecords} fromHowMany={aggregateResults?.matchedRecords + aggregateResults?.updatedRecords} />
+                <RecordDisplaySearchesAggregated text="Matched records" howMany={aggregateResults?.matchedRecords} fromHowMany={aggregateResults?.matchedRecords + aggregateResults?.missedRecords} />
                 <RecordDisplaySearchesAggregated text="Unrelated records" howMany={aggregateResults?.updatedRecords} fromHowMany={aggregateResults?.matchedRecords + aggregateResults?.updatedRecords} />
                 <RecordDisplaySearchesAggregated text="Missed records" howMany={aggregateResults?.missedRecords} fromHowMany={aggregateResults?.matchedRecords + aggregateResults?.missedRecords} />
             </div>
