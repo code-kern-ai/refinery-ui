@@ -71,7 +71,7 @@ export default function CreateEvaluationGroupModal(props: CreateEvaluationGroupM
                     <div className="flex items-center">
                         <span className="mr-4">Selected results</span>
                     </div>
-                    {selectedSets && selectedSets.map((set, index) => (<div key={set.id} className="bg-white overflow-hidden shadow rounded-lg border p-2 relative"
+                    {selectedSets && selectedSets.map((set, index) => (<div key={set.id} className="bg-white overflow-hidden shadow rounded-lg border p-2 relative hover:border-red-400 hover:border-opacity-50 cursor-pointer transition-all duration-200 ease-in-out"
                         onClick={() => {
                             setEvaluationSets([...evaluationSets, set]);
                             const newSelectedSets = selectedSets.filter((item) => item.id !== set.id);
@@ -82,7 +82,7 @@ export default function CreateEvaluationGroupModal(props: CreateEvaluationGroupM
                 </div>
                 <div className={`h-full border-gray-300 border-l`}>
                     <div>Evaluation sets</div>
-                    {evaluationSets && evaluationSets.map((set, index) => (<div key={set.id} className="bg-white overflow-hidden shadow rounded-lg border m-4 p-2 relative"
+                    {evaluationSets && evaluationSets.map((set, index) => (<div key={set.id} className="bg-white overflow-hidden shadow rounded-lg border m-4 p-2 relative hover:border-green-400 hover:border-opacity-30 cursor-pointer transition-all duration-200 ease-in-out"
                         onClick={() => {
                             setSelectedSets([...selectedSets, set]);
                             const newEvaluationSets = evaluationSets.filter((item) => item.id !== set.id);
