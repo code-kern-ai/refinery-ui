@@ -43,7 +43,7 @@ export function prepareTableBodyEvaluationRun(evaluationRuns, usersDict, embeddi
             },
             {
                 type: 'Component',
-                component: 'ViewCell',
+                component: 'EvaluationRunDetailsCell',
                 onClick: () => navigateToDetails(run.id),
                 disabled: run.state !== EvaluationRunState.SUCCESS
             }
