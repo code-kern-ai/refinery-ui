@@ -1,5 +1,6 @@
 import Modal from "@/src/components/shared/modal/Modal";
 import { RecordDisplay } from "@/src/components/shared/record-display/RecordDisplay";
+import { selectModal } from "@/src/reduxStore/states/modal";
 import { selectOnAttributeEmbeddings, selectVisibleAttributesDataBrowser } from "@/src/reduxStore/states/pages/settings";
 import { selectProjectId } from "@/src/reduxStore/states/project";
 import { createEvaluationSet, getSearchResults, recordSearchContains } from "@/src/services/base/playground";
@@ -11,7 +12,7 @@ import useDebounce from "@/submodules/react-components/hooks/useHooks/useDebounc
 import { Loading } from "@nextui-org/react";
 import { IconPlus, IconWand } from "@tabler/icons-react";
 import { useCallback, useEffect, useState } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 
 const ACCEPT_BUTTON = { buttonCaption: 'Create', useButton: true };
 const SEARCH_REQUEST = { offset: 0, limit: 20 };
@@ -21,6 +22,8 @@ type CreateEvaluationSetsModalProps = {
 };
 
 export default function CreateEvaluationSetModal(props: CreateEvaluationSetsModalProps) {
+    const dispatch = useDispatch();
+
     const projectId = useSelector(selectProjectId);
     const attributes = useSelector(selectVisibleAttributesDataBrowser);
     const onAttributeEmbeddings = useSelector(selectOnAttributeEmbeddings);
@@ -40,10 +43,17 @@ export default function CreateEvaluationSetModal(props: CreateEvaluationSetsModa
 
     const debouncedSearch = useDebounce(search, 1000);
 
+    const evaluationSetModalState = useSelector(selectModal(ModalEnum.EVALUATION_SET));
+
+    useEffect(() => {
+        if (!evaluationSetModalState.open) {
+            resetState();
+        }
+    }, [evaluationSetModalState.open, dispatch]);
+
     const createEvaluationSetPost = useCallback(() => {
         createEvaluationSet(projectId, question, selectedRecords.map((record) => record.id), (res) => {
-            setQuestion("");
-            setSelectedRecords([]);
+            resetState();
             props.refetchEvaluationSets();
         });
     }, [question, selectedRecords, projectId]);
@@ -86,6 +96,19 @@ export default function CreateEvaluationSetModal(props: CreateEvaluationSetsModa
             setShowSimilarityRecordsList(true)
             setLoading(false);
         });
+    }
+
+    function resetState() {
+        setQuestion("");
+        setSearch("");
+        setSelectedRecords([]);
+        setSelectedRecords([]);
+        setSelectedEmbedding(null);
+        setLimit(10);
+        setSimilarityRecordList([]);
+        setShowSimilarityRecordsList(false);
+        setLoading(false);
+        setAddedSimilarityRecords([]);
     }
 
     return <Modal modalName={ModalEnum.EVALUATION_SET} acceptButton={acceptButton} className="md:max-w-6xl">
