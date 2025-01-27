@@ -21,7 +21,7 @@ export function EvaluationGroups() {
     const users = useSelector(selectAllUsers);
     const usersDict = arrayToDict(users, 'id');
 
-    const [evaluationGroups, setEvaluationGroups] = useState([]);
+    const [evaluationGroups, setEvaluationGroups] = useState(null);
     const [preparedValues, setPreparedValues] = useState([]);
     const [preparedHeaders, setPreparedHeaders] = useState(EVALUATION_GROUPS_TABLE_HEADER);
     const [selectedEvaluationGroups, setSelectedEvaluationGroups] = useState(new Set<string>());
@@ -100,7 +100,7 @@ export function EvaluationGroups() {
                     className={`ml-auto bg-green-100 border border-green-400 text-green-700 text-xs font-semibold px-4 py-2 rounded-md cursor-pointer opacity-100 hover:bg-green-200 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50`}
                     onClick={() => dispatch(openModal(ModalEnum.EVALUATION_GROUP))}>Create evaluation group</button>
             </div >
-            {evaluationGroups.length > 0 ?
+            {evaluationGroups && (evaluationGroups.length > 0 ?
                 <KernTable
                     headers={preparedHeaders}
                     values={preparedValues}
@@ -112,7 +112,7 @@ export function EvaluationGroups() {
                 <div className="text-sm inline-block font-normal text-gray-500 italic mt-3">
                     No evaluation groups available yet.
                 </div>
-            }
+            )}
             {selectedEvaluationGroups.size > 0 &&
                 <div className='pt-4'>
                     <KernButton

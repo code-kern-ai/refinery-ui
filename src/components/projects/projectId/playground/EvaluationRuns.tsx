@@ -25,7 +25,7 @@ export default function EvaluationRuns() {
     const onAttributeEmbeddings = useSelector(selectOnAttributeEmbeddings);
 
     const [preparedValues, setPreparedValues] = useState([]);
-    const [evaluationRuns, setEvaluationRuns] = useState([]);
+    const [evaluationRuns, setEvaluationRuns] = useState(null);
     const [evaluationGroups, setEvaluationGroups] = useState([]);
     const [evaluationDict, setEvaluationDict] = useState(null);
     const [embeddingsDict, setEmbeddingsDict] = useState(null);
@@ -108,7 +108,7 @@ export default function EvaluationRuns() {
                     className={`ml-auto bg-green-100 border border-green-400 text-green-700 text-xs font-semibold px-4 py-2 rounded-md cursor-pointer opacity-100 hover:bg-green-200 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50`}
                     onClick={() => dispatch(openModal(ModalEnum.EVALUATION_RUN))}>Create evaluation run</button>
             </div >
-            {evaluationRuns.length > 0 ?
+            {evaluationRuns && (evaluationRuns.length > 0 ?
                 <KernTable
                     headers={preparedHeaders}
                     values={preparedValues}
@@ -119,7 +119,7 @@ export default function EvaluationRuns() {
                 <div className="text-sm inline-block font-normal text-gray-500 italic mt-3">
                     No evaluation runs available yet.
                 </div>
-            }
+            )}
             {selectedEvaluationRuns.size > 0 &&
                 <div className='pt-4'>
                     <KernButton
