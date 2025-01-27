@@ -80,7 +80,7 @@ export default function EvaluationRunDetails() {
             {evaluationRun && evaluationSetsDict && <div>
                 {evaluationRun.results.map((result, index) => <Fragment key={index}>
                     <div className="text-md leading-5 font-normal text-gray-500 my-5"><strong className="underline">Question:</strong> {evaluationSetsDict[result.evaluation_set_id].question}</div>
-                    <div className="grid grid-cols-3 gap-x-2">
+                    <div className="grid grid-cols-3 gap-x-2 items-start">
                         <RecordDisplaySearches attributes={attributes} records={result.true_positives} text="Matched records"
                             howMany={result.true_positives.length} fromHowMany={evaluationSetsDict[result.evaluation_set_id].recordIds.length} />
                         <RecordDisplaySearches attributes={attributes} records={result.false_positives} text="Unrelated records"
@@ -121,22 +121,31 @@ function RecordDisplaySearches({ attributes, records, text, howMany, fromHowMany
             </div>
         </dt>
         <dd className="pb-4 flex items-baseline">
-            <div className="inset-x-0 bg-gray-50 px-4 py-4 w-full" style={{ maxHeight: "500px", overflowY: "auto" }}>
-                <div className="text-sm">
+            <div className="inset-x-0 bg-gray-50 px-4 pt-3 w-full rounded-md">
+                <div className="text-sm pb-3">
                     <button className="text-sm font-normal text-gray-500 underline" onClick={() => setShowRecords(!showRecords)}>{showRecords ? "Hide" : "Show"} records</button>
                 </div>
-                {showRecords && <>
-                    {records.length > 0 ? <>
-                        {records.map((record, index) => <div key={record.id} className="my-2">
-                            <div key={index} className="flex flex-col gap-x-3 bg-white rounded-md border border-gray-300 py-2 px-3 m-2">
-                                <RecordDisplay
+                <div
+                    className={`transition-all duration-200 ease-in-out overflow-y-auto ${showRecords ? "max-h-[500px] opacity-100" : "max-h-0 opacity-0"
+                        } overflow-hidden`}
+                >
+                    {records.length > 0 ? (
+                        records.map((record, index) => (
+                            <div key={record.id} className="my-2">
+                                <div
                                     key={index}
-                                    attributes={attributes}
-                                    record={record} />
+                                    className="flex flex-col gap-x-3 bg-white rounded-md border border-gray-300 py-2 px-3 m-2"
+                                >
+                                    <RecordDisplay key={index} attributes={attributes} record={record} />
+                                </div>
                             </div>
-                        </div>)}
-                    </> : <div className="leading-5 text-center mt-3 text-sm font-normal-text-gray-500 text-gray-500 italic">There are no matching results</div>}
-                </>}
+                        ))
+                    ) : (
+                        <div className="leading-5 text-center mb-2 text-sm font-normal-text-gray-500 text-gray-500 italic">
+                            There are no matching results
+                        </div>
+                    )}
+                </div>
             </div>
         </dd>
     </div>

@@ -100,7 +100,7 @@ export default function EvaluationRuns() {
             <div className="text-lg leading-6 text-gray-900 font-medium w-full flex items-center">
                 <div>
                     <label>Evaluation runs</label>
-                    <div className="mt-1">
+                    <div className="mt-1 mb-3">
                         <div className="text-sm leading-5 font-normal text-gray-500 inline-block">You can create your evaluation runs.</div>
                     </div>
                 </div>
