@@ -2,7 +2,7 @@ import Modal from "@/src/components/shared/modal/Modal";
 import { RecordDisplay } from "@/src/components/shared/record-display/RecordDisplay";
 import { selectVisibleAttributesDataBrowser } from "@/src/reduxStore/states/pages/settings";
 import { selectProjectId } from "@/src/reduxStore/states/project";
-import { createEvaluationGroups, createEvaluationSet, getEvaluationSets, recordSearchContains } from "@/src/services/base/playground";
+import { createEvaluationGroups, getEvaluationSets } from "@/src/services/base/playground";
 import { ModalButton, ModalEnum } from "@/src/types/shared/modal";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useSelector } from "react-redux";

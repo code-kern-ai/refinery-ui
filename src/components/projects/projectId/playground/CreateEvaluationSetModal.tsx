@@ -53,6 +53,7 @@ export default function CreateEvaluationSetModal(props: CreateEvaluationSetsModa
     }, [createEvaluationSetPost, selectedRecords, question]);
 
     useEffect(() => {
+        if (!searchRequest || projectId) return;
         recordSearchContains(projectId, search, searchRequest.offset, searchRequest.limit, (res) => {
             setRecordList([...recordList, ...res]);
         });
