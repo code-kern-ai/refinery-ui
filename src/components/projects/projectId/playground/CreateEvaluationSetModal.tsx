@@ -63,6 +63,7 @@ export default function CreateEvaluationSetModal(props: CreateEvaluationSetsModa
     }, [createEvaluationSetPost, selectedRecords, question]);
 
     useEffect(() => {
+        if (!searchRequest || projectId) return;
         recordSearchContains(projectId, search, searchRequest.offset, searchRequest.limit, (res) => {
             setRecordList([...recordList, ...res]);
         });
@@ -113,7 +114,7 @@ export default function CreateEvaluationSetModal(props: CreateEvaluationSetsModa
     return <Modal modalName={ModalEnum.EVALUATION_SET} acceptButton={acceptButton} className="md:max-w-6xl">
         <div className="h-full">
             <div className="flex flex-grow justify-center text-lg leading-6 text-gray-900 font-medium">Create new evaluation set</div>
-            <div className={`bg-white grid overflow-hidden min-h-full grid-cols-2`} style={{ height: 'calc(100vh - 200px)', overflowY: 'scroll' }} onScroll={(e: any) => refetchMoreRecords(e)}>
+            <div className={`bg-white grid overflow-hidden min-h-full grid-cols-2`}>
                 <div className="flex flex-col gap-y-2 m-3 h-full">
                     <div className="flex items-center">
                         <span className="mr-3">Embedding</span>
@@ -143,13 +144,6 @@ export default function CreateEvaluationSetModal(props: CreateEvaluationSetsModa
                             }}
                         />
                         <KernButton
-                            text={"Reset"}
-                            disabled={showSimilarityRecordsList === false}
-                            onClick={() => {
-                                setShowSimilarityRecordsList(false)
-                            }}
-                        />
-                        <KernButton
                             text={"Add all similar"}
                             icon={IconPlus}
                             iconColor='green'
@@ -170,26 +164,31 @@ export default function CreateEvaluationSetModal(props: CreateEvaluationSetsModa
                             }}
                         />
                     </div>
-                    <div className="flex items-center pt-10">
+                    <div className="flex items-center pt-5">
                         <span className="mr-4">{selectedRecords.length === 0 ? '' : 'Results'}</span>
                     </div>
-                    {selectedRecords && selectedRecords.map((record, index) => (<div key={record.id} className="bg-white overflow-hidden shadow rounded-lg border p-2 relative hover:border-red-400 hover:border-opacity-50 cursor-pointer transition-all duration-200 ease-in-out">
-                        <RecordDisplay
-                            attributes={attributes}
-                            record={record}
-                            onClick={() => {
-                                const isInSimilarityRecords = addedSimilarityRecords.some(item => item.id === record.id);
+                    <div style={{
+                        maxHeight: 'calc(100vh - 500px)',
+                        overflowY: 'auto',
+                    }}>
+                        {selectedRecords && selectedRecords.map((record, index) => (<div key={record.id} className="bg-white overflow-hidden shadow rounded-lg border p-2 relative hover:border-red-400 hover:border-opacity-50 cursor-pointer transition-all duration-200 ease-in-out my-4">
+                            <RecordDisplay
+                                attributes={attributes}
+                                record={record}
+                                onClick={() => {
+                                    const isInSimilarityRecords = addedSimilarityRecords.some(item => item.id === record.id);
 
-                                if (isInSimilarityRecords) {
-                                    setSimilarityRecordList([...similarityRecordList, record])
-                                } else {
-                                    setRecordList([...recordList, record]);
-                                }
+                                    if (isInSimilarityRecords) {
+                                        setSimilarityRecordList([...similarityRecordList, record])
+                                    } else {
+                                        setRecordList([...recordList, record]);
+                                    }
 
-                                const newSelectedRecords = selectedRecords.filter((item) => item.id !== record.id);
-                                setSelectedRecords(newSelectedRecords);
-                            }} />
-                    </div >))}
+                                    const newSelectedRecords = selectedRecords.filter((item) => item.id !== record.id);
+                                    setSelectedRecords(newSelectedRecords);
+                                }} />
+                        </div >))}
+                    </div>
                 </div>
                 {loading ? (
                     <div className="flex justify-center items-center h-full">
@@ -197,25 +196,38 @@ export default function CreateEvaluationSetModal(props: CreateEvaluationSetsModa
                     </div>
                 ) : showSimilarityRecordsList ? (
                     <div className={`h-full border-gray-300 border-l`}>
-                        {similarityRecordList && similarityRecordList.map((record, index) => (
-                            <div key={record.id} className="bg-purple-100 overflow-hidden shadow rounded-lg border m-4 p-2 relative hover:border-green-400 hover:border-opacity-30 cursor-pointer transition-all duration-200 ease-in-out">
-                                <RecordDisplay
-                                    attributes={attributes}
-                                    record={record}
-                                    onClick={() => {
-                                        setSelectedRecords([...selectedRecords, record]);
-                                        const newRecordList = recordList.filter((item) => item.id !== record.id);
-                                        const newSimilarityRecordList = similarityRecordList.filter((item) => {
-                                            if (item.id === record.id) {
-                                                setAddedSimilarityRecords(prevRecords => [...prevRecords, item]);
-                                            }
-                                            return item.id !== record.id;
-                                        });
-                                        setSimilarityRecordList(newSimilarityRecordList);
-                                        setRecordList(newRecordList)
-                                    }} />
-                            </div>
-                        ))}
+                        <div className="m-3 flex justify-end">
+                            <KernButton
+                                text="Clear"
+                                onClick={() => {
+                                    setShowSimilarityRecordsList(false)
+                                }}
+                            />
+                        </div>
+                        <div style={{
+                            maxHeight: 'calc(100vh - 300px)',
+                            overflowY: 'auto',
+                        }}>
+                            {similarityRecordList && similarityRecordList.map((record, index) => (
+                                <div key={record.id} className="bg-purple-100 overflow-hidden shadow rounded-lg border m-4 p-2 relative hover:border-green-400 hover:border-opacity-30 cursor-pointer transition-all duration-200 ease-in-out">
+                                    <RecordDisplay
+                                        attributes={attributes}
+                                        record={record}
+                                        onClick={() => {
+                                            setSelectedRecords([...selectedRecords, record]);
+                                            const newRecordList = recordList.filter((item) => item.id !== record.id);
+                                            const newSimilarityRecordList = similarityRecordList.filter((item) => {
+                                                if (item.id === record.id) {
+                                                    setAddedSimilarityRecords(prevRecords => [...prevRecords, item]);
+                                                }
+                                                return item.id !== record.id;
+                                            });
+                                            setSimilarityRecordList(newSimilarityRecordList);
+                                            setRecordList(newRecordList)
+                                        }} />
+                                </div>
+                            ))}
+                        </div>
                     </div>
                 ) : (
                     <div className={`h-full border-gray-300 border-l`}>
@@ -227,18 +239,23 @@ export default function CreateEvaluationSetModal(props: CreateEvaluationSetsModa
                                 className="w-full h-10 p-2 line-height-textarea border rounded-md border-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100" />
                             <div>Records</div>
                         </div>
-                        {recordList && recordList.map((record, index) => (
-                            <div key={record.id} className="bg-white overflow-hidden shadow rounded-lg border m-4 p-2 relative hover:border-green-400 hover:border-opacity-30 cursor-pointer transition-all duration-200 ease-in-out">
-                                <RecordDisplay
-                                    attributes={attributes}
-                                    record={record}
-                                    onClick={() => {
-                                        setSelectedRecords([...selectedRecords, record]);
-                                        const newRecordList = recordList.filter((item) => item.id !== record.id);
-                                        setRecordList(newRecordList);
-                                    }} />
-                            </div>
-                        ))}
+                        <div style={{
+                            maxHeight: 'calc(100vh - 300px)',
+                            overflowY: 'scroll',
+                        }} onScroll={(e: any) => refetchMoreRecords(e)}>
+                            {recordList && recordList.map((record, index) => (
+                                <div key={record.id} className="bg-white overflow-hidden shadow rounded-lg border m-4 p-2 relative hover:border-green-400 hover:border-opacity-30 cursor-pointer transition-all duration-200 ease-in-out">
+                                    <RecordDisplay
+                                        attributes={attributes}
+                                        record={record}
+                                        onClick={() => {
+                                            setSelectedRecords([...selectedRecords, record]);
+                                            const newRecordList = recordList.filter((item) => item.id !== record.id);
+                                            setRecordList(newRecordList);
+                                        }} />
+                                </div>
+                            ))}
+                        </div>
                     </div>
                 )}
             </div>
