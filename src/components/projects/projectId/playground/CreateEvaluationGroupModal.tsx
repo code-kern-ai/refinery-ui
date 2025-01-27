@@ -1,11 +1,11 @@
 import Modal from "@/src/components/shared/modal/Modal";
-import { RecordDisplay } from "@/src/components/shared/record-display/RecordDisplay";
+import { selectModal } from "@/src/reduxStore/states/modal";
 import { selectVisibleAttributesDataBrowser } from "@/src/reduxStore/states/pages/settings";
 import { selectProjectId } from "@/src/reduxStore/states/project";
 import { createEvaluationGroups, getEvaluationSets } from "@/src/services/base/playground";
 import { ModalButton, ModalEnum } from "@/src/types/shared/modal";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 
 const ACCEPT_BUTTON = { buttonCaption: 'Create', useButton: true };
 
@@ -14,6 +14,8 @@ type CreateEvaluationGroupModalProps = {
 }
 
 export default function CreateEvaluationGroupModal(props: CreateEvaluationGroupModalProps) {
+    const dispatch = useDispatch();
+
     const projectId = useSelector(selectProjectId);
     const attributes = useSelector(selectVisibleAttributesDataBrowser);
 
@@ -22,6 +24,8 @@ export default function CreateEvaluationGroupModal(props: CreateEvaluationGroupM
     const [evaluationSets, setEvaluationSets] = useState([]);
     const [selectedSets, setSelectedSets] = useState([]);
     const [hasCreated, setHasCreated] = useState(false)
+    const evaluationGroupModalState = useSelector(selectModal(ModalEnum.EVALUATION_GROUP));
+
     const isFetchingEvalSets = useRef(false);
 
     const createEvaluationGroupPost = useCallback(() => {
@@ -34,9 +38,14 @@ export default function CreateEvaluationGroupModal(props: CreateEvaluationGroupM
     }, [name, selectedSets, projectId]);
 
     useEffect(() => {
+        if (!evaluationGroupModalState.open) {
+            createEvaluationGroupPost();
+        }
+    }, [evaluationGroupModalState.open, dispatch]);
+
+    useEffect(() => {
         setAcceptButton({ ...acceptButton, emitFunction: createEvaluationGroupPost, disabled: selectedSets.length === 0 || name === "" });
     }, [createEvaluationGroupPost, name, selectedSets]);
-
 
     useEffect(() => {
         if (isFetchingEvalSets.current) return;
@@ -53,7 +62,6 @@ export default function CreateEvaluationGroupModal(props: CreateEvaluationGroupM
         setSelectedSets([]);
         setHasCreated(false);
     }, [hasCreated]);
-
 
     return <Modal modalName={ModalEnum.EVALUATION_GROUP} acceptButton={acceptButton} className="md:max-w-6xl">
         <div className="h-full">
