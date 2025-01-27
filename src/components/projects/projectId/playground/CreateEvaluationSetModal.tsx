@@ -121,13 +121,6 @@ export default function CreateEvaluationSetModal(props: CreateEvaluationSetsModa
                             }}
                         />
                         <KernButton
-                            text={"Reset"}
-                            disabled={showSimilarityRecordsList === false}
-                            onClick={() => {
-                                setShowSimilarityRecordsList(false)
-                            }}
-                        />
-                        <KernButton
                             text={"Add all similar"}
                             icon={IconPlus}
                             iconColor='green'
@@ -180,25 +173,38 @@ export default function CreateEvaluationSetModal(props: CreateEvaluationSetsModa
                     </div>
                 ) : showSimilarityRecordsList ? (
                     <div className={`h-full border-gray-300 border-l`}>
-                        {similarityRecordList && similarityRecordList.map((record, index) => (
-                            <div key={record.id} className="bg-purple-100 overflow-hidden shadow rounded-lg border m-4 p-2 relative hover:border-green-400 hover:border-opacity-30 cursor-pointer transition-all duration-200 ease-in-out">
-                                <RecordDisplay
-                                    attributes={attributes}
-                                    record={record}
-                                    onClick={() => {
-                                        setSelectedRecords([...selectedRecords, record]);
-                                        const newRecordList = recordList.filter((item) => item.id !== record.id);
-                                        const newSimilarityRecordList = similarityRecordList.filter((item) => {
-                                            if (item.id === record.id) {
-                                                setAddedSimilarityRecords(prevRecords => [...prevRecords, item]);
-                                            }
-                                            return item.id !== record.id;
-                                        });
-                                        setSimilarityRecordList(newSimilarityRecordList);
-                                        setRecordList(newRecordList)
-                                    }} />
-                            </div>
-                        ))}
+                        <div className="m-3 flex justify-end">
+                            <KernButton
+                                text="Clear"
+                                onClick={() => {
+                                    setShowSimilarityRecordsList(false)
+                                }}
+                            />
+                        </div>
+                        <div style={{
+                            maxHeight: 'calc(100vh - 300px)',
+                            overflowY: 'auto',
+                        }}>
+                            {similarityRecordList && similarityRecordList.map((record, index) => (
+                                <div key={record.id} className="bg-purple-100 overflow-hidden shadow rounded-lg border m-4 p-2 relative hover:border-green-400 hover:border-opacity-30 cursor-pointer transition-all duration-200 ease-in-out">
+                                    <RecordDisplay
+                                        attributes={attributes}
+                                        record={record}
+                                        onClick={() => {
+                                            setSelectedRecords([...selectedRecords, record]);
+                                            const newRecordList = recordList.filter((item) => item.id !== record.id);
+                                            const newSimilarityRecordList = similarityRecordList.filter((item) => {
+                                                if (item.id === record.id) {
+                                                    setAddedSimilarityRecords(prevRecords => [...prevRecords, item]);
+                                                }
+                                                return item.id !== record.id;
+                                            });
+                                            setSimilarityRecordList(newSimilarityRecordList);
+                                            setRecordList(newRecordList)
+                                        }} />
+                                </div>
+                            ))}
+                        </div>
                     </div>
                 ) : (
                     <div className={`h-full border-gray-300 border-l`}>
