@@ -43,9 +43,9 @@ export default function EvaluationRunDetails() {
             missedRecords: 0
         };
         evaluationRun.results.forEach((result) => {
-            aggregateResults.matchedRecords += result.truePositives.length;
-            aggregateResults.updatedRecords += result.falsePositives.length;
-            aggregateResults.missedRecords += result.falseNegatives.length;
+            aggregateResults.matchedRecords += result.true_positives.length;
+            aggregateResults.updatedRecords += result.false_positives.length;
+            aggregateResults.missedRecords += result.false_negatives.length;
         })
 
         setAggregateResults(aggregateResults)
@@ -79,14 +79,14 @@ export default function EvaluationRunDetails() {
             <div className="text-md leading-5 font-normal text-gray-700 mt-5"><strong>Statistics per each set in the evaluation run</strong></div>
             {evaluationRun && evaluationSetsDict && <div>
                 {evaluationRun.results.map((result, index) => <Fragment key={index}>
-                    <div className="text-md leading-5 font-normal text-gray-500 my-5"><strong className="underline">Question:</strong> {evaluationSetsDict[result.evaluationSetId].question}</div>
+                    <div className="text-md leading-5 font-normal text-gray-500 my-5"><strong className="underline">Question:</strong> {evaluationSetsDict[result.evaluation_set_id].question}</div>
                     <div className="grid grid-cols-3 gap-x-2">
-                        <RecordDisplaySearches attributes={attributes} records={result.truePositives} text="Matched records"
-                            howMany={result.truePositives.length} fromHowMany={evaluationSetsDict[result.evaluationSetId].recordIds.length} />
-                        <RecordDisplaySearches attributes={attributes} records={result.falsePositives} text="Unrelated records"
-                            howMany={result.falsePositives.length} fromHowMany={result.falsePositives.length + result.truePositives.length} />
-                        <RecordDisplaySearches attributes={attributes} records={result.falseNegatives} text="Missed records"
-                            howMany={result.falseNegatives.length} fromHowMany={evaluationSetsDict[result.evaluationSetId].recordIds.length} />
+                        <RecordDisplaySearches attributes={attributes} records={result.true_positives} text="Matched records"
+                            howMany={result.true_positives.length} fromHowMany={evaluationSetsDict[result.evaluation_set_id].recordIds.length} />
+                        <RecordDisplaySearches attributes={attributes} records={result.false_positives} text="Unrelated records"
+                            howMany={result.false_positives.length} fromHowMany={result.false_positives.length + result.true_positives.length} />
+                        <RecordDisplaySearches attributes={attributes} records={result.false_negatives} text="Missed records"
+                            howMany={result.false_negatives.length} fromHowMany={evaluationSetsDict[result.evaluation_set_id].recordIds.length} />
                     </div>
                 </Fragment>)}
             </div >}
