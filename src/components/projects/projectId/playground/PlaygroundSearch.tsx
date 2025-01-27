@@ -5,18 +5,17 @@ import { selectProjectId } from "@/src/reduxStore/states/project";
 import { createEvaluationSet, getSearchResults } from "@/src/services/base/playground";
 import { Embedding } from "@/src/types/components/projects/projectId/settings/embeddings";
 import KernDropdown from "@/submodules/react-components/components/KernDropdown";
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { RecordDisplay } from "@/src/components/shared/record-display/RecordDisplay";
 import { selectVisibleAttributesDataBrowser } from "@/src/reduxStore/states/pages/settings";
 import LoadingIcon from "@/submodules/react-components/components/LoadingIcon";
-import { IconFilterOff, IconFilter } from '@tabler/icons-react'
-import { useRouter } from "next/router";
+import { IconFilterOff, IconFilter, IconCategoryPlus, IconLoader2 } from '@tabler/icons-react'
 import PlaygroundSearchMetaFilterModal from "./PlaygroundSearchMetaFilterModal";
 
+const PLAYGROUND_LIMIT_DEFAULT = 10;
 
 export function PlaygroundSearch() {
-    const router = useRouter();
     const dispatch = useDispatch();
 
     const projectId = useSelector(selectProjectId);
@@ -27,21 +26,34 @@ export function PlaygroundSearch() {
     const [selectedEmbedding, setSelectedEmbedding] = useState<Embedding>(null);
     const [question, setQuestion] = useState("");
     const [searchResults, setSearchResults] = useState(null);
-    const [limit, setLimit] = useState(10);
-    const [toggleMetaFilter, setToggleMetaFilter] = useState(false);
+    const [limit, setLimit] = useState(PLAYGROUND_LIMIT_DEFAULT);
     const [metaDataFilter, setMetaDataFilter] = useState(null);
 
-    function getSearchResultsPost() {
+    const [setCreationLoading, setSetCreationLoading] = useState(false);
+    const [createdSet, setCreatedSet] = useState(false);
+
+    const getSearchResultsPost = useCallback(() => {
         setLoading(true);
-        getSearchResults(projectId, selectedEmbedding.id, question, limit, metaDataFilter, (result) => {
+        getSearchResults(projectId, selectedEmbedding?.id, question, limit, metaDataFilter, (result) => {
             setLoading(false);
+            setCreatedSet(false);
             setSearchResults(result);
         });
-    }
+    }, [projectId, selectedEmbedding?.id, question, limit, metaDataFilter]);
 
-    function createSetFromRecords() {
-        createEvaluationSet(projectId, question, searchResults.map((record) => record.id), (result) => { });
-    }
+
+    const createSetFromRecords = useCallback(() => {
+        setSetCreationLoading(true);
+        if (createdSet) return;
+        setCreatedSet(true);
+        createEvaluationSet(projectId, question, searchResults.map((record) => record.id), (result) => {
+            setTimeout(() => {
+                setSetCreationLoading(false);
+            }, 1500);
+
+        });
+    }, [projectId, question, searchResults, createdSet]);
+
 
     return <div className={`grid overflow-hidden h-full grid-cols-2`}>
         <div className="flex flex-col gap-y-2 m-3 h-full">
@@ -80,11 +92,15 @@ export function PlaygroundSearch() {
         <div className={`h-full border-gray-300 border-l`}>
             <div className="flex flex-row mx-4 my-1 items-center">
                 <span className="mr-4"><span>{searchResults?.length > 0 ? searchResults.length + " " : ""}</span>Record{searchResults?.length > 1 ? "s" : ""}</span>
-                <button disabled={searchResults?.length === 0 || selectedEmbedding === null || question === "" || loading}
-                    className={`ml-auto bg-green-100 border border-green-400 text-green-700 text-xs font-semibold px-4 py-2 rounded-md cursor-pointer opacity-100 hover:bg-green-200 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50`}
-                    onClick={createSetFromRecords}>Create set from saved records</button>
+                <button disabled={!searchResults || searchResults?.length === 0 || selectedEmbedding === null || question === "" || loading || createdSet}
+                    className={`flex items-center ml-auto gap-x-2 bg-green-100 border border-green-400 text-green-700 text-xs font-semibold px-3 py-2 rounded-md cursor-pointer opacity-100 hover:bg-green-200 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50`}
+                    onClick={createSetFromRecords}>
+                    {!setCreationLoading ? <span><IconCategoryPlus className="ml-1 h-4 w-4" /></span> :
+                        <span><IconLoader2 className="ml-1 h-4 w-4 animate-spin" /></span>}
+                    Create set from results
+                </button>
             </div>
-            {!searchResults && <div className="text-sm inline-block font-normal text-gray-500 italic mx-3">Start by searching for records.</div>}
+            {!loading && !searchResults && <div className="text-sm inline-block font-normal text-gray-500 italic mx-3">Start by searching for records.</div>}
             {!loading && searchResults && (searchResults.length > 0 ? <div className="relative ml-2 font-dmMono text-xs whitespace-pre-line overflow-y-auto">
                 {searchResults.map((result, index) => <div key={index} className="flex flex-col gap-x-3 bg-white rounded-md border border-gray-300 py-2 px-3 m-2">
                     <div className="absolute right-4 text-gray-500 text-xs">{result?.score.toFixed(3)}</div>

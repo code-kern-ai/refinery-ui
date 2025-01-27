@@ -1,6 +1,6 @@
 import Modal from "@/src/components/shared/modal/Modal";
 import { useCallback, useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import { ModalButton, ModalEnum } from "@/src/types/shared/modal";
 import { selectUniqueValuesDict, } from "@/src/reduxStore/states/pages/data-browser";
 import { selectEmbeddings, selectUsableAttributes } from "@/src/reduxStore/states/pages/settings";
@@ -16,6 +16,8 @@ import { IconPlus, IconTrash } from "@tabler/icons-react";
 
 const ACCEPT_BUTTON = { buttonCaption: 'Save', useButton: true };
 const ABORT_BUTTON = { buttonCaption: 'Reset', useButton: true };
+const FILTER_INTEGRATION_OPERATORS = Object.values(FilterIntegrationOperator).map(t => t.split("_").join(" "));
+const FILTER_INTEGRATION_OPERATOR_TOOLTIPS = Object.values(FilterIntegrationOperator).map(t => getFilterIntegrationOperatorTooltip(t));
 
 export default function PlaygroundSearchMetaFilterModal(props: { selectedEmbedding: Embedding, setMetaDataFilter: any }) {
 
@@ -25,9 +27,9 @@ export default function PlaygroundSearchMetaFilterModal(props: { selectedEmbeddi
 
     const [filterAttributesSS, setFilterAttributesSS] = useState<any>(null);
     const [filterAttributesForm, setFilterAttributesForm] = useState<any>([]);
-    const [operatorsDict, setOperatorsDict] = useState<{ [key: string]: string[] }>({});
+    const [operatorsDict, setOperatorsDict] = useState<{ [key: string]: string[] }>(null);
     const [colorsAttributes, setColorAttributes] = useState<string[]>([]);
-    const [tooltipsDict, setTooltipsDict] = useState<{ [key: string]: string[] }>({});
+    const [tooltipsDict, setTooltipsDict] = useState<{ [key: string]: string[] }>(null);
 
     const [acceptButton, setAcceptButton] = useState<ModalButton>(ACCEPT_BUTTON);
     const [abortButton, setAbortButton] = useState<ModalButton>(ABORT_BUTTON);
@@ -38,9 +40,21 @@ export default function PlaygroundSearchMetaFilterModal(props: { selectedEmbeddi
     }, [embeddings, props.selectedEmbedding]);
 
     useEffect(() => {
-        if (!filterAttributesSS || !props.selectedEmbedding) return;
-        prepareOperatorsAndTooltips();
-    }, [filterAttributesSS, props.selectedEmbedding]);
+        if (!filterAttributesSS) return;
+        let colors = [];
+        const newOperatorsDict = {};
+        const newTooltipsDict = {};
+
+        filterAttributesSS.forEach((attribute) => {
+            const attributeType = attributes.find(att => att.name == attribute)?.dataType
+            newOperatorsDict[attribute] = FILTER_INTEGRATION_OPERATORS.filter(operator => attributeType == DataTypeEnum.INTEGER || operator !== FilterIntegrationOperator.BETWEEN);
+            newTooltipsDict[attribute] = FILTER_INTEGRATION_OPERATOR_TOOLTIPS.filter(tooltip => attributeType == DataTypeEnum.INTEGER || tooltip !== getFilterIntegrationOperatorTooltip(FilterIntegrationOperator.BETWEEN));
+            colors.push(getColorForDataType(attributeType));
+        });
+        setOperatorsDict(newOperatorsDict);
+        setTooltipsDict(newTooltipsDict);
+        setColorAttributes(colors);
+    }, [filterAttributesSS]);
 
     useEffect(() => {
         if (!operatorsDict) return;
@@ -69,32 +83,6 @@ export default function PlaygroundSearchMetaFilterModal(props: { selectedEmbeddi
         });
     }, [cancelMetaDataFilter]);
 
-    function prepareOperatorsAndTooltips() {
-        if (!filterAttributesSS) return;
-        let operators = [];
-        let tooltips = [];
-        let colors = [];
-        let operatorsCopy = { ...operatorsDict };
-        let tooltipsCopy = { ...tooltipsDict };
-        for (let t of Object.values(FilterIntegrationOperator)) {
-            operators.push(t.split("_").join(" "));
-            tooltips.push(getFilterIntegrationOperatorTooltip(t));
-        }
-        filterAttributesSS.forEach((attribute: string) => {
-            const attributeType = attributes.find(att => att.name == attribute)?.dataType
-            if (attributeType !== DataTypeEnum.INTEGER) {
-                operators = operators.filter(operator => operator !== FilterIntegrationOperator.BETWEEN);
-                tooltips = tooltips.filter(tooltip => tooltip !== getFilterIntegrationOperatorTooltip(FilterIntegrationOperator.BETWEEN));
-            }
-            operatorsCopy[attribute] = operators;
-            tooltipsCopy[attribute] = tooltips;
-            colors.push(getColorForDataType(attributeType));
-        });
-        setOperatorsDict(operatorsCopy);
-        setTooltipsDict(tooltipsCopy);
-        setColorAttributes(colors);
-    }
-
     function initFilterForm() {
         if (!filterAttributesSS) return;
         if (!operatorsDict) return;
@@ -120,10 +108,7 @@ export default function PlaygroundSearchMetaFilterModal(props: { selectedEmbeddi
     }
 
     function removeFilterAttributesSS(index: number) {
-        const form = [...filterAttributesForm];
-        form.splice(index, 1);
-        setFilterAttributesForm(form);
-
+        setFilterAttributesForm(prevForm => prevForm.filter((_, i) => i !== index));
     }
 
     function checkIfDecimals(event: any, i: number, form: any) {
@@ -132,10 +117,13 @@ export default function PlaygroundSearchMetaFilterModal(props: { selectedEmbeddi
     }
 
     function addFilterAttributesSS() {
-        let form = [...filterAttributesForm];
-        form.push(filterAttributesSSGroup(filterAttributesSS, operatorsDict, attributes));
-        form = extendArrayElementsByUniqueId(form);
-        setFilterAttributesForm(form);
+        setFilterAttributesForm(prevForm => {
+            const newForm = [
+                ...prevForm,
+                filterAttributesSSGroup(filterAttributesSS, operatorsDict, attributes)
+            ];
+            return extendArrayElementsByUniqueId(newForm);
+        });
     }
 
     return (
