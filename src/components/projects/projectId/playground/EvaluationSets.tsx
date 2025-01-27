@@ -25,7 +25,7 @@ export function EvaluationSets() {
     const usersDict = arrayToDict(users, 'id');
 
     const [evaluationSets, setEvaluationSets] = useState(null);
-    const [preparedValues, setPreparedValues] = useState([]);
+    const [preparedValues, setPreparedValues] = useState(null);
     const [preparedHeaders, setPreparedHeaders] = useState(EVALUATION_SETS_TABLE_HEADER);
     const [selectedEvaluationSets, setSelectedEvaluationSets] = useState(new Set<string>());
     const [checked, setChecked] = useState(false);
@@ -101,7 +101,7 @@ export function EvaluationSets() {
                     className={`ml-auto bg-green-100 border border-green-400 text-green-700 text-xs font-semibold px-4 py-2 rounded-md cursor-pointer opacity-100 hover:bg-green-200 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50`}
                     onClick={() => dispatch(openModal(ModalEnum.EVALUATION_SET))}>Create evaluation set</button>
             </div >
-            {evaluationSets && (
+            {preparedHeaders && preparedValues && (
                 evaluationSets.length > 0 ?
                     <KernTable
                         headers={preparedHeaders}
