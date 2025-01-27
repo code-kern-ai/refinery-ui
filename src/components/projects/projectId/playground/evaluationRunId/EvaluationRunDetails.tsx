@@ -59,24 +59,24 @@ export default function EvaluationRunDetails() {
 
     return <>
         {projectId && <div className={`grid overflow-hidden min-h-full p-4`}>
-            <div className="flex items-center gap-2">
-                <button onClick={() => router.back()} className="text-green-800 text-sm font-medium">
+            <div className="flex items-center gap-y-2 gap-x-3">
+                <button onClick={() => router.back()} className="flex items-center text-green-800 text-sm font-medium">
                     <IconArrowLeft className="h-5 w-5 inline-block text-green-800" />
-                    <span className="leading-5">Go back</span>
+                    <span className="leading-5 ml-1">Go back</span>
                 </button>
-                <label className="text-lg leading-6 text-gray-900 font-medium"> Evaluation Run Results</label>
+                <label className="text-xl leading-6 text-gray-900 font-medium"> Evaluation Run Results</label>
             </div>
             <div className="my-1">
                 <div className="text-sm leading-5 font-normal text-gray-500 inline-block">You can see the results of the evaluation run</div>
             </div>
-            <div className="text-md leading-5 font-normal text-gray-700 my-5"><strong>Aggregated view for all sets in the evaluation run</strong></div>
+            <div className="text-lg leading-5 font-normal text-gray-700 my-5"><strong>Global totals</strong></div>
             <div className="grid grid-cols-3 gap-x-2">
                 <RecordDisplaySearchesAggregated text="Matched records" howMany={aggregateResults?.matchedRecords} fromHowMany={aggregateResults?.matchedRecords + aggregateResults?.missedRecords} />
                 <RecordDisplaySearchesAggregated text="Unrelated records" howMany={aggregateResults?.updatedRecords} fromHowMany={aggregateResults?.matchedRecords + aggregateResults?.updatedRecords} />
                 <RecordDisplaySearchesAggregated text="Missed records" howMany={aggregateResults?.missedRecords} fromHowMany={aggregateResults?.matchedRecords + aggregateResults?.missedRecords} />
             </div>
 
-            <div className="text-md leading-5 font-normal text-gray-700 mt-5"><strong>Statistics per each set in the evaluation run</strong></div>
+            <div className="text-lg leading-5 font-normal text-gray-700 mt-5"><strong>Set-wise totals</strong></div>
             {evaluationRun && evaluationSetsDict && <div>
                 {evaluationRun.results.map((result, index) => <Fragment key={index}>
                     <div className="text-md leading-5 font-normal text-gray-500 my-5"><strong className="underline">Question:</strong> {evaluationSetsDict[result.evaluation_set_id].question}</div>
@@ -121,7 +121,7 @@ function RecordDisplaySearches({ attributes, records, text, howMany, fromHowMany
             </div>
         </dt>
         <dd className="pb-4 flex items-baseline">
-            <div className="inset-x-0 bg-gray-50 px-4 pt-3 w-full rounded-md">
+            <div className="inset-x-0 bg-gray-50 px-4 pt-2 mt-2 w-full rounded-md">
                 <div className="text-sm pb-3">
                     <button className="text-sm font-normal text-gray-500 underline" onClick={() => setShowRecords(!showRecords)}>{showRecords ? "Hide" : "Show"} records</button>
                 </div>
