@@ -55,7 +55,6 @@ export default function CreateEvaluationSetModal(props: CreateEvaluationSetsModa
 
     const createEvaluationSetPost = useCallback(() => {
         createEvaluationSet(projectId, question, selectedRecords.map((record) => record.id), (res) => {
-            resetState();
             props.refetchEvaluationSets();
         });
     }, [question, selectedRecords, projectId]);
@@ -65,11 +64,11 @@ export default function CreateEvaluationSetModal(props: CreateEvaluationSetsModa
     }, [createEvaluationSetPost, selectedRecords, question]);
 
     useEffect(() => {
-        if (!searchRequest || !projectId) return;
+        if (!searchRequest || !projectId || !evaluationSetModalState.open) return;
         recordSearchContains(projectId, search, searchRequest.offset, searchRequest.limit, (res) => {
             updateAndSortRecordList(res)
         });
-    }, [searchRequest, projectId]);
+    }, [searchRequest, projectId, evaluationSetModalState.open]);
 
     useEffect(() => {
         recordSearchContains(projectId, search, searchRequest.offset, searchRequest.limit, (res) => {
@@ -88,8 +87,6 @@ export default function CreateEvaluationSetModal(props: CreateEvaluationSetsModa
     useEffect(() => {
         setSearchRequest(SEARCH_REQUEST);
     }, [search]);
-
-
 
     useEffect(() => {
         if (searchSimilarity == "") {
@@ -129,20 +126,6 @@ export default function CreateEvaluationSetModal(props: CreateEvaluationSetsModa
     }
 
     function resetState() {
-        var inSimilar = []
-        var inRecord = []
-        selectedRecords.forEach((record) => {
-            const isInSimilarityRecords = addedSimilarityRecords.some(item => item.id === record.id);
-            if (isInSimilarityRecords) {
-                inSimilar.push(record);
-            } else {
-                inRecord.push(record);
-            }
-        });
-
-        setSimilarityRecordList([...similarityRecordList, ...inSimilar]);
-        updateAndSortRecordList(inRecord);
-
         setQuestion("");
         setSearch("");
         setSelectedEmbedding(null);
