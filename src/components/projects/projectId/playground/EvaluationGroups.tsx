@@ -102,9 +102,8 @@ export function EvaluationGroups() {
                 {selectedEvaluationGroups.size > 0 &&
                     <div className='ml-2'>
                         <KernButton
-                            text={"Delete all selected"}
-                            icon={IconMinus}
-                            iconColor='red'
+                            text="Delete all selected"
+                            buttonColor="red"
                             onClick={() => {
                                 dispatch(setModalStates(ModalEnum.DELETE_EVALUATION_GROUP, { open: true, evaluationGroupIds: Array.from(selectedEvaluationGroups) }));
                             }}
