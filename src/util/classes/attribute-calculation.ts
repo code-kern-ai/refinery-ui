@@ -50,10 +50,10 @@ export class AttributeCodeLookup {
                     }
                     case 'LLM_RESPONSE': return {
                         code: `                  
-def ac(record):
+async def ac(record):
     # no post processing of answer
 
-    llm_response = get_llm_response()
+    llm_response = await get_llm_response()
     return llm_response.get("result") or "no result provided"
                     `
                     }

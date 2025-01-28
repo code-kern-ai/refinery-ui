@@ -11,7 +11,7 @@ export type LLMConfig = {
         model: string;
         temperature: number;
         maxLength: number;
-        stopSequences: string[];
+        stopSequences: string[]; //not in use for llm ac since json mode is used
         topP: number;
         frequencyPenalty: number;
         presencePenalty: number;

@@ -1,5 +1,4 @@
-import { IconX } from "@tabler/icons-react";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { LocalStorageDropdown } from "@/submodules/react-components/components/LocalStorageDropdown";
 import { InputWithSlider } from "../InputWithSlider";
 
@@ -13,7 +12,6 @@ type LLmProps = {
 
 export default function Azure(props: LLmProps) {
 
-    const [newStopSequence, setNewStopSequence] = useState<string>('');
 
     useEffect(() => {
         if (props.llmConfig.model) {
@@ -58,36 +56,6 @@ export default function Azure(props: LLmProps) {
                         onChange={(value) => props.setLlmConfig({ ...props.llmConfig, maxLength: value })}
                         disabled={props.disabled}
                     />
-                    <div>
-                        <label className="block mb-2 text-sm font-medium text-gray-900">Stop sequences</label>
-                        <input
-                            type="text"
-                            value={newStopSequence}
-                            className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                            onChange={(e) => setNewStopSequence(e.target.value)}
-                            onKeyPress={(e) => {
-                                if (e.key === 'Enter' && props.llmConfig.stopSequences.length < 4) {
-                                    props.setLlmConfig({ ...props.llmConfig, stopSequences: [...props.llmConfig.stopSequences, newStopSequence] })
-                                    setNewStopSequence('');
-                                }
-                            }}
-                            disabled={props.llmConfig.stopSequences.length >= 4 || props.disabled}
-                        />
-                        <div className='mt-2 flex items-center gap-x-2'>
-                            {props.llmConfig.stopSequences.map((stopSequence, index) => (
-                                <div
-                                    key={index}
-                                    className='flex items-center gap-x-2 bg-gray-100 rounded-md px-2 py-1'
-                                >
-                                    <p className='text-sm text-gray-700'>{stopSequence}</p>
-                                    {!props.disabled && <IconX
-                                        className='h-4 w-4 text-gray-500 cursor-pointer'
-                                        onClick={() => props.setLlmConfig({ ...props.llmConfig, stopSequences: props.llmConfig.stopSequences.filter((_, i) => i !== index) })}
-                                    />}
-                                </div>
-                            ))}
-                        </div>
-                    </div>
                     <InputWithSlider
                         label="Top P"
                         value={props.llmConfig.topP}

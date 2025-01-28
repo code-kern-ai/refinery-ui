@@ -19,21 +19,12 @@ import { DataTypeEnum } from "@/src/types/shared/general";
 import { capitalizeFirst } from "@/submodules/javascript-functions/case-types-parser";
 import { runAttributeLlmPlayground } from "@/src/services/base/attribute";
 import { jsonCopy } from "@/submodules/javascript-functions/general";
+import { TEMPLATE_EXAMPLES } from "./llmTemplates";
 
 const ACCEPT_BUTTON = { buttonCaption: "Use current values for attribute", useButton: true };
 const DISPLAY_STATES = [AttributeState.AUTOMATICALLY_CREATED, AttributeState.UPLOADED, AttributeState.USABLE]
 
 
-const TEMPLATE_EXAMPLES = {
-    REASONED_CLICKBAIT: {
-        templatePrompt: "You are running your own information network and need to ensure no clickbait news articles are published. To ensure your answer can be validated always provide a reason and your final result being either 'yes' or 'no' to the question is this clickbait. JSON Schema {\"reason\": <reasoning>, \"result\":<result>}",
-        questionPrompt: "News article: '{{headline}}'"
-    },
-    SHORT_SUMMARY_REFERENCE: {
-        templatePrompt: "Summarize the given text into two short sentences.",
-        questionPrompt: "{{reference}}"
-    }
-}
 const TEMPLATE_OPTIONS = Object.keys(TEMPLATE_EXAMPLES).map((key) => ({ name: capitalizeFirst(key), value: key }));
 
 
