@@ -65,7 +65,7 @@ export default function CreateEvaluationSetModal(props: CreateEvaluationSetsModa
     useEffect(() => {
         if (!searchRequest || !projectId) return;
         recordSearchContains(projectId, search, searchRequest.offset, searchRequest.limit, (res) => {
-            setRecordList([...recordList, ...res]);
+            updateAndSortRecordList(res)
         });
     }, [searchRequest, projectId]);
 
@@ -98,6 +98,16 @@ export default function CreateEvaluationSetModal(props: CreateEvaluationSetsModa
         });
     }
 
+    function updateAndSortRecordList(newRecords = []) {
+        setRecordList((prev) => {
+            const merged = [...prev, ...newRecords];
+            merged.sort(
+                (a, b) => (a.data?.running_id || 0) - (b.data?.running_id || 0)
+            );
+            return merged;
+        });
+    }
+
     function resetState() {
         var inSimilar = []
         var inRecord = []
@@ -109,17 +119,10 @@ export default function CreateEvaluationSetModal(props: CreateEvaluationSetsModa
                 inRecord.push(record);
             }
         });
-        
-        setSimilarityRecordList([...similarityRecordList, ...inSimilar]);
 
-        setRecordList(prev => {
-            const merged = [...prev, ...inRecord];
-            merged.sort(
-              (a, b) => (a.data?.running_id || 0) - (b.data?.running_id || 0)
-            );
-            return merged;
-          });
-        
+        setSimilarityRecordList([...similarityRecordList, ...inSimilar]);
+        updateAndSortRecordList(inRecord);
+
         setQuestion("");
         setSearch("");
         setSelectedEmbedding(null);
@@ -201,7 +204,7 @@ export default function CreateEvaluationSetModal(props: CreateEvaluationSetsModa
                                     if (isInSimilarityRecords) {
                                         setSimilarityRecordList([...similarityRecordList, record])
                                     } else {
-                                        setRecordList([...recordList, record]);
+                                        updateAndSortRecordList([record])
                                     }
 
                                     const newSelectedRecords = selectedRecords.filter((item) => item.id !== record.id);
