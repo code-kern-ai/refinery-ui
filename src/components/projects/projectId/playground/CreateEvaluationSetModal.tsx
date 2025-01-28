@@ -63,7 +63,7 @@ export default function CreateEvaluationSetModal(props: CreateEvaluationSetsModa
     }, [createEvaluationSetPost, selectedRecords, question]);
 
     useEffect(() => {
-        if (!searchRequest || projectId) return;
+        if (!searchRequest || !projectId) return;
         recordSearchContains(projectId, search, searchRequest.offset, searchRequest.limit, (res) => {
             setRecordList([...recordList, ...res]);
         });
@@ -79,7 +79,7 @@ export default function CreateEvaluationSetModal(props: CreateEvaluationSetsModa
 
     const refetchMoreRecords = useCallback((e: any) => {
         if (e.target.scrollHeight - e.target.scrollTop === e.target.clientHeight) {
-            setSearchRequest({ ...searchRequest, offset: searchRequest.offset + searchRequest.limit });
+            setSearchRequest({ ...searchRequest, offset: searchRequest.offset + searchRequest.limit, limit: searchRequest.limit });
         }
     }, [recordList, searchRequest, projectId]);
 
