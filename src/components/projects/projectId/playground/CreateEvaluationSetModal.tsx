@@ -101,10 +101,13 @@ export default function CreateEvaluationSetModal(props: CreateEvaluationSetsModa
     function updateAndSortRecordList(newRecords = []) {
         setRecordList((prev) => {
             const merged = [...prev, ...newRecords];
-            merged.sort(
+            const uniqueRecords = Array.from(
+                new Map(merged.map((item) => [item.data?.running_id, item])).values()
+            );
+            uniqueRecords.sort(
                 (a, b) => (a.data?.running_id || 0) - (b.data?.running_id || 0)
             );
-            return merged;
+            return uniqueRecords;
         });
     }
 
