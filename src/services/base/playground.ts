@@ -85,11 +85,12 @@ export function getEvaluationRuns(projectId: string, onResult: (result: any) => 
     jsonFetchWrapper(finalUrl, FetchType.GET, onResult);
 }
 
-export function createEvaluationRun(projectId, embeddingId: string, evaluationGroupId: string, onResult: (result: any) => void) {
+export function createEvaluationRun(projectId, embeddingId: string, evaluationGroupId: string, threshold: number, onResult: (result: any) => void) {
     const finalUrl = `${playgroundEndpoint}/${projectId}/evaluation-runs`;
     const body = {
         embeddingId: embeddingId,
-        evaluationGroupId: evaluationGroupId
+        evaluationGroupId: evaluationGroupId,
+        threshold: threshold
     }
     jsonFetchWrapper(finalUrl, FetchType.POST, onResult, JSON.stringify(body));
 }
