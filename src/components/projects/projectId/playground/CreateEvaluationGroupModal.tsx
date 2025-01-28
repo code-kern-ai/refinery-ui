@@ -67,6 +67,9 @@ export default function CreateEvaluationGroupModal(props: CreateEvaluationGroupM
         setName("");
         setSelectedSets([]);
         props.refetchEvaluationGroups();
+        getEvaluationSets(projectId, (res) => {
+            setEvaluationSets(res);
+        });
         setHasCreated(false)
     }
 
