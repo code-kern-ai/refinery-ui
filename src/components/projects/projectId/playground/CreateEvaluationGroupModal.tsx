@@ -22,23 +22,18 @@ export default function CreateEvaluationGroupModal(props: CreateEvaluationGroupM
     const [name, setName] = useState("");
     const [evaluationSets, setEvaluationSets] = useState([]);
     const [selectedSets, setSelectedSets] = useState([]);
-    const [hasCreated, setHasCreated] = useState(false)
     const evaluationGroupModalState = useSelector(selectModal(ModalEnum.EVALUATION_GROUP));
-
-    const isFetchingEvalSets = useRef(false);
 
     const createEvaluationGroupPost = useCallback(() => {
         createEvaluationGroups(projectId, selectedSets.map((set) => set.id), name, (res) => {
-            setName("");
-            setSelectedSets([]);
             props.refetchEvaluationGroups();
-            setHasCreated(true)
         });
     }, [name, selectedSets, projectId]);
 
     useEffect(() => {
         if (!evaluationGroupModalState.open) {
-            resetState()
+            setName("");
+            setSelectedSets([]);
         }
     }, [evaluationGroupModalState.open, dispatch]);
 
@@ -47,30 +42,11 @@ export default function CreateEvaluationGroupModal(props: CreateEvaluationGroupM
     }, [createEvaluationGroupPost, name, selectedSets]);
 
     useEffect(() => {
-        if (isFetchingEvalSets.current) return;
-        isFetchingEvalSets.current = true;
-        getEvaluationSets(projectId, (res) => {
-            setEvaluationSets(res);
-            isFetchingEvalSets.current = false;
-        });
-    }, [projectId, hasCreated]);
-
-    useEffect(() => {
-        if (!hasCreated) return;
-        setEvaluationSets([]);
-        setSelectedSets([]);
-        setHasCreated(false);
-    }, [hasCreated]);
-
-    function resetState() {
-        setName("");
-        setSelectedSets([]);
-        props.refetchEvaluationGroups();
+        if (!evaluationGroupModalState.open) return
         getEvaluationSets(projectId, (res) => {
             setEvaluationSets(res);
         });
-        setHasCreated(false)
-    }
+    }, [projectId, evaluationGroupModalState.open]);
 
     return <Modal modalName={ModalEnum.EVALUATION_GROUP} acceptButton={acceptButton} className="md:max-w-6xl">
         <div className="h-full">
