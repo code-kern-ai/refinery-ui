@@ -239,10 +239,7 @@ export default function CreateEvaluationSetModal(props: CreateEvaluationSetsModa
                                 className="w-full h-10 p-2 line-height-textarea border rounded-md border-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100" />
                             <div>Records</div>
                         </div>
-                        <div style={{
-                            maxHeight: 'calc(100vh - 300px)',
-                            overflowY: 'scroll',
-                        }} onScroll={(e: any) => refetchMoreRecords(e)}>
+                        <div className={"h-[calc(100vh-300px)] overflow-y-auto"} onScroll={(e: any) => refetchMoreRecords(e)}>
                             {recordList && recordList.map((record, index) => (
                                 <div key={record.id} className="bg-white overflow-hidden shadow rounded-lg border m-4 p-2 relative hover:border-green-400 hover:border-opacity-30 cursor-pointer transition-all duration-200 ease-in-out">
                                     <RecordDisplay
