@@ -3,13 +3,14 @@ import { BACKEND_BASE_URI } from "./_settings";
 
 export const playgroundEndpoint = `${BACKEND_BASE_URI}/api/v1/playground`;
 
-export function getSearchResults(projectId: string, embeddingId: string, question: string, limit: number, metaDataFilter: any, onResult: (result: any) => void) {
+export function getSearchResults(projectId: string, embeddingId: string, question: string, limit: number, metaDataFilter: any, threshold: number, onResult: (result: any) => void) {
     const finalUrl = `${playgroundEndpoint}/${projectId}/search`;
     const body = {
         embeddingId: embeddingId,
         question: question,
         limit: limit,
-        filter: metaDataFilter
+        filter: metaDataFilter,
+        threshold: threshold
     }
     jsonFetchWrapper(finalUrl, FetchType.POST, onResult, JSON.stringify(body));
 }
@@ -84,11 +85,12 @@ export function getEvaluationRuns(projectId: string, onResult: (result: any) => 
     jsonFetchWrapper(finalUrl, FetchType.GET, onResult);
 }
 
-export function createEvaluationRun(projectId, embeddingId: string, evaluationGroupId: string, onResult: (result: any) => void) {
+export function createEvaluationRun(projectId, embeddingId: string, evaluationGroupId: string, threshold: number, onResult: (result: any) => void) {
     const finalUrl = `${playgroundEndpoint}/${projectId}/evaluation-runs`;
     const body = {
         embeddingId: embeddingId,
-        evaluationGroupId: evaluationGroupId
+        evaluationGroupId: evaluationGroupId,
+        threshold: threshold
     }
     jsonFetchWrapper(finalUrl, FetchType.POST, onResult, JSON.stringify(body));
 }

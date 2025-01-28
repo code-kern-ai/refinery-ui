@@ -14,6 +14,7 @@ import { IconFilterOff, IconFilter, IconCategoryPlus, IconLoader2 } from '@table
 import PlaygroundSearchMetaFilterModal from "./PlaygroundSearchMetaFilterModal";
 
 const PLAYGROUND_LIMIT_DEFAULT = 10;
+const PLAYGROUND_THRESHOLD_DEFAULT = -9999;
 
 export function PlaygroundSearch() {
     const dispatch = useDispatch();
@@ -27,6 +28,7 @@ export function PlaygroundSearch() {
     const [question, setQuestion] = useState("");
     const [searchResults, setSearchResults] = useState(null);
     const [limit, setLimit] = useState(PLAYGROUND_LIMIT_DEFAULT);
+    const [threshold, setThreshold] = useState(PLAYGROUND_THRESHOLD_DEFAULT);
     const [metaDataFilter, setMetaDataFilter] = useState(null);
 
     const [setCreationLoading, setSetCreationLoading] = useState(false);
@@ -34,12 +36,12 @@ export function PlaygroundSearch() {
 
     const getSearchResultsPost = useCallback(() => {
         setLoading(true);
-        getSearchResults(projectId, selectedEmbedding?.id, question, limit, metaDataFilter, (result) => {
+        getSearchResults(projectId, selectedEmbedding?.id, question, limit, metaDataFilter, threshold, (result) => {
             setLoading(false);
             setCreatedSet(false);
             setSearchResults(result);
         });
-    }, [projectId, selectedEmbedding?.id, question, limit, metaDataFilter]);
+    }, [projectId, selectedEmbedding?.id, question, limit, metaDataFilter, threshold]);
 
 
     const createSetFromRecords = useCallback(() => {
@@ -79,6 +81,13 @@ export function PlaygroundSearch() {
                         <input className="w-14 bg-white text-gray-700 text-xs font-semibold px-2 py-2 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100"
                             onChange={(event: any) => { setLimit(Number(event.target.value)); }}
                             value={limit}>
+                        </input>
+                    </div>
+                    <div className="flex items-center gap-x-2">
+                        <span>Threshold</span>
+                        <input type="number" className="w-14 bg-white text-gray-700 text-xs font-semibold px-2 py-2 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100"
+                            onChange={(event: any) => { setThreshold(Number(event.target.value)); }}
+                            value={threshold}>
                         </input>
                     </div>
                 </div>
