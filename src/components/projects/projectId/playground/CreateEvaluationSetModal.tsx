@@ -40,6 +40,8 @@ export default function CreateEvaluationSetModal(props: CreateEvaluationSetsModa
     const [showSimilarityRecordsList, setShowSimilarityRecordsList] = useState(false);
     const [loading, setLoading] = useState(false);
     const [addedSimilarityRecords, setAddedSimilarityRecords] = useState<any[]>([]);
+    const [searchSimilarity, setSearchSimilarity] = useState("");
+    const [saveSimilarityRecordList, setSaveSimilarityRecordList] = useState<any[]>([]);
 
     const debouncedSearch = useDebounce(search, 1000);
 
@@ -87,12 +89,27 @@ export default function CreateEvaluationSetModal(props: CreateEvaluationSetsModa
         setSearchRequest(SEARCH_REQUEST);
     }, [search]);
 
+
+
+    useEffect(() => {
+        if (searchSimilarity == "") {
+            setSimilarityRecordList(saveSimilarityRecordList);
+            return
+        }
+        const filteredRecords = similarityRecordList.filter((record) => {
+            const recordString = JSON.stringify(record);
+            return recordString.toLowerCase().includes(searchSimilarity.toLowerCase());
+        });
+        setSimilarityRecordList(filteredRecords);
+    }, [searchSimilarity]);
+
     function getSimilarRecords() {
         setLoading(true);
         getSearchResults(projectId, selectedEmbedding.id, question, limit, null, null, (result) => {
             const selectedRecordIds = new Set(selectedRecords.map(r => r.id));
             const newSimilarityRecordList = result.filter((item) => !selectedRecordIds.has(item.id));
             setSimilarityRecordList(newSimilarityRecordList);
+            setSaveSimilarityRecordList(newSimilarityRecordList);
             setShowSimilarityRecordsList(true)
             setLoading(false);
         });
@@ -219,11 +236,15 @@ export default function CreateEvaluationSetModal(props: CreateEvaluationSetsModa
                     </div>
                 ) : showSimilarityRecordsList ? (
                     <div className={`h-full border-gray-300 border-l`}>
-                        <div className="m-3 flex justify-end">
+                        <div className="m-3 flex gap-x-2">
+                            <input type="text" placeholder="Search..." value={searchSimilarity}
+                                onChange={(event: any) => { setSearchSimilarity(event.target.value); }}
+                                className="w-full h-10 p-2 line-height-textarea border rounded-md border-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100" />
                             <KernButton
                                 text="Clear"
                                 onClick={() => {
                                     setShowSimilarityRecordsList(false)
+                                    setSearchSimilarity("")
                                 }}
                             />
                         </div>
