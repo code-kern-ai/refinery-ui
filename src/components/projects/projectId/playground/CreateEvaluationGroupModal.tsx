@@ -17,7 +17,6 @@ export default function CreateEvaluationGroupModal(props: CreateEvaluationGroupM
     const dispatch = useDispatch();
 
     const projectId = useSelector(selectProjectId);
-    const attributes = useSelector(selectVisibleAttributesDataBrowser);
 
     const [acceptButton, setAcceptButton] = useState<ModalButton>(ACCEPT_BUTTON);
     const [name, setName] = useState("");
