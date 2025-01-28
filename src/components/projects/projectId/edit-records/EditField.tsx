@@ -68,7 +68,7 @@ export default function EditField(props: EditFieldProps) {
     }
 
     return (<>
-        {props.attribute.dataType == DataTypeEnum.TEXT &&
+        {(props.attribute.dataType == DataTypeEnum.TEXT || props.attribute.dataType == DataTypeEnum.LLM_RESPONSE) &&
             <textarea value={inputValue} ref={inputRef}
                 onChange={(e) => setInputValue(e.target.value)}
                 onInput={setDynamicStyles}
