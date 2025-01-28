@@ -65,7 +65,7 @@ export default function CreateEvaluationSetModal(props: CreateEvaluationSetsModa
     useEffect(() => {
         if (!searchRequest || !projectId) return;
         recordSearchContains(projectId, search, searchRequest.offset, searchRequest.limit, (res) => {
-            setRecordList([...recordList, ...res]);
+            updateAndSortRecordList(res)
         });
     }, [searchRequest, projectId]);
 
@@ -98,16 +98,40 @@ export default function CreateEvaluationSetModal(props: CreateEvaluationSetsModa
         });
     }
 
+    function updateAndSortRecordList(newRecords = []) {
+        setRecordList((prev) => {
+            const merged = [...prev, ...newRecords];
+            merged.sort(
+                (a, b) => (a.data?.running_id || 0) - (b.data?.running_id || 0)
+            );
+            return merged;
+        });
+    }
+
     function resetState() {
+        var inSimilar = []
+        var inRecord = []
+        selectedRecords.forEach((record) => {
+            const isInSimilarityRecords = addedSimilarityRecords.some(item => item.id === record.id);
+            if (isInSimilarityRecords) {
+                inSimilar.push(record);
+            } else {
+                inRecord.push(record);
+            }
+        });
+
+        setSimilarityRecordList([...similarityRecordList, ...inSimilar]);
+        updateAndSortRecordList(inRecord);
+
         setQuestion("");
         setSearch("");
-        setSelectedRecords([]);
         setSelectedEmbedding(null);
         setLimit(10);
-        setSimilarityRecordList([]);
         setShowSimilarityRecordsList(false);
         setLoading(false);
         setAddedSimilarityRecords([]);
+        setSimilarityRecordList([]);
+        setSelectedRecords([]);
     }
 
     return <Modal modalName={ModalEnum.EVALUATION_SET} acceptButton={acceptButton} className="md:max-w-6xl">
@@ -180,7 +204,7 @@ export default function CreateEvaluationSetModal(props: CreateEvaluationSetsModa
                                     if (isInSimilarityRecords) {
                                         setSimilarityRecordList([...similarityRecordList, record])
                                     } else {
-                                        setRecordList([...recordList, record]);
+                                        updateAndSortRecordList([record])
                                     }
 
                                     const newSelectedRecords = selectedRecords.filter((item) => item.id !== record.id);
