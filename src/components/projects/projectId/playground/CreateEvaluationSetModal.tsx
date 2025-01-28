@@ -89,16 +89,25 @@ export default function CreateEvaluationSetModal(props: CreateEvaluationSetsModa
     }, [search]);
 
     useEffect(() => {
-        if (searchSimilarity == "") {
+        if (searchSimilarity === "") {
             setSimilarityRecordList(saveSimilarityRecordList);
-            return
+            return;
         }
-        const filteredRecords = similarityRecordList.filter((record) => {
-            const recordString = JSON.stringify(record);
-            return recordString.toLowerCase().includes(searchSimilarity.toLowerCase());
+        const filteredRecords = saveSimilarityRecordList.filter((record) => {
+            const recordValues = Object.values(record.data);
+            return recordValues.some((value) => {
+                if (typeof value === 'string') {
+                    return value.toLowerCase().includes(searchSimilarity.toLowerCase());
+                } else if (typeof value === 'number') {
+                    return value.toString().includes(searchSimilarity);
+                }
+                return false;
+            });
         });
+
         setSimilarityRecordList(filteredRecords);
-    }, [searchSimilarity]);
+    }, [searchSimilarity, saveSimilarityRecordList]);
+
 
     function getSimilarRecords() {
         setLoading(true);
