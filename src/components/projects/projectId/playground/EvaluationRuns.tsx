@@ -107,6 +107,18 @@ export default function EvaluationRuns() {
                 <button
                     className={`ml-auto bg-green-100 border border-green-400 text-green-700 text-xs font-semibold px-4 py-2 rounded-md cursor-pointer opacity-100 hover:bg-green-200 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50`}
                     onClick={() => dispatch(openModal(ModalEnum.EVALUATION_RUN))}>Run Evaluation</button>
+                {selectedEvaluationRuns.size > 0 &&
+                    <div className='ml-2'>
+                        <KernButton
+                            text={"Delete all selected"}
+                            icon={IconMinus}
+                            iconColor='red'
+                            onClick={() => {
+                                dispatch(setModalStates(ModalEnum.DELETE_EVALUATION_RUN, { open: true, evaluationRunIds: Array.from(selectedEvaluationRuns) }));
+                            }}
+                        />
+                    </div>
+                }
             </div >
             {preparedHeaders && preparedValues && (evaluationRuns.length > 0 ?
                 <KernTable
@@ -120,18 +132,6 @@ export default function EvaluationRuns() {
                     No evaluation runs available yet.
                 </div>
             )}
-            {selectedEvaluationRuns.size > 0 &&
-                <div className='pt-4'>
-                    <KernButton
-                        text={"Delete all selected"}
-                        icon={IconMinus}
-                        iconColor='red'
-                        onClick={() => {
-                            dispatch(setModalStates(ModalEnum.DELETE_EVALUATION_RUN, { open: true, evaluationRunIds: Array.from(selectedEvaluationRuns) }));
-                        }}
-                    />
-                </div>
-            }
         </div>}
         <CreateEvaluationRunModal evaluationGroups={evaluationGroups} setRefetchTrigger={setRefetchTrigger} />
         <DeleteEvaluationRunsModal refetchEvaluationRuns={refetchEvaluationRuns} />
