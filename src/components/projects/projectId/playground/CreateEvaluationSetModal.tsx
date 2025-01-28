@@ -99,16 +99,36 @@ export default function CreateEvaluationSetModal(props: CreateEvaluationSetsModa
     }
 
     function resetState() {
+        var inSimilar = []
+        var inRecord = []
+        selectedRecords.forEach((record) => {
+            const isInSimilarityRecords = addedSimilarityRecords.some(item => item.id === record.id);
+            if (isInSimilarityRecords) {
+                inSimilar.push(record);
+            } else {
+                inRecord.push(record);
+            }
+        });
+        
+        setSimilarityRecordList([...similarityRecordList, ...inSimilar]);
+
+        setRecordList(prev => {
+            const merged = [...prev, ...inRecord];
+            merged.sort(
+              (a, b) => (a.data?.running_id || 0) - (b.data?.running_id || 0)
+            );
+            return merged;
+          });
+        
         setQuestion("");
         setSearch("");
-        setSelectedRecords([]);
-        setSelectedRecords([]);
         setSelectedEmbedding(null);
         setLimit(10);
-        setSimilarityRecordList([]);
         setShowSimilarityRecordsList(false);
         setLoading(false);
         setAddedSimilarityRecords([]);
+        setSimilarityRecordList([]);
+        setSelectedRecords([]);
     }
 
     return <Modal modalName={ModalEnum.EVALUATION_SET} acceptButton={acceptButton} className="md:max-w-6xl">
