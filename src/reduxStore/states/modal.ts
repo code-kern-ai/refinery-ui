@@ -216,6 +216,9 @@ const initialState: Modals = {
     [ModalEnum.EVALUATION_META_FILTER_APPLY]: {
         open: false,
     },
+    [ModalEnum.EVALUATION_REFORMULATE]: {
+        open: false,
+    },
     [ModalEnum.DELETE_EVALUATION_RUN]: {
         open: false
     },

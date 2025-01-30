@@ -12,6 +12,7 @@ import { selectVisibleAttributesDataBrowser } from "@/src/reduxStore/states/page
 import LoadingIcon from "@/submodules/react-components/components/LoadingIcon";
 import { IconFilterOff, IconFilter, IconCategoryPlus, IconLoader2, IconCircleCheck, IconXboxX, IconWand, IconHistory, } from '@tabler/icons-react'
 import PlaygroundSearchMetaFilterModal from "./PlaygroundSearchMetaFilterModal";
+import PlaygroundSearchReformulateModal from "./PlaygroundSearchReformulateModal";
 import { Tooltip } from "@nextui-org/react";
 
 const PLAYGROUND_LIMIT_DEFAULT = 10;
@@ -87,7 +88,8 @@ export function PlaygroundSearch() {
                 ></textarea>
                 <div className="absolute top-2 right-2 flex gap-x-2">
                     <Tooltip content="Reformulate" color="invert" placement="bottom">
-                        <span className="p-1 rounded-md text-gray-400 cursor-pointer hover:bg-gray-100 hover:text-gray-500 transition duration-150 ease-in-out">
+                        <span className="p-1 rounded-md text-gray-400 cursor-pointer hover:bg-gray-100 hover:text-gray-500 transition duration-150 ease-in-out"
+                            onClick={() => dispatch(openModal(ModalEnum.EVALUATION_REFORMULATE))}>
                             <IconWand className="h-5 w-5" />
                         </span>
                     </Tooltip>
@@ -172,5 +174,6 @@ export function PlaygroundSearch() {
             </div>}
         </div>
         <PlaygroundSearchMetaFilterModal selectedEmbedding={selectedEmbedding} setMetaDataFilter={setMetaDataFilter} />
+        <PlaygroundSearchReformulateModal />
     </div >
 }
