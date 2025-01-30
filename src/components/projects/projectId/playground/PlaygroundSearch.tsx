@@ -10,8 +10,9 @@ import { useSelector, useDispatch } from "react-redux";
 import { RecordDisplay } from "@/src/components/shared/record-display/RecordDisplay";
 import { selectVisibleAttributesDataBrowser } from "@/src/reduxStore/states/pages/settings";
 import LoadingIcon from "@/submodules/react-components/components/LoadingIcon";
-import { IconFilterOff, IconFilter, IconCategoryPlus, IconLoader2 } from '@tabler/icons-react'
+import { IconFilterOff, IconFilter, IconCategoryPlus, IconLoader2, IconCircleCheck, IconX, IconXboxX } from '@tabler/icons-react'
 import PlaygroundSearchMetaFilterModal from "./PlaygroundSearchMetaFilterModal";
+import { Tooltip } from "@nextui-org/react";
 
 const PLAYGROUND_LIMIT_DEFAULT = 10;
 const PLAYGROUND_THRESHOLD_DEFAULT = -9999;
@@ -33,8 +34,17 @@ export function PlaygroundSearch() {
 
     const [setCreationLoading, setSetCreationLoading] = useState(false);
     const [createdSet, setCreatedSet] = useState(false);
+    const [questionHistory, setQuestionHistory] = useState(localStorage.getItem('questionHistory'));
 
     const getSearchResultsPost = useCallback(() => {
+        const getQuestions = JSON.parse(localStorage.getItem('questionHistory')) || [];
+        if (getQuestions.length >= 50) {
+            getQuestions.shift();
+        }
+        getQuestions.push(question);
+        localStorage.setItem('questionHistory', JSON.stringify(getQuestions));
+        setQuestionHistory(localStorage.getItem('questionHistory'));
+
         setLoading(true);
         getSearchResults(projectId, selectedEmbedding?.id, question, limit, metaDataFilter, threshold, (result) => {
             setLoading(false);
@@ -95,6 +105,32 @@ export function PlaygroundSearch() {
                     className="ml-auto w-44 bg-white text-gray-700 text-xs font-semibold px-4 py-2 rounded-md border border-gray-300 hover:bg-gray-50 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed">
                     Search
                 </button>
+            </div>
+            <div className="flex items-center mt-10 mb-3">
+                <label className="text-lg leading-6 text-gray-900 font-medium ">Question history</label>
+                <button disabled={!questionHistory} onClick={() => {
+                    localStorage.removeItem('questionHistory');
+                    setQuestionHistory(null);
+                }}
+                    className="ml-auto bg-white text-gray-700 text-xs font-semibold px-4 py-2 rounded-md border border-gray-300 hover:bg-gray-50 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed">Clear history</button>
+            </div>
+            <div className="flex flex-col gap-y-2">
+                {questionHistory ? <>
+                    {JSON.parse(questionHistory).map((question, index) => <div className="grid items-center gap-x-2" style={{ gridTemplateColumns: '90% 5% 5%' }}>
+                        <div key={index} className="text-sm font-normal text-gray-500">{index + 1}. {question}</div>
+                        <Tooltip content="Use this question as current" placement="top" color="invert">
+                            <IconCircleCheck className="h-5 w-5 text-green-500 cursor-pointer" onClick={() => setQuestion(question)} />
+                        </Tooltip>
+                        <Tooltip content="Remove this question from the history" placement="top" color="invert">
+                            <IconXboxX className="h-5 w-5 text-red-500 cursor-pointer" onClick={() => {
+                                const getQuestions = JSON.parse(localStorage.getItem('questionHistory'));
+                                getQuestions.splice(index, 1);
+                                localStorage.setItem('questionHistory', JSON.stringify(getQuestions));
+                                setQuestionHistory(localStorage.getItem('questionHistory'));
+                            }} />
+                        </Tooltip>
+                    </div>)}
+                </> : <div className="text-sm font-normal text-gray-500 italic mx-3">No questions asked yet.</div>}
             </div>
 
         </div>
