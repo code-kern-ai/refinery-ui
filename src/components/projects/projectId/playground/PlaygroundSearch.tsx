@@ -34,6 +34,21 @@ export function PlaygroundSearch() {
 
     const [setCreationLoading, setSetCreationLoading] = useState(false);
     const [createdSet, setCreatedSet] = useState(false);
+    const [showHistory, setShowHistory] = useState(false);
+
+    const historyEntries = [
+        "What are the most common types of life insurance policies available, and how do they differ from one another?",
+        "How does the claims process work in health insurance, and what documentation is typically required?",
+        "What factors should I consider when choosing an auto insurance policy to ensure adequate coverage?",
+        "Can you explain how the deductible and premium work together in a homeowners insurance policy?",
+        "How does insurance fraud impact premiums, and what are some common types of insurance fraud to watch out for?",
+        "What is the difference between term life insurance and whole life insurance, and which one is better for different situations?",
+        "How does comprehensive coverage differ from collision coverage in an auto insurance policy?",
+        "What are the key exclusions that I should be aware of when reviewing a travel insurance policy?",
+        "How do insurers calculate the payout amount for property damage under a renters insurance policy?",
+        "What are the benefits and drawbacks of choosing a high-deductible health plan (HDHP) in combination with a health savings account (HSA)?"
+    ];
+
 
     const getSearchResultsPost = useCallback(() => {
         setLoading(true);
@@ -57,6 +72,10 @@ export function PlaygroundSearch() {
         });
     }, [projectId, question, searchResults, createdSet]);
 
+    const handleHistoryClick = useCallback((entry: string) => {
+        setQuestion(entry);
+        setShowHistory(false);
+    }, []);
 
     return <div className={`grid overflow-hidden h-full grid-cols-2`}>
         <div className="flex flex-col gap-y-2 m-3 h-full">
@@ -78,12 +97,29 @@ export function PlaygroundSearch() {
                         </span>
                     </Tooltip>
                     <Tooltip content="History" color="invert" placement="bottom">
-
-                        <span className="p-1 rounded-md text-gray-400 cursor-pointer hover:bg-gray-100 hover:text-gray-500 transition duration-150 ease-in-out">
+                        <span
+                            className="p-1 rounded-md text-gray-400 cursor-pointer hover:bg-gray-100 hover:text-gray-500 transition duration-150 ease-in-out"
+                            onClick={() => setShowHistory(!showHistory)}
+                        >
                             <IconHistory className="h-5 w-5" />
                         </span>
                     </Tooltip>
-
+                    {showHistory && (
+                        <div className="absolute top-8 right-0 w-80 bg-white border border-gray-300 shadow-lg rounded-md p-2 z-50">
+                            <div className="ml-1 text-md font-semibold text-gray-600 mb-1">Last questions</div>
+                            <ul>
+                                {historyEntries.map((questionEntry, index) => (
+                                    <li
+                                        key={index}
+                                        className="p-2 text-gray-700 hover:bg-gray-100 rounded-md cursor-pointer transition duration-150"
+                                        onClick={() => handleHistoryClick(questionEntry)}
+                                    >
+                                        {questionEntry}
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>
+                    )}
                 </div>
             </div>
             <div className="flex items-center justify-between">
