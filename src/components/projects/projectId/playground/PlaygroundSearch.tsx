@@ -34,22 +34,8 @@ export function PlaygroundSearch() {
 
     const [setCreationLoading, setSetCreationLoading] = useState(false);
     const [createdSet, setCreatedSet] = useState(false);
-    const [questionHistory, setQuestionHistory] = useState(localStorage.getItem('questionHistory'));
+    const [questionHistory, setQuestionHistory] = useState<string[]>(JSON.parse(localStorage.getItem('questionHistory')));
     const [showHistory, setShowHistory] = useState(false);
-
-    const historyEntries = [
-        "What are the most common types of life insurance policies available, and how do they differ from one another?",
-        "How does the claims process work in health insurance, and what documentation is typically required?",
-        "What factors should I consider when choosing an auto insurance policy to ensure adequate coverage?",
-        "Can you explain how the deductible and premium work together in a homeowners insurance policy?",
-        "How does insurance fraud impact premiums, and what are some common types of insurance fraud to watch out for?",
-        "What is the difference between term life insurance and whole life insurance, and which one is better for different situations?",
-        "How does comprehensive coverage differ from collision coverage in an auto insurance policy?",
-        "What are the key exclusions that I should be aware of when reviewing a travel insurance policy?",
-        "How do insurers calculate the payout amount for property damage under a renters insurance policy?",
-        "What are the benefits and drawbacks of choosing a high-deductible health plan (HDHP) in combination with a health savings account (HSA)?"
-    ];
-
 
     const getSearchResultsPost = useCallback(() => {
         const getQuestions = JSON.parse(localStorage.getItem('questionHistory')) || [];
@@ -58,7 +44,7 @@ export function PlaygroundSearch() {
         }
         getQuestions.push(question);
         localStorage.setItem('questionHistory', JSON.stringify(getQuestions));
-        setQuestionHistory(localStorage.getItem('questionHistory'));
+        setQuestionHistory(JSON.parse(localStorage.getItem('questionHistory')));
 
         setLoading(true);
         getSearchResults(projectId, selectedEmbedding?.id, question, limit, metaDataFilter, threshold, (result) => {
@@ -117,7 +103,7 @@ export function PlaygroundSearch() {
                         <div className="absolute top-8 right-0 w-80 bg-white border border-gray-300 shadow-lg rounded-md p-2 z-50 max-h-96 overflow-y-auto">
                             <div className="ml-1 text-md font-semibold text-gray-600 mb-1">Last questions</div>
                             <ul>
-                                {historyEntries.map((questionEntry, index) => (
+                                {questionHistory.map((questionEntry, index) => (
                                     <li
                                         key={index}
                                         className="p-2 text-gray-700 hover:bg-gray-100 rounded-md cursor-pointer transition duration-150"
@@ -159,33 +145,6 @@ export function PlaygroundSearch() {
                     Search
                 </button>
             </div>
-            <div className="flex items-center mt-10 mb-3">
-                <label className="text-lg leading-6 text-gray-900 font-medium ">Question history</label>
-                <button disabled={!questionHistory} onClick={() => {
-                    localStorage.removeItem('questionHistory');
-                    setQuestionHistory(null);
-                }}
-                    className="ml-auto bg-white text-gray-700 text-xs font-semibold px-4 py-2 rounded-md border border-gray-300 hover:bg-gray-50 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed">Clear history</button>
-            </div>
-            <div className="flex flex-col gap-y-2">
-                {questionHistory ? <>
-                    {JSON.parse(questionHistory).map((question, index) => <div className="grid items-center gap-x-2" style={{ gridTemplateColumns: '90% 5% 5%' }}>
-                        <div key={index} className="text-sm font-normal text-gray-500">{index + 1}. {question}</div>
-                        <Tooltip content="Use this question as current" placement="top" color="invert">
-                            <IconCircleCheck className="h-5 w-5 text-green-500 cursor-pointer" onClick={() => setQuestion(question)} />
-                        </Tooltip>
-                        <Tooltip content="Remove this question from the history" placement="top" color="invert">
-                            <IconXboxX className="h-5 w-5 text-red-500 cursor-pointer" onClick={() => {
-                                const getQuestions = JSON.parse(localStorage.getItem('questionHistory'));
-                                getQuestions.splice(index, 1);
-                                localStorage.setItem('questionHistory', JSON.stringify(getQuestions));
-                                setQuestionHistory(localStorage.getItem('questionHistory'));
-                            }} />
-                        </Tooltip>
-                    </div>)}
-                </> : <div className="text-sm font-normal text-gray-500 italic mx-3">No questions asked yet.</div>}
-            </div>
-
         </div>
         <div className={`h-full border-gray-300 border-l`}>
             <div className="flex flex-row mx-4 my-1 items-center">
