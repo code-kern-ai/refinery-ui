@@ -9,7 +9,6 @@ import { getAttributes } from "@/src/services/base/attribute";
 import { setAllAttributes, setAllEmbeddings } from "@/src/reduxStore/states/pages/settings";
 import { getEmbeddings } from "@/src/services/base/embedding";
 import { postProcessingEmbeddings } from "@/src/util/components/projects/projectId/settings/embeddings-helper";
-import { IconCategoryPlus } from "@tabler/icons-react";
 
 const STEPS = [
     { id: 0, name: 'Playground' },
@@ -52,30 +51,9 @@ export default function QuestionPlayground() {
         {projectId && <>
             <div className={`overflow-hidden p-4 flex items-center flex-shrink-0`}>
                 <nav aria-label="Progress" className="flex items-center w-full">
-                    <ol role="list" className="divide-y divide-gray-300 rounded-md border border-gray-300 md:flex md:divide-y-0">
-                        <li className="relative md:flex md:flex-1 cursor-pointer" onClick={() => toggleTabs(0)}>
-                            {openTab == 0 ? (
-                                <div className="flex items-center px-6 py-2 text-sm font-medium" aria-current="step">
-                                    <span className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full border-2 border-purple-600">
-                                        <IconCategoryPlus className="text-purple-600 h-5 w-5" />
-                                    </span>
-                                    <span className="ml-4 text-sm font-medium text-purple-600">{STEPS[0].name}</span>
-                                </div>
-                            ) : (
-                                <div className="group flex items-center">
-                                    <span className="flex items-center px-6 py-2 text-sm font-medium">
-                                        <span className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full border-2 border-gray-300">
-                                            <IconCategoryPlus className="text-gray-500 h-5 w-5" />
-                                        </span>
-                                        <span className="ml-4 text-sm font-medium text-gray-500">{STEPS[0].name}</span>
-                                    </span>
-                                </div>
-                            )}
-                        </li>
-                    </ol>
-                    <ol className="divide-y divide-gray-300 rounded-md border border-gray-300 md:flex md:divide-y-0 ml-auto">
-                        {STEPS.slice(1).map((step, stepIdx) => (
-                            <li key={step.name} className="relative md:flex md:flex-1 cursor-pointer" onClick={() => toggleTabs(stepIdx + 1)}>
+                    <ol className="divide-y divide-gray-300 rounded-md border border-gray-300 md:flex md:divide-y-0 w-1/2">
+                        {STEPS.map((step, stepIdx) => (
+                            <li key={step.name} className="flex justify-center items-center relative flex-1 cursor-pointer" onClick={() => toggleTabs(stepIdx)}>
                                 {openTab == step.id ? (
                                     <div className="flex items-center pr-6 pl-5 py-2 text-sm font-medium" aria-current="step">
                                         <span className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full border-2 border-purple-600">
@@ -93,7 +71,7 @@ export default function QuestionPlayground() {
                                         </span>
                                     </div>
                                 )}
-                                {stepIdx !== STEPS.length - 2 ? (
+                                {stepIdx !== STEPS.length - 1 ? (
                                     <>
                                         <div className="absolute right-0 top-0 hidden h-full w-3 md:block" aria-hidden="true">
                                             <svg
