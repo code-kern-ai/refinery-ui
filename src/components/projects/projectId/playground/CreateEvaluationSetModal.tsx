@@ -6,6 +6,7 @@ import { selectProjectId } from "@/src/reduxStore/states/project";
 import { createEvaluationSet, getSearchResults, recordSearchContains } from "@/src/services/base/playground";
 import { Embedding } from "@/src/types/components/projects/projectId/settings/embeddings";
 import { ModalButton, ModalEnum } from "@/src/types/shared/modal";
+import { InfoButton } from "@/submodules/react-components/components/InfoButton";
 import KernButton from "@/submodules/react-components/components/kern-button/KernButton";
 import KernDropdown from "@/submodules/react-components/components/KernDropdown";
 import useDebounce from "@/submodules/react-components/hooks/useHooks/useDebounce";
@@ -156,7 +157,8 @@ export default function CreateEvaluationSetModal(props: CreateEvaluationSetsModa
                         <KernDropdown dropdownWidth={"w-full"} options={onAttributeEmbeddings} buttonName={selectedEmbedding ? selectedEmbedding.name : 'Select embedding'} selectedOption={(value) => setSelectedEmbedding(value)} dropdownClasses="my-2" />
                     </div>
                     <div className="flex items-center">
-                        <span className="mr-4">Enter an evaluation question</span>
+                        <span className="mr-1">Enter an evaluation question</span>
+                        <InfoButton content="To help refine a question, we provide a reformulation in the 'Playground' tab. Additionally, users can access their question history and select a previous question." infoButtonSize='sm' divPosition='right' />
                     </div>
                     <textarea placeholder="Enter question..."
                         className={`placeholder-italic w-full h-22 p-2 line-height-textarea border rounded-md border-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100`}
