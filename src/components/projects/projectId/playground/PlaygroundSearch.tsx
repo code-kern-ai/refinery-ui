@@ -10,8 +10,9 @@ import { useSelector, useDispatch } from "react-redux";
 import { RecordDisplay } from "@/src/components/shared/record-display/RecordDisplay";
 import { selectVisibleAttributesDataBrowser } from "@/src/reduxStore/states/pages/settings";
 import LoadingIcon from "@/submodules/react-components/components/LoadingIcon";
-import { IconFilterOff, IconFilter, IconCategoryPlus, IconLoader2 } from '@tabler/icons-react'
+import { IconFilterOff, IconFilter, IconCategoryPlus, IconLoader2, IconHistory, IconWand } from '@tabler/icons-react'
 import PlaygroundSearchMetaFilterModal from "./PlaygroundSearchMetaFilterModal";
+import { Tooltip } from "@nextui-org/react";
 
 const PLAYGROUND_LIMIT_DEFAULT = 10;
 const PLAYGROUND_THRESHOLD_DEFAULT = -9999;
@@ -63,11 +64,28 @@ export function PlaygroundSearch() {
                 <span className="mr-3">Embedding</span>
                 <KernDropdown dropdownWidth={"w-full"} options={onAttributeEmbeddings} buttonName={selectedEmbedding ? selectedEmbedding.name : 'Select embedding'} selectedOption={(value) => setSelectedEmbedding(value)} dropdownClasses="my-2" />
             </div>
-            <textarea placeholder="Enter question..."
-                className={`placeholder-italic w-full h-44 p-2 line-height-textarea border rounded-md border-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100`}
-                onChange={(event: any) => { setQuestion(event.target.value); }}
-                value={question}
-            ></textarea>
+            <div className="relative w-full">
+                <textarea
+                    placeholder="Enter question..."
+                    className="placeholder-italic w-full h-44 p-2 pr-16 line-height-textarea border rounded-md border-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100"
+                    onChange={(event: any) => setQuestion(event.target.value)}
+                    value={question}
+                ></textarea>
+                <div className="absolute top-2 right-2 flex gap-x-2">
+                    <Tooltip content="Reformulate" color="invert" placement="bottom">
+                        <span className="p-1 rounded-md text-gray-400 cursor-pointer hover:bg-gray-100 hover:text-gray-500 transition duration-150 ease-in-out">
+                            <IconWand className="h-5 w-5" />
+                        </span>
+                    </Tooltip>
+                    <Tooltip content="History" color="invert" placement="bottom">
+
+                        <span className="p-1 rounded-md text-gray-400 cursor-pointer hover:bg-gray-100 hover:text-gray-500 transition duration-150 ease-in-out">
+                            <IconHistory className="h-5 w-5" />
+                        </span>
+                    </Tooltip>
+
+                </div>
+            </div>
             <div className="flex items-center justify-between">
                 <div className="flex items-center gap-x-2 justify-between">
                     <button onClick={() => dispatch(openModal(ModalEnum.EVALUATION_META_FILTER_APPLY))} disabled={!selectedEmbedding}
