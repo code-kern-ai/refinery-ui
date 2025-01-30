@@ -101,7 +101,7 @@ export default function ExecutionContainer(props: ExecutionContainerProps) {
                                 <div key={record.id} className="divide-y divide-gray-200 bg-white">
                                     <div className="flex-shrink-0 border-b border-gray-200 shadow-sm flex justify-between items-center">
                                         <div className="flex items-center text-xs leading-5 text-gray-500 font-normal mx-4 my-3 text-justify">
-                                            {record.value}
+                                            {String(record.value)}
                                         </div>
                                         <div className="flex items-center justify-center mr-5 ml-auto">
                                             <button onClick={() => {
