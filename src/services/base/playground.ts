@@ -107,3 +107,11 @@ export function deleteEvaluationRunsPost(projectId: string, evaluationRunIds: st
     }
     jsonFetchWrapper(finalUrl, FetchType.DELETE, onResult, JSON.stringify(body));
 }
+
+export function getReformulationByQuestion(projectId: string, question: string, onResult: (result: any) => void) {
+    const finalUrl = `${playgroundEndpoint}/${projectId}/reformulation`;
+    const body = {
+        question: question
+    }
+    jsonFetchWrapper(finalUrl, FetchType.POST, onResult, JSON.stringify(body));
+}

@@ -2,7 +2,7 @@ import { openModal, setModalStates } from "@/src/reduxStore/states/modal";
 import { ModalEnum } from "@/src/types/shared/modal";
 import { selectOnAttributeEmbeddings } from "@/src/reduxStore/states/pages/settings";
 import { selectProjectId } from "@/src/reduxStore/states/project";
-import { createEvaluationSet, getSearchResults } from "@/src/services/base/playground";
+import { createEvaluationSet, getSearchResults, getReformulationByQuestion } from "@/src/services/base/playground";
 import { Embedding } from "@/src/types/components/projects/projectId/settings/embeddings";
 import KernDropdown from "@/submodules/react-components/components/KernDropdown";
 import { useState, useCallback } from "react";
@@ -37,6 +37,7 @@ export function PlaygroundSearch() {
     const [createdSet, setCreatedSet] = useState(false);
     const [questionHistory, setQuestionHistory] = useState<string[]>(JSON.parse(localStorage.getItem('questionHistory')));
     const [showHistory, setShowHistory] = useState(false);
+    const [reformulationLoading, setReformulationLoading] = useState(false);
 
     const getSearchResultsPost = useCallback(() => {
         const getQuestions = JSON.parse(localStorage.getItem('questionHistory')) || [];
@@ -73,6 +74,15 @@ export function PlaygroundSearch() {
         setShowHistory(false);
     }, []);
 
+    const handleReformulation = useCallback(() => {
+        setReformulationLoading(true);
+        getReformulationByQuestion(projectId, question, (result) => {
+            setQuestion(result.reformulation);
+            setReformulationLoading(false);
+        })
+    }, [projectId, question]);
+
+
     return <div className={`grid overflow-hidden h-full grid-cols-2`}>
         <div className="flex flex-col gap-y-2 m-3 h-full">
             <div className="flex items-center">
@@ -86,6 +96,7 @@ export function PlaygroundSearch() {
                     onChange={(event: any) => setQuestion(event.target.value)}
                     value={question}
                 ></textarea>
+                {reformulationLoading && <span className="absolute top-1/4 left-1/2 transform -translate-x-1/2 -translate-y-1/2"><IconLoader2 className="absolute h-6 w-6 animate-spin" /></span>}
                 <div className="absolute top-2 right-2 flex gap-x-2">
                     <Tooltip content="Reformulate" color="invert" placement="bottom">
                         <span className="p-1 rounded-md text-gray-400 cursor-pointer hover:bg-gray-100 hover:text-gray-500 transition duration-150 ease-in-out"
@@ -174,6 +185,6 @@ export function PlaygroundSearch() {
             </div>}
         </div>
         <PlaygroundSearchMetaFilterModal selectedEmbedding={selectedEmbedding} setMetaDataFilter={setMetaDataFilter} />
-        <PlaygroundSearchReformulateModal />
+        <PlaygroundSearchReformulateModal handleReformulation={handleReformulation} />
     </div >
 }
