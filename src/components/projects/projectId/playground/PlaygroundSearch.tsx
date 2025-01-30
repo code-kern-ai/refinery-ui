@@ -10,7 +10,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { RecordDisplay } from "@/src/components/shared/record-display/RecordDisplay";
 import { selectVisibleAttributesDataBrowser } from "@/src/reduxStore/states/pages/settings";
 import LoadingIcon from "@/submodules/react-components/components/LoadingIcon";
-import { IconFilterOff, IconFilter, IconCategoryPlus, IconLoader2, IconCircleCheck, IconX, IconXboxX } from '@tabler/icons-react'
+import { IconFilterOff, IconFilter, IconCategoryPlus, IconLoader2, IconCircleCheck, IconXboxX, IconWand, IconHistory, } from '@tabler/icons-react'
 import PlaygroundSearchMetaFilterModal from "./PlaygroundSearchMetaFilterModal";
 import { Tooltip } from "@nextui-org/react";
 
@@ -35,6 +35,21 @@ export function PlaygroundSearch() {
     const [setCreationLoading, setSetCreationLoading] = useState(false);
     const [createdSet, setCreatedSet] = useState(false);
     const [questionHistory, setQuestionHistory] = useState(localStorage.getItem('questionHistory'));
+    const [showHistory, setShowHistory] = useState(false);
+
+    const historyEntries = [
+        "What are the most common types of life insurance policies available, and how do they differ from one another?",
+        "How does the claims process work in health insurance, and what documentation is typically required?",
+        "What factors should I consider when choosing an auto insurance policy to ensure adequate coverage?",
+        "Can you explain how the deductible and premium work together in a homeowners insurance policy?",
+        "How does insurance fraud impact premiums, and what are some common types of insurance fraud to watch out for?",
+        "What is the difference between term life insurance and whole life insurance, and which one is better for different situations?",
+        "How does comprehensive coverage differ from collision coverage in an auto insurance policy?",
+        "What are the key exclusions that I should be aware of when reviewing a travel insurance policy?",
+        "How do insurers calculate the payout amount for property damage under a renters insurance policy?",
+        "What are the benefits and drawbacks of choosing a high-deductible health plan (HDHP) in combination with a health savings account (HSA)?"
+    ];
+
 
     const getSearchResultsPost = useCallback(() => {
         const getQuestions = JSON.parse(localStorage.getItem('questionHistory')) || [];
@@ -66,6 +81,10 @@ export function PlaygroundSearch() {
         });
     }, [projectId, question, searchResults, createdSet]);
 
+    const handleHistoryClick = useCallback((entry: string) => {
+        setQuestion(entry);
+        setShowHistory(false);
+    }, []);
 
     return <div className={`grid overflow-hidden h-full grid-cols-2`}>
         <div className="flex flex-col gap-y-2 m-3 h-full">
@@ -73,11 +92,45 @@ export function PlaygroundSearch() {
                 <span className="mr-3">Embedding</span>
                 <KernDropdown dropdownWidth={"w-full"} options={onAttributeEmbeddings} buttonName={selectedEmbedding ? selectedEmbedding.name : 'Select embedding'} selectedOption={(value) => setSelectedEmbedding(value)} dropdownClasses="my-2" />
             </div>
-            <textarea placeholder="Enter question..."
-                className={`placeholder-italic w-full h-44 p-2 line-height-textarea border rounded-md border-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100`}
-                onChange={(event: any) => { setQuestion(event.target.value); }}
-                value={question}
-            ></textarea>
+            <div className="relative w-full">
+                <textarea
+                    placeholder="Enter question..."
+                    className="placeholder-italic w-full h-44 p-2 pr-16 line-height-textarea border rounded-md border-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100"
+                    onChange={(event: any) => setQuestion(event.target.value)}
+                    value={question}
+                ></textarea>
+                <div className="absolute top-2 right-2 flex gap-x-2">
+                    <Tooltip content="Reformulate" color="invert" placement="bottom">
+                        <span className="p-1 rounded-md text-gray-400 cursor-pointer hover:bg-gray-100 hover:text-gray-500 transition duration-150 ease-in-out">
+                            <IconWand className="h-5 w-5" />
+                        </span>
+                    </Tooltip>
+                    <Tooltip content="History" color="invert" placement="bottom">
+                        <span
+                            className="p-1 rounded-md text-gray-400 cursor-pointer hover:bg-gray-100 hover:text-gray-500 transition duration-150 ease-in-out"
+                            onClick={() => setShowHistory(!showHistory)}
+                        >
+                            <IconHistory className="h-5 w-5" />
+                        </span>
+                    </Tooltip>
+                    {showHistory && (
+                        <div className="absolute top-8 right-0 w-80 bg-white border border-gray-300 shadow-lg rounded-md p-2 z-50 max-h-96 overflow-y-auto">
+                            <div className="ml-1 text-md font-semibold text-gray-600 mb-1">Last questions</div>
+                            <ul>
+                                {historyEntries.map((questionEntry, index) => (
+                                    <li
+                                        key={index}
+                                        className="p-2 text-gray-700 hover:bg-gray-100 rounded-md cursor-pointer transition duration-150"
+                                        onClick={() => handleHistoryClick(questionEntry)}
+                                    >
+                                        {questionEntry}
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>
+                    )}
+                </div>
+            </div>
             <div className="flex items-center justify-between">
                 <div className="flex items-center gap-x-2 justify-between">
                     <button onClick={() => dispatch(openModal(ModalEnum.EVALUATION_META_FILTER_APPLY))} disabled={!selectedEmbedding}
