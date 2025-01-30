@@ -105,7 +105,7 @@ export function PlaygroundSearch() {
                         </span>
                     </Tooltip>
                     {showHistory && (
-                        <div className="absolute top-8 right-0 w-80 bg-white border border-gray-300 shadow-lg rounded-md p-2 z-50">
+                        <div className="absolute top-8 right-0 w-80 bg-white border border-gray-300 shadow-lg rounded-md p-2 z-50 max-h-96 overflow-y-auto">
                             <div className="ml-1 text-md font-semibold text-gray-600 mb-1">Last questions</div>
                             <ul>
                                 {historyEntries.map((questionEntry, index) => (

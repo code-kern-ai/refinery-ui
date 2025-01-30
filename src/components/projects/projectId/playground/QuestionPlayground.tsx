@@ -48,9 +48,9 @@ export default function QuestionPlayground() {
         });
     }
 
-    return <>
+    return <div className="flex flex-col w-full" style={{ height: 'calc(100vh - 4rem)' }}>
         {projectId && <>
-            <div className={`overflow-hidden min-h-full p-4 flex items-center`}>
+            <div className={`overflow-hidden p-4 flex items-center`}>
                 <nav aria-label="Progress" className="flex items-center w-full">
                     <ol role="list" className="divide-y divide-gray-300 rounded-md border border-gray-300 md:flex md:divide-y-0">
                         <li className="relative md:flex md:flex-1 cursor-pointer" onClick={() => toggleTabs(0)}>
@@ -118,5 +118,5 @@ export default function QuestionPlayground() {
             {openTab === 3 && <EvaluationRuns />}
         </>
         }
-    </>
+    </div>
 }
