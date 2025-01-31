@@ -77,9 +77,15 @@ export function PlaygroundSearch() {
     const handleReformulation = useCallback((apiKey) => {
         setReformulationLoading(true);
         getReformulationByQuestion(projectId, question, apiKey, (result) => {
-            setQuestion(result.reformulation);
+            if (!result?.reformulation) setQuestion("Error reformulating question.");
+            else setQuestion(result?.reformulation);
             setReformulationLoading(false);
-        })
+        },
+            (error) => {
+                setReformulationLoading(false);
+                setQuestion("Error reformulating question.");
+            }
+        )
     }, [projectId, question]);
 
 
