@@ -83,7 +83,7 @@ export function PlaygroundSearch() {
     }, [projectId, question]);
 
 
-    return <div className={`grid overflow-hidden h-full grid-cols-2`}>
+    return <div className={`grid overflow-hidden h-full grid-cols-2`} style={{ minHeight: 'calc(100vh - 10rem)' }}>
         <div className="flex flex-col gap-y-2 m-3 h-full">
             <div className="flex items-center">
                 <span className="mr-3">Embedding</span>
