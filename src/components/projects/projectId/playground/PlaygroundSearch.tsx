@@ -74,9 +74,9 @@ export function PlaygroundSearch() {
         setShowHistory(false);
     }, []);
 
-    const handleReformulation = useCallback(() => {
+    const handleReformulation = useCallback((apiKey) => {
         setReformulationLoading(true);
-        getReformulationByQuestion(projectId, question, (result) => {
+        getReformulationByQuestion(projectId, question, apiKey, (result) => {
             setQuestion(result.reformulation);
             setReformulationLoading(false);
         })
