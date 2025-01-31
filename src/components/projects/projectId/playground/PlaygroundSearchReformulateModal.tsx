@@ -23,7 +23,7 @@ export default function PlaygroundSearchReformulateModal(props: { handleReformul
                 type="text"
                 value={apiKey}
                 onChange={(e) => setApiKey(e.target.value)}
-                placeholder="Enter your API key"
+                placeholder="OpenAI API key"
                 className="w-full p-2 mt-3 border rounded"
             />
         </Modal>
