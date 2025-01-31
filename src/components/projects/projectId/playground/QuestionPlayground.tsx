@@ -48,7 +48,7 @@ export default function QuestionPlayground() {
         });
     }
 
-    return <div className="flex flex-col w-full" style={{ height: 'calc(100vh - 4rem)' }}>
+    return <div className="flex flex-col w-full" style={{ minHeight: 'calc(100vh - 4rem)' }}>
         {projectId && <>
             <div className={`overflow-hidden p-4 flex items-center flex-shrink-0`}>
                 <nav aria-label="Progress" className="flex items-center w-full">

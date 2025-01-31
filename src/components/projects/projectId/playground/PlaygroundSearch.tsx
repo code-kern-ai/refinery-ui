@@ -83,7 +83,7 @@ export function PlaygroundSearch() {
     }, [projectId, question]);
 
 
-    return <div className={`grid overflow-hidden h-full grid-cols-2`}>
+    return <div className={`grid overflow-hidden h-full grid-cols-2`} style={{ minHeight: 'calc(100vh - 10rem)' }}>
         <div className="flex flex-col gap-y-2 m-3 h-full">
             <div className="flex items-center">
                 <span className="mr-3">Embedding</span>
@@ -99,18 +99,19 @@ export function PlaygroundSearch() {
                 {reformulationLoading && <span className="absolute top-1/4 left-1/2 transform -translate-x-1/2 -translate-y-1/2"><IconLoader2 className="absolute h-6 w-6 animate-spin" /></span>}
                 <div className="absolute top-2 right-2 flex gap-x-2">
                     <Tooltip content="Reformulate" color="invert" placement="bottom">
-                        <span className="p-1 rounded-md text-gray-400 cursor-pointer hover:bg-gray-100 hover:text-gray-500 transition duration-150 ease-in-out"
+                        <button disabled={!question || loading || !selectedEmbedding}
+                            className="p-1 rounded-md text-gray-400 cursor-pointer hover:bg-gray-100 hover:text-gray-500 transition duration-150 ease-in-out disabled:opacity-50 disabled:cursor-not-allowed"
                             onClick={() => dispatch(openModal(ModalEnum.EVALUATION_REFORMULATE))}>
                             <IconWand className="h-5 w-5" />
-                        </span>
+                        </button>
                     </Tooltip>
                     <Tooltip content="History" color="invert" placement="bottom">
-                        <span
+                        <button
                             className="p-1 rounded-md text-gray-400 cursor-pointer hover:bg-gray-100 hover:text-gray-500 transition duration-150 ease-in-out"
                             onClick={() => setShowHistory(!showHistory)}
                         >
                             <IconHistory className="h-5 w-5" />
-                        </span>
+                        </button>
                     </Tooltip>
                     {showHistory && (
                         <div className="absolute top-8 right-0 w-80 bg-white border border-gray-300 shadow-lg rounded-md p-2 z-50 max-h-96 overflow-y-auto">
