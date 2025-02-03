@@ -126,7 +126,6 @@ export function PlaygroundSearch() {
                                 {questionHistory && questionHistory.map((questionEntry, index) => (
                                     <li
                                         key={index}
-                                        // className="p-2 text-gray-700 rounded-md cursor-pointer transition duration-150 bg-white my-2"
                                         className="p-2 text-gray-700 rounded-md border-2 border-white cursor-pointer transition duration-150 bg-white my-2 hover:border-black"
                                         onClick={() => handleHistoryClick(questionEntry)}
                                     >
