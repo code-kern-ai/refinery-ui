@@ -120,13 +120,14 @@ export function PlaygroundSearch() {
                         </button>
                     </Tooltip>
                     {showHistory && (
-                        <div className="absolute top-8 right-0 w-80 bg-white border border-gray-300 shadow-lg rounded-md p-2 z-50 max-h-96 overflow-y-auto">
-                            <div className="ml-1 text-md font-semibold text-gray-600 mb-1">Last questions</div>
+                        <div className="absolute top-8 right-0 w-80 bg-gray-100 border border-gray-300 shadow-lg rounded-md p-2 z-50 max-h-96 overflow-y-auto">
+                            <div className="ml-1 text-md text-black mb-1">Last questions</div>
                             <ul>
                                 {questionHistory && questionHistory.map((questionEntry, index) => (
                                     <li
                                         key={index}
-                                        className="p-2 text-gray-700 hover:bg-gray-100 rounded-md cursor-pointer transition duration-150"
+                                        // className="p-2 text-gray-700 rounded-md cursor-pointer transition duration-150 bg-white my-2"
+                                        className="p-2 text-gray-700 rounded-md border-2 border-white cursor-pointer transition duration-150 bg-white my-2 hover:border-black"
                                         onClick={() => handleHistoryClick(questionEntry)}
                                     >
                                         {questionEntry}
