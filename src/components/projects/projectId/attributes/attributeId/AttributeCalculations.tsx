@@ -416,6 +416,7 @@ export default function AttributeCalculation() {
                                     buttonName="Use code example"
                                     options={LLM_CODE_TEMPLATE_OPTIONS}
                                     dropdownWidth="w-52"
+                                    disabled={currentAttribute.state == AttributeState.USABLE}
                                     selectedOption={selectCodeTemplate}
                                 />
                             </Tooltip>}
