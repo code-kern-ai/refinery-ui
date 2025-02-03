@@ -38,6 +38,8 @@ import LLMResponseConfig from "./LLMResponseConfig";
 import useDebounce from "@/submodules/react-components/hooks/useHooks/useDebounce";
 import useRefFor from "@/submodules/react-components/hooks/useRefFor";
 import { simpleDictCompare } from "@/submodules/javascript-functions/validations";
+import { LLM_CODE_TEMPLATE_EXAMPLES } from "./LLM/llmTemplates";
+import { capitalizeFirst } from "@/submodules/javascript-functions/case-types-parser";
 
 const EDITOR_OPTIONS = { theme: 'vs-light', language: 'python', readOnly: false };
 
@@ -45,6 +47,8 @@ export const LLM_PROVIDER_OPTIONS = [
     'Open AI',
     'Azure'
 ];
+
+const LLM_CODE_TEMPLATE_OPTIONS = Object.keys(LLM_CODE_TEMPLATE_EXAMPLES).map((key) => ({ name: capitalizeFirst(key), value: key }));
 
 
 export default function AttributeCalculation() {
@@ -72,6 +76,18 @@ export default function AttributeCalculation() {
 
     const currentAttributeRef = useRefFor(currentAttribute);
     const debouncedConfig = useDebounce(additionalConfigTmp, 500);
+
+    const updateSourceCode = useCallback((value: string, attributeNameParam?: string) => {
+        var regMatch: any = getPythonFunctionRegExMatch(value);
+        if (!regMatch) {
+            console.log("Can't find python function name -- seems wrong -- better dont save");
+            return;
+        }
+        const finalSourceCode = value.replace(regMatch[0], 'def ac(record)');
+        updateAttribute(projectId, currentAttribute.id, (res) => {
+
+        }, null, null, attributeNameParam, finalSourceCode);
+    }, [projectId, currentAttribute]);
 
     useEffect(() => setAdditionalConfigTmp(currentAttribute?.additionalConfig), [currentAttribute?.additionalConfig])
 
@@ -112,7 +128,7 @@ export default function AttributeCalculation() {
             setEditorOptions({ ...EDITOR_OPTIONS, readOnly: false });
         }
         setAttributeName(currentAttribute.name);
-    }, [currentAttribute]);
+    }, [currentAttribute, updateSourceCode]);
 
     useEffect(() => {
         if (!projectId || allUsers.length == 0) return;
@@ -140,7 +156,7 @@ export default function AttributeCalculation() {
             spinner.unsubscribe();
             subscription.unsubscribe();
         }
-    }, [editorValue, currentAttribute]);
+    }, [editorValue, currentAttribute, updateSourceCode]);
 
 
     useEffect(() => {
@@ -150,6 +166,7 @@ export default function AttributeCalculation() {
         updateAttribute(projectId, currentAttribute.id, (res) => {
             setCurrentAttribute(postProcessCurrentAttribute(attributeNew));
             dispatch(updateAttributeById(attributeNew));
+            setEnableButton(true);
         }, null, null, null, null, null, debouncedConfig);
 
     }, [debouncedConfig])
@@ -235,17 +252,6 @@ export default function AttributeCalculation() {
         }
     }
 
-    function updateSourceCode(value: string, attributeNameParam?: string) {
-        var regMatch: any = getPythonFunctionRegExMatch(value);
-        if (!regMatch) {
-            console.log("Can't find python function name -- seems wrong -- better dont save");
-            return;
-        }
-        const finalSourceCode = value.replace(regMatch[0], 'def ac(record)');
-        updateAttribute(projectId, currentAttribute.id, (res) => {
-
-        }, null, null, attributeNameParam, finalSourceCode);
-    }
 
     function checkProjectTokenization() {
         getProjectTokenization(projectId, (res) => {
@@ -296,6 +302,12 @@ export default function AttributeCalculation() {
             }
         }
     }, [projectId, currentAttribute]);
+
+    const selectCodeTemplate = useCallback((option) => {
+        if (!currentAttributeRef.current) return;
+        updateSourceCode(LLM_CODE_TEMPLATE_EXAMPLES[option.value]);
+        setEditorValue(LLM_CODE_TEMPLATE_EXAMPLES[option.value].replace('def ac(record)', 'def ' + currentAttributeRef.current.name + '(record)'));
+    }, [updateSourceCode])
 
     const orgId = useSelector(selectOrganizationId);
     useWebsocket(orgId, Application.REFINERY, CurrentPage.ATTRIBUTE_CALCULATION, handleWebsocketNotification, projectId);
@@ -395,11 +407,19 @@ export default function AttributeCalculation() {
                     currentAttribute.dataType == DataTypeEnum.LLM_RESPONSE &&
                     <LLMResponseConfig disabled={currentAttribute.state == AttributeState.USABLE} attributeId={currentAttribute?.id} fullLlmConfig={additionalConfigTmp} setFullLlmConfig={setAdditionalConfigTmp} apiKey={additionalConfigTmp?.llmConfig.apiKey} />
                 }
-
-
-
                 <div className="flex flex-row items-center justify-between my-3">
-                    <div className="text-sm leading-5 font-medium text-gray-700 inline-block mr-2">{currentAttribute.dataType == DataTypeEnum.LLM_RESPONSE ? 'Postprocessing' : 'Editor'}</div>
+                    <div className="flex flex-row flex-nowrap items-center">
+                        <span className="text-sm leading-5 font-medium text-gray-700 inline-block mr-2">{currentAttribute.dataType == DataTypeEnum.LLM_RESPONSE ? 'Postprocessing' : 'Editor'}</span>
+                        {currentAttribute.dataType == DataTypeEnum.LLM_RESPONSE &&
+                            <Tooltip content={TOOLTIPS_DICT.ATTRIBUTE_CALCULATION.LLM_POSTPROCESSING_CODE} color="invert" placement="right">
+                                <KernDropdown
+                                    buttonName="Use code example"
+                                    options={LLM_CODE_TEMPLATE_OPTIONS}
+                                    dropdownWidth="w-52"
+                                    selectedOption={selectCodeTemplate}
+                                />
+                            </Tooltip>}
+                    </div>
                     <div className="flex flex-row flex-nowrap">
                         <VisitBricksButton urlExtension="generators" tooltipPlacement="left" size="small" />
                         <Tooltip content={TOOLTIPS_DICT.ATTRIBUTE_CALCULATION.AVAILABLE_LIBRARIES} placement="bottom" color="invert">

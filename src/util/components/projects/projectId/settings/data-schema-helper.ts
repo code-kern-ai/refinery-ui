@@ -1,4 +1,5 @@
 import { Attribute, AttributeVisibility } from "@/src/types/components/projects/projectId/settings/data-schema";
+import { DataTypeEnum } from "@/src/types/shared/general";
 import { jsonCopy } from "@/submodules/javascript-functions/general";
 
 export const DATA_TYPES = [
@@ -45,12 +46,13 @@ export function postProcessingAttributes(attributes: Attribute[]): Attribute[] {
 
 export function getColorForDataType(dataType): string {
     switch (dataType) {
-        case 'CATEGORY': return 'amber';
-        case 'TEXT': return 'lime';
-        case 'BOOLEAN': return 'cyan';
-        case 'INTEGER': return 'indigo';
-        case 'FLOAT': return 'purple';
-        case 'EMBEDDING_LIST': return 'rose';
+        case DataTypeEnum.CATEGORY: return 'amber';
+        case DataTypeEnum.TEXT: return 'lime';
+        case DataTypeEnum.BOOLEAN: return 'cyan';
+        case DataTypeEnum.INTEGER: return 'indigo';
+        case DataTypeEnum.FLOAT: return 'purple';
+        case DataTypeEnum.EMBEDDING_LIST: return 'rose';
+        case DataTypeEnum.LLM_RESPONSE: return 'emerald';
         default: return 'gray';
     }
 }

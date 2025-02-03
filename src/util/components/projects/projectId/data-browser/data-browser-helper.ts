@@ -1,6 +1,6 @@
 import { ColumnData, DataSlice } from "@/src/types/components/projects/projectId/data-browser/data-browser";
 import { LabelingTask } from "@/src/types/components/projects/projectId/settings/labeling-tasks";
-import { User } from "@/src/types/shared/general";
+import { DataTypeEnum, User } from "@/src/types/shared/general";
 import { buildFullLink } from "@/src/util/shared/link-parser-helper";
 import { dateAsUTCDate } from "@/submodules/javascript-functions/date-parser";
 import { informationSourceTypeToString, labelSourceToString, sliceTypeToString } from "@/submodules/javascript-functions/enums/enum-functions";
@@ -177,7 +177,7 @@ export function postProcessUniqueValues(uniqueValues: any, attributesSortOrder: 
     const uniqueValuesDict = uniqueValues;
     for (let key in uniqueValuesDict) {
         const attributeType = getAttributeType(attributesSortOrder, key);
-        if (attributeType == 'TEXT') {
+        if (attributeType == DataTypeEnum.TEXT || attributeType == DataTypeEnum.LLM_RESPONSE) {
             delete uniqueValuesDict[key];
         }
     }

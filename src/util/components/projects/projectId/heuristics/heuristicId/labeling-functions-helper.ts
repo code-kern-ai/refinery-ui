@@ -5,11 +5,12 @@ import { InformationSourceType } from "@/submodules/javascript-functions/enums/e
 import { parseContainerLogsData } from "@/submodules/javascript-functions/logs-parser";
 import { getColorStruct } from "../shared-helper";
 import { extendArrayElementsByUniqueId } from "@/submodules/javascript-functions/id-prep";
+import { DataTypeEnum } from "@/src/types/shared/general";
 
 export function embeddingRelevant(embedding: Embedding, attributes: Attribute[], labelingTasks: LabelingTask[], currentLabelingTaskId: string): boolean {
     if (!embedding) return false;
     const attributeType = attributes.find(a => a.id == embedding.attributeId)?.dataType;
-    if (attributeType != 'TEXT') return false;
+    if (attributeType != DataTypeEnum.TEXT && attributeType != DataTypeEnum.LLM_RESPONSE) return false;
     const onlyAttribute = labelingTasks.find(lt => lt.id == currentLabelingTaskId)?.taskType == 'MULTICLASS_CLASSIFICATION';
     return (embedding.type == 'ON_ATTRIBUTE' && onlyAttribute) || (embedding.type != 'ON_ATTRIBUTE' && !onlyAttribute)
 }

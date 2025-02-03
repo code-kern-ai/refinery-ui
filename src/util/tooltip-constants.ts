@@ -110,6 +110,7 @@ export const TOOLTIPS_DICT = {
         'BEING_EXECUTED': 'Currently being executed',
         'DELETE': 'Delete this attribute calculation',
         'EXECUTE_10_RECORDS': 'Execute the attribute on 10 records',
+        'LLM_POSTPROCESSING_CODE': 'Overwrites existing postprocessing code!',
     },
     [CurrentPage.LOOKUP_LISTS_OVERVIEW]: {
         'ENABLE_ACTIONS': 'At least one lookup list is needed to enable actions',

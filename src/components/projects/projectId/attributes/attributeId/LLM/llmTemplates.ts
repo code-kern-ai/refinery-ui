@@ -1,15 +1,15 @@
 
 export const TEMPLATE_EXAMPLES = {
-    REASONED_CLICKBAIT: {
-        templatePrompt: "You are running your own information network and need to ensure no clickbait news articles are published. To ensure your answer can be validated always provide a reason and your final result being either 'yes' or 'no' to the question is this clickbait. JSON Schema {\"reason\": <reasoning>, \"result\":<result>}",
-        questionPrompt: "News article: '{{headline}}'"
-    },
-    SHORT_SUMMARY_REFERENCE: {
-        templatePrompt: "Summarize the given text into two short sentences.",
-        questionPrompt: "{{reference}}"
-    },
-    META_DATA_EXTRACTION_REFERENCE: {
-        templatePrompt: `Your task is to extract meta data from the given text following this structure: 
+  REASONED_CLICKBAIT: {
+    templatePrompt: "You are running your own information network and need to ensure no clickbait news articles are published. To ensure your answer can be validated always provide a reason and your final result being either 'yes' or 'no' to the question is this clickbait. JSON Schema {\"reason\": <reasoning>, \"result\":<result>}",
+    questionPrompt: "News article: '{{headline}}'"
+  },
+  SHORT_SUMMARY_REFERENCE: {
+    templatePrompt: "Summarize the given text into two short sentences. Don't add any new keys only provide {\"result\":\"<summar>\"}",
+    questionPrompt: "{{reference}}"
+  },
+  META_DATA_EXTRACTION_REFERENCE: {
+    templatePrompt: `Your task is to extract meta data from the given text following this structure: 
 {
   "linguistic_metadata": {
     "language": "",  // ISO 639-1 language code
@@ -44,14 +44,14 @@ export const TEMPLATE_EXAMPLES = {
 }
 
 Don't remove any keys from the structure even if they are empty.`,
-        questionPrompt: "{{reference}}"
-        // removed since llms cant count words,
-        // "word_count": ,  // Integer word count
-        // "paragraph_count":   // Integer paragraph count
+    questionPrompt: "{{reference}}"
+    // removed since llms cant count words,
+    // "word_count": ,  // Integer word count
+    // "paragraph_count":   // Integer paragraph count
 
-    },
-    ENTITY_EXTRACTION_REFERENCE: {
-        templatePrompt: `Your task is to extract entities from the given text. To help with the task here is a list of entities with some examples: 
+  },
+  ENTITY_EXTRACTION_REFERENCE: {
+    templatePrompt: `Your task is to extract entities from the given text. To help with the task here is a list of entities with some examples: 
 {
   "entities": {
     "person": {
@@ -127,20 +127,45 @@ Don't remove any keys from the structure even if they are empty.`,
 
 
 Provide all extracted entities as a list. Don't add a description or examples to the list. Only provide the entity names under the corresponding sections. If no entities are found, return an empty list for the section.`,
-        questionPrompt: "{{reference}}"
-    },
-    TRANSLATION_REFERENCE: {
-        templatePrompt: "Translate the given text to iso 639-1 de.",
-        questionPrompt: "{{reference}}"
-    },
-    CLEANSE_REFERENCE: {
-        templatePrompt: `Your task is to clean the given text. For this ensure:
+    questionPrompt: "{{reference}}"
+  },
+  TRANSLATION_REFERENCE: {
+    templatePrompt: "Translate the given text to iso 639-1 de.",
+    questionPrompt: "{{reference}}"
+  },
+  CLEANSE_REFERENCE: {
+    templatePrompt: `Your task is to clean the given text. For this ensure:
 - All html tags are removed
 - unnecessary characters are removed (e.g. emojis, special characters unrelated to the sentence)
 - keep list intact, ensure the lists use '-' as enumeration 
 - keep line breaks between list points
 - Don't change the text only return the final cleaned up result
 - Keep markdown intact`,
-        questionPrompt: "{{reference}}"
-    }
+    questionPrompt: "{{reference}}"
+  }
+}
+
+export const LLM_CODE_TEMPLATE_EXAMPLES = {
+  DEFAULT: `
+async def ac(record):
+    # no post processing of answer
+
+    llm_response = await get_llm_response()
+    return llm_response.get("result") or "no result provided"
+`,
+  JSON_DUMPS_ALL_RESULTS: `import json
+async def ac(record):
+    llm_response = await get_llm_response()
+    return json.dumps(llm_response, indent=2)
+`,
+  TRY_RESULTS: `
+async def ac(record):
+    try:
+        llm_response = await get_llm_response()
+        return llm_response.get("result","no result provided")
+    except Exception as e:
+        print(f"Error at {record['running_id']}: " + str(e))
+        return "Error: " + str(e)
+`
+
 }
