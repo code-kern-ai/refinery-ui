@@ -1,11 +1,11 @@
-import { openModal, setModalStates } from "@/src/reduxStore/states/modal";
+import { openModal } from "@/src/reduxStore/states/modal";
 import { ModalEnum } from "@/src/types/shared/modal";
 import { selectOnAttributeEmbeddings } from "@/src/reduxStore/states/pages/settings";
 import { selectProjectId } from "@/src/reduxStore/states/project";
-import { createEvaluationSet, getSearchResults, getReformulationByQuestion } from "@/src/services/base/playground";
+import { createEvaluationSet, getSearchResults, getReformulationByQuestion, getPlaygroundQuestions } from "@/src/services/base/playground";
 import { Embedding } from "@/src/types/components/projects/projectId/settings/embeddings";
 import KernDropdown from "@/submodules/react-components/components/KernDropdown";
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { RecordDisplay } from "@/src/components/shared/record-display/RecordDisplay";
 import { selectVisibleAttributesDataBrowser } from "@/src/reduxStore/states/pages/settings";
@@ -35,24 +35,17 @@ export function PlaygroundSearch() {
 
     const [setCreationLoading, setSetCreationLoading] = useState(false);
     const [createdSet, setCreatedSet] = useState(false);
-    const [questionHistory, setQuestionHistory] = useState<string[]>(JSON.parse(localStorage.getItem('questionHistory')));
+    const [questionHistory, setQuestionHistory] = useState<string[]>();
     const [showHistory, setShowHistory] = useState(false);
     const [reformulationLoading, setReformulationLoading] = useState(false);
 
     const getSearchResultsPost = useCallback(() => {
-        const getQuestions = JSON.parse(localStorage.getItem('questionHistory')) || [];
-        if (getQuestions.length >= 50) {
-            getQuestions.shift();
-        }
-        getQuestions.push(question);
-        localStorage.setItem('questionHistory', JSON.stringify(getQuestions));
-        setQuestionHistory(JSON.parse(localStorage.getItem('questionHistory')));
-
         setLoading(true);
-        getSearchResults(projectId, selectedEmbedding?.id, question, limit, metaDataFilter, threshold, (result) => {
+        getSearchResults(projectId, selectedEmbedding?.id, question, limit, metaDataFilter, threshold, true, (result) => {
             setLoading(false);
             setCreatedSet(false);
             setSearchResults(result);
+            refetchQuestionMemory();
         });
     }, [projectId, selectedEmbedding?.id, question, limit, metaDataFilter, threshold]);
 
@@ -87,6 +80,17 @@ export function PlaygroundSearch() {
             }
         )
     }, [projectId, question]);
+
+    useEffect(() => {
+        if (!projectId) return;
+        refetchQuestionMemory();
+    }, [projectId]);
+
+    function refetchQuestionMemory() {
+        getPlaygroundQuestions(projectId, (result) => {
+            setQuestionHistory(result);
+        });
+    }
 
 
     return <div className={`grid overflow-hidden h-full grid-cols-2`} style={{ minHeight: 'calc(100vh - 10rem)' }}>

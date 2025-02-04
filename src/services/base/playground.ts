@@ -3,8 +3,9 @@ import { BACKEND_BASE_URI } from "./_settings";
 
 export const playgroundEndpoint = `${BACKEND_BASE_URI}/api/v1/playground`;
 
-export function getSearchResults(projectId: string, embeddingId: string, question: string, limit: number, metaDataFilter: any, threshold: number, onResult: (result: any) => void) {
-    const finalUrl = `${playgroundEndpoint}/${projectId}/search`;
+export function getSearchResults(projectId: string, embeddingId: string, question: string, limit: number, metaDataFilter: any, threshold: number, saveQuestion: boolean = false, onResult: (result: any) => void) {
+    // use the ES6 syntax to add or not the saveQuestion parameter
+    const finalUrl = `${playgroundEndpoint}/${projectId}/search${saveQuestion ? '?saveQuestion=true' : ''}`;
     const body = {
         embeddingId: embeddingId,
         question: question,
@@ -115,4 +116,9 @@ export function getReformulationByQuestion(projectId: string, question: string, 
         apiKey: apiKey
     }
     jsonFetchWrapper(finalUrl, FetchType.POST, onResult, JSON.stringify(body), undefined, onError);
+}
+
+export function getPlaygroundQuestions(projectId: string, onResult: (result: any) => void) {
+    const finalUrl = `${playgroundEndpoint}/${projectId}/playground-questions`;
+    jsonFetchWrapper(finalUrl, FetchType.GET, onResult);
 }
