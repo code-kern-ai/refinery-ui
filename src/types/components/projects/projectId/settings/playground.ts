@@ -33,3 +33,14 @@ export enum EvaluationRunState {
     SUCCESS = 'SUCCESS',
     FAILED = 'FAILED',
 }
+
+export type PlaygroundQuestion = {
+    id: string;
+    createdAt: string;
+    createdBy: string;
+    embeddingId: string;
+    metaInfo: any;
+    projectId: string;
+    question: string;
+    recordIds: any[];
+};

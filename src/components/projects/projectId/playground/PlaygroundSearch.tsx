@@ -14,6 +14,7 @@ import { IconFilterOff, IconFilter, IconCategoryPlus, IconLoader2, IconCircleChe
 import PlaygroundSearchMetaFilterModal from "./PlaygroundSearchMetaFilterModal";
 import PlaygroundSearchReformulateModal from "./PlaygroundSearchReformulateModal";
 import { Tooltip } from "@nextui-org/react";
+import { PlaygroundQuestion } from "@/src/types/components/projects/projectId/settings/playground";
 
 const PLAYGROUND_LIMIT_DEFAULT = 10;
 const PLAYGROUND_THRESHOLD_DEFAULT = -9999;
@@ -35,7 +36,7 @@ export function PlaygroundSearch() {
 
     const [setCreationLoading, setSetCreationLoading] = useState(false);
     const [createdSet, setCreatedSet] = useState(false);
-    const [questionHistory, setQuestionHistory] = useState<any[]>();
+    const [questionHistory, setQuestionHistory] = useState<PlaygroundQuestion[]>();
     const [showHistory, setShowHistory] = useState(false);
     const [reformulationLoading, setReformulationLoading] = useState(false);
 
