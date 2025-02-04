@@ -35,7 +35,7 @@ export function PlaygroundSearch() {
 
     const [setCreationLoading, setSetCreationLoading] = useState(false);
     const [createdSet, setCreatedSet] = useState(false);
-    const [questionHistory, setQuestionHistory] = useState<string[]>();
+    const [questionHistory, setQuestionHistory] = useState<any>();
     const [showHistory, setShowHistory] = useState(false);
     const [reformulationLoading, setReformulationLoading] = useState(false);
 
@@ -131,9 +131,9 @@ export function PlaygroundSearch() {
                                     <li
                                         key={index}
                                         className="p-2 text-gray-700 rounded-md border-2 border-white cursor-pointer transition duration-150 bg-white my-2 hover:border-black"
-                                        onClick={() => handleHistoryClick(questionEntry)}
+                                        onClick={() => handleHistoryClick(questionEntry.question)}
                                     >
-                                        {questionEntry}
+                                        {questionEntry.question}
                                     </li>
                                 ))}
                             </ul>
