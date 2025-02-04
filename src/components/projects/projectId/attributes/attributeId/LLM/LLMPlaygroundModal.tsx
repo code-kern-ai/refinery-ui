@@ -122,7 +122,12 @@ export default function LLMPlaygroundModal() {
         return attributes.filter(a => DISPLAY_STATES.includes(a.state)).map(a => ({ name: a.name, dataType: a.dataType }));
     }, [attributes])
 
-    return (<Modal modalName={ModalEnum.LLM_PLAYGROUND} acceptButton={acceptButton} className="ml-10 md:max-w-[calc(100vw-15rem)]">
+    const finalAcceptButton = useMemo(() => {
+        if (playgroundTestRunning) return { ...acceptButton, disabled: true };
+        return acceptButton;
+    }, [acceptButton, playgroundTestRunning])
+
+    return (<Modal modalName={ModalEnum.LLM_PLAYGROUND} acceptButton={finalAcceptButton} className="ml-10 md:max-w-[calc(100vw-15rem)]">
         <div className="pl-2 pr-5 max-h-[calc(100vh-15rem)] overflow-y-auto">
             <div className="flex flex-row items-center justify-center">
                 <span className="text-lg flex flex-row gap-x-2 text-gray-900 font-medium items-center">
