@@ -68,7 +68,7 @@ export default function ExecutionContainer(props: ExecutionContainerProps) {
                     on all records, or test-run it on 10 examples (which are sampled randomly). Test results are
                     shown
                     below after computation.{
-                        props.currentAttribute.dataType == DataTypeEnum.LLM_RESPONSE && <span >Note that LLM results are cached for the same set of settings to ensure that a critical error during the final execution doesn't lose the already calculated values</span>
+                        props.currentAttribute.dataType == DataTypeEnum.LLM_RESPONSE && <span className="italic">Note that LLM results are cached for the same set of settings to ensure that a critical error during the final execution doesn't lose the already calculated values</span>
                     }</div>
                 {requestedSomething && <div className="inline-block">
                     <LoadingIcon color="indigo" />

@@ -143,7 +143,7 @@ export default function LLMPlaygroundModal() {
                             onKeyDown={(e) => e.key === 'Enter' && getByRunningId()}
                             className="w-16 h-full text-right text-sm text-gray-900 border border-gray-200 rounded-lg align-top"
                         />
-                        <KernButton icon={IconHandClick} text="Get by running_id" size="small" onClick={getByRunningId} />
+                        <KernButton disabled={!inputRunningId} icon={IconHandClick} text="Get by running_id" size="small" onClick={getByRunningId} />
                     </div>
                     <div className="grid grid-cols-2 gap-2 text-sm max-h-52 overflow-y-auto" style={{ gridTemplateColumns: `max-content auto` }}>
                         {recordKeys.map((rk) => <Fragment key={rk.name}>
