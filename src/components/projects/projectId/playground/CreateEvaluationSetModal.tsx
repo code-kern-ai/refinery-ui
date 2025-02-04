@@ -112,7 +112,7 @@ export default function CreateEvaluationSetModal(props: CreateEvaluationSetsModa
 
     function getSimilarRecords() {
         setLoading(true);
-        getSearchResults(projectId, selectedEmbedding.id, question, limit, null, null, (result) => {
+        getSearchResults(projectId, selectedEmbedding.id, question, limit, null, null, null, (result) => {
             const selectedRecordIds = new Set(selectedRecords.map(r => r.id));
             const newSimilarityRecordList = result.filter((item) => !selectedRecordIds.has(item.id));
             setSimilarityRecordList(newSimilarityRecordList);
