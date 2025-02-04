@@ -35,7 +35,7 @@ export function PlaygroundSearch() {
 
     const [setCreationLoading, setSetCreationLoading] = useState(false);
     const [createdSet, setCreatedSet] = useState(false);
-    const [questionHistory, setQuestionHistory] = useState<any>();
+    const [questionHistory, setQuestionHistory] = useState<any[]>();
     const [showHistory, setShowHistory] = useState(false);
     const [reformulationLoading, setReformulationLoading] = useState(false);
 
