@@ -75,7 +75,7 @@ export default function AttributeCalculation() {
     const [additionalConfigTmp, setAdditionalConfigTmp] = useState<LLMConfig>(null);
 
     const currentAttributeRef = useRefFor(currentAttribute);
-    const debouncedConfig = useDebounce(additionalConfigTmp, 500);
+    const debouncedConfig = useDebounce(additionalConfigTmp, 1000);
 
     const updateSourceCode = useCallback((value: string, attributeNameParam?: string) => {
         var regMatch: any = getPythonFunctionRegExMatch(value);
