@@ -1,16 +1,7 @@
 
 import OpenAI from "./models/OpenAI"
 import Azure from "./models/Azure"
-
-type LLMConfigProps = {
-    llmIdentifier: string,
-    llmConfig: any,
-    setLlmConfig: (llmConfig: any) => void,
-    onlyEssential?: boolean,
-    projectId?: string,
-    isVision?: boolean,
-    disabled?: boolean,
-}
+import { LLMConfigProps } from "./types";
 
 export function isLLMConfigValid(llmIdentifier: string, llmConfig: any): boolean {
     switch (llmIdentifier) {

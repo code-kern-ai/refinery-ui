@@ -1,16 +1,9 @@
 import { useEffect } from "react";
 import KernDropdown from "@/submodules/react-components/components/KernDropdown";
-import { InputWithSlider } from "../InputWithSlider";
+import { InputWithSlider } from "@/submodules/react-components/components/InputWithSlider";
+import { LLmPropsOpenAI } from "../types";
 
 
-interface LLmProps {
-    llmConfig: any;
-    setLlmConfig: (llmConfig: any) => void;
-    onlyEssential?: boolean;
-    projectId?: string;
-    isVision?: boolean;
-    disabled?: boolean;
-}
 
 // https://platform.openai.com/docs/models
 const MODEL_OPTIONS = ['gpt-4o-mini', 'gpt-4o', 'gpt-4', 'gpt-4-turbo-preview', 'gpt-4-1106-preview', 'gpt-4-0125-preview', 'gpt-4-turbo', 'gpt-3.5-turbo']
@@ -26,7 +19,7 @@ const MAX_LENGTH = {
     'gpt-4o-mini': 128000,
 }
 
-export default function OpenAI(props: LLmProps) {
+export default function OpenAI(props: LLmPropsOpenAI) {
 
     useEffect(() => {
         if (props.llmConfig.model) {

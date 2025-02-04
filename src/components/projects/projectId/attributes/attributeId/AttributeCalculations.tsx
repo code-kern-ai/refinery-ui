@@ -4,7 +4,7 @@ import { selectAttributes, selectVisibleAttributeAC, setAllAttributes, setLabeli
 import { selectProjectId } from "@/src/reduxStore/states/project"
 import { Attribute, AttributeState, LLMConfig } from "@/src/types/components/projects/projectId/settings/data-schema";
 import { DataTypeEnum } from "@/src/types/shared/general";
-import { postProcessCurrentAttribute } from "@/src/util/components/projects/projectId/settings/attribute-calculation-helper";
+import { LLM_PROVIDER_OPTIONS, postProcessCurrentAttribute } from "@/src/util/components/projects/projectId/settings/attribute-calculation-helper";
 import { ATTRIBUTES_VISIBILITY_STATES, DATA_TYPES, getTooltipVisibilityState } from "@/src/util/components/projects/projectId/settings/data-schema-helper";
 import { copyToClipboard } from "@/submodules/javascript-functions/general";
 import { Editor } from "@monaco-editor/react";
@@ -38,17 +38,10 @@ import LLMResponseConfig from "./LLMResponseConfig";
 import useDebounce from "@/submodules/react-components/hooks/useHooks/useDebounce";
 import useRefFor from "@/submodules/react-components/hooks/useRefFor";
 import { simpleDictCompare } from "@/submodules/javascript-functions/validations";
-import { LLM_CODE_TEMPLATE_EXAMPLES } from "./LLM/llmTemplates";
-import { capitalizeFirst } from "@/submodules/javascript-functions/case-types-parser";
+import { LLM_CODE_TEMPLATE_EXAMPLES, LLM_CODE_TEMPLATE_OPTIONS } from "./LLM/llmTemplates";
 
 const EDITOR_OPTIONS = { theme: 'vs-light', language: 'python', readOnly: false };
 
-export const LLM_PROVIDER_OPTIONS = [
-    'Open AI',
-    'Azure'
-];
-
-const LLM_CODE_TEMPLATE_OPTIONS = Object.keys(LLM_CODE_TEMPLATE_EXAMPLES).map((key) => ({ name: capitalizeFirst(key), value: key }));
 
 
 export default function AttributeCalculation() {
@@ -109,7 +102,7 @@ export default function AttributeCalculation() {
             setCurrentAttribute(currentAttribute);
             setEditorValue(currentAttribute?.sourceCodeToDisplay);
         });
-    }, [projectId, currentAttribute])
+    }, [projectId, currentAttribute, router.query.attributeId])
 
     useEffect(() => {
         if (!attributes) return;

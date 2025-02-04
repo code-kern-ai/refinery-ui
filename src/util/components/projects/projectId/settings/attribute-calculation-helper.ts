@@ -41,3 +41,10 @@ export function postProcessRecordByRecordId(record: Record): Record {
     prepareRecord.data = JSON.parse(prepareRecord.data);
     return prepareRecord;
 }
+
+
+
+export const LLM_PROVIDER_OPTIONS = [
+    'Open AI',
+    'Azure'
+];

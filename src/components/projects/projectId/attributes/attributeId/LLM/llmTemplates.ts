@@ -1,3 +1,4 @@
+import { capitalizeFirst } from "@/submodules/javascript-functions/case-types-parser";
 
 export const TEMPLATE_EXAMPLES = {
   REASONED_CLICKBAIT: {
@@ -169,3 +170,7 @@ async def ac(record):
 `
 
 }
+
+
+export const LLM_CODE_TEMPLATE_OPTIONS = Object.keys(LLM_CODE_TEMPLATE_EXAMPLES).map((key) => ({ name: capitalizeFirst(key), value: key }));
+export const TEMPLATE_OPTIONS = Object.keys(TEMPLATE_EXAMPLES).map((key) => ({ name: capitalizeFirst(key), value: key }));

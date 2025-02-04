@@ -1,16 +1,10 @@
 import { useEffect } from "react";
 import { LocalStorageDropdown } from "@/submodules/react-components/components/LocalStorageDropdown";
-import { InputWithSlider } from "../InputWithSlider";
+import { InputWithSlider } from "@/submodules/react-components/components/InputWithSlider";
+import { LLmPropsAzure } from "../types";
 
-type LLmProps = {
-    llmConfig: any;
-    setLlmConfig: (llmConfig: any) => void;
-    onlyEssential?: boolean;
-    projectId?: string;
-    disabled?: boolean;
-}
 
-export default function Azure(props: LLmProps) {
+export default function Azure(props: LLmPropsAzure) {
 
 
     useEffect(() => {

@@ -11,22 +11,17 @@ import useRefFor from "@/submodules/react-components/hooks/useRefFor";
 import { updateAttribute } from "@/src/services/base/project-setting";
 import { selectProjectId } from "@/src/reduxStore/states/project";
 import KernDropdown from "@/submodules/react-components/components/KernDropdown";
-import { LLM_PROVIDER_OPTIONS } from "../AttributeCalculations";
 import { searchRecordsExtended } from "@/src/services/base/data-browser";
 import { generateRandomSeed } from "@/src/util/components/projects/projectId/data-browser/search-groups-helper";
 import KernButton from "@/submodules/react-components/components/kern-button/KernButton";
 import { DataTypeEnum } from "@/src/types/shared/general";
-import { capitalizeFirst } from "@/submodules/javascript-functions/case-types-parser";
 import { runAttributeLlmPlayground } from "@/src/services/base/attribute";
 import { jsonCopy } from "@/submodules/javascript-functions/general";
-import { TEMPLATE_EXAMPLES } from "./llmTemplates";
+import { TEMPLATE_EXAMPLES, TEMPLATE_OPTIONS } from "./llmTemplates";
+import { LLM_PROVIDER_OPTIONS } from "@/src/util/components/projects/projectId/settings/attribute-calculation-helper";
 
 const ACCEPT_BUTTON = { buttonCaption: "Use current values for attribute", useButton: true };
 const DISPLAY_STATES = [AttributeState.AUTOMATICALLY_CREATED, AttributeState.UPLOADED, AttributeState.USABLE]
-
-
-const TEMPLATE_OPTIONS = Object.keys(TEMPLATE_EXAMPLES).map((key) => ({ name: capitalizeFirst(key), value: key }));
-
 
 export default function LLMPlaygroundModal() {
     const projectId = useSelector(selectProjectId);
@@ -44,7 +39,7 @@ export default function LLMPlaygroundModal() {
     const recordDataRef = useRefFor(recordData);
     const [llmAnswer, setLlmAnswer] = useState<any>(null);
 
-    const [inputRunningId, setInputRunningId] = useState<string>('');
+    const [inputRunningId, setInputRunningId] = useState('');
     const inputRunningIdRef = useRefFor(inputRunningId);
 
     const searchAndSetWithFilter = useCallback((filter) => {

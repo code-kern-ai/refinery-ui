@@ -1,19 +1,10 @@
-import { Dispatch, SetStateAction, useState } from "react";
+import { useState } from "react";
 import { LLMConfig } from "./LLM/LLMConfig";
 import { IconAdjustmentsAlt, IconAdjustmentsOff, IconSettings, IconTerminal, IconUser } from "@tabler/icons-react";
-import { LLMConfig as LLMConfigType } from "@/src/types/components/projects/projectId/settings/data-schema";
 import KernButton from "@/submodules/react-components/components/kern-button/KernButton";
 import LLMResponsePlayground from "./LLMResponsePlayground";
+import { LLMResponseConfigProps } from "./LLM/types";
 
-type LLMResponseConfigProps = {
-    attributeId: string;
-    fullLlmConfig: LLMConfigType;
-    setFullLlmConfig: Dispatch<SetStateAction<LLMConfigType>>;
-    disabled?: boolean;
-    noPlayground?: boolean;
-    keepConfigOpen?: boolean;
-    apiKey?: string; //only for playground
-}
 
 export default function LLMResponseConfig(props: LLMResponseConfigProps) {
     const [configOpen, setConfigOpen] = useState(true);
