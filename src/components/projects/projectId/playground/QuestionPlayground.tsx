@@ -52,7 +52,7 @@ export default function QuestionPlayground() {
         {projectId && <>
             <div className="overflow-hidden p-4 flex items-center flex-shrink-0">
                 <nav aria-label="Progress" className="flex items-center w-full">
-                    <ol className="divide-y divide-gray-300 rounded-md border border-gray-300 md:flex md:divide-y-0 w-1/2">
+                    <ol className="divide-y divide-gray-300 rounded-md border border-gray-300 md:flex md:divide-y-0 w-full">
                         {STEPS.map((step, stepIdx) => (
                             <li key={step.name} className="flex justify-center items-center relative flex-1 cursor-pointer" onClick={() => toggleTabs(stepIdx)}>
                                 {openTab == step.id ? (

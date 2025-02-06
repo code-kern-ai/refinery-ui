@@ -97,7 +97,7 @@ export function PlaygroundSearch() {
     }
 
 
-    return <div className="grid overflow-hidden h-full grid-cols-2" style={{ minHeight: 'calc(100vh - 10rem)' }}>
+    return <div className="grid overflow-hidden h-full grid-cols-2">
         <div className="flex flex-col gap-y-2 m-3 h-full">
             <div className="flex items-center">
                 <span className="mr-3">Embedding</span>
@@ -113,7 +113,7 @@ export function PlaygroundSearch() {
                 {reformulationLoading && <span className="absolute top-1/4 left-1/2 transform -translate-x-1/2 -translate-y-1/2"><IconLoader2 className="absolute h-6 w-6 animate-spin" /></span>}
                 <div className="absolute top-2 right-2 flex gap-x-2">
                     <Tooltip content="Reformulate" color="invert" placement="bottom">
-                        <button disabled={!question || loading || !selectedEmbedding}
+                        <button disabled={!question || loading}
                             className="p-1 rounded-md text-gray-400 cursor-pointer hover:bg-gray-100 hover:text-gray-500 transition duration-150 ease-in-out disabled:opacity-50 disabled:cursor-not-allowed"
                             onClick={() => dispatch(openModal(ModalEnum.EVALUATION_REFORMULATE))}>
                             <IconWand className="h-5 w-5" />
@@ -186,7 +186,7 @@ export function PlaygroundSearch() {
                 </button>
             </div>
             {!loading && !searchResults && <div className="text-sm inline-block font-normal text-gray-500 italic mx-3">Start by searching for records.</div>}
-            {!loading && searchResults && (searchResults.length > 0 ? <div className="relative ml-2 font-dmMono text-xs whitespace-pre-line overflow-y-auto">
+            {!loading && searchResults && (searchResults.length > 0 ? <div className="relative ml-2 font-dmMono text-xs whitespace-pre-line h-[calc(100vh-200px)] overflow-y-auto">
                 {searchResults.map((result, index) => <div key={index} className="flex flex-col gap-x-3 bg-white rounded-md border border-gray-300 py-2 px-3 m-2">
                     <div className="absolute right-4 text-gray-500 text-xs">{result?.score.toFixed(3)}</div>
                     <RecordDisplay record={result} attributes={attributes} />
