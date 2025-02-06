@@ -50,7 +50,7 @@ export default function QuestionPlayground() {
 
     return <div className="flex flex-col w-full" style={{ minHeight: 'calc(100vh - 4rem)' }}>
         {projectId && <>
-            <div className={`overflow-hidden p-4 flex items-center flex-shrink-0`}>
+            <div className="overflow-hidden p-4 flex items-center flex-shrink-0">
                 <nav aria-label="Progress" className="flex items-center w-full">
                     <ol className="divide-y divide-gray-300 rounded-md border border-gray-300 md:flex md:divide-y-0 w-1/2">
                         {STEPS.map((step, stepIdx) => (

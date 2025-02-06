@@ -58,7 +58,7 @@ export default function EvaluationRunDetails() {
     }
 
     return <>
-        {projectId && <div className={`grid overflow-hidden min-h-full p-4`}>
+        {projectId && <div className="grid overflow-hidden min-h-full p-4">
             <div className="flex items-center gap-y-2 gap-x-3">
                 <button onClick={() => router.back()} className="flex items-center text-green-800 text-sm font-medium">
                     <IconArrowLeft className="h-5 w-5 inline-block text-green-800" />
@@ -101,7 +101,7 @@ function RecordDisplaySearches({ attributes, records, text, howMany, fromHowMany
 
     return <div className="relative bg-white pt-5 px-4 shadow rounded-lg">
         <dt>
-            <div className={`flex items-center gap-2`}>
+            <div className="flex items-center gap-2">
                 {text === "Matched records" && <div className="bg-green-200 p-2 rounded-full flex justify-center items-center">
                     <IconCheck className="text-green-800" size={20} stroke={2.5} />
                 </div>}
@@ -156,7 +156,7 @@ function RecordDisplaySearchesAggregated({ text, howMany, fromHowMany }) {
 
     return <div className="relative bg-white p-4 shadow rounded-lg">
         <dt>
-            <div className={`flex items-center gap-2`}>
+            <div className="flex items-center gap-2">
                 {text === "Matched records" && <div className="bg-green-200 p-2 rounded-full flex justify-center items-center">
                     <IconCheck className="text-green-800" size={20} stroke={2.5} />
                 </div>}
