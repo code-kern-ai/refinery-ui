@@ -53,7 +53,10 @@ export function PlaygroundSearch() {
 
     const createSetFromRecords = useCallback(() => {
         setSetCreationLoading(true);
-        if (createdSet) return;
+        if (createdSet) {
+            setSetCreationLoading(false);
+            return;
+        }
         setCreatedSet(true);
         createEvaluationSet(projectId, question, searchResults.map((record) => record.id), (result) => {
             setTimeout(() => {
@@ -94,7 +97,7 @@ export function PlaygroundSearch() {
     }
 
 
-    return <div className={`grid overflow-hidden h-full grid-cols-2`} style={{ minHeight: 'calc(100vh - 10rem)' }}>
+    return <div className="grid overflow-hidden h-full grid-cols-2" style={{ minHeight: 'calc(100vh - 10rem)' }}>
         <div className="flex flex-col gap-y-2 m-3 h-full">
             <div className="flex items-center">
                 <span className="mr-3">Embedding</span>
@@ -171,11 +174,11 @@ export function PlaygroundSearch() {
                 </button>
             </div>
         </div>
-        <div className={`h-full border-gray-300 border-l`}>
+        <div className="h-full border-gray-300 border-l">
             <div className="flex flex-row mx-4 my-1 items-center">
                 <span className="mr-4"><span>{searchResults?.length > 0 ? searchResults.length + " " : ""}</span>Record{searchResults?.length > 1 ? "s" : ""}</span>
                 <button disabled={!searchResults || searchResults?.length === 0 || selectedEmbedding === null || question === "" || loading || createdSet}
-                    className={`flex items-center ml-auto gap-x-2 bg-green-100 border border-green-400 text-green-700 text-xs font-semibold px-3 py-2 rounded-md cursor-pointer opacity-100 hover:bg-green-200 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50`}
+                    className="flex items-center ml-auto gap-x-2 bg-green-100 border border-green-400 text-green-700 text-xs font-semibold px-3 py-2 rounded-md cursor-pointer opacity-100 hover:bg-green-200 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50"
                     onClick={createSetFromRecords}>
                     {!setCreationLoading ? <span><IconCategoryPlus className="ml-1 h-4 w-4" /></span> :
                         <span><IconLoader2 className="ml-1 h-4 w-4 animate-spin" /></span>}
