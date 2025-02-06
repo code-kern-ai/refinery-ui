@@ -20,7 +20,7 @@ export default function DeleteEvaluationRunsModal(props: DeleteEvaluationRunsMod
         deleteEvaluationRunsPost(projectId, modalDeleteEvaluationRun.evaluationRunIds, (res) => {
             props.refetchEvaluationRuns();
         });
-    }, [modalDeleteEvaluationRun]);
+    }, [modalDeleteEvaluationRun, props.refetchEvaluationRuns]);
 
     useEffect(() => {
         setAbortButton({ ...ABORT_BUTTON, emitFunction: deleteEvaluationRuns });

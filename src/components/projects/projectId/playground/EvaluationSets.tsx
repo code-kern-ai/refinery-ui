@@ -10,7 +10,7 @@ import { postProcessRecordByRecordId } from "@/src/util/components/projects/proj
 import ViewEvaluationSetsModal from "./ViewEvaluationSetsModal";
 import DeleteEvaluationSetsModal from "./DeleteEvaluationSetsModal";
 import KernTable from "@/submodules/react-components/components/kern-table/KernTable";
-import { EVALUATION_SETS_TABLE_HEADER, prepareTableBodyEvaluationSets } from "@/src/util/table-preparations/evaluation-sets";
+import { EVALUATION_SETS_TABLE_CONFIG, EVALUATION_SETS_TABLE_HEADER, prepareTableBodyEvaluationSets } from "@/src/util/table-preparations/evaluation-sets";
 import KernButton from "@/submodules/react-components/components/kern-button/KernButton";
 import { IconMinus } from "@tabler/icons-react";
 import { selectAllUsers } from "@/src/reduxStore/states/general";
@@ -117,9 +117,7 @@ export function EvaluationSets() {
                     <KernTable
                         headers={preparedHeaders}
                         values={preparedValues}
-                        config={{
-                            addBorder: true
-                        }}
+                        config={EVALUATION_SETS_TABLE_CONFIG}
                     /> :
                     <div className="text-sm inline-block font-normal text-gray-500 italic mt-3">
                         No evaluation sets available yet.

@@ -2,7 +2,7 @@ import { EvaluationRunState } from "@/src/types/components/projects/projectId/se
 import { parseUTC } from "@/submodules/javascript-functions/date-parser";
 
 export const EVALUATION_RUN_TABLE_HEADER = [{ column: "", id: "checkboxes", hasCheckboxes: true, checked: false }, { column: "Embedding", id: "embedding" }, { column: "Evaluation group", id: "evaluationGroup" }, { column: 'Created At', id: 'createdAt' }, { column: 'Created By', id: 'createdBy' }, { column: "State", id: "state" }, { column: "Run details", id: "runDetails" }];
-
+export const EVALUATION_RUN_TABLE_CONFIG = { addBorder: true };
 
 export function prepareTableBodyEvaluationRun(evaluationRuns, usersDict, embeddingsDict, evaluationGroupsDict, navigateToDetails, selectedEvaluationRuns, setSelectedEvaluationRuns) {
     let finalData = [];

@@ -4,7 +4,7 @@ import { openModal, setModalStates } from "@/src/reduxStore/states/modal";
 import { useDispatch, useSelector } from "react-redux";
 import { selectProjectId } from "@/src/reduxStore/states/project";
 import KernTable from "@/submodules/react-components/components/kern-table/KernTable";
-import { EVALUATION_RUN_TABLE_HEADER, prepareTableBodyEvaluationRun } from "@/src/util/table-preparations/evaluation-runs";
+import { EVALUATION_RUN_TABLE_CONFIG, EVALUATION_RUN_TABLE_HEADER, prepareTableBodyEvaluationRun } from "@/src/util/table-preparations/evaluation-runs";
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { getEvaluationGroups, getEvaluationRuns } from "@/src/services/base/playground";
 import { selectAllUsers } from "@/src/reduxStore/states/general";
@@ -12,7 +12,6 @@ import { arrayToDict } from "@/submodules/javascript-functions/general";
 import { selectOnAttributeEmbeddings } from "@/src/reduxStore/states/pages/settings";
 import { useRouter } from "next/router";
 import KernButton from "@/submodules/react-components/components/kern-button/KernButton";
-import { IconMinus } from "@tabler/icons-react";
 import DeleteEvaluationRunsModal from "./DeleteEvaluationRunsModal";
 
 export default function EvaluationRuns() {
@@ -123,9 +122,7 @@ export default function EvaluationRuns() {
                 <KernTable
                     headers={preparedHeaders}
                     values={preparedValues}
-                    config={{
-                        addBorder: true
-                    }}
+                    config={EVALUATION_RUN_TABLE_CONFIG}
                 /> :
                 <div className="text-sm inline-block font-normal text-gray-500 italic mt-3">
                     No evaluation runs available yet.

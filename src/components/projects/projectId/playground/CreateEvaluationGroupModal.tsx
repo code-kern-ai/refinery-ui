@@ -51,13 +51,13 @@ export default function CreateEvaluationGroupModal(props: CreateEvaluationGroupM
     return <Modal modalName={ModalEnum.EVALUATION_GROUP} acceptButton={acceptButton} className="md:max-w-6xl">
         <div className="h-full">
             <div className="flex flex-grow justify-center text-lg leading-6 text-gray-900 font-medium">Create new evaluation group</div>
-            <div className={`bg-white grid overflow-hidden min-h-full grid-cols-2`} style={{ height: 'calc(100vh - 200px)', overflowY: 'scroll' }}>
-                <div className="flex flex-col gap-y-2 m-3" style={{ maxHeight: 'calc(100vh - 200px)', overflowY: 'auto' }}>
+            <div className="bg-white grid overflow-hidden min-h-full grid-cols-2 h-[calc(100vh-200px)] overflow-y-scroll">
+                <div className="flex flex-col gap-y-2 m-3">
                     <div className="flex items-center">
                         <span className="mr-4">Execution</span>
                     </div>
                     <input placeholder="Enter name..."
-                        className={`placeholder-italic w-full p-2 line-height-textarea border rounded-md border-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100`}
+                        className="placeholder-italic w-full p-2 line-height-textarea border rounded-md border-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100"
                         onChange={(event: any) => { setName(event.target.value); }}
                         value={name}
                     />
@@ -73,7 +73,7 @@ export default function CreateEvaluationGroupModal(props: CreateEvaluationGroupM
                         {set.question}
                     </div >))}
                 </div>
-                <div className={`h-full border-gray-300 border-l`}>
+                <div className="h-full border-gray-300 border-l">
                     <div>Evaluation sets</div>
                     {evaluationSets && evaluationSets.map((set, index) => (<div key={set.id} className="bg-white overflow-hidden shadow rounded-lg border m-4 p-2 relative hover:border-green-400 hover:border-opacity-30 cursor-pointer transition-all duration-200 ease-in-out"
                         onClick={() => {

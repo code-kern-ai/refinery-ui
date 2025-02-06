@@ -1,7 +1,9 @@
 import { parseUTC } from "@/submodules/javascript-functions/date-parser";
 
 export const EVALUATION_SETS_TABLE_HEADER = [{ column: "", id: "checkboxes", hasCheckboxes: true, checked: false }, { column: 'Question', id: 'question' }, { column: 'Created At', id: 'createdAt' }, { column: 'Created By', id: 'createdBy' }, { column: 'Records', id: 'records' }, { column: "View", id: 'viewRecords' }];
+export const EVALUATION_SETS_TABLE_CONFIG = { addBorder: true };
 const MAX_QUESTION_SHOW = 100;
+
 export function prepareTableBodyEvaluationSets(evaluationSets, selectedEvaluationSets, setSelectedEvaluationSets, usersDict, openModal) {
     let finalData = [];
     evaluationSets.forEach((set) => {

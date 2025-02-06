@@ -52,13 +52,13 @@ export default function CreateEvaluationSetModal(props: CreateEvaluationSetsModa
         if (!evaluationSetModalState.open) {
             resetState();
         }
-    }, [evaluationSetModalState.open, dispatch]);
+    }, [evaluationSetModalState.open]);
 
     const createEvaluationSetPost = useCallback(() => {
         createEvaluationSet(projectId, question, selectedRecords.map((record) => record.id), (res) => {
             props.refetchEvaluationSets();
         });
-    }, [question, selectedRecords, projectId]);
+    }, [question, selectedRecords, projectId, props.refetchEvaluationSets]);
 
     useEffect(() => {
         setAcceptButton({ ...acceptButton, emitFunction: createEvaluationSetPost, disabled: selectedRecords.length === 0 || question === "" });
@@ -83,7 +83,7 @@ export default function CreateEvaluationSetModal(props: CreateEvaluationSetsModa
         if (e.target.scrollHeight - e.target.scrollTop === e.target.clientHeight) {
             setSearchRequest({ ...searchRequest, offset: searchRequest.offset + searchRequest.limit, limit: searchRequest.limit });
         }
-    }, [recordList, searchRequest, projectId]);
+    }, [searchRequest]);
 
     useEffect(() => {
         setSearchRequest(SEARCH_REQUEST);
@@ -150,18 +150,18 @@ export default function CreateEvaluationSetModal(props: CreateEvaluationSetsModa
     return <Modal modalName={ModalEnum.EVALUATION_SET} acceptButton={acceptButton} className="md:max-w-6xl">
         <div className="h-full">
             <div className="flex flex-grow justify-center text-lg leading-6 text-gray-900 font-medium">Create new evaluation set</div>
-            <div className={`bg-white grid overflow-hidden min-h-full grid-cols-2`}>
+            <div className="bg-white grid overflow-hidden min-h-full grid-cols-2">
                 <div className="flex flex-col gap-y-2 m-3 h-full">
                     <div className="flex items-center">
                         <span className="mr-3">Embedding</span>
-                        <KernDropdown dropdownWidth={"w-full"} options={onAttributeEmbeddings} buttonName={selectedEmbedding ? selectedEmbedding.name : 'Select embedding'} selectedOption={(value) => setSelectedEmbedding(value)} dropdownClasses="my-2" />
+                        <KernDropdown dropdownWidth="w-full" options={onAttributeEmbeddings} buttonName={selectedEmbedding ? selectedEmbedding.name : 'Select embedding'} selectedOption={(value) => setSelectedEmbedding(value)} dropdownClasses="my-2" />
                     </div>
                     <div className="flex items-center">
                         <span className="mr-1">Enter an evaluation question</span>
                         <InfoButton content="To help refine a question, we provide a reformulation in the 'Playground' tab. Additionally, users can access their question history and select a previous question." infoButtonSize='sm' divPosition='right' />
                     </div>
                     <textarea placeholder="Enter question..."
-                        className={`placeholder-italic w-full h-22 p-2 line-height-textarea border rounded-md border-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100`}
+                        className="placeholder-italic w-full h-22 p-2 line-height-textarea border rounded-md border-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100"
                         onChange={(event: any) => { setQuestion(event.target.value); }}
                         value={question}
                     ></textarea>
@@ -172,7 +172,7 @@ export default function CreateEvaluationSetModal(props: CreateEvaluationSetsModa
                             value={limit}>
                         </input>
                         <KernButton
-                            text={"Run similarity search"}
+                            text="Run similarity search"
                             icon={IconWand}
                             iconColor='purple'
                             disabled={question === '' || !selectedEmbedding}
@@ -181,7 +181,7 @@ export default function CreateEvaluationSetModal(props: CreateEvaluationSetsModa
                             }}
                         />
                         <KernButton
-                            text={"Add all similar"}
+                            text="Add all similar"
                             icon={IconPlus}
                             iconColor='green'
                             disabled={showSimilarityRecordsList === false}
@@ -214,13 +214,11 @@ export default function CreateEvaluationSetModal(props: CreateEvaluationSetsModa
                                 record={record}
                                 onClick={() => {
                                     const isInSimilarityRecords = addedSimilarityRecords.some(item => item.id === record.id);
-
                                     if (isInSimilarityRecords) {
                                         setSimilarityRecordList([...similarityRecordList, record])
                                     } else {
                                         updateAndSortRecordList([record])
                                     }
-
                                     const newSelectedRecords = selectedRecords.filter((item) => item.id !== record.id);
                                     setSelectedRecords(newSelectedRecords);
                                 }} />
@@ -232,7 +230,7 @@ export default function CreateEvaluationSetModal(props: CreateEvaluationSetsModa
                         <Loading size="md" type="spinner" color="currentColor" />
                     </div>
                 ) : showSimilarityRecordsList ? (
-                    <div className={`h-full border-gray-300 border-l`}>
+                    <div className="h-full border-gray-300 border-l">
                         <div className="m-3 flex gap-x-2">
                             <input type="text" placeholder="Search..." value={searchSimilarity}
                                 onChange={(event: any) => { setSearchSimilarity(event.target.value); }}
@@ -245,10 +243,7 @@ export default function CreateEvaluationSetModal(props: CreateEvaluationSetsModa
                                 }}
                             />
                         </div>
-                        <div style={{
-                            maxHeight: 'calc(100vh - 300px)',
-                            overflowY: 'auto',
-                        }}>
+                        <div className="max-h-[calc(100vh-300px)] overflow-y-auto">
                             {similarityRecordList && similarityRecordList.map((record, index) => (
                                 <div key={record.id} className="bg-purple-100 overflow-hidden shadow rounded-lg border m-4 p-2 relative hover:border-green-400 hover:border-opacity-30 cursor-pointer transition-all duration-200 ease-in-out">
                                     <RecordDisplay
@@ -271,7 +266,7 @@ export default function CreateEvaluationSetModal(props: CreateEvaluationSetsModa
                         </div>
                     </div>
                 ) : (
-                    <div className={`h-full border-gray-300 border-l`}>
+                    <div className="h-full border-gray-300 border-l">
                         <div className="m-3 text-left">
                             <label>Filter by search</label>
                             <input type="text" placeholder="Search..."
@@ -280,7 +275,7 @@ export default function CreateEvaluationSetModal(props: CreateEvaluationSetsModa
                                 className="w-full h-10 p-2 line-height-textarea border rounded-md border-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100" />
                             <div>Records</div>
                         </div>
-                        <div className={"h-[calc(100vh-300px)] overflow-y-auto"} onScroll={(e: any) => refetchMoreRecords(e)}>
+                        <div className="h-[calc(100vh-300px)] overflow-y-auto" onScroll={(e: any) => refetchMoreRecords(e)}>
                             {recordList && recordList.map((record, index) => (
                                 <div key={record.id} className="bg-white overflow-hidden shadow rounded-lg border m-4 p-2 relative hover:border-green-400 hover:border-opacity-30 cursor-pointer transition-all duration-200 ease-in-out">
                                     <RecordDisplay

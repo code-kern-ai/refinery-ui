@@ -1,6 +1,7 @@
 import { parseUTC } from "@/submodules/javascript-functions/date-parser";
 
 export const EVALUATION_GROUPS_TABLE_HEADER = [{ column: "", id: "checkboxes", hasCheckboxes: true, checked: false }, { column: 'Name', id: 'name' }, { column: 'Created At', id: 'createdAt' }, { column: 'Created By', id: 'createdBy' }, { column: 'Evaluation sets', id: 'evaluationSets' }];
+export const EVALUATION_GROUPS_TABLE_CONFIG = { addBorder: true };
 
 export function prepareTableBodyEvaluationGroups(evaluationGroups, selectedEvaluationGroups, setSelectedEvaluationGroups, usersDict, openModal) {
     let finalData = [];

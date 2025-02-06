@@ -3,23 +3,21 @@ import CreateEvaluationGroupModal from "./CreateEvaluationGroupModal";
 import { ModalEnum } from "@/src/types/shared/modal";
 import { useDispatch, useSelector } from "react-redux";
 import { selectProjectId } from "@/src/reduxStore/states/project";
-import { useEffect, useState, useRef, useLayoutEffect, useCallback } from "react";
+import { useEffect, useState, useRef, useLayoutEffect, useCallback, useMemo } from "react";
 import { getEvaluationGroups, getEvaluationSetsByGroupId } from "@/src/services/base/playground";
 import ViewEvaluationGroupModal from "./ViewEvaluationGroupModal";
 import KernTable from "@/submodules/react-components/components/kern-table/KernTable";
-import { EVALUATION_GROUPS_TABLE_HEADER, prepareTableBodyEvaluationGroups } from "@/src/util/table-preparations/evaluation-groups";
+import { EVALUATION_GROUPS_TABLE_CONFIG, EVALUATION_GROUPS_TABLE_HEADER, prepareTableBodyEvaluationGroups } from "@/src/util/table-preparations/evaluation-groups";
 import { selectAllUsers } from "@/src/reduxStore/states/general";
 import { arrayToDict } from "@/submodules/javascript-functions/general";
 import DeleteEvaluationGroupsModal from "./DeleteEvaluationGroupsModal";
 import KernButton from "@/submodules/react-components/components/kern-button/KernButton";
-import { IconMinus } from "@tabler/icons-react";
 
 export function EvaluationGroups() {
     const dispatch = useDispatch();
 
     const projectId = useSelector(selectProjectId);
     const users = useSelector(selectAllUsers);
-    const usersDict = arrayToDict(users, 'id');
 
     const [evaluationGroups, setEvaluationGroups] = useState(null);
     const [preparedValues, setPreparedValues] = useState(null);
@@ -29,6 +27,8 @@ export function EvaluationGroups() {
     const [checked, setChecked] = useState(false);
     const [indeterminate, setIndeterminate] = useState(false);
     const checkbox = useRef<any>(null);
+
+    const usersDict = useMemo(() => arrayToDict(users, 'id'), [users]);
 
     useEffect(() => {
         if (!projectId) return;
@@ -115,9 +115,7 @@ export function EvaluationGroups() {
                 <KernTable
                     headers={preparedHeaders}
                     values={preparedValues}
-                    config={{
-                        addBorder: true
-                    }}
+                    config={EVALUATION_GROUPS_TABLE_CONFIG}
                 />
                 :
                 <div className="text-sm inline-block font-normal text-gray-500 italic mt-3">
