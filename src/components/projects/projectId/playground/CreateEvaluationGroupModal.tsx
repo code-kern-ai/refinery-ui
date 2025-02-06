@@ -52,7 +52,7 @@ export default function CreateEvaluationGroupModal(props: CreateEvaluationGroupM
         <div className="h-full">
             <div className="flex flex-grow justify-center text-lg leading-6 text-gray-900 font-medium">Create new evaluation group</div>
             <div className={`bg-white grid overflow-hidden min-h-full grid-cols-2`} style={{ height: 'calc(100vh - 200px)', overflowY: 'scroll' }}>
-                <div className="flex flex-col gap-y-2 m-3 h-full">
+                <div className="flex flex-col gap-y-2 m-3" style={{ maxHeight: 'calc(100vh - 200px)', overflowY: 'auto' }}>
                     <div className="flex items-center">
                         <span className="mr-4">Execution</span>
                     </div>
