@@ -1,8 +1,8 @@
 import Modal from "@/src/components/shared/modal/Modal";
 import { useCallback, useEffect, useState } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { ModalButton, ModalEnum } from "@/src/types/shared/modal";
-import { selectUniqueValuesDict, } from "@/src/reduxStore/states/pages/data-browser";
+import { selectUniqueValuesDict, setUniqueValuesDict, } from "@/src/reduxStore/states/pages/data-browser";
 import { selectEmbeddings, selectUsableAttributes } from "@/src/reduxStore/states/pages/settings";
 import { FilterIntegrationOperator, SearchOperator } from "@/src/types/components/projects/projectId/data-browser/search-operators";
 import { Embedding } from "@/src/types/components/projects/projectId/settings/embeddings";
@@ -13,6 +13,9 @@ import { getColorForDataType } from "@/src/util/components/projects/projectId/se
 import { extendArrayElementsByUniqueId } from "@/submodules/javascript-functions/id-prep";
 import KernDropdown from "@/submodules/react-components/components/KernDropdown";
 import { IconPlus, IconTrash } from "@tabler/icons-react";
+import { getUniqueValuesByAttributes } from "@/src/services/base/dataSlices";
+import { postProcessUniqueValues } from "@/src/util/components/projects/projectId/data-browser/data-browser-helper";
+import { selectProjectId } from "@/src/reduxStore/states/project";
 
 const ACCEPT_BUTTON = { buttonCaption: 'Save', useButton: true };
 const ABORT_BUTTON = { buttonCaption: 'Reset', useButton: true };
@@ -20,7 +23,9 @@ const FILTER_INTEGRATION_OPERATORS = Object.values(FilterIntegrationOperator).ma
 const FILTER_INTEGRATION_OPERATOR_TOOLTIPS = Object.values(FilterIntegrationOperator).map(t => getFilterIntegrationOperatorTooltip(t));
 
 export default function PlaygroundSearchMetaFilterModal(props: { selectedEmbedding: Embedding, setMetaDataFilter: any }) {
+    const dispatch = useDispatch();
 
+    const projectId = useSelector(selectProjectId);
     const attributes = useSelector(selectUsableAttributes);
     const embeddings = useSelector(selectEmbeddings);
     const uniqueValuesDict = useSelector(selectUniqueValuesDict);
@@ -33,6 +38,13 @@ export default function PlaygroundSearchMetaFilterModal(props: { selectedEmbeddi
 
     const [acceptButton, setAcceptButton] = useState<ModalButton>(ACCEPT_BUTTON);
     const [abortButton, setAbortButton] = useState<ModalButton>(ABORT_BUTTON);
+
+    useEffect(() => {
+        if (!projectId) return;
+        getUniqueValuesByAttributes(projectId, (res) => {
+            dispatch(setUniqueValuesDict(postProcessUniqueValues(res, attributes)));
+        });
+    }, [projectId]);
 
     useEffect(() => {
         if (!embeddings || !props.selectedEmbedding) return;
@@ -64,7 +76,7 @@ export default function PlaygroundSearchMetaFilterModal(props: { selectedEmbeddi
     const cancelMetaDataFilter = useCallback(() => {
         props.setMetaDataFilter(null);
         initFilterForm();
-    }, []);
+    }, [props.setMetaDataFilter]);
 
     const updateMetaDataFilter = useCallback(() => {
         const attFilter = prepareAttFilter(filterAttributesForm, attributes, false);
@@ -79,9 +91,9 @@ export default function PlaygroundSearchMetaFilterModal(props: { selectedEmbeddi
 
     useEffect(() => {
         setAbortButton({
-            ...abortButton, emitFunction: cancelMetaDataFilter
+            ...abortButton, emitFunction: cancelMetaDataFilter, disabled: !filterAttributesSS
         });
-    }, [cancelMetaDataFilter]);
+    }, [cancelMetaDataFilter, filterAttributesSS]);
 
     function initFilterForm() {
         if (!filterAttributesSS) return;
@@ -127,7 +139,7 @@ export default function PlaygroundSearchMetaFilterModal(props: { selectedEmbeddi
     }
 
     return (
-        <Modal modalName={ModalEnum.EVALUATION_META_FILTER_APPLY} acceptButton={acceptButton} abortButton={abortButton} className="md:max-w-6xl">
+        <Modal modalName={ModalEnum.EVALUATION_META_FILTER_APPLY} acceptButton={acceptButton} abortButton={abortButton} className={`${!filterAttributesSS ? '' : 'md:max-w-6xl'}`}>
             <div className="contents mx-2">
                 {!filterAttributesSS && <div className="text-sm inline-block font-normal text-gray-500 italic mx-3">No filter attributes defined for selected embedding.</div>}
                 {filterAttributesForm && filterAttributesForm.map((form, index) => (<div key={form.id} className="contents mx-2">
