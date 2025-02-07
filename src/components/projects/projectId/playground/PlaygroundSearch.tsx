@@ -2,7 +2,7 @@ import { openModal } from "@/src/reduxStore/states/modal";
 import { ModalEnum } from "@/src/types/shared/modal";
 import { selectOnAttributeEmbeddings } from "@/src/reduxStore/states/pages/settings";
 import { selectProjectId } from "@/src/reduxStore/states/project";
-import { createEvaluationSet, getSearchResults, getReformulationByQuestion, getPlaygroundQuestions } from "@/src/services/base/playground";
+import { createEvaluationSet, getSearchResults, getReformulationByQuestion, getPlaygroundQuestions, deleteQuestionFromHistory } from "@/src/services/base/playground";
 import { Embedding } from "@/src/types/components/projects/projectId/settings/embeddings";
 import KernDropdown from "@/submodules/react-components/components/KernDropdown";
 import { useState, useCallback, useEffect } from "react";
@@ -10,7 +10,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { RecordDisplay } from "@/src/components/shared/record-display/RecordDisplay";
 import { selectVisibleAttributesDataBrowser } from "@/src/reduxStore/states/pages/settings";
 import LoadingIcon from "@/submodules/react-components/components/LoadingIcon";
-import { IconFilterOff, IconFilter, IconCategoryPlus, IconLoader2, IconCircleCheck, IconXboxX, IconWand, IconHistory, } from '@tabler/icons-react'
+import { IconFilterOff, IconFilter, IconCategoryPlus, IconLoader2, IconCircleCheck, IconXboxX, IconWand, IconHistory, IconTrash, } from '@tabler/icons-react'
 import PlaygroundSearchMetaFilterModal from "./PlaygroundSearchMetaFilterModal";
 import PlaygroundSearchReformulateModal from "./PlaygroundSearchReformulateModal";
 import { Tooltip } from "@nextui-org/react";
@@ -96,6 +96,12 @@ export function PlaygroundSearch() {
         });
     }
 
+    function deleteQuestionFromHistoryFunc(questionId: string) {
+        deleteQuestionFromHistory(projectId, questionId, (result) => {
+            refetchQuestionMemory();
+        });
+    }
+
 
     return <div className="grid overflow-hidden h-full grid-cols-2">
         <div className="flex flex-col gap-y-2 m-3 h-full">
@@ -132,13 +138,17 @@ export function PlaygroundSearch() {
                             <div className="ml-1 text-md text-black mb-1">Last questions</div>
                             <ul>
                                 {questionHistory && questionHistory.map((questionEntry, index) => (
-                                    <li
-                                        key={index}
-                                        className="p-2 text-gray-700 rounded-md border-2 border-white cursor-pointer transition duration-150 bg-white my-2 hover:border-black"
-                                        onClick={() => handleHistoryClick(questionEntry.question)}
-                                    >
-                                        {questionEntry.question}
-                                    </li>
+                                    <div className="p-2 flex items-center rounded-md border-2 border-white cursor-pointer transition duration-150 bg-white my-2 hover:border-black">
+                                        <li
+                                            key={index}
+                                            className=" text-gray-700 "
+                                            onClick={() => handleHistoryClick(questionEntry.question)}
+                                        >
+                                            {questionEntry.question}
+                                        </li>
+                                        <IconTrash onClick={() => deleteQuestionFromHistoryFunc(questionEntry.id)}
+                                            className="h-6 w-6 text-red-700 cursor-pointer ml-auto" />
+                                    </div>
                                 ))}
                             </ul>
                         </div>

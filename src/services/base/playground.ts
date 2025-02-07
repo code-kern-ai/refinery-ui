@@ -121,3 +121,8 @@ export function getPlaygroundQuestions(projectId: string, onResult: (result: any
     const finalUrl = `${playgroundEndpoint}/${projectId}/playground-questions`;
     jsonFetchWrapper(finalUrl, FetchType.GET, onResult);
 }
+
+export function deleteQuestionFromHistory(projectId: string, questionId: string, onResult: (result: any) => void) {
+    const finalUrl = `${playgroundEndpoint}/${projectId}/playground-questions/${questionId}`;
+    jsonFetchWrapper(finalUrl, FetchType.DELETE, onResult);
+}
