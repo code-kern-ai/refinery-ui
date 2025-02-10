@@ -12,7 +12,7 @@ export default function ViewEvaluationSetsModal() {
 
     return (<>
         {modalViewEvaluationSets.open && modalViewEvaluationSets.records && <>
-            <Modal modalName={ModalEnum.VIEW_EVALUATION_SET}>
+            <Modal modalName={ModalEnum.VIEW_EVALUATION_SET} className="md:max-w-4xl">
                 <h1 className="text-lg text-gray-900 mb-2 text-center">Details</h1>
                 <div className="flex flex-col">
                     <div className="text-left mb-1">{modalViewEvaluationSets.question}</div>

@@ -5,16 +5,17 @@ import { selectProjectId } from "@/src/reduxStore/states/project";
 import { createEvaluationSet, getSearchResults, getReformulationByQuestion, getPlaygroundQuestions, deleteQuestionFromHistory } from "@/src/services/base/playground";
 import { Embedding } from "@/src/types/components/projects/projectId/settings/embeddings";
 import KernDropdown from "@/submodules/react-components/components/KernDropdown";
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { RecordDisplay } from "@/src/components/shared/record-display/RecordDisplay";
 import { selectVisibleAttributesDataBrowser } from "@/src/reduxStore/states/pages/settings";
 import LoadingIcon from "@/submodules/react-components/components/LoadingIcon";
-import { IconFilterOff, IconFilter, IconCategoryPlus, IconLoader2, IconCircleCheck, IconXboxX, IconWand, IconHistory, IconTrash, } from '@tabler/icons-react'
+import { IconFilterOff, IconFilter, IconCategoryPlus, IconLoader2, IconWand, IconHistory, IconTrash, } from '@tabler/icons-react'
 import PlaygroundSearchMetaFilterModal from "./PlaygroundSearchMetaFilterModal";
 import PlaygroundSearchReformulateModal from "./PlaygroundSearchReformulateModal";
 import { Tooltip } from "@nextui-org/react";
 import { PlaygroundQuestion } from "@/src/types/components/projects/projectId/settings/playground";
+import useOnClickOutside from "@/submodules/react-components/hooks/useHooks/useOnClickOutside";
 
 const PLAYGROUND_LIMIT_DEFAULT = 10;
 const PLAYGROUND_THRESHOLD_DEFAULT = -9999;
@@ -39,6 +40,9 @@ export function PlaygroundSearch() {
     const [questionHistory, setQuestionHistory] = useState<PlaygroundQuestion[]>();
     const [showHistory, setShowHistory] = useState(false);
     const [reformulationLoading, setReformulationLoading] = useState(false);
+
+    const dropdownRef = useRef(null);
+    useOnClickOutside(dropdownRef, () => { setShowHistory(false) });
 
     const getSearchResultsPost = useCallback(() => {
         setLoading(true);
@@ -102,8 +106,7 @@ export function PlaygroundSearch() {
         });
     }
 
-
-    return <div className="grid overflow-hidden h-full grid-cols-2">
+    return <div className="grid overflow-hidden grid-cols-2 h-[calc(100vh-200px)]">
         <div className="flex flex-col gap-y-2 m-3 h-full">
             <div className="flex items-center">
                 <span className="mr-3">Embedding</span>
@@ -128,19 +131,23 @@ export function PlaygroundSearch() {
                     <Tooltip content="History" color="invert" placement="bottom">
                         <button
                             className="p-1 rounded-md text-gray-400 cursor-pointer hover:bg-gray-100 hover:text-gray-500 transition duration-150 ease-in-out"
-                            onClick={() => setShowHistory(!showHistory)}
+                            onClick={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                setShowHistory(!showHistory);
+                            }}
+                            onMouseDown={(e) => { e.preventDefault(); e.stopPropagation(); }}
                         >
                             <IconHistory className="h-5 w-5" />
                         </button>
                     </Tooltip>
                     {showHistory && (
-                        <div className="absolute top-8 right-0 w-80 bg-gray-100 border border-gray-300 shadow-lg rounded-md p-2 z-50 max-h-96 overflow-y-auto">
+                        <div ref={dropdownRef} className="absolute top-8 right-0 w-80 bg-gray-100 border border-gray-300 shadow-lg rounded-md p-2 z-50 max-h-96 overflow-y-auto">
                             <div className="ml-1 text-md text-black mb-1">Last questions</div>
                             <ul>
                                 {questionHistory && questionHistory.map((questionEntry, index) => (
-                                    <div className="p-2 flex items-center rounded-md border-2 border-white cursor-pointer transition duration-150 bg-white my-2 hover:border-black">
+                                    <div key={questionEntry.id} className="p-2 flex items-center rounded-md border-2 border-white cursor-pointer transition duration-150 bg-white my-2 hover:border-black">
                                         <li
-                                            key={index}
                                             className=" text-gray-700 "
                                             onClick={() => handleHistoryClick(questionEntry.question)}
                                         >
