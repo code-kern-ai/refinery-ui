@@ -14,6 +14,7 @@ import { Loading } from "@nextui-org/react";
 import { IconPlus, IconWand } from "@tabler/icons-react";
 import { useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import QuestionHistory from "./QuestionHistory";
 
 const ACCEPT_BUTTON = { buttonCaption: 'Create', useButton: true };
 const SEARCH_REQUEST = { offset: 0, limit: 20 };
@@ -43,6 +44,7 @@ export default function CreateEvaluationSetModal(props: CreateEvaluationSetsModa
     const [addedSimilarityRecords, setAddedSimilarityRecords] = useState<any[]>([]);
     const [searchSimilarity, setSearchSimilarity] = useState("");
     const [saveSimilarityRecordList, setSaveSimilarityRecordList] = useState<any[]>([]);
+    const [refetchHistory, setRefetchHistory] = useState(false);
 
     const debouncedSearch = useDebounce(search, 1000);
 
@@ -112,13 +114,17 @@ export default function CreateEvaluationSetModal(props: CreateEvaluationSetsModa
 
     function getSimilarRecords() {
         setLoading(true);
-        getSearchResults(projectId, selectedEmbedding.id, question, limit, null, null, null, (result) => {
+        getSearchResults(projectId, selectedEmbedding.id, question, limit, null, null, true, (result) => {
             const selectedRecordIds = new Set(selectedRecords.map(r => r.id));
             const newSimilarityRecordList = result.filter((item) => !selectedRecordIds.has(item.id));
             setSimilarityRecordList(newSimilarityRecordList);
             setSaveSimilarityRecordList(newSimilarityRecordList);
             setShowSimilarityRecordsList(true)
             setLoading(false);
+            setRefetchHistory(true);
+            setTimeout(() => {
+                setRefetchHistory(false);
+            }, 1000);
         });
     }
 
@@ -180,15 +186,20 @@ export default function CreateEvaluationSetModal(props: CreateEvaluationSetsModa
                         <span className="mr-3">Embedding</span>
                         <KernDropdown dropdownWidth="w-full" options={onAttributeEmbeddings} buttonName={selectedEmbedding ? selectedEmbedding.name : 'Select embedding'} selectedOption={(value) => setSelectedEmbedding(value)} dropdownClasses="my-2" />
                     </div>
-                    <div className="flex items-center">
-                        <span className="mr-1">Enter an evaluation question</span>
-                        <InfoButton content="To help refine a question, we provide a reformulation in the 'Playground' tab. Additionally, users can access their question history and select a previous question." infoButtonSize='sm' divPosition='right' />
+                    <div className="relative w-full">
+                        <div className="flex items-center">
+                            <span className="mr-1">Enter an evaluation question</span>
+                            <InfoButton content="To help refine a question, we provide a reformulation in the 'Playground' tab. Additionally, users can access their question history and select a previous question." infoButtonSize='sm' divPosition='right' />
+                        </div>
+                        <textarea placeholder="Enter question..."
+                            className="placeholder-italic w-full h-22 p-2 line-height-textarea border rounded-md border-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100"
+                            onChange={(event: any) => { setQuestion(event.target.value); }}
+                            value={question}
+                        ></textarea>
+                        <div className="absolute top-9 right-1">
+                            <QuestionHistory setQuestion={(question: string) => setQuestion(question)} refetchHistory={refetchHistory} />
+                        </div>
                     </div>
-                    <textarea placeholder="Enter question..."
-                        className="placeholder-italic w-full h-22 p-2 line-height-textarea border rounded-md border-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100"
-                        onChange={(event: any) => { setQuestion(event.target.value); }}
-                        value={question}
-                    ></textarea>
                     <div className="flex items-center gap-x-2">
                         <span>Limit</span>
                         <input className="w-14 bg-white text-gray-700 text-xs font-semibold px-2 py-2 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100"
@@ -200,9 +211,7 @@ export default function CreateEvaluationSetModal(props: CreateEvaluationSetsModa
                             icon={IconWand}
                             iconColor='purple'
                             disabled={question === '' || !selectedEmbedding}
-                            onClick={() => {
-                                getSimilarRecords()
-                            }}
+                            onClick={getSimilarRecords}
                         />
                         <KernButton
                             text="Add all similar"
