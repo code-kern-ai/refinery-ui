@@ -403,7 +403,7 @@ export default function AttributeCalculation() {
                 </div>
                 {
                     currentAttribute.dataType == DataTypeEnum.LLM_RESPONSE &&
-                    <LLMResponseConfig disabled={currentAttribute.state == AttributeState.USABLE} attributeId={currentAttribute?.id} fullLlmConfig={additionalConfigTmp} setFullLlmConfig={setAdditionalConfigTmp} apiKey={additionalConfigTmp?.llmConfig.apiKey} />
+                    <LLMResponseConfig disabled={currentAttribute.state == AttributeState.USABLE} attributeId={currentAttribute?.id} fullLlmConfig={additionalConfigTmp} setFullLlmConfig={setAdditionalConfigTmp} apiKey={additionalConfigTmp?.llmConfig.apiKey} noPlayground={currentAttribute.state == AttributeState.USABLE} />
                 }
                 <div className="flex flex-row items-center justify-between my-3">
                     <div className="flex flex-row flex-nowrap items-center">
