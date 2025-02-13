@@ -60,9 +60,11 @@ export function createAttribute(projectId: string, name: string, dataType: strin
     jsonFetchWrapper(finalUrl, FetchType.POST, onResult, JSON.stringify(convertCamelToSnakeCase({ name, dataType })));
 }
 
-export function updateAttribute(projectId: string, attributeId: string, onResult: (result: any) => void, dataType?: string, isPrimaryKey?: boolean, name?: string, sourceCode?: string, visibility?: string) {
+export function updateAttribute(projectId: string, attributeId: string, onResult: (result: any) => void, dataType?: string, isPrimaryKey?: boolean, name?: string, sourceCode?: string, visibility?: string, additionalConfig?: any) {
     const finalUrl = `${projectSettingEndpoint}/${projectId}/update-attribute`;
-    jsonFetchWrapper(finalUrl, FetchType.POST, onResult, JSON.stringify(convertCamelToSnakeCase({ attributeId, dataType, isPrimaryKey, name, sourceCode, visibility })));
+    const baseData: any = convertCamelToSnakeCase({ attributeId, dataType, isPrimaryKey, name, sourceCode, visibility });
+    baseData.additional_config = additionalConfig;
+    jsonFetchWrapper(finalUrl, FetchType.POST, onResult, JSON.stringify(baseData));
 }
 
 export function calculateUserAttributeAllRecordsPost(projectId: string, options: {

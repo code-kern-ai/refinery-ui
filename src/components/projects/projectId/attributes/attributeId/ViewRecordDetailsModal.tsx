@@ -14,7 +14,7 @@ export default function ViewRecordDetailsModal(props: ViewRecordDetailsModalProp
 
     return (<>
         {modalViewRecordDetails.open && modalViewRecordDetails.record && props.sampleRecords && <>
-            <Modal modalName={ModalEnum.VIEW_RECORD_DETAILS}>
+            <Modal modalName={ModalEnum.VIEW_RECORD_DETAILS} className="md:max-w-5xl">
                 <h1 className="text-lg text-gray-900 mb-2 text-center">View details</h1>
 
                 <div className={`overflow-y-auto max-height-modal text-sm text-gray-500 my-2 ${style.scrollableSize}`}>
@@ -22,7 +22,7 @@ export default function ViewRecordDetailsModal(props: ViewRecordDetailsModalProp
                         attributes={attributes}
                         record={modalViewRecordDetails.record} />
                     <div className="text-sm leading-5 text-left text-gray-900 font-medium">Calculated value</div>
-                    <div className="text-sm leading-5 text-left text-gray-500 font-normal">
+                    <div className="text-sm leading-5 text-left text-gray-500 font-normal whitespace-pre-line">
                         {props.currentAttribute.dataType != DataTypeEnum.EMBEDDING_LIST ? <span>
                             {props.sampleRecords.calculatedAttributes[modalViewRecordDetails.recordIdx]}
                         </span> : <div className="flex flex-col gap-y-2 divide-y">

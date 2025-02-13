@@ -57,9 +57,9 @@ const settingsSlice = createSlice({
         setAllAttributes(state, action: PayloadAction<Attribute[]>) {
             if (action.payload) state.attributes.all = postProcessingAttributes(action.payload);
             else state.attributes.all = [];
-            state.attributes.useableEmbedableAttributes = state.attributes.all.filter((attribute) => (attribute.dataType === DataTypeEnum.TEXT || attribute.dataType === DataTypeEnum.EMBEDDING_LIST) &&
+            state.attributes.useableEmbedableAttributes = state.attributes.all.filter((attribute) => (attribute.dataType === DataTypeEnum.TEXT || attribute.dataType === DataTypeEnum.LLM_RESPONSE || attribute.dataType === DataTypeEnum.EMBEDDING_LIST) &&
                 (attribute.state === AttributeState.UPLOADED || attribute.state === AttributeState.AUTOMATICALLY_CREATED || attribute.state === AttributeState.USABLE));
-            state.attributes.useableNonTextAttributes = state.attributes.all.filter((attribute) => (attribute.dataType !== DataTypeEnum.TEXT && attribute.dataType !== DataTypeEnum.EMBEDDING_LIST) &&
+            state.attributes.useableNonTextAttributes = state.attributes.all.filter((attribute) => (attribute.dataType !== DataTypeEnum.TEXT && attribute.dataType !== DataTypeEnum.LLM_RESPONSE && attribute.dataType !== DataTypeEnum.EMBEDDING_LIST) &&
                 (attribute.state === AttributeState.UPLOADED || attribute.state === AttributeState.AUTOMATICALLY_CREATED || attribute.state === AttributeState.USABLE));
             const fullRecordEl = {
                 id: '@@NO_ATTRIBUTE@@',
@@ -67,7 +67,7 @@ const settingsSlice = createSlice({
             }
             const filterFromAll = state.attributes.all.filter((attribute) => (attribute.state === AttributeState.UPLOADED || attribute.state === AttributeState.AUTOMATICALLY_CREATED || attribute.state === AttributeState.USABLE));
             state.attributes.usableAttributes = [fullRecordEl, ...filterFromAll];
-            state.attributes.usableTextAttributes = state.attributes.useableEmbedableAttributes.filter((attribute) => attribute.dataType === DataTypeEnum.TEXT);
+            state.attributes.usableTextAttributes = state.attributes.useableEmbedableAttributes.filter((attribute) => attribute.dataType === DataTypeEnum.TEXT || attribute.dataType === DataTypeEnum.LLM_RESPONSE);
         },
         extendAllAttributes(state, action: PayloadAction<Attribute>) {
             if (action.payload) state.attributes.all.push(action.payload);

@@ -21,7 +21,7 @@ export default function ChangeColorModal() {
     const modalChangeColor = useSelector(selectModal(ModalEnum.CHANGE_COLOR));
     const modalRenameLabel = useSelector(selectModal(ModalEnum.RENAME_LABEL));
 
-    const [hotKeyError, setHotKeyError] = useState<string>('');
+    const [hotKeyError, setHotKeyError] = useState('');
     const [usedHotKeys, setUsedHotKeys] = useState<string[]>([]);
 
     function handleKeyboardEvent(event: KeyboardEvent) {

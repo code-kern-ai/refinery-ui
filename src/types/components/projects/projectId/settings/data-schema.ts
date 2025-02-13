@@ -3,6 +3,24 @@ export type DataSchemaProps = {
     pKeyValid: boolean;
 };
 
+export type LLMConfig = {
+    llmIdentifier: string;
+    questionPrompt: string;
+    templatePrompt: string;
+    llmConfig: {
+        model: string;
+        temperature: number;
+        maxLength: number;
+        stopSequences: string[]; //not in use for llm ac since json mode is used
+        topP: number;
+        frequencyPenalty: number;
+        presencePenalty: number;
+        apiKey: string;
+        apiVersion?: string, //only for azure
+        endpoint?: string,  //only for azure
+    }
+}
+
 export type Attribute = {
     id: string;
     name: string;
@@ -24,6 +42,7 @@ export type Attribute = {
     sourceCodeToDisplay?: string;
     saveSourceCode: boolean;
     key?: string;
+    additionalConfig?: LLMConfig;
 }
 
 export type AttributeVisibilityStates = {

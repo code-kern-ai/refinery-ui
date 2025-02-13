@@ -14,6 +14,7 @@ import ViewRecordDetailsModal from "./ViewRecordDetailsModal";
 import { extendArrayElementsByUniqueId } from "@/submodules/javascript-functions/id-prep";
 import { getRecordByRecordId } from "@/src/services/base/project-setting";
 import { getSampleRecords } from "@/src/services/base/attribute";
+import { DataTypeEnum } from "@/src/types/shared/general";
 
 export default function ExecutionContainer(props: ExecutionContainerProps) {
     const projectId = useSelector(selectProjectId);
@@ -56,7 +57,6 @@ export default function ExecutionContainer(props: ExecutionContainerProps) {
             dispatch(setModalStates(ModalEnum.VIEW_RECORD_DETAILS, { record: postProcessRecordByRecordId(res) }));
         });
     }
-
     return (<div>
         <div className="mt-8 text-sm leading-5">
             <div className="text-gray-700 font-medium mr-2">
@@ -64,10 +64,12 @@ export default function ExecutionContainer(props: ExecutionContainerProps) {
             </div>
 
             <div className="flex items-center">
-                <div className="text-gray-500 font-normal">You can execute your attribute calculation
+                <div className="text-gray-500 font-normal inline-flex flex-col gap-y-2 w-full">You can execute your attribute calculation
                     on all records, or test-run it on 10 examples (which are sampled randomly). Test results are
                     shown
-                    below after computation.</div>
+                    below after computation.{
+                        props.currentAttribute.dataType == DataTypeEnum.LLM_RESPONSE && <span className="italic">Note that LLM results are cached for the same set of settings to ensure that a critical error during the final execution doesn't lose the already calculated values</span>
+                    }</div>
                 {requestedSomething && <div className="inline-block">
                     <LoadingIcon color="indigo" />
                 </div>}
@@ -75,7 +77,7 @@ export default function ExecutionContainer(props: ExecutionContainerProps) {
                 <Tooltip content={TOOLTIPS_DICT.ATTRIBUTE_CALCULATION.EXECUTE_10_RECORDS} color="invert" placement="bottom" className="ml-auto">
                     <button onClick={calculateUserAttributeSampleRecords}
                         disabled={props.currentAttribute.state == AttributeState.USABLE || props.currentAttribute.state == AttributeState.RUNNING || requestedSomething || props.tokenizationProgress < 1 || props.checkUnsavedChanges}
-                        className={`bg-white text-gray-700 text-xs font-semibold px-4 py-2 rounded-md border border-gray-300 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed`}>
+                        className="bg-white text-gray-700 text-xs font-semibold px-4 py-2 rounded-md border whitespace-nowrap border-gray-300 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed">
                         Run on 10
                     </button>
                 </Tooltip>
@@ -83,7 +85,7 @@ export default function ExecutionContainer(props: ExecutionContainerProps) {
                 <Tooltip color="invert" placement="bottom" content={props.currentAttribute.state == AttributeState.USABLE ? 'Attribute is already in use' : requestedSomething ? 'Test is running' : checkIfAtLeastRunning ? 'Another attribute is running' : checkIfAtLeastQueued ? 'Another attribute is queued for execution' : props.tokenizationProgress < 1 ? 'Tokenization is in progress' : runOn10HasError ? 'Run on 10 records has an error' : 'Execute the attribute on all records'}>
                     <button onClick={() => dispatch(setModalStates(ModalEnum.EXECUTE_ATTRIBUTE_CALCULATION, { open: true, requestedSomething: requestedSomething }))}
                         disabled={props.currentAttribute.state == AttributeState.USABLE || props.currentAttribute.state == AttributeState.RUNNING || requestedSomething || checkIfAtLeastRunning || checkIfAtLeastQueued || props.tokenizationProgress < 1 || runOn10HasError || props.checkUnsavedChanges}
-                        className={`bg-indigo-700 text-white text-xs leading-4 font-semibold px-4 py-2 rounded-md cursor-pointer ml-3 hover:bg-indigo-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed`}>
+                        className="bg-indigo-700 text-white text-xs leading-4 font-semibold px-4 py-2 rounded-md cursor-pointer ml-3 hover:bg-indigo-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed">
                         Run
                     </button>
                 </Tooltip>
@@ -99,7 +101,7 @@ export default function ExecutionContainer(props: ExecutionContainerProps) {
                                 <div key={record.id} className="divide-y divide-gray-200 bg-white">
                                     <div className="flex-shrink-0 border-b border-gray-200 shadow-sm flex justify-between items-center">
                                         <div className="flex items-center text-xs leading-5 text-gray-500 font-normal mx-4 my-3 text-justify">
-                                            {record.value}
+                                            {String(record.value)}
                                         </div>
                                         <div className="flex items-center justify-center mr-5 ml-auto">
                                             <button onClick={() => {

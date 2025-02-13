@@ -2,16 +2,16 @@ import Statuses from "@/src/components/shared/statuses/Statuses";
 import { selectAllLookupLists, setAllLookupLists } from "@/src/reduxStore/states/pages/lookup-lists";
 import { selectAttributes, selectVisibleAttributeAC, setAllAttributes, setLabelingTasksAll, updateAttributeById } from "@/src/reduxStore/states/pages/settings";
 import { selectProjectId } from "@/src/reduxStore/states/project"
-import { Attribute, AttributeState } from "@/src/types/components/projects/projectId/settings/data-schema";
+import { Attribute, AttributeState, LLMConfig } from "@/src/types/components/projects/projectId/settings/data-schema";
 import { DataTypeEnum } from "@/src/types/shared/general";
-import { postProcessCurrentAttribute } from "@/src/util/components/projects/projectId/settings/attribute-calculation-helper";
+import { LLM_PROVIDER_OPTIONS, postProcessCurrentAttribute } from "@/src/util/components/projects/projectId/settings/attribute-calculation-helper";
 import { ATTRIBUTES_VISIBILITY_STATES, DATA_TYPES, getTooltipVisibilityState } from "@/src/util/components/projects/projectId/settings/data-schema-helper";
 import { copyToClipboard } from "@/submodules/javascript-functions/general";
 import { Editor } from "@monaco-editor/react";
 import { Tooltip } from "@nextui-org/react";
 import { IconAlertTriangleFilled, IconArrowLeft, IconCircleCheckFilled } from "@tabler/icons-react";
 import { useRouter } from "next/router";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux"
 import ExecutionContainer from "./ExecutionContainer";
 import { getPythonFunctionRegExMatch, toPythonFunctionName } from "@/submodules/javascript-functions/python-functions-parser";
@@ -24,7 +24,6 @@ import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
 import { selectAllUsers, selectOrganizationId, setComments } from "@/src/reduxStore/states/general";
 import { CommentDataManager } from "@/src/util/classes/comments";
 import { CommentType } from "@/src/types/shared/comments";
-import { AttributeCodeLookup } from "@/src/util/classes/attribute-calculation";
 import KernDropdown from "@/submodules/react-components/components/KernDropdown";
 import { useWebsocket } from "@/submodules/react-components/hooks/web-socket/useWebsocket";
 import { postProcessLabelingTasksSchema } from "@/src/util/components/projects/projectId/settings/labeling-tasks-helper";
@@ -35,8 +34,15 @@ import { getLabelingTasksByProjectId, getProjectTokenization } from "@/src/servi
 import { getAttributeByAttributeId, updateAttribute } from "@/src/services/base/project-setting";
 import { Application, CurrentPage } from "@/submodules/react-components/hooks/web-socket/constants";
 import { VisitBricksButton } from "@/src/components/shared/bricks/VisitBricksButton";
+import LLMResponseConfig from "./LLMResponseConfig";
+import useDebounce from "@/submodules/react-components/hooks/useHooks/useDebounce";
+import useRefFor from "@/submodules/react-components/hooks/useRefFor";
+import { simpleDictCompare } from "@/submodules/javascript-functions/validations";
+import { LLM_CODE_TEMPLATE_EXAMPLES, LLM_CODE_TEMPLATE_OPTIONS } from "./LLM/llmTemplates";
 
 const EDITOR_OPTIONS = { theme: 'vs-light', language: 'python', readOnly: false };
+
+
 
 export default function AttributeCalculation() {
     const router = useRouter();
@@ -59,18 +65,27 @@ export default function AttributeCalculation() {
     const [attributeName, setAttributeName] = useState('');
     const [checkUnsavedChanges, setCheckUnsavedChanges] = useState(false);
     const [enableRunButton, setEnableButton] = useState(false);
+    const [additionalConfigTmp, setAdditionalConfigTmp] = useState<LLMConfig>(null);
 
+    const currentAttributeRef = useRefFor(currentAttribute);
+    const debouncedConfig = useDebounce(additionalConfigTmp, 1000);
+
+    const updateSourceCode = useCallback((value: string, attributeNameParam?: string) => {
+        var regMatch: any = getPythonFunctionRegExMatch(value);
+        if (!regMatch) {
+            console.log("Can't find python function name -- seems wrong -- better dont save");
+            return;
+        }
+        const finalSourceCode = value.replace(regMatch[0], 'def ac(record)');
+        updateAttribute(projectId, currentAttribute.id, (res) => {
+
+        }, null, null, attributeNameParam, finalSourceCode);
+    }, [projectId, currentAttribute]);
+
+    useEffect(() => setAdditionalConfigTmp(currentAttribute?.additionalConfig), [currentAttribute?.additionalConfig])
 
     useEffect(() => {
         if (!projectId) return;
-        if (!currentAttribute || attributes.length == 0) {
-            getAttributes(projectId, ['ALL'], (res) => {
-                dispatch(setAllAttributes(res));
-                const currentAttribute = postProcessCurrentAttribute(attributes.find((attribute) => attribute.id === router.query.attributeId));
-                setCurrentAttribute(currentAttribute);
-                setEditorValue(currentAttribute?.sourceCodeToDisplay);
-            });
-        }
         if (lookupLists.length == 0) {
             getLookupListsByProjectId(projectId, (res) => {
                 dispatch(setAllLookupLists(res));
@@ -78,7 +93,16 @@ export default function AttributeCalculation() {
         }
         refetchLabelingTasksAndProcess();
         checkProjectTokenization();
-    }, [projectId, attributes, currentAttribute]);
+    }, [projectId, attributes]);
+
+    useEffect(() => {
+        if (currentAttribute || !projectId) return;
+        getAttributeByAttributeId(projectId, router.query.attributeId as string, (attribute) => {
+            const currentAttribute = postProcessCurrentAttribute(attribute);
+            setCurrentAttribute(currentAttribute);
+            setEditorValue(currentAttribute?.sourceCodeToDisplay);
+        });
+    }, [projectId, currentAttribute, router.query.attributeId])
 
     useEffect(() => {
         if (!attributes) return;
@@ -97,7 +121,7 @@ export default function AttributeCalculation() {
             setEditorOptions({ ...EDITOR_OPTIONS, readOnly: false });
         }
         setAttributeName(currentAttribute.name);
-    }, [currentAttribute]);
+    }, [currentAttribute, updateSourceCode]);
 
     useEffect(() => {
         if (!projectId || allUsers.length == 0) return;
@@ -125,7 +149,21 @@ export default function AttributeCalculation() {
             spinner.unsubscribe();
             subscription.unsubscribe();
         }
-    }, [editorValue, currentAttribute]);
+    }, [editorValue, currentAttribute, updateSourceCode]);
+
+
+    useEffect(() => {
+        if (!currentAttributeRef.current || !currentAttributeRef.current.additionalConfig || simpleDictCompare(currentAttributeRef.current?.additionalConfig, debouncedConfig)) return;
+        const attributeNew = { ...currentAttribute };
+        attributeNew.additionalConfig = { ...debouncedConfig };
+        updateAttribute(projectId, currentAttribute.id, (res) => {
+            setCurrentAttribute(postProcessCurrentAttribute(attributeNew));
+            dispatch(updateAttributeById(attributeNew));
+            setEnableButton(true);
+        }, null, null, null, null, null, debouncedConfig);
+
+    }, [debouncedConfig])
+
 
     function setUpCommentsRequests() {
         const requests = [];
@@ -207,17 +245,6 @@ export default function AttributeCalculation() {
         }
     }
 
-    function updateSourceCode(value: string, attributeNameParam?: string) {
-        var regMatch: any = getPythonFunctionRegExMatch(value);
-        if (!regMatch) {
-            console.log("Can't find python function name -- seems wrong -- better dont save");
-            return;
-        }
-        const finalSourceCode = value.replace(regMatch[0], 'def ac(record)');
-        updateAttribute(projectId, currentAttribute.id, (res) => {
-
-        }, null, null, attributeNameParam, finalSourceCode);
-    }
 
     function checkProjectTokenization() {
         getProjectTokenization(projectId, (res) => {
@@ -269,8 +296,19 @@ export default function AttributeCalculation() {
         }
     }, [projectId, currentAttribute]);
 
+    const selectCodeTemplate = useCallback((option) => {
+        if (!currentAttributeRef.current) return;
+        updateSourceCode(LLM_CODE_TEMPLATE_EXAMPLES[option.value]);
+        setEditorValue(LLM_CODE_TEMPLATE_EXAMPLES[option.value].replace('def ac(record)', 'def ' + currentAttributeRef.current.name + '(record)'));
+    }, [updateSourceCode])
+
     const orgId = useSelector(selectOrganizationId);
     useWebsocket(orgId, Application.REFINERY, CurrentPage.ATTRIBUTE_CALCULATION, handleWebsocketNotification, projectId);
+
+    const disabledOptions = useMemo(() => {
+        if (!currentAttribute || currentAttribute.dataType == DataTypeEnum.LLM_RESPONSE) return undefined;
+        return DATA_TYPES.map((e) => e.value == DataTypeEnum.LLM_RESPONSE);
+    }, [currentAttribute?.dataType])
 
     return (projectId && <div className={`bg-white p-4 overflow-y-auto min-h-full h-[calc(100vh-4rem)]`} onScroll={(e: any) => onScrollEvent(e)}>
         {currentAttribute && <div>
@@ -315,11 +353,25 @@ export default function AttributeCalculation() {
 
                     <div className="text-sm leading-5 font-medium text-gray-700">Data type</div>
                     <div className="flex flex-row items-center">
-                        <Tooltip color="invert" placement="right" content={currentAttribute.state == AttributeState.USABLE || currentAttribute.state == AttributeState.RUNNING ? TOOLTIPS_DICT.ATTRIBUTE_CALCULATION.CANNOT_EDIT_DATATYPE : TOOLTIPS_DICT.ATTRIBUTE_CALCULATION.EDIT_DATATYPE}>
+                        <Tooltip color="invert" placement="right" className="cursor-not-allowed" content={currentAttribute.state == AttributeState.USABLE || currentAttribute.state == AttributeState.RUNNING ? TOOLTIPS_DICT.ATTRIBUTE_CALCULATION.CANNOT_EDIT_DATATYPE : TOOLTIPS_DICT.ATTRIBUTE_CALCULATION.EDIT_DATATYPE}>
                             <KernDropdown buttonName={currentAttribute.dataTypeName} options={DATA_TYPES} dropdownWidth="w-52"
-                                selectedOption={(option: any) => updateDataType(option)} disabled={currentAttribute.state == AttributeState.USABLE} dropdownClasses="z-30" />
+                                selectedOption={(option: any) => updateDataType(option)} disabledOptions={disabledOptions} disabled={currentAttribute.state == AttributeState.USABLE || currentAttribute.dataType == DataTypeEnum.LLM_RESPONSE} dropdownClasses="z-30" />
                         </Tooltip>
                         {currentAttribute.dataType == DataTypeEnum.EMBEDDING_LIST && <div className="text-gray-700 text-sm ml-3">Only useable for similarity search</div>}
+                        {currentAttribute.dataType == DataTypeEnum.LLM_RESPONSE && <div className="ml-3 flex flex-row flex-nowrap w-full items-center gap-x-2">
+                            <label className="block text-sm font-medium text-gray-900 whitespace-nowrap">Provider</label>
+                            <KernDropdown
+                                buttonName={additionalConfigTmp?.llmIdentifier ?? 'Select LLM provider'}
+                                options={LLM_PROVIDER_OPTIONS}
+                                dropdownWidth="w-52"
+                                selectedOption={(option) => setAdditionalConfigTmp(p => ({ ...p, llmIdentifier: option }))}
+                                disabled={currentAttribute.state == AttributeState.USABLE}
+                            />
+                            <label className="block text-sm font-medium text-gray-900 whitespace-nowrap">Api Key</label>
+
+                            <input type="text" disabled={currentAttribute.state == AttributeState.USABLE} value={additionalConfigTmp?.llmConfig.apiKey || ""} onInput={(e: any) => setAdditionalConfigTmp(p => ({ ...p, llmConfig: { ...additionalConfigTmp.llmConfig, apiKey: e.target.value } }))}
+                                className="h-8 text-sm border-gray-300 rounded-md placeholder-italic w-full border text-gray-700 pl-4 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100 disabled:opacity-50" />
+                        </div>}
                     </div>
                     <div className="text-sm leading-5 font-medium text-gray-700 inline-block">Attributes</div>
                     <div className="flex flex-row items-center">
@@ -349,8 +401,24 @@ export default function AttributeCalculation() {
                         ))}
                     </div>
                 </div>
+                {
+                    currentAttribute.dataType == DataTypeEnum.LLM_RESPONSE &&
+                    <LLMResponseConfig disabled={currentAttribute.state == AttributeState.USABLE} attributeId={currentAttribute?.id} fullLlmConfig={additionalConfigTmp} setFullLlmConfig={setAdditionalConfigTmp} apiKey={additionalConfigTmp?.llmConfig.apiKey} noPlayground={currentAttribute.state == AttributeState.USABLE} />
+                }
                 <div className="flex flex-row items-center justify-between my-3">
-                    <div className="text-sm leading-5 font-medium text-gray-700 inline-block mr-2">Editor</div>
+                    <div className="flex flex-row flex-nowrap items-center">
+                        <span className="text-sm leading-5 font-medium text-gray-700 inline-block mr-2">{currentAttribute.dataType == DataTypeEnum.LLM_RESPONSE ? 'Postprocessing' : 'Editor'}</span>
+                        {currentAttribute.dataType == DataTypeEnum.LLM_RESPONSE &&
+                            <Tooltip content={TOOLTIPS_DICT.ATTRIBUTE_CALCULATION.LLM_POSTPROCESSING_CODE} color="invert" placement="right">
+                                <KernDropdown
+                                    buttonName="Use code example"
+                                    options={LLM_CODE_TEMPLATE_OPTIONS}
+                                    dropdownWidth="w-52"
+                                    disabled={currentAttribute.state == AttributeState.USABLE}
+                                    selectedOption={selectCodeTemplate}
+                                />
+                            </Tooltip>}
+                    </div>
                     <div className="flex flex-row flex-nowrap">
                         <VisitBricksButton urlExtension="generators" tooltipPlacement="left" size="small" />
                         <Tooltip content={TOOLTIPS_DICT.ATTRIBUTE_CALCULATION.AVAILABLE_LIBRARIES} placement="bottom" color="invert">
