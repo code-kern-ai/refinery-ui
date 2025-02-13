@@ -353,7 +353,7 @@ export default function AttributeCalculation() {
 
                     <div className="text-sm leading-5 font-medium text-gray-700">Data type</div>
                     <div className="flex flex-row items-center">
-                        <Tooltip color="invert" placement="right" content={currentAttribute.state == AttributeState.USABLE || currentAttribute.state == AttributeState.RUNNING ? TOOLTIPS_DICT.ATTRIBUTE_CALCULATION.CANNOT_EDIT_DATATYPE : TOOLTIPS_DICT.ATTRIBUTE_CALCULATION.EDIT_DATATYPE}>
+                        <Tooltip color="invert" placement="right" className="cursor-not-allowed" content={currentAttribute.state == AttributeState.USABLE || currentAttribute.state == AttributeState.RUNNING ? TOOLTIPS_DICT.ATTRIBUTE_CALCULATION.CANNOT_EDIT_DATATYPE : TOOLTIPS_DICT.ATTRIBUTE_CALCULATION.EDIT_DATATYPE}>
                             <KernDropdown buttonName={currentAttribute.dataTypeName} options={DATA_TYPES} dropdownWidth="w-52"
                                 selectedOption={(option: any) => updateDataType(option)} disabledOptions={disabledOptions} disabled={currentAttribute.state == AttributeState.USABLE || currentAttribute.dataType == DataTypeEnum.LLM_RESPONSE} dropdownClasses="z-30" />
                         </Tooltip>
