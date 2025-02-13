@@ -48,3 +48,11 @@ export const LLM_PROVIDER_OPTIONS = [
     'Open AI',
     'Azure'
 ];
+
+export function postProcessLLMPlaygroundRecordData(recordList: any[]): any[] {
+    if (!recordList || recordList.length == 0) return null;
+    return recordList.map((record) => {
+        const parsed = JSON.parse(record.recordData);
+        return ({ ...parsed.data, id: parsed.id });
+    });
+}

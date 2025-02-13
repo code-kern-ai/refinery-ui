@@ -18,7 +18,7 @@ import { DataTypeEnum } from "@/src/types/shared/general";
 import { runAttributeLlmPlayground } from "@/src/services/base/attribute";
 import { jsonCopy } from "@/submodules/javascript-functions/general";
 import { TEMPLATE_EXAMPLES, TEMPLATE_OPTIONS } from "./llmTemplates";
-import { LLM_PROVIDER_OPTIONS } from "@/src/util/components/projects/projectId/settings/attribute-calculation-helper";
+import { LLM_PROVIDER_OPTIONS, postProcessLLMPlaygroundRecordData } from "@/src/util/components/projects/projectId/settings/attribute-calculation-helper";
 
 const ACCEPT_BUTTON = { buttonCaption: "Use current values for attribute", useButton: true };
 const DISPLAY_STATES = [AttributeState.AUTOMATICALLY_CREATED, AttributeState.UPLOADED, AttributeState.USABLE]
@@ -45,15 +45,12 @@ export default function LLMPlaygroundModal() {
     const searchAndSetWithFilter = useCallback((filter) => {
         searchRecordsExtended(projectId, filter, 0, 1, (res) => {
             if (res && res.recordList) {
-                if (res.recordList.length == 0) {
+                const parsedData = postProcessLLMPlaygroundRecordData(res.recordList);
+                if (!parsedData) {
                     console.warn("No records found -> using random instead");
                     get1RandomRecords();
                     return;
                 }
-                const parsedData = res.recordList.map((record) => {
-                    const parsed = JSON.parse(record.recordData);
-                    return ({ ...parsed.data, id: parsed.id });
-                });
                 setRecordData(parsedData);
             }
         });
