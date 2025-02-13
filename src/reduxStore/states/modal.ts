@@ -194,6 +194,39 @@ const initialState: Modals = {
         attributeId: null,
         apiKey: null,//since it's only available in the by id function this is passed along
     },
+    [ModalEnum.EVALUATION_SET]: {
+        open: false,
+    },
+    [ModalEnum.VIEW_EVALUATION_SET]: {
+        open: false,
+        records: [],
+        question: ""
+    },
+    [ModalEnum.DELETE_EVALUATION_SET]: {
+        open: false
+    },
+    [ModalEnum.EVALUATION_GROUP]: {
+        open: false,
+    },
+    [ModalEnum.DELETE_EVALUATION_GROUP]: {
+        open: false
+    },
+    [ModalEnum.VIEW_EVALUATION_GROUP]: {
+        open: false,
+        sets: []
+    },
+    [ModalEnum.EVALUATION_RUN]: {
+        open: false,
+    },
+    [ModalEnum.EVALUATION_META_FILTER_APPLY]: {
+        open: false,
+    },
+    [ModalEnum.EVALUATION_REFORMULATE]: {
+        open: false,
+    },
+    [ModalEnum.DELETE_EVALUATION_RUN]: {
+        open: false
+    },
 };
 
 const modalSlice = createSlice({

@@ -7,7 +7,7 @@ import { Embedding, EmbeddingState, EmbeddingType } from "@/src/types/components
 import { ModalEnum } from "@/src/types/shared/modal";
 import { DATA_TYPES, getColorForDataType } from "@/src/util/components/projects/projectId/settings/data-schema-helper";
 import { Tooltip } from "@nextui-org/react";
-import { IconAlertTriangleFilled, IconArrowAutofitDown, IconCircleCheckFilled, IconNotes, IconPlus, IconTrash } from "@tabler/icons-react";
+import { IconAlertTriangleFilled, IconArrowAutofitDown, IconCircleCheckFilled, IconNotes, IconPlus, IconTrash, IconMessageCircleSearch } from "@tabler/icons-react";
 import { useRouter } from "next/router";
 import { useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -182,6 +182,14 @@ export default function Embeddings(props: { refetchEmbeddings: () => void }) {
                         See downloaded models
                     </button>
                 </Tooltip>
+                <Tooltip content={TOOLTIPS_DICT.PROJECT_SETTINGS.EMBEDDINGS.PLAYGROUND} color="invert" placement="right">
+                    <button onClick={() => router.push(`/projects/${projectId}/playground`)}
+                        className={`"ml-1 inline-block items-center px-2.5 py-1.5 border border-gray-300 shadow-sm text-xs font-semibold rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none cursor-pointer disabled:cursor-not-allowed disabled:opacity-50`}>
+                        <IconMessageCircleSearch className="h-5 w-5 inline-block mr-1" />
+                        Evaluation
+                    </button>
+                </Tooltip>
+
             </div>
         </div>
 
