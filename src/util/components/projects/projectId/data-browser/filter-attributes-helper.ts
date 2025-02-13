@@ -34,9 +34,9 @@ export function getPlaceholderText(attributeType: string) {
     }
 }
 
-export function prepareAttFilter(filterAttributesForm: any, attributes: Attribute[]) {
+export function prepareAttFilter(filterAttributesForm: any, attributes: Attribute[], stringify = true) {
     const filter = [];
-    if (filterAttributesForm.length == 0 || !filterAttributesForm[0].name) return JSON.stringify(filter);
+    if (filterAttributesForm.length == 0 || !filterAttributesForm[0].name) return stringify ? JSON.stringify(filter) : filter;
     for (let i = 0; i < filterAttributesForm.length; i++) {
         const attribute = filterAttributesForm[i];
         if (attribute.operator !== FilterIntegrationOperator.IN) {
@@ -58,7 +58,7 @@ export function prepareAttFilter(filterAttributesForm: any, attributes: Attribut
             filter.push({ "key": attribute.name, "value": values, "type": "between" });
         }
     }
-    return JSON.stringify(filter);
+    return stringify ? JSON.stringify(filter) : filter;
 }
 
 function parseSearchValue(attributeName: any, value: any, attributes: Attribute[]) {

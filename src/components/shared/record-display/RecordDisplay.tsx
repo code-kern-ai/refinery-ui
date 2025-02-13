@@ -26,7 +26,7 @@ export function RecordDisplay(props: any) {
     }, [props.record, props.attributes, isTextHighlightNeeded]);
 
     return (<>
-        {preparedAttributes && preparedAttributes.map((attribute, index) => (<div key={attribute.key}>
+        {preparedAttributes && preparedAttributes.map((attribute, index) => (<div key={attribute.key} onClick={props.onClick ? props.onClick : undefined}>
             <div className="font-semibold text-sm text-gray-800">
                 <div className="flex flex-row items-center">
                     <span className="font-dmMono">{attributesDict[attribute.id]?.name}</span>

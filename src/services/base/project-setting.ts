@@ -43,6 +43,13 @@ export function getRecordByRecordId(projectId: string, recordId: string, onResul
     jsonFetchWrapper(finalUrl, FetchType.GET, onResult);
 }
 
+export function getRecordsBatch(projectId: string, options: {
+    recordIds: string[]
+}, onResult: (result: any) => void) {
+    const finalUrl = `${projectSettingEndpoint}/${projectId}/records-batch`;
+    jsonFetchWrapper(finalUrl, FetchType.POST, onResult, JSON.stringify(convertCamelToSnakeCase(options)));
+}
+
 export function getProjectSize(projectId: string, onResult: (result: any) => void) {
     const finalUrl = `${projectSettingEndpoint}/${projectId}/project-size`;
     jsonFetchWrapper(finalUrl, FetchType.GET, onResult);

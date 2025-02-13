@@ -10,7 +10,7 @@ export class RouteManager {
         data: { active: false, checkFor: ['data-browser', 'edit-records'] },
         labeling: { active: false, checkFor: ['labeling'] },
         heuristics: { active: false, checkFor: ['heuristics', 'lookup-lists', 'labeling-function', 'active-learning'] },
-        settings: { active: false, checkFor: ['settings', 'attributes', 'upload-records'] },
+        settings: { active: false, checkFor: ['settings', 'attributes', 'upload-records', 'playground'] },
         admin: { active: false, checkFor: ['admin'] },
     }
 
