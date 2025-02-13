@@ -27,13 +27,6 @@ export type EvaluationRun = {
     metaInfo: any;
 }
 
-export enum EvaluationRunState {
-    INITIATED = 'INITIATED',
-    RUNNING = 'RUNNING',
-    SUCCESS = 'SUCCESS',
-    FAILED = 'FAILED',
-}
-
 export type PlaygroundQuestion = {
     id: string;
     createdAt: string;
