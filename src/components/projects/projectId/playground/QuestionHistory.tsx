@@ -27,7 +27,6 @@ export default function QuestionHistory(props: QuestionHistoryProps) {
     }, [projectId, props.refetchHistory]);
 
     function handleHistoryClick(entry: string) {
-        console.log(entry)
         props.setQuestion(entry);
         setShowHistory(false);
     }
