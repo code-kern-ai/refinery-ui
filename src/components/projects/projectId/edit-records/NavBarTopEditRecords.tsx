@@ -12,6 +12,7 @@ import { timer } from "rxjs";
 import { scrollElementIntoView } from "@/submodules/javascript-functions/scrollHelper";
 import { jsonCopy } from "@/submodules/javascript-functions/general";
 import ExplainModal from "./ExplainModal";
+import KernButton from "@/submodules/react-components/components/kern-button/KernButton";
 
 export default function NavBarTopEditRecords(props: NavBarTopEditRecordsProps) {
     const router = useRouter();
@@ -43,37 +44,35 @@ export default function NavBarTopEditRecords(props: NavBarTopEditRecordsProps) {
         <div className="relative flex-shrink-0 bg-white shadow-sm flex justify-between items-center h-full">
             <div className="flex flex-row flex-nowrap items-center">
                 <div className="flex justify-center overflow-visible">
-                    <Tooltip content={TOOLTIPS_DICT.EDIT_RECORDS.GO_TO_DATA_BROWSER} placement="bottom" color="invert">
-                        <button onClick={() => router.push(`/projects/${projectId}/data-browser`)}
-                            className="bg-white text-gray-700 text-xs font-semibold mr-3 px-4 py-2 rounded-md border border-gray-300 hover:bg-gray-50 focus:outline-none">
-                            Data browser
-                        </button>
-                    </Tooltip>
+                    <KernButton
+                        text="Data browser"
+                        onClick={() => router.push(`/projects/${projectId}/data-browser`)}
+                        tooltip={TOOLTIPS_DICT.EDIT_RECORDS.GO_TO_DATA_BROWSER}
+                        tooltipPlacement="bottom"
+                    />
                 </div>
             </div>
             <div className="flex flex-row flex-nowrap items-center">
-                <div className="flex justify-center overflow-visible items-center">
-                    <div className="text-sm leading-5 text-gray-500 flex-shrink-0 mr-3 my-3">
+                <div className="flex justify-center overflow-visible items-center gap-x-3">
+                    <div className="text-sm leading-5 text-gray-500 flex-shrink-0 my-3">
                         <Tooltip content={TOOLTIPS_DICT.EDIT_RECORDS.DIFFERENT_RECORDS} color="invert" placement="bottom" className="cursor-auto">
                             <span className="cursor-help underline filtersUnderline">{props.erdData.navBar.positionString} current session</span>
                         </Tooltip>
                     </div>
-                    <Tooltip content={TOOLTIPS_DICT.EDIT_RECORDS.PERSIST_CHANGES} color="invert" placement="left">
-                        <button onClick={() => dispatch(setModalStates(ModalEnum.SYNC_RECORDS, { open: true, syncModalAmount: Object.keys(props.erdData.cachedRecordChanges).length }))}
-                            className="bg-white text-gray-700 text-xs font-semibold mr-3 px-4 py-1.5 rounded-md border gap-x-1 border-gray-300 whitespace-nowrap inline-flex items-center hover:bg-gray-50 focus:outline-none">
-                            Synchronize with DB
-                            <IconDatabase size={24} strokeWidth={2} />
-                        </button>
-                    </Tooltip>
-                    <Tooltip content={TOOLTIPS_DICT.EDIT_RECORDS.SWITCH_COLUMN} color="invert" placement="left">
-                        <button onClick={nextColumnClass}
-                            className="bg-white text-gray-700 text-xs font-semibold mr-3 px-4 py-1.5 rounded-md border gap-x-1 border-gray-300 whitespace-nowrap inline-flex items-center hover:bg-gray-50 focus:outline-none">
-                            Switch view
-                            {props.erdData.columnClass == 'grid-cols-3' && <IconColumns1 size={24} strokeWidth={2} />}
-                            {props.erdData.columnClass == 'grid-cols-1' && <IconColumns2 size={24} strokeWidth={2} />}
-                            {props.erdData.columnClass == 'grid-cols-2' && <IconColumns3 size={24} strokeWidth={2} />}
-                        </button>
-                    </Tooltip>
+                    <KernButton
+                        text="Synchronize with DB"
+                        onClick={() => dispatch(setModalStates(ModalEnum.SYNC_RECORDS, { open: true, syncModalAmount: Object.keys(props.erdData.cachedRecordChanges).length }))}
+                        tooltip={TOOLTIPS_DICT.EDIT_RECORDS.PERSIST_CHANGES}
+                        tooltipPlacement="left"
+                        icon={IconDatabase}
+                    />
+                    <KernButton
+                        text="Switch view"
+                        onClick={nextColumnClass}
+                        tooltip={TOOLTIPS_DICT.EDIT_RECORDS.SWITCH_COLUMN}
+                        tooltipPlacement="bottom"
+                        icon={props.erdData.columnClass == 'grid-cols-3' ? IconColumns1 : props.erdData.columnClass == 'grid-cols-1' ? IconColumns2 : IconColumns3}
+                    />
                 </div>
             </div >
         </div >

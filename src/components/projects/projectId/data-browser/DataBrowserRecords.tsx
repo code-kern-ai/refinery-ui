@@ -18,6 +18,7 @@ import { setSessionData } from '@/src/reduxStore/states/tmp';
 import Export from '@/src/components/shared/export/Export';
 import { LabelingLinkType } from '@/src/types/components/projects/projectId/labeling/labeling-main-component';
 import { Fragment, useEffect } from 'react';
+import KernButton from '@/submodules/react-components/components/kern-button/KernButton';
 
 export default function DataBrowserRecords(props: DataBrowserRecordsProps) {
     const dispatch = useDispatch();
@@ -119,18 +120,20 @@ export default function DataBrowserRecords(props: DataBrowserRecordsProps) {
                         </div>
                     </div>
                 </div>}
-                {(activeSlice != null || activeSearchParams.length > 0 || similaritySearch.recordsInDisplay) && <button onClick={() => {
-                    clearFilters();
-                }} className="mr-1 inline-flex items-center px-2.5 py-2 border border-gray-300 shadow-sm text-xs font-semibold rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none cursor-pointer">
-                    <IconFilterOff className="h-4 w-4 mr-1" />Clear filters
-                </button>}
-                <Tooltip content={TOOLTIPS_DICT.DATA_BROWSER.CONFIGURATION} color="invert" placement='bottom'>
-                    <button onClick={() => dispatch(openModal(ModalEnum.CONFIGURATION))}
-                        className="mr-1 inline-flex items-center px-2.5 py-2 border border-gray-300 shadow-sm text-xs font-semibold rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none cursor-pointer">
-                        <IconAdjustments className="h-4 w-4 mr-1" />
-                        Configuration
-                    </button>
-                </Tooltip>
+                {(activeSlice != null || activeSearchParams.length > 0 || similaritySearch.recordsInDisplay) && <KernButton
+                    text="Clear filters"
+                    icon={IconFilterOff}
+                    onClick={clearFilters}
+                    className="mr-1"
+                />}
+                <KernButton
+                    text="Configuration"
+                    icon={IconAdjustments}
+                    onClick={() => dispatch(openModal(ModalEnum.CONFIGURATION))}
+                    className="mr-1"
+                    tooltip={TOOLTIPS_DICT.DATA_BROWSER.CONFIGURATION}
+                    tooltipPlacement='bottom'
+                />
                 <Export sessionId={extendedRecords?.sessionId} />
             </div>
         </div>}

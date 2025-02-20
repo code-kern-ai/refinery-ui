@@ -1,16 +1,17 @@
 import { Fragment, useCallback, useEffect, useRef, useState } from 'react'
 import { Menu, Transition } from '@headlessui/react'
-import { ChevronDownIcon } from '@heroicons/react/20/solid'
 import { useRouter } from 'next/router';
 import { useDispatch, useSelector } from 'react-redux';
 import { selectAllProjects } from '@/src/reduxStore/states/project';
 import { ModalButton, ModalEnum } from '@/src/types/shared/modal';
 import { closeModal, openModal } from '@/src/reduxStore/states/modal';
 import Modal from '../shared/modal/Modal';
-import { IconAlertTriangle, IconFishHook, IconMessageCircle, IconNews, IconQuestionMark, IconScreenshot } from '@tabler/icons-react';
+import { IconAlertTriangle, IconArrowDown, IconFishHook, IconMessageCircle, IconNews, IconQuestionMark, IconScreenshot } from '@tabler/icons-react';
 import { setSearchGroupsStore } from '@/src/reduxStore/states/pages/data-browser';
 import { selectProjectIdSampleProject, setProjectIdSampleProject } from '@/src/reduxStore/states/tmp';
 import { createSampleProject } from '@/src/services/base/project';
+import KernButton from '@/submodules/react-components/components/kern-button/KernButton';
+import { ChevronDownIcon } from '@heroicons/react/20/solid';
 
 const ACCEPT_BUTTON = { buttonCaption: "Create", closeAfterClick: false, useButton: true, disabled: true };
 
@@ -74,12 +75,14 @@ export default function SampleProjectsDropdown() {
     return (
         <Menu as="div" className="relative inline-block text-left">
             <div>
-                <Menu.Button className={`inline-flex justify-between items-center bg-blue-700 text-white text-xs font-semibold ml-6 mt-6 mr-6 xs:mr-0 px-4 py-2 rounded-md cursor-pointer hover:bg-blue-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500`}
-                >
-                    Sample projects
-                    <ChevronDownIcon
-                        className="-mr-1 ml-2 h-5 w-5"
-                        aria-hidden="true"
+                <Menu.Button>
+                    <KernButton
+                        text="Sample projects"
+                        icon={ChevronDownIcon}
+                        iconColor='white'
+                        buttonColor="blue"
+                        solidTheme={true}
+                        textColor="white"
                     />
                 </Menu.Button>
             </div>
@@ -93,7 +96,7 @@ export default function SampleProjectsDropdown() {
                 leaveFrom="transform opacity-100 scale-100"
                 leaveTo="transform opacity-0 scale-95"
             >
-                <Menu.Items className="absolute w-max z-10 mt-2 small:max-h-72 small:overflow-y-auto origin-top-left rounded-md ml-6 bg-white shadow-sm ring-1 ring-black ring-opacity-5 focus:outline-none">
+                <Menu.Items className="absolute w-max z-10 mt-2 small:max-h-72 small:overflow-y-auto origin-top-left rounded-md bg-white shadow-sm ring-1 ring-black ring-opacity-5 focus:outline-none">
                     <div className="py-1">
                         <Menu.Item>
                             {({ active }) => (

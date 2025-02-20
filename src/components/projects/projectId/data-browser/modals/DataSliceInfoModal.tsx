@@ -6,6 +6,7 @@ import { UserRole } from "@/src/types/shared/sidebar";
 import { parseLinkFromText } from "@/src/util/shared/link-parser-helper";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
 import { copyToClipboard } from "@/submodules/javascript-functions/general";
+import KernButton from "@/submodules/react-components/components/kern-button/KernButton";
 import { Tooltip } from "@nextui-org/react";
 import { useRouter } from "next/router";
 import { Fragment } from "react";
@@ -37,10 +38,14 @@ export default function DataSliceInfoModal() {
                                 {value.substring(value.startsWith("https") ? 8 : 7)}</span>
                         </Tooltip>
                     </div>
-                    <button onClick={() => testLink(value + '?pos=1&type=DATA_SLICE')}
-                        className="opacity-100 w-40 bg-indigo-700 text-white text-xs leading-4 font-semibold px-4 py-2 rounded-md cursor-pointer hover:bg-indigo-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed">
-                        View as expert
-                    </button>
+                    <KernButton
+                        text='View as expert'
+                        buttonColor="indigo"
+                        solidTheme={true}
+                        textColor="white"
+                        onClick={() => testLink(value + '?pos=1&type=DATA_SLICE')}
+                        className="mt-2"
+                    />
                 </div>) : (<div className="flex flex-grow justify-between gap-8 text-sm">
                     <p>{key}</p>
                     <p>{value}</p>

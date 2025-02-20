@@ -28,6 +28,7 @@ import { checkActiveGroups, prefillActiveValues } from "@/src/util/components/pr
 import { getWeakSupervisionRun } from "@/src/services/base/heuristic";
 import { getRecordsByStaticSlice, searchRecordsExtended } from "@/src/services/base/data-browser";
 import { staticDataSlicesCurrentCount } from "@/src/services/base/dataSlices";
+import KernButton from "@/submodules/react-components/components/kern-button/KernButton";
 
 const GROUP_SORT_ORDER = 0;
 let GLOBAL_SEARCH_GROUP_COUNT = 0;
@@ -800,10 +801,9 @@ export default function SearchGroups() {
 }
 
 function ButtonLabelsDisabled() {
-    return (<button disabled={true} className="cursor-not-allowed inline-flex rounded-md border border-gray-300 w-80 shadow-sm px-4 py-1.5 items-center bg-white text-xs font-semibold text-gray-700 focus:ring-offset-2 focus:ring-offset-gray-400" >
-        <div className="truncate min-w-0 mr-4">
-            No labels associated with this task
-        </div>
-        <IconPointerOff className="h-5 w-5 text-gray-400" />
-    </button>)
+    return (<KernButton
+        text="No labels associated with this task"
+        disabled={true}
+        icon={IconPointerOff}
+    />)
 }

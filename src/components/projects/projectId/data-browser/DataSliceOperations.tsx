@@ -13,6 +13,7 @@ import { useDispatch, useSelector } from "react-redux";
 import CreateOutlierSliceModal from "./modals/CreateOutlierSliceModal";
 import SaveDataSliceModal from "./modals/SaveDataSliceModal";
 import { createOutlierSlice, updateDataSlice } from "@/src/services/base/data-browser";
+import KernButton from "@/submodules/react-components/components/kern-button/KernButton";
 
 export function DataSliceOperations(props: { fullSearch: {} }) {
     const dispatch = useDispatch();
@@ -48,30 +49,36 @@ export function DataSliceOperations(props: { fullSearch: {} }) {
 
     return (<div>
         <div className="flex items-center mt-4">
-            <Tooltip content={TOOLTIPS_DICT.DATA_BROWSER.SAVE_SLICE} color="invert" placement="top">
-                <button onClick={() => dispatch(openModal(ModalEnum.SAVE_DATA_SLICE))}
-                    className="mr-1 inline-flex items-center w-36 px-2.5 py-1.5 border border-gray-200 shadow-sm text-xs font-medium rounded text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 cursor-pointer">
-                    <IconFilter className="w-6 h-6 mr-1" />
-                    Save data slice
-                </button>
-            </Tooltip>
-            <Tooltip content={TOOLTIPS_DICT.DATA_BROWSER.SAVE_SLICE} color="invert" placement="top">
-                <button onClick={updateSlice} disabled={!activeSlice || activeSlice?.sliceType == Slice.STATIC_OUTLIER || (activeSlice?.static && activeSlice.count == additionalData.staticDataSliceCurrentCount && !additionalData.displayOutdatedWarning)}
-                    className="mr-1 f inline-flex items-center w-40 px-2.5 py-1.5 border border-gray-200 shadow-sm text-xs font-medium rounded text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 cursor-pointer disabled:cursor-not-allowed disabled:opacity-50">
-                    <IconRotate className="w-6 h-6 mr-1" />
-                    Update data slice
-                </button>
-            </Tooltip>
+            <KernButton
+                text="Save data slice"
+                icon={IconFilter}
+                onClick={() => dispatch(openModal(ModalEnum.SAVE_DATA_SLICE))}
+                className="mr-1"
+                tooltip={TOOLTIPS_DICT.DATA_BROWSER.SAVE_SLICE}
+                tooltipPlacement='top'
+            />
+
+            <KernButton
+                text="Update data slice"
+                icon={IconRotate}
+                onClick={updateSlice}
+                disabled={!activeSlice || activeSlice?.sliceType == Slice.STATIC_OUTLIER || (activeSlice?.static && activeSlice.count == additionalData.staticDataSliceCurrentCount && !additionalData.displayOutdatedWarning)}
+                className="mr-1"
+                tooltip={TOOLTIPS_DICT.DATA_BROWSER.SAVE_SLICE}
+                tooltipPlacement='top'
+            />
         </div>
         <div className="mt-1">
-            <Tooltip content={embeddings.length == 0 ? TOOLTIPS_DICT.DATA_BROWSER.CREATE_EMBEDDINGS : TOOLTIPS_DICT.DATA_BROWSER.STATIC_DATA_SLICE} color="invert" placement="right">
-                <button onClick={() => embeddings.length == 1 ? requestOutlierSlice() : dispatch(openModal(ModalEnum.CREATE_OUTLIER_SLICE))}
-                    disabled={embeddings.length == 0}
-                    className="mr-1 f inline-flex items-center w-36 px-2.5 py-1.5 border border-gray-200 shadow-sm text-xs font-medium rounded text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 cursor-pointer disabled:cursor-not-allowed disabled:opacity-50">
-                    <IconChartBubble className="w-6 h-6 mr-1 text-green-700 fill-green-100" />
-                    Find outliers
-                </button>
-            </Tooltip>
+            <KernButton
+                text="Find outliers"
+                icon={IconChartBubble}
+                iconColor="green"
+                onClick={() => embeddings.length == 1 ? requestOutlierSlice() : dispatch(openModal(ModalEnum.CREATE_OUTLIER_SLICE))}
+                disabled={embeddings.length == 0}
+                className="mr-1"
+                tooltip={embeddings.length == 0 ? TOOLTIPS_DICT.DATA_BROWSER.CREATE_EMBEDDINGS : TOOLTIPS_DICT.DATA_BROWSER.STATIC_DATA_SLICE}
+                tooltipPlacement='right'
+            />
         </div>
 
         <SaveDataSliceModal fullSearch={props.fullSearch} />

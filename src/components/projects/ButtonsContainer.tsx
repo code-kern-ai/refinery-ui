@@ -11,6 +11,7 @@ import ModalUpload from "../shared/upload/ModalUpload";
 import SampleProjectsDropdown from "./SampleProjectsDropdown";
 import { useWebsocket } from "@/submodules/react-components/hooks/web-socket/useWebsocket";
 import { Application, CurrentPage, CurrentPageSubKey } from "@/submodules/react-components/hooks/web-socket/constants";
+import KernButton from "@/submodules/react-components/components/kern-button/KernButton";
 
 const BASE_OPTIONS = { reloadOnFinish: false, deleteProjectOnFail: true, closeModalOnClick: false, isModal: true, navigateToProject: true, showBadPasswordMsg: null };
 
@@ -37,19 +38,27 @@ export default function ButtonsContainer() {
     useWebsocket(orgId, Application.REFINERY, CurrentPage.PROJECTS, handleWebsocketNotification, null, CurrentPageSubKey.BUTTONS_CONTAINER);
 
     return (
-        user && user.role === UserRole.ENGINEER ? (<div>
-            <button onClick={() => {
-                dispatch(setUploadFileType(UploadFileType.RECORDS_NEW));
-                router.push("/projects/new");
-            }} className="bg-blue-700 text-white text-xs font-semibold px-4 py-2.5 rounded-md mt-6 hover:bg-blue-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-                New project
-            </button>
-            <button onClick={() => {
-                dispatch(openModal(ModalEnum.MODAL_UPLOAD));
-                dispatch(setUploadFileType(UploadFileType.PROJECT));
-            }} className="bg-blue-700 text-white text-xs font-semibold ml-6 mt-6 mr-6 xs:mr-0 px-4 py-2.5 rounded-md cursor-pointer hover:bg-blue-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-                Import snapshot
-            </button>
+        user && user.role === UserRole.ENGINEER ? (<div className="flex flex-row items-start gap-x-4 mt-4">
+            <KernButton
+                text='New project'
+                buttonColor="blue"
+                solidTheme={true}
+                textColor="white"
+                onClick={() => {
+                    dispatch(setUploadFileType(UploadFileType.RECORDS_NEW));
+                    router.push("/projects/new");
+                }}
+            />
+            <KernButton
+                text="Import snapshot"
+                buttonColor="blue"
+                solidTheme={true}
+                textColor="white"
+                onClick={() => {
+                    dispatch(openModal(ModalEnum.MODAL_UPLOAD));
+                    dispatch(setUploadFileType(UploadFileType.PROJECT));
+                }}
+            />
             <SampleProjectsDropdown />
             <ModalUpload uploadOptions={uploadOptions} />
         </div>) : (<></>)

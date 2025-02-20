@@ -2,6 +2,7 @@ import Modal from "@/src/components/shared/modal/Modal";
 import { closeModal } from "@/src/reduxStore/states/modal";
 import { ExplainModalProps } from "@/src/types/components/projects/projectId/edit-records";
 import { ModalEnum } from "@/src/types/shared/modal";
+import KernButton from "@/submodules/react-components/components/kern-button/KernButton";
 import { IconAlertTriangleFilled, IconInfoCircleFilled } from "@tabler/icons-react";
 import { useDispatch } from "react-redux";
 
@@ -34,15 +35,15 @@ export default function ExplainModal(props: ExplainModalProps) {
             <div>Further, already set labels for information extraction will be removed.</div>
             <div>Attribute calculation, Weak Supervision and Heuristics are <b>NOT</b> rerun automatically.</div>
         </div>
-        <div className="flex mt-6 justify-end">
-            <button onClick={closeModalAndNeverShowAgain}
-                className="ml-2 bg-white text-gray-700 text-xs font-semibold px-4 py-2 rounded border border-gray-300 cursor-pointer hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-                Close and never show again
-            </button>
-            <button onClick={() => dispatch(closeModal(ModalEnum.EXPLAIN_EDIT_RECORDS))}
-                className="ml-2 bg-white text-gray-700 text-xs font-semibold px-4 py-2 rounded border border-gray-300 cursor-pointer hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-                Close
-            </button>
+        <div className="flex mt-6 justify-end gap-x-3">
+            <KernButton
+                text="Close and never show again"
+                onClick={closeModalAndNeverShowAgain}
+            />
+            <KernButton
+                text="Close"
+                onClick={() => dispatch(closeModal(ModalEnum.EXPLAIN_EDIT_RECORDS))}
+            />
         </div>
     </Modal>)
 }

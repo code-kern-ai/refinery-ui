@@ -39,6 +39,7 @@ import useDebounce from "@/submodules/react-components/hooks/useHooks/useDebounc
 import useRefFor from "@/submodules/react-components/hooks/useRefFor";
 import { simpleDictCompare } from "@/submodules/javascript-functions/validations";
 import { LLM_CODE_TEMPLATE_EXAMPLES, LLM_CODE_TEMPLATE_OPTIONS } from "./LLM/llmTemplates";
+import KernButton from "@/submodules/react-components/components/kern-button/KernButton";
 
 const EDITOR_OPTIONS = { theme: 'vs-light', language: 'python', readOnly: false };
 
@@ -330,12 +331,14 @@ export default function AttributeCalculation() {
             <div className="w-full">
                 <div className={`grid gap-4 ${isHeaderNormal ? 'grid-cols-2' : 'grid-cols-1'}`}>
                     {isHeaderNormal && <div className="flex items-center mt-2">
-                        <Tooltip color="invert" placement="bottom" content={currentAttribute.state == AttributeState.USABLE || currentAttribute.state == AttributeState.RUNNING ? TOOLTIPS_DICT.ATTRIBUTE_CALCULATION.CANNOT_EDIT_NAME : TOOLTIPS_DICT.ATTRIBUTE_CALCULATION.EDIT_NAME}>
-                            <button onClick={() => openName(true)} disabled={currentAttribute.state == AttributeState.USABLE || currentAttribute.state == AttributeState.RUNNING}
-                                className={`flex-shrink-0 bg-white text-gray-700 text-xs font-semibold mr-3 px-4 py-2 rounded-md border border-gray-300 block float-left hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 ${currentAttribute.state == AttributeState.USABLE || currentAttribute.state == AttributeState.RUNNING}`}>
-                                Edit name
-                            </button>
-                        </Tooltip>
+                        <KernButton
+                            text="Edit name"
+                            disabled={currentAttribute.state == AttributeState.USABLE || currentAttribute.state == AttributeState.RUNNING}
+                            onClick={() => openName(true)}
+                            className="mr-3"
+                            tooltip={currentAttribute.state == AttributeState.USABLE || currentAttribute.state == AttributeState.RUNNING ? TOOLTIPS_DICT.ATTRIBUTE_CALCULATION.CANNOT_EDIT_NAME : TOOLTIPS_DICT.ATTRIBUTE_CALCULATION.EDIT_NAME}
+                            tooltipPlacement="bottom"
+                        />
                         <div className="inline-block" onDoubleClick={() => openName(true)}>
                             {(isNameOpen && currentAttribute.state != AttributeState.USABLE && currentAttribute.state != AttributeState.RUNNING)
                                 ? (<input type="text" value={attributeName} onInput={(e: any) => setAttributeName(toPythonFunctionName(e.target.value))}
