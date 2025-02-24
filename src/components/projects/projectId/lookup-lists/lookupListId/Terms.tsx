@@ -4,6 +4,7 @@ import { Term, TermsProps } from "@/src/types/components/projects/projectId/look
 import { BLACKLISTED_TERMS_DROPDOWN_OPTIONS, TERMS_DROPDOWN_OPTIONS, isTermUnique } from "@/src/util/components/projects/projectId/lookup-lists-helper";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
 import { jsonCopy } from "@/submodules/javascript-functions/general";
+import KernButton from "@/submodules/react-components/components/kern-button/KernButton";
 import KernDropdown from "@/submodules/react-components/components/KernDropdown";
 import { Tooltip } from "@nextui-org/react";
 import { IconCircleCheckFilled, IconCircleMinus } from "@tabler/icons-react";
@@ -100,9 +101,15 @@ export default function Terms(props: TermsProps) {
                             addTermToKnowledgeBaseImpl();
                         }
                     }} className="h-8 w-96 text-sm border-gray-300 rounded-md placeholder-italic border text-gray-900 pl-4 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100" placeholder="Description - optional" />
-                <button disabled={name == '' || !isTermUnique(name, terms)} onClick={addTermToKnowledgeBaseImpl}
-                    className="bg-indigo-700 flex-shrink-0 text-white text-xs font-semibold px-4 py-2 rounded-md cursor-pointer hover:bg-indigo-800 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed">
-                    Add term</button>
+
+                <KernButton
+                    text="Add term"
+                    buttonColor="indigo"
+                    solidTheme={true}
+                    textColor="white"
+                    onClick={addTermToKnowledgeBaseImpl}
+                    disabled={name == '' || !isTermUnique(name, terms)}
+                />
             </div>
         </div>
         {terms.length > 0 && <div className="grid grid-cols-1 gap-6 mt-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3">
@@ -130,21 +137,23 @@ export default function Terms(props: TermsProps) {
                                     placeholder="Description - optional"
                                     className="h-8 w-full text-sm border-gray-300 rounded-md placeholder-italic border text-gray-900 pl-4 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100" />
                             </div>
-                            <div className="mt-2 flex">
-                                <Tooltip content={TOOLTIPS_DICT.GENERAL.SUBMIT} placement="top" color="invert">
-                                    <button className="mx-2" onClick={() => {
+                            <div className="mt-2 flex gap-x-2">
+                                <KernButton
+                                    icon={IconCircleCheckFilled}
+                                    tooltip={TOOLTIPS_DICT.GENERAL.SUBMIT}
+                                    tooltipPlacement="top"
+                                    onClick={() => {
                                         updateProperty('value', newTermName, index);
                                         updateProperty('comment', newDescription, index);
                                         openTermEditor(false, term.id, newTermName, newDescription);
-                                    }}>
-                                        <IconCircleCheckFilled />
-                                    </button>
-                                </Tooltip>
-                                <Tooltip content={TOOLTIPS_DICT.GENERAL.CANCEL} placement="top" color="invert">
-                                    <button onClick={cancelTermEditor}>
-                                        <IconCircleMinus />
-                                    </button>
-                                </Tooltip>
+                                    }}
+                                />
+                                <KernButton
+                                    icon={IconCircleMinus}
+                                    tooltip={TOOLTIPS_DICT.GENERAL.CANCEL}
+                                    tooltipPlacement="top"
+                                    onClick={cancelTermEditor}
+                                />
                             </div>
                         </div>}
                     </> : <>

@@ -20,6 +20,8 @@ import { useWebsocket } from "@/submodules/react-components/hooks/web-socket/use
 import { getAllComments } from "@/src/services/base/comment";
 import { createKnowledgeBase, getLookupListsByProjectId } from "@/src/services/base/lookup-lists";
 import { Application, CurrentPage } from "@/submodules/react-components/hooks/web-socket/constants";
+import KernButton from "@/submodules/react-components/components/kern-button/KernButton";
+import { ChevronDownIcon } from "@heroicons/react/20/solid";
 
 
 export default function LookupListsOverview() {
@@ -130,40 +132,36 @@ export default function LookupListsOverview() {
                                     selectedOption={(option: any) => executeOption(option)} dropdownClasses="mr-3" buttonClasses={`${style.actionsHeight} text-xs`} dropdownItemsWidth='w-40' dropdownWidth='w-32'
                                     iconsArray={['IconSquareCheck', 'IconSquare', 'IconTrash']} />
                             ) : (
-                                <Tooltip placement="left" content={TOOLTIPS_DICT.LOOKUP_LISTS_OVERVIEW.ENABLE_ACTIONS} color="invert">
-                                    <button type="button" disabled={true}
-                                        className="mr-3 inline-flex items-center justify-center w-full rounded-md border border-gray-300 shadow-sm px-4 py-1.5 bg-white text-xs font-medium text-gray-700 opacity-50 cursor-not-allowed focus:ring-offset-2 focus:ring-offset-gray-400"
-                                        id="menu-button" aria-expanded="true" aria-haspopup="true">
-                                        Actions
-                                        <svg className="-mr-1 ml-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
-                                            fill="currentColor" aria-hidden="true">
-                                            <path fillRule="evenodd"
-                                                d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
-                                                clipRule="evenodd" />
-                                        </svg>
-                                    </button>
-                                </Tooltip>
+                                <KernButton
+                                    onClick={() => { }}
+                                    className="mr-3"
+                                    tooltip={TOOLTIPS_DICT.LOOKUP_LISTS_OVERVIEW.ENABLE_ACTIONS}
+                                    disabled={true}
+                                    text="Actions"
+                                    tooltipPlacement="top"
+                                    icon={ChevronDownIcon}
+                                />
                             )}
 
                             <div className="flex justify-center overflow-visible">
-                                <Tooltip placement="left" content={TOOLTIPS_DICT.LOOKUP_LISTS_OVERVIEW.CREATE_LOOKUP_LIST} color="invert">
-                                    <button onClick={createLookupList}
-                                        className="bg-white text-gray-700 text-xs font-medium mr-3 px-4 py-2 rounded-md border border-gray-300 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-                                        New list
-                                    </button>
-                                </Tooltip>
-
+                                <KernButton
+                                    text="New list"
+                                    onClick={createLookupList}
+                                    className="mr-3"
+                                    tooltip={TOOLTIPS_DICT.LOOKUP_LISTS_OVERVIEW.CREATE_LOOKUP_LIST}
+                                    tooltipPlacement="left"
+                                />
                             </div>
 
                             <div className="flex justify-center overflow-visible">
-                                <Tooltip placement="left" content={TOOLTIPS_DICT.LOOKUP_LISTS_OVERVIEW.NAVIGATE_HEURISTICS} color="invert">
-                                    <a href={`/refinery/projects/${projectId}/heuristics`} onClick={(e: any) => { e.preventDefault(); router.push(`/projects/${projectId}/heuristics`) }}
-                                        className="bg-white text-gray-700 text-xs font-medium mr-3 px-4 py-2 rounded-md border border-gray-300 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-                                        Heuristics
-                                    </a>
-                                </Tooltip>
+                                <KernButton
+                                    text="Heuristics"
+                                    onClick={(e: any) => { e.preventDefault(); router.push(`/projects/${projectId}/heuristics`) }}
+                                    className="mr-3"
+                                    tooltip={TOOLTIPS_DICT.LOOKUP_LISTS_OVERVIEW.NAVIGATE_HEURISTICS}
+                                    tooltipPlacement="left"
+                                />
                             </div>
-
                         </div>
                     </div>
                     {lookupLists && lookupLists.length == 0 ? (

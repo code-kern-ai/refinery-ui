@@ -13,7 +13,7 @@ import { ACTIONS_DROPDOWN_OPTIONS, NEW_HEURISTICS, checkSelectedHeuristics, post
 import { TOOLTIPS_DICT } from '@/src/util/tooltip-constants';
 import { InformationSourceType } from '@/submodules/javascript-functions/enums/enums';
 import { Tooltip } from '@nextui-org/react';
-import { IconPlus, IconWaveSine } from '@tabler/icons-react';
+import { IconLoader, IconPlus, IconWaveSine } from '@tabler/icons-react';
 import { useRouter } from 'next/router';
 import { useCallback, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -24,6 +24,9 @@ import { useWebsocket } from '@/submodules/react-components/hooks/web-socket/use
 import { createTask, getWeakSupervisionRun, setAllHeuristics } from "@/src/services/base/heuristic";
 import { initWeakSupervision } from "@/src/services/base/weak-supervision";
 import { Application, CurrentPage } from "@/submodules/react-components/hooks/web-socket/constants";
+import KernButton from "@/submodules/react-components/components/kern-button/KernButton";
+import IconButton from "@/submodules/react-components/components/kern-button/IconButton";
+import { ChevronDownIcon } from "@heroicons/react/20/solid";
 
 
 export default function HeuristicsHeader(props: HeuristicsHeaderProps) {
@@ -160,84 +163,101 @@ export default function HeuristicsHeader(props: HeuristicsHeaderProps) {
                         disabledOptions={[false, false]}
                         selectedOption={(option: string) => executeOption(option)} buttonClasses={`${style.actionsHeight} text-xs whitespace-nowrap`} dropdownClasses="mr-3" dropdownItemsWidth='w-40' dropdownWidth='w-32'
                         iconsArray={['IconCode', 'IconBolt']} useFillForIcons={[false, true]} />
-                </Tooltip>) : (<Tooltip content={TOOLTIPS_DICT.HEURISTICS.DISABLED_NEW_HEURISTIC} color="invert">
-                    <button type="button" disabled={true}
-                        className="mr-3 inline-flex items-center justify-center w-full rounded-md border border-gray-300 shadow-sm px-4 py-1.5 bg-white text-xs font-medium text-gray-700 opacity-50 cursor-not-allowed focus:ring-offset-2 focus:ring-offset-gray-400"
-                        id="menu-button" aria-expanded="true" aria-haspopup="true">
-                        New heuristic
-                        <svg className="-mr-1 ml-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
-                            fill="currentColor" aria-hidden="true">
-                            <path fillRule="evenodd"
-                                d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
-                                clipRule="evenodd" />
-                        </svg>
-                    </button>
-                </Tooltip>)}
+                </Tooltip>) : (
+                    <KernButton
+                        onClick={() => { }}
+                        className="mr-3"
+                        tooltip={TOOLTIPS_DICT.HEURISTICS.DISABLED_NEW_HEURISTIC}
+                        disabled={true}
+                        text="New heuristic"
+                    />
+                )}
 
                 {heuristics && heuristics.length > 0 ? (
                     <KernDropdown options={ACTIONS_DROPDOWN_OPTIONS} buttonName="Actions" disabledOptions={[false, false, heuristics.every((checked) => !checked.selected), heuristics.every((checked) => !checked.selected)]}
                         selectedOption={(option: string) => executeOption(option)} dropdownClasses="mr-3" buttonClasses={`${style.actionsHeight} text-xs`} dropdownItemsWidth='w-40' dropdownWidth='w-32'
                         iconsArray={['IconSquareCheck', 'IconSquare', 'IconPlayerPlayFilled', 'IconTrash']} />
                 ) : (
-                    <Tooltip placement="top" content={TOOLTIPS_DICT.HEURISTICS.ENABLE_ACTIONS} color="invert">
-                        <button type="button" disabled={true}
-                            className="mr-3 inline-flex items-center justify-center w-full rounded-md border border-gray-300 shadow-sm px-4 py-1.5 bg-white text-xs font-medium text-gray-700 opacity-50 cursor-not-allowed focus:ring-offset-2 focus:ring-offset-gray-400"
-                            id="menu-button" aria-expanded="true" aria-haspopup="true">
-                            Actions
-                            <svg className="-mr-1 ml-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
-                                fill="currentColor" aria-hidden="true">
-                                <path fillRule="evenodd"
-                                    d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
-                                    clipRule="evenodd" />
-                            </svg>
-                        </button>
-                    </Tooltip>
+                    <KernButton
+                        onClick={() => { }}
+                        className="mr-3"
+                        tooltip={TOOLTIPS_DICT.HEURISTICS.ENABLE_ACTIONS}
+                        disabled={true}
+                        text="Actions"
+                        tooltipPlacement="top"
+                        icon={ChevronDownIcon}
+                    />
                 )}
 
                 <div className="flex justify-center overflow-visible">
                     {areHeuristicsSelected ? (<>
                         {areValidHeuristicsSelected ? (
-                            <Tooltip content={TOOLTIPS_DICT.HEURISTICS.WEAK_SUPERVISION} color="invert" placement="top">
-                                <button onClick={startWeakSupervision}
-                                    disabled={props.tokenizationProgress < 1}
-                                    className="bg-indigo-700 flex items-center text-white text-xs font-semibold mr-3 px-4 py-2 rounded-md border hover:bg-indigo-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed">
-                                    Weak supervision
-                                </button>
-                            </Tooltip>
-                        ) : (<Tooltip content={TOOLTIPS_DICT.HEURISTICS.SELECT_AT_LEAST_ONE_VALID_HEURISTIC} color="invert" placement="top">
-                            <button className="bg-indigo-700 text-white text-xs font-semibold mr-3 px-4 py-2 rounded-md border opacity-50 cursor-not-allowed" disabled={true}>
-                                Weak supervision
-                            </button>
-                        </Tooltip>)}
-                    </>) : (<Tooltip content={TOOLTIPS_DICT.HEURISTICS.SELECT_AT_LEAST_ONE_HEURISTIC} color="invert" placement="top">
-                        <button className="bg-indigo-700 text-white text-xs font-semibold mr-3 px-4 py-2 rounded-md border opacity-50 cursor-not-allowed" disabled={true}>
-                            Weak supervision
-                        </button>
-                    </Tooltip>)}
+                            <KernButton
+                                text="Weak supervision"
+                                buttonColor="indigo"
+                                solidTheme={true}
+                                textColor="white"
+                                disabled={props.tokenizationProgress < 1}
+                                tooltip={TOOLTIPS_DICT.HEURISTICS.WEAK_SUPERVISION}
+                                tooltipPlacement="top"
+                                size="small"
+                                className="mr-3"
+                                onClick={startWeakSupervision}
+                            />
+                        ) : (
+                            <KernButton
+                                text="Weak supervision"
+                                buttonColor="indigo"
+                                solidTheme={true}
+                                textColor="white"
+                                disabled={true}
+                                tooltip={TOOLTIPS_DICT.HEURISTICS.SELECT_AT_LEAST_ONE_VALID_HEURISTIC}
+                                tooltipPlacement="top"
+                                size="small"
+                                className="mr-3"
+                            />
+                        )}
+                    </>) : (
+                        <KernButton
+                            text="Weak supervision"
+                            buttonColor="indigo"
+                            solidTheme={true}
+                            textColor="white"
+                            disabled={true}
+                            tooltip={TOOLTIPS_DICT.HEURISTICS.SELECT_AT_LEAST_ONE_HEURISTIC}
+                            tooltipPlacement="top"
+                            size="small"
+                            className="mr-3"
+                        />
+                    )}
+                </div>
+
+                <div className="flex justify-center overflow-visible mr-3">
+                    {currentWeakSupervisionRun ? (
+                        <IconButton
+                            icon={loadingIconWS ? IconLoader : IconWaveSine}
+                            tooltip={TOOLTIPS_DICT.HEURISTICS.LAST_WEAK_SUPERVISION_INFO}
+                            tooltipPlacement="top"
+                            onClick={() => dispatch(openModal(ModalEnum.LAST_WEAK_SUPERVISION_RUN))}
+                        />
+                    ) : (
+                        <IconButton
+                            icon={IconWaveSine}
+                            tooltip={TOOLTIPS_DICT.HEURISTICS.LAST_WEAK_SUPERVISION_INFO}
+                            tooltipPlacement="top"
+                            disabled={true}
+                        />
+                    )}
                 </div>
 
                 <div className="flex justify-center overflow-visible">
-                    {currentWeakSupervisionRun ? (<Tooltip content={TOOLTIPS_DICT.HEURISTICS.LAST_WEAK_SUPERVISION_INFO} color="invert" placement="top">
-                        <button onClick={() => dispatch(openModal(ModalEnum.LAST_WEAK_SUPERVISION_RUN))}
-                            className="bg-white text-gray-700 text-xs font-medium mr-3 px-4 py-1.5 rounded-md border border-gray-300 cursor-pointer inline-block hover:bg-gray-50">
-                            {loadingIconWS ? <div className='flex justify-center items-center h-5 w-5'>
-                                <Loading type="points" size="sm" />
-                            </div> : <IconWaveSine size={20} strokeWidth={2} className="text-gray-700" />}
-                        </button>
-                    </Tooltip>) : (<Tooltip content={TOOLTIPS_DICT.HEURISTICS.LAST_WEAK_SUPERVISION_INFO} color="invert" placement="top">
-                        <button className="bg-white text-gray-700 text-xs font-medium mr-3 px-4 py-1.5 rounded-md border border-gray-300 cursor-pointer inline-block hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50" disabled={true}>
-                            <IconWaveSine size={20} strokeWidth={2} className="text-gray-500" />
-                        </button>
-                    </Tooltip>)}
-                </div>
-
-                <div className="flex justify-center overflow-visible">
-                    <Tooltip placement="top" content={<div className="w-24">{TOOLTIPS_DICT.HEURISTICS.NAVIGATE_LOOKUP_LISTS}</div>} color="invert">
-                        <a href={`/refinery/projects/${projectId}/lookup-lists`} onClick={(e: any) => { e.preventDefault(); router.push(`/projects/${projectId}/lookup-lists`) }}
-                            className=" bg-white text-gray-700 text-xs font-medium mr-3 px-4 py-2 rounded-md border border-gray-300 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-                            Lookup lists
-                        </a>
-                    </Tooltip>
+                    <KernButton
+                        text="Lookup lists"
+                        onClick={(e: any) => { e.preventDefault(); router.push(`/projects/${projectId}/lookup-lists`) }}
+                        className="mr-3"
+                        tooltip={TOOLTIPS_DICT.HEURISTICS.NAVIGATE_LOOKUP_LISTS}
+                        tooltipPlacement="left"
+                    />
                 </div>
             </div>
 

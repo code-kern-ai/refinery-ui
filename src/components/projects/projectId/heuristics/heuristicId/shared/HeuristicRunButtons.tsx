@@ -11,6 +11,7 @@ import { InformationSourceType } from "@/submodules/javascript-functions/enums/e
 import { Tooltip } from "@nextui-org/react";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
+import KernButton from "@/submodules/react-components/components/kern-button/KernButton";
 
 export default function HeuristicRunButtons(props: HeuristicRunButtonsProps) {
     const projectId = useSelector(selectProjectId);
@@ -64,18 +65,27 @@ export default function HeuristicRunButtons(props: HeuristicRunButtonsProps) {
     return (
         <>
             {justClickedRun && <div><LoadingIcon color="indigo" /></div>}
-            <Tooltip content={props.runOn10IsRunning ? TOOLTIPS_DICT.HEURISTICS.RUN_ON_10_RUNNING : TOOLTIPS_DICT.HEURISTICS.RUN} color="invert" placement="left">
-                <button onClick={runHeuristic} disabled={!canStartHeuristic || props.runOn10IsRunning}
-                    className="ml-2 text-xs font-medium px-4 py-2 rounded-md border border-blue-300 text-blue-700 bg-blue-50 hover:bg-blue-100 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed">
-                    Run
-                </button>
-            </Tooltip>
-            <Tooltip content={props.runOn10IsRunning ? TOOLTIPS_DICT.HEURISTICS.RUN_ON_10_RUNNING : TOOLTIPS_DICT.HEURISTICS.RUN_WS} color="invert" placement="left">
-                <button onClick={runHeuristicAndWeaklySupervise} disabled={!canStartHeuristic || props.runOn10IsRunning}
-                    className="ml-2 text-white text-xs font-medium px-4 py-2 rounded-md border bg-indigo-700 hover:bg-indigo-800 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed">
-                    Run + weakly supervise
-                </button>
-            </Tooltip>
+            <KernButton
+                onClick={runHeuristic}
+                disabled={!canStartHeuristic || props.runOn10IsRunning}
+                text="Run"
+                buttonColor="blue"
+                className="ml-2"
+                tooltip={props.runOn10IsRunning ? TOOLTIPS_DICT.HEURISTICS.RUN_ON_10_RUNNING : TOOLTIPS_DICT.HEURISTICS.RUN}
+                tooltipPlacement="left"
+            />
+
+            <KernButton
+                text="Run + weakly supervise"
+                buttonColor="indigo"
+                solidTheme={true}
+                textColor="white"
+                onClick={runHeuristicAndWeaklySupervise}
+                disabled={!canStartHeuristic || props.runOn10IsRunning}
+                tooltip={props.runOn10IsRunning ? TOOLTIPS_DICT.HEURISTICS.RUN_ON_10_RUNNING : TOOLTIPS_DICT.HEURISTICS.RUN_WS}
+                tooltipPlacement="left"
+                className="ml-2"
+            />
         </>
     )
 }

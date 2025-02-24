@@ -20,6 +20,7 @@ import { useWebsocket } from "@/submodules/react-components/hooks/web-socket/use
 import { getLookupListsByLookupListId, getTermsByLookupListId, updateKnowledgeBase } from "@/src/services/base/lookup-lists";
 import { getAllComments } from "@/src/services/base/comment";
 import { Application, CurrentPage } from "@/submodules/react-components/hooks/web-socket/constants";
+import KernButton from "@/submodules/react-components/components/kern-button/KernButton";
 
 export default function LookupListsDetails() {
     const router = useRouter();
@@ -162,12 +163,13 @@ export default function LookupListsDetails() {
 
             <div className={`grid gap-4 ${isHeaderNormal ? 'grid-cols-2' : 'grid-cols-1'}`}>
                 {isHeaderNormal && <div className="flex items-center mt-2">
-                    <Tooltip color="invert" placement="bottom" content={TOOLTIPS_DICT.LOOKUP_LISTS_DETAILS.EDIT_NAME}>
-                        <button onClick={() => openProperty(true, LookupListProperty.NAME)}
-                            className="flex-shrink-0 bg-white text-gray-700 text-xs font-semibold mr-3 px-4 py-2 rounded-md border border-gray-300 block float-left hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-                            Edit name
-                        </button>
-                    </Tooltip>
+                    <KernButton
+                        text="Edit name"
+                        onClick={() => openProperty(true, LookupListProperty.NAME)}
+                        className="mr-3"
+                        tooltip={TOOLTIPS_DICT.LOOKUP_LISTS_DETAILS.EDIT_NAME}
+                        tooltipPlacement="bottom"
+                    />
                     <div className="flex-grow" onDoubleClick={() => openProperty(true, LookupListProperty.NAME)}>
                         {isNameOpen
                             ? (<input type="text" value={lookupList.name} ref={nameRef} onInput={(e: any) => changeLookupList(e.target.value, LookupListProperty.NAME)}
@@ -177,12 +179,13 @@ export default function LookupListsDetails() {
                     </div>
                 </div>}
                 {isHeaderNormal && <div className="flex items-center mt-2">
-                    <Tooltip color="invert" placement="bottom" content={TOOLTIPS_DICT.LOOKUP_LISTS_DETAILS.EDIT_DESCRIPTION}>
-                        <button onClick={() => openProperty(true, LookupListProperty.DESCRIPTION)}
-                            className="flex-shrink-0 bg-white text-gray-700 text-xs font-semibold mr-3 px-4 py-2 rounded-md border border-gray-300 block float-left hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-                            Edit description
-                        </button>
-                    </Tooltip>
+                    <KernButton
+                        text="Edit description"
+                        onClick={() => openProperty(true, LookupListProperty.DESCRIPTION)}
+                        className="mr-3"
+                        tooltip={TOOLTIPS_DICT.LOOKUP_LISTS_DETAILS.EDIT_DESCRIPTION}
+                        tooltipPlacement="bottom"
+                    />
                     <div className="flex-grow" onDoubleClick={() => openProperty(true, LookupListProperty.DESCRIPTION)}>
                         {isDescriptionOpen
                             ? (<input type="text" value={description} ref={descriptionRef} onChange={(e: any) => setDescription(e.target.value)}

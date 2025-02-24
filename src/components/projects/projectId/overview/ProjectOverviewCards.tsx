@@ -6,6 +6,7 @@ import { Tooltip } from "@nextui-org/react";
 import { IconBottle, IconBulb, IconClick } from "@tabler/icons-react";
 import { useRouter } from "next/router";
 import { useSelector } from "react-redux";
+import ButtonAsText from "@/submodules/react-components/components/kern-button/ButtonAsText";
 
 const CARDS_DATA = [
     { color: 'yellow', stats: CardStatsEnum.MANUAL, label: 'Manually labeled', linkLabel: 'Continue labeling', link: 'labeling' },
@@ -47,8 +48,11 @@ export default function ProjectOverviewCards(props: ProjectOverviewCardsProps) {
                         )}
                         <div className="absolute bottom-0 inset-x-0 bg-gray-50 px-4 py-4 sm:px-6">
                             <div className="text-sm">
-                                <button className="font-medium text-green-700 hover:text-green-500"
-                                    onClick={() => router.push(`/projects/${projectId}/${card.link}`)}>{card.linkLabel}</button>
+                                <ButtonAsText
+                                    text={card.linkLabel}
+                                    onClick={() => router.push(`/projects/${projectId}/${card.link}`)}
+                                    color="green"
+                                />
                             </div>
                         </div>
                     </dd>

@@ -27,6 +27,7 @@ import style from '@/src/styles/components/projects/projectId/labeling.module.cs
 import { getStoreSnapshotValue } from "@/src/reduxStore/store"
 import { createLabel } from "@/src/services/base/labeling-tasks";
 import { addClassificationLabels, addExtractionLabel, deleteRecordLabelAssociationByIds, removeGoldStar, setGoldStar } from "@/src/services/base/labeling"
+import KernButton from "@/submodules/react-components/components/kern-button/KernButton"
 
 const L_VARS = getDefaultLabelingVars();
 
