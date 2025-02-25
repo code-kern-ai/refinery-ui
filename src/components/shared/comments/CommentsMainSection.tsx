@@ -12,6 +12,7 @@ import { CommentCreation } from "./CommentCreation";
 import { convertTypeToKey } from "@/src/util/shared/comments-helper";
 import { CommentDataManager } from "@/src/util/classes/comments";
 import { createComment, deleteCommentPost, updateCommentPost } from "@/src/services/base/comment";
+import IconButton from "@/submodules/react-components/components/kern-button/IconButton";
 
 export default function CommentsMainSection(props: CommentMainSectionProps) {
     const comments = useSelector(selectComments);
@@ -152,10 +153,10 @@ export default function CommentsMainSection(props: CommentMainSectionProps) {
                                     Comments
                                 </Tooltip>
                             </div>
-                            <button onClick={props.toggleOpen} type="button" className="rounded-md text-gray-400">
-                                <span className="sr-only">Close panel</span>
-                                <IconX size={24} strokeWidth={2} className='text-gray-400 cursor-pointer' />
-                            </button>
+                            <IconButton
+                                icon={IconX}
+                                onClick={props.toggleOpen}
+                            />
                         </div>
                         <DisplayComments position={positionComment} openComments={openCommentsArray} editComments={editCommentsArray} commentTexts={commentTextsArray}
                             handleCommentClick={(index: number) => handleCommentClick(index)}

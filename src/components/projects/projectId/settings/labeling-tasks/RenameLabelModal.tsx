@@ -10,6 +10,7 @@ import { ModalButton, ModalEnum } from "@/src/types/shared/modal";
 import { LabelHelper } from "@/src/util/classes/label-helper";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
 import { jsonCopy } from "@/submodules/javascript-functions/general";
+import KernButton from "@/submodules/react-components/components/kern-button/KernButton";
 import { Tooltip } from "@nextui-org/react";
 import { IconAlertTriangleFilled, IconInfoCircleFilled, IconTriangleInverted } from "@tabler/icons-react";
 import { useCallback, useEffect, useState } from "react";
@@ -102,14 +103,17 @@ export default function RenameLabelModal() {
                     </Tooltip>
                 </div>
                 <div className="flex flex-col gap-y-2" style={{ maxHeight: 'calc(100vh - 200px)', overflow: 'auto' }}>
-                    <div className="flex flex-row flex-nowrap items-center">
+                    <div className="flex flex-row flex-nowrap items-center gap-x-2">
                         <input value={renameLabelData.newLabelName ?? ''}
                             onChange={(event: any) => checkInputRenameLabel(event)} onKeyDown={(event: any) => {
                                 if (event.key == 'Enter') checkRenameLabel();
                             }} className="h-8 w-full text-sm border-gray-300 rounded-md placeholder-italic border text-gray-900 pl-4 placeholder:text-gray-400 focus:outline-none " />
-                        <button onClick={checkRenameLabel} disabled={!renameLabelData.canCheck}
-                            className={`ml-2 flex-shrink-0 bg-green-100 text-green-700 border border-green-400 text-xs font-semibold px-4 py-2 rounded-md hover:bg-green-200 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50`}>
-                            Check Rename {renameLabelData.canCheck}</button>
+                        <KernButton
+                            text="Check Rename"
+                            disabled={!renameLabelData.canCheck}
+                            onClick={checkRenameLabel}
+                            buttonColor="green"
+                        />
                     </div>
                     {renameLabelData?.checkResults?.errors?.length > 0 && <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative flex flex-col">
                         <div className="self-center flex flex-row flex-nowrap items-center -mt-1 mb-1">
@@ -179,8 +183,12 @@ export default function RenameLabelModal() {
                                         <span className="text-sm font-medium text-left">Suggested changes:</span>
                                         <Highlight text={warning.newParsed} searchFor={warning.new_highlighting} />
                                     </div>}
-                                    <button onClick={() => handleLabelRenameWarning(warning)}
-                                        className="self-center mt-2 bg-green-100 text-green-700 border border-green-400 text-xs font-semibold px-4 py-2 rounded-md hover:bg-green-200 focus:outline-none">Change</button>
+                                    <KernButton
+                                        text="Change"
+                                        onClick={() => handleLabelRenameWarning(warning)}
+                                        buttonColor="green"
+                                        className="self-center"
+                                    />
                                 </div>
                             </div>
                         ))}
