@@ -4,6 +4,7 @@ import { selectProjectId } from "@/src/reduxStore/states/project"
 import { getAttributes } from "@/src/services/base/attribute"
 import { getEvaluationRunById, getEvaluationSets } from "@/src/services/base/playground"
 import { arrayToDict, percentRoundString } from "@/submodules/javascript-functions/general"
+import ButtonAsText from "@/submodules/react-components/components/kern-button/ButtonAsText"
 import { IconArrowLeft, IconCheck, IconX } from "@tabler/icons-react"
 import { useRouter } from "next/router"
 import { Fragment, useEffect, useState } from "react"
@@ -60,10 +61,12 @@ export default function EvaluationRunDetails() {
     return <>
         {projectId && <div className="grid overflow-hidden min-h-full p-4">
             <div className="flex items-center gap-y-2 gap-x-3">
-                <button onClick={() => router.back()} className="flex items-center text-green-800 text-sm font-medium">
-                    <IconArrowLeft className="h-5 w-5 inline-block text-green-800" />
-                    <span className="leading-5 ml-1">Go back</span>
-                </button>
+                <ButtonAsText
+                    text="Go back"
+                    onClick={() => router.back()}
+                    iconLeft={IconArrowLeft}
+                    color="green"
+                />
                 <label className="text-xl leading-6 text-gray-900 font-medium"> Evaluation Run Results</label>
             </div>
             <div className="my-1">
@@ -122,8 +125,12 @@ function RecordDisplaySearches({ attributes, records, text, howMany, fromHowMany
         </dt>
         <dd className="pb-4 flex items-baseline">
             <div className="inset-x-0 bg-gray-50 px-4 pt-2 mt-2 w-full rounded-md">
-                <div className="text-sm pb-3">
-                    <button className="text-sm font-normal text-gray-500 underline" onClick={() => setShowRecords(!showRecords)}>{showRecords ? "Hide" : "Show"} records</button>
+                <div className="text-sm pb-3 underline">
+                    <ButtonAsText
+                        text={showRecords ? "Hide records" : "Show records"}
+                        onClick={() => setShowRecords(!showRecords)}
+                        color="gray"
+                    />
                 </div>
                 <div
                     className={`transition-all duration-200 ease-in-out overflow-y-auto ${showRecords ? "max-h-[500px] opacity-100" : "max-h-0 opacity-0"

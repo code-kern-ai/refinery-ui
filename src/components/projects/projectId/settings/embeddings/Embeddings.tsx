@@ -17,6 +17,7 @@ import FilterAttributesModal from "./FilterAttributesModal";
 import DeleteEmbeddingModal from "./DeleteEmbeddingModal";
 import { useWebsocket } from "@/submodules/react-components/hooks/web-socket/useWebsocket";
 import { Application, CurrentPage, CurrentPageSubKey } from "@/submodules/react-components/hooks/web-socket/constants";
+import KernButton from "@/submodules/react-components/components/kern-button/KernButton";
 
 
 export default function Embeddings(props: { refetchEmbeddings: () => void }) {
@@ -168,28 +169,27 @@ export default function Embeddings(props: { refetchEmbeddings: () => void }) {
                 </div>
             </div>
             <div className="mt-1 flex items-center gap-1">
-                <Tooltip content={TOOLTIPS_DICT.PROJECT_SETTINGS.EMBEDDINGS.GENERATE_EMBEDDING} color="invert" placement="right">
-                    <button onClick={() => dispatch(openModal(ModalEnum.ADD_EMBEDDING))}
-                        className="inline-block items-center px-2.5 py-1.5 border border-gray-300 shadow-sm text-xs font-semibold rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none cursor-pointer">
-                        <IconPlus className="h-5 w-5 inline-block mr-1" />
-                        Generate embedding
-                    </button>
-                </Tooltip>
-                <Tooltip content={TOOLTIPS_DICT.PROJECT_SETTINGS.EMBEDDINGS.NAVIGATE_MODELS_DOWNLOADED} color="invert" placement="right">
-                    <button onClick={() => router.push('/models-download')}
-                        className={`"ml-1 inline-block items-center px-2.5 py-1.5 border border-gray-300 shadow-sm text-xs font-semibold rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none cursor-pointer disabled:cursor-not-allowed disabled:opacity-50`}>
-                        <IconArrowAutofitDown className="h-5 w-5 inline-block mr-1" />
-                        See downloaded models
-                    </button>
-                </Tooltip>
-                <Tooltip content={TOOLTIPS_DICT.PROJECT_SETTINGS.EMBEDDINGS.PLAYGROUND} color="invert" placement="right">
-                    <button onClick={() => router.push(`/projects/${projectId}/playground`)}
-                        className={`"ml-1 inline-block items-center px-2.5 py-1.5 border border-gray-300 shadow-sm text-xs font-semibold rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none cursor-pointer disabled:cursor-not-allowed disabled:opacity-50`}>
-                        <IconMessageCircleSearch className="h-5 w-5 inline-block mr-1" />
-                        Evaluation
-                    </button>
-                </Tooltip>
-
+                <KernButton
+                    text="Generate embedding"
+                    onClick={() => dispatch(openModal(ModalEnum.ADD_EMBEDDING))}
+                    icon={IconPlus}
+                    tooltip={TOOLTIPS_DICT.PROJECT_SETTINGS.EMBEDDINGS.GENERATE_EMBEDDING}
+                    tooltipPlacement="right"
+                />
+                <KernButton
+                    text="See downloaded models"
+                    onClick={() => router.push('/models-download')}
+                    icon={IconArrowAutofitDown}
+                    tooltip={TOOLTIPS_DICT.PROJECT_SETTINGS.EMBEDDINGS.NAVIGATE_MODELS_DOWNLOADED}
+                    tooltipPlacement="right"
+                />
+                <KernButton
+                    text="Evaluation"
+                    onClick={() => router.push(`/projects/${projectId}/playground`)}
+                    icon={IconMessageCircleSearch}
+                    tooltip={TOOLTIPS_DICT.PROJECT_SETTINGS.EMBEDDINGS.PLAYGROUND}
+                    tooltipPlacement="right"
+                />
             </div>
         </div>
 

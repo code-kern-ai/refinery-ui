@@ -15,6 +15,8 @@ import PlaygroundSearchMetaFilterModal from "./PlaygroundSearchMetaFilterModal";
 import PlaygroundSearchReformulateModal from "./PlaygroundSearchReformulateModal";
 import { Tooltip } from "@nextui-org/react";
 import QuestionHistory from "./QuestionHistory";
+import IconButton from "@/submodules/react-components/components/kern-button/IconButton";
+import KernButton from "@/submodules/react-components/components/kern-button/KernButton";
 
 const PLAYGROUND_LIMIT_DEFAULT = 10;
 const PLAYGROUND_THRESHOLD_DEFAULT = -9999;
@@ -97,24 +99,24 @@ export function PlaygroundSearch() {
                 ></textarea>
                 {reformulationLoading && <span className="absolute top-1/4 left-1/2 transform -translate-x-1/2 -translate-y-1/2"><IconLoader2 className="absolute h-6 w-6 animate-spin" /></span>}
                 <div className="absolute top-2 right-2 flex gap-x-2">
-                    <Tooltip content="Reformulate" color="invert" placement="bottom">
-                        <button disabled={!question || loading}
-                            className="p-1 rounded-md text-gray-400 cursor-pointer hover:bg-gray-100 hover:text-gray-500 transition duration-150 ease-in-out disabled:opacity-50 disabled:cursor-not-allowed"
-                            onClick={() => dispatch(openModal(ModalEnum.EVALUATION_REFORMULATE))}>
-                            <IconWand className="h-5 w-5" />
-                        </button>
-                    </Tooltip>
+                    <IconButton
+                        icon={IconWand}
+                        tooltip="Reformulate"
+                        disabled={!question || loading}
+                        onClick={() => dispatch(openModal(ModalEnum.EVALUATION_REFORMULATE))}
+                        tooltipPlacement="bottom"
+                    />
                     <QuestionHistory setQuestion={(question: string) => setQuestion(question)} refetchHistory={refetchHistory} />
                 </div>
             </div>
             <div className="flex items-center justify-between">
                 <div className="flex items-center gap-x-2 justify-between">
-                    <button onClick={() => dispatch(openModal(ModalEnum.EVALUATION_META_FILTER_APPLY))} disabled={!selectedEmbedding}
-                        className="flex items-center bg-white text-gray-700 text-xs font-semibold px-3 py-2 rounded-md border border-gray-300 hover:bg-gray-50 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed">
-                        Meta
-                        {!metaDataFilter ? <span><IconFilterOff className="ml-1 h-4 w-4 text-gray-400" /></span> :
-                            <span><IconFilter className="ml-1 h-4 w-4 text-kernpurple" /></span>}
-                    </button>
+                    <KernButton
+                        onClick={() => dispatch(openModal(ModalEnum.EVALUATION_META_FILTER_APPLY))}
+                        disabled={!selectedEmbedding}
+                        icon={!metaDataFilter?.length ? IconFilterOff : IconFilter}
+                        text="Meta"
+                    />
                     <div className="flex items-center gap-x-2">
                         <span>Limit</span>
                         <input className="w-14 bg-white text-gray-700 text-xs font-semibold px-2 py-2 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100"
@@ -130,22 +132,25 @@ export function PlaygroundSearch() {
                         </input>
                     </div>
                 </div>
-                <button disabled={!question || loading || !selectedEmbedding} onClick={getSearchResultsPost}
-                    className="ml-auto w-44 bg-white text-gray-700 text-xs font-semibold px-4 py-2 rounded-md border border-gray-300 hover:bg-gray-50 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed">
-                    Search
-                </button>
+                <KernButton
+                    text="Search"
+                    disabled={!question || loading || !selectedEmbedding}
+                    onClick={getSearchResultsPost}
+                />
             </div>
         </div>
         <div className="h-full border-gray-300 border-l">
             <div className="flex flex-row mx-4 my-1 items-center">
                 <span className="mr-4"><span>{searchResults?.length > 0 ? searchResults.length + " " : ""}</span>Record{searchResults?.length > 1 ? "s" : ""}</span>
-                <button disabled={!searchResults || searchResults?.length === 0 || selectedEmbedding === null || question === "" || loading || createdSet}
-                    className="flex items-center ml-auto gap-x-2 bg-green-100 border border-green-400 text-green-700 text-xs font-semibold px-3 py-2 rounded-md cursor-pointer opacity-100 hover:bg-green-200 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50"
-                    onClick={createSetFromRecords}>
-                    {!setCreationLoading ? <span><IconCategoryPlus className="ml-1 h-4 w-4" /></span> :
-                        <span><IconLoader2 className="ml-1 h-4 w-4 animate-spin" /></span>}
-                    Create set from results
-                </button>
+                <KernButton
+                    text="Create set from results"
+                    disabled={!searchResults || searchResults?.length === 0 || selectedEmbedding === null || question === "" || loading || createdSet}
+                    onClick={createSetFromRecords}
+                    icon={!setCreationLoading ? IconCategoryPlus : IconLoader2}
+                    buttonColor="green"
+                    iconColor="green"
+                    className="ml-auto"
+                />
             </div>
             {!loading && !searchResults && <div className="text-sm inline-block font-normal text-gray-500 italic mx-3">Start by searching for records.</div>}
             {!loading && searchResults && (searchResults.length > 0 ? <div className="relative ml-2 font-dmMono text-xs whitespace-pre-line h-[calc(100vh-200px)] overflow-y-auto">

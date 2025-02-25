@@ -7,6 +7,7 @@ import { useRouter } from "next/router";
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { deleteProjectPost } from "@/src/services/base/project";
+import KernButton from "@/submodules/react-components/components/kern-button/KernButton";
 
 export default function ProjectMetaData() {
     const router = useRouter();
@@ -65,12 +66,14 @@ export default function ProjectMetaData() {
                         <div
                             className="border-t bg-gray-50 border-gray-200 px-2 py-2 flex justify-between items-center space-x-3 sm:px-3">
                             <div className="flex-shrink-0">
-                                <Tooltip content={TOOLTIPS_DICT.PROJECT_SETTINGS.META_DATA.STORE_CHANGES} color="invert" placement="right">
-                                    <button onClick={updateProjectNameAndDescription}
-                                        disabled={projectName === '' && projectDescription === ''} type="button"
-                                        className={`inline-flex items-center px-2.5 py-1.5 border border-gray-300 shadow-sm text-xs font-medium rounded text-gray-700 bg-white hover:bg-gray-50 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50`}>
-                                        Update</button>
-                                </Tooltip>
+                                <KernButton
+                                    text="Update"
+                                    onClick={updateProjectNameAndDescription}
+                                    disabled={projectName === '' && projectDescription === ''}
+                                    type="button"
+                                    tooltip={TOOLTIPS_DICT.PROJECT_SETTINGS.META_DATA.STORE_CHANGES}
+                                    tooltipPlacement="right"
+                                />
                             </div>
                         </div>
                     </div>
@@ -89,10 +92,15 @@ export default function ProjectMetaData() {
                         onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); (projectNameDelete === project.name) ? deleteProject() : null } }} />
 
                     <Tooltip content={<div className="w-24">{TOOLTIPS_DICT.PROJECT_SETTINGS.META_DATA.CANNOT_BE_REVERTED}</div>} placement="top" color="invert">
-                        <button onClick={deleteProject} disabled={!(projectNameDelete === project.name)} type="button"
-                            className={`inline-flex text-xs items-center bg-red-100 border border-red-400 text-red-700 font-semibold px-4 py-2 rounded-md ml-6 hover:bg-red-200 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50 `}>
-                            <IconWreckingBall className="h-4 w-4 mr-2" />
-                            Delete</button>
+                        <KernButton
+                            text="Delete"
+                            onClick={deleteProject}
+                            disabled={!(projectNameDelete === project.name)}
+                            type="button"
+                            icon={IconWreckingBall}
+                            buttonColor="red"
+                            iconColor="red"
+                        />
                     </Tooltip>
                 </div>
             </div>

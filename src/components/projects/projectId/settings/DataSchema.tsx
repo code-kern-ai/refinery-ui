@@ -14,6 +14,7 @@ import { IconArrowRight, IconCheck, IconX } from "@tabler/icons-react";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import ButtonAsText from "@/submodules/react-components/components/kern-button/ButtonAsText";
 
 export default function DataSchema(props: DataSchemaProps) {
     const router = useRouter();
@@ -127,14 +128,19 @@ export default function DataSchema(props: DataSchemaProps) {
                                                 selectedOption={(option: any) => updateVisibility(option, attribute)} tooltipsArray={tooltipsArray} />
                                         </td>
                                         <td className="text-center px-3 py-2 text-sm text-gray-500">
-                                            {attribute.userCreated ? <button type="button" className="text-green-800 text-sm font-medium"
-                                                onClick={() => {
-                                                    dispatch(setCurrentPage(CurrentPage.ATTRIBUTE_CALCULATION));
-                                                    router.push(`/projects/${projectId}/attributes/${attribute.id}`);
-                                                }}>
-                                                <span className="leading-5">Details</span>
-                                                <IconArrowRight className="h-5 w-5 inline-block text-green-800" />
-                                            </button> : <label className="text-gray-500 italic">Not changeable</label>}
+                                            {attribute.userCreated ?
+                                                <div className="flex justify-center">
+                                                    <ButtonAsText
+                                                        text="Details"
+                                                        color="green"
+                                                        iconRight={IconArrowRight}
+                                                        onClick={() => {
+                                                            dispatch(setCurrentPage(CurrentPage.ATTRIBUTE_CALCULATION));
+                                                            router.push(`/projects/${projectId}/attributes/${attribute.id}`);
+                                                        }}
+                                                    />
+                                                </div>
+                                                : <label className="text-gray-500 italic">Not changeable</label>}
                                         </td>
                                     </tr>
                                 ))

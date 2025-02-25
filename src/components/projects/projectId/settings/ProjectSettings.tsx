@@ -32,6 +32,7 @@ import { getAttributes, getCheckCompositeKey } from "@/src/services/base/attribu
 import { getEmbeddings, getRecommendedEncoders } from "@/src/services/base/embedding";
 import { getQueuedTasks } from "@/src/services/base/project-setting";
 import { Application, CurrentPage } from "@/submodules/react-components/hooks/web-socket/constants";
+import KernButton from "@/submodules/react-components/components/kern-button/KernButton";
 
 export default function ProjectSettings() {
     const dispatch = useDispatch();
@@ -243,31 +244,33 @@ export default function ProjectSettings() {
             <DataSchema isAcOrTokenizationRunning={isAcRunning || tokenizationProgress < 1} pKeyValid={pKeyValid} />
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-2 mt-1 align-top">
-                <div className="items-center flex flex-row">
-                    <Tooltip content={TOOLTIPS_DICT.PROJECT_SETTINGS.ADD_NEW_ATTRIBUTE} color="invert" placement="bottom">
-                        <button onClick={() => dispatch(openModal(ModalEnum.CREATE_NEW_ATTRIBUTE))} className="mr-1 inline-flex items-center px-2.5 py-1.5 border border-gray-300 shadow-sm text-xs font-semibold rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none cursor-pointer">
-                            <IconPlus className="mr-1 h-5 w-5 inline-block" />
-                            Add new attribute
-                        </button>
-                    </Tooltip>
-                    <Tooltip content={isAcRunning ? 'Attribute calculation in progress' : tokenizationProgress < 1 ? 'Tokenization in progress' : 'Upload more records to the project'} placement="right" color="invert">
-                        <button disabled={isAcRunning || tokenizationProgress < 1} onClick={() => {
+                <div className="items-center flex flex-row gap-x-1">
+                    <KernButton
+                        text="Add new attribute"
+                        onClick={() => dispatch(openModal(ModalEnum.CREATE_NEW_ATTRIBUTE))}
+                        tooltip={TOOLTIPS_DICT.PROJECT_SETTINGS.ADD_NEW_ATTRIBUTE}
+                        tooltipPlacement="bottom"
+                        icon={IconPlus}
+                    />
+                    <KernButton
+                        text="Upload records"
+                        disabled={isAcRunning || tokenizationProgress < 1}
+                        onClick={() => {
                             dispatch(setUploadFileType(UploadFileType.RECORDS_ADD));
                             router.push(`/projects/${project.id}/upload-records`);
                         }}
-                            className={`mr-1 inline-flex items-center px-2.5 py-1.5 border border-gray-300 shadow-sm text-xs font-semibold rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none cursor-pointer disabled:cursor-not-allowed disabled:opacity-50`}>
-                            <IconUpload className="mr-1 h-5 w-5 inline-block" />
-                            Upload records
-                        </button>
-                    </Tooltip>
+                        tooltip={isAcRunning ? 'Attribute calculation in progress' : tokenizationProgress < 1 ? 'Tokenization in progress' : 'Upload more records to the project'}
+                        tooltipPlacement="right"
+                        icon={IconUpload}
+                    />
                     <Export />
-                    <Tooltip content={TOOLTIPS_DICT.PROJECT_SETTINGS.PROJECT_SNAPSHOT} placement="bottom" color="invert">
-                        <button onClick={() => dispatch(openModal(ModalEnum.PROJECT_SNAPSHOT))}
-                            className="mr-1 inline-flex items-center px-2.5 py-1.5 border border-gray-300 shadow-sm text-xs font-semibold rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none cursor-pointer">
-                            <IconCamera className="mr-1 h-5 w-5 inline-block" />
-                            Create project snapshot
-                        </button>
-                    </Tooltip>
+                    <KernButton
+                        text=" Create project snapshot"
+                        onClick={() => dispatch(openModal(ModalEnum.PROJECT_SNAPSHOT))}
+                        tooltip={TOOLTIPS_DICT.PROJECT_SETTINGS.PROJECT_SNAPSHOT}
+                        tooltipPlacement="bottom"
+                        icon={IconCamera}
+                    />
                 </div>
                 <div className="text-left lg:text-right flex flex-row items-center justify-end">
                     <Tooltip content={project.tokenizer} color="invert" placement="bottom" className="cursor-auto">
