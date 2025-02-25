@@ -5,6 +5,7 @@ import LoadingIcon from "../../../../../submodules/react-components/components/L
 import { IconDatabase } from "@tabler/icons-react";
 import { UploadHelper } from "@/src/util/classes/upload-helper";
 import { useDropzone } from 'react-dropzone';
+import KernButton from "@/submodules/react-components/components/kern-button/KernButton";
 
 export default function UploadField(props: UploadFieldProps) {
     const fileUpload = useRef<HTMLInputElement>(null);
@@ -59,16 +60,19 @@ export default function UploadField(props: UploadFieldProps) {
                             className={`w-full border border-dashed rounded-lg h-36 my-6 cursor-pointer ${file || props.uploadStarted ? 'bg-white' : 'border-slate-400'}`} style={{ 'pointerEvents': props.uploadStarted ? 'none' : 'auto' }}>
                             <IconDatabase className="h-9 w-8 m-auto block text-gray-500 mt-6" />
                             {file == null && !props.uploadStarted ? (<div className="text-gray-600 text-sm font-medium text-center mb-6">
-                                <button className="text-indigo-700 mt-1">Click to select a file</button>
+                                <div className="text-indigo-700 mt-1">Click to select a file</div>
                                 <div className="text-xs font-normal text-gray-500 mt-1">or drag and drop</div>
                             </div>) : (<>
                                 <div className="text-indigo-700 text-center text-sm font-medium">{file?.name} <span
                                     className={`uppercase text-gray-600 ${props.doingSomething ? 'hidden' : 'inline-block'}`}>{fileSize}</span>
                                 </div>
-                                <button onClick={(e: any) => onFileRemove(e)}
-                                    className={`bg-red-100 text-red-700 border border-red-400 text-xs font-semibold px-4 py-2 rounded-md cursor-pointer m-auto block hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 ${(props.uploadStarted || props.doingSomething) ? 'hidden' : 'block'}`}>
-                                    Remove
-                                </button></>)}
+                                <KernButton
+                                    text="Remove"
+                                    onClick={(e: any) => onFileRemove(e)}
+                                    buttonColor="red"
+                                    className="m-auto block"
+                                />
+                            </>)}
 
                             {props.uploadStarted && props.isFileCleared && (UploadHelper.getUploadTask()?.state == UploadStates.IN_PROGRESS || UploadHelper.getUploadTask()?.state == UploadStates.WAITING || UploadHelper.getUploadTask()?.state == UploadStates.PENDING) && <div>
                                 <div className="flex flex-row items-center flex-nowrap -mt-1 mx-2 mb-2">

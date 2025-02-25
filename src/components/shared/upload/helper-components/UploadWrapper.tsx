@@ -9,6 +9,7 @@ import { selectEmbeddings } from "@/src/reduxStore/states/pages/settings";
 import { Embedding, PlatformType } from "@/src/types/components/projects/projectId/settings/embeddings";
 import CryptedField from "../../crypted-field/CryptedField";
 import { ZIP_TYPE } from "@/src/util/classes/upload-helper";
+import KernButton from "@/submodules/react-components/components/kern-button/KernButton";
 
 
 export default function UploadWrapper(props: UploadWrapperProps) {
@@ -87,14 +88,20 @@ export default function UploadWrapper(props: UploadWrapperProps) {
 
         {
             !props.isModal && <div className="mt-4 flex flex-row gap-x-2">
-                <button onClick={props.submitUpload} type="submit"
-                    className="bg-blue-700 text-white text-xs font-semibold px-4 py-2 rounded-md hover:bg-blue-800 focus:outline-none opacity-100 cursor-pointer">
-                    Proceed
-                </button>
-                <button type="button" onClick={() => uploadFileType == UploadFileType.RECORDS_NEW ? router.push('/projects') : router.back()}
-                    className="bg-red-100 border border-red-400 text-red-700 text-xs font-semibold px-4 py-2 rounded-md cursor-pointer hover:bg-red-200 focus:outline-none">
-                    {uploadFileType == UploadFileType.RECORDS_NEW ? 'Cancel project creation' : 'Cancel'}
-                </button>
+                <KernButton
+                    text="Proceed"
+                    buttonColor="blue"
+                    solidTheme={true}
+                    textColor="white"
+                    onClick={props.submitUpload}
+                    type="submit"
+                />
+                <KernButton
+                    text={uploadFileType == UploadFileType.RECORDS_NEW ? 'Cancel project creation' : 'Cancel'}
+                    onClick={() => uploadFileType == UploadFileType.RECORDS_NEW ? router.push('/projects') : router.back()}
+                    buttonColor="red"
+                    type="submit"
+                />
             </div >
         }
     </>)

@@ -3,6 +3,7 @@ import { selectProjectId, setActiveProject } from "@/src/reduxStore/states/proje
 import { ModalEnum } from "@/src/types/shared/modal";
 import { NotificationDataProps } from "@/src/types/shared/notification-center";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
+import KernButton from "@/submodules/react-components/components/kern-button/KernButton";
 import { Tooltip } from "@nextui-org/react";
 import { useRouter } from "next/router";
 import { Fragment, useState } from "react";
@@ -40,12 +41,12 @@ export default function NotificationData(props: NotificationDataProps) {
                     </button></span>})<div className="mt-1 text-left">{props.notification[0].timePassed} ago</div>
             </h3>
             <div className="flex-grow">
-                {props.notification > 1 && <Tooltip content={TOOLTIPS_DICT.GENERAL.MORE_INFO_AVAILABLE} color="invert" placement="left">
-                    <button onClick={() => switchExpandedState(props.notification[0])}
-                        className="border border-gray-200 float-right inline-flex items-center px-2.5 py-0.5 rounded-md text-sm font-medium bg-gray-100 text-gray-800 cursor-pointer">
-                        {props.notification.length}
-                    </button>
-                </Tooltip>}
+                {props.notification > 1 && <KernButton
+                    text={props.notification.length}
+                    tooltip={TOOLTIPS_DICT.GENERAL.MORE_INFO_AVAILABLE}
+                    onClick={() => switchExpandedState(props.notification[0])}
+                    tooltipPlacement="left"
+                />}
             </div>
         </div>
         <div className={`mt-1 text-sm text-left text-${props.textColor}-700`}>
