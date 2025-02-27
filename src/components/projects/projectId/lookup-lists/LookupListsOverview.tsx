@@ -133,7 +133,6 @@ export default function LookupListsOverview() {
                                     iconsArray={['IconSquareCheck', 'IconSquare', 'IconTrash']} />
                             ) : (
                                 <KernButton
-                                    onClick={() => { }}
                                     className="mr-3"
                                     tooltip={TOOLTIPS_DICT.LOOKUP_LISTS_OVERVIEW.ENABLE_ACTIONS}
                                     disabled={true}

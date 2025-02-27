@@ -165,7 +165,6 @@ export default function HeuristicsHeader(props: HeuristicsHeaderProps) {
                         iconsArray={['IconCode', 'IconBolt']} useFillForIcons={[false, true]} />
                 </Tooltip>) : (
                     <KernButton
-                        onClick={() => { }}
                         className="mr-3"
                         tooltip={TOOLTIPS_DICT.HEURISTICS.DISABLED_NEW_HEURISTIC}
                         disabled={true}
@@ -179,7 +178,6 @@ export default function HeuristicsHeader(props: HeuristicsHeaderProps) {
                         iconsArray={['IconSquareCheck', 'IconSquare', 'IconPlayerPlayFilled', 'IconTrash']} />
                 ) : (
                     <KernButton
-                        onClick={() => { }}
                         className="mr-3"
                         tooltip={TOOLTIPS_DICT.HEURISTICS.ENABLE_ACTIONS}
                         disabled={true}
@@ -190,46 +188,18 @@ export default function HeuristicsHeader(props: HeuristicsHeaderProps) {
                 )}
 
                 <div className="flex justify-center overflow-visible">
-                    {areHeuristicsSelected ? (<>
-                        {areValidHeuristicsSelected ? (
-                            <KernButton
-                                text="Weak supervision"
-                                buttonColor="indigo"
-                                solidTheme={true}
-                                textColor="white"
-                                disabled={props.tokenizationProgress < 1}
-                                tooltip={TOOLTIPS_DICT.HEURISTICS.WEAK_SUPERVISION}
-                                tooltipPlacement="top"
-                                size="small"
-                                className="mr-3"
-                                onClick={startWeakSupervision}
-                            />
-                        ) : (
-                            <KernButton
-                                text="Weak supervision"
-                                buttonColor="indigo"
-                                solidTheme={true}
-                                textColor="white"
-                                disabled={true}
-                                tooltip={TOOLTIPS_DICT.HEURISTICS.SELECT_AT_LEAST_ONE_VALID_HEURISTIC}
-                                tooltipPlacement="top"
-                                size="small"
-                                className="mr-3"
-                            />
-                        )}
-                    </>) : (
-                        <KernButton
-                            text="Weak supervision"
-                            buttonColor="indigo"
-                            solidTheme={true}
-                            textColor="white"
-                            disabled={true}
-                            tooltip={TOOLTIPS_DICT.HEURISTICS.SELECT_AT_LEAST_ONE_HEURISTIC}
-                            tooltipPlacement="top"
-                            size="small"
-                            className="mr-3"
-                        />
-                    )}
+                    <KernButton
+                        text="Weak supervision"
+                        buttonColor="indigo"
+                        solidTheme={true}
+                        textColor="white"
+                        disabled={!areHeuristicsSelected || !areValidHeuristicsSelected}
+                        tooltip={areHeuristicsSelected ? (areValidHeuristicsSelected ? TOOLTIPS_DICT.HEURISTICS.WEAK_SUPERVISION : TOOLTIPS_DICT.HEURISTICS.SELECT_AT_LEAST_ONE_VALID_HEURISTIC) : TOOLTIPS_DICT.HEURISTICS.SELECT_AT_LEAST_ONE_HEURISTIC}
+                        tooltipPlacement="top"
+                        size="small"
+                        className="mr-3"
+                        onClick={areHeuristicsSelected && areValidHeuristicsSelected ? startWeakSupervision : undefined}
+                    />
                 </div>
 
                 <div className="flex justify-center overflow-visible mr-3">

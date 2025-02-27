@@ -4,12 +4,12 @@ import { jsonCopy } from "@/submodules/javascript-functions/general";
 
 export function getQuickButtonConfig(): QuickButtonConfig {
     return {
-        showManual: ['bg-green-200', 'bg-gray-200', 'bg-gray-200', 'bg-gray-200'],
-        showWeakSupervision: ['bg-gray-200', 'bg-green-200', 'bg-gray-200', 'bg-gray-200'],
-        showHeuristics: ['bg-gray-200', 'bg-gray-200', 'bg-gray-200', 'bg-green-200'],
-        all: ['bg-green-200', 'bg-green-200', 'bg-green-200', 'bg-green-200'],
-        nothing: ['bg-white', 'bg-white', 'bg-white', 'bg-white'],
-        default: ['bg-green-200', 'bg-green-200', 'bg-white', 'bg-white'],
+        showManual: ['bg-green-200', 'bg-gray-200', 'bg-gray-200'],
+        showWeakSupervision: ['bg-gray-200', 'bg-green-200', 'bg-gray-200'],
+        showHeuristics: ['bg-gray-200', 'bg-gray-200', 'bg-green-200'],
+        all: ['bg-green-200', 'bg-green-200', 'bg-green-200'],
+        nothing: ['bg-white', 'bg-white', 'bg-white'],
+        default: ['bg-green-200', 'bg-green-200', 'bg-white'],
     }
 }
 

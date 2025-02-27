@@ -187,10 +187,9 @@ export default function ProjectSnapshotExportModal() {
                 text="Prepare download"
                 onClick={prepareDownload}
                 disabled={downloadPrepareMessage == DownloadState.PREPARATION || downloadPrepareMessage == DownloadState.DOWNLOAD}
-                icon={downloadPrepareMessage == DownloadState.PREPARATION ? LoadingIcon : null}
+                icon={downloadPrepareMessage == DownloadState.PREPARATION ? (props) => <LoadingIcon color="green" {...props} /> : null}
                 type="submit"
                 buttonColor="green"
-                iconColor="green"
             />
             <KernButton
                 text="Close"

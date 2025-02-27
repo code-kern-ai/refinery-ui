@@ -325,7 +325,7 @@ export default function ExportRecordsModal(props: ExportProps) {
                 onClick={prepareDownload}
                 disabled={downloadState == DownloadState.PREPARATION}
                 buttonColor="green"
-                icon={downloadState == DownloadState.PREPARATION ? LoadingIcon : null}
+                icon={downloadState == DownloadState.PREPARATION ? (props) => <LoadingIcon color="green" {...props} /> : null}
             />
             <KernButton
                 text="Close"
