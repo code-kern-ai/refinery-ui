@@ -10,6 +10,7 @@ import DeleteRecordModal from "./DeleteRecordModal";
 import { selectDisplayUserRole, selectRecordRequestsRecord, selectSettings, updateSettings } from "@/src/reduxStore/states/pages/labeling";
 import { ComponentType } from "@/src/types/components/projects/projectId/labeling/settings";
 import LabelingSettingsModal from "./LabelingSettingsModal";
+import KernButton from "@/submodules/react-components/components/kern-button/KernButton";
 
 export default function NavigationBarBottom() {
     const dispatch = useDispatch();
@@ -42,11 +43,15 @@ export default function NavigationBarBottom() {
                 <div className="flex flex-row flex-nowrap items-center">
                     <div className="flex justify-center overflow-visible">
                         {user.role == UserRole.ENGINEER && userDisplayRole == UserRole.ENGINEER && <Tooltip content={TOOLTIPS_DICT.LABELING.DELETE_CURRENT_RECORD} color="invert" placement="top">
-                            <button onClick={() => dispatch(openModal(ModalEnum.DELETE_RECORD))} disabled={record == null}
-                                className="bg-red-100 text-red-700 border border-red-400 text-xs font-semibold mr-3 px-4 py-2 rounded-md flex hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 disabled:opacity-50 disabled:cursor-not-allowed">
-                                <IconTrash className="mr-2" size={16} />
-                                Delete record
-                            </button>
+                            <KernButton
+                                text="Delete record"
+                                onClick={() => dispatch(openModal(ModalEnum.DELETE_RECORD))}
+                                className="mr-3"
+                                disabled={record == null}
+                                icon={IconTrash}
+                                buttonColor="red"
+                                iconColor="red"
+                            />
                         </Tooltip>}
                     </div>
                     <div className="flex justify-center overflow-visible items-center cursor-pointer">

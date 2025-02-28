@@ -11,6 +11,7 @@ import { NOT_AVAILABLE, UNKNOWN_USER } from "@/src/util/constants";
 import { IconArrowRight, IconX } from "@tabler/icons-react";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
 import { deleteProjectPost } from "@/src/services/base/project";
+import ButtonAsText from "@/submodules/react-components/components/kern-button/ButtonAsText";
 
 export default function ProjectCard(props: ProjectCardProps) {
     const router = useRouter();
@@ -102,11 +103,15 @@ export default function ProjectCard(props: ProjectCardProps) {
                             </div>}
                         </div>
                         <div>
-                            {props.project.status !== ProjectStatus.INIT_SAMPLE_PROJECT && <button onClick={manageProject}
-                                className="text-green-800 text-sm font-medium">
-                                <span className="leading-5">Continue project</span>
-                                <IconArrowRight className="h-5 w-5 inline-block text-green-800" />
-                            </button>}
+                            {props.project.status !== ProjectStatus.INIT_SAMPLE_PROJECT &&
+                                <ButtonAsText
+                                    text="Continue project"
+                                    onClick={manageProject}
+                                    color="green"
+                                    iconRight={IconArrowRight}
+                                    iconColor="green"
+                                />
+                            }
                         </div>
                     </div>
                 </div>

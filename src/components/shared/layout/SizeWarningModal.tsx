@@ -2,6 +2,7 @@ import { ModalEnum } from "@/src/types/shared/modal";
 import Modal from "../modal/Modal";
 import { useDispatch } from "react-redux";
 import { closeModal } from "@/src/reduxStore/states/modal";
+import KernButton from "@/submodules/react-components/components/kern-button/KernButton";
 
 
 export default function SizeWarningModal(props: { minWidth: number }) {
@@ -16,8 +17,11 @@ export default function SizeWarningModal(props: { minWidth: number }) {
             </div>
         </div>
         <div className="mt-5 flex justify-end">
-            <button className={`ml-2 bg-green-100 border border-green-400 text-green-700 text-xs font-semibold px-4 py-2 rounded-md cursor-pointer opacity-100 hover:bg-green-200 focus:outline-none`}
-                onClick={() => dispatch(closeModal(ModalEnum.SIZE_WARNING))}>Continue</button>
+            <KernButton
+                text="Continue"
+                onClick={() => dispatch(closeModal(ModalEnum.SIZE_WARNING))}
+                buttonColor="green"
+            />
         </div>
     </Modal>)
 }

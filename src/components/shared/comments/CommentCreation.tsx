@@ -4,6 +4,7 @@ import { selectSelectedComment, setSelectedComment } from "@/src/reduxStore/stat
 import { CommentCreationProps, CommentType } from "@/src/types/shared/comments";
 import { CommentDataManager } from "@/src/util/classes/comments";
 import { convertTypeToKey } from "@/src/util/shared/comments-helper";
+import KernButton from "@/submodules/react-components/components/kern-button/KernButton";
 import KernDropdown from "@/submodules/react-components/components/KernDropdown";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -132,16 +133,21 @@ export function CommentCreation(props: CommentCreationProps) {
                 </div>
             </div>
 
-            <div className="flex p-4">
-                <button type="button"
-                    disabled={newComment == '' || !type || !commentInstance || !commentId}
+            <div className="flex p-4 w-full gap-x-2 justify-between">
+                <KernButton
+                    text="Create comment"
+                    buttonColor="indigo"
+                    solidTheme={true}
+                    textColor="white"
                     onClick={saveComment}
-                    className={`flex-1 bg-indigo-700 text-white text-xs font-semibold px-4 py-2 rounded-md border hover:bg-indigo-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed`}>
-                    Create comment
-                </button>
-                <button onClick={props.closeCommentCreation}
+                    disabled={newComment == '' || !type || !commentInstance || !commentId}
                     type="button"
-                    className="flex-1 ml-3 bg-white text-gray-700 text-xs font-semibold px-4 py-2 rounded border border-gray-300 cursor-pointer hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 inline-block">Close</button>
+                />
+                <KernButton
+                    text="Close"
+                    onClick={props.closeCommentCreation}
+                    type="button"
+                />
             </div>
         </div >
     )

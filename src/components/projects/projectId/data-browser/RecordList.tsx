@@ -14,6 +14,7 @@ import { IconAngle, IconArrowRight, IconEdit, IconNotes } from "@tabler/icons-re
 import { useDispatch, useSelector } from "react-redux";
 import SimilaritySearchModal from "./modals/SimilaritySeachModal";
 import RecordCommentsModal from "./modals/RecordCommentsModal";
+import ButtonAsText from "@/submodules/react-components/components/kern-button/ButtonAsText";
 
 export default function RecordList(props: RecordListProps) {
     const dispatch = useDispatch();
@@ -49,19 +50,24 @@ export default function RecordList(props: RecordListProps) {
                             <label className="text-gray-700 text-sm font-medium">
                                 <span className="cursor-help leading-5 underline filtersUnderline">No embedding, can&apos;t find similar records</span>
                             </label>
-                        </Tooltip>) : (<button className="text-green-700 hover:text-green-500 text-sm font-medium cursor-pointer"
-                            onClick={() => dispatch(setModalStates(ModalEnum.SIMILARITY_SEARCH, { recordId: record.id, open: true }))}>
-                            <span className="leading-5">Find similar records
-                                <IconAngle className="h-4 w-4 inline-block" />
-                            </span>
-                        </button>)}
+                        </Tooltip>) : (
+                            <ButtonAsText
+                                text="Find similar records"
+                                color="green"
+                                onClick={() => dispatch(setModalStates(ModalEnum.SIMILARITY_SEARCH, { recordId: record.id, open: true }))}
+                                iconRight={IconAngle}
+                                iconColor="green"
+                            />
+                        )}
                     </div>
                     <div className="float-right">
-                        <button className="text-green-700 hover:text-green-500 text-sm font-medium cursor-pointer" onClick={() => props.recordClicked(index)}>
-                            <span className="leading-5">Continue with this record
-                                <IconArrowRight className="h-4 w-4 inline-block" />
-                            </span>
-                        </button>
+                        <ButtonAsText
+                            text="Continue with this record"
+                            color="green"
+                            onClick={() => props.recordClicked(index)}
+                            iconRight={IconArrowRight}
+                            iconColor="green"
+                        />
                     </div>
                 </div>
             </div>

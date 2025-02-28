@@ -15,12 +15,13 @@ import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
 import { downloadByteDataNoStringify } from "@/submodules/javascript-functions/export";
 import { formatBytes } from "@/submodules/javascript-functions/general";
 import { Tooltip } from "@nextui-org/react";
-import { IconDownload, IconInfoCircle } from "@tabler/icons-react";
+import { IconDownload, IconInfoCircle, IconLoader } from "@tabler/icons-react";
 import { Fragment, useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { timer } from "rxjs";
 import { Application, CurrentPage, CurrentPageSubKey } from "@/submodules/react-components/hooks/web-socket/constants";
 import { selectOrganizationId } from "@/src/reduxStore/states/general";
+import KernButton from "@/submodules/react-components/components/kern-button/KernButton";
 
 export default function ProjectSnapshotExportModal() {
     const dispatch = useDispatch();
@@ -173,25 +174,27 @@ export default function ProjectSnapshotExportModal() {
             <CryptedField label="Encrypt zip file with password" keyChange={(key: string) => setKey(key)} />
         </div>}
 
-        <div className="flex mt-6 justify-end">
-            {projectExportCredentials && projectExportCredentials.downloadFileName && <Tooltip content={TOOLTIPS_DICT.PROJECT_SETTINGS.LATEST_SNAPSHOT} color="invert">
-                <button onClick={exportViaFile} className="bg-white text-gray-700 text-xs font-semibold mr-4 px-4 py-2 rounded-md border border-gray-300 cursor-pointer hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-                    <IconDownload className="mr-1 h-5 w-5 inline-block" />
-                    {projectExportCredentials.downloadFileName}
-                </button>
-            </Tooltip>}
-            <button onClick={prepareDownload}
+        <div className="flex mt-6 justify-end gap-x-2">
+            {projectExportCredentials && projectExportCredentials.downloadFileName &&
+                <KernButton
+                    text={projectExportCredentials.downloadFileName}
+                    onClick={exportViaFile}
+                    icon={IconDownload}
+                    tooltip={TOOLTIPS_DICT.PROJECT_SETTINGS.LATEST_SNAPSHOT}
+                />
+            }
+            <KernButton
+                text="Prepare download"
+                onClick={prepareDownload}
                 disabled={downloadPrepareMessage == DownloadState.PREPARATION || downloadPrepareMessage == DownloadState.DOWNLOAD}
-                className={`bg-green-100 flex items-center mr-4 text-green-700 border border-green-400 text-xs font-semibold px-4 rounded-md cursor-pointer hover:bg-green-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50 disabled:cursor-not-allowed`}
-                type="submit">
-                Prepare download
-                {downloadPrepareMessage == DownloadState.PREPARATION && <span className="ml-2"><LoadingIcon color="green" /></span>}
-            </button>
-            <button onClick={() => dispatch(closeModal(ModalEnum.PROJECT_SNAPSHOT))}
-                className="bg-white text-gray-700 text-xs font-semibold px-4 py-2 rounded border border-gray-300 cursor-pointer hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-                Close
-            </button>
+                icon={downloadPrepareMessage == DownloadState.PREPARATION ? (props) => <LoadingIcon color="green" {...props} /> : null}
+                type="submit"
+                buttonColor="green"
+            />
+            <KernButton
+                text="Close"
+                onClick={() => dispatch(closeModal(ModalEnum.PROJECT_SNAPSHOT))}
+            />
         </div>
-
     </Modal>)
 }

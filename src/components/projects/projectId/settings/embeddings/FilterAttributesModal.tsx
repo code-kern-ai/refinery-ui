@@ -5,6 +5,7 @@ import { selectProjectId } from "@/src/reduxStore/states/project";
 import { updateEmbeddingPayload } from "@/src/services/base/embedding";
 import { FilterAttributesModalProps } from "@/src/types/components/projects/projectId/settings/embeddings";
 import { ModalEnum } from "@/src/types/shared/modal";
+import KernButton from "@/submodules/react-components/components/kern-button/KernButton";
 import KernDropdown from "@/submodules/react-components/components/KernDropdown";
 import { Tooltip } from "@nextui-org/react";
 import { useEffect, useState } from "react";
@@ -62,19 +63,20 @@ export default function FilterAttributesModal(props: FilterAttributesModalProps)
                     props.setFilterAttributesUpdate(attributes);
                 }} />
         </div>}
-        <div className="flex mt-6 justify-end">
-            {!props.showEditOption && <button onClick={editFilteredAttributes}
-                className="ml-2 bg-white text-gray-700 text-xs font-semibold px-4 py-2 rounded border border-gray-300 cursor-pointer hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-                Edit
-            </button>}
-            {props.showEditOption && <button onClick={saveFilteredAttributes}
-                className="ml-2 bg-green-100 border border-green-400 text-green-700 text-xs font-semibold px-4 py-2 rounded-md cursor-pointer opacity-100 hover:bg-green-200 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50">
-                Save
-            </button>}
-            <button onClick={() => dispatch(closeModal(ModalEnum.FILTERED_ATTRIBUTES))}
-                className="ml-2 bg-white text-gray-700 text-xs font-semibold px-4 py-2 rounded border border-gray-300 cursor-pointer hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-                Close
-            </button>
+        <div className="flex mt-6 justify-end gap-x-2">
+            {!props.showEditOption && <KernButton
+                text="Edit"
+                onClick={editFilteredAttributes}
+            />}
+            {props.showEditOption && <KernButton
+                text="Save"
+                onClick={saveFilteredAttributes}
+                buttonColor="green"
+            />}
+            <KernButton
+                text="Close"
+                onClick={() => dispatch(closeModal(ModalEnum.FILTERED_ATTRIBUTES))}
+            />
         </div>
     </Modal >
     )

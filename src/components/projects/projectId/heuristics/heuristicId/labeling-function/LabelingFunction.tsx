@@ -37,6 +37,7 @@ import { getLabelingTasksByProjectId } from "@/src/services/base/project";
 import { getHeuristicByHeuristicId, getLabelingFunctionOn10Records, getPayloadByPayloadId, updateHeuristicPost } from "@/src/services/base/heuristic";
 import { Application, CurrentPage } from "@/submodules/react-components/hooks/web-socket/constants";
 import { VisitBricksButton } from "@/src/components/shared/bricks/VisitBricksButton";
+import KernButton from "@/submodules/react-components/components/kern-button/KernButton";
 
 export default function LabelingFunction() {
     const dispatch = useDispatch();
@@ -254,12 +255,15 @@ export default function LabelingFunction() {
                             <KernDropdown options={attributes} buttonName={selectedAttribute ? selectedAttribute.name : 'Select display attribute'} buttonClasses="text-xs font-semibold actionsHeight"
                                 selectedOption={(option: any) => setSelectedAttribute(option)} />
                         </div>
-                        <Tooltip content={selectedAttribute == null ? TOOLTIPS_DICT.LABELING_FUNCTION.SELECT_ATTRIBUTE : TOOLTIPS_DICT.LABELING_FUNCTION.RUN_ON_10} color="invert" placement="left">
-                            <button disabled={selectedAttribute == null || runOn10IsRunning || justClickedRun || !canStartHeuristic} onClick={executeLabelingFunctionOn10Records}
-                                className="bg-white text-gray-700 text-xs font-semibold px-4 py-2 rounded-md border border-gray-300 hover:bg-gray-50 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed">
-                                Run on 10
-                            </button>
-                        </Tooltip>
+                        <KernButton
+                            text='Run on 10'
+                            buttonColor="indigo"
+                            solidTheme={true}
+                            textColor="white"
+                            disabled={selectedAttribute == null || runOn10IsRunning || justClickedRun || !canStartHeuristic}
+                            onClick={executeLabelingFunctionOn10Records}
+                            tooltip={selectedAttribute == null ? TOOLTIPS_DICT.LABELING_FUNCTION.SELECT_ATTRIBUTE : TOOLTIPS_DICT.LABELING_FUNCTION.RUN_ON_10}
+                        />
                         <HeuristicRunButtons updateDisplayLogWarning={val => setDisplayLogWarning(val)} runOn10IsRunning={runOn10IsRunning} justClickedRun={(justClickedRun) => setJustClickedRun(justClickedRun)} checkCanStartHeuristic={(val) => setCanStartHeuristic(val)} />
                     </div>
                 </div>

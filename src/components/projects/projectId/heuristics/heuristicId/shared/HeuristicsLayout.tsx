@@ -18,6 +18,7 @@ import { getLookupListsByProjectId } from "@/src/services/base/lookup-lists";
 import { updateHeuristicPost } from "@/src/services/base/heuristic";
 import { toPythonFunctionName } from "@/submodules/javascript-functions/python-functions-parser";
 import { capitalizeFirstForClassName } from "@/submodules/javascript-functions/case-types-parser";
+import KernButton from "@/submodules/react-components/components/kern-button/KernButton";
 
 export default function HeuristicsLayout(props: any) {
     const router = useRouter();
@@ -130,12 +131,13 @@ export default function HeuristicsLayout(props: any) {
             <div className="w-full">
                 <div className={`grid gap-4 ${isHeaderNormal ? 'grid-cols-2' : 'grid-cols-1'}`}>
                     {isHeaderNormal && <div className="flex items-start mt-2">
-                        <Tooltip color="invert" placement="bottom" content={TOOLTIPS_DICT.HEURISTICS.EDIT_NAME}>
-                            <button onClick={() => openProperty(true, HeuristicsProperty.NAME)}
-                                className="flex-shrink-0 bg-white text-gray-700 text-xs font-semibold mr-3 px-4 py-2 rounded-md border border-gray-300 block float-left hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-                                Edit name
-                            </button>
-                        </Tooltip>
+                        <KernButton
+                            text="Edit name"
+                            onClick={() => openProperty(true, HeuristicsProperty.NAME)}
+                            className="mr-3"
+                            tooltip={TOOLTIPS_DICT.HEURISTICS.EDIT_NAME}
+                            tooltipPlacement="bottom"
+                        />
                         <div className="flex-grow" onDoubleClick={() => openProperty(true, HeuristicsProperty.NAME)}>
                             {isNameOpen
                                 ? (<input type="text" value={currentHeuristic.name} ref={nameRef} onInput={(e: any) => changeHeuristic(e.target.value, HeuristicsProperty.NAME)}
@@ -145,10 +147,11 @@ export default function HeuristicsLayout(props: any) {
                         </div>
                     </div>}
                     <div className="flex items-start mt-2">
-                        <button onClick={() => openProperty(true, HeuristicsProperty.DESCRIPTION)}
-                            className="flex-shrink-0 bg-white text-gray-700 text-xs font-semibold mr-3 px-4 py-2 rounded-md border border-gray-300 block float-left hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-                            Edit description
-                        </button>
+                        <KernButton
+                            text="Edit description"
+                            onClick={() => openProperty(true, HeuristicsProperty.DESCRIPTION)}
+                            className="mr-3"
+                        />
                         <div className="flex-grow" onDoubleClick={() => openProperty(true, HeuristicsProperty.DESCRIPTION)}>
                             {isDescriptionOpen
                                 ? (<input type="text" value={currentHeuristic.description} ref={descriptionRef} onInput={(e: any) => changeHeuristic(e.target.value, HeuristicsProperty.DESCRIPTION)}

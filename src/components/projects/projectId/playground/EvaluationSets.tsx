@@ -97,9 +97,12 @@ export function EvaluationSets() {
                         <div className="text-sm leading-5 font-normal text-gray-500 inline-block">You can create your evaluation sets and use them for creating evaluation groups.</div>
                     </div>
                 </div>
-                <button
-                    className="ml-auto bg-green-100 border border-green-400 text-green-700 text-xs font-semibold px-4 py-2 rounded-md cursor-pointer opacity-100 hover:bg-green-200 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50"
-                    onClick={() => dispatch(openModal(ModalEnum.EVALUATION_SET))}>Create evaluation set</button>
+                <KernButton
+                    text="Create evaluation set"
+                    buttonColor="green"
+                    onClick={() => dispatch(openModal(ModalEnum.EVALUATION_SET))}
+                    className="ml-auto"
+                />
                 {selectedEvaluationSets.size > 0 &&
                     <div className='ml-2'>
                         <KernButton

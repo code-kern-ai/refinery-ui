@@ -46,7 +46,6 @@ export default function QuickButtons(props: QuickButtonsProps) {
                 <div className={`w-2.5 h-2.5 border rounded-full ${QUICK_BUTTONS.all[0]}`}></div>
                 <div className={`w-2.5 h-2.5 border rounded-full ${QUICK_BUTTONS.all[1]}`}></div>
                 <div className={`w-2.5 h-2.5 border rounded-full ${QUICK_BUTTONS.all[2]}`}></div>
-                <div className={`w-2.5 h-2.5 border rounded-full ${QUICK_BUTTONS.all[3]}`}></div>
             </div>}
             All
         </button>
@@ -56,7 +55,6 @@ export default function QuickButtons(props: QuickButtonsProps) {
                 <div className={`w-2.5 h-2.5 border rounded-full ${QUICK_BUTTONS.nothing[0]}`}></div>
                 <div className={`w-2.5 h-2.5 border rounded-full ${QUICK_BUTTONS.nothing[1]}`}></div>
                 <div className={`w-2.5 h-2.5 border rounded-full ${QUICK_BUTTONS.nothing[2]}`}></div>
-                <div className={`w-2.5 h-2.5 border rounded-full ${QUICK_BUTTONS.nothing[3]}`}></div>
             </div>}
             Nothing
         </button>
@@ -66,7 +64,6 @@ export default function QuickButtons(props: QuickButtonsProps) {
                 <div className={`w-2.5 h-2.5 border rounded-full ${QUICK_BUTTONS.default[0]}`}></div>
                 <div className={`w-2.5 h-2.5 border rounded-full ${QUICK_BUTTONS.default[1]}`}></div>
                 <div className={`w-2.5 h-2.5 border rounded-full ${QUICK_BUTTONS.default[2]}`}></div>
-                <div className={`w-2.5 h-2.5 border rounded-full ${QUICK_BUTTONS.default[3]}`}></div>
             </div>}
             Default
         </button>
@@ -88,7 +85,6 @@ function QuickButton(props: QuickButtonProps) {
                 <div className={`w-2.5 h-2.5 border rounded-full ${QUICK_BUTTONS[props.attributeName][0]}`}></div>
                 <div className={`w-2.5 h-2.5 border rounded-full ${QUICK_BUTTONS[props.attributeName][1]}`}></div>
                 <div className={`w-2.5 h-2.5 border rounded-full ${QUICK_BUTTONS[props.attributeName][2]}`}></div>
-                <div className={`w-2.5 h-2.5 border rounded-full ${QUICK_BUTTONS[props.attributeName][3]}`}></div>
             </div>}
             {props.caption}
         </button>

@@ -19,6 +19,8 @@ import AddLabelModal from "./AddLabelModal";
 import ChangeColorModal from "./ChangeColorModal";
 import KernDropdown from "@/submodules/react-components/components/KernDropdown";
 import { updateLabelingTask } from "@/src/services/base/labeling-tasks";
+import IconButton from "@/submodules/react-components/components/kern-button/IconButton";
+import KernButton from "@/submodules/react-components/components/kern-button/KernButton";
 
 export default function LabelingTasks() {
     const dispatch = useDispatch();
@@ -143,10 +145,11 @@ export default function LabelingTasks() {
                                                 <IconTrash className="h-4 w-4 ml-1 cursor-pointer" onClick={() => dispatch(setModalStates(ModalEnum.DELETE_LABEL, { taskId: task.id, label: label, open: true }))} />
                                             </div>
                                         ))}
-                                        <button disabled={task.taskType == LabelingTaskTaskType.NOT_SET}
-                                            className="bg-gray-100 text-gray-800 cursor-pointer p-1 rounded-md hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed">
-                                            <IconPlus className={`${task.taskType == LabelingTaskTaskType.NOT_SET ? 'cursor-not-allowed' : 'cursor-pointer'}`} onClick={() => dispatch(setModalStates(ModalEnum.ADD_LABEL, { taskId: task.id, open: true }))} />
-                                        </button>
+                                        <IconButton
+                                            icon={IconPlus}
+                                            disabled={task.taskType == LabelingTaskTaskType.NOT_SET}
+                                            onClick={() => dispatch(setModalStates(ModalEnum.ADD_LABEL, { taskId: task.id, open: true }))}
+                                        />
                                     </td>
                                     <td className="whitespace-nowrap text-center px-3 py-2 text-sm text-gray-500">
                                         <IconTrash onClick={() => dispatch(setModalStates(ModalEnum.DELETE_LABELING_TASK, { taskId: task.id, open: true }))}
@@ -160,13 +163,13 @@ export default function LabelingTasks() {
             </div>
         </div>
         <div className="mt-1 flex items-center gap-1">
-            <Tooltip content={TOOLTIPS_DICT.PROJECT_SETTINGS.LABELING_TASK.NEW_LABELING_TASK} color="invert" placement="right">
-                <button onClick={() => dispatch(openModal(ModalEnum.ADD_LABELING_TASK))}
-                    className="inline-block items-center px-2.5 py-1.5 border border-gray-300 shadow-sm text-xs font-semibold rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none cursor-pointer">
-                    <IconPlus className="h-5 w-5 inline-block mr-1" />
-                    Add labeling task
-                </button>
-            </Tooltip>
+            <KernButton
+                text="Add labeling task"
+                icon={IconPlus}
+                onClick={() => dispatch(openModal(ModalEnum.ADD_LABELING_TASK))}
+                tooltip={TOOLTIPS_DICT.PROJECT_SETTINGS.LABELING_TASK.NEW_LABELING_TASK}
+                tooltipPlacement="right"
+            />
         </div>
 
         <AddLabelingTaskModal />

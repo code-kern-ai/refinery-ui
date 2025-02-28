@@ -16,6 +16,7 @@ import { CacheEnum, selectCachedValue } from '@/src/reduxStore/states/cachedValu
 import VersionOverviewModal from './VersionOverviewModal';
 import { setProjectIdSampleProject } from '@/src/reduxStore/states/tmp';
 import { getHasUpdates } from '@/src/services/base/misc';
+import IconButton from '@/submodules/react-components/components/kern-button/IconButton';
 
 export default function Sidebar() {
     const router = useRouter();

@@ -15,6 +15,7 @@ import { extendArrayElementsByUniqueId } from "@/submodules/javascript-functions
 import { getRecordByRecordId } from "@/src/services/base/project-setting";
 import { getSampleRecords } from "@/src/services/base/attribute";
 import { DataTypeEnum } from "@/src/types/shared/general";
+import KernButton from "@/submodules/react-components/components/kern-button/KernButton";
 
 export default function ExecutionContainer(props: ExecutionContainerProps) {
     const projectId = useSelector(selectProjectId);
@@ -74,21 +75,27 @@ export default function ExecutionContainer(props: ExecutionContainerProps) {
                     <LoadingIcon color="indigo" />
                 </div>}
 
-                <Tooltip content={TOOLTIPS_DICT.ATTRIBUTE_CALCULATION.EXECUTE_10_RECORDS} color="invert" placement="bottom" className="ml-auto">
-                    <button onClick={calculateUserAttributeSampleRecords}
-                        disabled={props.currentAttribute.state == AttributeState.USABLE || props.currentAttribute.state == AttributeState.RUNNING || requestedSomething || props.tokenizationProgress < 1 || props.checkUnsavedChanges}
-                        className="bg-white text-gray-700 text-xs font-semibold px-4 py-2 rounded-md border whitespace-nowrap border-gray-300 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed">
-                        Run on 10
-                    </button>
-                </Tooltip>
+                <KernButton
+                    text='Run on 10'
+                    buttonColor="indigo"
+                    solidTheme={true}
+                    textColor="white"
+                    disabled={props.currentAttribute.state == AttributeState.USABLE || props.currentAttribute.state == AttributeState.RUNNING || requestedSomething || props.tokenizationProgress < 1 || props.checkUnsavedChanges}
+                    onClick={calculateUserAttributeSampleRecords}
+                    tooltip={TOOLTIPS_DICT.ATTRIBUTE_CALCULATION.EXECUTE_10_RECORDS}
+                    className="ml-auto"
+                />
 
-                <Tooltip color="invert" placement="bottom" content={props.currentAttribute.state == AttributeState.USABLE ? 'Attribute is already in use' : requestedSomething ? 'Test is running' : checkIfAtLeastRunning ? 'Another attribute is running' : checkIfAtLeastQueued ? 'Another attribute is queued for execution' : props.tokenizationProgress < 1 ? 'Tokenization is in progress' : runOn10HasError ? 'Run on 10 records has an error' : 'Execute the attribute on all records'}>
-                    <button onClick={() => dispatch(setModalStates(ModalEnum.EXECUTE_ATTRIBUTE_CALCULATION, { open: true, requestedSomething: requestedSomething }))}
-                        disabled={props.currentAttribute.state == AttributeState.USABLE || props.currentAttribute.state == AttributeState.RUNNING || requestedSomething || checkIfAtLeastRunning || checkIfAtLeastQueued || props.tokenizationProgress < 1 || runOn10HasError || props.checkUnsavedChanges}
-                        className="bg-indigo-700 text-white text-xs leading-4 font-semibold px-4 py-2 rounded-md cursor-pointer ml-3 hover:bg-indigo-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed">
-                        Run
-                    </button>
-                </Tooltip>
+                <KernButton
+                    text='Run'
+                    buttonColor="indigo"
+                    solidTheme={true}
+                    textColor="white"
+                    disabled={props.currentAttribute.state == AttributeState.USABLE || props.currentAttribute.state == AttributeState.RUNNING || requestedSomething || checkIfAtLeastRunning || checkIfAtLeastQueued || props.tokenizationProgress < 1 || runOn10HasError || props.checkUnsavedChanges}
+                    onClick={() => dispatch(setModalStates(ModalEnum.EXECUTE_ATTRIBUTE_CALCULATION, { open: true, requestedSomething: requestedSomething }))}
+                    tooltip={props.currentAttribute.state == AttributeState.USABLE ? 'Attribute is already in use' : requestedSomething ? 'Test is running' : checkIfAtLeastRunning ? 'Another attribute is running' : checkIfAtLeastQueued ? 'Another attribute is queued for execution' : props.tokenizationProgress < 1 ? 'Tokenization is in progress' : runOn10HasError ? 'Run on 10 records has an error' : 'Execute the attribute on all records'}
+                    className="ml-3"
+                />
             </div>
         </div>
 
@@ -104,12 +111,13 @@ export default function ExecutionContainer(props: ExecutionContainerProps) {
                                             {String(record.value)}
                                         </div>
                                         <div className="flex items-center justify-center mr-5 ml-auto">
-                                            <button onClick={() => {
-                                                dispatch(setModalStates(ModalEnum.VIEW_RECORD_DETAILS, { open: true, recordIdx: index }));
-                                                recordByRecordId(sampleRecords.recordIds[index]);
-                                            }} className="bg-white text-gray-700 text-xs font-semibold px-4 py-1 rounded border border-gray-300 cursor-pointer hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 inline-block">
-                                                View
-                                            </button>
+                                            <KernButton
+                                                text="View"
+                                                onClick={() => {
+                                                    dispatch(setModalStates(ModalEnum.VIEW_RECORD_DETAILS, { open: true, recordIdx: index }));
+                                                    recordByRecordId(sampleRecords.recordIds[index]);
+                                                }}
+                                            />
                                         </div>
                                     </div>
                                 </div>

@@ -1,8 +1,8 @@
 import { selectProjectId } from "@/src/reduxStore/states/project";
 import { deleteQuestionFromHistory, getPlaygroundQuestions } from "@/src/services/base/playground";
 import { PlaygroundQuestion } from "@/src/types/components/projects/projectId/settings/playground";
+import IconButton from "@/submodules/react-components/components/kern-button/IconButton";
 import useOnClickOutside from "@/submodules/react-components/hooks/useHooks/useOnClickOutside";
-import { Tooltip } from "@nextui-org/react";
 import { IconHistory, IconTrash } from "@tabler/icons-react";
 import { useEffect, useRef, useState } from "react";
 import { useSelector } from "react-redux";
@@ -45,19 +45,17 @@ export default function QuestionHistory(props: QuestionHistoryProps) {
 
     return (
         <>
-            <Tooltip content="History" color="invert" placement="bottom">
-                <button
-                    className="p-1 rounded-md text-gray-400 cursor-pointer hover:bg-gray-100 hover:text-gray-500 transition duration-150 ease-in-out"
-                    onClick={(e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        setShowHistory(!showHistory);
-                    }}
-                    onMouseDown={(e) => { e.preventDefault(); e.stopPropagation(); }}
-                >
-                    <IconHistory className="h-5 w-5" />
-                </button>
-            </Tooltip>
+            <IconButton
+                icon={IconHistory}
+                tooltip="History"
+                tooltipPlacement="bottom"
+                onMouseDown={(e) => { e.preventDefault(); e.stopPropagation(); }}
+                onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    setShowHistory(!showHistory);
+                }}
+            />
             {showHistory && (
                 <div ref={dropdownRef} className="absolute top-8 right-0 w-80 bg-gray-100 border border-gray-300 shadow-lg rounded-md p-2 z-50 max-h-96 overflow-y-auto">
                     <div className="ml-1 text-md text-black mb-1">Last questions</div>

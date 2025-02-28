@@ -6,6 +6,7 @@ import { useState } from "react";
 import { first, timer } from "rxjs";
 import Logs from "./Logs";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
+import IconButton from "@/submodules/react-components/components/kern-button/IconButton";
 
 export default function ContainerLogs(props: ContainerLogsProps) {
 
@@ -22,16 +23,16 @@ export default function ContainerLogs(props: ContainerLogsProps) {
     }
 
     return (<div>
-
-        <div className="mt-8 text-sm leading-5 w-full flex items-center">
+        <div className="mt-8 text-sm leading-5 w-full flex items-center gap-x-2">
             <div className="font-medium text-gray-700">Container Logs</div>
 
             {props.logs ? (
-                <Tooltip content={TOOLTIPS_DICT.GENERAL.CLICK_TO_COPY} color="invert" placement="top">
-                    <button onClick={() => copyToClipboardLogs(props.logs.join('\n'), 0)}>
-                        {copyClicked != 0 ? (<IconClipboard className="transition-all duration-500 ease-in-out" />) : (<IconCheck className="transition-all duration-500 ease-in-out" />)}
-                    </button>
-                </Tooltip>
+                <IconButton
+                    onClick={() => copyToClipboardLogs(props.logs.join('\n'), 0)}
+                    icon={copyClicked != 0 ? IconClipboard : IconCheck}
+                    tooltip={TOOLTIPS_DICT.GENERAL.CLICK_TO_COPY}
+                    tooltipPlacement="top"
+                />
             ) : (
                 <Tooltip content='No runs to copy' color="invert" placement="top" className="cursor-auto">
                     <IconClipboardOff className="text-gray-400 h-5 w-5 mx-1" />

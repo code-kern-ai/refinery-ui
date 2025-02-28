@@ -27,6 +27,7 @@ import { useWebsocket } from "@/submodules/react-components/hooks/web-socket/use
 import { getRecordExportFromData } from "@/src/services/base/project";
 import { getLastRecordExportCredentials, prepareRecordExport } from "@/src/services/base/project-setting";
 import { Application, CurrentPage } from "@/submodules/react-components/hooks/web-socket/constants";
+import KernButton from "@/submodules/react-components/components/kern-button/KernButton";
 
 export default function ExportRecordsModal(props: ExportProps) {
     const dispatch = useDispatch();
@@ -310,27 +311,26 @@ export default function ExportRecordsModal(props: ExportProps) {
             <pre className="text-sm">{prepareErrors.join("\n")}</pre>
         </div>}
         <CryptedField label="Encrypt zip file with password" keyChange={(key: string) => setKey(key)} />
-        <div className="flex mt-6 justify-end">
-            {recordExportCredentials && recordExportCredentials.downloadFileName && <Tooltip content={TOOLTIPS_DICT.PROJECT_SETTINGS.LATEST_SNAPSHOT} color="invert">
-                <button onClick={exportViaFile} className="bg-white text-gray-700 text-xs font-semibold mr-4 px-4 py-2 rounded-md border border-gray-300 cursor-pointer hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-                    <IconDownload className="mr-1 h-5 w-5 inline-block" />
-                    {recordExportCredentials.downloadFileName}
-                </button>
-            </Tooltip>}
-            <button onClick={prepareDownload}
+        <div className="flex mt-6 justify-end gap-x-3">
+            {recordExportCredentials && recordExportCredentials.downloadFileName &&
+                <KernButton
+                    text={recordExportCredentials.downloadFileName}
+                    onClick={exportViaFile}
+                    tooltip={TOOLTIPS_DICT.PROJECT_SETTINGS.LATEST_SNAPSHOT}
+                    icon={IconDownload}
+                />
+            }
+            <KernButton
+                text="Prepare download"
+                onClick={prepareDownload}
                 disabled={downloadState == DownloadState.PREPARATION}
-                className={`bg-green-100 flex items-center mr-4 text-green-700 border border-green-400 text-xs font-semibold px-4 rounded-md cursor-pointer hover:bg-green-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50 disabled:cursor-not-allowed`}
-                type="submit">
-                Prepare download
-                {downloadState == DownloadState.PREPARATION && <span className="ml-2"><LoadingIcon color="green" /></span>}
-            </button>
-            <button onClick={() => {
-                dispatch(closeModal(ModalEnum.EXPORT_RECORDS));
-
-            }}
-                className="bg-white text-gray-700 text-xs font-semibold px-4 py-2 rounded border border-gray-300 cursor-pointer hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-                Close
-            </button>
+                buttonColor="green"
+                icon={downloadState == DownloadState.PREPARATION ? (props) => <LoadingIcon color="green" {...props} /> : null}
+            />
+            <KernButton
+                text="Close"
+                onClick={() => dispatch(closeModal(ModalEnum.EXPORT_RECORDS))}
+            />
         </div>
     </Modal>)
 }
