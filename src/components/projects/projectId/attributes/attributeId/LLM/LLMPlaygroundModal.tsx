@@ -169,7 +169,7 @@ export default function LLMPlaygroundModal() {
                     <KernDropdown
                         buttonName={fullLlmConfig?.llmIdentifier ?? 'Select LLM provider'}
                         options={LLM_PROVIDER_OPTIONS}
-                        dropdownWidth="w-52"
+                        dropdownWidth="w-56"
                         selectedOption={(option) => setFullLlmConfig(p => ({ ...p, llmIdentifier: option }))}
                     /><label className="block text-sm font-medium text-gray-900 whitespace-nowrap">Api Key</label>
 
