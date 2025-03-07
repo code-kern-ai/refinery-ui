@@ -40,3 +40,4 @@ export type LLmPropsAzure = {
     projectId?: string;
     disabled?: boolean;
 }
+export type LLmPropsAzureFoundry = LLmPropsAzure;
