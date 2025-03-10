@@ -366,7 +366,7 @@ export default function AttributeCalculation() {
                             <KernDropdown
                                 buttonName={additionalConfigTmp?.llmIdentifier ?? 'Select LLM provider'}
                                 options={LLM_PROVIDER_OPTIONS}
-                                dropdownWidth="w-56"
+                                dropdownWidth="w-64"
                                 selectedOption={(option) => setAdditionalConfigTmp(p => ({ ...p, llmIdentifier: option }))}
                                 disabled={currentAttribute.state == AttributeState.USABLE}
                             />
