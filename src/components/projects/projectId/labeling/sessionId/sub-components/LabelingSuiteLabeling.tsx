@@ -113,7 +113,6 @@ export default function LabelingSuiteLabeling() {
         if (!tokenLookup || !extractionRef.current) return;
         const handleMouseUp = (e) => {
             const [check, attributeIdStart, tokenStart, tokenEnd, startEl] = parseSelectionData();
-            console.log(startEl)
             dispatch(setActiveTokenSelection({ attributeId: attributeIdStart, tokenStart, tokenEnd }));
             if (!check) {
                 clearSelected();
