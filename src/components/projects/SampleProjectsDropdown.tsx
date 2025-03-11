@@ -83,6 +83,7 @@ export default function SampleProjectsDropdown() {
                         buttonColor="blue"
                         solidTheme={true}
                         textColor="white"
+                        asDiv
                     />
                 </Menu.Button>
             </div>
