@@ -113,6 +113,7 @@ export default function LabelingSuiteLabeling() {
         if (!tokenLookup || !extractionRef.current) return;
         const handleMouseUp = (e) => {
             const [check, attributeIdStart, tokenStart, tokenEnd, startEl] = parseSelectionData();
+            console.log(startEl)
             dispatch(setActiveTokenSelection({ attributeId: attributeIdStart, tokenStart, tokenEnd }));
             if (!check) {
                 clearSelected();
@@ -492,8 +493,8 @@ export default function LabelingSuiteLabeling() {
         labelBoxPosition(e, startEl);
     }
 
-    function labelBoxPosition(e, startEl?: DOMRect) {
-        const labelBox: DOMRect = startEl || e.target.getBoundingClientRect();
+    function labelBoxPosition(e: any, startEl?: any) {
+        const labelBox: DOMRect = startEl ? startEl.getBoundingClientRect() : (e.target as HTMLElement).getBoundingClientRect();
         if (!labelBox) return;
         const baseBox: DOMRect = document.getElementById('base-dom-element')?.getBoundingClientRect();
         if (!baseBox) return;
