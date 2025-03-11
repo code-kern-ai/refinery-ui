@@ -118,7 +118,7 @@ export default function LabelingSuiteLabeling() {
                 clearSelected();
             } else {
                 window.getSelection().empty();
-                setSelected(attributeIdStart, tokenStart, tokenEnd, startEl);
+                setSelected(attributeIdStart, tokenStart, tokenEnd, e, startEl);
             }
         };
         extractionRef.current.addEventListener('mouseup', handleMouseUp);
@@ -474,7 +474,7 @@ export default function LabelingSuiteLabeling() {
         dispatch(setActiveTokenSelection(null));
     }, [tokenLookup]);
 
-    function setSelected(attributeId: string, tokenStart: number, tokenEnd: number, e?: any) {
+    function setSelected(attributeId: string, tokenStart: number, tokenEnd: number, e?: any, startEl?: DOMRect) {
         if (!canEditLabels && user.role != UserRole.ANNOTATOR && userDisplayRole != UserRole.ANNOTATOR) return;
         const tokenLookupCopy = jsonCopy(tokenLookup);
         if (!tokenLookupCopy[attributeId]) {
@@ -489,11 +489,11 @@ export default function LabelingSuiteLabeling() {
             setActiveTasksFuncRef.current(lVars.taskLookup[attributeId].lookup);
         }
         setTokenLookup(tokenLookupCopy);
-        labelBoxPosition(e);
+        labelBoxPosition(e, startEl);
     }
 
-    function labelBoxPosition(e) {
-        const labelBox: DOMRect = e.target?.getBoundingClientRect();
+    function labelBoxPosition(e: any, startEl?: any) {
+        const labelBox: DOMRect = startEl ? startEl.getBoundingClientRect() : (e.target as HTMLElement).getBoundingClientRect();
         if (!labelBox) return;
         const baseBox: DOMRect = document.getElementById('base-dom-element')?.getBoundingClientRect();
         if (!baseBox) return;
