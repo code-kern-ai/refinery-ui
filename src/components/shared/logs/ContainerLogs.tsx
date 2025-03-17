@@ -35,7 +35,10 @@ export default function ContainerLogs(props: ContainerLogsProps) {
                 />
             ) : (
                 <Tooltip content='No runs to copy' color="invert" placement="top" className="cursor-auto">
-                    <IconClipboardOff className="text-gray-400 h-5 w-5 mx-1" />
+                    <IconButton
+                        icon={IconClipboardOff}
+                        disabled
+                    />
                 </Tooltip>)}
 
 
