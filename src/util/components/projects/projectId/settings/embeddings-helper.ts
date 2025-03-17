@@ -84,7 +84,7 @@ function buildExpectedEmbeddingName(data: any): string {
 function buildEmbeddingNameWithApiToken(data: any) {
     if (data.apiToken == null) return "";
     if (data.platform == PlatformType.AZURE) data.model = data.engine;
-    const platformStr = "-" + data + "-";
+    const platformStr = "-" + data.platform + "-";
     const apiTokenCut = data.apiToken.substring(0, 3) + "..." + data.apiToken.substring(data.apiToken.length - 4, data.apiToken.length);
     if (data.platform == PlatformType.OPEN_AI || data.platform == PlatformType.AZURE) return platformStr + data.model + "-" + apiTokenCut;
     else return platformStr + apiTokenCut;
@@ -93,15 +93,11 @@ function buildEmbeddingNameWithApiToken(data: any) {
 export function checkDuplicates(embeddings: any, data: any): boolean {
     const currentName = buildExpectedEmbeddingName(data);
     if (currentName.slice(-1) == "-") return false;
-    else {
-        for (const embedding of embeddings) {
-            if (embedding.name == currentName) return false;
-        }
-    }
-    return true;
+    else return !embeddings.some((e) => e.name == currentName);
 }
 
 export function checkIfCreateEmbeddingIsDisabled(props: EmbeddingCreationEnabledProps) {
+    console.log(props)
     let checkFormFields: boolean = false;
     const platform = props.platform;
     if (!platform) return true;
