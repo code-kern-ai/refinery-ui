@@ -97,7 +97,6 @@ export function checkDuplicates(embeddings: any, data: any): boolean {
 }
 
 export function checkIfCreateEmbeddingIsDisabled(props: EmbeddingCreationEnabledProps) {
-    console.log(props)
     let checkFormFields: boolean = false;
     const platform = props.platform;
     if (!platform) return true;
