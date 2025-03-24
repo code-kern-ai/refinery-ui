@@ -18,6 +18,7 @@ export type LLMConfig = {
         apiKey: string;
         apiVersion?: string, //only for azure
         endpoint?: string,  //only for azure
+        openAioSeries?: boolean; //only for openai models
     }
 }
 

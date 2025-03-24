@@ -2,22 +2,22 @@ import { useEffect } from "react";
 import KernDropdown from "@/submodules/react-components/components/KernDropdown";
 import { InputWithSlider } from "@/submodules/react-components/components/InputWithSlider";
 import { LLmPropsOpenAI } from "../types";
+import OpenAIoSeriesSwitch from "./OpenAIoSeriesSwitch";
 
 
 
 // https://platform.openai.com/docs/models
-const MODEL_OPTIONS = ['gpt-4o-mini', 'gpt-4o', 'gpt-4', 'gpt-4-turbo-preview', 'gpt-4-1106-preview', 'gpt-4-0125-preview', 'gpt-4-turbo', 'gpt-3.5-turbo']
-const VISION_MODEL_OPTIONS = ['gpt-4o', 'gpt-4-turbo', 'gpt-4o-mini']
 const MAX_LENGTH = {
+    'gpt-4o-mini': 16384,
     'gpt-3.5-turbo': 16385,
     'gpt-4': 8192,
-    'gpt-4-turbo': 128000,
-    'gpt-4-turbo-preview': 128000,
-    'gpt-4-1106-preview': 128000,
-    'gpt-4-0125-preview': 128000,
-    'gpt-4o': 128000,
-    'gpt-4o-mini': 128000,
+    'gpt-4-turbo': 4096,
+    'gpt-4o': 16384,
+    'o1': 100000,
+    'o1-mini': 65536,
+    'o3-mini': 100000,
 }
+const MODEL_OPTIONS = Object.keys(MAX_LENGTH);
 
 export default function OpenAI(props: LLmPropsOpenAI) {
 
@@ -29,26 +29,23 @@ export default function OpenAI(props: LLmPropsOpenAI) {
     }, [props.llmConfig.model])
 
     useEffect(() => {
-        if (props.isVision) {
-            if (props.llmConfig.model && !VISION_MODEL_OPTIONS.includes(props.llmConfig.model)) {
-                props.setLlmConfig({ ...props.llmConfig, model: VISION_MODEL_OPTIONS[0] })
-            }
-        } else {
-            if (props.llmConfig.model && !MODEL_OPTIONS.includes(props.llmConfig.model)) {
-                props.setLlmConfig({ ...props.llmConfig, model: MODEL_OPTIONS[0] })
-            }
+        if (props.llmConfig.model && !MODEL_OPTIONS.includes(props.llmConfig.model)) {
+            props.setLlmConfig({ ...props.llmConfig, model: MODEL_OPTIONS[0] })
         }
     }, [])
-
     return (
         <div className='flex flex-col gap-y-6'>
             <div>
                 <label className="block mb-2 text-sm font-medium text-gray-900">Model</label>
                 <KernDropdown
                     buttonName={props.llmConfig.model ? props.llmConfig.model : 'Select model'}
-                    options={props.isVision ? VISION_MODEL_OPTIONS : MODEL_OPTIONS}
+                    options={MODEL_OPTIONS}
                     selectedOption={(option) => props.setLlmConfig({ ...props.llmConfig, model: option })}
                     disabled={props.disabled}
+                />
+                <OpenAIoSeriesSwitch
+                    llmConfig={props.llmConfig}
+                    setLlmConfig={props.setLlmConfig}
                 />
             </div>
             {props.onlyEssential ? null : <>

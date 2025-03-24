@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { LocalStorageDropdown } from "@/submodules/react-components/components/LocalStorageDropdown";
 import { InputWithSlider } from "@/submodules/react-components/components/InputWithSlider";
 import { LLmPropsAzure } from "../types";
+import OpenAIoSeriesSwitch from "./OpenAIoSeriesSwitch";
 
 
 export default function Azure(props: LLmPropsAzure) {
@@ -25,10 +26,14 @@ export default function Azure(props: LLmPropsAzure) {
                 <label className="block mb-2 text-sm font-medium text-gray-900">Azure URL</label>
                 <LocalStorageDropdown disabled={props.disabled} buttonName={props.llmConfig.apiBase ?? 'Select URL'} searchDefaultValue={props.llmConfig.apiBase} storageKey='AzureApiBase' onOptionSelected={(o) => props.setLlmConfig({ ...props.llmConfig, apiBase: o })} />
             </div>
-            <div>
+            <div className="-mb-5">
                 <label className="block mb-2 text-sm font-medium text-gray-900">API Version</label>
                 <LocalStorageDropdown disabled={props.disabled} buttonName={props.llmConfig.apiVersion ?? 'Select Version'} searchDefaultValue={props.llmConfig.apiVersion} storageKey='AzureVersion' onOptionSelected={(o) => props.setLlmConfig({ ...props.llmConfig, apiVersion: o })} />
             </div>
+            <OpenAIoSeriesSwitch
+                llmConfig={props.llmConfig}
+                setLlmConfig={props.setLlmConfig}
+            />
             {props.onlyEssential ? null : <>
 
                 <div className="grid grid-cols-2 xl:grid-cols-3 gap-2">

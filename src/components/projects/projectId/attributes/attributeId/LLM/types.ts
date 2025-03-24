@@ -18,7 +18,6 @@ export type LLMConfigProps = {
     setLlmConfig: (llmConfig: any) => void,
     onlyEssential?: boolean,
     projectId?: string,
-    isVision?: boolean,
     disabled?: boolean,
 }
 
@@ -28,7 +27,6 @@ export type LLmPropsOpenAI = {
     setLlmConfig: (llmConfig: any) => void;
     onlyEssential?: boolean;
     projectId?: string;
-    isVision?: boolean;
     disabled?: boolean;
 }
 
@@ -41,3 +39,8 @@ export type LLmPropsAzure = {
     disabled?: boolean;
 }
 export type LLmPropsAzureFoundry = LLmPropsAzure;
+
+export type OpenAIoSeriesSwitchProps = {
+    llmConfig: any;
+    setLlmConfig: (llmConfig: any) => void;
+}

@@ -7,7 +7,7 @@ import AzureFoundry from "./models/AzureFoundry";
 export function LLMConfig(props: LLMConfigProps) {
     switch (props.llmIdentifier) {
         case 'Open AI':
-            return <OpenAI disabled={props.disabled} llmConfig={props.llmConfig} setLlmConfig={props.setLlmConfig} onlyEssential={props.onlyEssential} projectId={props.projectId} isVision={props.isVision} />
+            return <OpenAI disabled={props.disabled} llmConfig={props.llmConfig} setLlmConfig={props.setLlmConfig} onlyEssential={props.onlyEssential} projectId={props.projectId} />
         case 'Azure':
             return <Azure disabled={props.disabled} llmConfig={props.llmConfig} setLlmConfig={props.setLlmConfig} onlyEssential={props.onlyEssential} projectId={props.projectId} />
         case 'Azure Foundry':
