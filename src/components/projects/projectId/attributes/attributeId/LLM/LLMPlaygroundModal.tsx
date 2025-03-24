@@ -74,7 +74,12 @@ export default function LLMPlaygroundModal() {
         if (!recordDataRef.current || recordDataRef.current?.length == 0) return;
         setPlaygroundTestRunning(true);
         const recordIds = recordDataRef.current.map((record) => record.id);
-        runAttributeLlmPlayground(projectId, modalRef.current.attributeId, recordIds, fullLlmConfigRef.current, (res) => {
+
+        const finalConfig = { ...fullLlmConfigRef.current };
+        if (finalConfig.llmConfig && finalConfig.llmIdentifier == 'Azure Foundry') {
+            delete finalConfig.llmConfig.openAioSeries;
+        }
+        runAttributeLlmPlayground(projectId, modalRef.current.attributeId, recordIds, finalConfig, (res) => {
             let answer = ""
             for (const id of recordIds) answer += "Answer: " + (res[id] || "No answer found") + "\n";
             if (res["logs"]) answer += "\n---\nlogs:\n" + res["logs"].join("\n");

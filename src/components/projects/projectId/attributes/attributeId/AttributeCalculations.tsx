@@ -156,12 +156,16 @@ export default function AttributeCalculation() {
     useEffect(() => {
         if (!currentAttributeRef.current || !currentAttributeRef.current.additionalConfig || simpleDictCompare(currentAttributeRef.current?.additionalConfig, debouncedConfig)) return;
         const attributeNew = { ...currentAttribute };
-        attributeNew.additionalConfig = { ...debouncedConfig };
+        const finalConfig = { ...debouncedConfig };
+        if (finalConfig.llmConfig && finalConfig.llmIdentifier == 'Azure Foundry') {
+            delete finalConfig.llmConfig.openAioSeries;
+        }
+        attributeNew.additionalConfig = { ...finalConfig };
         updateAttribute(projectId, currentAttribute.id, (res) => {
             setCurrentAttribute(postProcessCurrentAttribute(attributeNew));
             dispatch(updateAttributeById(attributeNew));
             setEnableButton(true);
-        }, null, null, null, null, null, debouncedConfig);
+        }, null, null, null, null, null, finalConfig);
 
     }, [debouncedConfig])
 
