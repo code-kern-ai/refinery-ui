@@ -20,6 +20,7 @@ import { getNotificationsByUser } from "@/src/services/base/notification";
 import { getAllActiveAdminMessages } from "@/src/services/base/organization";
 import { Application, CurrentPage } from "@/submodules/react-components/hooks/web-socket/constants";
 import AdminMessages from "@/submodules/react-components/components/AdminMessages";
+import { MemoIconAlertTriangleFilled, MemoIconCircleCheckFilled, MemoIconInfoCircleFilled } from "@/submodules/react-components/components/kern-icons/icons";
 
 const MIN_WIDTH = 1250;
 
@@ -130,7 +131,7 @@ export default function Layout({ children }) {
                         <div className="bg-blue-50 border-l-4 border-blue-400 p-4">
                             <div className="flex">
                                 <div className="flex-shrink-0">
-                                    <IconInfoCircleFilled className="h-5 w-5 text-blue-400" />
+                                    <MemoIconInfoCircleFilled className="h-5 w-5 text-blue-400" />
                                 </div>
                                 <div className="ml-3">
                                     <p className="text-sm text-blue-700">{notification.message}</p>
@@ -142,7 +143,7 @@ export default function Layout({ children }) {
                         <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4">
                             <div className="flex">
                                 <div className="flex-shrink-0">
-                                    <IconAlertTriangleFilled className="h-5 w-5 text-yellow-400" />
+                                    <MemoIconAlertTriangleFilled className="h-5 w-5 text-yellow-400" />
                                 </div>
                                 <div className="ml-3">
                                     <p className="text-sm text-yellow-700">{notification.message}</p>
@@ -154,7 +155,7 @@ export default function Layout({ children }) {
                         <div className="bg-red-50 border-l-4 border-red-400 p-4">
                             <div className="flex">
                                 <div className="flex-shrink-0">
-                                    <IconAlertTriangleFilled className="h-5 w-5 text-red-400" />
+                                    <MemoIconAlertTriangleFilled className="h-5 w-5 text-red-400" />
                                 </div>
                                 <div className="ml-3">
                                     <p className="text-sm text-red-700">{notification.message}</p>
@@ -166,7 +167,7 @@ export default function Layout({ children }) {
                         <div className="bg-green-50 border-l-4 border-green-400 p-4">
                             <div className="flex">
                                 <div className="flex-shrink-0">
-                                    <IconCircleCheckFilled className="h-5 w-5 text-green-400" />
+                                    <MemoIconCircleCheckFilled className="h-5 w-5 text-green-400" />
                                 </div>
                                 <div className="ml-3">
                                     <p className="text-sm text-green-700">{notification.message}</p>

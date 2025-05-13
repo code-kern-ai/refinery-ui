@@ -2,6 +2,7 @@ import { selectProjectId } from "@/src/reduxStore/states/project";
 import { deleteQuestionFromHistory, getPlaygroundQuestions } from "@/src/services/base/playground";
 import { PlaygroundQuestion } from "@/src/types/components/projects/projectId/settings/playground";
 import IconButton from "@/submodules/react-components/components/kern-button/IconButton";
+import { MemoIconTrash } from "@/submodules/react-components/components/kern-icons/icons";
 import useOnClickOutside from "@/submodules/react-components/hooks/useHooks/useOnClickOutside";
 import { IconHistory, IconTrash } from "@tabler/icons-react";
 import { useEffect, useRef, useState } from "react";
@@ -66,7 +67,7 @@ export default function QuestionHistory(props: QuestionHistoryProps) {
                                 <li className=" text-gray-700">
                                     {questionEntry.question}
                                 </li>
-                                <IconTrash onClick={() => deleteQuestionFromHistoryFunc(questionEntry.id)}
+                                <MemoIconTrash onClick={() => deleteQuestionFromHistoryFunc(questionEntry.id)}
                                     className="h-6 w-6 text-red-700 cursor-pointer ml-auto" />
                             </div>
                         ))}

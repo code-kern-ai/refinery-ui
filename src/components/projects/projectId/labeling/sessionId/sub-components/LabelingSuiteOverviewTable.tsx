@@ -16,6 +16,7 @@ import style from '@/src/styles/components/projects/projectId/labeling.module.cs
 import { LabelSourceHover } from "@/src/types/components/projects/projectId/labeling/labeling";
 import { UserRole } from "@/src/types/shared/sidebar";
 import { deleteRecordLabelAssociationByIds } from "@/src/services/base/labeling";
+import { MemoIconSearch, MemoIconTrash } from "@/submodules/react-components/components/kern-icons/icons";
 
 
 function shouldHighLight(tmpHighlightIds: string[], comparedIds: string[], additionalComparedIds?: string[]) {
@@ -180,12 +181,12 @@ export default function LabelingSuiteOverviewTable() {
                                         </td>
                                         <td onMouseEnter={() => onMouseEnter([ovItem.rla.id])} onMouseLeave={onMouseLeave}
                                             className={`${(shouldHighLight(tmpHighlightIds, ovItem.shouldHighlightOn) || hoverGroupsDict[ovItem.label.id] && hoverGroupsDict[ovItem.label.id][LabelingPageParts.OVERVIEW_TABLE] && hoverGroupsDict[ovItem.label.id][ovItem.sourceTypeKey]) ? settings.main.hoverGroupBackgroundColorClass : ''}`}>
-                                            <IconSearch className="w-6 h-6 text-gray-700" />
+                                            <MemoIconSearch className="w-6 h-6 text-gray-700" />
                                         </td>
                                         <td onMouseEnter={() => onMouseEnter([ovItem.rla.id])} onMouseLeave={onMouseLeave}
                                             className={`${(shouldHighLight(tmpHighlightIds, ovItem.shouldHighlightOn) || hoverGroupsDict[ovItem.label.id] && hoverGroupsDict[ovItem.label.id][LabelingPageParts.OVERVIEW_TABLE] && hoverGroupsDict[ovItem.label.id][ovItem.sourceTypeKey]) ? settings.main.hoverGroupBackgroundColorClass : ''}`}>
                                             {ovItem.canBeDeleted && <div onClick={() => deleteLabelFromRecord(ovItem.rla.id)}>
-                                                <IconTrash className="w-6 h-6 text-red-700 cursor-pointer" /></div>}
+                                                <MemoIconTrash className="w-6 h-6 text-red-700 cursor-pointer" /></div>}
                                         </td>
                                     </tr>))}
                                 </tbody>

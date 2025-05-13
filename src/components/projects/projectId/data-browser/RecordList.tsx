@@ -10,11 +10,12 @@ import { UserRole } from "@/src/types/shared/sidebar";
 import { DATA_BROWSER_TABLE_COLUMN_HEADERS } from "@/src/util/components/projects/projectId/data-browser/data-browser-helper";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
 import { Tooltip } from "@nextui-org/react";
-import { IconAngle, IconArrowRight, IconEdit, IconNotes } from "@tabler/icons-react";
+import { IconAngle, IconArrowRight } from "@tabler/icons-react";
 import { useDispatch, useSelector } from "react-redux";
 import SimilaritySearchModal from "./modals/SimilaritySeachModal";
 import RecordCommentsModal from "./modals/RecordCommentsModal";
 import ButtonAsText from "@/submodules/react-components/components/kern-button/ButtonAsText";
+import { MemoIconEdit, MemoIconNotes } from "@/submodules/react-components/components/kern-icons/icons";
 
 export default function RecordList(props: RecordListProps) {
     const dispatch = useDispatch();
@@ -32,7 +33,7 @@ export default function RecordList(props: RecordListProps) {
                 {recordComments[record.id] && <div className="cursor-pointer absolute top-10 right-4"
                     onClick={() => dispatch(setModalStates(ModalEnum.RECORD_COMMENTS, { commentsData: recordComments[record.id], open: true }))}>
                     <Tooltip content={TOOLTIPS_DICT.DATA_BROWSER.RECORD_COMMENTS} color="invert" placement="left">
-                        <IconNotes className="h-4 w-4" />
+                        <MemoIconNotes className="h-4 w-4" />
                     </Tooltip>
                 </div>}
 
@@ -73,7 +74,7 @@ export default function RecordList(props: RecordListProps) {
             </div>
             {user?.role == UserRole.ENGINEER && <div className="p-2 cursor-pointer absolute right-2 top-2">
                 <Tooltip content={TOOLTIPS_DICT.DATA_BROWSER.EDIT_RECORD} color="invert">
-                    <IconEdit className="h-4 w-4" onClick={() => props.editRecord(index)} />
+                    <MemoIconEdit className="h-4 w-4" onClick={() => props.editRecord(index)} />
                 </Tooltip></div>}
         </div >))
         }

@@ -17,6 +17,7 @@ import { Tooltip } from "@nextui-org/react";
 import QuestionHistory from "./QuestionHistory";
 import IconButton from "@/submodules/react-components/components/kern-button/IconButton";
 import KernButton from "@/submodules/react-components/components/kern-button/KernButton";
+import { MemoIconLoader2 } from "@/submodules/react-components/components/kern-icons/icons";
 
 const PLAYGROUND_LIMIT_DEFAULT = 10;
 const PLAYGROUND_THRESHOLD_DEFAULT = -9999;
@@ -97,7 +98,7 @@ export function PlaygroundSearch() {
                     onChange={(event: any) => setQuestion(event.target.value)}
                     value={question}
                 ></textarea>
-                {reformulationLoading && <span className="absolute top-1/4 left-1/2 transform -translate-x-1/2 -translate-y-1/2"><IconLoader2 className="absolute h-6 w-6 animate-spin" /></span>}
+                {reformulationLoading && <span className="absolute top-1/4 left-1/2 transform -translate-x-1/2 -translate-y-1/2"><MemoIconLoader2 className="absolute h-6 w-6 animate-spin" /></span>}
                 <div className="absolute top-2 right-2 flex gap-x-2">
                     <IconButton
                         icon={IconWand}

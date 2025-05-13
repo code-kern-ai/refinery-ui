@@ -8,6 +8,7 @@ import { IconAlertCircle } from "@tabler/icons-react";
 import { use, useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import Highlight from "../highlight/Highlight";
+import { MemoIconAlertCircle } from "@/submodules/react-components/components/kern-icons/icons";
 
 export function RecordDisplay(props: any) {
     const attributesDict = useSelector(selectAttributesDict);
@@ -59,7 +60,7 @@ export function RecordDisplay(props: any) {
 
 function NotPresentInRecord() {
     return (<div className="flex items-center">
-        <IconAlertCircle className="text-yellow-700" />
+        <MemoIconAlertCircle className="text-yellow-700" />
         <span className="text-gray-500 text-sm font-normal italic">Not present in the record</span>
     </div>
     )

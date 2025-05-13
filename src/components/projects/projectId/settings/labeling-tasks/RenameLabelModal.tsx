@@ -11,6 +11,7 @@ import { LabelHelper } from "@/src/util/classes/label-helper";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
 import { jsonCopy } from "@/submodules/javascript-functions/general";
 import KernButton from "@/submodules/react-components/components/kern-button/KernButton";
+import { MemoIconAlertTriangleFilled, MemoIconInfoCircleFilled, MemoIconTriangleInverted } from "@/submodules/react-components/components/kern-icons/icons";
 import { Tooltip } from "@nextui-org/react";
 import { IconAlertTriangleFilled, IconInfoCircleFilled, IconTriangleInverted } from "@tabler/icons-react";
 import { useCallback, useEffect, useState } from "react";
@@ -99,7 +100,7 @@ export default function RenameLabelModal() {
                     <p className="mr-2 font-medium">Change label name:</p><span
                         className={`border rounded-md py-1 px-2 text-sm font-medium shadow-sm  text-center ${modalRenameLabel.label.color?.backgroundColor} ${modalRenameLabel.label.color?.textColor} ${modalRenameLabel.label.color?.borderColor} ${modalRenameLabel.label.color?.hoverColor}`}>{modalRenameLabel.label.name}</span>
                     <Tooltip content={TOOLTIPS_DICT.PROJECT_SETTINGS.LABELING_TASK.INFO_RENAME_LABEL} color="invert" placement="top" className="ml-2">
-                        <IconInfoCircleFilled className="h-6 w-6 text-blue-500" />
+                        <MemoIconInfoCircleFilled className="h-6 w-6 text-blue-500" />
                     </Tooltip>
                 </div>
                 <div className="flex flex-col gap-y-2" style={{ maxHeight: 'calc(100vh - 200px)', overflow: 'auto' }}>
@@ -118,7 +119,7 @@ export default function RenameLabelModal() {
                     {renameLabelData?.checkResults?.errors?.length > 0 && <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative flex flex-col">
                         <div className="self-center flex flex-row flex-nowrap items-center -mt-1 mb-1">
                             <strong className="font-medium">Errors detected</strong>
-                            <IconAlertTriangleFilled className="h-5 w-5 text-red-400" />
+                            <MemoIconAlertTriangleFilled className="h-5 w-5 text-red-400" />
                         </div>
                         {renameLabelData?.checkResults?.errors.map((error: any) => (
                             <pre key={error.msg} className="text-sm overflow-x-auto">{error.msg}</pre>
@@ -127,7 +128,7 @@ export default function RenameLabelModal() {
                     {renameLabelData?.checkResults?.infos.length > 0 && <div className="bg-blue-100 border border-blue-400 text-blue-700 px-4 py-3 rounded relative flex flex-col">
                         <div className="self-center flex flex-row flex-nowrap items-center -mt-1 mb-1">
                             <strong className="font-medium">Information</strong>
-                            <IconInfoCircleFilled className="h-5 w-5 text-blue-400" />
+                            <MemoIconInfoCircleFilled className="h-5 w-5 text-blue-400" />
                         </div>
                         {renameLabelData?.checkResults?.infos.map((info: any) => (
                             <pre key={info.msg} className="text-sm overflow-x-auto">{info.msg}</pre>
@@ -136,7 +137,7 @@ export default function RenameLabelModal() {
                     {renameLabelData?.checkResults?.warnings?.length > 0 && <div className="bg-yellow-100 border border-yellow-400 text-yellow-700 px-4 py-3 rounded relative flex flex-col">
                         <div className="self-center flex flex-row flex-nowrap items-center -mt-1 mb-1">
                             <strong className="font-medium">Warning</strong>
-                            <IconAlertTriangleFilled className="h-5 w-5 text-yellow-400" />
+                            <MemoIconAlertTriangleFilled className="h-5 w-5 text-yellow-400" />
                         </div>
                         <div className="self-center">
                             <span className="text-sm mb-2">
@@ -157,7 +158,7 @@ export default function RenameLabelModal() {
                                     setRenameLabelData({ ...renameLabelData, checkResults: checkResults });
                                 }}>
                                     <div className="mr-1">
-                                        <IconTriangleInverted className={`h-3 w-3 ${warning.open ? 'transform rotate-180' : ''}`} />
+                                        <MemoIconTriangleInverted className={`h-3 w-3 ${warning.open ? 'transform rotate-180' : ''}`} />
                                     </div>
                                     <span className="text-sm overflow-x-auto">{warning.msg}</span>
                                 </div>

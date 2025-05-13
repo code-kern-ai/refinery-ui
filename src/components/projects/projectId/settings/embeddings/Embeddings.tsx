@@ -18,6 +18,7 @@ import DeleteEmbeddingModal from "./DeleteEmbeddingModal";
 import { useWebsocket } from "@/submodules/react-components/hooks/web-socket/useWebsocket";
 import { Application, CurrentPage, CurrentPageSubKey } from "@/submodules/react-components/hooks/web-socket/constants";
 import KernButton from "@/submodules/react-components/components/kern-button/KernButton";
+import { MemoIconAlertTriangleFilled, MemoIconCircleCheckFilled, MemoIconNotes, MemoIconTrash } from "@/submodules/react-components/components/kern-icons/icons";
 
 
 export default function Embeddings(props: { refetchEmbeddings: () => void }) {
@@ -119,7 +120,7 @@ export default function Embeddings(props: { refetchEmbeddings: () => void }) {
                                                         TOOLTIPS_DICT.PROJECT_SETTINGS.EMBEDDINGS.HAS_FILTER_ATTRIBUTES :
                                                         TOOLTIPS_DICT.PROJECT_SETTINGS.EMBEDDINGS.NO_FILTER_ATTRIBUTES)
                                                 } color="invert" >
-                                                    <IconNotes onClick={() => embedding.onQdrant ? dispatch(setModalStates(ModalEnum.FILTERED_ATTRIBUTES, { embeddingId: embedding.id, open: true, attributeNames: prepareAttributeDataByNames(embedding.filterAttributes), showEditOption: showEditOption })) : null}
+                                                    <MemoIconNotes onClick={() => embedding.onQdrant ? dispatch(setModalStates(ModalEnum.FILTERED_ATTRIBUTES, { embeddingId: embedding.id, open: true, attributeNames: prepareAttributeDataByNames(embedding.filterAttributes), showEditOption: showEditOption })) : null}
                                                         className={`h-6 w-6 ${embedding.filterAttributes && embedding.filterAttributes.length > 0 ? 'text-gray-700' : 'text-gray-300'} ${embedding.onQdrant ? "" : "cursor-not-allowed opacity-50"}`} />
                                                 </Tooltip>
                                             </td> : <td className="whitespace-nowrap text-center px-3 py-2 text-sm text-gray-500 flex justify-center"><LoadingIcon /></td>}
@@ -139,10 +140,10 @@ export default function Embeddings(props: { refetchEmbeddings: () => void }) {
                                                 <p className="text-xs italic">{embedding.state}</p>
                                             </div>}
                                             {embedding.state == EmbeddingState.FINISHED && <Tooltip content={TOOLTIPS_DICT.GENERAL.SUCCESSFULLY_CREATED} color="invert" className="cursor-auto">
-                                                <IconCircleCheckFilled className="h-6 w-6 text-green-500" />
+                                                <MemoIconCircleCheckFilled className="h-6 w-6 text-green-500" />
                                             </Tooltip>}
                                             {embedding.state == EmbeddingState.FAILED && <Tooltip content={TOOLTIPS_DICT.GENERAL.ERROR} color="invert" className="cursor-auto">
-                                                <IconAlertTriangleFilled className="h-6 w-6 text-red-500" />
+                                                <MemoIconAlertTriangleFilled className="h-6 w-6 text-red-500" />
                                             </Tooltip>}
                                         </td>
                                         <td className="whitespace-nowrap text-center px-3 py-2 text-sm text-gray-500">
@@ -152,7 +153,7 @@ export default function Embeddings(props: { refetchEmbeddings: () => void }) {
                                             {embedding.count}
                                         </td>
                                         <td className="whitespace-nowrap text-center px-3 py-2 text-sm text-gray-500">
-                                            <IconTrash onClick={() => dispatch(setModalStates(ModalEnum.DELETE_EMBEDDING, { embeddingId: embedding.id, open: true, isQueuedElement: embedding.state == EmbeddingState.QUEUED }))}
+                                            <MemoIconTrash onClick={() => dispatch(setModalStates(ModalEnum.DELETE_EMBEDDING, { embeddingId: embedding.id, open: true, isQueuedElement: embedding.state == EmbeddingState.QUEUED }))}
                                                 className="h-6 w-6 text-red-700 cursor-pointer" />
                                         </td>
                                     </tr>

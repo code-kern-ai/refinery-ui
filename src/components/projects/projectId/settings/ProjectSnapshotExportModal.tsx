@@ -22,6 +22,7 @@ import { timer } from "rxjs";
 import { Application, CurrentPage, CurrentPageSubKey } from "@/submodules/react-components/hooks/web-socket/constants";
 import { selectOrganizationId } from "@/src/reduxStore/states/general";
 import KernButton from "@/submodules/react-components/components/kern-button/KernButton";
+import { MemoIconInfoCircle } from "@/submodules/react-components/components/kern-icons/icons";
 
 export default function ProjectSnapshotExportModal() {
     const dispatch = useDispatch();
@@ -142,7 +143,7 @@ export default function ProjectSnapshotExportModal() {
                             </div>
                             <div className="flex items-center justify-items-center">
                                 {item.desc && <Tooltip content={item.desc} color="invert" placement="top" className="cursor-auto">
-                                    <IconInfoCircle className="h-6 w-6 text-gray-900" />
+                                    <MemoIconInfoCircle className="h-6 w-6 text-gray-900" />
                                 </Tooltip>}
                             </div>
                             <div className="flex">{item.sizeReadable}</div>

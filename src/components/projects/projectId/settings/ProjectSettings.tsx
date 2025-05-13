@@ -33,6 +33,7 @@ import { getEmbeddings, getRecommendedEncoders } from "@/src/services/base/embed
 import { getQueuedTasks } from "@/src/services/base/project-setting";
 import { Application, CurrentPage } from "@/submodules/react-components/hooks/web-socket/constants";
 import KernButton from "@/submodules/react-components/components/kern-button/KernButton";
+import { MemoIconCheck, MemoIconDots } from "@/submodules/react-components/components/kern-icons/icons";
 
 export default function ProjectSettings() {
     const dispatch = useDispatch();
@@ -284,11 +285,11 @@ export default function ProjectSettings() {
                             </div>
                         </div>}
                         {tokenizationProgress == 1 && <div className="absolute md:rounded-lg top-0 left-0 right-0 bottom-0 flex flex-row items-center justify-center" style={{ backgroundColor: '#f4f4f5bf' }}>
-                            <IconCheck className="h-4 w-4 text-green-700" />
+                            <MemoIconCheck className="h-4 w-4 text-green-700" />
                             <span className="text-sm font-medium text-green-700">Completed</span>
                         </div>}
                         {tokenizationProgress == -1 && <div className="absolute md:rounded-lg top-0 left-0 right-0 bottom-0 flex flex-row items-center justify-center" style={{ backgroundColor: '#f4f4f5bf' }}>
-                            <IconDots className="h-4 w-4 text-gray-700" />
+                            <MemoIconDots className="h-4 w-4 text-gray-700" />
                             <span className="text-sm font-medium text-gray-700">Queued</span>
                         </div>}
                         {!tokenizationProgress && <div className="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700">

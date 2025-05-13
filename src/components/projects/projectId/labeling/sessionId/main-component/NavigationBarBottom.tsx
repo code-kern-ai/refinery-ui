@@ -11,6 +11,7 @@ import { selectDisplayUserRole, selectRecordRequestsRecord, selectSettings, upda
 import { ComponentType } from "@/src/types/components/projects/projectId/labeling/settings";
 import LabelingSettingsModal from "./LabelingSettingsModal";
 import KernButton from "@/submodules/react-components/components/kern-button/KernButton";
+import { MemoIconSettings } from "@/submodules/react-components/components/kern-icons/icons";
 
 export default function NavigationBarBottom() {
     const dispatch = useDispatch();
@@ -84,7 +85,7 @@ export default function NavigationBarBottom() {
                 {user.role !== UserRole.ANNOTATOR && userDisplayRole != UserRole.ANNOTATOR && <Tooltip onClick={() => dispatch(openModal(ModalEnum.LABELING_SETTINGS))}
                     content={<div className="w-32">Open Labeling Suite settings</div>} color="invert" placement="left">
                     <div className="p-2 border border-gray-300 rounded-md">
-                        <IconSettings className="h-6 w-6" />
+                        <MemoIconSettings className="h-6 w-6" />
                     </div>
                 </Tooltip>}
             </div>

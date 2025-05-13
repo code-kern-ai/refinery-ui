@@ -15,6 +15,7 @@ import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import ButtonAsText from "@/submodules/react-components/components/kern-button/ButtonAsText";
+import { MemoIconCheck, MemoIconX } from "@/submodules/react-components/components/kern-icons/icons";
 
 export default function DataSchema(props: DataSchemaProps) {
     const router = useRouter();
@@ -82,10 +83,10 @@ export default function DataSchema(props: DataSchemaProps) {
                                         <div className="inline-block w-4 h-3.5">
                                             {props.pKeyValid != null && <>
                                                 {props.pKeyValid ? <Tooltip content={TOOLTIPS_DICT.PROJECT_SETTINGS.DATA_SCHEMA.UNIQUE_COMBINATION} color="invert" placement="bottom" className="cursor-auto">
-                                                    <IconCheck className="h-5 w-5 -mt-1" />
+                                                    <MemoIconCheck className="h-5 w-5 -mt-1" />
                                                 </Tooltip> :
                                                     <Tooltip content={TOOLTIPS_DICT.PROJECT_SETTINGS.DATA_SCHEMA.NOT_UNIQUE_COMBINATION} color="invert" placement="bottom" className="cursor-auto">
-                                                        <IconX className="h-5 w-5 -mt-1" />
+                                                        <MemoIconX className="h-5 w-5 -mt-1" />
                                                     </Tooltip>}
                                             </>}
                                         </div>

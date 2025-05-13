@@ -8,15 +8,13 @@ import { useState } from 'react';
 import AppSelectionDropdown from '@/submodules/react-components/components/AppSelectionDropdown';
 import { ModalEnum } from '@/src/types/shared/modal';
 import { openModal } from '@/src/reduxStore/states/modal';
-import { IconAlertCircle, IconBulb, IconChartPie, IconMaximize, IconMinimize, IconTag, IconTriangleSquareCircle } from '@tabler/icons-react';
-import { IconSettings } from '@tabler/icons-react';
 import { useRouter } from 'next/router';
 import { TOOLTIPS_DICT } from '@/src/util/tooltip-constants';
 import { CacheEnum, selectCachedValue } from '@/src/reduxStore/states/cachedValues';
 import VersionOverviewModal from './VersionOverviewModal';
 import { setProjectIdSampleProject } from '@/src/reduxStore/states/tmp';
 import { getHasUpdates } from '@/src/services/base/misc';
-import IconButton from '@/submodules/react-components/components/kern-button/IconButton';
+import { MemoIconAlertCircle, MemoIconBulb, MemoIconChartPie, MemoIconMaximize, MemoIconMinimize, MemoIconSettings, MemoIconTag, MemoIconTriangleSquareCircle } from '@/submodules/react-components/components/kern-icons/icons';
 
 export default function Sidebar() {
     const router = useRouter();
@@ -98,7 +96,7 @@ export default function Sidebar() {
                                                 <div className={`relative z-50`}>
                                                     <a href={`/refinery/projects/${project.id}/overview`} onClick={(e: any) => { e.preventDefault(); router.push(`/projects/${project.id}/overview`) }}
                                                         className={`${project.numDataScaleUploaded == 0 ? 'opacity-50 cursor-not-allowed' : 'opacity-100 cursor-pointer'} circle ${routeColor.overview.active ? 'text-kernpurple' : 'text-white'}`}>
-                                                        <IconChartPie className="w-6 h-6" />
+                                                        <MemoIconChartPie className="w-6 h-6" />
                                                     </a>
                                                 </div>
                                             </Tooltip>
@@ -109,7 +107,7 @@ export default function Sidebar() {
                                                 <div className={`relative z-50`}>
                                                     <a href={`/refinery/projects/${project.id}/data-browser`} onClick={(e: any) => { e.preventDefault(); router.push(`/projects/${project.id}/data-browser`) }}
                                                         className={`${project.numDataScaleUploaded == 0 ? 'opacity-50 cursor-not-allowed' : 'opacity-100 cursor-pointer'} circle ${routeColor.data.active ? 'text-kernpurple' : 'text-white'}`}>
-                                                        <IconTriangleSquareCircle className="w-6 h-6" />
+                                                        <MemoIconTriangleSquareCircle className="w-6 h-6" />
                                                     </a>
                                                 </div>
                                             </Tooltip>
@@ -119,7 +117,7 @@ export default function Sidebar() {
                                                 <div className={`relative z-50`}>
                                                     <a href={`/refinery/projects/${project.id}/labeling`} onClick={(e: any) => { e.preventDefault(); router.push(`/projects/${project.id}/labeling`) }}
                                                         className={`${project.numDataScaleUploaded == 0 ? 'opacity-50 cursor-not-allowed' : 'opacity-100 cursor-pointer'} circle ${routeColor.labeling.active ? 'text-kernpurple' : 'text-white'}`}>
-                                                        <IconTag className="w-6 h-6" />
+                                                        <MemoIconTag className="w-6 h-6" />
                                                     </a>
                                                 </div>
                                             </Tooltip>
@@ -130,7 +128,7 @@ export default function Sidebar() {
                                                 <div className={`relative z-50`}>
                                                     <a href={`/refinery/projects/${project.id}/heuristics`} onClick={(e: any) => { e.preventDefault(); router.push(`/projects/${project.id}/heuristics`) }}
                                                         className={`${project.numDataScaleUploaded == 0 ? 'opacity-50 cursor-not-allowed' : 'opacity-100 cursor-pointer'} circle ${routeColor.heuristics.active ? 'text-kernpurple' : 'text-white'}`}>
-                                                        <IconBulb className="w-6 h-6" />
+                                                        <MemoIconBulb className="w-6 h-6" />
                                                     </a>
                                                 </div>
                                             </Tooltip>
@@ -141,7 +139,7 @@ export default function Sidebar() {
                                                 <div className={`relative z-50`}>
                                                     <a href={`/refinery/projects/${project.id}/settings`} onClick={(e: any) => { e.preventDefault(); router.push(`/projects/${project.id}/settings`) }}
                                                         className={`circle ${routeColor.settings.active ? 'text-kernpurple' : 'text-white'}`}>
-                                                        <IconSettings className="w-6 h-6" />
+                                                        <MemoIconSettings className="w-6 h-6" />
                                                     </a>
                                                 </div>
                                             </Tooltip>
@@ -161,7 +159,7 @@ export default function Sidebar() {
                                 <Tooltip placement="right" trigger="hover" color="invert" content={TOOLTIPS_DICT.SIDEBAR.MAXIMIZE_SCREEN}>
                                     <button onClick={openFullScreen}
                                         className="z-50 cursor-pointer">
-                                        <IconMaximize className="text-white" />
+                                        <MemoIconMaximize className="text-white" />
                                     </button>
                                 </Tooltip>
                             </div>}
@@ -170,7 +168,7 @@ export default function Sidebar() {
                                 <Tooltip placement="right" trigger="hover" color="invert" content={TOOLTIPS_DICT.SIDEBAR.MINIMIZE_SCREEN}>
                                     <button onClick={closeFullScreen}
                                         className="z-50 cursor-pointer">
-                                        <IconMinimize className="text-white" />
+                                        <MemoIconMinimize className="text-white" />
                                     </button>
                                 </Tooltip>
                             </div>}
@@ -185,7 +183,7 @@ export default function Sidebar() {
                                         className="z-50 tooltip tooltip-right cursor-pointer select-none text-white flex items-center mr-1">
                                         v1.19.0
                                         {hasUpdates && <Tooltip placement="right" trigger="hover" color="invert" content={TOOLTIPS_DICT.SIDEBAR.NEWER_VERSION_AVAILABLE} >
-                                            <IconAlertCircle className="h-5 w-5 text-yellow-700" />
+                                            <MemoIconAlertCircle className="h-5 w-5 text-yellow-700" />
                                         </Tooltip>}
                                     </div>
                                 </Tooltip>

@@ -9,6 +9,7 @@ import { jsonCopy } from "@/submodules/javascript-functions/general";
 import { IconAlertTriangleFilled, IconInfoCircle, IconTrash } from "@tabler/icons-react";
 import { Fragment, useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { MemoIconAlertTriangleFilled, MemoIconInfoCircle, MemoIconTrash } from "@/submodules/react-components/components/kern-icons/icons";
 
 const ACCEPT_BUTTON = { buttonCaption: 'Synchronize', useButton: true, disabled: false, closeAfterClick: false };
 
@@ -70,7 +71,7 @@ export default function SyncRecordsModal(props: SyncRecordsModalProps) {
     return (<Modal modalName={ModalEnum.SYNC_RECORDS} acceptButton={acceptButton}>
         {props.erdData && <>
             <h1 className="text-lg text-gray-900 mb-2 text-center inline-flex items-center gap-x-1">Info
-                {syncing ? (<LoadingIcon color="blue" />) : (<IconInfoCircle className="text-blue-400" />)}
+                {syncing ? (<LoadingIcon color="blue" />) : (<MemoIconInfoCircle className="text-blue-400" />)}
             </h1>
             <div className="text-sm text-gray-700 flex flex-col gap-y-2 mb-2 font-medium" style={{
                 maxHeight: 'calc(100vh - 250px)', overflowY: 'auto'
@@ -90,7 +91,7 @@ export default function SyncRecordsModal(props: SyncRecordsModalProps) {
                         <span className="h-full w-full p-1 inline-flex items-center justify-center bg-red-200">{`${value.display.oldValue}`}</span>
                         <span className="h-full w-full p-1 inline-flex items-center justify-center bg-green-200">{`${value.newValue}`}</span>
                         <div className="bg-white h-full w-full p-1 inline-flex items-center justify-center cursor-pointer" onClick={() => removeFromCache(key)}>
-                            <IconTrash className="text-red-700 h-6 w-6" stroke={2} />
+                            <MemoIconTrash className="text-red-700 h-6 w-6" stroke={2} />
                         </div>
                     </Fragment>))}
                 </div>
@@ -98,7 +99,7 @@ export default function SyncRecordsModal(props: SyncRecordsModalProps) {
             {props.erdData.errors && <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative flex flex-col">
                 <div className="self-center flex flex-row flex-nowrap items-center -mt-1 mb-1">
                     <strong className="font-semibold">Errors while syncing changes</strong>
-                    <IconAlertTriangleFilled className="h-5 w-5 text-red-400" />
+                    <MemoIconAlertTriangleFilled className="h-5 w-5 text-red-400" />
                 </div>
                 {props.erdData.errors.map((error, index) => <div key={error} className="text-sm overflow-x-auto m-auto" style={{ maxWidth: '600px' }}>
                     {error}

@@ -4,6 +4,7 @@ import { IconAdjustmentsAlt, IconAdjustmentsOff, IconSettings, IconTerminal, Ico
 import KernButton from "@/submodules/react-components/components/kern-button/KernButton";
 import LLMResponsePlayground from "./LLMResponsePlayground";
 import { LLMResponseConfigProps } from "./LLM/types";
+import { MemoIconTerminal, MemoIconUser } from "@/submodules/react-components/components/kern-icons/icons";
 
 
 export default function LLMResponseConfig(props: LLMResponseConfigProps) {
@@ -65,8 +66,8 @@ function TemplatePrompt(props: TemplatePromptProps) {
             <div className="flex gap-x-2">
                 <div className='py-2'>
                     <div className='flex items-center justify-center bg-white h-6 w-6 rounded-lg border border-gray-300'>
-                        {props.type == "SYSTEM" ? <IconTerminal className='h-4 w-4 text-gray-500' />
-                            : <IconUser className='h-4 w-4 text-gray-500' />}
+                        {props.type == "SYSTEM" ? <MemoIconTerminal className='h-4 w-4 text-gray-500' />
+                            : <MemoIconUser className='h-4 w-4 text-gray-500' />}
                     </div>
                 </div>
                 <div className='text-sm font-mono text-gray-900 text-center leading-10'>

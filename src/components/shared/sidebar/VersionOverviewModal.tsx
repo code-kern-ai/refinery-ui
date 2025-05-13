@@ -8,6 +8,7 @@ import LoadingIcon from "../../../../submodules/react-components/components/Load
 import { useEffect, useState } from "react";
 import KernTable from "@/submodules/react-components/components/kern-table/KernTable";
 import { prepareTableBodyVersionOverview, VERSION_OVERVIEW_TABLE_COLUMNS } from "@/src/util/table-preparations/version-overview";
+import { MemoIconArrowRight } from "@/submodules/react-components/components/kern-icons/icons";
 
 
 export default function VersionOverviewModal() {
@@ -26,7 +27,7 @@ export default function VersionOverviewModal() {
 
             <a className="text-green-800 text-base font-medium ml-3" href="https://changelog.kern.ai/" target="_blank">
                 <span className="leading-5">Changelog</span>
-                <IconArrowRight className="h-4 w-4 inline-block text-green-800" />
+                <MemoIconArrowRight className="h-4 w-4 inline-block text-green-800" />
             </a>
         </div>
         {versionOverviewData ? (<div className="inline-block min-w-full align-middle mt-3">

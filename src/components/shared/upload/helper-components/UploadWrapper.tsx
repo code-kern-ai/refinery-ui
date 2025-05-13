@@ -10,6 +10,7 @@ import { Embedding, PlatformType } from "@/src/types/components/projects/project
 import CryptedField from "../../crypted-field/CryptedField";
 import { ZIP_TYPE } from "@/src/util/classes/upload-helper";
 import KernButton from "@/submodules/react-components/components/kern-button/KernButton";
+import { MemoIconAlertTriangle } from "@/submodules/react-components/components/kern-icons/icons";
 
 
 export default function UploadWrapper(props: UploadWrapperProps) {
@@ -43,7 +44,7 @@ export default function UploadWrapper(props: UploadWrapperProps) {
         {props.submitted && !selectedFile && props.uploadTask?.state !== UploadStates.IN_PROGRESS && <div className="rounded-md bg-yellow-50 p-4">
             <div className="flex">
                 <div className="flex-shrink-0">
-                    <IconAlertTriangle className="h-5 w-5 text-yellow-800" />
+                    <MemoIconAlertTriangle className="h-5 w-5 text-yellow-800" />
                 </div>
                 <div className="ml-3">
                     <h3 className="text-sm font-medium text-yellow-800">File required</h3>

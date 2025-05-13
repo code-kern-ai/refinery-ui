@@ -8,10 +8,11 @@ import { Tooltip } from "@nextui-org/react";
 import { useRouter } from "next/router";
 import { useDispatch, useSelector } from "react-redux";
 import { NOT_AVAILABLE, UNKNOWN_USER } from "@/src/util/constants";
-import { IconArrowRight, IconX } from "@tabler/icons-react";
+import { IconArrowRight } from "@tabler/icons-react";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
 import { deleteProjectPost } from "@/src/services/base/project";
 import ButtonAsText from "@/submodules/react-components/components/kern-button/ButtonAsText";
+import { MemoIconX } from "@/submodules/react-components/components/kern-icons/icons";
 
 export default function ProjectCard(props: ProjectCardProps) {
     const router = useRouter();
@@ -66,7 +67,7 @@ export default function ProjectCard(props: ProjectCardProps) {
                     {(isAdmin && props.project.status !== ProjectStatus.INIT_SAMPLE_PROJECT) &&
                         <div className="absolute top-0 left-0 cursor-pointer" onClick={() => adminOpenOrDeleteProject(props.project)}>
                             <Tooltip content={TOOLTIPS_DICT.PROJECTS.QUICK_DELETE} color="invert" offset={2} placement="right">
-                                <IconX className="h-6 w-6 text-gray-500" />
+                                <MemoIconX className="h-6 w-6 text-gray-500" />
                             </Tooltip>
                         </div>
                     }

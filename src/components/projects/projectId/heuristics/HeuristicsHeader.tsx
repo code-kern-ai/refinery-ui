@@ -27,6 +27,7 @@ import { Application, CurrentPage } from "@/submodules/react-components/hooks/we
 import KernButton from "@/submodules/react-components/components/kern-button/KernButton";
 import IconButton from "@/submodules/react-components/components/kern-button/IconButton";
 import { ChevronDownIcon } from "@heroicons/react/20/solid";
+import { MemoIconPlus } from "@/submodules/react-components/components/kern-icons/icons";
 
 
 export default function HeuristicsHeader(props: HeuristicsHeaderProps) {
@@ -153,7 +154,7 @@ export default function HeuristicsHeader(props: HeuristicsHeaderProps) {
                         localStorage.setItem('openModal', 'true');
                         router.push(`/projects/${projectId}/settings`);
                     }}>
-                        <IconPlus size={20} strokeWidth={1.5} className="text-gray-500 cursor-pointer" />
+                        <MemoIconPlus size={20} strokeWidth={1.5} className="text-gray-500 cursor-pointer" />
                     </button>
                 </Tooltip>
             </div>

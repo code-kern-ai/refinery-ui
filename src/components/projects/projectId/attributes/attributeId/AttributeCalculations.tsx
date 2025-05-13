@@ -40,6 +40,7 @@ import useRefFor from "@/submodules/react-components/hooks/useRefFor";
 import { simpleDictCompare } from "@/submodules/javascript-functions/validations";
 import { LLM_CODE_TEMPLATE_EXAMPLES, LLM_CODE_TEMPLATE_OPTIONS } from "./LLM/llmTemplates";
 import KernButton from "@/submodules/react-components/components/kern-button/KernButton";
+import { MemoIconAlertTriangleFilled, MemoIconArrowLeft, MemoIconCircleCheckFilled } from "@/submodules/react-components/components/kern-icons/icons";
 
 const EDITOR_OPTIONS = { theme: 'vs-light', language: 'python', readOnly: false };
 
@@ -324,7 +325,7 @@ export default function AttributeCalculation() {
                             e.preventDefault();
                             router.push(`/projects/${projectId}/settings`);
                         }} className="text-green-800 text-sm font-medium">
-                            <IconArrowLeft className="h-5 w-5 inline-block text-green-800" />
+                            <MemoIconArrowLeft className="h-5 w-5 inline-block text-green-800" />
                             <span className="leading-5">Go back</span>
                         </a>
                         {!isHeaderNormal && <div className="mx-4 text-sm leading-5 font-medium text-gray-500 inline-block">{currentAttribute.name}</div>}
@@ -493,10 +494,10 @@ export default function AttributeCalculation() {
                         </div>}
                     {currentAttribute.state !== AttributeState.RUNNING && currentAttribute.state !== AttributeState.INITIAL && <div className="flex flex-row items-center">
                         {currentAttribute.state == AttributeState.USABLE && <Tooltip content={TOOLTIPS_DICT.GENERAL.SUCCESSFULLY_CREATED} color="invert" className="cursor-auto">
-                            <IconCircleCheckFilled className="h-6 w-6 text-green-500" />
+                            <MemoIconCircleCheckFilled className="h-6 w-6 text-green-500" />
                         </Tooltip>}
                         {currentAttribute.state == AttributeState.FAILED && <Tooltip content={TOOLTIPS_DICT.GENERAL.ERROR} color="invert" className="cursor-auto">
-                            <IconAlertTriangleFilled className="h-6 w-6 text-red-500" />
+                            <MemoIconAlertTriangleFilled className="h-6 w-6 text-red-500" />
                         </Tooltip>}
                         <div className="py-6 text-sm leading-5 font-normal text-gray-500">
                             {currentAttribute.state === 'FAILED' ? 'Attribute calculation ran into errors.' : 'Attribute calculation finished successfully.'}

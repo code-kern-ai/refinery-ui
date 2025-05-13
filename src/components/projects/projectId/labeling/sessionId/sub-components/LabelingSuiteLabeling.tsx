@@ -28,6 +28,7 @@ import { getStoreSnapshotValue } from "@/src/reduxStore/store"
 import { createLabel } from "@/src/services/base/labeling-tasks";
 import { addClassificationLabels, addExtractionLabel, deleteRecordLabelAssociationByIds, removeGoldStar, setGoldStar } from "@/src/services/base/labeling"
 import KernButton from "@/submodules/react-components/components/kern-button/KernButton"
+import { MemoIconAlertCircle, MemoIconAssembly, MemoIconBolt, MemoIconCode, MemoIconStar } from "@/submodules/react-components/components/kern-icons/icons"
 
 const L_VARS = getDefaultLabelingVars();
 
@@ -554,7 +555,7 @@ export default function LabelingSuiteLabeling() {
                     <div className={`col-start-3 h-full py-1.5 flex ${i % 2 == 0 ? 'bg-white' : 'bg-gray-50'}`}>
                         {task.goldInfo?.can && <Tooltip content={task.goldInfo.is ? TOOLTIPS_DICT.LABELING.REMOVE_LABELS_GOLD_STAR : TOOLTIPS_DICT.LABELING.SET_LABELS_GOLD_STAR} color="invert" placement="top">
                             <div className="mt-0.5" onClick={() => toggleGoldStar(task.task.id, task.goldInfo?.is)}>
-                                <IconStar className={`${task.goldInfo.is ? style.specialUserActive : style.specialUserInActive}`} />
+                                <MemoIconStar className={`${task.goldInfo.is ? style.specialUserActive : style.specialUserInActive}`} />
                             </div>
                         </Tooltip>}
                     </div>
@@ -571,7 +572,7 @@ export default function LabelingSuiteLabeling() {
                                             (<p className={`break-words text-sm leading-5 font-normal text-gray-500 ${settings.main.lineBreaks != LineBreaksType.NORMAL ? (settings.main.lineBreaks == LineBreaksType.IS_PRE_WRAP ? 'whitespace-pre-wrap' : 'whitespace-pre-line') : ''}`}>
                                                 {`${recordRequests.record.data[lVars.taskLookup[attribute.id].attribute.name]}`}
                                             </p>) : (<>
-                                                <IconAlertCircle className="text-yellow-700 inline-block h-5 w-5" />
+                                                <MemoIconAlertCircle className="text-yellow-700 inline-block h-5 w-5" />
                                                 <span className="text-gray-500 text-sm font-normal italic">Not present in the
                                                     record</span>
                                             </>)}
@@ -616,10 +617,10 @@ export default function LabelingSuiteLabeling() {
                                                     ${((shouldHighlightOn(tmpHighlightIds, [LabelSourceHover.INFORMATION_SOURCE, rlaLabel.rla.id, rlaLabel.createdByName, rlaLabel.rla.labelingTaskLabel.labelingTask.id]) && rlaLabel.sourceTypeKey == LabelingPageParts.INFORMATION_SOURCE) || (hoverGroupsDict[rlaLabel.labelId] && hoverGroupsDict[rlaLabel.labelId][LabelingPageParts.INFORMATION_SOURCE] && rlaLabel.sourceTypeKey == LabelingPageParts.INFORMATION_SOURCE)) && style.labelOverlayHeuristic}
                                                     `}></div>
                                                 {rlaLabel.icon && <div className="mr-1">
-                                                    {rlaLabel.icon == InformationSourceType.LABELING_FUNCTION && <IconCode size={20} strokeWidth={1.5} />}
-                                                    {rlaLabel.icon == InformationSourceType.ACTIVE_LEARNING && <IconBolt size={20} strokeWidth={1.5} />}
-                                                    {rlaLabel.icon == LabelSourceHover.MODEL_CALLBACK && <IconBolt size={20} strokeWidth={1.5} />}
-                                                    {rlaLabel.icon == LabelSourceHover.WEAK_SUPERVISION && <IconAssembly size={20} strokeWidth={1.5} />}
+                                                    {rlaLabel.icon == InformationSourceType.LABELING_FUNCTION && <MemoIconCode size={20} strokeWidth={1.5} />}
+                                                    {rlaLabel.icon == InformationSourceType.ACTIVE_LEARNING && <MemoIconBolt size={20} strokeWidth={1.5} />}
+                                                    {rlaLabel.icon == LabelSourceHover.MODEL_CALLBACK && <MemoIconBolt size={20} strokeWidth={1.5} />}
+                                                    {rlaLabel.icon == LabelSourceHover.WEAK_SUPERVISION && <MemoIconAssembly size={20} strokeWidth={1.5} />}
                                                 </div>}
                                                 <div className="truncate" style={{ maxWidth: '260px' }}>{rlaLabel.labelDisplay}</div>
                                                 {rlaLabel.canBeDeleted && <div className="pl-1 cursor-pointer" onClick={() => deleteRecordLabelAssociation(rlaLabel.rla.id)}>

@@ -16,6 +16,7 @@ import SearchGroups from './SearchGroups';
 import DeleteSliceModal from './modals/DeleteSliceModal';
 import DataSliceInfoModal from './modals/DataSliceInfoModal';
 import MultilineTooltip from '@/src/components/shared/multilines-tooltip/MultilineTooltip';
+import { MemoIconAlertTriangle, MemoIconInfoCircle, MemoIconLayoutSidebar, MemoIconTrash } from '@/submodules/react-components/components/kern-icons/icons';
 
 export default function DataBrowserSidebar() {
     const dispatch = useDispatch();
@@ -82,7 +83,7 @@ export default function DataBrowserSidebar() {
         <div className={`flex flex-col select-none pt-4 px-4 pb-20 overflow-y-auto h-full ${style.sidebarWidthOpen} ${isSearchMenuVisible ? style.searchMenuWidth : null}`}>
             <div className="flex flex-row items-center">
                 {isSearchMenuOpen && <div className="bg-white text-lg font-medium text-gray-900 pr-3">Existing data slices</div>}
-                <IconLayoutSidebar onClick={openSearchMenu} className={`w-6 h-6 text-gray-900 cursor-pointer ${isSearchMenuOpen ? style.rotateTransform : null}`} />
+                <MemoIconLayoutSidebar onClick={openSearchMenu} className={`w-6 h-6 text-gray-900 cursor-pointer ${isSearchMenuOpen ? style.rotateTransform : null}`} />
             </div>
             {(isSearchMenuOpen || isSearchMenuVisible) && <div className={`transitionAll ${(isSearchMenuVisible && isSearchMenuOpen) ? 'opacity-100' : 'opacity-0'}`}>
                 {sliceNames.length > 6 && <div className="mt-2">
@@ -98,7 +99,7 @@ export default function DataBrowserSidebar() {
                             <button onClick={() => toggleSlice(slice)} style={{ width: '170px' }}
                                 className={`cursor-pointer inline-flex border items-center justify-between px-2.5 py-1.5 shadow-sm text-sm font-medium rounded text-gray-700 bg-white hover:bg-gray-50 focus:outline-none ${activeSlice?.id == slice.id ? 'ring-blue-500 ring-2' : ' border-gray-200'}`}>
                                 <label className="cursor-pointer mr-2" onClick={(e) => { updateSliceInfo(slice); e.stopPropagation(); }}>
-                                    <IconInfoCircle className={`w-6 h-6 ${slice.color.textColor} ${slice.color.fillColor}`} />
+                                    <MemoIconInfoCircle className={`w-6 h-6 ${slice.color.textColor} ${slice.color.fillColor}`} />
                                 </label>
                                 <label className={`text-gray-700 truncate cursor-pointer ${slice.sliceType == Slice.STATIC_OUTLIER ? 'text-xs whitespace-pre' : 'text-sm'}`}>
                                     {slice.displayName}</label>
@@ -106,7 +107,7 @@ export default function DataBrowserSidebar() {
                                     dispatch(setModalStates(ModalEnum.DELETE_SLICE, { sliceId: slice.id, open: true }));
                                     e.stopPropagation();
                                 }}>
-                                    <IconTrash className="text-red-700 h-5 w-5 ml-2 cursor-pointer" />
+                                    <MemoIconTrash className="text-red-700 h-5 w-5 ml-2 cursor-pointer" />
                                 </label>
                             </button>
                         </Tooltip>))}
@@ -122,7 +123,7 @@ export default function DataBrowserSidebar() {
                         {(!(activeSlice?.sliceType == Slice.STATIC_OUTLIER || !(additionalData.displayOutdatedWarning || (activeSlice?.static && additionalData.staticDataSliceCurrentCount != null && activeSlice.count != additionalData.staticDataSliceCurrentCount)))) &&
                             <Tooltip content={<MultilineTooltip tooltipLines={['Outdated slice', 'Save to update']} />} color="invert" placement="right" className="cursor-auto">
                                 <div className="flex items-center tooltip-right text-gray-400">
-                                    <IconAlertTriangle className="w-5 h-5" />
+                                    <MemoIconAlertTriangle className="w-5 h-5" />
                                 </div>
                             </Tooltip>
                         }

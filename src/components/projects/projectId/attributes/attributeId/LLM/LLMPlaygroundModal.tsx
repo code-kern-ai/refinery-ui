@@ -19,6 +19,7 @@ import { runAttributeLlmPlayground } from "@/src/services/base/attribute";
 import { jsonCopy } from "@/submodules/javascript-functions/general";
 import { TEMPLATE_EXAMPLES, TEMPLATE_OPTIONS } from "./llmTemplates";
 import { LLM_PROVIDER_OPTIONS, postProcessLLMPlaygroundRecordData } from "@/src/util/components/projects/projectId/settings/attribute-calculation-helper";
+import { MemoIconPlayCardStar, MemoIconTerminal } from "@/submodules/react-components/components/kern-icons/icons";
 
 const ACCEPT_BUTTON = { buttonCaption: "Use current values for attribute", useButton: true };
 const DISPLAY_STATES = [AttributeState.AUTOMATICALLY_CREATED, AttributeState.UPLOADED, AttributeState.USABLE]
@@ -133,7 +134,7 @@ export default function LLMPlaygroundModal() {
         <div className="pl-2 pr-5 max-h-[calc(100vh-15rem)] overflow-y-auto">
             <div className="flex flex-row items-center justify-center">
                 <span className="text-lg flex flex-row gap-x-2 text-gray-900 font-medium items-center">
-                    LLM Playground <IconPlayCardStar className="h-6 w-6" />
+                    LLM Playground <MemoIconPlayCardStar className="h-6 w-6" />
                 </span>
             </div>
             <div className="text-left">
@@ -189,7 +190,7 @@ export default function LLMPlaygroundModal() {
                     <div className="flex gap-x-2">
                         <div className='py-2'>
                             <div className='flex items-center justify-center bg-white h-6 w-6 rounded-lg border border-gray-300'>
-                                <IconTerminal className='h-4 w-4 text-gray-500' />
+                                <MemoIconTerminal className='h-4 w-4 text-gray-500' />
                             </div>
                         </div>
                         <div className='text-sm font-mono text-gray-900 text-center leading-10'>LLM Answer</div>

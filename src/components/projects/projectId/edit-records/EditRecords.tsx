@@ -17,6 +17,7 @@ import { useWebsocket } from "@/submodules/react-components/hooks/web-socket/use
 import { scrollElementIntoView } from "@/submodules/javascript-functions/scrollHelper";
 import { Application, CurrentPage } from "@/submodules/react-components/hooks/web-socket/constants";
 import { selectOrganizationId } from "@/src/reduxStore/states/general";
+import { MemoIconAlertCircle, MemoIconAlertTriangle, MemoIconAlertTriangleFilled, MemoIconBallpen, MemoIconBallpenOff } from "@/submodules/react-components/components/kern-icons/icons";
 
 export default function EditRecords() {
     const dispatch = useDispatch();
@@ -110,7 +111,7 @@ export default function EditRecords() {
                                                     <span>{`${record.data[attribute.name]}`}</span>
                                                     {erdData.cachedRecordChanges[buildAccessKey(record.id, attribute.name)] && <div className="absolute -left-5 top-0 text-yellow-500">
                                                         <Tooltip content={TOOLTIPS_DICT.EDIT_RECORDS.CACHED_VALUES} color="invert" placement="right" className="cursor-auto">
-                                                            <IconAlertTriangleFilled size={16} stroke={2} />
+                                                            <MemoIconAlertTriangleFilled size={16} stroke={2} />
                                                         </Tooltip>
                                                     </div>}
                                                 </span>) : <NotPresentInRecord />}
@@ -121,7 +122,7 @@ export default function EditRecords() {
                             </Fragment>))}
                             <div className="absolute top-2 right-2 flex flex-row flex-nowrap items-center gap-x-2">
                                 {record.rla_data && <Tooltip content={TOOLTIPS_DICT.EDIT_RECORDS.LABEL_ASSOCIATIONS} color="invert" placement="left" className="cursor-auto">
-                                    <IconAlertTriangle size={18} stroke={2} />
+                                    <MemoIconAlertTriangle size={18} stroke={2} />
                                 </Tooltip>}
                             </div>
                             <div className="absolute left-1 top-1 p-1 cursor-pointer" onClick={() => {
@@ -135,10 +136,10 @@ export default function EditRecords() {
                             }}>
                                 {record.id == erdData.editRecordId ?
                                     (<Tooltip content={TOOLTIPS_DICT.EDIT_RECORDS.STOP_EDIT} color="invert" placement="right">
-                                        <IconBallpenOff size={18} stroke={2} />
+                                        <MemoIconBallpenOff size={18} stroke={2} />
                                     </Tooltip>) :
                                     (<Tooltip content={TOOLTIPS_DICT.EDIT_RECORDS.EDIT_RECORD} color="invert" placement="right">
-                                        <IconBallpen size={18} />
+                                        <MemoIconBallpen size={18} />
                                     </Tooltip>)}
                             </div>
                         </div>
@@ -149,7 +150,7 @@ export default function EditRecords() {
 
 function NotPresentInRecord() {
     return (<div className="flex items-center">
-        <IconAlertCircle className="text-yellow-700" />
+        <MemoIconAlertCircle className="text-yellow-700" />
         <span className="text-gray-500 text-sm font-normal italic">Not present in the record</span>
     </div>
     )

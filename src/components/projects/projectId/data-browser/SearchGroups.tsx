@@ -29,6 +29,7 @@ import { getWeakSupervisionRun } from "@/src/services/base/heuristic";
 import { getRecordsByStaticSlice, searchRecordsExtended } from "@/src/services/base/data-browser";
 import { staticDataSlicesCurrentCount } from "@/src/services/base/dataSlices";
 import KernButton from "@/submodules/react-components/components/kern-button/KernButton";
+import { MemoIconArrowDown, MemoIconArrowsRandom, MemoIconFilterOff, MemoIconPlus, MemoIconTrash } from "@/submodules/react-components/components/kern-icons/icons";
 
 const GROUP_SORT_ORDER = 0;
 let GLOBAL_SEARCH_GROUP_COUNT = 0;
@@ -605,7 +606,7 @@ export default function SearchGroups() {
                                     {fullSearchStore[group.key].groupElements.length > 1 &&
                                         <div onClick={() => removeSearchGroupItem(group.key, index)}
                                             className="mt-2 cursor-pointer flex justify-center hover:border-transparent hover:bg-transparent border-transparent bg-transparent px-0">
-                                            <IconTrash className="text-gray-900 cursor-pointer h-4 w-4" />
+                                            <MemoIconTrash className="text-gray-900 cursor-pointer h-4 w-4" />
                                         </div>}
                                 </div>
                                 <div className="flex-grow mr-2.5 flex flex-col  mt-2 ">
@@ -650,7 +651,7 @@ export default function SearchGroups() {
                                 {index == fullSearchStore[group.key].groupElements.length - 1 &&
                                     <span onClick={() => addSearchGroupItem(groupItem, group.key)}
                                         className="bg-gray-100 text-gray-800 cursor-pointer p-1 rounded-md hover:bg-gray-300">
-                                        <IconPlus className="cursor-pointer" />
+                                        <MemoIconPlus className="cursor-pointer" />
                                     </span>}
                             </div>
                         </div>))}
@@ -690,7 +691,7 @@ export default function SearchGroups() {
                                         className="h-8 w-11 text-sm border-gray-300 rounded-md placeholder-italic border text-gray-900 pl-2 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100 disabled:opacity-50 disabled:cursor-not-allowed" />
                                     <span className="text-sm mx-0.5 font-dmMono">%</span>
                                     {fullSearchStore[group.key].groupElements['weakSupervisionConfidence'] && fullSearchStore[group.key].groupElements['weakSupervisionConfidence']['active'] && <Tooltip content={TOOLTIPS_DICT.DATA_BROWSER.CLEAR_WS_CONFIDENCE} color="invert">
-                                        <IconFilterOff className="text-red-700 cursor-pointer" onClick={() => clearConfidence(group.key, 'weakSupervisionConfidence')} />
+                                        <MemoIconFilterOff className="text-red-700 cursor-pointer" onClick={() => clearConfidence(group.key, 'weakSupervisionConfidence')} />
                                     </Tooltip>}
                                 </div>
                             </div>
@@ -721,7 +722,7 @@ export default function SearchGroups() {
                                     <div className="flex items-center cursor-pointer" onClick={() => setSortFormControl(index, group)}>
                                         <div className={`p-0 cursor-pointer ${groupItem['direction'] == 1 ? style.rotateTransform : null}`}>
                                             <div className="ml-2 mr-2 h-4 w-4 border-gray-300 border rounded cursor-pointer flex justify-center items-center hover:bg-gray-200">
-                                                {groupItem['active'] != 0 && <IconArrowDown className="text-gray-500 h-3 w-3" />}
+                                                {groupItem['active'] != 0 && <MemoIconArrowDown className="text-gray-500 h-3 w-3" />}
                                             </div>
                                         </div>
                                         <span className="ml-2 text-sm truncate w-full">{groupItem['displayName']}</span>
@@ -738,7 +739,7 @@ export default function SearchGroups() {
                                         <span className="ml-2 inline-flex items-center px-2.5 text-sm rounded-l-md border border-r-0 border-gray-300 bg-gray-50 text-gray-500 sm:text-sm">
                                             Seed
                                             <div className="ml-2 cursor-pointer" onClick={() => setRandomSeedGroup()}>
-                                                <IconArrowsRandom />
+                                                <MemoIconArrowsRandom />
                                             </div>
                                         </span>
                                         <input value={groupItem['seedString']}

@@ -4,6 +4,7 @@ import { LabelSelectionBoxProps } from "@/src/types/components/projects/projectI
 import { LabelingTaskTaskType } from "@/src/types/components/projects/projectId/settings/labeling-tasks";
 import { UserRole } from "@/src/types/shared/sidebar";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
+import { MemoIconCirclePlus } from "@/submodules/react-components/components/kern-icons/icons";
 import { Tooltip } from "@nextui-org/react";
 import { IconCirclePlus } from "@tabler/icons-react";
 import { Fragment, useEffect, useState, useCallback, useRef } from "react";
@@ -167,7 +168,7 @@ export default function LabelSelectionBox(props: LabelSelectionBoxProps) {
                                 updateNewLabelDict(task.task.id, '');
                             }}
                                 disabled={props.labelAddButtonDisabledDict[task.task.id] || newLabelDict[task.task.id] == ''} className="disabled:cursor-not-allowed disabled:opacity-50">
-                                <IconCirclePlus className={`${props.labelAddButtonDisabledDict[task.task.id] || newLabelDict[task.task.id] == '' ? 'text-gray-300' : 'text-gray-700'}`} />
+                                <MemoIconCirclePlus className={`${props.labelAddButtonDisabledDict[task.task.id] || newLabelDict[task.task.id] == '' ? 'text-gray-300' : 'text-gray-700'}`} />
                             </button>
                         </div>
                     </Tooltip>}

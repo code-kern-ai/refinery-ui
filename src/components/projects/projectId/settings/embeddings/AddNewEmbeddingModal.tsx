@@ -14,6 +14,7 @@ import { ModalButton, ModalEnum } from "@/src/types/shared/modal";
 import { postProcessingModelsDownload } from "@/src/util/components/models-downloaded/models-downloaded-helper";
 import { DEFAULT_AZURE_TYPE, GRANULARITY_TYPES_ARRAY, checkIfCreateEmbeddingIsDisabled, platformNamesDict } from "@/src/util/components/projects/projectId/settings/embeddings-helper";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
+import { MemoIconExternalLink } from "@/submodules/react-components/components/kern-icons/icons";
 import KernDropdown from "@/submodules/react-components/components/KernDropdown";
 import { Tooltip } from "@nextui-org/react";
 import { IconExternalLink } from "@tabler/icons-react";
@@ -292,7 +293,7 @@ export default function AddNewEmbeddingModal() {
                                 <span className="card-title mb-0 label-text flex"><span className="cursor-help underline filtersUnderline">Version</span></span>
                                 <Tooltip content={TOOLTIPS_DICT.PROJECT_SETTINGS.EMBEDDINGS.VERSION} placement="right" color="invert">
                                     <a href="https://learn.microsoft.com/en-us/rest/api/azureopenai/models/list" target="_blank">
-                                        <IconExternalLink className="cursor-help ml-1 h-5 w-5" /></a>
+                                        <MemoIconExternalLink className="cursor-help ml-1 h-5 w-5" /></a>
                                 </Tooltip>
                             </div>
                             <input placeholder="Enter Azure version" onChange={(e) => setVersion(e.target.value)} value={version}

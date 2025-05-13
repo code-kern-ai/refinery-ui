@@ -21,6 +21,7 @@ import KernDropdown from "@/submodules/react-components/components/KernDropdown"
 import { updateLabelingTask } from "@/src/services/base/labeling-tasks";
 import IconButton from "@/submodules/react-components/components/kern-button/IconButton";
 import KernButton from "@/submodules/react-components/components/kern-button/KernButton";
+import { MemoIconColorPicker, MemoIconTrash } from "@/submodules/react-components/components/kern-icons/icons";
 
 export default function LabelingTasks() {
     const dispatch = useDispatch();
@@ -139,10 +140,10 @@ export default function LabelingTasks() {
                                     <td className="flex flex-wrap justify-center items-center px-3 py-2 text-sm text-gray-500">
                                         {task.labels.map((label: LabelType) => (
                                             <div key={label.id} className={`inline-flex border items-center m-1 px-1.5 py-0.5 rounded-md text-sm font-medium ${label.color.backgroundColor} ${label.color.textColor} ${label.color.borderColor} ${label.color.hoverColor}`}>
-                                                <IconColorPicker className="h-4 w-4 mr-1 cursor-pointer" onClick={() => dispatch(setModalStates(ModalEnum.CHANGE_COLOR, { taskId: task.id, label: label, open: true }))} />
+                                                <MemoIconColorPicker className="h-4 w-4 mr-1 cursor-pointer" onClick={() => dispatch(setModalStates(ModalEnum.CHANGE_COLOR, { taskId: task.id, label: label, open: true }))} />
                                                 <span>{label.name}</span>
                                                 {label.hotkey && <kbd className="ml-2 uppercase inline-flex items-center border bg-white border-gray-200 rounded px-2 text-sm font-sans font-medium text-gray-400">{label.hotkey}</kbd>}
-                                                <IconTrash className="h-4 w-4 ml-1 cursor-pointer" onClick={() => dispatch(setModalStates(ModalEnum.DELETE_LABEL, { taskId: task.id, label: label, open: true }))} />
+                                                <MemoIconTrash className="h-4 w-4 ml-1 cursor-pointer" onClick={() => dispatch(setModalStates(ModalEnum.DELETE_LABEL, { taskId: task.id, label: label, open: true }))} />
                                             </div>
                                         ))}
                                         <IconButton
@@ -152,7 +153,7 @@ export default function LabelingTasks() {
                                         />
                                     </td>
                                     <td className="whitespace-nowrap text-center px-3 py-2 text-sm text-gray-500">
-                                        <IconTrash onClick={() => dispatch(setModalStates(ModalEnum.DELETE_LABELING_TASK, { taskId: task.id, open: true }))}
+                                        <MemoIconTrash onClick={() => dispatch(setModalStates(ModalEnum.DELETE_LABELING_TASK, { taskId: task.id, open: true }))}
                                             className="h-6 w-6 text-red-700 cursor-pointer" />
                                     </td>
                                 </tr>

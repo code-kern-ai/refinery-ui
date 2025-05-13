@@ -15,6 +15,7 @@ import { useEffect } from "react";
 import { parseLinkFromText } from "@/src/util/shared/link-parser-helper";
 import { getAvailableLinks } from "@/src/services/base/labeling";
 import KernButton from "@/submodules/react-components/components/kern-button/KernButton";
+import { MemoIconCircle, MemoIconStar } from "@/submodules/react-components/components/kern-icons/icons";
 
 export default function NavigationBarTop(props: NavigationBarTopProps) {
     const router = useRouter();
@@ -76,10 +77,10 @@ export default function NavigationBarTop(props: NavigationBarTopProps) {
                                             <img src={`/refinery/avatars/${user.avatarUri}`} className="w-8 h-8" />
                                         </div>) : (<div className="w-8 h-8 cursor-pointer relative" onClick={() => dispatch(setUserDisplayId(user.id))}>
                                             {user.userType == UserType.GOLD && <div className="absolute -top-1 -bottom-1">
-                                                <IconStar className={`w-full h-full ${user.id == displayId ? style.specialUserActive : style.specialUserInActive}`} />
+                                                <MemoIconStar className={`w-full h-full ${user.id == displayId ? style.specialUserActive : style.specialUserInActive}`} />
                                             </div>}
                                             {user.userType == UserType.ALL && <div className="absolute top-0 left-0 right-0 bottom-0">
-                                                <IconCircle className={`w-full h-full ${user.id == displayId ? style.specialUserActive : style.specialUserInActive}`} />
+                                                <MemoIconCircle className={`w-full h-full ${user.id == displayId ? style.specialUserActive : style.specialUserInActive}`} />
                                             </div>}
                                         </div>)}
                                     </Tooltip>

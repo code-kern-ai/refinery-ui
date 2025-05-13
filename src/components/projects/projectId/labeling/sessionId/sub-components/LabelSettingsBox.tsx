@@ -9,6 +9,7 @@ import InfoLabelBoxModal from "./InfoLabelBoxModal";
 import { jsonCopy } from "@/submodules/javascript-functions/general";
 import { selectSettings, setSettings } from "@/src/reduxStore/states/pages/labeling";
 import { selectProjectId } from "@/src/reduxStore/states/project";
+import { MemoIconChecks, MemoIconInfoCircle, MemoIconX } from "@/submodules/react-components/components/kern-icons/icons";
 
 export default function LabelSettingsBox(props: LabelSettingsBoxProps) {
     const dispatch = useDispatch();
@@ -42,7 +43,7 @@ export default function LabelSettingsBox(props: LabelSettingsBoxProps) {
             </div>
             <div className="flex flex-row flex-no-wrap gap-x-2 p-2.5 borders-gray border-t">
                 <Tooltip content={TOOLTIPS_DICT.LABELING.INFO_LABEL_BOX} color="invert" placement="top" onClick={() => dispatch(setModalStates(ModalEnum.INFO_LABEL_BOX, { open: true, labelSettingsLabel: props.labelSettingsLabel }))}>
-                    <IconInfoCircle className="h-6 w-6 text-gray-700" />
+                    <MemoIconInfoCircle className="h-6 w-6 text-gray-700" />
                 </Tooltip>
                 <div className="flex flex-row flex-nowrap items-center gap-x-1 cursor-pointer">
                     <span className="font-semibold text-sm text-gray-500">M</span>
@@ -60,10 +61,10 @@ export default function LabelSettingsBox(props: LabelSettingsBoxProps) {
                         checked={settings.task[projectId][props.labelSettingsLabel.taskId][props.labelSettingsLabel.id].showHeuristics} />
                 </div>
                 <Tooltip content={TOOLTIPS_DICT.LABELING.ACTIVATE_ALL} color="invert" placement="top" onClick={() => props.setAllLabelDisplaySetting(true, props.labelSettingsLabel)}>
-                    <IconChecks className="h-6 w-6 text-gray-700" />
+                    <MemoIconChecks className="h-6 w-6 text-gray-700" />
                 </Tooltip>
                 <Tooltip content={TOOLTIPS_DICT.LABELING.CLEAR_ALL} color="invert" placement="top" onClick={() => props.setAllLabelDisplaySetting(false, props.labelSettingsLabel)}>
-                    <IconX className="h-6 w-6 text-gray-700" />
+                    <MemoIconX className="h-6 w-6 text-gray-700" />
                 </Tooltip>
             </div>
         </div>}
