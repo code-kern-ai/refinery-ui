@@ -6,7 +6,6 @@ import { useDispatch, useSelector } from "react-redux";
 import style from "@/src/styles/shared/header.module.css";
 import LogoutDropdown from "./LogoutDropdown";
 import { useRouter } from "next/router";
-import { IconBell, IconHexagons, IconHome, IconPlayCard } from "@tabler/icons-react";
 import { selectAllProjectsNamesDict, selectProject, setAllProjects } from "@/src/reduxStore/states/project";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
 import NotificationCenterModal from "../notification-center/NotificationCenterModal";

@@ -3,7 +3,6 @@ import { selectHeuristic } from "@/src/reduxStore/states/pages/heuristics";
 import { Status } from "@/src/types/shared/statuses";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
 import { Tooltip } from "@nextui-org/react";
-import { IconAlertTriangleFilled, IconArrowRight, IconCircleCheckFilled } from "@tabler/icons-react";
 import { useSelector } from "react-redux";
 import { MemoIconAlertTriangleFilled, MemoIconArrowRight, MemoIconCircleCheckFilled } from "@/submodules/react-components/components/kern-icons/icons";
 

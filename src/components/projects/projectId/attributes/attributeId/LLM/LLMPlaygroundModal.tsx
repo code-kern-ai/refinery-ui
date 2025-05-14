@@ -4,7 +4,6 @@ import { Fragment, useCallback, useEffect, useMemo, useState } from "react";
 import { useSelector } from "react-redux";
 import { selectModal } from "@/src/reduxStore/states/modal";
 import { selectAttributes, selectAttributesDict } from "@/src/reduxStore/states/pages/settings";
-import { IconHandClick, IconPlayCardStar, IconPlayerPlay, IconRefresh, IconTerminal } from "@tabler/icons-react";
 import LLMResponseConfig from "../LLMResponseConfig";
 import { AttributeState, LLMConfig } from "@/src/types/components/projects/projectId/settings/data-schema";
 import useRefFor from "@/submodules/react-components/hooks/useRefFor";
@@ -19,7 +18,7 @@ import { runAttributeLlmPlayground } from "@/src/services/base/attribute";
 import { jsonCopy } from "@/submodules/javascript-functions/general";
 import { TEMPLATE_EXAMPLES, TEMPLATE_OPTIONS } from "./llmTemplates";
 import { LLM_PROVIDER_OPTIONS, postProcessLLMPlaygroundRecordData } from "@/src/util/components/projects/projectId/settings/attribute-calculation-helper";
-import { MemoIconPlayCardStar, MemoIconTerminal } from "@/submodules/react-components/components/kern-icons/icons";
+import { MemoIconHandClick, MemoIconPlayCardStar, MemoIconPlayerPlay, MemoIconRefresh, MemoIconTerminal } from "@/submodules/react-components/components/kern-icons/icons";
 
 const ACCEPT_BUTTON = { buttonCaption: "Use current values for attribute", useButton: true };
 const DISPLAY_STATES = [AttributeState.AUTOMATICALLY_CREATED, AttributeState.UPLOADED, AttributeState.USABLE]
@@ -141,7 +140,7 @@ export default function LLMPlaygroundModal() {
                 {recordData && <div className="">
                     <div className="flex flex-row gap-x-2 items-center">
                         <label className="block font-bold text-gray-900">Sample Record</label>
-                        <KernButton icon={IconRefresh} text="Get Random" size="small" onClick={get1RandomRecords} />
+                        <KernButton icon={MemoIconRefresh} text="Get Random" size="small" onClick={get1RandomRecords} />
 
                         <input
                             type="number"
@@ -151,7 +150,7 @@ export default function LLMPlaygroundModal() {
                             onKeyDown={(e) => e.key === 'Enter' && getByRunningId()}
                             className="w-16 h-full text-right text-sm text-gray-900 border border-gray-200 rounded-lg align-top"
                         />
-                        <KernButton disabled={!inputRunningId} icon={IconHandClick} text="Get by running_id" size="small" onClick={getByRunningId} />
+                        <KernButton disabled={!inputRunningId} icon={MemoIconHandClick} text="Get by running_id" size="small" onClick={getByRunningId} />
                     </div>
                     <div className="grid grid-cols-2 gap-2 text-sm max-h-52 overflow-y-auto" style={{ gridTemplateColumns: `max-content auto` }}>
                         {recordKeys.map((rk) => <Fragment key={rk.name}>
@@ -185,7 +184,7 @@ export default function LLMPlaygroundModal() {
                 </div>}
                 <LLMResponseConfig attributeId={modal.attributeId} fullLlmConfig={fullLlmConfig} setFullLlmConfig={setFullLlmConfig} noPlayground keepConfigOpen />
                 <div className="h-2"></div>
-                <KernButton text="Test configuration" icon={IconPlayerPlay} size="small" onClick={testConfigurationForRecordId} loading={playgroundTestRunning} />
+                <KernButton text="Test configuration" icon={MemoIconPlayerPlay} size="small" onClick={testConfigurationForRecordId} loading={playgroundTestRunning} />
                 {llmAnswer && <div className="border-b mb-10 border-gray-200 w-full align-top">
                     <div className="flex gap-x-2">
                         <div className='py-2'>

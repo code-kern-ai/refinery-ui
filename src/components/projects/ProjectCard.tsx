@@ -8,11 +8,10 @@ import { Tooltip } from "@nextui-org/react";
 import { useRouter } from "next/router";
 import { useDispatch, useSelector } from "react-redux";
 import { NOT_AVAILABLE, UNKNOWN_USER } from "@/src/util/constants";
-import { IconArrowRight } from "@tabler/icons-react";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
 import { deleteProjectPost } from "@/src/services/base/project";
 import ButtonAsText from "@/submodules/react-components/components/kern-button/ButtonAsText";
-import { MemoIconX } from "@/submodules/react-components/components/kern-icons/icons";
+import { MemoIconArrowRight, MemoIconX } from "@/submodules/react-components/components/kern-icons/icons";
 import { useCallback } from "react";
 import useRefFor from "@/submodules/react-components/hooks/useRefFor";
 
@@ -112,7 +111,7 @@ export default function ProjectCard(props: ProjectCardProps) {
                                     text="Continue project"
                                     onClick={manageProject}
                                     color="green"
-                                    iconRight={IconArrowRight}
+                                    iconRight={MemoIconArrowRight}
                                     iconColor="green"
                                 />
                             }

@@ -2,7 +2,6 @@ import { selectAnnotators, selectEngineers, selectExperts, selectInactiveOrganiz
 import { useSelector } from "react-redux"
 import YoutubeIntroduction from "../projects/YoutubeIntroduction";
 import { User } from "@/src/types/shared/general";
-import { IconUsersGroup } from "@tabler/icons-react";
 import { UNKNOWN_USER } from "@/src/util/constants";
 import { MemoIconUsersGroup } from "@/submodules/react-components/components/kern-icons/icons";
 

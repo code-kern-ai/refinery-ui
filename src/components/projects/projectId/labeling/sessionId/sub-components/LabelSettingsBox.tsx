@@ -3,7 +3,6 @@ import { LabelSettingsBoxProps } from "@/src/types/components/projects/projectId
 import { ModalEnum } from "@/src/types/shared/modal";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
 import { Tooltip } from "@nextui-org/react";
-import { IconChecks, IconInfoCircle, IconX } from "@tabler/icons-react";
 import { useDispatch, useSelector } from "react-redux";
 import InfoLabelBoxModal from "./InfoLabelBoxModal";
 import { jsonCopy } from "@/submodules/javascript-functions/general";

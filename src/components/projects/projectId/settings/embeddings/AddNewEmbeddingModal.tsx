@@ -17,7 +17,6 @@ import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
 import { MemoIconExternalLink } from "@/submodules/react-components/components/kern-icons/icons";
 import KernDropdown from "@/submodules/react-components/components/KernDropdown";
 import { Tooltip } from "@nextui-org/react";
-import { IconExternalLink } from "@tabler/icons-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 

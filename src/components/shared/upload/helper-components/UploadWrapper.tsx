@@ -4,7 +4,6 @@ import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { selectUploadData, setImportOptions } from "@/src/reduxStore/states/upload";
 import { useRouter } from "next/router";
-import { IconAlertTriangle } from "@tabler/icons-react";
 import { selectEmbeddings } from "@/src/reduxStore/states/pages/settings";
 import { Embedding, PlatformType } from "@/src/types/components/projects/projectId/settings/embeddings";
 import CryptedField from "../../crypted-field/CryptedField";

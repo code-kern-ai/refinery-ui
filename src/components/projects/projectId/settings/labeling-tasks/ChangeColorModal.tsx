@@ -10,7 +10,6 @@ import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
 import { jsonCopy } from "@/submodules/javascript-functions/general";
 import { MemoIconPencil } from "@/submodules/react-components/components/kern-icons/icons";
 import { Tooltip } from "@nextui-org/react";
-import { IconPencil } from "@tabler/icons-react";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 

@@ -5,7 +5,6 @@ import { ModalEnum } from '@/src/types/shared/modal';
 import { TOOLTIPS_DICT } from '@/src/util/tooltip-constants';
 import { Slice } from '@/submodules/javascript-functions/enums/enums';
 import { Tooltip } from '@nextui-org/react';
-import { IconAdjustments, IconAlertTriangleFilled, IconChartCircles, IconFilter, IconFilterOff, IconTriangleFilled } from '@tabler/icons-react';
 import { useDispatch, useSelector } from 'react-redux';
 import LoadingIcon from '@/submodules/react-components/components/LoadingIcon';
 import { selectVisibleAttributesHeuristics } from '@/src/reduxStore/states/pages/settings';
@@ -19,7 +18,7 @@ import Export from '@/src/components/shared/export/Export';
 import { LabelingLinkType } from '@/src/types/components/projects/projectId/labeling/labeling-main-component';
 import { Fragment, useEffect } from 'react';
 import KernButton from '@/submodules/react-components/components/kern-button/KernButton';
-import { MemoIconAlertTriangleFilled, MemoIconChartCircles, MemoIconFilter } from '@/submodules/react-components/components/kern-icons/icons';
+import { MemoIconAdjustments, MemoIconAlertTriangleFilled, MemoIconChartCircles, MemoIconFilter, MemoIconFilterOff } from '@/submodules/react-components/components/kern-icons/icons';
 
 export default function DataBrowserRecords(props: DataBrowserRecordsProps) {
     const dispatch = useDispatch();
@@ -123,13 +122,13 @@ export default function DataBrowserRecords(props: DataBrowserRecordsProps) {
                 </div>}
                 {(activeSlice != null || activeSearchParams.length > 0 || similaritySearch.recordsInDisplay) && <KernButton
                     text="Clear filters"
-                    icon={IconFilterOff}
+                    icon={MemoIconFilterOff}
                     onClick={clearFilters}
                     className="mr-1"
                 />}
                 <KernButton
                     text="Configuration"
-                    icon={IconAdjustments}
+                    icon={MemoIconAdjustments}
                     onClick={() => dispatch(openModal(ModalEnum.CONFIGURATION))}
                     className="mr-1"
                     tooltip={TOOLTIPS_DICT.DATA_BROWSER.CONFIGURATION}

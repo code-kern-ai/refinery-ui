@@ -15,7 +15,6 @@ import { getColorForDataType } from "@/src/util/components/projects/projectId/se
 import { extendArrayElementsByUniqueId } from "@/submodules/javascript-functions/id-prep";
 import { MemoIconPlus, MemoIconTrash } from "@/submodules/react-components/components/kern-icons/icons";
 import KernDropdown from "@/submodules/react-components/components/KernDropdown";
-import { IconPlus, IconTrash } from "@tabler/icons-react";
 import { useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 

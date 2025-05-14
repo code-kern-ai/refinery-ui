@@ -5,8 +5,7 @@ import { getAttributes } from "@/src/services/base/attribute"
 import { getEvaluationRunById, getEvaluationSets } from "@/src/services/base/playground"
 import { arrayToDict, percentRoundString } from "@/submodules/javascript-functions/general"
 import ButtonAsText from "@/submodules/react-components/components/kern-button/ButtonAsText"
-import { MemoIconCheck, MemoIconX } from "@/submodules/react-components/components/kern-icons/icons"
-import { IconArrowLeft, IconCheck, IconX } from "@tabler/icons-react"
+import { MemoIconArrowLeft, MemoIconCheck, MemoIconX } from "@/submodules/react-components/components/kern-icons/icons"
 import { useRouter } from "next/router"
 import { Fragment, useEffect, useState } from "react"
 import { useDispatch, useSelector } from "react-redux"
@@ -65,7 +64,7 @@ export default function EvaluationRunDetails() {
                 <ButtonAsText
                     text="Go back"
                     onClick={() => router.back()}
-                    iconLeft={IconArrowLeft}
+                    iconLeft={MemoIconArrowLeft}
                     color="green"
                 />
                 <label className="text-xl leading-6 text-gray-900 font-medium"> Evaluation Run Results</label>

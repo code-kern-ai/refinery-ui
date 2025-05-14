@@ -1,7 +1,6 @@
 import { Tooltip } from "@nextui-org/react";
 import CommentsMainSection from "./CommentsMainSection";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
-import { IconNotes } from "@tabler/icons-react";
 import { useDispatch, useSelector } from "react-redux";
 import { useCallback, useState } from "react";
 import { selectAllUsers, selectOrganizationId, setAllUsers, setComments } from "@/src/reduxStore/states/general";

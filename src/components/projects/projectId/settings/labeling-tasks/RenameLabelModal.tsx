@@ -13,7 +13,6 @@ import { jsonCopy } from "@/submodules/javascript-functions/general";
 import KernButton from "@/submodules/react-components/components/kern-button/KernButton";
 import { MemoIconAlertTriangleFilled, MemoIconInfoCircleFilled, MemoIconTriangleInverted } from "@/submodules/react-components/components/kern-icons/icons";
 import { Tooltip } from "@nextui-org/react";
-import { IconAlertTriangleFilled, IconInfoCircleFilled, IconTriangleInverted } from "@tabler/icons-react";
 import { useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 

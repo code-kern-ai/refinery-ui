@@ -4,14 +4,13 @@ import { ModalEnum } from "@/src/types/shared/modal";
 import { UserRole } from "@/src/types/shared/sidebar";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
 import { Tooltip } from "@nextui-org/react";
-import { IconSettings, IconTrash } from "@tabler/icons-react";
 import { useDispatch, useSelector } from "react-redux";
 import DeleteRecordModal from "./DeleteRecordModal";
 import { selectDisplayUserRole, selectRecordRequestsRecord, selectSettings, updateSettings } from "@/src/reduxStore/states/pages/labeling";
 import { ComponentType } from "@/src/types/components/projects/projectId/labeling/settings";
 import LabelingSettingsModal from "./LabelingSettingsModal";
 import KernButton from "@/submodules/react-components/components/kern-button/KernButton";
-import { MemoIconSettings } from "@/submodules/react-components/components/kern-icons/icons";
+import { MemoIconSettings, MemoIconTrash } from "@/submodules/react-components/components/kern-icons/icons";
 
 export default function NavigationBarBottom() {
     const dispatch = useDispatch();
@@ -49,7 +48,7 @@ export default function NavigationBarBottom() {
                                 onClick={() => dispatch(openModal(ModalEnum.DELETE_RECORD))}
                                 className="mr-3"
                                 disabled={record == null}
-                                icon={IconTrash}
+                                icon={MemoIconTrash}
                                 buttonColor="red"
                                 iconColor="red"
                             />

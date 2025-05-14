@@ -7,7 +7,6 @@ import { ModalEnum } from "@/src/types/shared/modal";
 import { LabelingSuiteManager } from "@/src/util/classes/labeling/manager";
 import { buildOverviewTableDisplayArray, filterRlaDataForUser, filterRlaLabelCondition, getEmptyHeaderHover, rlasHaveHeuristicData } from "@/src/util/components/projects/projectId/labeling/overview-table-helper";
 import { LabelSource } from "@/submodules/javascript-functions/enums/enums";
-import { IconSearch, IconTrash } from "@tabler/icons-react";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import LabelingInfoTableModal from "./LabelingInfoTableModal";

@@ -10,14 +10,12 @@ import { useSelector, useDispatch } from "react-redux";
 import { RecordDisplay } from "@/src/components/shared/record-display/RecordDisplay";
 import { selectVisibleAttributesDataBrowser } from "@/src/reduxStore/states/pages/settings";
 import LoadingIcon from "@/submodules/react-components/components/LoadingIcon";
-import { IconFilterOff, IconFilter, IconCategoryPlus, IconLoader2, IconWand } from '@tabler/icons-react'
 import PlaygroundSearchMetaFilterModal from "./PlaygroundSearchMetaFilterModal";
 import PlaygroundSearchReformulateModal from "./PlaygroundSearchReformulateModal";
-import { Tooltip } from "@nextui-org/react";
 import QuestionHistory from "./QuestionHistory";
 import IconButton from "@/submodules/react-components/components/kern-button/IconButton";
 import KernButton from "@/submodules/react-components/components/kern-button/KernButton";
-import { MemoIconLoader2 } from "@/submodules/react-components/components/kern-icons/icons";
+import { MemoIconCategoryPlus, MemoIconFilter, MemoIconFilterOff, MemoIconLoader2, MemoIconWand } from "@/submodules/react-components/components/kern-icons/icons";
 
 const PLAYGROUND_LIMIT_DEFAULT = 10;
 const PLAYGROUND_THRESHOLD_DEFAULT = -9999;
@@ -101,7 +99,7 @@ export function PlaygroundSearch() {
                 {reformulationLoading && <span className="absolute top-1/4 left-1/2 transform -translate-x-1/2 -translate-y-1/2"><MemoIconLoader2 className="absolute h-6 w-6 animate-spin" /></span>}
                 <div className="absolute top-2 right-2 flex gap-x-2">
                     <IconButton
-                        icon={IconWand}
+                        icon={MemoIconWand}
                         tooltip="Reformulate"
                         disabled={!question || loading}
                         onClick={() => dispatch(openModal(ModalEnum.EVALUATION_REFORMULATE))}
@@ -115,7 +113,7 @@ export function PlaygroundSearch() {
                     <KernButton
                         onClick={() => dispatch(openModal(ModalEnum.EVALUATION_META_FILTER_APPLY))}
                         disabled={!selectedEmbedding}
-                        icon={!metaDataFilter?.length ? IconFilterOff : IconFilter}
+                        icon={!metaDataFilter?.length ? MemoIconFilterOff : MemoIconFilter}
                         text="Meta"
                     />
                     <div className="flex items-center gap-x-2">
@@ -147,7 +145,7 @@ export function PlaygroundSearch() {
                     text="Create set from results"
                     disabled={!searchResults || searchResults?.length === 0 || selectedEmbedding === null || question === "" || loading || createdSet}
                     onClick={createSetFromRecords}
-                    icon={!setCreationLoading ? IconCategoryPlus : IconLoader2}
+                    icon={!setCreationLoading ? MemoIconCategoryPlus : MemoIconLoader2}
                     buttonColor="green"
                     iconColor="green"
                     className="ml-auto"

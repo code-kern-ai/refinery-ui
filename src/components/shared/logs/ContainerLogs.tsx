@@ -1,12 +1,12 @@
 import { ContainerLogsProps } from "@/src/types/components/projects/projectId/settings/attribute-calculation";
 import { copyToClipboard } from "@/submodules/javascript-functions/general";
 import { Tooltip } from "@nextui-org/react";
-import { IconCheck, IconClipboard, IconClipboardOff } from "@tabler/icons-react";
 import { useState } from "react";
 import { first, timer } from "rxjs";
 import Logs from "./Logs";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
 import IconButton from "@/submodules/react-components/components/kern-button/IconButton";
+import { MemoIconCheck, MemoIconClipboard, MemoIconClipboardOff } from "@/submodules/react-components/components/kern-icons/icons";
 
 export default function ContainerLogs(props: ContainerLogsProps) {
 
@@ -29,14 +29,14 @@ export default function ContainerLogs(props: ContainerLogsProps) {
             {props.logs ? (
                 <IconButton
                     onClick={() => copyToClipboardLogs(props.logs.join('\n'), 0)}
-                    icon={copyClicked != 0 ? IconClipboard : IconCheck}
+                    icon={copyClicked != 0 ? MemoIconClipboard : MemoIconCheck}
                     tooltip={TOOLTIPS_DICT.GENERAL.CLICK_TO_COPY}
                     tooltipPlacement="top"
                 />
             ) : (
                 <Tooltip content='No runs to copy' color="invert" placement="top" className="cursor-auto">
                     <IconButton
-                        icon={IconClipboardOff}
+                        icon={MemoIconClipboardOff}
                         disabled
                     />
                 </Tooltip>)}

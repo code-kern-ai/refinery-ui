@@ -3,7 +3,6 @@ import MultilineTooltip from "@/src/components/shared/multilines-tooltip/Multili
 import { selectProjectId } from "@/src/reduxStore/states/project";
 import { CardStats, CardStatsEnum, ProjectOverviewCardsProps } from "@/src/types/components/projects/projectId/project-overview/project-overview";
 import { Tooltip } from "@nextui-org/react";
-import { IconBottle, IconBulb, IconClick } from "@tabler/icons-react";
 import { useRouter } from "next/router";
 import { useSelector } from "react-redux";
 import ButtonAsText from "@/submodules/react-components/components/kern-button/ButtonAsText";

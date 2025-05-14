@@ -7,7 +7,6 @@ import { useSelector } from "react-redux";
 import { selectAllProjects } from "@/src/reduxStore/states/project";
 import Upload from "./Upload";
 import { selectUploadData } from "@/src/reduxStore/states/upload";
-import { IconAlertTriangle } from "@tabler/icons-react";
 import { timer } from "rxjs";
 import { selectModal } from "@/src/reduxStore/states/modal";
 import { MemoIconAlertTriangle } from "@/submodules/react-components/components/kern-icons/icons";

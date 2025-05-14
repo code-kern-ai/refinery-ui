@@ -3,7 +3,6 @@ import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
 import { MemoIconEye, MemoIconEyeOff } from "@/submodules/react-components/components/kern-icons/icons";
 import { useDefaults } from "@/submodules/react-components/hooks/useDefaults";
 import { Tooltip } from "@nextui-org/react";
-import { IconEye, IconEyeOff } from "@tabler/icons-react";
 import { useRef, useState } from "react";
 
 const DEFAULTS = {

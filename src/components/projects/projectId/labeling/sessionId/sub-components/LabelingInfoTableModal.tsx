@@ -3,7 +3,6 @@ import { selectHoverGroupDict, selectSettings, selectTmpHighlightIds, setHoverGr
 import { LabelingPageParts } from "@/src/types/components/projects/projectId/labeling/labeling-main-component";
 import { LabelingInfoTableModalProps } from "@/src/types/components/projects/projectId/labeling/overview-table";
 import { ModalEnum } from "@/src/types/shared/modal";
-import { IconSearch } from "@tabler/icons-react";
 import { useDispatch, useSelector } from "react-redux";
 import style from '@/src/styles/components/projects/projectId/labeling.module.css';
 import { LabelSourceHover } from "@/src/types/components/projects/projectId/labeling/labeling";

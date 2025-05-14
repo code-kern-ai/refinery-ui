@@ -6,7 +6,7 @@ import { AttributeState } from "@/src/types/components/projects/projectId/settin
 import { ModalEnum } from "@/src/types/shared/modal";
 import { postProcessRecordByRecordId } from "@/src/util/components/projects/projectId/settings/attribute-calculation-helper";
 import { Tooltip } from "@nextui-org/react";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
 import ConfirmExecutionModal from "./ConfirmExecutionModal";
@@ -16,6 +16,7 @@ import { getRecordByRecordId } from "@/src/services/base/project-setting";
 import { getSampleRecords } from "@/src/services/base/attribute";
 import { DataTypeEnum } from "@/src/types/shared/general";
 import KernButton from "@/submodules/react-components/components/kern-button/KernButton";
+import useRefFor from "@/submodules/react-components/hooks/useRefFor";
 
 export default function ExecutionContainer(props: ExecutionContainerProps) {
     const projectId = useSelector(selectProjectId);
@@ -35,15 +36,16 @@ export default function ExecutionContainer(props: ExecutionContainerProps) {
         }
     }, [props.enableRunButton]);
 
-    function calculateUserAttributeSampleRecords() {
+    const currentAttributesRef = useRefFor(props.currentAttribute);
+    const calculateUserAttributeSampleRecords = useCallback(() => {
         if (requestedSomething) return;
         setRequestedSomething(true);
-        getSampleRecords(projectId, props.currentAttribute.id, (res) => {
+        getSampleRecords(projectId, currentAttributesRef.current.id, (res) => {
             const sampleRecordsFinal = { ...res };
             setRequestedSomething(false);
             props.setEnabledButton(false);
             setRunOn10HasError(sampleRecordsFinal.calculatedAttributes.length > 0 ? false : true);
-            if (props.currentAttribute.dataType == 'EMBEDDING_LIST') {
+            if (currentAttributesRef.current.dataType == DataTypeEnum.EMBEDDING_LIST) {
                 sampleRecordsFinal.calculatedAttributesList = sampleRecordsFinal.calculatedAttributes.map((record: string) => JSON.parse(record));
                 sampleRecordsFinal.calculatedAttributesListDisplay = extendArrayElementsByUniqueId(sampleRecordsFinal.calculatedAttributesList);
             }
@@ -51,13 +53,24 @@ export default function ExecutionContainer(props: ExecutionContainerProps) {
             setSampleRecords(sampleRecordsFinal);
             props.refetchCurrentAttribute();
         });
-    }
+    }, [projectId]);
 
     function recordByRecordId(recordId: string) {
         getRecordByRecordId(projectId, recordId, (res) => {
             dispatch(setModalStates(ModalEnum.VIEW_RECORD_DETAILS, { record: postProcessRecordByRecordId(res) }));
         });
     }
+
+    const executeAttribute = useCallback(() => {
+        dispatch(setModalStates(ModalEnum.EXECUTE_ATTRIBUTE_CALCULATION, { open: true, requestedSomething: requestedSomething }));
+    }, []);
+
+    const sampleRecordsRef = useRefFor(sampleRecords);
+    const viewRecordDetails = useCallback((index: number) => () => {
+        dispatch(setModalStates(ModalEnum.VIEW_RECORD_DETAILS, { open: true, recordIdx: index }));
+        recordByRecordId(sampleRecordsRef.current.recordIds[index]);
+    }, []);
+
     return (<div>
         <div className="mt-8 text-sm leading-5">
             <div className="text-gray-700 font-medium mr-2">
@@ -92,7 +105,7 @@ export default function ExecutionContainer(props: ExecutionContainerProps) {
                     solidTheme={true}
                     textColor="white"
                     disabled={props.currentAttribute.state == AttributeState.USABLE || props.currentAttribute.state == AttributeState.RUNNING || requestedSomething || checkIfAtLeastRunning || checkIfAtLeastQueued || props.tokenizationProgress < 1 || runOn10HasError || props.checkUnsavedChanges}
-                    onClick={() => dispatch(setModalStates(ModalEnum.EXECUTE_ATTRIBUTE_CALCULATION, { open: true, requestedSomething: requestedSomething }))}
+                    onClick={executeAttribute}
                     tooltip={props.currentAttribute.state == AttributeState.USABLE ? 'Attribute is already in use' : requestedSomething ? 'Test is running' : checkIfAtLeastRunning ? 'Another attribute is running' : checkIfAtLeastQueued ? 'Another attribute is queued for execution' : props.tokenizationProgress < 1 ? 'Tokenization is in progress' : runOn10HasError ? 'Run on 10 records has an error' : 'Execute the attribute on all records'}
                     className="ml-3"
                 />
@@ -113,10 +126,7 @@ export default function ExecutionContainer(props: ExecutionContainerProps) {
                                         <div className="flex items-center justify-center mr-5 ml-auto">
                                             <KernButton
                                                 text="View"
-                                                onClick={() => {
-                                                    dispatch(setModalStates(ModalEnum.VIEW_RECORD_DETAILS, { open: true, recordIdx: index }));
-                                                    recordByRecordId(sampleRecords.recordIds[index]);
-                                                }}
+                                                onClick={viewRecordDetails(index)}
                                             />
                                         </div>
                                     </div>

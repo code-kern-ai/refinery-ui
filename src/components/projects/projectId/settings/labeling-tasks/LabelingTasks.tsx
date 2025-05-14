@@ -6,8 +6,6 @@ import { ModalEnum } from "@/src/types/shared/modal";
 import { LabelHelper } from "@/src/util/classes/label-helper";
 import { isTaskNameUnique, labelingTaskFromString, labelingTaskToString } from "@/src/util/components/projects/projectId/settings/labeling-tasks-helper";
 import { jsonCopy } from "@/submodules/javascript-functions/general";
-import { Tooltip } from "@nextui-org/react";
-import { IconColorPicker, IconPlus, IconTrash } from "@tabler/icons-react";
 import { useEffect, useState } from "react"
 import { useDispatch, useSelector } from "react-redux";
 import RenameLabelModal from "./RenameLabelModal";
@@ -21,7 +19,7 @@ import KernDropdown from "@/submodules/react-components/components/KernDropdown"
 import { updateLabelingTask } from "@/src/services/base/labeling-tasks";
 import IconButton from "@/submodules/react-components/components/kern-button/IconButton";
 import KernButton from "@/submodules/react-components/components/kern-button/KernButton";
-import { MemoIconColorPicker, MemoIconTrash } from "@/submodules/react-components/components/kern-icons/icons";
+import { MemoIconColorPicker, MemoIconPlus, MemoIconTrash } from "@/submodules/react-components/components/kern-icons/icons";
 
 export default function LabelingTasks() {
     const dispatch = useDispatch();
@@ -147,7 +145,7 @@ export default function LabelingTasks() {
                                             </div>
                                         ))}
                                         <IconButton
-                                            icon={IconPlus}
+                                            icon={MemoIconPlus}
                                             disabled={task.taskType == LabelingTaskTaskType.NOT_SET}
                                             onClick={() => dispatch(setModalStates(ModalEnum.ADD_LABEL, { taskId: task.id, open: true }))}
                                         />
@@ -166,7 +164,7 @@ export default function LabelingTasks() {
         <div className="mt-1 flex items-center gap-1">
             <KernButton
                 text="Add labeling task"
-                icon={IconPlus}
+                icon={MemoIconPlus}
                 onClick={() => dispatch(openModal(ModalEnum.ADD_LABELING_TASK))}
                 tooltip={TOOLTIPS_DICT.PROJECT_SETTINGS.LABELING_TASK.NEW_LABELING_TASK}
                 tooltipPlacement="right"

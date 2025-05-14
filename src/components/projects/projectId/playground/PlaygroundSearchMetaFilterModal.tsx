@@ -12,7 +12,6 @@ import { checkDecimalPatterns, getAttributeType, getFilterIntegrationOperatorToo
 import { getColorForDataType } from "@/src/util/components/projects/projectId/settings/data-schema-helper";
 import { extendArrayElementsByUniqueId } from "@/submodules/javascript-functions/id-prep";
 import KernDropdown from "@/submodules/react-components/components/KernDropdown";
-import { IconPlus, IconTrash } from "@tabler/icons-react";
 import { getUniqueValuesByAttributes } from "@/src/services/base/dataSlices";
 import { postProcessUniqueValues } from "@/src/util/components/projects/projectId/data-browser/data-browser-helper";
 import { selectProjectId } from "@/src/reduxStore/states/project";

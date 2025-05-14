@@ -2,7 +2,6 @@ import { selectAttributesDict, selectLabelingTasksAll, selectVisibleAttributesHe
 import { selectProjectId } from "@/src/reduxStore/states/project";
 import { attributeCreateSearchGroup, commentsCreateSearchGroup, generateRandomSeed, getBasicGroupItems, getBasicSearchGroup, getBasicSearchItem, labelingTasksCreateSearchGroup, orderByCreateSearchGroup, userCreateSearchGroup } from "@/src/util/components/projects/projectId/data-browser/search-groups-helper";
 import { SearchGroup, Slice, StaticOrderByKeys } from "@/submodules/javascript-functions/enums/enums";
-import { IconArrowDown, IconArrowsRandom, IconFilterOff, IconPlus, IconPointerOff, IconTrash } from "@tabler/icons-react";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import style from '@/src/styles/components/projects/projectId/data-browser.module.css';
@@ -29,7 +28,7 @@ import { getWeakSupervisionRun } from "@/src/services/base/heuristic";
 import { getRecordsByStaticSlice, searchRecordsExtended } from "@/src/services/base/data-browser";
 import { staticDataSlicesCurrentCount } from "@/src/services/base/dataSlices";
 import KernButton from "@/submodules/react-components/components/kern-button/KernButton";
-import { MemoIconArrowDown, MemoIconArrowsRandom, MemoIconFilterOff, MemoIconPlus, MemoIconTrash } from "@/submodules/react-components/components/kern-icons/icons";
+import { MemoIconArrowDown, MemoIconArrowsRandom, MemoIconFilterOff, MemoIconPlus, MemoIconPointerOff, MemoIconTrash } from "@/submodules/react-components/components/kern-icons/icons";
 
 const GROUP_SORT_ORDER = 0;
 let GLOBAL_SEARCH_GROUP_COUNT = 0;
@@ -805,6 +804,6 @@ function ButtonLabelsDisabled() {
     return (<KernButton
         text="No labels associated with this task"
         disabled={true}
-        icon={IconPointerOff}
+        icon={MemoIconPointerOff}
     />)
 }

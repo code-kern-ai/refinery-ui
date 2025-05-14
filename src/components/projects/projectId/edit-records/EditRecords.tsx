@@ -6,7 +6,6 @@ import { Fragment, useCallback, useEffect, useState } from "react";
 import { buildAccessKey, createDefaultEditRecordComponentData } from "@/src/util/components/projects/projectId/edit-records-helper";
 import style from '@/src/styles/components/projects/projectId/edit-records.module.css';
 import { DataTypeEnum } from "@/src/types/shared/general";
-import { IconAlertCircle, IconAlertTriangle, IconAlertTriangleFilled, IconBallpen, IconBallpenOff } from "@tabler/icons-react";
 import { Tooltip } from "@nextui-org/react";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
 import EditField from "./EditField";

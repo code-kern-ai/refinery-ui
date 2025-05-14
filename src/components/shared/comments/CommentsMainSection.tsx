@@ -2,7 +2,6 @@ import { CommentData, CommentMainSectionProps, CommentPosition } from "@/src/typ
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
 import { useLocalStorage } from "@/submodules/react-components/hooks/useLocalStorage";
 import { Tooltip } from "@nextui-org/react";
-import { IconArrowLeft, IconArrowRight, IconX } from "@tabler/icons-react";
 import { useCallback, useEffect, useState } from "react";
 import DisplayComments from "./DisplayComments";
 import { useSelector } from "react-redux";
@@ -13,7 +12,7 @@ import { convertTypeToKey } from "@/src/util/shared/comments-helper";
 import { CommentDataManager } from "@/src/util/classes/comments";
 import { createComment, deleteCommentPost, updateCommentPost } from "@/src/services/base/comment";
 import IconButton from "@/submodules/react-components/components/kern-button/IconButton";
-import { MemoIconArrowLeft, MemoIconArrowRight } from "@/submodules/react-components/components/kern-icons/icons";
+import { MemoIconArrowLeft, MemoIconArrowRight, MemoIconX } from "@/submodules/react-components/components/kern-icons/icons";
 
 export default function CommentsMainSection(props: CommentMainSectionProps) {
     const comments = useSelector(selectComments);
@@ -155,7 +154,7 @@ export default function CommentsMainSection(props: CommentMainSectionProps) {
                                 </Tooltip>
                             </div>
                             <IconButton
-                                icon={IconX}
+                                icon={MemoIconX}
                                 onClick={props.toggleOpen}
                             />
                         </div>

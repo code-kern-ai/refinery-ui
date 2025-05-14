@@ -1,6 +1,5 @@
 import { ModalEnum } from "@/src/types/shared/modal";
 import Modal from "../modal/Modal";
-import { IconArrowRight } from "@tabler/icons-react";
 import { useSelector } from "react-redux";
 import { CacheEnum, selectCachedValue } from "@/src/reduxStore/states/cachedValues";
 import style from '@/src/styles/shared/sidebar.module.css';

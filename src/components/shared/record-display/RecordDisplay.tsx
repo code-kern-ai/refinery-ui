@@ -1,11 +1,10 @@
 import { selectConfiguration, selectIsTextHighlightNeeded, selectTextHighlight } from "@/src/reduxStore/states/pages/data-browser";
-import { selectAttributesDict, selectVisibleAttributesHeuristics } from "@/src/reduxStore/states/pages/settings";
+import { selectAttributesDict } from "@/src/reduxStore/states/pages/settings";
 import { LineBreaksType } from "@/src/types/components/projects/projectId/data-browser/data-browser";
 import { Attribute } from "@/src/types/components/projects/projectId/settings/data-schema";
 import { DataTypeEnum } from "@/src/types/shared/general";
 import { postProcessAttributes, postProcessRecord } from "@/src/util/shared/record-display-helper";
-import { IconAlertCircle } from "@tabler/icons-react";
-import { use, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import Highlight from "../highlight/Highlight";
 import { MemoIconAlertCircle } from "@/submodules/react-components/components/kern-icons/icons";

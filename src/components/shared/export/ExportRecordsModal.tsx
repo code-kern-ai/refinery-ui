@@ -11,9 +11,7 @@ import { LabelSource } from "@/submodules/javascript-functions/enums/enums";
 import { labelSourceToString } from "@/submodules/javascript-functions/enums/enum-functions";
 import postProcessExportRecordData, { NONE_IN_PROJECT, buildForm, getExportTooltipFor } from "@/src/util/shared/export-helper";
 import GroupDisplay from "./GroupDisplay";
-import { IconDownload } from "@tabler/icons-react";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
-import { Tooltip } from "@nextui-org/react";
 import { DownloadState } from "@/src/types/components/projects/projectId/settings/project-export";
 import LoadingIcon from "../../../../submodules/react-components/components/LoadingIcon";
 import { ExportHelper } from "@/src/util/classes/export";
@@ -28,6 +26,7 @@ import { getRecordExportFromData } from "@/src/services/base/project";
 import { getLastRecordExportCredentials, prepareRecordExport } from "@/src/services/base/project-setting";
 import { Application, CurrentPage } from "@/submodules/react-components/hooks/web-socket/constants";
 import KernButton from "@/submodules/react-components/components/kern-button/KernButton";
+import { MemoIconDownload } from "@/submodules/react-components/components/kern-icons/icons";
 
 export default function ExportRecordsModal(props: ExportProps) {
     const dispatch = useDispatch();
@@ -317,7 +316,7 @@ export default function ExportRecordsModal(props: ExportProps) {
                     text={recordExportCredentials.downloadFileName}
                     onClick={exportViaFile}
                     tooltip={TOOLTIPS_DICT.PROJECT_SETTINGS.LATEST_SNAPSHOT}
-                    icon={IconDownload}
+                    icon={MemoIconDownload}
                 />
             }
             <KernButton

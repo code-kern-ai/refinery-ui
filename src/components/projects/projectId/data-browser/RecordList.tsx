@@ -10,12 +10,11 @@ import { UserRole } from "@/src/types/shared/sidebar";
 import { DATA_BROWSER_TABLE_COLUMN_HEADERS } from "@/src/util/components/projects/projectId/data-browser/data-browser-helper";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
 import { Tooltip } from "@nextui-org/react";
-import { IconAngle, IconArrowRight } from "@tabler/icons-react";
 import { useDispatch, useSelector } from "react-redux";
 import SimilaritySearchModal from "./modals/SimilaritySeachModal";
 import RecordCommentsModal from "./modals/RecordCommentsModal";
 import ButtonAsText from "@/submodules/react-components/components/kern-button/ButtonAsText";
-import { MemoIconEdit, MemoIconNotes } from "@/submodules/react-components/components/kern-icons/icons";
+import { MemoIconAngle, MemoIconArrowRight, MemoIconEdit, MemoIconNotes } from "@/submodules/react-components/components/kern-icons/icons";
 
 export default function RecordList(props: RecordListProps) {
     const dispatch = useDispatch();
@@ -56,7 +55,7 @@ export default function RecordList(props: RecordListProps) {
                                 text="Find similar records"
                                 color="green"
                                 onClick={() => dispatch(setModalStates(ModalEnum.SIMILARITY_SEARCH, { recordId: record.id, open: true }))}
-                                iconRight={IconAngle}
+                                iconRight={MemoIconAngle}
                                 iconColor="green"
                             />
                         )}
@@ -66,7 +65,7 @@ export default function RecordList(props: RecordListProps) {
                             text="Continue with this record"
                             color="green"
                             onClick={() => props.recordClicked(index)}
-                            iconRight={IconArrowRight}
+                            iconRight={MemoIconArrowRight}
                             iconColor="green"
                         />
                     </div>

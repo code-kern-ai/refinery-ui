@@ -2,9 +2,8 @@ import { selectProjectId } from "@/src/reduxStore/states/project";
 import { deleteQuestionFromHistory, getPlaygroundQuestions } from "@/src/services/base/playground";
 import { PlaygroundQuestion } from "@/src/types/components/projects/projectId/settings/playground";
 import IconButton from "@/submodules/react-components/components/kern-button/IconButton";
-import { MemoIconTrash } from "@/submodules/react-components/components/kern-icons/icons";
+import { MemoIconHistory, MemoIconTrash } from "@/submodules/react-components/components/kern-icons/icons";
 import useOnClickOutside from "@/submodules/react-components/hooks/useHooks/useOnClickOutside";
-import { IconHistory, IconTrash } from "@tabler/icons-react";
 import { useEffect, useRef, useState } from "react";
 import { useSelector } from "react-redux";
 
@@ -47,7 +46,7 @@ export default function QuestionHistory(props: QuestionHistoryProps) {
     return (
         <>
             <IconButton
-                icon={IconHistory}
+                icon={MemoIconHistory}
                 tooltip="History"
                 tooltipPlacement="bottom"
                 onMouseDown={(e) => { e.preventDefault(); e.stopPropagation(); }}

@@ -4,7 +4,6 @@ import { combineClassNames } from "@/submodules/javascript-functions/general";
 import { MemoIconDotsVertical, MemoIconEdit, MemoIconEye, MemoIconEyeOff, MemoIconTrash } from "@/submodules/react-components/components/kern-icons/icons";
 import { Menu, Transition } from "@headlessui/react";
 import { Tooltip } from "@nextui-org/react";
-import { IconDotsVertical, IconEdit, IconEye, IconEyeOff, IconTrash } from "@tabler/icons-react";
 import { Fragment } from "react";
 import { useSelector } from "react-redux";
 

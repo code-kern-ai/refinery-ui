@@ -8,7 +8,6 @@ import { ModalEnum } from '@/src/types/shared/modal';
 import { updateSliceInfoHelper } from '@/src/util/components/projects/projectId/data-browser/data-browser-helper';
 import { Slice } from '@/submodules/javascript-functions/enums/enums';
 import { Tooltip } from '@nextui-org/react';
-import { IconAlertTriangle, IconInfoCircle, IconLayoutSidebar, IconTrash } from '@tabler/icons-react';
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { timer } from 'rxjs';

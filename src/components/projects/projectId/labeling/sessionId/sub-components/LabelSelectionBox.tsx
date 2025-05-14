@@ -6,7 +6,6 @@ import { UserRole } from "@/src/types/shared/sidebar";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
 import { MemoIconCirclePlus } from "@/submodules/react-components/components/kern-icons/icons";
 import { Tooltip } from "@nextui-org/react";
-import { IconCirclePlus } from "@tabler/icons-react";
 import { Fragment, useEffect, useState, useCallback, useRef } from "react";
 import { useSelector } from "react-redux";
 

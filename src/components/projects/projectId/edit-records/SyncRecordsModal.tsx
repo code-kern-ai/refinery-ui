@@ -6,7 +6,6 @@ import { syncEditedRecords } from "@/src/services/base/record";
 import { SyncRecordsModalProps } from "@/src/types/components/projects/projectId/edit-records";
 import { ModalButton, ModalEnum } from "@/src/types/shared/modal";
 import { jsonCopy } from "@/submodules/javascript-functions/general";
-import { IconAlertTriangleFilled, IconInfoCircle, IconTrash } from "@tabler/icons-react";
 import { Fragment, useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { MemoIconAlertTriangleFilled, MemoIconInfoCircle, MemoIconTrash } from "@/submodules/react-components/components/kern-icons/icons";

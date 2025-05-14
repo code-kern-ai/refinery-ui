@@ -8,7 +8,6 @@ import { jsonCopy } from "@/submodules/javascript-functions/general";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import style from "@/src/styles/components/projects/projectId/labeling.module.css";
-import { IconLayoutNavbarCollapse } from "@tabler/icons-react";
 import QuickButtons from "./QuickButtons";
 import HeaderDisplay from "./HeaderDisplay";
 import { selectSettings, setSettings, updateSettings } from "@/src/reduxStore/states/pages/labeling";

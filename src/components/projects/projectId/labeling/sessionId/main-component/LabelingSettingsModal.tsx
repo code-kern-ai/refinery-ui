@@ -10,7 +10,6 @@ import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
 import { MemoIconInfoCircle } from "@/submodules/react-components/components/kern-icons/icons";
 import KernDropdown from "@/submodules/react-components/components/KernDropdown";
 import { Tooltip } from "@nextui-org/react";
-import { IconInfoCircle } from "@tabler/icons-react";
 import { Fragment, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 

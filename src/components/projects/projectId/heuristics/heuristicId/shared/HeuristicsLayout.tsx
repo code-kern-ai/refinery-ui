@@ -9,7 +9,6 @@ import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
 import { InformationSourceType } from "@/submodules/javascript-functions/enums/enums";
 import { copyToClipboard } from "@/submodules/javascript-functions/general";
 import { Tooltip } from "@nextui-org/react";
-import { IconArrowLeft } from "@tabler/icons-react";
 import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux"
 import { useRouter } from "next/router";

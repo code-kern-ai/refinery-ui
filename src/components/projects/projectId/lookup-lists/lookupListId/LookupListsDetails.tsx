@@ -5,7 +5,6 @@ import { postProcessLookupList, postProcessTerms } from "@/src/util/components/p
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
 import { copyToClipboard } from "@/submodules/javascript-functions/general";
 import { Tooltip } from "@nextui-org/react";
-import { IconArrowLeft } from "@tabler/icons-react";
 import { useRouter } from "next/router";
 import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux"

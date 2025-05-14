@@ -10,12 +10,11 @@ import { ATTRIBUTES_VISIBILITY_STATES, getTooltipVisibilityState } from "@/src/u
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
 import KernDropdown from "@/submodules/react-components/components/KernDropdown";
 import { Tooltip } from "@nextui-org/react";
-import { IconArrowRight, IconCheck, IconX } from "@tabler/icons-react";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import ButtonAsText from "@/submodules/react-components/components/kern-button/ButtonAsText";
-import { MemoIconCheck, MemoIconX } from "@/submodules/react-components/components/kern-icons/icons";
+import { MemoIconArrowRight, MemoIconCheck, MemoIconX } from "@/submodules/react-components/components/kern-icons/icons";
 
 export default function DataSchema(props: DataSchemaProps) {
     const router = useRouter();
@@ -134,7 +133,7 @@ export default function DataSchema(props: DataSchemaProps) {
                                                     <ButtonAsText
                                                         text="Details"
                                                         color="green"
-                                                        iconRight={IconArrowRight}
+                                                        iconRight={MemoIconArrowRight}
                                                         onClick={() => {
                                                             dispatch(setCurrentPage(CurrentPage.ATTRIBUTE_CALCULATION));
                                                             router.push(`/projects/${projectId}/attributes/${attribute.id}`);

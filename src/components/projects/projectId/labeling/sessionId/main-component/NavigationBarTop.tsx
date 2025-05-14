@@ -6,7 +6,6 @@ import { UserRole } from "@/src/types/shared/sidebar";
 import { SessionManager } from "@/src/util/classes/labeling/session-manager";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
 import { Tooltip } from "@nextui-org/react";
-import { IconArrowLeft, IconArrowRight, IconCircle, IconStar } from "@tabler/icons-react";
 import { useRouter } from "next/router";
 import { useDispatch, useSelector } from "react-redux";
 import style from '@/src/styles/components/projects/projectId/labeling.module.css';
@@ -15,7 +14,7 @@ import { useEffect } from "react";
 import { parseLinkFromText } from "@/src/util/shared/link-parser-helper";
 import { getAvailableLinks } from "@/src/services/base/labeling";
 import KernButton from "@/submodules/react-components/components/kern-button/KernButton";
-import { MemoIconCircle, MemoIconStar } from "@/submodules/react-components/components/kern-icons/icons";
+import { MemoIconArrowLeft, MemoIconArrowRight, MemoIconCircle, MemoIconStar } from "@/submodules/react-components/components/kern-icons/icons";
 
 export default function NavigationBarTop(props: NavigationBarTopProps) {
     const router = useRouter();
@@ -112,7 +111,7 @@ export default function NavigationBarTop(props: NavigationBarTopProps) {
                             text="Prev"
                             onClick={previousRecord}
                             disabled={SessionManager.prevDisabled}
-                            icon={IconArrowLeft}
+                            icon={MemoIconArrowLeft}
                         />
                         <KernButton
                             text="Next"
@@ -120,7 +119,7 @@ export default function NavigationBarTop(props: NavigationBarTopProps) {
                             solidTheme={true}
                             textColor="white"
                             onClick={nextRecord}
-                            icon={IconArrowRight}
+                            icon={MemoIconArrowRight}
                             disabled={SessionManager.nextDisabled}
                             iconColor="white"
                         />

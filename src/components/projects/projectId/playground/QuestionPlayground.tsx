@@ -9,7 +9,6 @@ import { getAttributes } from "@/src/services/base/attribute";
 import { setAllAttributes, setAllEmbeddings } from "@/src/reduxStore/states/pages/settings";
 import { getEmbeddings } from "@/src/services/base/embedding";
 import { postProcessingEmbeddings } from "@/src/util/components/projects/projectId/settings/embeddings-helper";
-import { IconCategoryPlus } from "@tabler/icons-react";
 import { MemoIconCategoryPlus } from "@/submodules/react-components/components/kern-icons/icons";
 
 const STEPS = [

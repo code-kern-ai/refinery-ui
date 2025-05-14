@@ -4,7 +4,6 @@ import { ExplainModalProps } from "@/src/types/components/projects/projectId/edi
 import { ModalEnum } from "@/src/types/shared/modal";
 import KernButton from "@/submodules/react-components/components/kern-button/KernButton";
 import { MemoIconAlertTriangleFilled, MemoIconInfoCircleFilled } from "@/submodules/react-components/components/kern-icons/icons";
-import { IconAlertTriangleFilled, IconInfoCircleFilled } from "@tabler/icons-react";
 import { useDispatch } from "react-redux";
 
 export default function ExplainModal(props: ExplainModalProps) {

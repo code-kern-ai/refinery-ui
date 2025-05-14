@@ -6,7 +6,6 @@ import { selectAllProjects } from '@/src/reduxStore/states/project';
 import { ModalButton, ModalEnum } from '@/src/types/shared/modal';
 import { closeModal, openModal } from '@/src/reduxStore/states/modal';
 import Modal from '../shared/modal/Modal';
-import { IconAlertTriangle, IconMessageCircle, IconNews, IconQuestionMark, IconScreenshot } from '@tabler/icons-react';
 import { setSearchGroupsStore } from '@/src/reduxStore/states/pages/data-browser';
 import { selectProjectIdSampleProject, setProjectIdSampleProject } from '@/src/reduxStore/states/tmp';
 import { createSampleProject } from '@/src/services/base/project';

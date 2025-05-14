@@ -9,7 +9,6 @@ import { ATTRIBUTES_VISIBILITY_STATES, DATA_TYPES, getTooltipVisibilityState } f
 import { copyToClipboard } from "@/submodules/javascript-functions/general";
 import { Editor } from "@monaco-editor/react";
 import { Tooltip } from "@nextui-org/react";
-import { IconAlertTriangleFilled, IconArrowLeft, IconCircleCheckFilled } from "@tabler/icons-react";
 import { useRouter } from "next/router";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux"

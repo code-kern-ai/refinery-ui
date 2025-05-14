@@ -2,7 +2,6 @@ import Header from "../header/Header";
 import Sidebar from "../sidebar/Sidebar";
 import { Fragment, useCallback, useEffect, useState } from "react";
 import { NotificationLevel } from "@/src/types/shared/notification-center";
-import { IconAlertTriangleFilled, IconCircleCheckFilled, IconInfoCircleFilled } from "@tabler/icons-react";
 import { useDispatch, useSelector } from "react-redux";
 import { selectCurrentPage, selectOrganizationId, selectUser } from "@/src/reduxStore/states/general";
 import { interval } from "rxjs";

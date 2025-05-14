@@ -7,7 +7,6 @@ import { Embedding, EmbeddingState, EmbeddingType } from "@/src/types/components
 import { ModalEnum } from "@/src/types/shared/modal";
 import { DATA_TYPES, getColorForDataType } from "@/src/util/components/projects/projectId/settings/data-schema-helper";
 import { Tooltip } from "@nextui-org/react";
-import { IconAlertTriangleFilled, IconArrowAutofitDown, IconCircleCheckFilled, IconNotes, IconPlus, IconTrash, IconMessageCircleSearch } from "@tabler/icons-react";
 import { useRouter } from "next/router";
 import { useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -18,7 +17,7 @@ import DeleteEmbeddingModal from "./DeleteEmbeddingModal";
 import { useWebsocket } from "@/submodules/react-components/hooks/web-socket/useWebsocket";
 import { Application, CurrentPage, CurrentPageSubKey } from "@/submodules/react-components/hooks/web-socket/constants";
 import KernButton from "@/submodules/react-components/components/kern-button/KernButton";
-import { MemoIconAlertTriangleFilled, MemoIconCircleCheckFilled, MemoIconNotes, MemoIconTrash } from "@/submodules/react-components/components/kern-icons/icons";
+import { MemoIconAlertTriangleFilled, MemoIconArrowAutofitDown, MemoIconCircleCheckFilled, MemoIconMessageCircleSearch, MemoIconNotes, MemoIconPlus, MemoIconTrash } from "@/submodules/react-components/components/kern-icons/icons";
 
 
 export default function Embeddings(props: { refetchEmbeddings: () => void }) {
@@ -173,21 +172,21 @@ export default function Embeddings(props: { refetchEmbeddings: () => void }) {
                 <KernButton
                     text="Generate embedding"
                     onClick={() => dispatch(openModal(ModalEnum.ADD_EMBEDDING))}
-                    icon={IconPlus}
+                    icon={MemoIconPlus}
                     tooltip={TOOLTIPS_DICT.PROJECT_SETTINGS.EMBEDDINGS.GENERATE_EMBEDDING}
                     tooltipPlacement="right"
                 />
                 <KernButton
                     text="See downloaded models"
                     onClick={() => router.push('/models-download')}
-                    icon={IconArrowAutofitDown}
+                    icon={MemoIconArrowAutofitDown}
                     tooltip={TOOLTIPS_DICT.PROJECT_SETTINGS.EMBEDDINGS.NAVIGATE_MODELS_DOWNLOADED}
                     tooltipPlacement="right"
                 />
                 <KernButton
                     text="Evaluation"
                     onClick={() => router.push(`/projects/${projectId}/playground`)}
-                    icon={IconMessageCircleSearch}
+                    icon={MemoIconMessageCircleSearch}
                     tooltip={TOOLTIPS_DICT.PROJECT_SETTINGS.EMBEDDINGS.PLAYGROUND}
                     tooltipPlacement="right"
                 />
