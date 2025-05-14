@@ -2,7 +2,7 @@ import Statuses from "@/src/components/shared/statuses/Statuses";
 import { selectAllLookupLists, setAllLookupLists } from "@/src/reduxStore/states/pages/lookup-lists";
 import { selectAttributes, selectVisibleAttributeAC, setAllAttributes, setLabelingTasksAll, updateAttributeById } from "@/src/reduxStore/states/pages/settings";
 import { selectProjectId } from "@/src/reduxStore/states/project"
-import { Attribute, AttributeState, AttributeWithOnClick, LLMConfig } from "@/src/types/components/projects/projectId/settings/data-schema";
+import { Attribute, AttributeState, AttributeVisibility, AttributeWithOnClick, LLMConfig } from "@/src/types/components/projects/projectId/settings/data-schema";
 import { DataTypeEnum } from "@/src/types/shared/general";
 import { LLM_PROVIDER_OPTIONS, postProcessCurrentAttribute } from "@/src/util/components/projects/projectId/settings/attribute-calculation-helper";
 import { ATTRIBUTES_VISIBILITY_STATES, DATA_TYPES, getTooltipVisibilityState } from "@/src/util/components/projects/projectId/settings/data-schema-helper";
@@ -40,6 +40,7 @@ import { simpleDictCompare } from "@/submodules/javascript-functions/validations
 import { LLM_CODE_TEMPLATE_EXAMPLES, LLM_CODE_TEMPLATE_OPTIONS } from "./LLM/llmTemplates";
 import KernButton from "@/submodules/react-components/components/kern-button/KernButton";
 import { MemoIconAlertTriangleFilled, MemoIconArrowLeft, MemoIconCircleCheckFilled } from "@/submodules/react-components/components/kern-icons/icons";
+import { LookupListWithOnClick } from "@/src/types/components/projects/projectId/lookup-lists";
 
 const EDITOR_OPTIONS = { theme: 'vs-light', language: 'python', readOnly: false };
 
@@ -197,10 +198,11 @@ export default function AttributeCalculation() {
 
     }
 
+    const attributesRef = useRefFor(attributes);
     const changeAttributeName = useCallback((name: string) => {
         if (name == currentAttributeRef.current.name) return;
         if (name == '') return;
-        const duplicateNameExists = attributes.find((attribute) => attribute.name == name);
+        const duplicateNameExists = attributesRef.current.find((attribute) => attribute.name == name);
         if (duplicateNameExists) {
             setDuplicateNameExists(true);
             setAttributeName(currentAttributeRef.current.name);
@@ -217,10 +219,10 @@ export default function AttributeCalculation() {
         }, null, null, attributeNew.name);
     }, []);
 
-    const updateVisibility = useCallback((option: any) => {
+    const updateVisibility = useCallback((option: { name: string, value: string }) => {
         const attributeNew = { ...currentAttributeRef.current };
-        attributeNew.visibility = option.value;
-        attributeNew.visibilityIndex = ATTRIBUTES_VISIBILITY_STATES.findIndex((state) => state.name === option);
+        attributeNew.visibility = option.value as AttributeVisibility;
+        attributeNew.visibilityIndex = ATTRIBUTES_VISIBILITY_STATES.findIndex((state) => state.name === option.name);
         attributeNew.visibilityName = option.name;
         attributeNew.saveSourceCode = false;
         updateAttribute(projectId, currentAttributeRef.current.id, (res) => {
@@ -229,7 +231,7 @@ export default function AttributeCalculation() {
         }, null, null, null, null, attributeNew.visibility);
     }, []);
 
-    const updateDataType = useCallback((option: any) => {
+    const updateDataType = useCallback((option: { name: string, value: string }) => {
         const attributeNew = { ...currentAttributeRef.current };
         attributeNew.dataType = option.value;
         attributeNew.dataTypeName = option.name;
@@ -322,6 +324,10 @@ export default function AttributeCalculation() {
         { ...attribute, onClick: copyToClipboardFunc(attribute.name) }
     )), [usableAttributes]);
 
+    const lookupListsFinal = useMemo(() => lookupLists.map((lookupList) => (
+        { ...lookupList, onClick: copyToClipboardFunc("from knowledge import " + lookupList.pythonVariable) }
+    )), [lookupLists]);
+
     const disabledOptions = useMemo(() => {
         if (!currentAttribute || currentAttribute.dataType == DataTypeEnum.LLM_RESPONSE) return undefined;
         return DATA_TYPES.map((e) => e.value == DataTypeEnum.LLM_RESPONSE);
@@ -404,11 +410,11 @@ export default function AttributeCalculation() {
                     </div>
 
                     <div className="text-sm leading-5 font-medium text-gray-700 inline-block">
-                        {lookupLists.length == 0 ? 'No lookup lists in project' : 'Lookup lists'}</div>
+                        {lookupListsFinal.length == 0 ? 'No lookup lists in project' : 'Lookup lists'}</div>
                     <div className="flex flex-row items-center">
-                        {lookupLists.map((lookupList) => (
+                        {lookupListsFinal.map((lookupList: LookupListWithOnClick) => (
                             <Tooltip key={lookupList.id} content={TOOLTIPS_DICT.GENERAL.IMPORT_STATEMENT} color="invert" placement="top">
-                                <span onClick={copyToClipboardFunc("from knowledge import " + lookupList.pythonVariable)}>
+                                <span onClick={lookupList.onClick}>
                                     <div className="cursor-pointer border items-center px-2 py-0.5 rounded text-xs font-medium text-center mr-2">
                                         {lookupList.pythonVariable} - {lookupList.termCount}
                                     </div>

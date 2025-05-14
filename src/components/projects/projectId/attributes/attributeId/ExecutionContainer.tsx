@@ -6,7 +6,7 @@ import { AttributeState } from "@/src/types/components/projects/projectId/settin
 import { ModalEnum } from "@/src/types/shared/modal";
 import { postProcessRecordByRecordId } from "@/src/util/components/projects/projectId/settings/attribute-calculation-helper";
 import { Tooltip } from "@nextui-org/react";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
 import ConfirmExecutionModal from "./ConfirmExecutionModal";
@@ -61,8 +61,9 @@ export default function ExecutionContainer(props: ExecutionContainerProps) {
         });
     }
 
+    const requestedSomethingRef = useRefFor(requestedSomething);
     const executeAttribute = useCallback(() => {
-        dispatch(setModalStates(ModalEnum.EXECUTE_ATTRIBUTE_CALCULATION, { open: true, requestedSomething: requestedSomething }));
+        dispatch(setModalStates(ModalEnum.EXECUTE_ATTRIBUTE_CALCULATION, { open: true, requestedSomething: requestedSomethingRef.current }));
     }, []);
 
     const sampleRecordsRef = useRefFor(sampleRecords);
@@ -70,6 +71,18 @@ export default function ExecutionContainer(props: ExecutionContainerProps) {
         dispatch(setModalStates(ModalEnum.VIEW_RECORD_DETAILS, { open: true, recordIdx: index }));
         recordByRecordId(sampleRecordsRef.current.recordIds[index]);
     }, []);
+
+    const sampleRecordsFinal = useMemo(() => {
+        if (sampleRecords && sampleRecords.calculatedAttributesDisplay) {
+            return sampleRecords.calculatedAttributesDisplay.map((record: any) => {
+                return {
+                    ...record,
+                    onClick: viewRecordDetails(record.id)
+                }
+            }
+            );
+        }
+    }, [sampleRecords]);
 
     return (<div>
         <div className="mt-8 text-sm leading-5">
@@ -112,12 +125,12 @@ export default function ExecutionContainer(props: ExecutionContainerProps) {
             </div>
         </div>
 
-        {sampleRecords && sampleRecords.calculatedAttributesDisplay.length > 0 && <div className="mt-4 flex flex-col">
+        {sampleRecordsFinal && sampleRecordsFinal.length > 0 && <div className="mt-4 flex flex-col">
             <div className="overflow-x-auto">
                 <div className="inline-block min-w-full align-middle">
                     <div className="overflow-hidden shadow ring-1 ring-black ring-opacity-5 md:rounded-lg">
                         <div className="min-w-full border divide-y divide-gray-300">
-                            {sampleRecords.calculatedAttributesDisplay.map((record: any, index: number) => (
+                            {sampleRecordsFinal.map((record: any, index: number) => (
                                 <div key={record.id} className="divide-y divide-gray-200 bg-white">
                                     <div className="flex-shrink-0 border-b border-gray-200 shadow-sm flex justify-between items-center">
                                         <div className="flex items-center text-xs leading-5 text-gray-500 font-normal mx-4 my-3 text-justify">
@@ -126,7 +139,7 @@ export default function ExecutionContainer(props: ExecutionContainerProps) {
                                         <div className="flex items-center justify-center mr-5 ml-auto">
                                             <KernButton
                                                 text="View"
-                                                onClick={viewRecordDetails(index)}
+                                                onClick={record.onClick}
                                             />
                                         </div>
                                     </div>
