@@ -59,6 +59,10 @@ export default function ModelsDownload() {
     const orgId = useSelector(selectOrganizationId);
     useWebsocket(orgId, Application.REFINERY, CurrentPage.MODELS_DOWNLOAD, handleWebsocketNotification);
 
+    const openCreateModal = useCallback(() => {
+        dispatch(openModal(ModalEnum.ADD_MODEL_DOWNLOAD));
+    }, []);
+
     return (<div className="p-4 bg-gray-100 flex-1 flex flex-col h-[calc(100vh-4rem)] overflow-y-auto">
         <div className="flex flex-row items-center">
             <ButtonAsText
@@ -87,7 +91,7 @@ export default function ModelsDownload() {
                 <KernButton
                     text="Add new model"
                     icon={IconPlus}
-                    onClick={() => dispatch(openModal(ModalEnum.ADD_MODEL_DOWNLOAD))}
+                    onClick={openCreateModal}
                 />
             </div>
         </div>

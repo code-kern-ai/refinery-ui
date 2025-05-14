@@ -198,49 +198,48 @@ export default function AttributeCalculation() {
 
     }
 
-    function changeAttributeName(name: string) {
-        if (name == currentAttribute.name) return;
+    const changeAttributeName = useCallback((name: string) => {
+        if (name == currentAttributeRef.current.name) return;
         if (name == '') return;
         const duplicateNameExists = attributes.find((attribute) => attribute.name == name);
         if (duplicateNameExists) {
             setDuplicateNameExists(true);
-            setAttributeName(currentAttribute.name);
+            setAttributeName(currentAttributeRef.current.name);
             return;
         }
-        const attributeNew = { ...currentAttribute };
+        const attributeNew = { ...currentAttributeRef.current };
         attributeNew.name = name;
         attributeNew.saveSourceCode = false;
-        updateAttribute(projectId, currentAttribute.id, (res) => {
+        updateAttribute(projectId, currentAttributeRef.current.id, (res) => {
             setCurrentAttribute(postProcessCurrentAttribute(attributeNew));
             setEditorValue(attributeNew.sourceCode.replace('def ac(record)', 'def ' + attributeNew.name + '(record)'));
             dispatch(updateAttributeById(attributeNew));
             setDuplicateNameExists(false);
         }, null, null, attributeNew.name);
-    }
+    }, []);
 
-    function updateVisibility(option: any) {
-        const attributeNew = { ...currentAttribute };
+    const updateVisibility = useCallback((option: any) => {
+        const attributeNew = { ...currentAttributeRef.current };
         attributeNew.visibility = option.value;
         attributeNew.visibilityIndex = ATTRIBUTES_VISIBILITY_STATES.findIndex((state) => state.name === option);
         attributeNew.visibilityName = option.name;
         attributeNew.saveSourceCode = false;
-        updateAttribute(projectId, currentAttribute.id, (res) => {
+        updateAttribute(projectId, currentAttributeRef.current.id, (res) => {
             setCurrentAttribute(postProcessCurrentAttribute(attributeNew));
             dispatch(updateAttributeById(attributeNew));
         }, null, null, null, null, attributeNew.visibility);
-    }
+    }, []);
 
-    function updateDataType(option: any) {
-        const attributeNew = { ...currentAttribute };
+    const updateDataType = useCallback((option: any) => {
+        const attributeNew = { ...currentAttributeRef.current };
         attributeNew.dataType = option.value;
         attributeNew.dataTypeName = option.name;
         attributeNew.saveSourceCode = false;
-        updateAttribute(projectId, currentAttribute.id, (res) => {
+        updateAttribute(projectId, currentAttributeRef.current.id, (res) => {
             setCurrentAttribute(postProcessCurrentAttribute(attributeNew));
             dispatch(updateAttributeById(attributeNew));
         }, attributeNew.dataType);
-    }
-
+    }, []);
 
     function onScrollEvent(event: any) {
         if (!(event.target instanceof HTMLElement)) return;
@@ -250,7 +249,6 @@ export default function AttributeCalculation() {
             setIsHeaderNormal(true);
         }
     }
-
 
     function checkProjectTokenization() {
         getProjectTokenization(projectId, (res) => {
@@ -311,6 +309,16 @@ export default function AttributeCalculation() {
     const orgId = useSelector(selectOrganizationId);
     useWebsocket(orgId, Application.REFINERY, CurrentPage.ATTRIBUTE_CALCULATION, handleWebsocketNotification, projectId);
 
+    const goBack = useCallback((e: React.MouseEvent) => {
+        e.preventDefault();
+        router.push(`/projects/${projectId}/settings`);
+    }, []);
+
+    const copyToClipboardFunc = useCallback(
+        (name: string) => () => copyToClipboard(name),
+        []
+    );
+
     const disabledOptions = useMemo(() => {
         if (!currentAttribute || currentAttribute.dataType == DataTypeEnum.LLM_RESPONSE) return undefined;
         return DATA_TYPES.map((e) => e.value == DataTypeEnum.LLM_RESPONSE);
@@ -321,10 +329,7 @@ export default function AttributeCalculation() {
             <div className={`sticky z-50 h-12 ${isHeaderNormal ? 'top-1' : '-top-5'}`}>
                 <div className={`bg-white flex-grow ${isHeaderNormal ? '' : 'shadow'}`}>
                     <div className={`flex-row justify-start items-center inline-block ${isHeaderNormal ? 'p-0' : 'flex py-2'}`} style={{ transition: 'all .25s ease-in-out' }}>
-                        <a href={`/refinery/projects/${projectId}/settings`} onClick={(e) => {
-                            e.preventDefault();
-                            router.push(`/projects/${projectId}/settings`);
-                        }} className="text-green-800 text-sm font-medium">
+                        <a href={`/refinery/projects/${projectId}/settings`} onClick={goBack} className="text-green-800 text-sm font-medium">
                             <MemoIconArrowLeft className="h-5 w-5 inline-block text-green-800" />
                             <span className="leading-5">Go back</span>
                         </a>
@@ -386,7 +391,7 @@ export default function AttributeCalculation() {
                         {usableAttributes.length == 0 && <div className="text-sm font-normal text-gray-500">No usable attributes.</div>}
                         {usableAttributes.map((attribute: Attribute) => (
                             <Tooltip key={attribute.id} content={attribute.dataTypeName + ' - ' + TOOLTIPS_DICT.GENERAL.CLICK_TO_COPY} color="invert" placement="top">
-                                <span onClick={() => copyToClipboard(attribute.name)}>
+                                <span onClick={copyToClipboardFunc(attribute.name)}>
                                     <div className={`cursor-pointer border items-center px-2 py-0.5 rounded text-xs font-medium text-center mr-2 ${'bg-' + attribute.color + '-100'} ${'text-' + attribute.color + '-700'} ${'border-' + attribute.color + '-400'} ${'hover:bg-' + attribute.color + '-200'}`}>
                                         {attribute.name}
                                     </div>
@@ -400,7 +405,7 @@ export default function AttributeCalculation() {
                     <div className="flex flex-row items-center">
                         {lookupLists.map((lookupList) => (
                             <Tooltip key={lookupList.id} content={TOOLTIPS_DICT.GENERAL.IMPORT_STATEMENT} color="invert" placement="top">
-                                <span onClick={() => copyToClipboard("from knowledge import " + lookupList.pythonVariable)}>
+                                <span onClick={copyToClipboardFunc("from knowledge import " + lookupList.pythonVariable)}>
                                     <div className="cursor-pointer border items-center px-2 py-0.5 rounded text-xs font-medium text-center mr-2">
                                         {lookupList.pythonVariable} - {lookupList.termCount}
                                     </div>

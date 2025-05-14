@@ -73,6 +73,10 @@ export default function SampleProjectsDropdown() {
         }
     }, []);
 
+    const furtherSampleProjects = useCallback(() => {
+        window.open("https://github.com/code-kern-ai/refinery-sample-projects", "_blank")
+    }, []);
+
     return (
         <Menu as="div" className="relative inline-block text-left">
             <div>
@@ -212,7 +216,7 @@ export default function SampleProjectsDropdown() {
                             {({ active }) => (
                                 <a key="sample-project-6"
                                     className={`opacity-100 cursor-pointer text-gray-900 block px-3 py-2 text-sm ${active ? "bg-kernindigo text-white" : ""}`}
-                                    onClick={() => window.open("https://github.com/code-kern-ai/refinery-sample-projects", "_blank")}>
+                                    onClick={furtherSampleProjects}>
                                     <span>Further sample projects</span>
                                 </a>
                             )}

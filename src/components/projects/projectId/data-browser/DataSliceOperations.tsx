@@ -14,6 +14,7 @@ import CreateOutlierSliceModal from "./modals/CreateOutlierSliceModal";
 import SaveDataSliceModal from "./modals/SaveDataSliceModal";
 import { createOutlierSlice, updateDataSlice } from "@/src/services/base/data-browser";
 import KernButton from "@/submodules/react-components/components/kern-button/KernButton";
+import { useCallback } from "react";
 
 export function DataSliceOperations(props: { fullSearch: {} }) {
     const dispatch = useDispatch();
@@ -29,7 +30,19 @@ export function DataSliceOperations(props: { fullSearch: {} }) {
     const additionalData = useSelector(selectAdditionalData);
     const embeddings = useSelector(selectEmbeddings);
 
-    function updateSlice() {
+    // function updateSlice() {
+    //     updateDataSlice(projectId, {
+    //         static: activeSlice.static,
+    //         dataSliceId: activeSlice.id,
+    //         filterRaw: getRawFilterForSave(props.fullSearch),
+    //         filterData: parseFilterToExtended(activeSearchParams, attributes, configuration, labelingTasks, user, props.fullSearch[SearchGroup.DRILL_DOWN].value)
+    //     }, (res) => {
+    //         dispatch(setActiveDataSlice(activeSlice));
+    //     });
+    //     dispatch(updateAdditionalDataState('displayOutdatedWarning', false));
+    // }
+
+    const updateSlice = useCallback(() => {
         updateDataSlice(projectId, {
             static: activeSlice.static,
             dataSliceId: activeSlice.id,
@@ -39,7 +52,7 @@ export function DataSliceOperations(props: { fullSearch: {} }) {
             dispatch(setActiveDataSlice(activeSlice));
         });
         dispatch(updateAdditionalDataState('displayOutdatedWarning', false));
-    }
+    }, [activeSlice, projectId, props.fullSearch, dispatch, activeSearchParams, attributes, configuration, labelingTasks, user]);
 
     function requestOutlierSlice() {
         if (embeddings.length == 0) return;
