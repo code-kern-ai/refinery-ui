@@ -2,7 +2,7 @@ import Statuses from "@/src/components/shared/statuses/Statuses";
 import { selectAllLookupLists, setAllLookupLists } from "@/src/reduxStore/states/pages/lookup-lists";
 import { selectAttributes, selectVisibleAttributeAC, setAllAttributes, setLabelingTasksAll, updateAttributeById } from "@/src/reduxStore/states/pages/settings";
 import { selectProjectId } from "@/src/reduxStore/states/project"
-import { Attribute, AttributeState, LLMConfig } from "@/src/types/components/projects/projectId/settings/data-schema";
+import { Attribute, AttributeState, AttributeWithOnClick, LLMConfig } from "@/src/types/components/projects/projectId/settings/data-schema";
 import { DataTypeEnum } from "@/src/types/shared/general";
 import { LLM_PROVIDER_OPTIONS, postProcessCurrentAttribute } from "@/src/util/components/projects/projectId/settings/attribute-calculation-helper";
 import { ATTRIBUTES_VISIBILITY_STATES, DATA_TYPES, getTooltipVisibilityState } from "@/src/util/components/projects/projectId/settings/data-schema-helper";
@@ -318,6 +318,10 @@ export default function AttributeCalculation() {
         []
     );
 
+    const usableAttributesFinal = useMemo(() => usableAttributes.map((attribute) => (
+        { ...attribute, onClick: copyToClipboardFunc(attribute.name) }
+    )), [usableAttributes]);
+
     const disabledOptions = useMemo(() => {
         if (!currentAttribute || currentAttribute.dataType == DataTypeEnum.LLM_RESPONSE) return undefined;
         return DATA_TYPES.map((e) => e.value == DataTypeEnum.LLM_RESPONSE);
@@ -387,10 +391,10 @@ export default function AttributeCalculation() {
                     </div>
                     <div className="text-sm leading-5 font-medium text-gray-700 inline-block">Attributes</div>
                     <div className="flex flex-row items-center">
-                        {usableAttributes.length == 0 && <div className="text-sm font-normal text-gray-500">No usable attributes.</div>}
-                        {usableAttributes.map((attribute: Attribute) => (
+                        {usableAttributesFinal.length == 0 && <div className="text-sm font-normal text-gray-500">No usable attributes.</div>}
+                        {usableAttributesFinal.map((attribute: AttributeWithOnClick) => (
                             <Tooltip key={attribute.id} content={attribute.dataTypeName + ' - ' + TOOLTIPS_DICT.GENERAL.CLICK_TO_COPY} color="invert" placement="top">
-                                <span onClick={copyToClipboardFunc(attribute.name)}>
+                                <span onClick={attribute.onClick}>
                                     <div className={`cursor-pointer border items-center px-2 py-0.5 rounded text-xs font-medium text-center mr-2 ${'bg-' + attribute.color + '-100'} ${'text-' + attribute.color + '-700'} ${'border-' + attribute.color + '-400'} ${'hover:bg-' + attribute.color + '-200'}`}>
                                         {attribute.name}
                                     </div>

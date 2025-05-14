@@ -46,6 +46,10 @@ export type Attribute = {
     additionalConfig?: LLMConfig;
 }
 
+export type AttributeWithOnClick = Attribute & {
+    onClick?: () => void;
+}
+
 export type AttributeVisibilityStates = {
     name: string;
     value: string;

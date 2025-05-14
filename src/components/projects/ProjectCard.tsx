@@ -1,7 +1,7 @@
 import { selectIsAdmin, selectUser } from "@/src/reduxStore/states/general";
 import { closeModal, setModalStates } from "@/src/reduxStore/states/modal";
 import { removeFromAllProjectsById } from "@/src/reduxStore/states/project";
-import { Project, ProjectCardProps, ProjectStatus } from "@/src/types/components/projects/projects-list";
+import { ProjectCardProps, ProjectStatus } from "@/src/types/components/projects/projects-list";
 import { ModalEnum } from "@/src/types/shared/modal";
 import { isStringTrue } from "@/submodules/javascript-functions/general";
 import { Tooltip } from "@nextui-org/react";
@@ -41,7 +41,6 @@ export default function ProjectCard(props: ProjectCardProps) {
         const deleteInstant = isStringTrue(localStorage.getItem("adminInstantDelete"));
         if (deleteInstant) {
             deleteProjectPost(projectId.current, (res) => {
-                dispatch(closeModal(ModalEnum.ADMIN_DELETE_PROJECT));
                 dispatch(removeFromAllProjectsById(projectId.current));
             })
         }
