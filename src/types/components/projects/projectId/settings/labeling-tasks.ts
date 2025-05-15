@@ -14,11 +14,20 @@ export type LabelingTask = {
     targetName?: string;
 };
 
+export type LabelingTaskWithOnClick = LabelingTask & {
+    onDelete: () => void;
+}
+
 export type LabelType = {
     id: string;
     name: string;
     color: LabelColors;
     hotkey: string;
+}
+
+export type LabelTypeWithOnClick = LabelType & {
+    onDelete: () => void;
+    onChangeColor: () => void;
 }
 
 export type LabelColors = {

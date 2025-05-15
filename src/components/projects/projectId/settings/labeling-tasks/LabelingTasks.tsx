@@ -1,12 +1,12 @@
 import { openModal, setModalStates } from "@/src/reduxStore/states/modal";
 import { selectLabelingTasksAll, setLabelingTasksAll } from "@/src/reduxStore/states/pages/settings";
 import { selectProjectId } from "@/src/reduxStore/states/project";
-import { LabelType, LabelingTask, LabelingTaskTaskType } from "@/src/types/components/projects/projectId/settings/labeling-tasks";
+import { LabelType, LabelTypeWithOnClick, LabelingTask, LabelingTaskTaskType, LabelingTaskWithOnClick } from "@/src/types/components/projects/projectId/settings/labeling-tasks";
 import { ModalEnum } from "@/src/types/shared/modal";
 import { LabelHelper } from "@/src/util/classes/label-helper";
 import { isTaskNameUnique, labelingTaskFromString, labelingTaskToString } from "@/src/util/components/projects/projectId/settings/labeling-tasks-helper";
 import { jsonCopy } from "@/submodules/javascript-functions/general";
-import { useEffect, useState } from "react"
+import { useCallback, useEffect, useMemo, useState } from "react"
 import { useDispatch, useSelector } from "react-redux";
 import RenameLabelModal from "./RenameLabelModal";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
@@ -20,6 +20,7 @@ import { updateLabelingTask } from "@/src/services/base/labeling-tasks";
 import IconButton from "@/submodules/react-components/components/kern-button/IconButton";
 import KernButton from "@/submodules/react-components/components/kern-button/KernButton";
 import { MemoIconColorPicker, MemoIconPlus, MemoIconTrash } from "@/submodules/react-components/components/kern-icons/icons";
+import { useConsoleLog } from "@/submodules/react-components/hooks/useConsoleLog";
 
 export default function LabelingTasks() {
     const dispatch = useDispatch();
@@ -87,6 +88,28 @@ export default function LabelingTasks() {
         return prepareNewArray;
     }
 
+    const deleteLabelingTask = useCallback((task) => () => dispatch(setModalStates(ModalEnum.DELETE_LABELING_TASK, { taskId: task.id, open: true })), [])
+
+    const deleteLabel = useCallback((task: LabelingTask, label: LabelType) => () => {
+        dispatch(setModalStates(ModalEnum.DELETE_LABEL, { taskId: task.id, label: label, open: true }));
+    }, []);
+
+    const changeColorLabel = useCallback((task: LabelingTask, label: LabelType) => () => {
+        dispatch(setModalStates(ModalEnum.CHANGE_COLOR, { taskId: task.id, label: label, open: true }));
+    }, []);
+
+    const labelingTasksFinal = useMemo(() => {
+        if (!labelingTasksSchema) return null;
+        return labelingTasksSchema.map((labelingTask) => (
+            {
+                ...labelingTask,
+                onDelete: deleteLabelingTask(labelingTask),
+                labels: labelingTask.labels.map((label) => ({ ...label, onDelete: deleteLabel(labelingTask, label), onChangeColor: changeColorLabel(labelingTask, label) })),
+            }
+        ))
+    }, [labelingTasksSchema]);
+
+
     return (<div className="mt-8">
         <div className="text-lg leading-6 text-gray-900 font-medium inline-block">
             Labeling tasks
@@ -119,7 +142,7 @@ export default function LabelingTasks() {
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-200">
-                            {labelingTasksSchema && labelingTasksSchema.map((task: LabelingTask, index: number) => (
+                            {labelingTasksFinal && labelingTasksFinal.map((task: LabelingTaskWithOnClick, index: number) => (
                                 <tr key={task.id} className={`${index % 2 != 0 ? 'bg-gray-50' : 'bg-white'}`}>
                                     <td className="whitespace-nowrap text-center px-3 py-2 text-sm text-gray-500">{task.targetName}</td>
                                     <td className="whitespace-nowrap text-center px-3 py-2 text-sm text-gray-500">
@@ -136,12 +159,12 @@ export default function LabelingTasks() {
                                             selectedOption={(option: any) => updateLabelingTaskType(task, index, labelingTaskFromString(option.name))} />
                                     </td>
                                     <td className="flex flex-wrap justify-center items-center px-3 py-2 text-sm text-gray-500">
-                                        {task.labels.map((label: LabelType) => (
+                                        {task.labels.map((label: LabelTypeWithOnClick) => (
                                             <div key={label.id} className={`inline-flex border items-center m-1 px-1.5 py-0.5 rounded-md text-sm font-medium ${label.color.backgroundColor} ${label.color.textColor} ${label.color.borderColor} ${label.color.hoverColor}`}>
-                                                <MemoIconColorPicker className="h-4 w-4 mr-1 cursor-pointer" onClick={() => dispatch(setModalStates(ModalEnum.CHANGE_COLOR, { taskId: task.id, label: label, open: true }))} />
+                                                <MemoIconColorPicker className="h-4 w-4 mr-1 cursor-pointer" onClick={label.onChangeColor} />
                                                 <span>{label.name}</span>
                                                 {label.hotkey && <kbd className="ml-2 uppercase inline-flex items-center border bg-white border-gray-200 rounded px-2 text-sm font-sans font-medium text-gray-400">{label.hotkey}</kbd>}
-                                                <MemoIconTrash className="h-4 w-4 ml-1 cursor-pointer" onClick={() => dispatch(setModalStates(ModalEnum.DELETE_LABEL, { taskId: task.id, label: label, open: true }))} />
+                                                <MemoIconTrash className="h-4 w-4 ml-1 cursor-pointer" onClick={label.onDelete} />
                                             </div>
                                         ))}
                                         <IconButton
@@ -151,8 +174,7 @@ export default function LabelingTasks() {
                                         />
                                     </td>
                                     <td className="whitespace-nowrap text-center px-3 py-2 text-sm text-gray-500">
-                                        <MemoIconTrash onClick={() => dispatch(setModalStates(ModalEnum.DELETE_LABELING_TASK, { taskId: task.id, open: true }))}
-                                            className="h-6 w-6 text-red-700 cursor-pointer" />
+                                        <MemoIconTrash onClick={task.onDelete} className="h-6 w-6 text-red-700 cursor-pointer" />
                                     </td>
                                 </tr>
                             ))}

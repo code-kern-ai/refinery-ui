@@ -3,12 +3,12 @@ import { selectOrganizationId } from "@/src/reduxStore/states/general";
 import { openModal, setModalStates } from "@/src/reduxStore/states/modal";
 import { selectAttributes, selectEmbeddings } from "@/src/reduxStore/states/pages/settings";
 import { selectProjectId } from "@/src/reduxStore/states/project";
-import { Embedding, EmbeddingState, EmbeddingType } from "@/src/types/components/projects/projectId/settings/embeddings";
+import { Embedding, EmbeddingState, EmbeddingType, EmbeddingWithOnClick } from "@/src/types/components/projects/projectId/settings/embeddings";
 import { ModalEnum } from "@/src/types/shared/modal";
 import { DATA_TYPES, getColorForDataType } from "@/src/util/components/projects/projectId/settings/data-schema-helper";
 import { Tooltip } from "@nextui-org/react";
 import { useRouter } from "next/router";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
 import AddNewEmbeddingModal from "./AddNewEmbeddingModal";
@@ -71,6 +71,14 @@ export default function Embeddings(props: { refetchEmbeddings: () => void }) {
     const orgId = useSelector(selectOrganizationId);
     useWebsocket(orgId, Application.REFINERY, CurrentPage.PROJECT_SETTINGS, handleWebsocketNotification, projectId, CurrentPageSubKey.EMBEDDINGS);
 
+    const openFilterAttributesModal = useCallback((embedding: Embedding) => () => {
+        embedding.onQdrant ? dispatch(setModalStates(ModalEnum.FILTERED_ATTRIBUTES, { embeddingId: embedding.id, open: true, attributeNames: prepareAttributeDataByNames(embedding.filterAttributes), showEditOption: showEditOption })) : null;
+    }, [showEditOption]);
+
+    const embeddingsFinal = useMemo(() => embeddings.map((embedding) => (
+        { ...embedding, onIconNotesClick: openFilterAttributesModal(embedding) }
+    )), [embeddings]);
+
     return (<div className="mt-8">
         <div className="text-lg leading-6 text-gray-900 font-medium inline-block w-full">
             <label>Embeddings</label>
@@ -107,7 +115,7 @@ export default function Embeddings(props: { refetchEmbeddings: () => void }) {
                                 </tr>
                             </thead>
                             {!somethingLoading ? <tbody className="divide-y divide-gray-200">
-                                {embeddings.map((embedding: Embedding, index: number) => (
+                                {embeddingsFinal.map((embedding: EmbeddingWithOnClick, index: number) => (
                                     <tr key={embedding.id} className={`${index % 2 != 0 ? 'bg-gray-50' : 'bg-white'}`}>
                                         <td className="whitespace-nowrap text-center px-3 py-2 text-sm text-gray-500">
                                             {embedding.name}
@@ -119,8 +127,11 @@ export default function Embeddings(props: { refetchEmbeddings: () => void }) {
                                                         TOOLTIPS_DICT.PROJECT_SETTINGS.EMBEDDINGS.HAS_FILTER_ATTRIBUTES :
                                                         TOOLTIPS_DICT.PROJECT_SETTINGS.EMBEDDINGS.NO_FILTER_ATTRIBUTES)
                                                 } color="invert" >
-                                                    <MemoIconNotes onClick={() => embedding.onQdrant ? dispatch(setModalStates(ModalEnum.FILTERED_ATTRIBUTES, { embeddingId: embedding.id, open: true, attributeNames: prepareAttributeDataByNames(embedding.filterAttributes), showEditOption: showEditOption })) : null}
-                                                        className={`h-6 w-6 ${embedding.filterAttributes && embedding.filterAttributes.length > 0 ? 'text-gray-700' : 'text-gray-300'} ${embedding.onQdrant ? "" : "cursor-not-allowed opacity-50"}`} />
+                                                    <span onClick={embedding.onIconNotesClick}>
+                                                        <MemoIconNotes
+                                                            className={`h-6 w-6 ${embedding.filterAttributes && embedding.filterAttributes.length > 0 ? 'text-gray-700' : 'text-gray-300'} ${embedding.onQdrant ? "" : "cursor-not-allowed opacity-50"}`} />
+                                                    </span>
+
                                                 </Tooltip>
                                             </td> : <td className="whitespace-nowrap text-center px-3 py-2 text-sm text-gray-500 flex justify-center"><LoadingIcon /></td>}
                                         <td className="whitespace-nowrap text-center px-3 py-2 text-sm text-gray-500">
