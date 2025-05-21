@@ -315,17 +315,14 @@ export default function AttributeCalculation() {
         router.push(`/projects/${projectId}/settings`);
     }, []);
 
-    const copyToClipboardFunc = useCallback(
-        (name: string) => () => copyToClipboard(name),
-        []
-    );
+    const copyToClipboardFunc = useCallback((name: string) => copyToClipboard(name), []);
 
     const usableAttributesFinal = useMemo(() => usableAttributes.map((attribute) => (
-        { ...attribute, onClick: copyToClipboardFunc(attribute.name) }
+        { ...attribute, onClick: () => copyToClipboardFunc(attribute.name) }
     )), [usableAttributes]);
 
     const lookupListsFinal = useMemo(() => lookupLists.map((lookupList) => (
-        { ...lookupList, onClick: copyToClipboardFunc("from knowledge import " + lookupList.pythonVariable) }
+        { ...lookupList, onClick: () => copyToClipboardFunc("from knowledge import " + lookupList.pythonVariable) }
     )), [lookupLists]);
 
     const disabledOptions = useMemo(() => {

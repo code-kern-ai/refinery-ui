@@ -71,13 +71,10 @@ export default function Embeddings(props: { refetchEmbeddings: () => void }) {
     const orgId = useSelector(selectOrganizationId);
     useWebsocket(orgId, Application.REFINERY, CurrentPage.PROJECT_SETTINGS, handleWebsocketNotification, projectId, CurrentPageSubKey.EMBEDDINGS);
 
-    const openFilterAttributesModal = useCallback((embedding: Embedding) => () => {
-        embedding.onQdrant ? dispatch(setModalStates(ModalEnum.FILTERED_ATTRIBUTES, { embeddingId: embedding.id, open: true, attributeNames: prepareAttributeDataByNames(embedding.filterAttributes), showEditOption: showEditOption })) : null;
-    }, [showEditOption]);
 
     const embeddingsFinal = useMemo(() => embeddings.map((embedding) => (
-        { ...embedding, onIconNotesClick: openFilterAttributesModal(embedding) }
-    )), [embeddings]);
+        { ...embedding, onIconNotesClick: () => embedding.onQdrant ? dispatch(setModalStates(ModalEnum.FILTERED_ATTRIBUTES, { embeddingId: embedding.id, open: true, attributeNames: prepareAttributeDataByNames(embedding.filterAttributes), showEditOption: showEditOption })) : null }
+    )), [embeddings, showEditOption]);
 
     return (<div className="mt-8">
         <div className="text-lg leading-6 text-gray-900 font-medium inline-block w-full">

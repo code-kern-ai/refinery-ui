@@ -88,8 +88,6 @@ export default function LabelingTasks() {
         return prepareNewArray;
     }
 
-    const deleteLabelingTask = useCallback((task) => () => dispatch(setModalStates(ModalEnum.DELETE_LABELING_TASK, { taskId: task.id, open: true })), [])
-
     const deleteLabel = useCallback((task: LabelingTask, label: LabelType) => () => {
         dispatch(setModalStates(ModalEnum.DELETE_LABEL, { taskId: task.id, label: label, open: true }));
     }, []);
@@ -103,7 +101,7 @@ export default function LabelingTasks() {
         return labelingTasksSchema.map((labelingTask) => (
             {
                 ...labelingTask,
-                onDelete: deleteLabelingTask(labelingTask),
+                onDelete: () => dispatch(setModalStates(ModalEnum.DELETE_LABELING_TASK, { taskId: labelingTask.id, open: true })),
                 labels: labelingTask.labels.map((label) => ({ ...label, onDelete: deleteLabel(labelingTask, label), onChangeColor: changeColorLabel(labelingTask, label) })),
             }
         ))
