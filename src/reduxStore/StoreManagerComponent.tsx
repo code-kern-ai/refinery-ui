@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { useDispatch, useSelector } from "react-redux";
-import { selectIsAdmin, selectOrganization, setAllUsers, setIsAdmin, setOrganization, setRouteColor, setUser } from "./states/general";
+import { selectIsAdmin, selectOrganization, selectUser, setAllUsers, setIsAdmin, setOrganization, setRouteColor, setUser } from "./states/general";
 import { getUserAvatarUri } from "@/submodules/javascript-functions/general";
 import { setActiveProject } from "./states/project";
 import { WebSocketsService } from "../../submodules/react-components/hooks/web-socket/WebSocketsService";
@@ -18,12 +18,14 @@ import { getProjectByProjectId } from "../services/base/project";
 import { getIsAdmin, getVersionOverview } from "../services/base/misc";
 import { getUserInfo, getOrganization, getOrganizationUsers } from "../services/base/organization";
 import { getAllTokenizerOptions, getEmbeddingPlatforms, getRecommendedEncoders } from "../services/base/embedding";
+import { UserRole } from "../types/shared/sidebar";
 
 export function GlobalStoreDataComponent(props: React.PropsWithChildren) {
     const router = useRouter();
     const dispatch = useDispatch();
     const isAdmin = useSelector(selectIsAdmin);
     const organization = useSelector(selectOrganization);
+    const userRole = useSelector(selectUser)?.role;
 
     const [dataLoaded, setDataLoaded] = useState(false);
 
@@ -33,6 +35,10 @@ export function GlobalStoreDataComponent(props: React.PropsWithChildren) {
         });
 
         getUserInfo((res) => {
+            if (res.role == UserRole.ANNOTATOR || res.role == UserRole.EXPERT) {
+                window.location.href = '/cognition';
+                return;
+            }
             const userInfo = { ...res };
             userInfo.avatarUri = getUserAvatarUri(res);
             dispatch(setUser(userInfo));
@@ -106,6 +112,6 @@ export function GlobalStoreDataComponent(props: React.PropsWithChildren) {
         })
     }, [ConfigManager.isInit()]);
 
-    if (!dataLoaded) return <></>;
+    if (!dataLoaded || userRole !== UserRole.ENGINEER) return <></>;
     return <div>{props.children}</div>;
 }
