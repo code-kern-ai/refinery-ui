@@ -3,10 +3,10 @@ import MultilineTooltip from "@/src/components/shared/multilines-tooltip/Multili
 import { selectProjectId } from "@/src/reduxStore/states/project";
 import { CardStats, CardStatsEnum, ProjectOverviewCardsProps } from "@/src/types/components/projects/projectId/project-overview/project-overview";
 import { Tooltip } from "@nextui-org/react";
-import { IconBottle, IconBulb, IconClick } from "@tabler/icons-react";
 import { useRouter } from "next/router";
 import { useSelector } from "react-redux";
 import ButtonAsText from "@/submodules/react-components/components/kern-button/ButtonAsText";
+import { MemoIconBottle, MemoIconBulb, MemoIconClick } from "@/submodules/react-components/components/kern-icons/icons";
 
 const CARDS_DATA = [
     { color: 'yellow', stats: CardStatsEnum.MANUAL, label: 'Manually labeled', linkLabel: 'Continue labeling', link: 'labeling' },
@@ -23,9 +23,9 @@ export default function ProjectOverviewCards(props: ProjectOverviewCardsProps) {
                 <div key={card.color} className="relative bg-white pt-5 px-4 pb-12 sm:pt-6 sm:px-6 shadow rounded-lg">
                     <dt>
                         <div className={`absolute bg-${card.color}-500 rounded-md p-3`}>
-                            {card.stats == CardStatsEnum.MANUAL && <IconClick className="h-6 w-6 text-white" />}
-                            {card.stats == CardStatsEnum.WEAK_SUPERVISION && <IconBottle className="h-6 w-6 text-white" />}
-                            {card.stats == CardStatsEnum.INFORMATION_SOURCE && <IconBulb className="h-6 w-6 text-white" />}
+                            {card.stats == CardStatsEnum.MANUAL && <MemoIconClick className="h-6 w-6 text-white" />}
+                            {card.stats == CardStatsEnum.WEAK_SUPERVISION && <MemoIconBottle className="h-6 w-6 text-white" />}
+                            {card.stats == CardStatsEnum.INFORMATION_SOURCE && <MemoIconBulb className="h-6 w-6 text-white" />}
                         </div>
                         <p className="ml-16 text-sm font-medium text-gray-500 truncate">{card.label}</p>
                     </dt>

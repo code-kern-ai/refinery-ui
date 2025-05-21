@@ -6,12 +6,12 @@ import { selectAllProjects } from '@/src/reduxStore/states/project';
 import { ModalButton, ModalEnum } from '@/src/types/shared/modal';
 import { closeModal, openModal } from '@/src/reduxStore/states/modal';
 import Modal from '../shared/modal/Modal';
-import { IconAlertTriangle, IconArrowDown, IconFishHook, IconMessageCircle, IconNews, IconQuestionMark, IconScreenshot } from '@tabler/icons-react';
 import { setSearchGroupsStore } from '@/src/reduxStore/states/pages/data-browser';
 import { selectProjectIdSampleProject, setProjectIdSampleProject } from '@/src/reduxStore/states/tmp';
 import { createSampleProject } from '@/src/services/base/project';
 import KernButton from '@/submodules/react-components/components/kern-button/KernButton';
 import { ChevronDownIcon } from '@heroicons/react/20/solid';
+import { MemoIconAlertTriangle, MemoIconFishHook, MemoIconMessageCircle, MemoIconNews, MemoIconQuestionMark, MemoIconScreenshot } from '@/submodules/react-components/components/kern-icons/icons';
 
 const ACCEPT_BUTTON = { buttonCaption: "Create", closeAfterClick: false, useButton: true, disabled: true };
 
@@ -72,6 +72,10 @@ export default function SampleProjectsDropdown() {
         }
     }, []);
 
+    const furtherSampleProjects = useCallback(() => {
+        window.open("https://github.com/code-kern-ai/refinery-sample-projects", "_blank")
+    }, []);
+
     return (
         <Menu as="div" className="relative inline-block text-left">
             <div>
@@ -107,7 +111,7 @@ export default function SampleProjectsDropdown() {
                                         importSampleProject("Clickbait", "Clickbait");
                                     }}>
                                     <div className="flex flex-row items-center">
-                                        <IconFishHook className="h-5 w-5 inline-block" />
+                                        <MemoIconFishHook className="h-5 w-5 inline-block" />
                                         <span className="ml-2">Clickbait</span>
                                     </div>
                                     <div className="mt-2">Binary classification for detecting nudging articles.</div>
@@ -133,7 +137,7 @@ export default function SampleProjectsDropdown() {
                                         importSampleProject("Conversational AI", "Conversational AI");
                                     }}>
                                     <div className="flex flex-row items-center">
-                                        <IconMessageCircle className="h-5 w-5 inline-block" />
+                                        <MemoIconMessageCircle className="h-5 w-5 inline-block" />
                                         <span className="ml-2">Conversational AI</span>
                                     </div>
                                     <div className="mt-2">Detecting intent within conversational lines.</div>
@@ -159,7 +163,7 @@ export default function SampleProjectsDropdown() {
                                         importSampleProject("AG News", "AG News");
                                     }}>
                                     <div className="flex flex-row items-center">
-                                        <IconNews className="h-5 w-5 inline-block" />
+                                        <MemoIconNews className="h-5 w-5 inline-block" />
                                         <span className="ml-2">AG News</span>
                                     </div>
                                     <div className="mt-2">Modelling topics of headline news.</div>
@@ -185,7 +189,7 @@ export default function SampleProjectsDropdown() {
                                         importSampleProject("Global Guard [References]", "Global Guard [References]");
                                     }}>
                                     <div className="flex flex-row items-center">
-                                        <IconScreenshot className="h-5 w-5 inline-block" />
+                                        <MemoIconScreenshot className="h-5 w-5 inline-block" />
                                         <span className="ml-2">DEV Global Guard [References]</span>
                                     </div>
                                     <div className="mt-2">References right after the wizard went through.</div>
@@ -200,7 +204,7 @@ export default function SampleProjectsDropdown() {
                                         importSampleProject("Global Guard [Questions]", "Global Guard [Questions]");
                                     }}>
                                     <div className="flex flex-row items-center">
-                                        <IconQuestionMark className="h-5 w-5 inline-block" />
+                                        <MemoIconQuestionMark className="h-5 w-5 inline-block" />
                                         <span className="ml-2">DEV Global Guard [Questions]</span>
                                     </div>
                                     <div className="mt-2">Questions right after the wizard went through.</div>
@@ -211,7 +215,7 @@ export default function SampleProjectsDropdown() {
                             {({ active }) => (
                                 <a key="sample-project-6"
                                     className={`opacity-100 cursor-pointer text-gray-900 block px-3 py-2 text-sm ${active ? "bg-kernindigo text-white" : ""}`}
-                                    onClick={() => window.open("https://github.com/code-kern-ai/refinery-sample-projects", "_blank")}>
+                                    onClick={furtherSampleProjects}>
                                     <span>Further sample projects</span>
                                 </a>
                             )}
@@ -235,7 +239,7 @@ export default function SampleProjectsDropdown() {
                     </div>
                     {projectNameExists && (<div className="text-red-700 text-xs mt-2 text-left">Project title exists</div>)}
                     <div className="flex flex-row mt-2">
-                        <IconAlertTriangle className="h-5 w-5 text-yellow-700" />
+                        <MemoIconAlertTriangle className="h-5 w-5 text-yellow-700" />
                         <label className="text-yellow-700 text-xs italic ml-2 text-left">The first sample project of a specific type can use the
                             default name, but after the name is taken, the user needs a custom name.</label>
                     </div>

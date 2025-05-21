@@ -11,10 +11,10 @@ import KernButton from "@/submodules/react-components/components/kern-button/Ker
 import KernDropdown from "@/submodules/react-components/components/KernDropdown";
 import useDebounce from "@/submodules/react-components/hooks/useHooks/useDebounce";
 import { Loading } from "@nextui-org/react";
-import { IconPlus, IconWand } from "@tabler/icons-react";
 import { useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import QuestionHistory from "./QuestionHistory";
+import { MemoIconPlus, MemoIconWand } from "@/submodules/react-components/components/kern-icons/icons";
 
 const ACCEPT_BUTTON = { buttonCaption: 'Create', useButton: true };
 const SEARCH_REQUEST = { offset: 0, limit: 20 };
@@ -208,14 +208,14 @@ export default function CreateEvaluationSetModal(props: CreateEvaluationSetsModa
                         </input>
                         <KernButton
                             text="Run similarity search"
-                            icon={IconWand}
+                            icon={MemoIconWand}
                             iconColor='purple'
                             disabled={question === '' || !selectedEmbedding}
                             onClick={getSimilarRecords}
                         />
                         <KernButton
                             text="Add all similar"
-                            icon={IconPlus}
+                            icon={MemoIconPlus}
                             iconColor='green'
                             disabled={showSimilarityRecordsList === false}
                             onClick={() => {

@@ -3,10 +3,10 @@ import { selectHoverGroupDict, selectSettings, selectTmpHighlightIds, setHoverGr
 import { LabelingPageParts } from "@/src/types/components/projects/projectId/labeling/labeling-main-component";
 import { LabelingInfoTableModalProps } from "@/src/types/components/projects/projectId/labeling/overview-table";
 import { ModalEnum } from "@/src/types/shared/modal";
-import { IconSearch } from "@tabler/icons-react";
 import { useDispatch, useSelector } from "react-redux";
 import style from '@/src/styles/components/projects/projectId/labeling.module.css';
 import { LabelSourceHover } from "@/src/types/components/projects/projectId/labeling/labeling";
+import { MemoIconSearch } from "@/submodules/react-components/components/kern-icons/icons";
 
 function shouldHighLight(tmpHighlightIds: string[], comparedIds: string[], additionalComparedIds?: string[]) {
     if (additionalComparedIds) {
@@ -81,7 +81,7 @@ export default function LabelingInfoTableModal(props: LabelingInfoTableModalProp
                         </td>
                         <td onMouseEnter={() => onMouseEnter([props.dataToDisplay[0].rla.id])} onMouseLeave={() => onMouseLeave()}
                             className={`${shouldHighLight(tmpHighlightIds, props.dataToDisplay[0].shouldHighlightOn) || hoverGroupsDict[props.dataToDisplay[0].label.id] && hoverGroupsDict[props.dataToDisplay[0].label.id][LabelingPageParts.TABLE_MODAL] ? settings.main.hoverGroupBackgroundColorClass : ''}`}>
-                            <IconSearch className="w-6 h-6 text-gray-700" />
+                            <MemoIconSearch className="w-6 h-6 text-gray-700" />
                         </td>
                     </tr>
                 </tbody>

@@ -2,10 +2,10 @@ import { UploadFieldProps, UploadStates } from "@/src/types/shared/upload";
 import { formatBytes } from "@/submodules/javascript-functions/general";
 import { useEffect, useRef, useState } from "react";
 import LoadingIcon from "../../../../../submodules/react-components/components/LoadingIcon";
-import { IconDatabase } from "@tabler/icons-react";
 import { UploadHelper } from "@/src/util/classes/upload-helper";
 import { useDropzone } from 'react-dropzone';
 import KernButton from "@/submodules/react-components/components/kern-button/KernButton";
+import { MemoIconDatabase } from "@/submodules/react-components/components/kern-icons/icons";
 
 export default function UploadField(props: UploadFieldProps) {
     const fileUpload = useRef<HTMLInputElement>(null);
@@ -58,7 +58,7 @@ export default function UploadField(props: UploadFieldProps) {
                     <div className="flex flex-grow items-center overflow-x-hidden">
                         <div  {...getRootProps()} onClick={() => fileUpload.current?.click()}
                             className={`w-full border border-dashed rounded-lg h-36 my-6 cursor-pointer ${file || props.uploadStarted ? 'bg-white' : 'border-slate-400'}`} style={{ 'pointerEvents': props.uploadStarted ? 'none' : 'auto' }}>
-                            <IconDatabase className="h-9 w-8 m-auto block text-gray-500 mt-6" />
+                            <MemoIconDatabase className="h-9 w-8 m-auto block text-gray-500 mt-6" />
                             {file == null && !props.uploadStarted ? (<div className="text-gray-600 text-sm font-medium text-center mb-6">
                                 <div className="text-indigo-700 mt-1">Click to select a file</div>
                                 <div className="text-xs font-normal text-gray-500 mt-1">or drag and drop</div>

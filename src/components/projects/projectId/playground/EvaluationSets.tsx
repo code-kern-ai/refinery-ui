@@ -12,7 +12,6 @@ import DeleteEvaluationSetsModal from "./DeleteEvaluationSetsModal";
 import KernTable from "@/submodules/react-components/components/kern-table/KernTable";
 import { EVALUATION_SETS_TABLE_CONFIG, EVALUATION_SETS_TABLE_HEADER, prepareTableBodyEvaluationSets } from "@/src/util/table-preparations/evaluation-sets";
 import KernButton from "@/submodules/react-components/components/kern-button/KernButton";
-import { IconMinus } from "@tabler/icons-react";
 import { selectAllUsers } from "@/src/reduxStore/states/general";
 import { arrayToDict } from "@/submodules/javascript-functions/general";
 

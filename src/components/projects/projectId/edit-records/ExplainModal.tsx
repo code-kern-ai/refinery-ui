@@ -3,7 +3,7 @@ import { closeModal } from "@/src/reduxStore/states/modal";
 import { ExplainModalProps } from "@/src/types/components/projects/projectId/edit-records";
 import { ModalEnum } from "@/src/types/shared/modal";
 import KernButton from "@/submodules/react-components/components/kern-button/KernButton";
-import { IconAlertTriangleFilled, IconInfoCircleFilled } from "@tabler/icons-react";
+import { MemoIconAlertTriangleFilled, MemoIconInfoCircleFilled } from "@/submodules/react-components/components/kern-icons/icons";
 import { useDispatch } from "react-redux";
 
 export default function ExplainModal(props: ExplainModalProps) {
@@ -19,14 +19,14 @@ export default function ExplainModal(props: ExplainModalProps) {
 
     return (<Modal modalName={ModalEnum.EXPLAIN_EDIT_RECORDS} hasOwnButtons={true}>
         <h1 className="text-lg text-gray-900 mb-2 text-center">Warning
-            <IconAlertTriangleFilled className="inline-block text-yellow-400" />
+            <MemoIconAlertTriangleFilled className="inline-block text-yellow-400" />
         </h1>
         <div className="text-sm text-gray-700 flex flex-col gap-y-2 my-2 font-medium">
             <div>Changing records directly should only be done in edge cases! </div>
             <div>This changes your data and cannot be undone.</div>
         </div>
         <h1 className="text-lg text-gray-900 text-center inline-flex items-center gap-x-1">Info
-            <IconInfoCircleFilled className="inline-block text-blue-400" />
+            <MemoIconInfoCircleFilled className="inline-block text-blue-400" />
         </h1>
         <div className="text-sm text-gray-700 flex flex-col gap-y-2 my-2 font-medium">
             <div>Currently your changes are only <b>cached</b>. This means they aren&apos;t persisted/updated yet.</div>

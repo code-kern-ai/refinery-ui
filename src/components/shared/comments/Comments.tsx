@@ -1,7 +1,6 @@
 import { Tooltip } from "@nextui-org/react";
 import CommentsMainSection from "./CommentsMainSection";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
-import { IconNotes } from "@tabler/icons-react";
 import { useDispatch, useSelector } from "react-redux";
 import { useCallback, useState } from "react";
 import { selectAllUsers, selectOrganizationId, setAllUsers, setComments } from "@/src/reduxStore/states/general";
@@ -13,6 +12,7 @@ import { useWebsocket } from "@/submodules/react-components/hooks/web-socket/use
 import { getAllComments } from "@/src/services/base/comment";
 import { getOrganizationUsers } from "@/src/services/base/organization";
 import { Application, CurrentPage, CurrentPageSubKey } from "@/submodules/react-components/hooks/web-socket/constants";
+import { MemoIconNotes } from "@/submodules/react-components/components/kern-icons/icons";
 
 export default function Comments() {
     const dispatch = useDispatch();
@@ -101,7 +101,7 @@ export default function Comments() {
     return (<>
         <button className="cursor-pointer inline-block mr-6" onClick={toggleModal}>
             <Tooltip content={TOOLTIPS_DICT.GENERAL.COMMENTS} color="invert" placement="bottom">
-                <IconNotes className="w-6 h-6" />
+                <MemoIconNotes className="w-6 h-6" />
             </Tooltip>
         </button>
         <CommentsMainSection open={sidebarOpen} toggleOpen={(toggleModal)} />

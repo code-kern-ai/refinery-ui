@@ -11,6 +11,10 @@ export type LookupList = {
     pythonVariable: string;
 }
 
+export type LookupListWithOnClick = LookupList & {
+    onClick: () => void;
+}
+
 export type Term = {
     blacklisted: boolean;
     comment: string;

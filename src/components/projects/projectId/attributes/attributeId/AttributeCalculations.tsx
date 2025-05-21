@@ -2,14 +2,13 @@ import Statuses from "@/src/components/shared/statuses/Statuses";
 import { selectAllLookupLists, setAllLookupLists } from "@/src/reduxStore/states/pages/lookup-lists";
 import { selectAttributes, selectVisibleAttributeAC, setAllAttributes, setLabelingTasksAll, updateAttributeById } from "@/src/reduxStore/states/pages/settings";
 import { selectProjectId } from "@/src/reduxStore/states/project"
-import { Attribute, AttributeState, LLMConfig } from "@/src/types/components/projects/projectId/settings/data-schema";
+import { Attribute, AttributeState, AttributeVisibility, AttributeWithOnClick, LLMConfig } from "@/src/types/components/projects/projectId/settings/data-schema";
 import { DataTypeEnum } from "@/src/types/shared/general";
 import { LLM_PROVIDER_OPTIONS, postProcessCurrentAttribute } from "@/src/util/components/projects/projectId/settings/attribute-calculation-helper";
 import { ATTRIBUTES_VISIBILITY_STATES, DATA_TYPES, getTooltipVisibilityState } from "@/src/util/components/projects/projectId/settings/data-schema-helper";
 import { copyToClipboard } from "@/submodules/javascript-functions/general";
 import { Editor } from "@monaco-editor/react";
 import { Tooltip } from "@nextui-org/react";
-import { IconAlertTriangleFilled, IconArrowLeft, IconCircleCheckFilled } from "@tabler/icons-react";
 import { useRouter } from "next/router";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux"
@@ -40,6 +39,8 @@ import useRefFor from "@/submodules/react-components/hooks/useRefFor";
 import { simpleDictCompare } from "@/submodules/javascript-functions/validations";
 import { LLM_CODE_TEMPLATE_EXAMPLES, LLM_CODE_TEMPLATE_OPTIONS } from "./LLM/llmTemplates";
 import KernButton from "@/submodules/react-components/components/kern-button/KernButton";
+import { MemoIconAlertTriangleFilled, MemoIconArrowLeft, MemoIconCircleCheckFilled } from "@/submodules/react-components/components/kern-icons/icons";
+import { LookupListWithOnClick } from "@/src/types/components/projects/projectId/lookup-lists";
 
 const EDITOR_OPTIONS = { theme: 'vs-light', language: 'python', readOnly: false };
 
@@ -197,49 +198,49 @@ export default function AttributeCalculation() {
 
     }
 
-    function changeAttributeName(name: string) {
-        if (name == currentAttribute.name) return;
+    const attributesRef = useRefFor(attributes);
+    const changeAttributeName = useCallback((name: string) => {
+        if (name == currentAttributeRef.current.name) return;
         if (name == '') return;
-        const duplicateNameExists = attributes.find((attribute) => attribute.name == name);
+        const duplicateNameExists = attributesRef.current.find((attribute) => attribute.name == name);
         if (duplicateNameExists) {
             setDuplicateNameExists(true);
-            setAttributeName(currentAttribute.name);
+            setAttributeName(currentAttributeRef.current.name);
             return;
         }
-        const attributeNew = { ...currentAttribute };
+        const attributeNew = { ...currentAttributeRef.current };
         attributeNew.name = name;
         attributeNew.saveSourceCode = false;
-        updateAttribute(projectId, currentAttribute.id, (res) => {
+        updateAttribute(projectId, currentAttributeRef.current.id, (res) => {
             setCurrentAttribute(postProcessCurrentAttribute(attributeNew));
             setEditorValue(attributeNew.sourceCode.replace('def ac(record)', 'def ' + attributeNew.name + '(record)'));
             dispatch(updateAttributeById(attributeNew));
             setDuplicateNameExists(false);
         }, null, null, attributeNew.name);
-    }
+    }, []);
 
-    function updateVisibility(option: any) {
-        const attributeNew = { ...currentAttribute };
-        attributeNew.visibility = option.value;
-        attributeNew.visibilityIndex = ATTRIBUTES_VISIBILITY_STATES.findIndex((state) => state.name === option);
+    const updateVisibility = useCallback((option: { name: string, value: string }) => {
+        const attributeNew = { ...currentAttributeRef.current };
+        attributeNew.visibility = option.value as AttributeVisibility;
+        attributeNew.visibilityIndex = ATTRIBUTES_VISIBILITY_STATES.findIndex((state) => state.name === option.name);
         attributeNew.visibilityName = option.name;
         attributeNew.saveSourceCode = false;
-        updateAttribute(projectId, currentAttribute.id, (res) => {
+        updateAttribute(projectId, currentAttributeRef.current.id, (res) => {
             setCurrentAttribute(postProcessCurrentAttribute(attributeNew));
             dispatch(updateAttributeById(attributeNew));
         }, null, null, null, null, attributeNew.visibility);
-    }
+    }, []);
 
-    function updateDataType(option: any) {
-        const attributeNew = { ...currentAttribute };
+    const updateDataType = useCallback((option: { name: string, value: string }) => {
+        const attributeNew = { ...currentAttributeRef.current };
         attributeNew.dataType = option.value;
         attributeNew.dataTypeName = option.name;
         attributeNew.saveSourceCode = false;
-        updateAttribute(projectId, currentAttribute.id, (res) => {
+        updateAttribute(projectId, currentAttributeRef.current.id, (res) => {
             setCurrentAttribute(postProcessCurrentAttribute(attributeNew));
             dispatch(updateAttributeById(attributeNew));
         }, attributeNew.dataType);
-    }
-
+    }, []);
 
     function onScrollEvent(event: any) {
         if (!(event.target instanceof HTMLElement)) return;
@@ -249,7 +250,6 @@ export default function AttributeCalculation() {
             setIsHeaderNormal(true);
         }
     }
-
 
     function checkProjectTokenization() {
         getProjectTokenization(projectId, (res) => {
@@ -310,6 +310,21 @@ export default function AttributeCalculation() {
     const orgId = useSelector(selectOrganizationId);
     useWebsocket(orgId, Application.REFINERY, CurrentPage.ATTRIBUTE_CALCULATION, handleWebsocketNotification, projectId);
 
+    const goBack = useCallback((e: React.MouseEvent) => {
+        e.preventDefault();
+        router.push(`/projects/${projectId}/settings`);
+    }, []);
+
+    const copyToClipboardFunc = useCallback((name: string) => copyToClipboard(name), []);
+
+    const usableAttributesFinal = useMemo(() => usableAttributes.map((attribute) => (
+        { ...attribute, onClick: () => copyToClipboardFunc(attribute.name) }
+    )), [usableAttributes]);
+
+    const lookupListsFinal = useMemo(() => lookupLists.map((lookupList) => (
+        { ...lookupList, onClick: () => copyToClipboardFunc("from knowledge import " + lookupList.pythonVariable) }
+    )), [lookupLists]);
+
     const disabledOptions = useMemo(() => {
         if (!currentAttribute || currentAttribute.dataType == DataTypeEnum.LLM_RESPONSE) return undefined;
         return DATA_TYPES.map((e) => e.value == DataTypeEnum.LLM_RESPONSE);
@@ -320,11 +335,8 @@ export default function AttributeCalculation() {
             <div className={`sticky z-50 h-12 ${isHeaderNormal ? 'top-1' : '-top-5'}`}>
                 <div className={`bg-white flex-grow ${isHeaderNormal ? '' : 'shadow'}`}>
                     <div className={`flex-row justify-start items-center inline-block ${isHeaderNormal ? 'p-0' : 'flex py-2'}`} style={{ transition: 'all .25s ease-in-out' }}>
-                        <a href={`/refinery/projects/${projectId}/settings`} onClick={(e) => {
-                            e.preventDefault();
-                            router.push(`/projects/${projectId}/settings`);
-                        }} className="text-green-800 text-sm font-medium">
-                            <IconArrowLeft className="h-5 w-5 inline-block text-green-800" />
+                        <a href={`/refinery/projects/${projectId}/settings`} onClick={goBack} className="text-green-800 text-sm font-medium">
+                            <MemoIconArrowLeft className="h-5 w-5 inline-block text-green-800" />
                             <span className="leading-5">Go back</span>
                         </a>
                         {!isHeaderNormal && <div className="mx-4 text-sm leading-5 font-medium text-gray-500 inline-block">{currentAttribute.name}</div>}
@@ -382,10 +394,10 @@ export default function AttributeCalculation() {
                     </div>
                     <div className="text-sm leading-5 font-medium text-gray-700 inline-block">Attributes</div>
                     <div className="flex flex-row items-center">
-                        {usableAttributes.length == 0 && <div className="text-sm font-normal text-gray-500">No usable attributes.</div>}
-                        {usableAttributes.map((attribute: Attribute) => (
+                        {usableAttributesFinal.length == 0 && <div className="text-sm font-normal text-gray-500">No usable attributes.</div>}
+                        {usableAttributesFinal.map((attribute: AttributeWithOnClick) => (
                             <Tooltip key={attribute.id} content={attribute.dataTypeName + ' - ' + TOOLTIPS_DICT.GENERAL.CLICK_TO_COPY} color="invert" placement="top">
-                                <span onClick={() => copyToClipboard(attribute.name)}>
+                                <span onClick={attribute.onClick}>
                                     <div className={`cursor-pointer border items-center px-2 py-0.5 rounded text-xs font-medium text-center mr-2 ${'bg-' + attribute.color + '-100'} ${'text-' + attribute.color + '-700'} ${'border-' + attribute.color + '-400'} ${'hover:bg-' + attribute.color + '-200'}`}>
                                         {attribute.name}
                                     </div>
@@ -395,11 +407,11 @@ export default function AttributeCalculation() {
                     </div>
 
                     <div className="text-sm leading-5 font-medium text-gray-700 inline-block">
-                        {lookupLists.length == 0 ? 'No lookup lists in project' : 'Lookup lists'}</div>
+                        {lookupListsFinal.length == 0 ? 'No lookup lists in project' : 'Lookup lists'}</div>
                     <div className="flex flex-row items-center">
-                        {lookupLists.map((lookupList) => (
+                        {lookupListsFinal.map((lookupList: LookupListWithOnClick) => (
                             <Tooltip key={lookupList.id} content={TOOLTIPS_DICT.GENERAL.IMPORT_STATEMENT} color="invert" placement="top">
-                                <span onClick={() => copyToClipboard("from knowledge import " + lookupList.pythonVariable)}>
+                                <span onClick={lookupList.onClick}>
                                     <div className="cursor-pointer border items-center px-2 py-0.5 rounded text-xs font-medium text-center mr-2">
                                         {lookupList.pythonVariable} - {lookupList.termCount}
                                     </div>
@@ -493,10 +505,10 @@ export default function AttributeCalculation() {
                         </div>}
                     {currentAttribute.state !== AttributeState.RUNNING && currentAttribute.state !== AttributeState.INITIAL && <div className="flex flex-row items-center">
                         {currentAttribute.state == AttributeState.USABLE && <Tooltip content={TOOLTIPS_DICT.GENERAL.SUCCESSFULLY_CREATED} color="invert" className="cursor-auto">
-                            <IconCircleCheckFilled className="h-6 w-6 text-green-500" />
+                            <MemoIconCircleCheckFilled className="h-6 w-6 text-green-500" />
                         </Tooltip>}
                         {currentAttribute.state == AttributeState.FAILED && <Tooltip content={TOOLTIPS_DICT.GENERAL.ERROR} color="invert" className="cursor-auto">
-                            <IconAlertTriangleFilled className="h-6 w-6 text-red-500" />
+                            <MemoIconAlertTriangleFilled className="h-6 w-6 text-red-500" />
                         </Tooltip>}
                         <div className="py-6 text-sm leading-5 font-normal text-gray-500">
                             {currentAttribute.state === 'FAILED' ? 'Attribute calculation ran into errors.' : 'Attribute calculation finished successfully.'}

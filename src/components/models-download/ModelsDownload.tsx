@@ -1,15 +1,11 @@
 import { selectModelsDownloaded, setModelsDownloaded } from "@/src/reduxStore/states/pages/models-downloaded";
-import { Tooltip } from "@nextui-org/react";
-import { IconAlertTriangleFilled, IconArrowLeft, IconCircleCheckFilled, IconExternalLink, IconLoader, IconPlus, IconTrash } from "@tabler/icons-react";
 import { useRouter } from "next/router";
 import { useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import LoadingIcon from "../../../submodules/react-components/components/LoadingIcon";
 import { openModal, setModalStates } from "@/src/reduxStore/states/modal";
 import { ModalEnum } from "@/src/types/shared/modal";
 import { selectIsAdmin, selectOrganizationId } from "@/src/reduxStore/states/general";
 import { timer } from "rxjs";
-import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
 import AddModelDownloadModal from "./AddModelDownloadModal";
 import DeleteModelDownloadModal from "./DeleteModelDownloadModal";
 import { useWebsocket } from "@/submodules/react-components/hooks/web-socket/useWebsocket";
@@ -19,6 +15,7 @@ import { MODELS_DOWNLOAD_TABLE_COLUMNS, prepareTableBodyModelsDownload } from "@
 import KernTable from "@/submodules/react-components/components/kern-table/KernTable";
 import ButtonAsText from "@/submodules/react-components/components/kern-button/ButtonAsText";
 import KernButton from "@/submodules/react-components/components/kern-button/KernButton";
+import { MemoIconArrowLeft, MemoIconPlus } from "@/submodules/react-components/components/kern-icons/icons";
 
 export default function ModelsDownload() {
     const router = useRouter();
@@ -59,13 +56,17 @@ export default function ModelsDownload() {
     const orgId = useSelector(selectOrganizationId);
     useWebsocket(orgId, Application.REFINERY, CurrentPage.MODELS_DOWNLOAD, handleWebsocketNotification);
 
+    const openCreateModal = useCallback(() => {
+        dispatch(openModal(ModalEnum.ADD_MODEL_DOWNLOAD));
+    }, []);
+
     return (<div className="p-4 bg-gray-100 flex-1 flex flex-col h-[calc(100vh-4rem)] overflow-y-auto">
         <div className="flex flex-row items-center">
             <ButtonAsText
                 text="Go back"
                 onClick={() => router.back()}
                 color="green"
-                iconLeft={IconArrowLeft}
+                iconLeft={MemoIconArrowLeft}
                 iconColor="green"
             />
         </div>
@@ -86,8 +87,8 @@ export default function ModelsDownload() {
             <div>
                 <KernButton
                     text="Add new model"
-                    icon={IconPlus}
-                    onClick={() => dispatch(openModal(ModalEnum.ADD_MODEL_DOWNLOAD))}
+                    icon={MemoIconPlus}
+                    onClick={openCreateModal}
                 />
             </div>
         </div>

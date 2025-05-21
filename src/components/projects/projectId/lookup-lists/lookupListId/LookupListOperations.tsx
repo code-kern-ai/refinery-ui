@@ -9,8 +9,6 @@ import { ModalEnum } from "@/src/types/shared/modal";
 import { UploadFileType } from "@/src/types/shared/upload";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
 import { downloadByteData } from "@/submodules/javascript-functions/export";
-import { Tooltip } from "@nextui-org/react";
-import { IconClipboard, IconClipboardOff, IconDownload, IconUpload } from "@tabler/icons-react";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -19,6 +17,7 @@ import PasteLookupListModal from "./PasteLookupListModal";
 import RemoveLookupListModal from "./RemoveLookupListModal";
 import { getExportLookupList } from "@/src/services/base/lookup-lists";
 import KernButton from "@/submodules/react-components/components/kern-button/KernButton";
+import { MemoIconClipboard, MemoIconClipboardOff, MemoIconDownload, MemoIconUpload } from "@/submodules/react-components/components/kern-icons/icons";
 
 const BASE_OPTIONS = { reloadOnFinish: true, closeModalOnClick: true, isModal: true, knowledgeBaseId: null };
 
@@ -58,7 +57,7 @@ export default function LookupListOperations(props: LookupListOperationsProps) {
                     className="mr-3"
                     tooltip={TOOLTIPS_DICT.LOOKUP_LISTS_DETAILS.UPLOAD_LOOKUP_LIST}
                     tooltipPlacement="bottom"
-                    icon={IconUpload}
+                    icon={MemoIconUpload}
                     iconColor="gray"
                 />
             </div>
@@ -69,7 +68,7 @@ export default function LookupListOperations(props: LookupListOperationsProps) {
                     className="mr-3"
                     tooltip={TOOLTIPS_DICT.LOOKUP_LISTS_DETAILS.DOWNLOAD_LOOKUP_LIST}
                     tooltipPlacement="bottom"
-                    icon={IconDownload}
+                    icon={MemoIconDownload}
                     iconColor="gray"
                 />
             </div>
@@ -80,7 +79,7 @@ export default function LookupListOperations(props: LookupListOperationsProps) {
                     className="mr-3"
                     tooltip={TOOLTIPS_DICT.LOOKUP_LISTS_DETAILS.PASTE_LOOKUP_LIST}
                     tooltipPlacement="bottom"
-                    icon={IconClipboard}
+                    icon={MemoIconClipboard}
                     iconColor="gray"
                 />
             </div>
@@ -91,7 +90,7 @@ export default function LookupListOperations(props: LookupListOperationsProps) {
                     className="mr-3"
                     tooltip={TOOLTIPS_DICT.LOOKUP_LISTS_DETAILS.DELETE_LOOKUP_LIST}
                     tooltipPlacement="bottom"
-                    icon={IconClipboardOff}
+                    icon={MemoIconClipboardOff}
                     buttonColor="red"
                     iconColor="red"
                 />

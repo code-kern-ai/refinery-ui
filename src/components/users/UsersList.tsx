@@ -2,8 +2,8 @@ import { selectAnnotators, selectEngineers, selectExperts, selectInactiveOrganiz
 import { useSelector } from "react-redux"
 import YoutubeIntroduction from "../projects/YoutubeIntroduction";
 import { User } from "@/src/types/shared/general";
-import { IconUsersGroup } from "@tabler/icons-react";
 import { UNKNOWN_USER } from "@/src/util/constants";
+import { MemoIconUsersGroup } from "@/submodules/react-components/components/kern-icons/icons";
 
 export default function UsersList() {
     const organizationInactive = useSelector(selectInactiveOrganization);
@@ -66,7 +66,7 @@ export default function UsersList() {
                         ))}
                     </div>
                     {experts?.length == 0 && <div className="text-center">
-                        <IconUsersGroup className="mx-auto h-12 w-12 text-gray-400" />
+                        <MemoIconUsersGroup className="mx-auto h-12 w-12 text-gray-400" />
                         <h2 className="mt-2 text-lg font-medium text-gray-900">Add experts</h2>
                         <p className="mt-1 text-sm text-gray-500">Let us know if you want to add experts.
                         </p>
@@ -102,7 +102,7 @@ export default function UsersList() {
                         ))}
                     </div>
                     {annotators?.length == 0 && <div className="text-center">
-                        <IconUsersGroup className="mx-auto h-12 w-12 text-gray-400" />
+                        <MemoIconUsersGroup className="mx-auto h-12 w-12 text-gray-400" />
                         <h2 className="mt-2 text-lg font-medium text-gray-900">Add annotators</h2>
                         <p className="mt-1 text-sm text-gray-500">Let us know if you want to add annotators.
                         </p>

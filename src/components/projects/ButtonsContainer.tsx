@@ -37,6 +37,16 @@ export default function ButtonsContainer() {
     const orgId = useSelector(selectOrganizationId);
     useWebsocket(orgId, Application.REFINERY, CurrentPage.PROJECTS, handleWebsocketNotification, null, CurrentPageSubKey.BUTTONS_CONTAINER);
 
+    const createNewProject = useCallback(() => {
+        dispatch(setUploadFileType(UploadFileType.RECORDS_NEW));
+        router.push("/projects/new");
+    }, []);
+
+    const importSnapshot = useCallback(() => {
+        dispatch(openModal(ModalEnum.MODAL_UPLOAD));
+        dispatch(setUploadFileType(UploadFileType.PROJECT));
+    }, []);
+
     return (
         user && user.role === UserRole.ENGINEER ? (<div className="flex flex-row items-start gap-x-4 mt-4">
             <KernButton
@@ -44,20 +54,14 @@ export default function ButtonsContainer() {
                 buttonColor="blue"
                 solidTheme={true}
                 textColor="white"
-                onClick={() => {
-                    dispatch(setUploadFileType(UploadFileType.RECORDS_NEW));
-                    router.push("/projects/new");
-                }}
+                onClick={createNewProject}
             />
             <KernButton
                 text="Import snapshot"
                 buttonColor="blue"
                 solidTheme={true}
                 textColor="white"
-                onClick={() => {
-                    dispatch(openModal(ModalEnum.MODAL_UPLOAD));
-                    dispatch(setUploadFileType(UploadFileType.PROJECT));
-                }}
+                onClick={importSnapshot}
             />
             <SampleProjectsDropdown />
             <ModalUpload uploadOptions={uploadOptions} />
