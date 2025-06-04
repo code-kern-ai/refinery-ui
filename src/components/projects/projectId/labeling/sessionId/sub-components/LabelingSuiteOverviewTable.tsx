@@ -7,7 +7,6 @@ import { ModalEnum } from "@/src/types/shared/modal";
 import { LabelingSuiteManager } from "@/src/util/classes/labeling/manager";
 import { buildOverviewTableDisplayArray, filterRlaDataForUser, filterRlaLabelCondition, getEmptyHeaderHover, rlasHaveHeuristicData } from "@/src/util/components/projects/projectId/labeling/overview-table-helper";
 import { LabelSource } from "@/submodules/javascript-functions/enums/enums";
-import { IconSearch, IconTrash } from "@tabler/icons-react";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import LabelingInfoTableModal from "./LabelingInfoTableModal";
@@ -16,6 +15,7 @@ import style from '@/src/styles/components/projects/projectId/labeling.module.cs
 import { LabelSourceHover } from "@/src/types/components/projects/projectId/labeling/labeling";
 import { UserRole } from "@/src/types/shared/sidebar";
 import { deleteRecordLabelAssociationByIds } from "@/src/services/base/labeling";
+import { MemoIconSearch, MemoIconTrash } from "@/submodules/react-components/components/kern-icons/icons";
 
 
 function shouldHighLight(tmpHighlightIds: string[], comparedIds: string[], additionalComparedIds?: string[]) {
@@ -180,12 +180,12 @@ export default function LabelingSuiteOverviewTable() {
                                         </td>
                                         <td onMouseEnter={() => onMouseEnter([ovItem.rla.id])} onMouseLeave={onMouseLeave}
                                             className={`${(shouldHighLight(tmpHighlightIds, ovItem.shouldHighlightOn) || hoverGroupsDict[ovItem.label.id] && hoverGroupsDict[ovItem.label.id][LabelingPageParts.OVERVIEW_TABLE] && hoverGroupsDict[ovItem.label.id][ovItem.sourceTypeKey]) ? settings.main.hoverGroupBackgroundColorClass : ''}`}>
-                                            <IconSearch className="w-6 h-6 text-gray-700" />
+                                            <MemoIconSearch className="w-6 h-6 text-gray-700" />
                                         </td>
                                         <td onMouseEnter={() => onMouseEnter([ovItem.rla.id])} onMouseLeave={onMouseLeave}
                                             className={`${(shouldHighLight(tmpHighlightIds, ovItem.shouldHighlightOn) || hoverGroupsDict[ovItem.label.id] && hoverGroupsDict[ovItem.label.id][LabelingPageParts.OVERVIEW_TABLE] && hoverGroupsDict[ovItem.label.id][ovItem.sourceTypeKey]) ? settings.main.hoverGroupBackgroundColorClass : ''}`}>
                                             {ovItem.canBeDeleted && <div onClick={() => deleteLabelFromRecord(ovItem.rla.id)}>
-                                                <IconTrash className="w-6 h-6 text-red-700 cursor-pointer" /></div>}
+                                                <MemoIconTrash className="w-6 h-6 text-red-700 cursor-pointer" /></div>}
                                         </td>
                                     </tr>))}
                                 </tbody>

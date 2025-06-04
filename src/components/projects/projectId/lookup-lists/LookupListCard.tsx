@@ -1,7 +1,7 @@
 import { selectAllLookupLists, selectCheckedLookupLists, setCheckedLookupLists } from "@/src/reduxStore/states/pages/lookup-lists";
 import { selectProjectId } from "@/src/reduxStore/states/project";
 import { LookupListCardProps } from "@/src/types/components/projects/projectId/lookup-lists";
-import { IconArrowRight } from "@tabler/icons-react";
+import { MemoIconArrowRight } from "@/submodules/react-components/components/kern-icons/icons";
 import { useRouter } from "next/router";
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -40,7 +40,7 @@ export function LookupListCard(props: LookupListCardProps) {
                     router.push(`/projects/${projectId}/lookup-lists/${props.lookupList.id}`);
                 }} className="text-green-800 float-right cursor-pointer">
                     Details
-                    <IconArrowRight className="h-5 w-5 inline-block text-green-800" />
+                    <MemoIconArrowRight className="h-5 w-5 inline-block text-green-800" />
                 </a>
             </div>
             <div className={`flex-row gap-16 font-normal text-gray-500 ${props.lookupList.description ? 'flex' : 'block'}`}>

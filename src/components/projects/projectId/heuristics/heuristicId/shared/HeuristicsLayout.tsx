@@ -9,7 +9,6 @@ import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
 import { InformationSourceType } from "@/submodules/javascript-functions/enums/enums";
 import { copyToClipboard } from "@/submodules/javascript-functions/general";
 import { Tooltip } from "@nextui-org/react";
-import { IconArrowLeft } from "@tabler/icons-react";
 import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux"
 import { useRouter } from "next/router";
@@ -19,6 +18,7 @@ import { updateHeuristicPost } from "@/src/services/base/heuristic";
 import { toPythonFunctionName } from "@/submodules/javascript-functions/python-functions-parser";
 import { capitalizeFirstForClassName } from "@/submodules/javascript-functions/case-types-parser";
 import KernButton from "@/submodules/react-components/components/kern-button/KernButton";
+import { MemoIconArrowLeft } from "@/submodules/react-components/components/kern-icons/icons";
 
 export default function HeuristicsLayout(props: any) {
     const router = useRouter();
@@ -117,7 +117,7 @@ export default function HeuristicsLayout(props: any) {
                             router.push(`/projects/${projectId}/heuristics`);
                             dispatch(setActiveHeuristics(null));
                         }} className="text-green-800 text-sm font-medium">
-                            <IconArrowLeft className="h-5 w-5 inline-block text-green-800" />
+                            <MemoIconArrowLeft className="h-5 w-5 inline-block text-green-800" />
                             <span className="leading-5">Go back</span>
                         </a>
                         {!isHeaderNormal && <div className="mx-4 text-sm leading-5 font-medium text-gray-500 inline-block">{currentHeuristic.name}</div>}

@@ -7,9 +7,9 @@ import { useSelector } from "react-redux";
 import { selectAllProjects } from "@/src/reduxStore/states/project";
 import Upload from "./Upload";
 import { selectUploadData } from "@/src/reduxStore/states/upload";
-import { IconAlertTriangle } from "@tabler/icons-react";
 import { timer } from "rxjs";
 import { selectModal } from "@/src/reduxStore/states/modal";
+import { MemoIconAlertTriangle } from "@/submodules/react-components/components/kern-icons/icons";
 
 const ACCEPT_BUTTON = { buttonCaption: "Upload", closeAfterClick: false, useButton: true, disabled: true };
 
@@ -89,7 +89,7 @@ export default function ModalUpload(props: UploadProps) {
                         className="h-8 w-full text-sm border-gray-300 rounded-md placeholder-italic border text-gray-900 pl-4 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100" placeholder="Enter some title here..." />
                     {isProjectTitleDuplicate && (<div className="text-red-700 text-xs mt-2">Project title exists</div>)}
                     <div className="flex flex-row mt-2">
-                        <IconAlertTriangle className="h-5 w-5 text-yellow-700" />
+                        <MemoIconAlertTriangle className="h-5 w-5 text-yellow-700" />
                         <label className="text-yellow-700 text-xs italic ml-2">If no project title is specified, the title mentioned in
                             the uploaded data will be used, potentially leading to a duplication of project titles.</label>
                     </div>

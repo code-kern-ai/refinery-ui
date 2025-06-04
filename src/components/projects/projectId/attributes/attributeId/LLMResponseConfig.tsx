@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { LLMConfig } from "./LLM/LLMConfig";
-import { IconAdjustmentsAlt, IconAdjustmentsOff, IconSettings, IconTerminal, IconUser } from "@tabler/icons-react";
 import KernButton from "@/submodules/react-components/components/kern-button/KernButton";
 import LLMResponsePlayground from "./LLMResponsePlayground";
 import { LLMResponseConfigProps } from "./LLM/types";
+import { MemoIconAdjustmentsAlt, MemoIconAdjustmentsOff, MemoIconSettings, MemoIconTerminal, MemoIconUser } from "@/submodules/react-components/components/kern-icons/icons";
 
 
 export default function LLMResponseConfig(props: LLMResponseConfigProps) {
@@ -15,8 +15,8 @@ export default function LLMResponseConfig(props: LLMResponseConfigProps) {
         <div className="mt-3 flex flex-col gap-y-2">
             <div className="flex flex-row flex-nowrap items-center gap-x-2">
                 <label className="block font-bold text-gray-900">LLM Config</label>
-                {!props.keepConfigOpen && <KernButton icon={IconSettings} onClick={() => setConfigOpen((p) => !p)} size="small" />}
-                {configOpen && <KernButton icon={fullConfigOpen ? IconAdjustmentsAlt : IconAdjustmentsOff} onClick={() => setFullConfigOpen((p) => !p)} size="small" />}
+                {!props.keepConfigOpen && <KernButton icon={MemoIconSettings} onClick={() => setConfigOpen((p) => !p)} size="small" />}
+                {configOpen && <KernButton icon={fullConfigOpen ? MemoIconAdjustmentsAlt : MemoIconAdjustmentsOff} onClick={() => setFullConfigOpen((p) => !p)} size="small" />}
 
                 {props.noPlayground ? null : <LLMResponsePlayground attributeId={props.attributeId} apiKey={props.apiKey} />}
 
@@ -65,8 +65,8 @@ function TemplatePrompt(props: TemplatePromptProps) {
             <div className="flex gap-x-2">
                 <div className='py-2'>
                     <div className='flex items-center justify-center bg-white h-6 w-6 rounded-lg border border-gray-300'>
-                        {props.type == "SYSTEM" ? <IconTerminal className='h-4 w-4 text-gray-500' />
-                            : <IconUser className='h-4 w-4 text-gray-500' />}
+                        {props.type == "SYSTEM" ? <MemoIconTerminal className='h-4 w-4 text-gray-500' />
+                            : <MemoIconUser className='h-4 w-4 text-gray-500' />}
                     </div>
                 </div>
                 <div className='text-sm font-mono text-gray-900 text-center leading-10'>

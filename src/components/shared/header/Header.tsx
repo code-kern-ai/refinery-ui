@@ -6,7 +6,6 @@ import { useDispatch, useSelector } from "react-redux";
 import style from "@/src/styles/shared/header.module.css";
 import LogoutDropdown from "./LogoutDropdown";
 import { useRouter } from "next/router";
-import { IconBell, IconHexagons, IconHome, IconPlayCard } from "@tabler/icons-react";
 import { selectAllProjectsNamesDict, selectProject, setAllProjects } from "@/src/reduxStore/states/project";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
 import NotificationCenterModal from "../notification-center/NotificationCenterModal";
@@ -18,6 +17,7 @@ import Comments from "../comments/Comments";
 import { getAllProjects } from "@/src/services/base/project";
 import { getNotifications } from "@/src/services/base/notification";
 import { CurrentPage } from "@/submodules/react-components/hooks/web-socket/constants";
+import { MemoIconBell, MemoIconHexagons, MemoIconHome } from "@/submodules/react-components/components/kern-icons/icons";
 
 export default function Header() {
     const router = useRouter();
@@ -88,7 +88,7 @@ export default function Header() {
                     <div className="flex items-center justify-center">
                         <a href="/refinery/projects" className="flex mr-6">
                             <Tooltip placement="bottom" trigger="hover" color="invert" content={TOOLTIPS_DICT.GENERAL.PROJECTS}>
-                                <IconHome className="w-6 h-6" />
+                                <MemoIconHome className="w-6 h-6" />
                             </Tooltip>
                         </a>
                     </div>
@@ -97,7 +97,7 @@ export default function Header() {
                             <a href="/refinery/users" onClick={(e: any) => { e.preventDefault(); dispatch(setProjectIdSampleProject(null)); router.push(`/users`) }}
                                 className="flex mr-6">
                                 <Tooltip placement="bottom" trigger="hover" color="invert" content={TOOLTIPS_DICT.GENERAL.USERS}>
-                                    <IconHexagons className="w-6 h-6" />
+                                    <MemoIconHexagons className="w-6 h-6" />
                                 </Tooltip>
                             </a>
                         </div>
@@ -108,7 +108,7 @@ export default function Header() {
                     {user?.role == UserRole.ENGINEER && <div className="flex items-center justify-center">
                         <button className="flex mr-6 cursor-pointer" onClick={openModalAndRefetchNotifications}>
                             <Tooltip content={TOOLTIPS_DICT.GENERAL.NOTIFICATION_CENTER} placement="bottom" color="invert">
-                                <IconBell className="w-6 h-6" />
+                                <MemoIconBell className="w-6 h-6" />
                             </Tooltip>
                         </button>
                     </div>}

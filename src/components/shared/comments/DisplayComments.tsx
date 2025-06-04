@@ -1,9 +1,9 @@
 import { selectComments, selectUser } from "@/src/reduxStore/states/general";
 import { CommentData, CommentPosition, DisplayCommentsProps } from "@/src/types/shared/comments";
 import { combineClassNames } from "@/submodules/javascript-functions/general";
+import { MemoIconDotsVertical, MemoIconEdit, MemoIconEye, MemoIconEyeOff, MemoIconTrash } from "@/submodules/react-components/components/kern-icons/icons";
 import { Menu, Transition } from "@headlessui/react";
 import { Tooltip } from "@nextui-org/react";
-import { IconDotsVertical, IconEdit, IconEye, IconEyeOff, IconTrash } from "@tabler/icons-react";
 import { Fragment } from "react";
 import { useSelector } from "react-redux";
 
@@ -34,7 +34,7 @@ export default function DisplayComments(props: DisplayCommentsProps) {
                                         <Tooltip content={comment.creationUser} contentColor="invert" hideArrow={true} placement={positionComment == CommentPosition.RIGHT ? 'bottom' : 'right'}
                                             css={{ color: '#6B7280', border: '1px solid #6B7280', backgroundColor: '#F3F4F6', textAlign: 'center' }}>
                                             {!comment.is_private ? (<img className={`h-10 w-10 p-1 ${user?.id == comment.created_by ? 'border border-blue-400 rounded-full' : null}`} src={`/refinery/avatars/${comment.avatarUri}`} alt="" />) : (
-                                                <IconEyeOff className={`h-10 w-10 p-1 ${user?.id == comment.created_by ? 'border border-blue-400 rounded-full' : null}`} />
+                                                <MemoIconEyeOff className={`h-10 w-10 p-1 ${user?.id == comment.created_by ? 'border border-blue-400 rounded-full' : null}`} />
                                             )}
                                         </Tooltip>
                                     </span>
@@ -48,7 +48,7 @@ export default function DisplayComments(props: DisplayCommentsProps) {
                             <Menu as="div" className="absolute right-0 inline-block flex-shrink-0 text-left">
                                 <Menu.Button className="group relative inline-flex h-8 w-8 items-center justify-center rounded-full disabled:cursor-not-allowed disabled:opacity-50" disabled={comment.created_by != user.id}>
                                     <span className="flex h-full w-full items-center justify-center rounded-full">
-                                        <IconDotsVertical
+                                        <MemoIconDotsVertical
                                             size={24}
                                             strokeWidth={2}
                                             className='text-gray-700 font-semibold' />
@@ -79,7 +79,7 @@ export default function DisplayComments(props: DisplayCommentsProps) {
                                                     )}
                                                     >
                                                         <div className="flex flex-row items-center">
-                                                            <IconEdit
+                                                            <MemoIconEdit
                                                                 className={`font-semibold h-5 w-5 ${active ? 'text-gray-900' : 'text-gray-700'}`} />
                                                             <span className="ml-2">Edit</span>
                                                         </div>
@@ -97,10 +97,10 @@ export default function DisplayComments(props: DisplayCommentsProps) {
                                                     )}
                                                     >
                                                         <div className="flex flex-row items-center">
-                                                            {!comment.is_private && <><IconEyeOff
+                                                            {!comment.is_private && <><MemoIconEyeOff
                                                                 className={`font-semibold h-5 w-5 ${active ? 'text-gray-900' : 'text-gray-700'}`} />
                                                                 <span className="ml-2">Private</span></>}
-                                                            {comment.is_private && <><IconEye
+                                                            {comment.is_private && <><MemoIconEye
                                                                 className={`font-semibold h-5 w-5 ${active ? 'text-gray-900' : 'text-gray-700'}`} />
                                                                 <span className="ml-2">Public</span></>}
                                                         </div>
@@ -115,7 +115,7 @@ export default function DisplayComments(props: DisplayCommentsProps) {
                                                     )}
                                                     >
                                                         <div className="flex flex-row items-center">
-                                                            <IconTrash
+                                                            <MemoIconTrash
                                                                 className={`font-semibold h-5 w-5 ${active ? 'text-gray-900' : 'text-gray-700'}`} />
                                                             <span className="ml-2">Delete</span>
                                                         </div>

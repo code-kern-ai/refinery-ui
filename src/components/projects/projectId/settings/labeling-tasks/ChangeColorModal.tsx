@@ -8,8 +8,8 @@ import { ModalEnum } from "@/src/types/shared/modal";
 import { LabelHelper } from "@/src/util/classes/label-helper";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
 import { jsonCopy } from "@/submodules/javascript-functions/general";
+import { MemoIconPencil } from "@/submodules/react-components/components/kern-icons/icons";
 import { Tooltip } from "@nextui-org/react";
-import { IconPencil } from "@tabler/icons-react";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
@@ -92,7 +92,7 @@ export default function ChangeColorModal() {
                     }}
                         className={`inline-flex items-center border rounded-md py-1 px-2 text-sm font-medium shadow-sm text-center cursor-pointer ${modalChangeColor.label.color?.backgroundColor} ${modalChangeColor.label.color?.textColor} ${modalChangeColor.label.color?.borderColor} ${modalChangeColor.label.color?.hoverColor}`}>
                         {modalChangeColor.label.name}
-                        <IconPencil className="h-5 w-5 ml-2" />
+                        <MemoIconPencil className="h-5 w-5 ml-2" />
                     </span>
                 </Tooltip>
             </div>

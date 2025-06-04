@@ -1,8 +1,8 @@
 import { CryptoFieldProps } from "@/src/types/shared/crypted-field";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
+import { MemoIconEye, MemoIconEyeOff } from "@/submodules/react-components/components/kern-icons/icons";
 import { useDefaults } from "@/submodules/react-components/hooks/useDefaults";
 import { Tooltip } from "@nextui-org/react";
-import { IconEye, IconEyeOff } from "@tabler/icons-react";
 import { useRef, useState } from "react";
 
 const DEFAULTS = {
@@ -38,11 +38,11 @@ export default function CryptedField(_props: CryptoFieldProps) {
                 <button onClick={toggleKey} disabled={!key} className="disabled:cursor-not-allowed disabled:opacity-50">
                     {!show ? (
                         <Tooltip content={TOOLTIPS_DICT.GENERAL.SHOW_PASSWORD} color="invert" placement="right">
-                            <IconEye className={`text-gray-500 absolute top-1 right-3 ${!key ? 'cursor-not-allowed opacity-50' : 'cursor-pointer opacity-100'}`} />
+                            <MemoIconEye className={`text-gray-500 absolute top-1 right-3 ${!key ? 'cursor-not-allowed opacity-50' : 'cursor-pointer opacity-100'}`} />
                         </Tooltip>
                     ) : (
                         <Tooltip content={TOOLTIPS_DICT.GENERAL.HIDE_PASSWORD} color="invert" placement="right">
-                            <IconEyeOff className={`text-gray-500 absolute top-1 right-3 ${!key ? 'cursor-not-allowed opacity-50' : 'cursor-pointer opacity-100'}`} />
+                            <MemoIconEyeOff className={`text-gray-500 absolute top-1 right-3 ${!key ? 'cursor-not-allowed opacity-50' : 'cursor-pointer opacity-100'}`} />
                         </Tooltip>
                     )}
                 </button>

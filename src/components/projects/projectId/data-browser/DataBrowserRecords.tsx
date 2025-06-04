@@ -5,7 +5,6 @@ import { ModalEnum } from '@/src/types/shared/modal';
 import { TOOLTIPS_DICT } from '@/src/util/tooltip-constants';
 import { Slice } from '@/submodules/javascript-functions/enums/enums';
 import { Tooltip } from '@nextui-org/react';
-import { IconAdjustments, IconAlertTriangleFilled, IconChartCircles, IconFilter, IconFilterOff, IconTriangleFilled } from '@tabler/icons-react';
 import { useDispatch, useSelector } from 'react-redux';
 import LoadingIcon from '@/submodules/react-components/components/LoadingIcon';
 import { selectVisibleAttributesHeuristics } from '@/src/reduxStore/states/pages/settings';
@@ -19,6 +18,7 @@ import Export from '@/src/components/shared/export/Export';
 import { LabelingLinkType } from '@/src/types/components/projects/projectId/labeling/labeling-main-component';
 import { Fragment, useEffect } from 'react';
 import KernButton from '@/submodules/react-components/components/kern-button/KernButton';
+import { MemoIconAdjustments, MemoIconAlertTriangleFilled, MemoIconChartCircles, MemoIconFilter, MemoIconFilterOff } from '@/submodules/react-components/components/kern-icons/icons';
 
 export default function DataBrowserRecords(props: DataBrowserRecordsProps) {
     const dispatch = useDispatch();
@@ -105,7 +105,7 @@ export default function DataBrowserRecords(props: DataBrowserRecordsProps) {
                         <div className="rounded-md bg-yellow-50 p-2">
                             <div className="flex items-center">
                                 <div className="flex-shrink-0">
-                                    <IconAlertTriangleFilled className="h-5 w-5 text-yellow-400" />
+                                    <MemoIconAlertTriangleFilled className="h-5 w-5 text-yellow-400" />
                                 </div>
                                 {activeSlice?.static ? (<div className="ml-3">
                                     <p className="text-sm font-medium text-yellow-800">Static data slice active. Filter
@@ -122,13 +122,13 @@ export default function DataBrowserRecords(props: DataBrowserRecordsProps) {
                 </div>}
                 {(activeSlice != null || activeSearchParams.length > 0 || similaritySearch.recordsInDisplay) && <KernButton
                     text="Clear filters"
-                    icon={IconFilterOff}
+                    icon={MemoIconFilterOff}
                     onClick={clearFilters}
                     className="mr-1"
                 />}
                 <KernButton
                     text="Configuration"
-                    icon={IconAdjustments}
+                    icon={MemoIconAdjustments}
                     onClick={() => dispatch(openModal(ModalEnum.CONFIGURATION))}
                     className="mr-1"
                     tooltip={TOOLTIPS_DICT.DATA_BROWSER.CONFIGURATION}
@@ -143,12 +143,12 @@ export default function DataBrowserRecords(props: DataBrowserRecordsProps) {
                     <div className="whitespace-pre-line break-all rounded-full items-center py-0.5 px-2.5 text-sm font-medium border border-green-700 bg-green-100 text-green-700 grid grid-cols-2 mr-2"
                         style={{ gridTemplateColumns: 'auto max-content' }}>
                         <div className="flex items-center">
-                            <IconFilter className="h-4 w-4 mr-1" />
+                            <MemoIconFilter className="h-4 w-4 mr-1" />
                             <div className="whitespace-pre-line break-all m-auto">{searchText}</div>
                         </div>
                     </div>
                     {!(i == activeSearchParams.length - 1 && j == searchParam.splittedText.length - 1) && <Tooltip content={TOOLTIPS_DICT.DATA_BROWSER.INTERSECTION} color="invert" placement="top">
-                        <IconChartCircles className="h-4 w-4 mr-1" />
+                        <MemoIconChartCircles className="h-4 w-4 mr-1" />
                     </Tooltip>}
                 </div>))}
             </Fragment>))}

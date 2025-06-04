@@ -25,6 +25,10 @@ export type Embedding = {
     onQdrant?: boolean;
 };
 
+export type EmbeddingWithOnClick = Embedding & {
+    onIconNotesClick?: () => void;
+}
+
 export enum EmbeddingType {
     ON_ATTRIBUTE = "ON_ATTRIBUTE",
     ON_TOKEN = "ON_TOKEN"

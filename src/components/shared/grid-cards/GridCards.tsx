@@ -4,12 +4,12 @@ import { GridCardsProps } from "@/src/types/shared/grid-cards";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
 import { InformationSourceType } from "@/submodules/javascript-functions/enums/enums";
 import { Tooltip } from "@nextui-org/react";
-import { IconArrowRight, IconBolt, IconCode, IconSparkles, IconUsers } from "@tabler/icons-react";
 import { useSelector } from "react-redux";
 import style from '@/src/styles/components/projects/projectId/heuristics/heuristics.module.css';
 import { useRouter } from "next/router";
 import Statuses from "../statuses/Statuses";
 import { toggleHeuristicById } from "@/src/services/base/heuristic";
+import { MemoIconArrowRight, MemoIconBolt, MemoIconCode } from "@/submodules/react-components/components/kern-icons/icons";
 
 export default function GridCards(props: GridCardsProps) {
     const router = useRouter();
@@ -34,10 +34,10 @@ export default function GridCards(props: GridCardsProps) {
                         <input type="checkbox" className="cursor-pointer" name="heuristic-name" checked={heuristic.selected} onChange={() => toggleHeuristic(projectId, heuristic.id)} />
                     </label>
                     {heuristic.informationSourceType === InformationSourceType.LABELING_FUNCTION && <Tooltip content={TOOLTIPS_DICT.HEURISTICS.LABELING_FUNCTION} color="invert" placement="right" className="cursor-auto">
-                        <IconCode size={20} strokeWidth={1.5} />
+                        <MemoIconCode size={20} strokeWidth={1.5} />
                     </Tooltip>}
                     {heuristic.informationSourceType === InformationSourceType.ACTIVE_LEARNING && <Tooltip content={TOOLTIPS_DICT.HEURISTICS.ACTIVE_LEARNING} color="invert" placement="right" className="cursor-auto">
-                        <IconBolt size={20} strokeWidth={1.5} className="fill-gray-800" />
+                        <MemoIconBolt size={20} strokeWidth={1.5} className="fill-gray-800" />
                     </Tooltip>}
                 </div>
 
@@ -48,7 +48,7 @@ export default function GridCards(props: GridCardsProps) {
                             e.preventDefault();
                             router.push(`${heuristic.routerLink}`);
                         }}> Details
-                            <IconArrowRight className="h-5 w-5 inline-block text-green-800" />
+                            <MemoIconArrowRight className="h-5 w-5 inline-block text-green-800" />
                         </a>}
                     </div>
                     <div className="flow-root font-normal">

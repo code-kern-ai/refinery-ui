@@ -15,13 +15,13 @@ import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
 import { downloadByteDataNoStringify } from "@/submodules/javascript-functions/export";
 import { formatBytes } from "@/submodules/javascript-functions/general";
 import { Tooltip } from "@nextui-org/react";
-import { IconDownload, IconInfoCircle, IconLoader } from "@tabler/icons-react";
 import { Fragment, useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { timer } from "rxjs";
 import { Application, CurrentPage, CurrentPageSubKey } from "@/submodules/react-components/hooks/web-socket/constants";
 import { selectOrganizationId } from "@/src/reduxStore/states/general";
 import KernButton from "@/submodules/react-components/components/kern-button/KernButton";
+import { MemoIconDownload, MemoIconInfoCircle } from "@/submodules/react-components/components/kern-icons/icons";
 
 export default function ProjectSnapshotExportModal() {
     const dispatch = useDispatch();
@@ -142,7 +142,7 @@ export default function ProjectSnapshotExportModal() {
                             </div>
                             <div className="flex items-center justify-items-center">
                                 {item.desc && <Tooltip content={item.desc} color="invert" placement="top" className="cursor-auto">
-                                    <IconInfoCircle className="h-6 w-6 text-gray-900" />
+                                    <MemoIconInfoCircle className="h-6 w-6 text-gray-900" />
                                 </Tooltip>}
                             </div>
                             <div className="flex">{item.sizeReadable}</div>
@@ -179,7 +179,7 @@ export default function ProjectSnapshotExportModal() {
                 <KernButton
                     text={projectExportCredentials.downloadFileName}
                     onClick={exportViaFile}
-                    icon={IconDownload}
+                    icon={MemoIconDownload}
                     tooltip={TOOLTIPS_DICT.PROJECT_SETTINGS.LATEST_SNAPSHOT}
                 />
             }

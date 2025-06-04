@@ -8,10 +8,10 @@ import { jsonCopy } from "@/submodules/javascript-functions/general";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import style from "@/src/styles/components/projects/projectId/labeling.module.css";
-import { IconLayoutNavbarCollapse } from "@tabler/icons-react";
 import QuickButtons from "./QuickButtons";
 import HeaderDisplay from "./HeaderDisplay";
 import { selectSettings, setSettings, updateSettings } from "@/src/reduxStore/states/pages/labeling";
+import { MemoIconLayoutNavbarCollapse } from "@/submodules/react-components/components/kern-icons/icons";
 
 export default function LabelingSuiteTaskHeader() {
     const dispatch = useDispatch();
@@ -78,7 +78,7 @@ export default function LabelingSuiteTaskHeader() {
     return (<div id="base-dom-task-header" className="relative bg-white p-4">
         {displayData && displayData.length > 0 ? (<>
             <div className={`absolute top-4 right-4 p-2 cursor-pointer ${settings.task.isCollapsed ? style.rotateTransform : null}`} onClick={toggleIsCollapsed}>
-                <IconLayoutNavbarCollapse size={24} stroke={2} />
+                <MemoIconLayoutNavbarCollapse size={24} stroke={2} />
             </div>
             {settings.task.isCollapsed ? (<div className="flex flex-row flex-wrap gap-x-2">
                 <QuickButtons />

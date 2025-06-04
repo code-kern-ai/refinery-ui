@@ -12,10 +12,10 @@ import { checkDecimalPatterns, getAttributeType, getFilterIntegrationOperatorToo
 import { getColorForDataType } from "@/src/util/components/projects/projectId/settings/data-schema-helper";
 import { extendArrayElementsByUniqueId } from "@/submodules/javascript-functions/id-prep";
 import KernDropdown from "@/submodules/react-components/components/KernDropdown";
-import { IconPlus, IconTrash } from "@tabler/icons-react";
 import { getUniqueValuesByAttributes } from "@/src/services/base/dataSlices";
 import { postProcessUniqueValues } from "@/src/util/components/projects/projectId/data-browser/data-browser-helper";
 import { selectProjectId } from "@/src/reduxStore/states/project";
+import { MemoIconPlus, MemoIconTrash } from "@/submodules/react-components/components/kern-icons/icons";
 
 const ACCEPT_BUTTON = { buttonCaption: 'Save', useButton: true };
 const ABORT_BUTTON = { buttonCaption: 'Reset', useButton: true };
@@ -148,7 +148,7 @@ export default function PlaygroundSearchMetaFilterModal(props: { selectedEmbeddi
                             {filterAttributesForm.length > 1 &&
                                 <div onClick={() => removeFilterAttributesSS(index)}
                                     className="mt-2 cursor-pointer flex justify-center hover:border-transparent hover:bg-transparent border-transparent bg-transparent px-0">
-                                    <IconTrash className="text-gray-900 cursor-pointer h-4 w-4" />
+                                    <MemoIconTrash className="text-gray-900 cursor-pointer h-4 w-4" />
                                 </div>}
                         </div>
                         <div className="flex-grow mr-2.5 flex flex-col  mt-2 ">
@@ -185,7 +185,7 @@ export default function PlaygroundSearchMetaFilterModal(props: { selectedEmbeddi
                         {index == filterAttributesForm.length - 1 &&
                             <span onClick={() => addFilterAttributesSS()}
                                 className="bg-gray-100 text-gray-800 cursor-pointer p-1 rounded-md hover:bg-gray-300">
-                                <IconPlus className="cursor-pointer" />
+                                <MemoIconPlus className="cursor-pointer" />
                             </span>}
                     </div>
                 </div>))}

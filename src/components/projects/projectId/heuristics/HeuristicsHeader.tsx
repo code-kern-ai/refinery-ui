@@ -1,4 +1,3 @@
-import { Loading } from "@nextui-org/react";
 import { selectOrganizationId } from '@/src/reduxStore/states/general';
 import { openModal, selectModal } from '@/src/reduxStore/states/modal';
 import { selectHeuristicsAll, setHeuristicType } from '@/src/reduxStore/states/pages/heuristics';
@@ -13,7 +12,6 @@ import { ACTIONS_DROPDOWN_OPTIONS, NEW_HEURISTICS, checkSelectedHeuristics, post
 import { TOOLTIPS_DICT } from '@/src/util/tooltip-constants';
 import { InformationSourceType } from '@/submodules/javascript-functions/enums/enums';
 import { Tooltip } from '@nextui-org/react';
-import { IconLoader, IconPlus, IconWaveSine } from '@tabler/icons-react';
 import { useRouter } from 'next/router';
 import { useCallback, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -27,6 +25,7 @@ import { Application, CurrentPage } from "@/submodules/react-components/hooks/we
 import KernButton from "@/submodules/react-components/components/kern-button/KernButton";
 import IconButton from "@/submodules/react-components/components/kern-button/IconButton";
 import { ChevronDownIcon } from "@heroicons/react/20/solid";
+import { MemoIconLoader, MemoIconPlus, MemoIconWaveSine } from "@/submodules/react-components/components/kern-icons/icons";
 
 
 export default function HeuristicsHeader(props: HeuristicsHeaderProps) {
@@ -153,7 +152,7 @@ export default function HeuristicsHeader(props: HeuristicsHeaderProps) {
                         localStorage.setItem('openModal', 'true');
                         router.push(`/projects/${projectId}/settings`);
                     }}>
-                        <IconPlus size={20} strokeWidth={1.5} className="text-gray-500 cursor-pointer" />
+                        <MemoIconPlus size={20} strokeWidth={1.5} className="text-gray-500 cursor-pointer" />
                     </button>
                 </Tooltip>
             </div>
@@ -205,14 +204,14 @@ export default function HeuristicsHeader(props: HeuristicsHeaderProps) {
                 <div className="flex justify-center overflow-visible mr-3">
                     {currentWeakSupervisionRun ? (
                         <IconButton
-                            icon={loadingIconWS ? IconLoader : IconWaveSine}
+                            icon={loadingIconWS ? MemoIconLoader : MemoIconWaveSine}
                             tooltip={TOOLTIPS_DICT.HEURISTICS.LAST_WEAK_SUPERVISION_INFO}
                             tooltipPlacement="top"
                             onClick={() => dispatch(openModal(ModalEnum.LAST_WEAK_SUPERVISION_RUN))}
                         />
                     ) : (
                         <IconButton
-                            icon={IconWaveSine}
+                            icon={MemoIconWaveSine}
                             tooltip={TOOLTIPS_DICT.HEURISTICS.LAST_WEAK_SUPERVISION_INFO}
                             tooltipPlacement="top"
                             disabled={true}

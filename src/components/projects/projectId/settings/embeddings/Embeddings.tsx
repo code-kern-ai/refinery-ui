@@ -3,13 +3,12 @@ import { selectOrganizationId } from "@/src/reduxStore/states/general";
 import { openModal, setModalStates } from "@/src/reduxStore/states/modal";
 import { selectAttributes, selectEmbeddings } from "@/src/reduxStore/states/pages/settings";
 import { selectProjectId } from "@/src/reduxStore/states/project";
-import { Embedding, EmbeddingState, EmbeddingType } from "@/src/types/components/projects/projectId/settings/embeddings";
+import { Embedding, EmbeddingState, EmbeddingType, EmbeddingWithOnClick } from "@/src/types/components/projects/projectId/settings/embeddings";
 import { ModalEnum } from "@/src/types/shared/modal";
 import { DATA_TYPES, getColorForDataType } from "@/src/util/components/projects/projectId/settings/data-schema-helper";
 import { Tooltip } from "@nextui-org/react";
-import { IconAlertTriangleFilled, IconArrowAutofitDown, IconCircleCheckFilled, IconNotes, IconPlus, IconTrash, IconMessageCircleSearch } from "@tabler/icons-react";
 import { useRouter } from "next/router";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
 import AddNewEmbeddingModal from "./AddNewEmbeddingModal";
@@ -18,6 +17,7 @@ import DeleteEmbeddingModal from "./DeleteEmbeddingModal";
 import { useWebsocket } from "@/submodules/react-components/hooks/web-socket/useWebsocket";
 import { Application, CurrentPage, CurrentPageSubKey } from "@/submodules/react-components/hooks/web-socket/constants";
 import KernButton from "@/submodules/react-components/components/kern-button/KernButton";
+import { MemoIconAlertTriangleFilled, MemoIconArrowAutofitDown, MemoIconCircleCheckFilled, MemoIconMessageCircleSearch, MemoIconNotes, MemoIconPlus, MemoIconTrash } from "@/submodules/react-components/components/kern-icons/icons";
 
 
 export default function Embeddings(props: { refetchEmbeddings: () => void }) {
@@ -71,6 +71,11 @@ export default function Embeddings(props: { refetchEmbeddings: () => void }) {
     const orgId = useSelector(selectOrganizationId);
     useWebsocket(orgId, Application.REFINERY, CurrentPage.PROJECT_SETTINGS, handleWebsocketNotification, projectId, CurrentPageSubKey.EMBEDDINGS);
 
+
+    const embeddingsFinal = useMemo(() => embeddings.map((embedding) => (
+        { ...embedding, onIconNotesClick: () => embedding.onQdrant ? dispatch(setModalStates(ModalEnum.FILTERED_ATTRIBUTES, { embeddingId: embedding.id, open: true, attributeNames: prepareAttributeDataByNames(embedding.filterAttributes), showEditOption: showEditOption })) : null }
+    )), [embeddings, showEditOption]);
+
     return (<div className="mt-8">
         <div className="text-lg leading-6 text-gray-900 font-medium inline-block w-full">
             <label>Embeddings</label>
@@ -107,7 +112,7 @@ export default function Embeddings(props: { refetchEmbeddings: () => void }) {
                                 </tr>
                             </thead>
                             {!somethingLoading ? <tbody className="divide-y divide-gray-200">
-                                {embeddings.map((embedding: Embedding, index: number) => (
+                                {embeddingsFinal.map((embedding: EmbeddingWithOnClick, index: number) => (
                                     <tr key={embedding.id} className={`${index % 2 != 0 ? 'bg-gray-50' : 'bg-white'}`}>
                                         <td className="whitespace-nowrap text-center px-3 py-2 text-sm text-gray-500">
                                             {embedding.name}
@@ -119,8 +124,11 @@ export default function Embeddings(props: { refetchEmbeddings: () => void }) {
                                                         TOOLTIPS_DICT.PROJECT_SETTINGS.EMBEDDINGS.HAS_FILTER_ATTRIBUTES :
                                                         TOOLTIPS_DICT.PROJECT_SETTINGS.EMBEDDINGS.NO_FILTER_ATTRIBUTES)
                                                 } color="invert" >
-                                                    <IconNotes onClick={() => embedding.onQdrant ? dispatch(setModalStates(ModalEnum.FILTERED_ATTRIBUTES, { embeddingId: embedding.id, open: true, attributeNames: prepareAttributeDataByNames(embedding.filterAttributes), showEditOption: showEditOption })) : null}
-                                                        className={`h-6 w-6 ${embedding.filterAttributes && embedding.filterAttributes.length > 0 ? 'text-gray-700' : 'text-gray-300'} ${embedding.onQdrant ? "" : "cursor-not-allowed opacity-50"}`} />
+                                                    <span onClick={embedding.onIconNotesClick}>
+                                                        <MemoIconNotes
+                                                            className={`h-6 w-6 ${embedding.filterAttributes && embedding.filterAttributes.length > 0 ? 'text-gray-700' : 'text-gray-300'} ${embedding.onQdrant ? "" : "cursor-not-allowed opacity-50"}`} />
+                                                    </span>
+
                                                 </Tooltip>
                                             </td> : <td className="whitespace-nowrap text-center px-3 py-2 text-sm text-gray-500 flex justify-center"><LoadingIcon /></td>}
                                         <td className="whitespace-nowrap text-center px-3 py-2 text-sm text-gray-500">
@@ -139,10 +147,10 @@ export default function Embeddings(props: { refetchEmbeddings: () => void }) {
                                                 <p className="text-xs italic">{embedding.state}</p>
                                             </div>}
                                             {embedding.state == EmbeddingState.FINISHED && <Tooltip content={TOOLTIPS_DICT.GENERAL.SUCCESSFULLY_CREATED} color="invert" className="cursor-auto">
-                                                <IconCircleCheckFilled className="h-6 w-6 text-green-500" />
+                                                <MemoIconCircleCheckFilled className="h-6 w-6 text-green-500" />
                                             </Tooltip>}
                                             {embedding.state == EmbeddingState.FAILED && <Tooltip content={TOOLTIPS_DICT.GENERAL.ERROR} color="invert" className="cursor-auto">
-                                                <IconAlertTriangleFilled className="h-6 w-6 text-red-500" />
+                                                <MemoIconAlertTriangleFilled className="h-6 w-6 text-red-500" />
                                             </Tooltip>}
                                         </td>
                                         <td className="whitespace-nowrap text-center px-3 py-2 text-sm text-gray-500">
@@ -152,7 +160,7 @@ export default function Embeddings(props: { refetchEmbeddings: () => void }) {
                                             {embedding.count}
                                         </td>
                                         <td className="whitespace-nowrap text-center px-3 py-2 text-sm text-gray-500">
-                                            <IconTrash onClick={() => dispatch(setModalStates(ModalEnum.DELETE_EMBEDDING, { embeddingId: embedding.id, open: true, isQueuedElement: embedding.state == EmbeddingState.QUEUED }))}
+                                            <MemoIconTrash onClick={() => dispatch(setModalStates(ModalEnum.DELETE_EMBEDDING, { embeddingId: embedding.id, open: true, isQueuedElement: embedding.state == EmbeddingState.QUEUED }))}
                                                 className="h-6 w-6 text-red-700 cursor-pointer" />
                                         </td>
                                     </tr>
@@ -172,21 +180,21 @@ export default function Embeddings(props: { refetchEmbeddings: () => void }) {
                 <KernButton
                     text="Generate embedding"
                     onClick={() => dispatch(openModal(ModalEnum.ADD_EMBEDDING))}
-                    icon={IconPlus}
+                    icon={MemoIconPlus}
                     tooltip={TOOLTIPS_DICT.PROJECT_SETTINGS.EMBEDDINGS.GENERATE_EMBEDDING}
                     tooltipPlacement="right"
                 />
                 <KernButton
                     text="See downloaded models"
                     onClick={() => router.push('/models-download')}
-                    icon={IconArrowAutofitDown}
+                    icon={MemoIconArrowAutofitDown}
                     tooltip={TOOLTIPS_DICT.PROJECT_SETTINGS.EMBEDDINGS.NAVIGATE_MODELS_DOWNLOADED}
                     tooltipPlacement="right"
                 />
                 <KernButton
                     text="Evaluation"
                     onClick={() => router.push(`/projects/${projectId}/playground`)}
-                    icon={IconMessageCircleSearch}
+                    icon={MemoIconMessageCircleSearch}
                     tooltip={TOOLTIPS_DICT.PROJECT_SETTINGS.EMBEDDINGS.PLAYGROUND}
                     tooltipPlacement="right"
                 />

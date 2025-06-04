@@ -5,9 +5,8 @@ import { BLACKLISTED_TERMS_DROPDOWN_OPTIONS, TERMS_DROPDOWN_OPTIONS, isTermUniqu
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
 import { jsonCopy } from "@/submodules/javascript-functions/general";
 import KernButton from "@/submodules/react-components/components/kern-button/KernButton";
+import { MemoIconCircleCheckFilled, MemoIconCircleMinus } from "@/submodules/react-components/components/kern-icons/icons";
 import KernDropdown from "@/submodules/react-components/components/KernDropdown";
-import { Tooltip } from "@nextui-org/react";
-import { IconCircleCheckFilled, IconCircleMinus } from "@tabler/icons-react";
 import { useRouter } from "next/router";
 import { Fragment, useState } from "react";
 import { useSelector } from "react-redux";
@@ -139,7 +138,7 @@ export default function Terms(props: TermsProps) {
                             </div>
                             <div className="mt-2 flex gap-x-2">
                                 <KernButton
-                                    icon={IconCircleCheckFilled}
+                                    icon={MemoIconCircleCheckFilled}
                                     tooltip={TOOLTIPS_DICT.GENERAL.SUBMIT}
                                     tooltipPlacement="top"
                                     onClick={() => {
@@ -149,7 +148,7 @@ export default function Terms(props: TermsProps) {
                                     }}
                                 />
                                 <KernButton
-                                    icon={IconCircleMinus}
+                                    icon={MemoIconCircleMinus}
                                     tooltip={TOOLTIPS_DICT.GENERAL.CANCEL}
                                     tooltipPlacement="top"
                                     onClick={cancelTermEditor}

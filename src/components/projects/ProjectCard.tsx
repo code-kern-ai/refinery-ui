@@ -1,17 +1,19 @@
 import { selectIsAdmin, selectUser } from "@/src/reduxStore/states/general";
 import { closeModal, setModalStates } from "@/src/reduxStore/states/modal";
 import { removeFromAllProjectsById } from "@/src/reduxStore/states/project";
-import { Project, ProjectCardProps, ProjectStatus } from "@/src/types/components/projects/projects-list";
+import { ProjectCardProps, ProjectStatus } from "@/src/types/components/projects/projects-list";
 import { ModalEnum } from "@/src/types/shared/modal";
 import { isStringTrue } from "@/submodules/javascript-functions/general";
 import { Tooltip } from "@nextui-org/react";
 import { useRouter } from "next/router";
 import { useDispatch, useSelector } from "react-redux";
 import { NOT_AVAILABLE, UNKNOWN_USER } from "@/src/util/constants";
-import { IconArrowRight, IconX } from "@tabler/icons-react";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
 import { deleteProjectPost } from "@/src/services/base/project";
 import ButtonAsText from "@/submodules/react-components/components/kern-button/ButtonAsText";
+import { MemoIconArrowRight, MemoIconX } from "@/submodules/react-components/components/kern-icons/icons";
+import { useCallback } from "react";
+import useRefFor from "@/submodules/react-components/hooks/useRefFor";
 
 export default function ProjectCard(props: ProjectCardProps) {
     const router = useRouter();
@@ -19,20 +21,6 @@ export default function ProjectCard(props: ProjectCardProps) {
 
     const isAdmin = useSelector(selectIsAdmin);
     const user = useSelector(selectUser);
-
-    function adminOpenOrDeleteProject(project: Project) {
-        if (!isAdmin) return;
-        const deleteInstant = isStringTrue(localStorage.getItem("adminInstantDelete"));
-        if (deleteInstant) {
-            deleteProjectPost(project.id, (res) => {
-                dispatch(closeModal(ModalEnum.ADMIN_DELETE_PROJECT));
-                dispatch(removeFromAllProjectsById(project.id));
-            })
-        }
-        else {
-            dispatch(setModalStates(ModalEnum.ADMIN_DELETE_PROJECT, { projectId: project.id, open: true }));
-        }
-    }
 
     function manageProject(): void {
         const projectId = props.project.id;
@@ -46,6 +34,20 @@ export default function ProjectCard(props: ProjectCardProps) {
             router.push(`/projects/${projectId}/labeling`)
         }
     }
+
+    const projectId = useRefFor(props.project.id);
+    const adminOpenOrDeleteProjectFunc = useCallback(() => {
+        if (!isAdmin) return;
+        const deleteInstant = isStringTrue(localStorage.getItem("adminInstantDelete"));
+        if (deleteInstant) {
+            deleteProjectPost(projectId.current, (res) => {
+                dispatch(removeFromAllProjectsById(projectId.current));
+            })
+        }
+        else {
+            dispatch(setModalStates(ModalEnum.ADMIN_DELETE_PROJECT, { projectId: projectId.current, open: true }));
+        }
+    }, []);
 
     return (
         <div key={props.project.id} className="relative card shadow bg-white m-4 rounded-2xl">
@@ -64,9 +66,9 @@ export default function ProjectCard(props: ProjectCardProps) {
                         </>}
                     </div>}
                     {(isAdmin && props.project.status !== ProjectStatus.INIT_SAMPLE_PROJECT) &&
-                        <div className="absolute top-0 left-0 cursor-pointer" onClick={() => adminOpenOrDeleteProject(props.project)}>
+                        <div className="absolute top-0 left-0 cursor-pointer" onClick={adminOpenOrDeleteProjectFunc}>
                             <Tooltip content={TOOLTIPS_DICT.PROJECTS.QUICK_DELETE} color="invert" offset={2} placement="right">
-                                <IconX className="h-6 w-6 text-gray-500" />
+                                <MemoIconX className="h-6 w-6 text-gray-500" />
                             </Tooltip>
                         </div>
                     }
@@ -108,7 +110,7 @@ export default function ProjectCard(props: ProjectCardProps) {
                                     text="Continue project"
                                     onClick={manageProject}
                                     color="green"
-                                    iconRight={IconArrowRight}
+                                    iconRight={MemoIconArrowRight}
                                     iconColor="green"
                                 />
                             }

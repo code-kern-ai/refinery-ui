@@ -2,12 +2,12 @@ import { selectProject, setActiveProject } from "@/src/reduxStore/states/project
 import { updateProjectNameAndDescriptionPost } from "@/src/services/base/project";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
 import { Tooltip } from "@nextui-org/react";
-import { IconWreckingBall } from "@tabler/icons-react";
 import { useRouter } from "next/router";
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { deleteProjectPost } from "@/src/services/base/project";
 import KernButton from "@/submodules/react-components/components/kern-button/KernButton";
+import { MemoIconWreckingBall } from "@/submodules/react-components/components/kern-icons/icons";
 
 export default function ProjectMetaData() {
     const router = useRouter();
@@ -97,7 +97,7 @@ export default function ProjectMetaData() {
                             onClick={deleteProject}
                             disabled={!(projectNameDelete === project.name)}
                             type="button"
-                            icon={IconWreckingBall}
+                            icon={MemoIconWreckingBall}
                             buttonColor="red"
                             iconColor="red"
                         />

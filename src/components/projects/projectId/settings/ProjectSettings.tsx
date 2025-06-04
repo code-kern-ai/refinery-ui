@@ -4,7 +4,6 @@ import { selectProject, setActiveProject } from "@/src/reduxStore/states/project
 import { useCallback, useEffect, useState } from "react";
 import { selectAttributes, selectEmbeddings, setAllAttributes, setAllEmbeddings, setAllRecommendedEncodersDict, setLabelingTasksAll, setRecommendedEncodersAll } from "@/src/reduxStore/states/pages/settings";
 import { timer } from "rxjs";
-import { IconCamera, IconCheck, IconDots, IconPlus, IconUpload } from "@tabler/icons-react";
 import { ModalEnum } from "@/src/types/shared/modal";
 import { openModal, setModalStates } from "@/src/reduxStore/states/modal";
 import { useRouter } from "next/router";
@@ -33,6 +32,7 @@ import { getEmbeddings, getRecommendedEncoders } from "@/src/services/base/embed
 import { getQueuedTasks } from "@/src/services/base/project-setting";
 import { Application, CurrentPage } from "@/submodules/react-components/hooks/web-socket/constants";
 import KernButton from "@/submodules/react-components/components/kern-button/KernButton";
+import { MemoIconCamera, MemoIconCheck, MemoIconDots, MemoIconPlus, MemoIconUpload } from "@/submodules/react-components/components/kern-icons/icons";
 
 export default function ProjectSettings() {
     const dispatch = useDispatch();
@@ -250,7 +250,7 @@ export default function ProjectSettings() {
                         onClick={() => dispatch(openModal(ModalEnum.CREATE_NEW_ATTRIBUTE))}
                         tooltip={TOOLTIPS_DICT.PROJECT_SETTINGS.ADD_NEW_ATTRIBUTE}
                         tooltipPlacement="bottom"
-                        icon={IconPlus}
+                        icon={MemoIconPlus}
                     />
                     <KernButton
                         text="Upload records"
@@ -261,7 +261,7 @@ export default function ProjectSettings() {
                         }}
                         tooltip={isAcRunning ? 'Attribute calculation in progress' : tokenizationProgress < 1 ? 'Tokenization in progress' : 'Upload more records to the project'}
                         tooltipPlacement="right"
-                        icon={IconUpload}
+                        icon={MemoIconUpload}
                     />
                     <Export />
                     <KernButton
@@ -269,7 +269,7 @@ export default function ProjectSettings() {
                         onClick={() => dispatch(openModal(ModalEnum.PROJECT_SNAPSHOT))}
                         tooltip={TOOLTIPS_DICT.PROJECT_SETTINGS.PROJECT_SNAPSHOT}
                         tooltipPlacement="bottom"
-                        icon={IconCamera}
+                        icon={MemoIconCamera}
                     />
                 </div>
                 <div className="text-left lg:text-right flex flex-row items-center justify-end">
@@ -284,11 +284,11 @@ export default function ProjectSettings() {
                             </div>
                         </div>}
                         {tokenizationProgress == 1 && <div className="absolute md:rounded-lg top-0 left-0 right-0 bottom-0 flex flex-row items-center justify-center" style={{ backgroundColor: '#f4f4f5bf' }}>
-                            <IconCheck className="h-4 w-4 text-green-700" />
+                            <MemoIconCheck className="h-4 w-4 text-green-700" />
                             <span className="text-sm font-medium text-green-700">Completed</span>
                         </div>}
                         {tokenizationProgress == -1 && <div className="absolute md:rounded-lg top-0 left-0 right-0 bottom-0 flex flex-row items-center justify-center" style={{ backgroundColor: '#f4f4f5bf' }}>
-                            <IconDots className="h-4 w-4 text-gray-700" />
+                            <MemoIconDots className="h-4 w-4 text-gray-700" />
                             <span className="text-sm font-medium text-gray-700">Queued</span>
                         </div>}
                         {!tokenizationProgress && <div className="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700">

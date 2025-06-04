@@ -4,7 +4,6 @@ import { NavBarTopEditRecordsProps } from "@/src/types/components/projects/proje
 import { ModalEnum } from "@/src/types/shared/modal";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
 import { Tooltip } from "@nextui-org/react";
-import { IconColumns1, IconColumns2, IconColumns3, IconDatabase } from "@tabler/icons-react";
 import { useRouter } from "next/router";
 import { useDispatch, useSelector } from "react-redux";
 import SyncRecordsModal from "./SyncRecordsModal";
@@ -13,6 +12,7 @@ import { scrollElementIntoView } from "@/submodules/javascript-functions/scrollH
 import { jsonCopy } from "@/submodules/javascript-functions/general";
 import ExplainModal from "./ExplainModal";
 import KernButton from "@/submodules/react-components/components/kern-button/KernButton";
+import { MemoIconColumns1, MemoIconColumns2, MemoIconColumns3, MemoIconDatabase } from "@/submodules/react-components/components/kern-icons/icons";
 
 export default function NavBarTopEditRecords(props: NavBarTopEditRecordsProps) {
     const router = useRouter();
@@ -64,14 +64,14 @@ export default function NavBarTopEditRecords(props: NavBarTopEditRecordsProps) {
                         onClick={() => dispatch(setModalStates(ModalEnum.SYNC_RECORDS, { open: true, syncModalAmount: Object.keys(props.erdData.cachedRecordChanges).length }))}
                         tooltip={TOOLTIPS_DICT.EDIT_RECORDS.PERSIST_CHANGES}
                         tooltipPlacement="left"
-                        icon={IconDatabase}
+                        icon={MemoIconDatabase}
                     />
                     <KernButton
                         text="Switch view"
                         onClick={nextColumnClass}
                         tooltip={TOOLTIPS_DICT.EDIT_RECORDS.SWITCH_COLUMN}
                         tooltipPlacement="bottom"
-                        icon={props.erdData.columnClass == 'grid-cols-3' ? IconColumns1 : props.erdData.columnClass == 'grid-cols-1' ? IconColumns2 : IconColumns3}
+                        icon={props.erdData.columnClass == 'grid-cols-3' ? MemoIconColumns1 : props.erdData.columnClass == 'grid-cols-1' ? MemoIconColumns2 : MemoIconColumns3}
                     />
                 </div>
             </div >

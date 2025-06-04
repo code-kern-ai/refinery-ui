@@ -13,8 +13,8 @@ import { filterAttributesSSGroup, getPlaceholderText, prepareAttFilter, prepareF
 import { checkDecimalPatterns, getAttributeType, getFilterIntegrationOperatorTooltip } from "@/src/util/components/projects/projectId/data-browser/search-operators-helper";
 import { getColorForDataType } from "@/src/util/components/projects/projectId/settings/data-schema-helper";
 import { extendArrayElementsByUniqueId } from "@/submodules/javascript-functions/id-prep";
+import { MemoIconPlus, MemoIconTrash } from "@/submodules/react-components/components/kern-icons/icons";
 import KernDropdown from "@/submodules/react-components/components/KernDropdown";
-import { IconPlus, IconTrash } from "@tabler/icons-react";
 import { useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
@@ -169,7 +169,7 @@ export default function SimilaritySearchModal() {
                         {filterAttributesForm.length > 1 &&
                             <div onClick={() => removeFilterAttributesSS(index)}
                                 className="mt-2 cursor-pointer flex justify-center hover:border-transparent hover:bg-transparent border-transparent bg-transparent px-0">
-                                <IconTrash className="text-gray-900 cursor-pointer h-4 w-4" />
+                                <MemoIconTrash className="text-gray-900 cursor-pointer h-4 w-4" />
                             </div>}
                     </div>
                     <div className="flex-grow mr-2.5 flex flex-col  mt-2 ">
@@ -206,7 +206,7 @@ export default function SimilaritySearchModal() {
                     {index == filterAttributesForm.length - 1 &&
                         <span onClick={() => addFilterAttributesSS()}
                             className="bg-gray-100 text-gray-800 cursor-pointer p-1 rounded-md hover:bg-gray-300">
-                            <IconPlus className="cursor-pointer" />
+                            <MemoIconPlus className="cursor-pointer" />
                         </span>}
                 </div>
             </div>))}

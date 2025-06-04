@@ -2,7 +2,6 @@ import { CommentData, CommentMainSectionProps, CommentPosition } from "@/src/typ
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
 import { useLocalStorage } from "@/submodules/react-components/hooks/useLocalStorage";
 import { Tooltip } from "@nextui-org/react";
-import { IconArrowLeft, IconArrowRight, IconX } from "@tabler/icons-react";
 import { useCallback, useEffect, useState } from "react";
 import DisplayComments from "./DisplayComments";
 import { useSelector } from "react-redux";
@@ -13,6 +12,7 @@ import { convertTypeToKey } from "@/src/util/shared/comments-helper";
 import { CommentDataManager } from "@/src/util/classes/comments";
 import { createComment, deleteCommentPost, updateCommentPost } from "@/src/services/base/comment";
 import IconButton from "@/submodules/react-components/components/kern-button/IconButton";
+import { MemoIconArrowLeft, MemoIconArrowRight, MemoIconX } from "@/submodules/react-components/components/kern-icons/icons";
 
 export default function CommentsMainSection(props: CommentMainSectionProps) {
     const comments = useSelector(selectComments);
@@ -136,13 +136,13 @@ export default function CommentsMainSection(props: CommentMainSectionProps) {
                         <div className="flex flex-row items-center px-4 pt-4">
                             {positionComment == CommentPosition.RIGHT ? <Tooltip content={TOOLTIPS_DICT.GENERAL.MOVE_COMMENT_LEFT} color="invert">
                                 <div className='cursor-pointer' onClick={flipCommentPosition}>
-                                    <IconArrowLeft size={24}
+                                    <MemoIconArrowLeft size={24}
                                         strokeWidth={2}
                                         className='text-gray-700 font-semibold cursor-pointer' />
                                 </div>
                             </Tooltip> : <Tooltip content={TOOLTIPS_DICT.GENERAL.MOVE_COMMENT_RIGHT} color="invert">
                                 <div className='cursor-pointer' onClick={flipCommentPosition}>
-                                    <IconArrowRight size={24}
+                                    <MemoIconArrowRight size={24}
                                         strokeWidth={2}
                                         className='text-gray-700 font-semibold cursor-pointer' />
                                 </div>
@@ -154,7 +154,7 @@ export default function CommentsMainSection(props: CommentMainSectionProps) {
                                 </Tooltip>
                             </div>
                             <IconButton
-                                icon={IconX}
+                                icon={MemoIconX}
                                 onClick={props.toggleOpen}
                             />
                         </div>

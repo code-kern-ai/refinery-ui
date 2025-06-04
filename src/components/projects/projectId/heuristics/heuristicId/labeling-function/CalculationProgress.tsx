@@ -3,8 +3,8 @@ import { selectHeuristic } from "@/src/reduxStore/states/pages/heuristics";
 import { Status } from "@/src/types/shared/statuses";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
 import { Tooltip } from "@nextui-org/react";
-import { IconAlertTriangleFilled, IconArrowRight, IconCircleCheckFilled } from "@tabler/icons-react";
 import { useSelector } from "react-redux";
+import { MemoIconAlertTriangleFilled, MemoIconArrowRight, MemoIconCircleCheckFilled } from "@/submodules/react-components/components/kern-icons/icons";
 
 export default function CalculationProgress() {
     const currentHeuristic = useSelector(selectHeuristic);
@@ -20,10 +20,10 @@ export default function CalculationProgress() {
                                 <LoadingIcon />
                             </Tooltip>}
                             {currentHeuristic.lastTask.state == Status.FINISHED && <Tooltip content={TOOLTIPS_DICT.GENERAL.SUCCESSFULLY_CREATED} color="invert" className="cursor-auto mx-2">
-                                <IconCircleCheckFilled className="h-6 w-6 text-green-500" />
+                                <MemoIconCircleCheckFilled className="h-6 w-6 text-green-500" />
                             </Tooltip>}
                             {currentHeuristic.lastTask.state == Status.FAILED && <Tooltip content={TOOLTIPS_DICT.GENERAL.ERROR} color="invert" className="cursor-auto mx-2">
-                                <IconAlertTriangleFilled className="h-6 w-6 text-red-500" />
+                                <MemoIconAlertTriangleFilled className="h-6 w-6 text-red-500" />
                             </Tooltip>}
                             {currentHeuristic.lastTask.state === Status.CREATED ? (<>
                                 <div className="text-sm leading-5 font-normal text-gray-500">run#{currentHeuristic.lastTask.iteration}</div>
@@ -36,7 +36,7 @@ export default function CalculationProgress() {
                             </>) : (<><div className="text-sm leading-5 font-normal text-gray-500">run#{currentHeuristic.lastTask.iteration}</div>
                                 {currentHeuristic.lastTask.durationText && <Tooltip content={TOOLTIPS_DICT.LABELING_FUNCTION.EXECUTION_TIME} color="invert" placement="top" className="cursor-auto">
                                     <div className="text-sm leading-5 font-normal text-gray-500 ml-2 select-none flex items-center">
-                                        <IconArrowRight className="h-4 w-4 text-gray-500" />
+                                        <MemoIconArrowRight className="h-4 w-4 text-gray-500" />
                                         <span className="ml-2">{currentHeuristic.lastTask.durationText}</span>
                                     </div>
                                 </Tooltip>}
