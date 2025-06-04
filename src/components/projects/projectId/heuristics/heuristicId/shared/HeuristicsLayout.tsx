@@ -1,7 +1,7 @@
 import Statuses from "@/src/components/shared/statuses/Statuses";
 import { selectHeuristic, setActiveHeuristics, updateHeuristicsState } from "@/src/reduxStore/states/pages/heuristics";
 import { selectAllLookupLists, setAllLookupLists } from "@/src/reduxStore/states/pages/lookup-lists";
-import { selectVisibleAttributesHeuristics, setAllAttributes } from "@/src/reduxStore/states/pages/settings";
+import { selectVisibleAttributesHeuristics, selectVisibleAttributesWithoutPermissions, setAllAttributes } from "@/src/reduxStore/states/pages/settings";
 import { selectProjectId } from "@/src/reduxStore/states/project"
 import { HeuristicsProperty } from "@/src/types/components/projects/projectId/heuristics/heuristicId/heuristics-details";
 import { Attribute } from "@/src/types/components/projects/projectId/settings/data-schema";
@@ -26,7 +26,7 @@ export default function HeuristicsLayout(props: any) {
 
     const projectId = useSelector(selectProjectId);
     const currentHeuristic = useSelector(selectHeuristic);
-    const usableAttributes = useSelector(selectVisibleAttributesHeuristics);
+    const usableAttributes = useSelector(selectVisibleAttributesWithoutPermissions);
     const lookupLists = useSelector(selectAllLookupLists);
 
     const [isHeaderNormal, setIsHeaderNormal] = useState(true);
