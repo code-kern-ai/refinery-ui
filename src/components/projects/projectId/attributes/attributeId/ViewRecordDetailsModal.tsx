@@ -24,10 +24,10 @@ export default function ViewRecordDetailsModal(props: ViewRecordDetailsModalProp
                     <div className="text-sm leading-5 text-left text-gray-900 font-medium">Calculated value</div>
                     <div className="text-sm leading-5 text-left text-gray-500 font-normal whitespace-pre-line">
                         {props.currentAttribute.dataType != DataTypeEnum.EMBEDDING_LIST ? <span>
-                            {props.sampleRecords.calculatedAttributes[modalViewRecordDetails.recordIdx]}
+                            {props.sampleRecords[modalViewRecordDetails.recordIdx].calculatedValue.value}
                         </span> : <div className="flex flex-col gap-y-2 divide-y">
-                            {props.sampleRecords.calculatedAttributesListDisplay[modalViewRecordDetails.recordIdx].map((item: any) => <span key={item.id} className="mt-1">
-                                {props.sampleRecords.calculatedAttributesList[modalViewRecordDetails.recordIdx]}
+                            {props.sampleRecords[modalViewRecordDetails.recordIdx].calculatedValue.value.map((item: any) => <span key={item} className="mt-1">
+                                {item}
                             </span>)}
                         </div>}
                     </div>

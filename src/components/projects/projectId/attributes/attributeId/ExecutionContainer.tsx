@@ -74,10 +74,12 @@ export default function ExecutionContainer(props: ExecutionContainerProps) {
 
     const sampleRecordsFinal = useMemo(() => {
         if (sampleRecords && sampleRecords.calculatedAttributesDisplay) {
-            return sampleRecords.calculatedAttributesDisplay.map((record: any) => {
+            return sampleRecords.calculatedAttributesDisplay.map((record: any, index) => {
+                const calculatedValue = currentAttributesRef.current.dataType != DataTypeEnum.EMBEDDING_LIST ? record : { id: record.id, value: JSON.parse(record.value) }
                 return {
                     ...record,
-                    onClick: viewRecordDetails(record.id)
+                    onClick: viewRecordDetails(index),
+                    calculatedValue: calculatedValue
                 }
             }
             );
@@ -130,7 +132,7 @@ export default function ExecutionContainer(props: ExecutionContainerProps) {
                 <div className="inline-block min-w-full align-middle">
                     <div className="overflow-hidden shadow ring-1 ring-black ring-opacity-5 md:rounded-lg">
                         <div className="min-w-full border divide-y divide-gray-300">
-                            {sampleRecordsFinal.map((record: any, index: number) => (
+                            {sampleRecordsFinal.map((record: any) => (
                                 <div key={record.id} className="divide-y divide-gray-200 bg-white">
                                     <div className="flex-shrink-0 border-b border-gray-200 shadow-sm flex justify-between items-center">
                                         <div className="flex items-center text-xs leading-5 text-gray-500 font-normal mx-4 my-3 text-justify">
@@ -151,7 +153,7 @@ export default function ExecutionContainer(props: ExecutionContainerProps) {
             </div>
         </div >}
 
-        <ViewRecordDetailsModal currentAttribute={props.currentAttribute} sampleRecords={sampleRecords} />
+        <ViewRecordDetailsModal currentAttribute={props.currentAttribute} sampleRecords={sampleRecordsFinal} />
         <ConfirmExecutionModal currentAttributeId={props.currentAttribute.id} />
     </div >)
 }
