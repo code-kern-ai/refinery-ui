@@ -1,6 +1,6 @@
 import Statuses from "@/src/components/shared/statuses/Statuses";
 import { selectAllLookupLists, setAllLookupLists } from "@/src/reduxStore/states/pages/lookup-lists";
-import { selectAttributes, selectVisibleAttributeAC, setAllAttributes, setLabelingTasksAll, updateAttributeById } from "@/src/reduxStore/states/pages/settings";
+import { selectAttributes, selectVisibleAttributeAC, selectVisibleAttributesWithoutPermissions, setAllAttributes, setLabelingTasksAll, updateAttributeById } from "@/src/reduxStore/states/pages/settings";
 import { selectProjectId } from "@/src/reduxStore/states/project"
 import { Attribute, AttributeState, AttributeVisibility, AttributeWithOnClick, LLMConfig } from "@/src/types/components/projects/projectId/settings/data-schema";
 import { DataTypeEnum } from "@/src/types/shared/general";
@@ -52,7 +52,7 @@ export default function AttributeCalculation() {
 
     const projectId = useSelector(selectProjectId);
     const attributes = useSelector(selectAttributes);
-    const usableAttributes = useSelector(selectVisibleAttributeAC)
+    const usableAttributes = useSelector(selectVisibleAttributesWithoutPermissions);
     const lookupLists = useSelector(selectAllLookupLists);
     const allUsers = useSelector(selectAllUsers);
 

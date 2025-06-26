@@ -148,6 +148,7 @@ export const selectVisibleAttributesDataBrowser = createSelector([selectUsableAt
 export const selectVisibleAttributeAC = createSelector([selectUsableAttributesFiltered], (a): any => a ? a.filter((a) => a.visibility != AttributeVisibility.HIDE) : null);
 export const selectVisibleAttributesHeuristics = createSelector([selectUsableAttributesFiltered], (a): any => a ? a.filter((a) => a.visibility != AttributeVisibility.HIDE) : null);
 export const selectOnAttributeEmbeddings = createSelector([selectEmbeddings], (a): any => a ? a.filter((embedding) => embedding.type == EmbeddingType.ON_ATTRIBUTE && embedding.state == Status.FINISHED) : null);
+export const selectVisibleAttributesWithoutPermissions = createSelector([selectUsableAttributesFiltered], (a): any => a ? a.filter((a) => a.dataType != DataTypeEnum.PERMISSION) : null);
 
 export const { setAllAttributes, extendAllAttributes, removeFromAllAttributesById, updateAttributeById, setAllEmbeddings, setFilteredEmbeddings, removeFromAllEmbeddingsById, setAllRecommendedEncodersDict, setRecommendedEncodersAll, setLabelingTasksAll, removeFromAllLabelingTasksById, removeLabelFromLabelingTask } = settingsSlice.actions;
 export const settingsReducer = settingsSlice.reducer;

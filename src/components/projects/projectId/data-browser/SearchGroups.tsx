@@ -85,6 +85,7 @@ export default function SearchGroups() {
         });
         colors.push('gray');
         visibleAttributes.forEach((att) => {
+            if (att.dataType == DataTypeEnum.PERMISSION) return;
             attributesSort.push({
                 name: att.name,
                 key: att.id,
