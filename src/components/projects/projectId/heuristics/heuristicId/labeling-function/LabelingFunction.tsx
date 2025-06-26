@@ -8,7 +8,7 @@ import { postProcessCurrentHeuristic, postProcessLastTaskLogs } from "@/src/util
 import { Tooltip } from "@nextui-org/react";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
 import { postProcessLabelingTasksSchema } from "@/src/util/components/projects/projectId/settings/labeling-tasks-helper";
-import { selectVisibleAttributesHeuristics, selectLabelingTasksAll, setLabelingTasksAll } from "@/src/reduxStore/states/pages/settings";
+import { selectVisibleAttributesHeuristics, selectLabelingTasksAll, setLabelingTasksAll, selectVisibleAttributesWithoutPermissions } from "@/src/reduxStore/states/pages/settings";
 import HeuristicsEditor from "../shared/HeuristicsEditor";
 import DangerZone from "@/src/components/shared/danger-zone/DangerZone";
 import HeuristicRunButtons from "../shared/HeuristicRunButtons";
@@ -46,7 +46,7 @@ export default function LabelingFunction() {
     const projectId = useSelector(selectProjectId);
     const currentHeuristic = useSelector(selectHeuristic);
     const labelingTasks = useSelector(selectLabelingTasksAll);
-    const attributes = useSelector(selectVisibleAttributesHeuristics);
+    const attributes = useSelector(selectVisibleAttributesWithoutPermissions);
     const allUsers = useSelector(selectAllUsers);
 
     const [lastTaskLogs, setLastTaskLogs] = useState<string[]>([]);

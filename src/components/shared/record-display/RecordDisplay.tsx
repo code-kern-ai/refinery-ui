@@ -3,11 +3,11 @@ import { selectAttributesDict } from "@/src/reduxStore/states/pages/settings";
 import { LineBreaksType } from "@/src/types/components/projects/projectId/data-browser/data-browser";
 import { Attribute } from "@/src/types/components/projects/projectId/settings/data-schema";
 import { DataTypeEnum } from "@/src/types/shared/general";
-import { postProcessAttributes, postProcessRecord } from "@/src/util/shared/record-display-helper";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import Highlight from "../highlight/Highlight";
 import { MemoIconAlertCircle } from "@/submodules/react-components/components/kern-icons/icons";
+import { postProcessAttributes, postProcessRecord } from "@/submodules/javascript-functions/post-process-functions";
 
 export function RecordDisplay(props: any) {
     const attributesDict = useSelector(selectAttributesDict);
@@ -33,8 +33,8 @@ export function RecordDisplay(props: any) {
                 </div>
             </div>
             {attributesDict[attribute.id] && <div className="text-gray-800 text-sm mb-4 overflow-anywhere flex text-left">
-                {attribute.dataType == DataTypeEnum.EMBEDDING_LIST ? (<div className="flex flex-col gap-y-1 divide-y">
-                    {preparedRecord.data[attributesDict[attribute.key].name] && preparedRecord.data[attributesDict[attribute.key].name].map((item, indexJ) => (<div key={indexJ} className="pt-1">
+                {attribute.dataType === DataTypeEnum.EMBEDDING_LIST || attribute.dataType === DataTypeEnum.PERMISSION ? (<div className="flex flex-col gap-y-1 divide-y">
+                    {preparedRecord.data[attributesDict[attribute.key].name] ? preparedRecord.data[attributesDict[attribute.key].name].map((item, indexJ) => (<div key={indexJ} className="pt-1">
                         {(configuration.highlightText && isTextHighlightNeeded[attribute.key]) ? (<Highlight text={item.toString()}
                             additionalClasses={[configuration.lineBreaks == LineBreaksType.NORMAL ? '' : (configuration.lineBreaks == LineBreaksType.IS_PRE_WRAP ? 'whitespace-pre-wrap' : 'whitespace-pre-line')]}
                             searchForExtended={textHighlight[attribute.id]} />) : (
@@ -42,7 +42,7 @@ export function RecordDisplay(props: any) {
                                 {item != null && item !== '' ? item : <NotPresentInRecord />}
                             </span>
                         )}
-                    </div>))}
+                    </div>)) : <NotPresentInRecord />}
                 </div>) : (<>
                     {(configuration.highlightText && isTextHighlightNeeded[attribute.key]) ? (<Highlight text={preparedRecord.data[attributesDict[attribute.key].name]?.toString()}
                         additionalClasses={[configuration.lineBreaks == LineBreaksType.NORMAL ? '' : (configuration.lineBreaks == LineBreaksType.IS_PRE_WRAP ? 'whitespace-pre-wrap' : 'whitespace-pre-line')]}
