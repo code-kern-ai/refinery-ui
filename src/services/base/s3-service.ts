@@ -44,7 +44,6 @@ export function uploadFile(credentialsAndUploadIdParsed: any, file: File, filena
 }
 
 export function downloadFile(credentialBlock: any, isStringData: boolean = true): any {
-    console.log(credentialBlock)
     const credentials = credentialBlock["Credentials"];
     const object = credentialBlock["objectName"];
     const bucket = credentialBlock["bucket"];

@@ -1,4 +1,4 @@
-FROM kernai/refinery-parent-images:v1.23.0-next
+FROM node:18
 
 WORKDIR /app
 
