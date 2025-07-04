@@ -85,6 +85,9 @@ export default function ProjectMetaData() {
             <div className="text-gray-900 text-lg leading-6 font-medium">Danger zone</div>
             <div className="text-sm leading-5 font-normal mt-2 text-gray-500 inline-block">This action can not be reversed.
                 Are you sure you want to delete this project?</div>
+            {project.is_integration_project && <div className="text-sm text-red-500 italic">
+                This is an integration project, please do not delete it unless the integration is deleted
+            </div>}
             <div className="form-control">
                 <div className="flex space-x-2 items-center">
                     <input className="h-9 w-full text-sm border-gray-300 rounded-md placeholder-italic border text-gray-900 pl-4 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100"

@@ -12,7 +12,7 @@ import { toPythonFunctionName } from "@/submodules/javascript-functions/python-f
 import KernDropdown from "@/submodules/react-components/components/KernDropdown";
 import { Tooltip } from "@nextui-org/react";
 import { useRouter } from "next/router";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
 const ACCEPT_BUTTON = { buttonCaption: "Accept", useButton: true, disabled: true }
@@ -58,6 +58,10 @@ export default function CreateNewAttributeModal() {
         setDuplicateNameExists(checkName);
     }
 
+    const filteredDataTypes = useMemo(() => {
+        return DATA_TYPES.filter(type => type.value !== 'PERMISSION');
+    }, []);
+
     return (<Modal modalName={ModalEnum.CREATE_NEW_ATTRIBUTE} acceptButton={acceptButton}>
         <div className="flex flex-grow justify-center text-lg leading-6 text-gray-900 font-medium">
             Add new attribute </div>
@@ -73,7 +77,7 @@ export default function CreateNewAttributeModal() {
             <Tooltip content={TOOLTIPS_DICT.PROJECT_SETTINGS.SELECT_ATTRIBUTE_TYPE} color="invert" placement="right">
                 <span className="cursor-help card-title mb-0 label-text font-normal"><span className="underline filtersUnderline">Attribute type</span></span>
             </Tooltip>
-            <KernDropdown buttonName={attributeType ? attributeType.name : 'Select type'} options={DATA_TYPES} selectedOption={(option: any) => setAttributeType(option)} />
+            <KernDropdown buttonName={attributeType ? attributeType.name : 'Select type'} options={filteredDataTypes} selectedOption={(option: any) => setAttributeType(option)} />
         </div>
         {duplicateNameExists && <div className="text-red-700 text-xs mt-2">Attribute name exists</div>}
         {attributeType.name == 'Embedding List' && <div className="border border-gray-300 text-xs text-gray-500 p-2.5 rounded-lg text-justify mt-2 max-w-2xl">

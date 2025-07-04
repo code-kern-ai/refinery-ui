@@ -15,6 +15,7 @@ export type SampleRecord = {
     calculatedAttributesList: any[];
     calculatedAttributesDisplay: any[];
     calculatedAttributesListDisplay: any[];
+    id: number;
 };
 
 export type ContainerLogsProps = {
@@ -31,7 +32,7 @@ export type Record = {
 
 export type ViewRecordDetailsModalProps = {
     currentAttribute: Attribute;
-    sampleRecords: SampleRecord;
+    sampleRecords: any;
 }
 
 export type ConfirmExecutionModalProps = {

@@ -15,6 +15,7 @@ import { useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import QuestionHistory from "./QuestionHistory";
 import { MemoIconPlus, MemoIconWand } from "@/submodules/react-components/components/kern-icons/icons";
+import { postProcessUpdateAndSortRecords } from "@/submodules/javascript-functions/post-process-functions";
 
 const ACCEPT_BUTTON = { buttonCaption: 'Create', useButton: true };
 const SEARCH_REQUEST = { offset: 0, limit: 20 };
@@ -129,16 +130,7 @@ export default function CreateEvaluationSetModal(props: CreateEvaluationSetsModa
     }
 
     function updateAndSortRecordList(newRecords = []) {
-        setRecordList((prev) => {
-            const merged = [...prev, ...newRecords];
-            const uniqueRecords = Array.from(
-                new Map(merged.map((item) => [item.data?.running_id, item])).values()
-            );
-            uniqueRecords.sort(
-                (a, b) => (a.data?.running_id || 0) - (b.data?.running_id || 0)
-            );
-            return uniqueRecords;
-        });
+        setRecordList((prev) => postProcessUpdateAndSortRecords(prev, newRecords));
     }
 
     function resetState() {

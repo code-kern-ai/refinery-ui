@@ -10,6 +10,7 @@ export const DATA_TYPES = [
     { name: 'Boolean', value: 'BOOLEAN' },
     { name: 'Embedding List', value: 'EMBEDDING_LIST' },
     { name: 'LLM Response', value: 'LLM_RESPONSE' },
+    { name: 'Permission', value: 'PERMISSION' },
 ];
 
 export const ATTRIBUTES_VISIBILITY_STATES = [

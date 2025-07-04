@@ -14,6 +14,7 @@ export type Project = {
     timeStamp: string;
     date: string;
     time: string
+    is_integration_project: boolean;
 }
 
 export enum ProjectStatus {
