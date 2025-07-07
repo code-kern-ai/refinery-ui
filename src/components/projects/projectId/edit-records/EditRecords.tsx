@@ -89,6 +89,7 @@ export default function EditRecords() {
                         }} id={record.id == erdData.data.selectedRecordId ? 'flash-it' : null}>
                         <div className="px-4 py-5 sm:p-6">
                             {erdData.data.attributes.map((attribute) => (<Fragment key={attribute.id}>
+
                                 <div>
                                     <div className="font-semibold text-sm text-gray-800">
                                         <div className="flex flex-row items-center">
@@ -98,26 +99,32 @@ export default function EditRecords() {
                                     <div className="text-gray-800 text-sm mb-4 overflow-anywhere flex">
                                         {attribute.dataType == DataTypeEnum.EMBEDDING_LIST ? (<div className="flex flex-col gap-y-1 divide-y w-full">
                                             {record.data[attribute.name].map((item, subKey) => (<div key={subKey} className="pt-1">
-                                                {(record.id == erdData.editRecordId && !attribute.isPrimaryKey) ? <EditField attribute={attribute} record={record} subKey={subKey} erdData={erdData} setErdData={(erdData) => setErdData(erdData)} /> : <>
-                                                    {item != null && item !== '' ? (<span className="whitespace-pre-wrap">
-                                                        <span>{item}</span>
-                                                    </span>) : (<NotPresentInRecord />)}
-                                                </>}
+                                                {(record.id == erdData.editRecordId && !attribute.isPrimaryKey) ?
+                                                    <EditField attribute={attribute} record={record} subKey={subKey} erdData={erdData} setErdData={(erdData) => setErdData(erdData)} /> : <>
+                                                        {item != null && item !== '' ? (<span className="whitespace-pre-wrap" style={{ wordBreak: 'break-word' }}>
+                                                            <span>{item}</span>
+                                                        </span>) : (<NotPresentInRecord />)}
+                                                    </>}
                                             </div>))}
-                                        </div>) : (<>
-                                            {(record.id == erdData.editRecordId && !attribute.isPrimaryKey) ? <EditField attribute={attribute} record={record} erdData={erdData} setErdData={(erdData) => setErdData(erdData)} /> : <>
-                                                {record.data[attribute.name] != null && record.data[attribute.name] !== '' ? (<span className="whitespace-pre-wrap relative">
-                                                    <span>{`${record.data[attribute.name]}`}</span>
-                                                    {erdData.cachedRecordChanges[buildAccessKey(record.id, attribute.name)] && <div className="absolute -left-5 top-0 text-yellow-500">
-                                                        <Tooltip content={TOOLTIPS_DICT.EDIT_RECORDS.CACHED_VALUES} color="invert" placement="right" className="cursor-auto">
-                                                            <MemoIconAlertTriangleFilled size={16} stroke={2} />
-                                                        </Tooltip>
-                                                    </div>}
-                                                </span>) : <NotPresentInRecord />}
-                                            </>}
-                                        </>)}
+                                        </div>) :
+                                            attribute.dataType == DataTypeEnum.PERMISSION ? <span className="font-dmMono">Permissions are not editable</span> :
+                                                (
+                                                    <>
+                                                        {(record.id == erdData.editRecordId && !attribute.isPrimaryKey) ? <EditField attribute={attribute} record={record} erdData={erdData} setErdData={(erdData) => setErdData(erdData)} /> : <>
+                                                            {record.data[attribute.name] != null && record.data[attribute.name] !== '' ? (<span className="whitespace-pre-wrap relative" style={{ wordBreak: 'break-word' }}>
+                                                                <span>{`${record.data[attribute.name]}`}</span>
+                                                                {erdData.cachedRecordChanges[buildAccessKey(record.id, attribute.name)] && <div className="absolute -left-5 top-0 text-yellow-500">
+                                                                    <Tooltip content={TOOLTIPS_DICT.EDIT_RECORDS.CACHED_VALUES} color="invert" placement="right" className="cursor-auto">
+                                                                        <MemoIconAlertTriangleFilled size={16} stroke={2} />
+                                                                    </Tooltip>
+                                                                </div>}
+                                                            </span>) : <NotPresentInRecord />}
+                                                        </>}
+                                                    </>)}
+
                                     </div>
                                 </div>
+
                             </Fragment>))}
                             <div className="absolute top-2 right-2 flex flex-row flex-nowrap items-center gap-x-2">
                                 {record.rla_data && <Tooltip content={TOOLTIPS_DICT.EDIT_RECORDS.LABEL_ASSOCIATIONS} color="invert" placement="left" className="cursor-auto">

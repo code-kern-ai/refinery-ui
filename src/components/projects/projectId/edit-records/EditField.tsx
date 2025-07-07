@@ -4,13 +4,14 @@ import { DataTypeEnum } from "@/src/types/shared/general";
 import { ModalEnum } from "@/src/types/shared/modal";
 import { buildAccessKey } from "@/src/util/components/projects/projectId/edit-records-helper";
 import { jsonCopy } from "@/submodules/javascript-functions/general";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useDispatch } from "react-redux";
 
 export default function EditField(props: EditFieldProps) {
     const dispatch = useDispatch();
 
-    const [inputValue, setInputValue] = useState(props.record.data[props.attribute.name]);
+
+    const [inputValue, setInputValue] = useState(null);
 
     const inputRef = useRef(null);
 
@@ -66,6 +67,14 @@ export default function EditField(props: EditFieldProps) {
             inputRef.current.style.overflowY = overflowStyle;
         }
     }
+
+    useEffect(() => {
+        if (props.subKey == undefined) setInputValue(props.record.data[props.attribute.name]);
+        else setInputValue(props.record.data[props.attribute.name][props.subKey]);
+    }, [props.record.data[props.attribute.name], props.subKey]);
+
+    if (!inputValue) return null;
+
 
     return (<>
         {(props.attribute.dataType == DataTypeEnum.TEXT || props.attribute.dataType == DataTypeEnum.LLM_RESPONSE) &&
