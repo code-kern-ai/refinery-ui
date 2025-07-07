@@ -65,7 +65,7 @@ export default function ProjectCard(props: ProjectCardProps) {
                             <span className="text-sm text-gray-900 ">{props.project.time}</span>
                         </>}
                     </div>}
-                    {props.project.is_integration_project && <div className="absolute bottom-0 left-2/4 flex flex-row flex-nowrap gap-x-1 bg-gray-100 px-1 rounded-br rounded-bl" style={{ 'transform': 'translate(-50%' }}>
+                    {props.project.isIntegrationProject && <div className="absolute bottom-0 left-2/4 flex flex-row flex-nowrap gap-x-1 bg-gray-100 px-1 rounded-br rounded-bl" style={{ 'transform': 'translate(-50%' }}>
                         <span className="text-sm text-red-500">This is an integration project, please do not delete it unless the integration is deleted</span>
                     </div>}
                     {(isAdmin && props.project.status !== ProjectStatus.INIT_SAMPLE_PROJECT) &&
