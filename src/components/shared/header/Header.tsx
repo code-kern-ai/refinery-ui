@@ -64,7 +64,6 @@ export default function Header() {
             });
         });
     }
-
     return (
         <header className="sticky top-0 z-50 w-full">
             <div className="relative z-10 flex-shrink-0 h-16 bg-white border-b border-gray-200 shadow-sm flex justify-between items-center">
@@ -92,7 +91,7 @@ export default function Header() {
                             </Tooltip>
                         </a>
                     </div>
-                    {(user?.role == UserRole.ENGINEER) ? (
+                    {(organizationInactive !== true && user?.role == UserRole.ENGINEER) ? (
                         <div className="flex items-center justify-center">
                             <a href="/refinery/users" onClick={(e: any) => { e.preventDefault(); dispatch(setProjectIdSampleProject(null)); router.push(`/users`) }}
                                 className="flex mr-6">
@@ -105,7 +104,7 @@ export default function Header() {
                     <div className="flex items-center justify-center">
                         {displayComments && <Comments />}
                     </div>
-                    {user?.role == UserRole.ENGINEER && <div className="flex items-center justify-center">
+                    {organizationInactive !== true && user?.role == UserRole.ENGINEER && <div className="flex items-center justify-center">
                         <button className="flex mr-6 cursor-pointer" onClick={openModalAndRefetchNotifications}>
                             <Tooltip content={TOOLTIPS_DICT.GENERAL.NOTIFICATION_CENTER} placement="bottom" color="invert">
                                 <MemoIconBell className="w-6 h-6" />

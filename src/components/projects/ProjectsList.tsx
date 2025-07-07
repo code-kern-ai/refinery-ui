@@ -44,6 +44,8 @@ export default function ProjectsList() {
         if (!organizationInactive) {
             refetchProjectsAndPostProcess();
             refetchStatsAndPostProcess();
+        } else {
+            setDataLoaded(true);
         }
     }, [organizationInactive, user]);
 
@@ -70,7 +72,6 @@ export default function ProjectsList() {
 
     const orgId = useSelector(selectOrganizationId);
     useWebsocket(orgId, Application.REFINERY, CurrentPage.PROJECTS, handleWebsocketNotification);
-
     return (
         <div>
             {dataLoaded ? (<>
