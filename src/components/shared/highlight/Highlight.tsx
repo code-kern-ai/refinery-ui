@@ -45,9 +45,9 @@ export default function Highlight(props: any) {
         setParts(extendArrayElementsByUniqueId(rebuildText(props.text, finalRegEx)));
     }, [finalRegEx, props.text]);
 
-    return (<span>
+    return (<pre className="text-left text-sm">
         {parts && parts.map((part, index) => (<span key={part.id} className={`${part.isMatch ? highlightClass : null} ${addClassString}`}>
             {part.text}
         </span>))}
-    </span>)
+    </pre>)
 }
