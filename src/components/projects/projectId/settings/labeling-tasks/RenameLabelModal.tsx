@@ -63,8 +63,8 @@ export default function RenameLabelModal() {
             const renameLabelDataCopy = { ...renameLabelData };
             result.warnings.forEach(e => {
                 e.open = false;
-                e.oldParsed = LabelHelper.prepareSourceCode(e.old, e.information_source_name);
-                e.newParsed = LabelHelper.prepareSourceCode(e.new, e.information_source_name);
+                e.oldParsed = LabelHelper.prepareSourceCode(e.old, e.informationSourceName);
+                e.newParsed = LabelHelper.prepareSourceCode(e.new, e.informationSourceName);
             });
             renameLabelDataCopy.checkResults = result;
             setRenameLabelData(renameLabelDataCopy);
