@@ -45,7 +45,7 @@ export default function ProjectMetaData() {
     }, []);
 
     const isIntegrationProject = useMemo(() => {
-        return allProjects && allProjects.some(p => p.id === project.id && p.isIntegrationProject);
+        return allProjects && allProjects.find(p => p.id === project.id)?.isIntegrationProject;
     }, [allProjects, project.id]);
 
     return (<div>
