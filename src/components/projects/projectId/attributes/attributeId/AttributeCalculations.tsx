@@ -332,7 +332,7 @@ export default function AttributeCalculation() {
 
     return (projectId && <div className={`bg-white p-4 overflow-y-auto min-h-full h-[calc(100vh-4rem)]`} onScroll={(e: any) => onScrollEvent(e)}>
         {currentAttribute && <div>
-            <div className={`sticky z-50 h-12 ${isHeaderNormal ? 'top-1' : '-top-5'}`}>
+            <div className={`sticky z-40 h-12 ${isHeaderNormal ? 'top-1' : '-top-5'}`}>
                 <div className={`bg-white flex-grow ${isHeaderNormal ? '' : 'shadow'}`}>
                     <div className={`flex-row justify-start items-center inline-block ${isHeaderNormal ? 'p-0' : 'flex py-2'}`} style={{ transition: 'all .25s ease-in-out' }}>
                         <a href={`/refinery/projects/${projectId}/settings`} onClick={goBack} className="text-green-800 text-sm font-medium">

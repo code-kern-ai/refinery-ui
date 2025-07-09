@@ -63,8 +63,8 @@ export default function RenameLabelModal() {
             const renameLabelDataCopy = { ...renameLabelData };
             result.warnings.forEach(e => {
                 e.open = false;
-                e.oldParsed = LabelHelper.prepareSourceCode(e.old, e.information_source_name);
-                e.newParsed = LabelHelper.prepareSourceCode(e.new, e.information_source_name);
+                e.oldParsed = LabelHelper.prepareSourceCode(e.old, e.informationSourceName);
+                e.newParsed = LabelHelper.prepareSourceCode(e.new, e.informationSourceName);
             });
             renameLabelDataCopy.checkResults = result;
             setRenameLabelData(renameLabelDataCopy);
@@ -172,16 +172,10 @@ export default function RenameLabelModal() {
                                             <span className="text-sm">{warning.new}</span>
                                         </div></div>}
                                     {warning.key == 'HEURISTIC' && <div className="flex flex-col gap-y-2">
-                                        <span className="text-sm">
-                                            <Tooltip content={TOOLTIPS_DICT.PROJECT_SETTINGS.LABELING_TASK.OPEN_HEURISTICS} placement="right" color="invert">
-                                                <a href={'../heuristics/' + warning.id} target="_blank"
-                                                    className="cursor-pointer underline font-medium">
-                                                    Current source code:</a>
-                                            </Tooltip>
-                                        </span>
-                                        <Highlight text={warning.oldParsed} searchFor={warning.old_highlighting} />
-                                        <span className="text-sm font-medium text-left">Suggested changes:</span>
-                                        <Highlight text={warning.newParsed} searchFor={warning.new_highlighting} />
+                                        <span className="text-sm font-medium underline text-left">Current source code:</span>
+                                        <Highlight text={warning.oldParsed} searchFor={warning.oldHighlighting} />
+                                        <span className="text-sm font-medium underline text-left">Suggested changes:</span>
+                                        <Highlight text={warning.newParsed} searchFor={warning.newHighlighting} />
                                     </div>}
                                     <KernButton
                                         text="Change"

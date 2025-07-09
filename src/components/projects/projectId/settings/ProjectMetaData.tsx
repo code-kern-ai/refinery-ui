@@ -1,9 +1,9 @@
-import { selectProject, setActiveProject } from "@/src/reduxStore/states/project";
-import { updateProjectNameAndDescriptionPost } from "@/src/services/base/project";
+import { selectAllProjects, selectProject, setActiveProject, setAllProjects } from "@/src/reduxStore/states/project";
+import { getAllProjects, updateProjectNameAndDescriptionPost } from "@/src/services/base/project";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
 import { Tooltip } from "@nextui-org/react";
 import { useRouter } from "next/router";
-import { useState } from "react";
+import { use, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { deleteProjectPost } from "@/src/services/base/project";
 import KernButton from "@/submodules/react-components/components/kern-button/KernButton";
@@ -14,6 +14,7 @@ export default function ProjectMetaData() {
     const dispatch = useDispatch();
 
     const project = useSelector(selectProject);
+    const allProjects = useSelector(selectAllProjects);
 
     const [projectName, setProjectName] = useState('');
     const [projectDescription, setProjectDescription] = useState('');
@@ -38,6 +39,14 @@ export default function ProjectMetaData() {
             router.push('/projects');
         });
     }
+
+    useEffect(() => {
+        getAllProjects((projects) => dispatch(setAllProjects(projects)));
+    }, []);
+
+    const isIntegrationProject = useMemo(() => {
+        return allProjects && allProjects.find(p => p.id === project.id)?.isIntegrationProject;
+    }, [allProjects, project.id]);
 
     return (<div>
         <div className="mt-8">
@@ -85,7 +94,7 @@ export default function ProjectMetaData() {
             <div className="text-gray-900 text-lg leading-6 font-medium">Danger zone</div>
             <div className="text-sm leading-5 font-normal mt-2 text-gray-500 inline-block">This action can not be reversed.
                 Are you sure you want to delete this project?</div>
-            {project.is_integration_project && <div className="text-sm text-red-500 italic">
+            {isIntegrationProject && <div className="text-sm text-red-500 italic">
                 This is an integration project, please do not delete it unless the integration is deleted
             </div>}
             <div className="form-control">
