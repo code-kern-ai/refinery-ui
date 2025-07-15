@@ -30,43 +30,4 @@ export function prepareTableBodyEvaluationSets(evaluationSets: EvaluationSet[], 
         toTableColumnText(String(set.recordIds?.length)),
         toTableColumnComponent('ViewCell', undefined, { onClick: () => openModal(set.recordIds, set.question) })
     ]);
-    // evaluationSets.forEach((set) => {
-    //     const currentRow = [
-    //         {
-    //             type: 'boolean',
-    //             value: set.id,
-    //             checked: selectedEvaluationSets.has(set.id),
-    //             valueChange: (e) => setSelectedEvaluationSets(
-    //                 e.target.checked ? prev => new Set(prev).add(set.id) : prev => {
-    //                     const newSet = new Set(prev);
-    //                     newSet.delete(set.id);
-    //                     return newSet;
-    //                 }
-    //             )
-    //         },
-    //         {
-    //             type: 'text',
-    //             value: set.question.length > MAX_QUESTION_SHOW ? set.question.slice(0, MAX_QUESTION_SHOW) + '...' : set.question
-    //         },
-    //         {
-    //             type: 'text',
-    //             value: parseUTC(set.createdAt)
-    //         },
-    //         {
-    //             type: 'text',
-    //             value: usersDict[set.createdBy]?.firstName + ' ' + usersDict[set.createdBy]?.lastName
-    //         },
-    //         {
-    //             type: 'text',
-    //             value: Number(set.recordIds?.length)
-    //         },
-    //         {
-    //             type: 'Component',
-    //             component: 'ViewCell',
-    //             onClick: () => openModal(set.recordIds, set.question),
-    //         },
-    //     ];
-    //     finalData.push(currentRow);
-    // });
-    // return finalData;
 }
