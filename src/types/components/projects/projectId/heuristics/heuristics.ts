@@ -27,17 +27,17 @@ export type Heuristic = {
 
 export type StatData = {
     color: string;
-    false_negatives: number;
-    false_positives: number;
+    falseNegatives: number;
+    falsePositives: number;
     id: string;
     label: string;
     labelId: string;
-    record_coverage: number;
-    source_conflicts: number;
-    source_id: string;
-    source_overlaps: number;
-    total_hits: number;
-    true_positives: number;
+    recordCoverage: number;
+    sourceConflicts: number;
+    sourceId: string;
+    sourceOverlaps: number;
+    totalHits: number;
+    truePositives: number;
 }
 
 export type Stat = {

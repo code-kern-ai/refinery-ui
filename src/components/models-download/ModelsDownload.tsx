@@ -1,6 +1,6 @@
 import { selectModelsDownloaded, setModelsDownloaded } from "@/src/reduxStore/states/pages/models-downloaded";
 import { useRouter } from "next/router";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { openModal, setModalStates } from "@/src/reduxStore/states/modal";
 import { ModalEnum } from "@/src/types/shared/modal";
@@ -23,20 +23,15 @@ export default function ModelsDownload() {
     const isAdmin = useSelector(selectIsAdmin);
     const modelsDownloaded = useSelector(selectModelsDownloaded);
 
-    const [preparedValues, setPreparedValues] = useState([]);
-
     useEffect(() => {
         refetchModels();
     }, []);
 
-    useEffect(() => {
-        if (!modelsDownloaded) return;
-        setPreparedValues(prepareTableBodyModelsDownload(modelsDownloaded, openDeleteModal, isAdmin));
-    }, [modelsDownloaded]);
-
-    function openDeleteModal(model) {
+    const openDeleteModal = useCallback((model) => {
         dispatch(setModalStates(ModalEnum.DELETE_MODEL_DOWNLOAD, { modelName: model.name, open: true }));
-    }
+    }, []);
+
+    const preparedValues = useMemo(() => prepareTableBodyModelsDownload(modelsDownloaded, openDeleteModal, isAdmin), [modelsDownloaded, isAdmin]);
 
     function refetchModels() {
         getModelProviderInfo((res) => {

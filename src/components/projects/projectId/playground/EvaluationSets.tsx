@@ -3,7 +3,7 @@ import { ModalEnum } from "@/src/types/shared/modal";
 import { useDispatch, useSelector } from "react-redux";
 import { selectProjectId } from "@/src/reduxStore/states/project";
 import CreateEvaluationSetModal from "./CreateEvaluationSetModal";
-import { useEffect, useState, useRef, useLayoutEffect, useCallback } from "react";
+import { useEffect, useState, useCallback, useMemo } from "react";
 import { getEvaluationSets } from "@/src/services/base/playground";
 import { getRecordsBatch } from "@/src/services/base/project-setting";
 import { postProcessRecordByRecordId } from "@/src/util/components/projects/projectId/settings/attribute-calculation-helper";
@@ -15,7 +15,6 @@ import KernButton from "@/submodules/react-components/components/kern-button/Ker
 import { selectAllUsers } from "@/src/reduxStore/states/general";
 import { arrayToDict } from "@/submodules/javascript-functions/general";
 
-
 export function EvaluationSets() {
     const dispatch = useDispatch();
 
@@ -24,44 +23,13 @@ export function EvaluationSets() {
     const usersDict = arrayToDict(users, 'id');
 
     const [evaluationSets, setEvaluationSets] = useState(null);
-    const [preparedValues, setPreparedValues] = useState(null);
-    const [preparedHeaders, setPreparedHeaders] = useState(EVALUATION_SETS_TABLE_HEADER);
+    const [checked, setChecked] = useState(false)
     const [selectedEvaluationSets, setSelectedEvaluationSets] = useState(new Set<string>());
-    const [checked, setChecked] = useState(false);
-    const [indeterminate, setIndeterminate] = useState(false);
-    const checkbox = useRef<any>(null);
 
     useEffect(() => {
         if (!projectId) return;
-        getEvaluationSets(projectId, (res) => {
-            setEvaluationSets(res);
-        });
+        getEvaluationSets(projectId, (res) => setEvaluationSets(res));
     }, [projectId]);
-
-    useLayoutEffect(() => {
-        if (!selectedEvaluationSets || !evaluationSets) return;
-        const isIndeterminate = selectedEvaluationSets.size > 0 && selectedEvaluationSets.size < evaluationSets.length;
-        setChecked(selectedEvaluationSets.size > 0 && selectedEvaluationSets.size === evaluationSets.length);
-        setIndeterminate(isIndeterminate);
-
-        if (checkbox.current !== null) {
-            checkbox.current.indeterminate = isIndeterminate;
-        }
-    }, [selectedEvaluationSets, evaluationSets]);
-
-    useEffect(() => {
-        if (!evaluationSets) return;
-        setPreparedValues(prepareTableBodyEvaluationSets(evaluationSets, selectedEvaluationSets, setSelectedEvaluationSets, usersDict, viewEvalSetRecordsModal));
-    }, [evaluationSets, selectedEvaluationSets, setSelectedEvaluationSets]);
-
-    useEffect(() => {
-        setPreparedHeaders(preparedHeaders.map((header) => {
-            if (header.id === "checkboxes") {
-                return { ...header, hasCheckboxes: true, checked: checked, onChange: toggleAll };
-            }
-            return header;
-        }))
-    }, [checked, evaluationSets, selectedEvaluationSets])
 
     const refetchEvaluationSets = useCallback(() => {
         getEvaluationSets(projectId, (res) => {
@@ -70,22 +38,34 @@ export function EvaluationSets() {
         });
     }, [projectId]);
 
-    function toggleAll() {
-        if (checked || indeterminate) setSelectedEvaluationSets(new Set<string>());
+    const toggleAll = useCallback(() => {
+        if (!evaluationSets || evaluationSets.length === 0) return;
+        if (checked) setSelectedEvaluationSets(new Set<string>());
         else setSelectedEvaluationSets(new Set<string>(evaluationSets.map(x => x.id)));
-        setChecked(!checked && !indeterminate);
-        setIndeterminate(false);
-    }
+        setChecked(!checked);
+    }, [checked, evaluationSets]);
 
-    function viewEvalSetRecordsModal(recordIds: any[], question) {
+    const viewEvalSetRecordsModal = useCallback((recordIds: any[], question) => {
         let recordsArr = [];
         getRecordsBatch(projectId, { recordIds: recordIds }, (recordsBatch) => {
             recordsBatch.forEach((record) => {
                 recordsArr = [...recordsArr, postProcessRecordByRecordId(record)];
             });
             dispatch(setModalStates(ModalEnum.VIEW_EVALUATION_SET, { open: true, records: recordsArr, question: question }));
-        })
-    }
+        });
+    }, [projectId]);
+
+    const preparedValues = useMemo(() => {
+        if (!evaluationSets) return null;
+        return prepareTableBodyEvaluationSets(evaluationSets, selectedEvaluationSets, setSelectedEvaluationSets, usersDict, viewEvalSetRecordsModal);
+    }, [evaluationSets, selectedEvaluationSets, setSelectedEvaluationSets, usersDict]);
+
+    const finalHeaders = useMemo(() => EVALUATION_SETS_TABLE_HEADER.map((set) => {
+        if (!selectedEvaluationSets || !evaluationSets) return;
+        if (set.id === "checkboxes") return { ...set, checked: selectedEvaluationSets.size === evaluationSets.length, onChange: toggleAll };
+        return set;
+    }), [selectedEvaluationSets, evaluationSets]);
+
 
     return <>
         {projectId != null && <div className="p-4 bg-gray-100 h-full flex-1 flex flex-col overflow-y-auto">
@@ -114,10 +94,10 @@ export function EvaluationSets() {
                     </div>
                 }
             </div >
-            {preparedHeaders && preparedValues && (
+            {finalHeaders && preparedValues && (
                 evaluationSets.length > 0 ?
                     <KernTable
-                        headers={preparedHeaders}
+                        headers={finalHeaders}
                         values={preparedValues}
                         config={EVALUATION_SETS_TABLE_CONFIG}
                     /> :

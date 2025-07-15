@@ -33,7 +33,7 @@ function convertStatDataGlobal(data = null) {
 export function mapInformationSourceStats(sourceStatistics) {
     if (sourceStatistics.length) {
         return sourceStatistics.map((wrapper) => {
-            return convertStatData(wrapper['node'])
+            return convertStatData(wrapper)
         })
     } else {
         return [convertStatData()];

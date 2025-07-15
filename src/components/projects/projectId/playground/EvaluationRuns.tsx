@@ -5,7 +5,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { selectProjectId } from "@/src/reduxStore/states/project";
 import KernTable from "@/submodules/react-components/components/kern-table/KernTable";
 import { EVALUATION_RUN_TABLE_CONFIG, EVALUATION_RUN_TABLE_HEADER, prepareTableBodyEvaluationRun } from "@/src/util/table-preparations/evaluation-runs";
-import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { getEvaluationGroups, getEvaluationRuns } from "@/src/services/base/playground";
 import { selectAllUsers } from "@/src/reduxStore/states/general";
 import { arrayToDict } from "@/submodules/javascript-functions/general";
@@ -23,17 +23,13 @@ export default function EvaluationRuns() {
     const usersDict = arrayToDict(users, 'id');
     const onAttributeEmbeddings = useSelector(selectOnAttributeEmbeddings);
 
-    const [preparedValues, setPreparedValues] = useState(null);
     const [evaluationRuns, setEvaluationRuns] = useState(null);
     const [evaluationGroups, setEvaluationGroups] = useState([]);
     const [evaluationDict, setEvaluationDict] = useState(null);
     const [embeddingsDict, setEmbeddingsDict] = useState(null);
     const [refetchTrigger, setRefetchTrigger] = useState(false)
-    const [preparedHeaders, setPreparedHeaders] = useState(EVALUATION_RUN_TABLE_HEADER);
     const [selectedEvaluationRuns, setSelectedEvaluationRuns] = useState(new Set<string>());
     const [checked, setChecked] = useState(false);
-    const [indeterminate, setIndeterminate] = useState(false);
-    const checkbox = useRef<any>(null);
 
     useEffect(() => {
         if (!projectId) return;
@@ -51,31 +47,6 @@ export default function EvaluationRuns() {
         setEmbeddingsDict(arrayToDict(onAttributeEmbeddings, 'id'));
     }, [onAttributeEmbeddings]);
 
-    useLayoutEffect(() => {
-        if (!selectedEvaluationRuns || !evaluationRuns) return;
-        const isIndeterminate = selectedEvaluationRuns.size > 0 && selectedEvaluationRuns.size < evaluationRuns.length;
-        setChecked(selectedEvaluationRuns.size > 0 && selectedEvaluationRuns.size === evaluationRuns.length);
-        setIndeterminate(isIndeterminate);
-
-        if (checkbox.current !== null) {
-            checkbox.current.indeterminate = isIndeterminate;
-        }
-    }, [selectedEvaluationRuns, evaluationRuns]);
-
-    useEffect(() => {
-        if (!evaluationRuns || !evaluationDict || !embeddingsDict) return;
-        setPreparedValues(prepareTableBodyEvaluationRun(evaluationRuns, usersDict, embeddingsDict, evaluationDict, navigateToDetails, selectedEvaluationRuns, setSelectedEvaluationRuns));
-    }, [evaluationRuns, evaluationDict, embeddingsDict, selectedEvaluationRuns, setSelectedEvaluationRuns]);
-
-    useEffect(() => {
-        setPreparedHeaders(preparedHeaders.map((header) => {
-            if (header.id === "checkboxes") {
-                return { ...header, hasCheckboxes: true, checked: checked, onChange: toggleAll };
-            }
-            return header;
-        }))
-    }, [checked, evaluationGroups, selectedEvaluationRuns])
-
     const refetchEvaluationRuns = useCallback(() => {
         getEvaluationRuns(projectId, (res) => {
             setEvaluationRuns(res);
@@ -83,16 +54,28 @@ export default function EvaluationRuns() {
         });
     }, [projectId]);
 
-    function toggleAll() {
-        if (checked || indeterminate) setSelectedEvaluationRuns(new Set<string>());
-        else setSelectedEvaluationRuns(new Set<string>(evaluationRuns.map(x => x.id)));
-        setChecked(!checked && !indeterminate)
-        setIndeterminate(false)
-    }
-
-    function navigateToDetails(evaluationRunId: string) {
+    const navigateToDetails = useCallback((evaluationRunId: string) => {
         router.push(`/projects/${projectId}/playground/${evaluationRunId}`);
-    }
+    }, [projectId]);
+
+    const toggleAll = useCallback(() => {
+        if (!evaluationRuns || evaluationRuns.length === 0) return;
+        if (checked) setSelectedEvaluationRuns(new Set<string>());
+        else setSelectedEvaluationRuns(new Set<string>(evaluationRuns.map(x => x.id)));
+        setChecked(!checked);
+    }, [checked, evaluationRuns]);
+
+
+    const preparedValues = useMemo(() => {
+        if (!evaluationRuns) return null;
+        return prepareTableBodyEvaluationRun(evaluationRuns, usersDict, embeddingsDict, evaluationDict, navigateToDetails, selectedEvaluationRuns, setSelectedEvaluationRuns);
+    }, [evaluationRuns, usersDict, embeddingsDict, evaluationDict, selectedEvaluationRuns, setSelectedEvaluationRuns]);
+
+    const finalHeaders = useMemo(() => EVALUATION_RUN_TABLE_HEADER.map((run) => {
+        if (!selectedEvaluationRuns || !evaluationRuns) return;
+        if (run.id === "checkboxes") return { ...run, checked: selectedEvaluationRuns.size === evaluationRuns.length, onChange: toggleAll };
+        return run;
+    }), [selectedEvaluationRuns, evaluationRuns]);
 
     return <>
         {projectId != null && <div className="p-4 bg-gray-100 h-full flex-1 flex flex-col overflow-y-auto">
@@ -121,9 +104,9 @@ export default function EvaluationRuns() {
                     </div>
                 }
             </div >
-            {preparedHeaders && preparedValues && (evaluationRuns.length > 0 ?
+            {finalHeaders && preparedValues && (evaluationRuns.length > 0 ?
                 <KernTable
-                    headers={preparedHeaders}
+                    headers={finalHeaders}
                     values={preparedValues}
                     config={EVALUATION_RUN_TABLE_CONFIG}
                 /> :
