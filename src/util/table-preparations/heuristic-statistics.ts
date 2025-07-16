@@ -1,4 +1,4 @@
-import { toTableColumnComponent, toTableColumnText } from "@/submodules/react-components/helpers/kern-table-helper";
+import { toTableColumnComponent, toTableColumnNumber, toTableColumnText } from "@/submodules/react-components/helpers/kern-table-helper";
 
 export const HEURISTICS_STATISTICS_TABLE_COLUMNS = [
     { column: 'Label', id: 'label' },
@@ -17,10 +17,10 @@ export function prepareTableBodyHeuristicStatistics(stats) {
         toTableColumnComponent('LabelCell', undefined, { sourceContainer: stat }),
         toTableColumnText(stat.values.Precision),
         toTableColumnText(stat.values.Recall),
-        toTableColumnText(stat.values.Coverage),
-        toTableColumnText(stat.values.TotalHits),
-        toTableColumnText(stat.values.Conflicts),
-        toTableColumnText(stat.values.Overlaps),
+        toTableColumnNumber(stat.values.Coverage),
+        toTableColumnNumber(stat.values.TotalHits),
+        toTableColumnNumber(stat.values.Conflicts),
+        toTableColumnNumber(stat.values.Overlaps),
     ])
 
 }

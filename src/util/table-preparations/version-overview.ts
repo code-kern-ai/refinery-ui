@@ -1,5 +1,5 @@
 import { VersionOverview } from "@/src/types/shared/sidebar";
-import { toTableColumnComponent, toTableColumnText } from "@/submodules/react-components/helpers/kern-table-helper";
+import { toTableColumnComponent, toTableColumnDate, toTableColumnText } from "@/submodules/react-components/helpers/kern-table-helper";
 
 export const VERSION_OVERVIEW_TABLE_COLUMNS = [
     { column: 'Service', id: 'service' },
@@ -15,7 +15,7 @@ export function prepareTableBodyVersionOverview(versionOverview: VersionOverview
         toTableColumnText(element.service),
         toTableColumnText(element.installedVersion),
         toTableColumnComponent('RemoteVersionCell', undefined, { service: element }),
-        toTableColumnText(element.parseDate),
+        toTableColumnDate(element.lastChecked),
         toTableColumnComponent('ExternalLinkCell', undefined, { link: element.link })
     ]);
 }

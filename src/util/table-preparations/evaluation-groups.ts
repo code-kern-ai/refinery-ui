@@ -1,6 +1,6 @@
 import { EvaluationGroup } from "@/src/types/components/projects/projectId/settings/playground";
 import { parseUTC } from "@/submodules/javascript-functions/date-parser";
-import { toTableColumnCheckbox, toTableColumnComponent, toTableColumnText } from "@/submodules/react-components/helpers/kern-table-helper";
+import { toTableColumnCheckbox, toTableColumnComponent, toTableColumnDate, toTableColumnText } from "@/submodules/react-components/helpers/kern-table-helper";
 import { Dispatch } from "react";
 
 export const EVALUATION_GROUPS_TABLE_HEADER = [
@@ -23,7 +23,7 @@ export function prepareTableBodyEvaluationGroups(evaluationGroups: EvaluationGro
             return newSet;
         })),
         toTableColumnText(group.name),
-        toTableColumnText(parseUTC(group.createdAt)),
+        toTableColumnDate(group.createdAt),
         toTableColumnText(`${usersDict[group.createdBy]?.firstName} ${usersDict[group.createdBy]?.lastName}`),
         toTableColumnComponent('ViewCell', undefined, { onClick: () => openModal(group.id) })
     ]);

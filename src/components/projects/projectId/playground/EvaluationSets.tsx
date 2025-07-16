@@ -14,6 +14,7 @@ import { EVALUATION_SETS_TABLE_CONFIG, EVALUATION_SETS_TABLE_HEADER, prepareTabl
 import KernButton from "@/submodules/react-components/components/kern-button/KernButton";
 import { selectAllUsers } from "@/src/reduxStore/states/general";
 import { arrayToDict } from "@/submodules/javascript-functions/general";
+import useRefFor from "@/submodules/react-components/hooks/useRefFor";
 
 export function EvaluationSets() {
     const dispatch = useDispatch();
@@ -26,17 +27,18 @@ export function EvaluationSets() {
     const [checked, setChecked] = useState(false)
     const [selectedEvaluationSets, setSelectedEvaluationSets] = useState(new Set<string>());
 
+    const projectIdRef = useRefFor(projectId);
     useEffect(() => {
-        if (!projectId) return;
-        getEvaluationSets(projectId, (res) => setEvaluationSets(res));
-    }, [projectId]);
+        if (!projectIdRef.current) return;
+        getEvaluationSets(projectIdRef.current, (res) => setEvaluationSets(res));
+    }, []);
 
     const refetchEvaluationSets = useCallback(() => {
-        getEvaluationSets(projectId, (res) => {
+        getEvaluationSets(projectIdRef.current, (res) => {
             setEvaluationSets(res);
             setSelectedEvaluationSets(new Set<string>());
         });
-    }, [projectId]);
+    }, []);
 
     const toggleAll = useCallback(() => {
         if (!evaluationSets || evaluationSets.length === 0) return;
@@ -47,25 +49,26 @@ export function EvaluationSets() {
 
     const viewEvalSetRecordsModal = useCallback((recordIds: any[], question) => {
         let recordsArr = [];
-        getRecordsBatch(projectId, { recordIds: recordIds }, (recordsBatch) => {
+        getRecordsBatch(projectIdRef.current, { recordIds: recordIds }, (recordsBatch) => {
             recordsBatch.forEach((record) => {
                 recordsArr = [...recordsArr, postProcessRecordByRecordId(record)];
             });
             dispatch(setModalStates(ModalEnum.VIEW_EVALUATION_SET, { open: true, records: recordsArr, question: question }));
         });
-    }, [projectId]);
+    }, []);
 
     const preparedValues = useMemo(() => {
         if (!evaluationSets) return null;
         return prepareTableBodyEvaluationSets(evaluationSets, selectedEvaluationSets, setSelectedEvaluationSets, usersDict, viewEvalSetRecordsModal);
-    }, [evaluationSets, selectedEvaluationSets, setSelectedEvaluationSets, usersDict]);
+    }, [evaluationSets, selectedEvaluationSets, setSelectedEvaluationSets, usersDict, viewEvalSetRecordsModal]);
 
-    const finalHeaders = useMemo(() => EVALUATION_SETS_TABLE_HEADER.map((set) => {
+    const finalHeaders = useMemo(() => {
         if (!selectedEvaluationSets || !evaluationSets) return;
-        if (set.id === "checkboxes") return { ...set, checked: selectedEvaluationSets.size === evaluationSets.length, onChange: toggleAll };
-        return set;
-    }), [selectedEvaluationSets, evaluationSets]);
-
+        return EVALUATION_SETS_TABLE_HEADER.map((set) => {
+            if (set.id === "checkboxes") return { ...set, checked: selectedEvaluationSets.size === evaluationSets.length, onChange: toggleAll };
+            return set;
+        });
+    }, [selectedEvaluationSets, evaluationSets, toggleAll]);
 
     return <>
         {projectId != null && <div className="p-4 bg-gray-100 h-full flex-1 flex flex-col overflow-y-auto">

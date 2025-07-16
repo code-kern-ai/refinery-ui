@@ -13,10 +13,7 @@ import { MemoIconArrowRight } from "@/submodules/react-components/components/ker
 export default function VersionOverviewModal() {
     const versionOverviewData = useSelector(selectCachedValue(CacheEnum.VERSION_OVERVIEW));
 
-    const preparedValues = useMemo(() => {
-        if (!versionOverviewData) return [];
-        return prepareTableBodyVersionOverview(versionOverviewData);
-    }, [versionOverviewData]);
+    const preparedValues = useMemo(() => prepareTableBodyVersionOverview(versionOverviewData), [versionOverviewData])
 
     return (<Modal modalName={ModalEnum.VERSION_OVERVIEW}>
         <div className="inline-block justify-center text-lg leading-6 text-gray-900 font-medium">

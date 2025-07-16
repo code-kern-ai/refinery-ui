@@ -1,6 +1,6 @@
 import { EvaluationRun } from "@/src/types/components/projects/projectId/settings/playground";
 import { parseUTC } from "@/submodules/javascript-functions/date-parser";
-import { toTableColumnCheckbox, toTableColumnComponent, toTableColumnText } from "@/submodules/react-components/helpers/kern-table-helper";
+import { toTableColumnCheckbox, toTableColumnComponent, toTableColumnDate, toTableColumnText } from "@/submodules/react-components/helpers/kern-table-helper";
 import { EvaluationRunState } from "@/submodules/react-components/types/evaluationRun";
 import { Dispatch } from "react";
 
@@ -27,7 +27,7 @@ export function prepareTableBodyEvaluationRun(evaluationRuns: EvaluationRun[], u
         })),
         toTableColumnText(embeddingsDict[run.embeddingId]?.name),
         toTableColumnText(evaluationGroupsDict[run.evaluationGroupId]?.name),
-        toTableColumnText(parseUTC(run.createdAt)),
+        toTableColumnDate(run.createdAt),
         toTableColumnText(`${usersDict[run.createdBy]?.firstName} ${usersDict[run.createdBy]?.lastName}`),
         toTableColumnComponent('EvaluationRunStateCell', undefined, { value: run.state }),
         toTableColumnComponent('EvaluationRunDetailsCell', undefined, {

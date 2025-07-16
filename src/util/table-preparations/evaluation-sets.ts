@@ -1,6 +1,6 @@
 import { EvaluationSet } from "@/src/types/components/projects/projectId/settings/playground";
 import { parseUTC } from "@/submodules/javascript-functions/date-parser";
-import { toTableColumnCheckbox, toTableColumnComponent, toTableColumnText } from "@/submodules/react-components/helpers/kern-table-helper";
+import { toTableColumnCheckbox, toTableColumnComponent, toTableColumnDate, toTableColumnNumber, toTableColumnText } from "@/submodules/react-components/helpers/kern-table-helper";
 import { Dispatch } from "react";
 
 export const EVALUATION_SETS_TABLE_HEADER = [
@@ -25,9 +25,9 @@ export function prepareTableBodyEvaluationSets(evaluationSets: EvaluationSet[], 
             return newSet;
         })),
         toTableColumnText(set.question.length > MAX_QUESTION_SHOW ? set.question.slice(0, MAX_QUESTION_SHOW) + '...' : set.question),
-        toTableColumnText(parseUTC(set.createdAt)),
+        toTableColumnDate(set.createdAt),
         toTableColumnText(`${usersDict[set.createdBy]?.firstName} ${usersDict[set.createdBy]?.lastName}`),
-        toTableColumnText(String(set.recordIds?.length)),
+        toTableColumnNumber(set.recordIds?.length),
         toTableColumnComponent('ViewCell', undefined, { onClick: () => openModal(set.recordIds, set.question) })
     ]);
 }

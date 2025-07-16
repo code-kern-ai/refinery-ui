@@ -26,22 +26,23 @@ export function EvaluationGroups() {
 
     const usersDict = useMemo(() => arrayToDict(users, 'id'), [users]);
 
+    const projectIdRef = useRef(projectId);
     useEffect(() => {
-        if (!projectId) return;
+        if (!projectIdRef.current) return;
         if (isFetchingEvalGroups.current) return;
         isFetchingEvalGroups.current = true
-        getEvaluationGroups(projectId, (res) => {
+        getEvaluationGroups(projectIdRef.current, (res) => {
             setEvaluationGroups(res);
             isFetchingEvalGroups.current = false
         });
-    }, [projectId]);
+    }, []);
 
     const refetchEvaluationGroups = useCallback(() => {
-        getEvaluationGroups(projectId, (res) => {
+        getEvaluationGroups(projectIdRef.current, (res) => {
             setEvaluationGroups(res);
             setSelectedEvaluationGroups(new Set<string>());
         });
-    }, [projectId]);
+    }, []);
 
     const toggleAll = useCallback(() => {
         if (!evaluationGroups || evaluationGroups.length === 0) return;
@@ -52,22 +53,24 @@ export function EvaluationGroups() {
 
     const viewSetsModal = useCallback((groupId: string) => {
         let setsArr = [];
-        getEvaluationSetsByGroupId(projectId, groupId, (res) => {
+        getEvaluationSetsByGroupId(projectIdRef.current, groupId, (res) => {
             setsArr = res;
-            dispatch(setModalStates(ModalEnum.VIEW_EVALUATION_GROUP, { open: true, sets: setsArr }));
+            dispatch(setModalStates(ModalEnum.VIEW_EVALUATION_GROUP, { open: true, sets: res }));
         });
-    }, [projectId]);
+    }, []);
 
     const preparedValues = useMemo(() => {
         if (!evaluationGroups) return null;
         return prepareTableBodyEvaluationGroups(evaluationGroups, selectedEvaluationGroups, setSelectedEvaluationGroups, usersDict, viewSetsModal);
-    }, [evaluationGroups, selectedEvaluationGroups, setSelectedEvaluationGroups, usersDict]);
+    }, [evaluationGroups, selectedEvaluationGroups, setSelectedEvaluationGroups, usersDict, viewSetsModal]);
 
-    const finalHeaders = useMemo(() => EVALUATION_GROUPS_TABLE_HEADER.map((group) => {
-        if (!selectedEvaluationGroups || !evaluationGroups) return;
-        if (group.id === "checkboxes") return { ...group, checked: selectedEvaluationGroups.size === evaluationGroups.length, onChange: toggleAll };
-        return group;
-    }), [selectedEvaluationGroups, evaluationGroups]);
+    const finalHeaders = useMemo(() => {
+        if (!evaluationGroups || !selectedEvaluationGroups) return null;
+        return EVALUATION_GROUPS_TABLE_HEADER.map((group) => {
+            if (group.id === "checkboxes") return { ...group, checked: selectedEvaluationGroups.size === evaluationGroups.length, onChange: toggleAll };
+            return group;
+        });
+    }, [evaluationGroups, selectedEvaluationGroups, toggleAll]);
 
     return <>
         {projectId != null && <div className="p-4 bg-gray-100 h-full flex-1 flex flex-col overflow-y-auto">

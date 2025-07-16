@@ -69,13 +69,15 @@ export default function EvaluationRuns() {
     const preparedValues = useMemo(() => {
         if (!evaluationRuns) return null;
         return prepareTableBodyEvaluationRun(evaluationRuns, usersDict, embeddingsDict, evaluationDict, navigateToDetails, selectedEvaluationRuns, setSelectedEvaluationRuns);
-    }, [evaluationRuns, usersDict, embeddingsDict, evaluationDict, selectedEvaluationRuns, setSelectedEvaluationRuns]);
+    }, [evaluationRuns, usersDict, embeddingsDict, evaluationDict, selectedEvaluationRuns, setSelectedEvaluationRuns, navigateToDetails]);
 
-    const finalHeaders = useMemo(() => EVALUATION_RUN_TABLE_HEADER.map((run) => {
-        if (!selectedEvaluationRuns || !evaluationRuns) return;
-        if (run.id === "checkboxes") return { ...run, checked: selectedEvaluationRuns.size === evaluationRuns.length, onChange: toggleAll };
-        return run;
-    }), [selectedEvaluationRuns, evaluationRuns]);
+    const finalHeaders = useMemo(() => {
+        if (!evaluationRuns || !selectedEvaluationRuns) return null;
+        return EVALUATION_RUN_TABLE_HEADER.map((run) => {
+            if (run.id === "checkboxes") return { ...run, checked: selectedEvaluationRuns.size === evaluationRuns.length, onChange: toggleAll };
+            return run;
+        })
+    }, [selectedEvaluationRuns, evaluationRuns, toggleAll]);
 
     return <>
         {projectId != null && <div className="p-4 bg-gray-100 h-full flex-1 flex flex-col overflow-y-auto">
