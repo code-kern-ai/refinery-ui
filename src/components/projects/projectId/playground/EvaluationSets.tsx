@@ -63,7 +63,7 @@ export function EvaluationSets() {
     }, [evaluationSets, selectedEvaluationSets, setSelectedEvaluationSets, usersDict, viewEvalSetRecordsModal]);
 
     const finalHeaders = useMemo(() => {
-        if (!selectedEvaluationSets || !evaluationSets) return;
+        if (!selectedEvaluationSets || !evaluationSets) return null;
         return EVALUATION_SETS_TABLE_HEADER.map((set) => {
             if (set.id === "checkboxes") return { ...set, checked: selectedEvaluationSets.size === evaluationSets.length, onChange: toggleAll };
             return set;
