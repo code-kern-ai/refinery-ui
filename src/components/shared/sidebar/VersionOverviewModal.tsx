@@ -4,7 +4,7 @@ import { useSelector } from "react-redux";
 import { CacheEnum, selectCachedValue } from "@/src/reduxStore/states/cachedValues";
 import style from '@/src/styles/shared/sidebar.module.css';
 import LoadingIcon from "../../../../submodules/react-components/components/LoadingIcon";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import KernTable from "@/submodules/react-components/components/kern-table/KernTable";
 import { prepareTableBodyVersionOverview, VERSION_OVERVIEW_TABLE_COLUMNS } from "@/src/util/table-preparations/version-overview";
 import { MemoIconArrowRight } from "@/submodules/react-components/components/kern-icons/icons";
@@ -13,12 +13,7 @@ import { MemoIconArrowRight } from "@/submodules/react-components/components/ker
 export default function VersionOverviewModal() {
     const versionOverviewData = useSelector(selectCachedValue(CacheEnum.VERSION_OVERVIEW));
 
-    const [preparedValues, setPreparedValues] = useState([]);
-
-    useEffect(() => {
-        if (!versionOverviewData) return;
-        setPreparedValues(prepareTableBodyVersionOverview(versionOverviewData));
-    }, [versionOverviewData]);
+    const preparedValues = useMemo(() => prepareTableBodyVersionOverview(versionOverviewData), [versionOverviewData])
 
     return (<Modal modalName={ModalEnum.VERSION_OVERVIEW}>
         <div className="inline-block justify-center text-lg leading-6 text-gray-900 font-medium">

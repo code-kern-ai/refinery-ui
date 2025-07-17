@@ -3,7 +3,7 @@ import CreateEvaluationGroupModal from "./CreateEvaluationGroupModal";
 import { ModalEnum } from "@/src/types/shared/modal";
 import { useDispatch, useSelector } from "react-redux";
 import { selectProjectId } from "@/src/reduxStore/states/project";
-import { useEffect, useState, useRef, useLayoutEffect, useCallback, useMemo } from "react";
+import { useEffect, useState, useRef, useCallback, useMemo } from "react";
 import { getEvaluationGroups, getEvaluationSetsByGroupId } from "@/src/services/base/playground";
 import ViewEvaluationGroupModal from "./ViewEvaluationGroupModal";
 import KernTable from "@/submodules/react-components/components/kern-table/KernTable";
@@ -20,72 +20,57 @@ export function EvaluationGroups() {
     const users = useSelector(selectAllUsers);
 
     const [evaluationGroups, setEvaluationGroups] = useState(null);
-    const [preparedValues, setPreparedValues] = useState(null);
-    const [preparedHeaders, setPreparedHeaders] = useState(EVALUATION_GROUPS_TABLE_HEADER);
     const [selectedEvaluationGroups, setSelectedEvaluationGroups] = useState(new Set<string>());
     const isFetchingEvalGroups = useRef(false);
     const [checked, setChecked] = useState(false);
-    const [indeterminate, setIndeterminate] = useState(false);
-    const checkbox = useRef<any>(null);
 
     const usersDict = useMemo(() => arrayToDict(users, 'id'), [users]);
 
+    const projectIdRef = useRef(projectId);
     useEffect(() => {
-        if (!projectId) return;
+        if (!projectIdRef.current) return;
         if (isFetchingEvalGroups.current) return;
         isFetchingEvalGroups.current = true
-        getEvaluationGroups(projectId, (res) => {
+        getEvaluationGroups(projectIdRef.current, (res) => {
             setEvaluationGroups(res);
             isFetchingEvalGroups.current = false
         });
-    }, [projectId]);
-
-    useLayoutEffect(() => {
-        if (!selectedEvaluationGroups || !evaluationGroups) return;
-        const isIndeterminate = selectedEvaluationGroups.size > 0 && selectedEvaluationGroups.size < evaluationGroups.length;
-        setChecked(selectedEvaluationGroups.size > 0 && selectedEvaluationGroups.size === evaluationGroups.length);
-        setIndeterminate(isIndeterminate);
-
-        if (checkbox.current !== null) {
-            checkbox.current.indeterminate = isIndeterminate;
-        }
-    }, [selectedEvaluationGroups, evaluationGroups]);
-
-    useEffect(() => {
-        if (!evaluationGroups) return;
-        setPreparedValues(prepareTableBodyEvaluationGroups(evaluationGroups, selectedEvaluationGroups, setSelectedEvaluationGroups, usersDict, viewSetsModal));
-    }, [evaluationGroups, selectedEvaluationGroups, setSelectedEvaluationGroups]);
-
-    function viewSetsModal(groupId: string) {
-        let setsArr = [];
-        getEvaluationSetsByGroupId(projectId, groupId, (res) => {
-            setsArr = res;
-            dispatch(setModalStates(ModalEnum.VIEW_EVALUATION_GROUP, { open: true, sets: setsArr }));
-        });
-    }
-
-    useEffect(() => {
-        setPreparedHeaders(preparedHeaders.map((header) => {
-            if (header.id === "checkboxes") {
-                return { ...header, hasCheckboxes: true, checked: checked, onChange: toggleAll };
-            }
-            return header;
-        }))
-    }, [checked, evaluationGroups, selectedEvaluationGroups])
+    }, []);
 
     const refetchEvaluationGroups = useCallback(() => {
-        getEvaluationGroups(projectId, (res) => {
+        getEvaluationGroups(projectIdRef.current, (res) => {
             setEvaluationGroups(res);
             setSelectedEvaluationGroups(new Set<string>());
         });
-    }, [projectId]);
+    }, []);
 
-    function toggleAll() {
-        if (checked || indeterminate) setSelectedEvaluationGroups(new Set<string>());
+    const toggleAll = useCallback(() => {
+        if (!evaluationGroups || evaluationGroups.length === 0) return;
+        if (checked) setSelectedEvaluationGroups(new Set<string>());
         else setSelectedEvaluationGroups(new Set<string>(evaluationGroups.map(x => x.id)));
-        setChecked(!checked && !indeterminate)
-        setIndeterminate(false)
-    }
+        setChecked(!checked);
+    }, [checked, evaluationGroups]);
+
+    const viewSetsModal = useCallback((groupId: string) => {
+        let setsArr = [];
+        getEvaluationSetsByGroupId(projectIdRef.current, groupId, (res) => {
+            setsArr = res;
+            dispatch(setModalStates(ModalEnum.VIEW_EVALUATION_GROUP, { open: true, sets: res }));
+        });
+    }, []);
+
+    const preparedValues = useMemo(() => {
+        if (!evaluationGroups) return null;
+        return prepareTableBodyEvaluationGroups(evaluationGroups, selectedEvaluationGroups, setSelectedEvaluationGroups, usersDict, viewSetsModal);
+    }, [evaluationGroups, selectedEvaluationGroups, setSelectedEvaluationGroups, usersDict, viewSetsModal]);
+
+    const finalHeaders = useMemo(() => {
+        if (!evaluationGroups || !selectedEvaluationGroups) return null;
+        return EVALUATION_GROUPS_TABLE_HEADER.map((group) => {
+            if (group.id === "checkboxes") return { ...group, checked: selectedEvaluationGroups.size === evaluationGroups.length, onChange: toggleAll };
+            return group;
+        });
+    }, [evaluationGroups, selectedEvaluationGroups, toggleAll]);
 
     return <>
         {projectId != null && <div className="p-4 bg-gray-100 h-full flex-1 flex flex-col overflow-y-auto">
@@ -114,9 +99,9 @@ export function EvaluationGroups() {
                     </div>
                 }
             </div>
-            {preparedHeaders && preparedValues && (evaluationGroups.length > 0 ?
+            {finalHeaders && preparedValues && (evaluationGroups.length > 0 ?
                 <KernTable
-                    headers={preparedHeaders}
+                    headers={finalHeaders}
                     values={preparedValues}
                     config={EVALUATION_GROUPS_TABLE_CONFIG}
                 />
