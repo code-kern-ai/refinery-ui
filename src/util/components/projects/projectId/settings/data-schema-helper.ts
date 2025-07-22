@@ -11,6 +11,7 @@ export const DATA_TYPES = [
     { name: 'Embedding List', value: 'EMBEDDING_LIST' },
     { name: 'LLM Response', value: 'LLM_RESPONSE' },
     { name: 'Permission', value: 'PERMISSION' },
+    { name: 'Text List', value: 'TEXT_LIST' }
 ];
 
 export const ATTRIBUTES_VISIBILITY_STATES = [

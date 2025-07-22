@@ -75,7 +75,16 @@ export default function ExecutionContainer(props: ExecutionContainerProps) {
     const sampleRecordsFinal = useMemo(() => {
         if (sampleRecords && sampleRecords.calculatedAttributesDisplay) {
             return sampleRecords.calculatedAttributesDisplay.map((record: any, index) => {
-                const calculatedValue = currentAttributesRef.current.dataType != DataTypeEnum.EMBEDDING_LIST ? record : { id: record.id, value: JSON.parse(record.value) }
+                let calculatedValue;
+                if (currentAttributesRef.current.dataType == DataTypeEnum.EMBEDDING_LIST) {
+                    calculatedValue = { id: record.id, value: JSON.parse(record.value) };
+                }
+                if (currentAttributesRef.current.dataType == DataTypeEnum.TEXT_LIST) {
+                    calculatedValue = { id: record.id, value: JSON.stringify(record) };
+                }
+                else {
+                    calculatedValue = record
+                }
                 return {
                     ...record,
                     onClick: viewRecordDetails(index),
@@ -85,7 +94,6 @@ export default function ExecutionContainer(props: ExecutionContainerProps) {
             );
         }
     }, [sampleRecords]);
-
     return (<div>
         <div className="mt-8 text-sm leading-5">
             <div className="text-gray-700 font-medium mr-2">
@@ -136,7 +144,7 @@ export default function ExecutionContainer(props: ExecutionContainerProps) {
                                 <div key={record.id} className="divide-y divide-gray-200 bg-white">
                                     <div className="flex-shrink-0 border-b border-gray-200 shadow-sm flex justify-between items-center">
                                         <div className="flex items-center text-xs leading-5 text-gray-500 font-normal mx-4 my-3 text-justify">
-                                            {String(record.value)}
+                                            {String(record?.calculatedValue?.value)}
                                         </div>
                                         <div className="flex items-center justify-center mr-5 ml-auto">
                                             <KernButton

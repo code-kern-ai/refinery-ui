@@ -22,4 +22,5 @@ export enum DataTypeEnum {
     EMBEDDING_LIST = "EMBEDDING_LIST",
     LLM_RESPONSE = "LLM_RESPONSE",
     PERMISSION = "PERMISSION",
+    TEXT_LIST = "TEXT_LIST",
 }
