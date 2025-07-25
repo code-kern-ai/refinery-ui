@@ -46,8 +46,6 @@ export type EmbeddingPlatform = {
 export enum PlatformType {
     HUGGING_FACE = "huggingface",
     OPEN_AI = "openai",
-    COHERE = "cohere",
-    PYTHON = "python",
     AZURE = "azure"
 }
 

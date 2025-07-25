@@ -46,8 +46,6 @@ export function postProcessingEmbeddingPlatforms(platforms: EmbeddingPlatform[],
 export const platformNamesDict = {
     [PlatformType.HUGGING_FACE]: "Hugging Face",
     [PlatformType.OPEN_AI]: "OpenAI",
-    [PlatformType.COHERE]: "Cohere",
-    [PlatformType.PYTHON]: "Python",
     [PlatformType.AZURE]: "Azure"
 }
 
@@ -73,9 +71,9 @@ function buildExpectedEmbeddingName(data: any): string {
     let toReturn = data.targetAttribute.name;
     toReturn += "-" + (data.granularity.value == EmbeddingType.ON_ATTRIBUTE ? 'classification' : 'extraction');
     const platform = data.platform;
-    if (platform == PlatformType.HUGGING_FACE || platform == PlatformType.PYTHON) {
+    if (platform == PlatformType.HUGGING_FACE) {
         toReturn += "-" + platform + "-" + data.model;
-    } else if (platform == PlatformType.OPEN_AI || platform == PlatformType.COHERE || platform == PlatformType.AZURE) {
+    } else if (platform == PlatformType.OPEN_AI || platform == PlatformType.AZURE) {
         toReturn += buildEmbeddingNameWithApiToken(data);
     }
     return toReturn;
@@ -106,12 +104,10 @@ export function checkIfCreateEmbeddingIsDisabled(props: EmbeddingCreationEnabled
     const engine = props.engine;
     const version = props.version;
     const url = props.url;
-    if (platform.name == platformNamesDict[PlatformType.HUGGING_FACE] || platform.name == platformNamesDict[PlatformType.PYTHON]) {
+    if (platform.name == platformNamesDict[PlatformType.HUGGING_FACE]) {
         checkFormFields = model == null || model == "";
     } else if (platform.name == platformNamesDict[PlatformType.OPEN_AI]) {
         checkFormFields = model == null || apiToken == null || apiToken == "" || !termsAccepted;
-    } else if (platform.name == platformNamesDict[PlatformType.COHERE]) {
-        checkFormFields = apiToken == null || apiToken == "" || !termsAccepted;
     } else if (platform.name == platformNamesDict[PlatformType.AZURE]) {
         checkFormFields = apiToken == null || apiToken == "" || url == null || url == "" || version == null || version == "" || !termsAccepted || !engine;
     }
