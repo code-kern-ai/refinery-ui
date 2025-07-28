@@ -155,7 +155,7 @@ export default function LLMPlaygroundModal() {
                     <div className="grid grid-cols-2 gap-2 text-sm max-h-52 overflow-y-auto" style={{ gridTemplateColumns: `max-content auto` }}>
                         {recordKeys.map((rk) => <Fragment key={rk.name}>
                             <label className="block font-bold text-gray-900">{rk.name}</label>
-                            {recordData.map((record) => rk.dataType == DataTypeEnum.EMBEDDING_LIST ? <div key={record.running_id} className="flex flex-col divide-y divide-gray-200">
+                            {recordData.map((record) => (rk.dataType == DataTypeEnum.EMBEDDING_LIST || rk.dataType == DataTypeEnum.TEXT_LIST) ? <div key={record.running_id} className="flex flex-col divide-y divide-gray-200">
                                 {record[rk.name].map((li, idx) => <span key={idx} className="text-gray-700">{li}</span>)}
                             </div> : <span key={record.running_id} className="text-gray-700">{record[rk.name]}</span>)}
                         </Fragment>)}

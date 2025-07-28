@@ -176,9 +176,13 @@ function parseUTC(utc: string, forOutlier: boolean = false) {
 export function postProcessUniqueValues(uniqueValues: any, attributesSortOrder: any) {
     const uniqueValuesDict = uniqueValues;
     for (let key in uniqueValuesDict) {
-        const attributeType = getAttributeType(attributesSortOrder, key);
+        const attributeType = attributesSortOrder.find(att => att.name == key)?.dataType;
         if (attributeType == DataTypeEnum.TEXT || attributeType == DataTypeEnum.LLM_RESPONSE) {
             delete uniqueValuesDict[key];
+        } else if (attributeType == DataTypeEnum.TEXT_LIST) {
+            uniqueValuesDict[key] = uniqueValuesDict[key].map((value: string) => {
+                return JSON.parse(value);
+            })[0];
         }
     }
     return uniqueValuesDict;

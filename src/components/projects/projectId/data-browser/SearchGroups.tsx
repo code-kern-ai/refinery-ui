@@ -29,6 +29,7 @@ import { getRecordsByStaticSlice, searchRecordsExtended } from "@/src/services/b
 import { staticDataSlicesCurrentCount } from "@/src/services/base/dataSlices";
 import KernButton from "@/submodules/react-components/components/kern-button/KernButton";
 import { MemoIconArrowDown, MemoIconArrowsRandom, MemoIconFilterOff, MemoIconPlus, MemoIconPointerOff, MemoIconTrash } from "@/submodules/react-components/components/kern-icons/icons";
+import { useConsoleLog } from "@/submodules/react-components/hooks/useConsoleLog";
 
 const GROUP_SORT_ORDER = 0;
 let GLOBAL_SEARCH_GROUP_COUNT = 0;
@@ -336,7 +337,14 @@ export default function SearchGroups() {
             const attributeName = formControlsIdx['name'];
             attributeType = getAttributeType(attributesSortOrder, attributeName);
         }
-        if (attributeType !== DataTypeEnum.BOOLEAN) {
+        if (attributeType == DataTypeEnum.TEXT_LIST) {
+            operatorsCopy.push({
+                value: SearchOperator.CONTAINS.split("_").join(" "),
+            });
+            tooltipsCopy.push(getSearchOperatorTooltip(SearchOperator.CONTAINS));
+            formControlsIdx['operator'] = SearchOperator.CONTAINS;
+
+        } else if (attributeType !== DataTypeEnum.BOOLEAN) {
             for (let t of Object.values(SearchOperator)) {
                 operatorsCopy.push({
                     value: t.split("_").join(" "),
@@ -356,6 +364,8 @@ export default function SearchGroups() {
         setTooltipArray(tooltipsCopy);
         dispatch(setFullSearchStore(fullSearchCopy));
     }
+
+    useConsoleLog(uniqueValuesDict, 'uniqueValuesDict');
 
     function removeSearchGroupItem(groupKey, index) {
         const fullSearchCopy = jsonCopy(fullSearchStore);
@@ -622,7 +632,7 @@ export default function SearchGroups() {
                                             }
                                         </div>
                                     </div>
-                                    {uniqueValuesDict[groupItem['name']] && groupItem['operator'] != '' && groupItem['operator'] != 'BETWEEN' && groupItem['operator'] != 'IN' && groupItem['operator'] != 'IN WC' ? (
+                                    {(uniqueValuesDict[groupItem['name']] && groupItem['operator'] != '' && groupItem['operator'] != 'BETWEEN' && groupItem['operator'] != 'IN' && groupItem['operator'] != 'IN WC' || saveAttributeType == DataTypeEnum.TEXT_LIST) ? (
                                         <div className="my-2">
                                             <KernDropdown options={uniqueValuesDict[groupItem['name']]} buttonName={groupItem['searchValue'] ? groupItem['searchValue'] : 'Select value'}
                                                 selectedOption={(option: any) => selectValueDropdown(option, index, 'searchValue', group.key)} fontClass="font-dmMono" />

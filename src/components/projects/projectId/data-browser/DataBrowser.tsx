@@ -48,8 +48,14 @@ export default function DataBrowser() {
         refetchAttributesAndProcess();
         refetchLabelingTasksAndProcess();
         refetchEmbeddingsAndPostProcess();
-        refetchUniqueValuesAndProcess();
     }, [projectId, users, user]);
+
+    useEffect(() => {
+        if (!attributes || attributes.length == 0 || !projectId) return;
+        getUniqueValuesByAttributes(projectId, (res) => {
+            dispatch(setUniqueValuesDict(postProcessUniqueValues(res, attributes)));
+        });
+    }, [attributes, projectId]);
 
     useEffect(() => {
         if (!projectId || !labelingTasks || !recordList) return;
@@ -138,12 +144,6 @@ export default function DataBrowser() {
 
     function getNextRecords() {
         setSearchRequest({ offset: searchRequest.offset + searchRequest.limit, limit: searchRequest.limit });
-    }
-
-    function refetchUniqueValuesAndProcess() {
-        getUniqueValuesByAttributes(projectId, (res) => {
-            dispatch(setUniqueValuesDict(postProcessUniqueValues(res, attributes)));
-        });
     }
 
     const setSearchRequestToInit = useCallback(() => {
