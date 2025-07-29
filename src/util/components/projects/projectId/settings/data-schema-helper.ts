@@ -55,7 +55,7 @@ export function getColorForDataType(dataType): string {
         case DataTypeEnum.FLOAT: return 'purple';
         case DataTypeEnum.EMBEDDING_LIST: return 'rose';
         case DataTypeEnum.LLM_RESPONSE: return 'emerald';
-        case DataTypeEnum.TEXT_LIST: return 'blue';
+        case DataTypeEnum.TEXT_LIST: return 'teal';
         default: return 'gray';
     }
 }
