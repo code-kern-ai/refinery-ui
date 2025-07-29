@@ -57,10 +57,6 @@ export type DataBrowserRecordsProps = {
     clearSearchRequest: () => void;
 };
 
-export type DataBrowserProps = {
-    clearSearchRequest: () => void;
-};
-
 export type DataBrowserSidebarProps = {
     clearRequest: boolean;
 }

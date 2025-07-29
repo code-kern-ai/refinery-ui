@@ -21,11 +21,10 @@ import { getEmbeddings } from "@/src/services/base/embedding";
 import { parseFilterToExtended } from "@/src/util/components/projects/projectId/data-browser/filter-parser-helper";
 import { SearchGroup, Slice } from "@/submodules/javascript-functions/enums/enums";
 import { Application, CurrentPage } from "@/submodules/react-components/hooks/web-socket/constants";
-import { DataBrowserProps } from "@/src/types/components/projects/projectId/data-browser/data-browser";
 
 const SEARCH_REQUEST = { offset: 0, limit: 20 };
 
-export default function DataBrowser(props: DataBrowserProps) {
+export default function DataBrowser() {
     const dispatch = useDispatch();
 
     const projectId = useSelector(selectProjectId);
