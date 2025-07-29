@@ -58,9 +58,14 @@ export default function PlaygroundSearchMetaFilterModal(props: { selectedEmbeddi
         const newTooltipsDict = {};
 
         filterAttributesSS.forEach((attribute) => {
-            const attributeType = attributes.find(att => att.name == attribute)?.dataType
-            newOperatorsDict[attribute] = FILTER_INTEGRATION_OPERATORS.filter(operator => attributeType == DataTypeEnum.INTEGER || operator !== FilterIntegrationOperator.BETWEEN);
-            newTooltipsDict[attribute] = FILTER_INTEGRATION_OPERATOR_TOOLTIPS.filter(tooltip => attributeType == DataTypeEnum.INTEGER || tooltip !== getFilterIntegrationOperatorTooltip(FilterIntegrationOperator.BETWEEN));
+            const attributeType = attributes.find(att => att.name == attribute)?.dataType;
+            if (attributeType == DataTypeEnum.TEXT_LIST) {
+                newOperatorsDict[attribute] = [FilterIntegrationOperator.EQUAL];
+                newTooltipsDict[attribute] = [getFilterIntegrationOperatorTooltip(FilterIntegrationOperator.EQUAL)];
+            } else {
+                newOperatorsDict[attribute] = FILTER_INTEGRATION_OPERATORS.filter(operator => attributeType == DataTypeEnum.INTEGER || operator !== FilterIntegrationOperator.BETWEEN);
+                newTooltipsDict[attribute] = FILTER_INTEGRATION_OPERATOR_TOOLTIPS.filter(tooltip => attributeType == DataTypeEnum.INTEGER || tooltip !== getFilterIntegrationOperatorTooltip(FilterIntegrationOperator.BETWEEN));
+            }
             colors.push(getColorForDataType(attributeType));
         });
         setOperatorsDict(newOperatorsDict);

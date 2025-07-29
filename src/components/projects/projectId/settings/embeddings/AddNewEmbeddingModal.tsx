@@ -99,7 +99,7 @@ export default function AddNewEmbeddingModal() {
 
     function checkIfAttributeHasToken() {
         const attribute = useableEmbedableAttributes.find((a) => a.id == targetAttribute.id);
-        if (attribute?.dataType == DataTypeEnum.EMBEDDING_LIST) {
+        if (attribute?.dataType == DataTypeEnum.EMBEDDING_LIST || attribute?.dataType == DataTypeEnum.TEXT_LIST) {
             setGranularityArray(GRANULARITY_TYPES_ARRAY.filter((g) => g.value != EmbeddingType.ON_TOKEN));
         } else {
             checkIfPlatformHasToken();
