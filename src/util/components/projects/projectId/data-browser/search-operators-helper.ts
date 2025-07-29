@@ -1,4 +1,5 @@
 import { FilterIntegrationOperator, SearchOperator } from "@/src/types/components/projects/projectId/data-browser/search-operators";
+import { DataTypeEnum } from "@/src/types/shared/general";
 
 export function getAttributeType(attributes: any[], attributeName: string) {
     return attributes.find(att => att.name == attributeName)?.type;
@@ -134,6 +135,9 @@ export function prepareOperator(searchElement: any, attributeType: string): stri
     if (attributeType == "BOOLEAN") {
         return SearchOperator.EQUAL;
     } else {
+        if (attributeType == DataTypeEnum.TEXT_LIST && searchElement.values.operator == SearchOperator.EQUAL) {
+            return SearchOperator.CONTAINS;
+        }
         return searchElement.values.operator;
     }
 }

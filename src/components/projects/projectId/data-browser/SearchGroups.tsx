@@ -29,12 +29,12 @@ import { getRecordsByStaticSlice, searchRecordsExtended } from "@/src/services/b
 import { staticDataSlicesCurrentCount } from "@/src/services/base/dataSlices";
 import KernButton from "@/submodules/react-components/components/kern-button/KernButton";
 import { MemoIconArrowDown, MemoIconArrowsRandom, MemoIconFilterOff, MemoIconPlus, MemoIconPointerOff, MemoIconTrash } from "@/submodules/react-components/components/kern-icons/icons";
-import { useConsoleLog } from "@/submodules/react-components/hooks/useConsoleLog";
+import { SearchGroupsProps } from "@/src/types/components/projects/projectId/data-browser/data-browser";
 
 const GROUP_SORT_ORDER = 0;
 let GLOBAL_SEARCH_GROUP_COUNT = 0;
 
-export default function SearchGroups() {
+export default function SearchGroups(props: SearchGroupsProps) {
     const dispatch = useDispatch();
 
     const projectId = useSelector(selectProjectId);
@@ -97,7 +97,7 @@ export default function SearchGroups() {
         });
         setBackgroundColors(colors);
         setAttributeSortOrder(attributesSort);
-    }, [attributes]);
+    }, [attributes, props.clearRequest]);
 
     useEffect(() => {
         if (!attributesSortOrder || !searchGroupsStore) return;
@@ -339,10 +339,10 @@ export default function SearchGroups() {
         }
         if (attributeType == DataTypeEnum.TEXT_LIST) {
             operatorsCopy.push({
-                value: SearchOperator.CONTAINS.split("_").join(" "),
+                value: SearchOperator.EQUAL.split("_").join(" "),
             });
-            tooltipsCopy.push(getSearchOperatorTooltip(SearchOperator.CONTAINS));
-            formControlsIdx['operator'] = SearchOperator.CONTAINS;
+            tooltipsCopy.push(getSearchOperatorTooltip(SearchOperator.EQUAL));
+            formControlsIdx['operator'] = SearchOperator.EQUAL;
 
         } else if (attributeType !== DataTypeEnum.BOOLEAN) {
             for (let t of Object.values(SearchOperator)) {
@@ -364,8 +364,6 @@ export default function SearchGroups() {
         setTooltipArray(tooltipsCopy);
         dispatch(setFullSearchStore(fullSearchCopy));
     }
-
-    useConsoleLog(uniqueValuesDict, 'uniqueValuesDict');
 
     function removeSearchGroupItem(groupKey, index) {
         const fullSearchCopy = jsonCopy(fullSearchStore);
@@ -622,17 +620,17 @@ export default function SearchGroups() {
                                 <div className="flex-grow mr-2.5 flex flex-col  mt-2 ">
                                     <div className="flex-grow flex flex-row flex-wrap gap-1">
                                         <div style={{ width: groupItem.operator != '' ? '49%' : '100%' }}>
-                                            <KernDropdown options={attributesSortOrder} buttonName={groupItem.name} backgroundColors={backgroundColors}
-                                                selectedOption={(option: any) => selectValueDropdown(option.name, index, 'name', group.key)} fontClass="font-dmMono" buttonClasses="text-xs" />
+                                            {attributesSortOrder && <KernDropdown options={attributesSortOrder} buttonName={groupItem.name} backgroundColors={backgroundColors}
+                                                selectedOption={(option: any) => selectValueDropdown(option.name, index, 'name', group.key)} fontClass="font-dmMono" buttonClasses="text-xs" />}
                                         </div>
                                         <div style={{ width: '49%' }}>
-                                            {groupItem.operator != '' &&
+                                            {(groupItem.operator != '' && operatorsDropdown) &&
                                                 <KernDropdown options={operatorsDropdown} buttonName={groupItem.operator} tooltipsArray={tooltipsArray} tooltipArrayPlacement="right" buttonClasses="text-xs"
                                                     selectedOption={(option: any) => selectValueDropdown(option.value, index, 'operator', group.key)} fontClass="font-dmMono" />
                                             }
                                         </div>
                                     </div>
-                                    {(uniqueValuesDict[groupItem['name']] && groupItem['operator'] != '' && groupItem['operator'] != 'BETWEEN' && groupItem['operator'] != 'IN' && groupItem['operator'] != 'IN WC' || saveAttributeType == DataTypeEnum.TEXT_LIST) ? (
+                                    {(uniqueValuesDict && uniqueValuesDict[groupItem['name']] && groupItem['operator'] != '' && groupItem['operator'] != 'BETWEEN' && groupItem['operator'] != 'IN' && groupItem['operator'] != 'IN WC' || saveAttributeType == DataTypeEnum.TEXT_LIST) ? (
                                         <div className="my-2">
                                             <KernDropdown options={uniqueValuesDict[groupItem['name']]} buttonName={groupItem['searchValue'] ? groupItem['searchValue'] : 'Select value'}
                                                 selectedOption={(option: any) => selectValueDropdown(option, index, 'searchValue', group.key)} fontClass="font-dmMono" />
@@ -651,7 +649,7 @@ export default function SearchGroups() {
                                         </div>
                                     )}
 
-                                    {(groupItem['operator'] == "BEGINS WITH" || groupItem['operator'] == "ENDS WITH" || groupItem['operator'] == SearchOperator.CONTAINS || groupItem['operator'] == "IN WC") && (saveAttributeType != DataTypeEnum.INTEGER && saveAttributeType != DataTypeEnum.FLOAT) &&
+                                    {(groupItem['operator'] == "BEGINS WITH" || groupItem['operator'] == "ENDS WITH" || groupItem['operator'] == SearchOperator.CONTAINS || groupItem['operator'] == "IN WC") && (saveAttributeType != DataTypeEnum.INTEGER && saveAttributeType != DataTypeEnum.FLOAT && saveAttributeType != DataTypeEnum.TEXT_LIST) &&
                                         <label htmlFor="caseSensitive" className="text-xs text-gray-500 cursor-pointer flex items-center pb-2">
                                             <input name="caseSensitive" className="mr-1 cursor-pointer" id="caseSensitive"
                                                 onChange={(e: any) => selectValueDropdown(e.target.checked, index, 'caseSensitive', group.key)} type="checkbox" />Case sensitive</label>}

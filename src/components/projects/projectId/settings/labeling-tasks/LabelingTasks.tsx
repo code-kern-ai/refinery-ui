@@ -20,7 +20,6 @@ import { updateLabelingTask } from "@/src/services/base/labeling-tasks";
 import IconButton from "@/submodules/react-components/components/kern-button/IconButton";
 import KernButton from "@/submodules/react-components/components/kern-button/KernButton";
 import { MemoIconColorPicker, MemoIconPlus, MemoIconTrash } from "@/submodules/react-components/components/kern-icons/icons";
-import { useConsoleLog } from "@/submodules/react-components/hooks/useConsoleLog";
 
 export default function LabelingTasks() {
     const dispatch = useDispatch();

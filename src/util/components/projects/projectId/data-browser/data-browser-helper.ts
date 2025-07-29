@@ -5,8 +5,7 @@ import { buildFullLink } from "@/src/util/shared/link-parser-helper";
 import { dateAsUTCDate } from "@/submodules/javascript-functions/date-parser";
 import { informationSourceTypeToString, labelSourceToString, sliceTypeToString } from "@/submodules/javascript-functions/enums/enum-functions";
 import { LabelSource, Slice } from "@/submodules/javascript-functions/enums/enums";
-import { jsonCopy, tryParseJSON } from "@/submodules/javascript-functions/general";
-import { getAttributeType } from "./search-operators-helper";
+import { jsonCopy } from "@/submodules/javascript-functions/general";
 
 export function postProcessDataSlices(dataSlices: DataSlice[]) {
     const prepareDataSlices = jsonCopy(dataSlices);
