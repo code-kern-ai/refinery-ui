@@ -339,10 +339,10 @@ export default function SearchGroups(props: SearchGroupsProps) {
         }
         if (attributeType == DataTypeEnum.TEXT_LIST) {
             operatorsCopy.push({
-                value: SearchOperator.EQUAL.split("_").join(" "),
+                value: SearchOperator.CONTAINS.split("_").join(" "),
             });
-            tooltipsCopy.push(getSearchOperatorTooltip(SearchOperator.EQUAL));
-            formControlsIdx['operator'] = SearchOperator.EQUAL;
+            tooltipsCopy.push(getSearchOperatorTooltip(SearchOperator.CONTAINS));
+            formControlsIdx['operator'] = SearchOperator.CONTAINS;
 
         } else if (attributeType !== DataTypeEnum.BOOLEAN) {
             for (let t of Object.values(SearchOperator)) {

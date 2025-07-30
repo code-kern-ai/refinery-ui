@@ -15,6 +15,9 @@ import SimilaritySearchModal from "./modals/SimilaritySeachModal";
 import RecordCommentsModal from "./modals/RecordCommentsModal";
 import ButtonAsText from "@/submodules/react-components/components/kern-button/ButtonAsText";
 import { MemoIconAngle, MemoIconArrowRight, MemoIconEdit, MemoIconNotes } from "@/submodules/react-components/components/kern-icons/icons";
+import { useEffect, useMemo } from "react";
+import { selectAllProjects, selectProject, setAllProjects } from "@/src/reduxStore/states/project";
+import { getAllProjects } from "@/src/services/base/project";
 
 export default function RecordList(props: RecordListProps) {
     const dispatch = useDispatch();
@@ -25,6 +28,16 @@ export default function RecordList(props: RecordListProps) {
     const embeddings = useSelector(selectEmbeddings);
     const recordComments = useSelector(selectRecordComments);
     const attributes = useSelector(selectVisibleAttributesDataBrowser);
+    const project = useSelector(selectProject);
+    const allProjects = useSelector(selectAllProjects);
+
+    useEffect(() => {
+        getAllProjects((projects) => dispatch(setAllProjects(projects)));
+    }, []);
+
+    const isIntegrationProject = useMemo(() => {
+        return allProjects && allProjects.find(p => p.id === project.id)?.isIntegrationProject;
+    }, [allProjects, project.id]);
 
     return (<>
         {recordList && recordList.map((record, index) => (<div key={record.id} className="bg-white overflow-hidden shadow rounded-lg border mb-4 pb-4 relative">
@@ -71,7 +84,7 @@ export default function RecordList(props: RecordListProps) {
                     </div>
                 </div>
             </div>
-            {user?.role == UserRole.ENGINEER && <div className="p-2 cursor-pointer absolute right-2 top-2">
+            {(user?.role == UserRole.ENGINEER && !isIntegrationProject) && <div className="p-2 cursor-pointer absolute right-2 top-2">
                 <Tooltip content={TOOLTIPS_DICT.DATA_BROWSER.EDIT_RECORD} color="invert">
                     <MemoIconEdit className="h-4 w-4" onClick={() => props.editRecord(index)} />
                 </Tooltip></div>}

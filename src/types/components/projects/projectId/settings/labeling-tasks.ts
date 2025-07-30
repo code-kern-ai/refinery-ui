@@ -1,3 +1,4 @@
+import { DataTypeEnum } from "@/src/types/shared/general";
 import { Attribute } from "./data-schema";
 
 export type LabelingTask = {
@@ -16,6 +17,7 @@ export type LabelingTask = {
 
 export type LabelingTaskWithOnClick = LabelingTask & {
     onDelete: () => void;
+    attributeType: DataTypeEnum;
 }
 
 export type LabelType = {

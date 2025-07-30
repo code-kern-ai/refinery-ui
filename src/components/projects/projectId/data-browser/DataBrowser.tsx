@@ -43,7 +43,7 @@ export default function DataBrowser() {
     const [clearRequest, setClearRequest] = useState(false);
 
     useEffect(() => {
-        if (!projectId) return;
+        if (!projectId || !attributes) return;
         if (!users || !user) return;
         refetchDataSlicesAndProcess();
         refetchAttributesAndProcess();
@@ -52,11 +52,11 @@ export default function DataBrowser() {
     }, [projectId, users, user]);
 
     useEffect(() => {
-        if (!attributes || attributes.length == 0 || !projectId) return;
+        if (!projectId || !attributes) return;
         getUniqueValuesByAttributes(projectId, (res) => {
             dispatch(setUniqueValuesDict(postProcessUniqueValues(res, attributes)));
         });
-    }, [attributes, projectId]);
+    }, [projectId, attributes]);
 
     useEffect(() => {
         if (!projectId || !labelingTasks || !recordList) return;

@@ -135,9 +135,6 @@ export function prepareOperator(searchElement: any, attributeType: string): stri
     if (attributeType == "BOOLEAN") {
         return SearchOperator.EQUAL;
     } else {
-        if (attributeType == DataTypeEnum.TEXT_LIST && searchElement.values.operator == SearchOperator.EQUAL) {
-            return SearchOperator.CONTAINS;
-        }
         return searchElement.values.operator;
     }
 }
