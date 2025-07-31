@@ -22,7 +22,7 @@ export function postProcessingFormGroups(projectSize: any, embeddings: Embedding
     projectSize.forEach((element: any) => {
         let hasGdpr = false;
         if (element.table == ProjectExportGroup.EMBEDDING_TENSORS) {
-            hasGdpr = embeddings.some((e: any) => e.name.split("-")[2] == PlatformType.COHERE || e.name.split("-")[2] == PlatformType.OPEN_AI || e.name.split("-")[2] == PlatformType.AZURE);
+            hasGdpr = embeddings.some((e: any) => e.name.split("-")[2] == PlatformType.OPEN_AI || e.name.split("-")[2] == PlatformType.AZURE);
         }
         let group = {
             export: element.default,

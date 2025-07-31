@@ -109,7 +109,7 @@ export default function AddNewEmbeddingModal() {
     function changePlatformOrGranularity() {
         prepareSuggestions();
         const savePlatform = platform.platform;
-        if (savePlatform == PlatformType.COHERE || savePlatform == PlatformType.OPEN_AI || savePlatform == PlatformType.AZURE) {
+        if (savePlatform == PlatformType.OPEN_AI || savePlatform == PlatformType.AZURE) {
             setGranularity(GRANULARITY_TYPES_ARRAY.find((g) => g.value == EmbeddingType.ON_ATTRIBUTE));
             if (savePlatform == PlatformType.AZURE) {
                 const azureUrls = localStorage.getItem('azureUrls');
@@ -137,7 +137,7 @@ export default function AddNewEmbeddingModal() {
 
     function checkIfPlatformHasToken() {
         if (!platform) return;
-        if (platform.name == platformNamesDict[PlatformType.COHERE] || platform.name == platformNamesDict[PlatformType.OPEN_AI] || platform.name == platformNamesDict[PlatformType.AZURE]) {
+        if (platform.name == platformNamesDict[PlatformType.OPEN_AI] || platform.name == platformNamesDict[PlatformType.AZURE]) {
             setGranularityArray(GRANULARITY_TYPES_ARRAY.filter((g) => g.value != EmbeddingType.ON_TOKEN));
         } else {
             setGranularityArray(GRANULARITY_TYPES_ARRAY);
@@ -179,12 +179,10 @@ export default function AddNewEmbeddingModal() {
             filterAttributes: filteredAttributes
         }
 
-        if (platform.name == platformNamesDict[PlatformType.HUGGING_FACE] || platform.name == platformNamesDict[PlatformType.PYTHON]) {
+        if (platform.name == platformNamesDict[PlatformType.HUGGING_FACE]) {
             config.model = model;
         } else if (platform.name == platformNamesDict[PlatformType.OPEN_AI]) {
             config.model = model;
-            config.apiToken = apiToken;
-        } else if (platform.name == platformNamesDict[PlatformType.COHERE]) {
             config.apiToken = apiToken;
         } else if (platform.name == platformNamesDict[PlatformType.AZURE]) {
             config.model = engine; //note that is handled internally as model so we use the model field for the request
@@ -251,15 +249,6 @@ export default function AddNewEmbeddingModal() {
                         <input placeholder="Enter your API token" onChange={(e) => setApiToken(e.target.value)} value={apiToken}
                             className="h-9 w-full text-sm border-gray-300 rounded-md placeholder-italic border text-gray-900 pl-4 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100" />
                     </>}
-                    {platform && platform.name == platformNamesDict[PlatformType.COHERE] && <>
-                        <Tooltip content={TOOLTIPS_DICT.PROJECT_SETTINGS.EMBEDDINGS.API_TOKEN} placement="right" color="invert">
-                            <span className="card-title mb-0 label-text flex"><span className="cursor-help underline filtersUnderline">API token</span></span>
-                        </Tooltip>
-                        <input placeholder="Enter your API token" onChange={(e) => setApiToken(e.target.value)} value={apiToken}
-                            className="h-9 w-full text-sm border-gray-300 rounded-md placeholder-italic border text-gray-900 pl-4 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100" />
-                    </>}
-                    {platform && platform.name == platformNamesDict[PlatformType.PYTHON] && <SuggestionsModel options={embeddingHandles[targetAttribute]} selectedOption={(option: string) => setModel(option)} />}
-
                     {platform && platform.name == platformNamesDict[PlatformType.AZURE] && <>
                         <Tooltip content={TOOLTIPS_DICT.PROJECT_SETTINGS.EMBEDDINGS.API_TOKEN} placement="right" color="invert">
                             <span className="card-title mb-0 label-text flex"><span className="cursor-help underline filtersUnderline">API token</span></span>
@@ -302,11 +291,10 @@ export default function AddNewEmbeddingModal() {
                         </>}
                     </>}
                 </div>
-                {platform && (platform.name == platformNamesDict[PlatformType.COHERE] || platform.name == platformNamesDict[PlatformType.OPEN_AI] || platform.name == platformNamesDict[PlatformType.AZURE]) && <div className="text-center mt-3">
+                {platform && (platform.name == platformNamesDict[PlatformType.OPEN_AI] || platform.name == platformNamesDict[PlatformType.AZURE]) && <div className="text-center mt-3">
                     <div className="border border-gray-300 text-xs text-gray-500 p-2.5 rounded-lg text-justify">
                         <label ref={gdprText} className="text-gray-700">
                             {selectedPlatform.splitTerms[0]}
-                            {platform.name == platformNamesDict[PlatformType.COHERE] && <a href={selectedPlatform.link} target="_blank" className="underline">cohere terms of service.</a>}
                             {platform.name == platformNamesDict[PlatformType.OPEN_AI] && <a href={selectedPlatform.link} target="_blank" className="underline">openai terms of service.</a>}
                             {platform.name == platformNamesDict[PlatformType.AZURE] && <a href={selectedPlatform.link} target="_blank" className="underline">azure terms of service.</a>}
                             <div>{selectedPlatform.splitTerms[1]}</div>
