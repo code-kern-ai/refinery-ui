@@ -56,7 +56,7 @@ export default function AddNewEmbeddingModal() {
 
     useEffect(() => {
         prepareSuggestions();
-        checkIfPlatformHasToken();
+        // checkIfPlatformHasToken();
     }, []);
 
     useEffect(() => {
@@ -84,7 +84,7 @@ export default function AddNewEmbeddingModal() {
         const suggestionListFiltered = suggestionList.map((suggestion: any) => {
             const suggestionCopy = { ...suggestion };
             const applicability = JSON.parse(suggestionCopy.applicability);
-            if ((granularity.value == EmbeddingType.ON_ATTRIBUTE && applicability.attribute) || (granularity.value == EmbeddingType.ON_TOKEN && applicability.token)) {
+            if ((granularity.value == EmbeddingType.ON_ATTRIBUTE && applicability.attribute) /*|| (granularity.value == EmbeddingType.ON_TOKEN && applicability.token)*/) {
                 suggestionCopy.forceHidden = false;
             } else {
                 suggestionCopy.forceHidden = true;
@@ -99,11 +99,13 @@ export default function AddNewEmbeddingModal() {
 
     function checkIfAttributeHasToken() {
         const attribute = useableEmbedableAttributes.find((a) => a.id == targetAttribute.id);
-        if (attribute?.dataType == DataTypeEnum.EMBEDDING_LIST) {
-            setGranularityArray(GRANULARITY_TYPES_ARRAY.filter((g) => g.value != EmbeddingType.ON_TOKEN));
-        } else {
-            checkIfPlatformHasToken();
-        }
+        setGranularityArray(GRANULARITY_TYPES_ARRAY);
+
+        // if (attribute?.dataType == DataTypeEnum.EMBEDDING_LIST) {
+        //     setGranularityArray(GRANULARITY_TYPES_ARRAY.filter((g) => g.value != EmbeddingType.ON_TOKEN));
+        // } else {
+        //     checkIfPlatformHasToken();
+        // }
     }
 
     function changePlatformOrGranularity() {
@@ -131,18 +133,21 @@ export default function AddNewEmbeddingModal() {
         acceptButtonCopy.disabled = checkIfCreateEmbeddingIsDisabled({ platform, model, apiToken, termsAccepted, embeddings, targetAttribute, granularity, engine, url, version, embeddingPlatforms });
         setAcceptButton(acceptButtonCopy);
         setTermsAccepted(false);
-        setModel(null);
+        if (savePlatform == PlatformType.PRIVATEMODE_AI) {
+            console.log("Private Mode AI platform selected, setting model to default.");
+            setModel("intfloat/multilingual-e5-large-instruct");
+        } else setModel(null);
         setApiToken('');
     }
 
-    function checkIfPlatformHasToken() {
-        if (!platform) return;
-        if (platform.name == platformNamesDict[PlatformType.OPEN_AI] || platform.name == platformNamesDict[PlatformType.AZURE]) {
-            setGranularityArray(GRANULARITY_TYPES_ARRAY.filter((g) => g.value != EmbeddingType.ON_TOKEN));
-        } else {
-            setGranularityArray(GRANULARITY_TYPES_ARRAY);
-        }
-    }
+    // function checkIfPlatformHasToken() {
+    //     if (!platform) return;
+    //     if (platform.name == platformNamesDict[PlatformType.OPEN_AI] || platform.name == platformNamesDict[PlatformType.AZURE]) {
+    //         setGranularityArray(GRANULARITY_TYPES_ARRAY.filter((g) => g.value != EmbeddingType.ON_TOKEN));
+    //     } else {
+    //         setGranularityArray(GRANULARITY_TYPES_ARRAY);
+    //     }
+    // }
 
     const prepareAzureData = useCallback(() => {
         const getAzureUrl = localStorage.getItem('azureUrls');
@@ -175,7 +180,8 @@ export default function AddNewEmbeddingModal() {
             platform: platform.platform,
             termsText: gdprText.current != null ? gdprText.current.innerText : null,
             termsAccepted: termsAccepted,
-            embeddingType: granularity.value == EmbeddingType.ON_TOKEN ? EmbeddingType.ON_TOKEN : EmbeddingType.ON_ATTRIBUTE,
+            // embeddingType: granularity.value == EmbeddingType.ON_TOKEN ? EmbeddingType.ON_TOKEN : EmbeddingType.ON_ATTRIBUTE,
+            embeddingType: EmbeddingType.ON_ATTRIBUTE,
             filterAttributes: filteredAttributes
         }
 
@@ -191,6 +197,8 @@ export default function AddNewEmbeddingModal() {
             config.type = DEFAULT_AZURE_TYPE;
             config.version = version;
             prepareAzureData();
+        } else if (platform.name == platformNamesDict[PlatformType.PRIVATEMODE_AI]) {
+            config.model = model;
         }
         createEmbeddingPost(projectId, targetAttribute.id, JSON.stringify(config), (res) => { });
 
@@ -290,13 +298,20 @@ export default function AddNewEmbeddingModal() {
                             <SuggestionsAzure options={azureVersions} selectedOption={(option: string) => setVersion(option)} name="Version" tooltip="The latest version of the Azure OpenAI service can also be found here." />
                         </>}
                     </>}
+                    {platform && platform.name == platformNamesDict[PlatformType.PRIVATEMODE_AI] && <>
+                        <Tooltip content={TOOLTIPS_DICT.PROJECT_SETTINGS.EMBEDDINGS.MODEL} placement="right" color="invert">
+                            <span className="card-title mb-0 label-text flex"><span className="cursor-help underline filtersUnderline">Model</span></span>
+                        </Tooltip>
+                        <input defaultValue="intfloat/multilingual-e5-large-instruct" disabled className="h-9 w-full text-sm border-gray-300 rounded-md placeholder-italic border text-gray-900 pl-4 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100 disabled:opacity-50" />
+                    </>}
                 </div>
-                {platform && (platform.name == platformNamesDict[PlatformType.OPEN_AI] || platform.name == platformNamesDict[PlatformType.AZURE]) && <div className="text-center mt-3">
+                {platform && (platform.name == platformNamesDict[PlatformType.OPEN_AI] || platform.name == platformNamesDict[PlatformType.AZURE] || platform.name == platformNamesDict[PlatformType.PRIVATEMODE_AI]) && <div className="text-center mt-3">
                     <div className="border border-gray-300 text-xs text-gray-500 p-2.5 rounded-lg text-justify">
                         <label ref={gdprText} className="text-gray-700">
                             {selectedPlatform.splitTerms[0]}
                             {platform.name == platformNamesDict[PlatformType.OPEN_AI] && <a href={selectedPlatform.link} target="_blank" className="underline">openai terms of service.</a>}
                             {platform.name == platformNamesDict[PlatformType.AZURE] && <a href={selectedPlatform.link} target="_blank" className="underline">azure terms of service.</a>}
+                            {platform.name == platformNamesDict[PlatformType.PRIVATEMODE_AI] && <a href={selectedPlatform.link} target="_blank" className="underline">private mode ai terms of service.</a>}
                             <div>{selectedPlatform.splitTerms[1]}</div>
                         </label>
                     </div>
