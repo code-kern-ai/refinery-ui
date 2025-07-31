@@ -45,7 +45,7 @@ export default function ExecutionContainer(props: ExecutionContainerProps) {
             setRequestedSomething(false);
             props.setEnabledButton(false);
             setRunOn10HasError(sampleRecordsFinal.calculatedAttributes.length > 0 ? false : true);
-            if (currentAttributesRef.current.dataType == DataTypeEnum.EMBEDDING_LIST) {
+            if (currentAttributesRef.current.dataType == DataTypeEnum.EMBEDDING_LIST || currentAttributesRef.current.dataType == DataTypeEnum.TEXT_LIST) {
                 sampleRecordsFinal.calculatedAttributesList = sampleRecordsFinal.calculatedAttributes.map((record: string) => JSON.parse(record));
                 sampleRecordsFinal.calculatedAttributesListDisplay = extendArrayElementsByUniqueId(sampleRecordsFinal.calculatedAttributesList);
             }
@@ -76,11 +76,8 @@ export default function ExecutionContainer(props: ExecutionContainerProps) {
         if (sampleRecords && sampleRecords.calculatedAttributesDisplay) {
             return sampleRecords.calculatedAttributesDisplay.map((record: any, index) => {
                 let calculatedValue;
-                if (currentAttributesRef.current.dataType == DataTypeEnum.EMBEDDING_LIST) {
+                if (currentAttributesRef.current.dataType == DataTypeEnum.EMBEDDING_LIST || currentAttributesRef.current.dataType == DataTypeEnum.TEXT_LIST) {
                     calculatedValue = { id: record.id, value: JSON.parse(record.value) };
-                }
-                if (currentAttributesRef.current.dataType == DataTypeEnum.TEXT_LIST) {
-                    calculatedValue = { id: record.id, value: JSON.stringify(record) };
                 }
                 else {
                     calculatedValue = record
@@ -144,7 +141,7 @@ export default function ExecutionContainer(props: ExecutionContainerProps) {
                                 <div key={record.id} className="divide-y divide-gray-200 bg-white">
                                     <div className="flex-shrink-0 border-b border-gray-200 shadow-sm flex justify-between items-center">
                                         <div className="flex items-center text-xs leading-5 text-gray-500 font-normal mx-4 my-3 text-justify">
-                                            {String(record?.calculatedValue?.value)}
+                                            {Array.isArray(record?.calculatedValue?.value) ? JSON.stringify(record?.calculatedValue?.value) : String(record?.calculatedValue?.value)}
                                         </div>
                                         <div className="flex items-center justify-center mr-5 ml-auto">
                                             <KernButton

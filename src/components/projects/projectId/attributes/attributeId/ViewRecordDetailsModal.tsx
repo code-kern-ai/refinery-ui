@@ -6,10 +6,18 @@ import style from '@/src/styles/components/projects/projectId/attribute-calculat
 import { RecordDisplay } from "@/src/components/shared/record-display/RecordDisplay";
 import { ViewRecordDetailsModalProps } from "@/src/types/components/projects/projectId/settings/attribute-calculation";
 import { selectVisibleAttributesHeuristics } from "@/src/reduxStore/states/pages/settings";
+import { useMemo } from "react";
 
 export default function ViewRecordDetailsModal(props: ViewRecordDetailsModalProps) {
     const modalViewRecordDetails = useSelector(selectModal(ModalEnum.VIEW_RECORD_DETAILS));
     const attributes = useSelector(selectVisibleAttributesHeuristics);
+
+    const displayValue = useMemo(() => {
+        if (!props.sampleRecords || !modalViewRecordDetails.open) return null;
+        return Array.isArray(props.sampleRecords[modalViewRecordDetails.recordIdx].calculatedValue.value)
+            ? JSON.stringify(props.sampleRecords[modalViewRecordDetails.recordIdx].calculatedValue.value)
+            : String(props.sampleRecords[modalViewRecordDetails.recordIdx].calculatedValue.value);
+    }, [props.sampleRecords, modalViewRecordDetails.recordIdx, modalViewRecordDetails.open]);
 
     return (<>
         {modalViewRecordDetails.open && modalViewRecordDetails.record && props.sampleRecords && <>
@@ -23,7 +31,7 @@ export default function ViewRecordDetailsModal(props: ViewRecordDetailsModalProp
                     <div className="text-sm leading-5 text-left text-gray-900 font-medium">Calculated value</div>
                     <div className="text-sm leading-5 text-left text-gray-500 font-normal whitespace-pre-line">
                         <div className="flex flex-col gap-y-2 divide-y">
-                            {props.sampleRecords[modalViewRecordDetails.recordIdx].calculatedValue.value}
+                            {displayValue}
                         </div>
                     </div>
                 </div>
