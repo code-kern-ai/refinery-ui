@@ -19,7 +19,7 @@ export default function UploadWrapper(props: UploadWrapperProps) {
     const uploadFileType = useSelector(selectUploadData).uploadFileType;
     const importOptions = useSelector(selectUploadData).importOptions;
     const embeddings = useSelector(selectEmbeddings);
-    const recalculationCosts = embeddings.some((e: Embedding) => e.platform == PlatformType.COHERE || e.platform == PlatformType.OPEN_AI || e.platform == PlatformType.AZURE);
+    const recalculationCosts = embeddings.some((e: Embedding) => e.platform == PlatformType.OPEN_AI || e.platform == PlatformType.AZURE);
 
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
     const [fileEndsWithZip, setFileEndsWithZip] = useState<boolean>(false);
