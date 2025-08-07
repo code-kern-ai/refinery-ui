@@ -19,6 +19,7 @@ import { jsonCopy } from "@/submodules/javascript-functions/general";
 import { TEMPLATE_EXAMPLES, TEMPLATE_OPTIONS } from "./llmTemplates";
 import { LLM_PROVIDER_OPTIONS, postProcessLLMPlaygroundRecordData } from "@/src/util/components/projects/projectId/settings/attribute-calculation-helper";
 import { MemoIconHandClick, MemoIconPlayCardStar, MemoIconPlayerPlay, MemoIconRefresh, MemoIconTerminal } from "@/submodules/react-components/components/kern-icons/icons";
+import { InfoButton } from "@/submodules/react-components/components/InfoButton";
 
 const ACCEPT_BUTTON = { buttonCaption: "Use current values for attribute", useButton: true };
 const DISPLAY_STATES = [AttributeState.AUTOMATICALLY_CREATED, AttributeState.UPLOADED, AttributeState.USABLE]
@@ -176,10 +177,12 @@ export default function LLMPlaygroundModal() {
                         options={LLM_PROVIDER_OPTIONS}
                         dropdownWidth="w-64"
                         selectedOption={(option) => setFullLlmConfig(p => ({ ...p, llmIdentifier: option }))}
-                    /><label className="block text-sm font-medium text-gray-900 whitespace-nowrap">Api Key</label>
+                    /><label className={"block text-sm font-medium text-gray-900 whitespace-nowrap" + (fullLlmConfig?.llmIdentifier != 'Privatemode AI' ? "" : " line-through")}>Api Key</label>
 
-                    <input type="text" value={fullLlmConfig?.llmConfig.apiKey || ""} onInput={(e: any) => setFullLlmConfig(p => ({ ...p, llmConfig: { ...fullLlmConfig.llmConfig, apiKey: e.target.value } }))}
-                        className="h-8 text-sm border-gray-300 rounded-md placeholder-italic w-full border text-gray-700 pl-4 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100" />
+                    {fullLlmConfig?.llmIdentifier != 'Privatemode AI' ?
+                        <input type="text" value={fullLlmConfig?.llmConfig.apiKey || ""} onInput={(e: any) => setFullLlmConfig(p => ({ ...p, llmConfig: { ...fullLlmConfig.llmConfig, apiKey: e.target.value } }))}
+                            className="h-8 text-sm border-gray-300 rounded-md placeholder-italic w-full border text-gray-700 pl-4 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100" />
+                        : <InfoButton content="Set in backend" divPosition="right" infoButtonSize="sm" />}
 
                 </div>}
                 <LLMResponseConfig attributeId={modal.attributeId} fullLlmConfig={fullLlmConfig} setFullLlmConfig={setFullLlmConfig} noPlayground keepConfigOpen />
