@@ -134,7 +134,6 @@ export default function AddNewEmbeddingModal() {
         setAcceptButton(acceptButtonCopy);
         setTermsAccepted(false);
         if (savePlatform == PlatformType.PRIVATEMODE_AI) {
-            console.log("Private Mode AI platform selected, setting model to default.");
             setModel("intfloat/multilingual-e5-large-instruct");
         } else setModel(null);
         setApiToken('');

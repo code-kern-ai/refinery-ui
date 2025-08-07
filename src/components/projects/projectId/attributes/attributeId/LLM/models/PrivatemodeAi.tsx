@@ -11,10 +11,10 @@ export const MODEL_MAP_FULL_NAME = {
 }
 const REVERSE_MAP_FULL_NAME = Object.fromEntries(Object.entries(MODEL_MAP_FULL_NAME).map(([key, value]) => [value, key]));
 export const MODEL_OPTIONS = Object.keys(MODEL_MAP_FULL_NAME);
-
+const MODEL_MAP_FULL_NAME_OPTIONS = Object.keys(REVERSE_MAP_FULL_NAME);
 export default function PrivatemodeAi(props: LLmPropsPrivatemodeAI) {
     useEffect(() => {
-        if (props.llmConfig.model && !MODEL_OPTIONS.includes(props.llmConfig.model)) {
+        if (props.llmConfig.model && !MODEL_MAP_FULL_NAME_OPTIONS.includes(props.llmConfig.model)) {
             props.setLlmConfig({ ...props.llmConfig, model: MODEL_MAP_FULL_NAME[MODEL_OPTIONS[0]] })
         }
     }, []);
