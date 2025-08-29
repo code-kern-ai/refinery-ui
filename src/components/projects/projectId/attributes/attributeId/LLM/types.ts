@@ -30,6 +30,14 @@ export type LLmPropsOpenAI = {
     disabled?: boolean;
 }
 
+export type LLmPropsPrivatemodeAI = {
+    llmConfig: any;
+    setLlmConfig: (llmConfig: any) => void;
+    onlyEssential?: boolean;
+    projectId?: string;
+    disabled?: boolean;
+}
+
 
 export type LLmPropsAzure = {
     llmConfig: any;

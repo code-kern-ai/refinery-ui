@@ -31,7 +31,7 @@ export type EmbeddingWithOnClick = Embedding & {
 
 export enum EmbeddingType {
     ON_ATTRIBUTE = "ON_ATTRIBUTE",
-    ON_TOKEN = "ON_TOKEN"
+    // ON_TOKEN = "ON_TOKEN" //currently removed since it doesn't seem to be used but kept code wise for easy reenabling
 };
 
 export type EmbeddingPlatform = {
@@ -46,7 +46,8 @@ export type EmbeddingPlatform = {
 export enum PlatformType {
     HUGGING_FACE = "huggingface",
     OPEN_AI = "openai",
-    AZURE = "azure"
+    AZURE = "azure",
+    PRIVATEMODE_AI = "privatemode-ai"
 }
 
 export type RecommendedEncoder = {

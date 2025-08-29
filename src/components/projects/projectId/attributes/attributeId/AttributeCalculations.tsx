@@ -41,6 +41,7 @@ import { LLM_CODE_TEMPLATE_EXAMPLES, LLM_CODE_TEMPLATE_OPTIONS } from "./LLM/llm
 import KernButton from "@/submodules/react-components/components/kern-button/KernButton";
 import { MemoIconAlertTriangleFilled, MemoIconArrowLeft, MemoIconCircleCheckFilled } from "@/submodules/react-components/components/kern-icons/icons";
 import { LookupListWithOnClick } from "@/src/types/components/projects/projectId/lookup-lists";
+import { InfoButton } from "@/submodules/react-components/components/InfoButton";
 
 const EDITOR_OPTIONS = { theme: 'vs-light', language: 'python', readOnly: false };
 
@@ -386,10 +387,12 @@ export default function AttributeCalculation() {
                                 selectedOption={(option) => setAdditionalConfigTmp(p => ({ ...p, llmIdentifier: option }))}
                                 disabled={currentAttribute.state == AttributeState.USABLE}
                             />
-                            <label className="block text-sm font-medium text-gray-900 whitespace-nowrap">Api Key</label>
+                            <label className={"block text-sm font-medium text-gray-900 whitespace-nowrap" + (additionalConfigTmp?.llmIdentifier != 'Privatemode AI' ? "" : " line-through")}>Api Key</label>
 
-                            <input type="text" disabled={currentAttribute.state == AttributeState.USABLE} value={additionalConfigTmp?.llmConfig.apiKey || ""} onInput={(e: any) => setAdditionalConfigTmp(p => ({ ...p, llmConfig: { ...additionalConfigTmp.llmConfig, apiKey: e.target.value } }))}
-                                className="h-8 text-sm border-gray-300 rounded-md placeholder-italic w-full border text-gray-700 pl-4 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100 disabled:opacity-50" />
+                            {additionalConfigTmp?.llmIdentifier != 'Privatemode AI' ?
+                                <input type="text" disabled={currentAttribute.state == AttributeState.USABLE} value={additionalConfigTmp?.llmConfig.apiKey || ""} onInput={(e: any) => setAdditionalConfigTmp(p => ({ ...p, llmConfig: { ...additionalConfigTmp.llmConfig, apiKey: e.target.value } }))}
+                                    className="h-8 text-sm border-gray-300 rounded-md placeholder-italic w-full border text-gray-700 pl-4 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100 disabled:opacity-50" />
+                                : <InfoButton content="Set in backend" divPosition="right" infoButtonSize="sm" />}
                         </div>}
                     </div>
                     <div className="text-sm leading-5 font-medium text-gray-700 inline-block">Attributes</div>

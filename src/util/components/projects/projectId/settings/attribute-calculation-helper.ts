@@ -47,7 +47,8 @@ export function postProcessRecordByRecordId(record: Record): Record {
 export const LLM_PROVIDER_OPTIONS = [
     'Open AI',
     'Azure',
-    'Azure Foundry'
+    'Azure Foundry',
+    'Privatemode AI'
 ];
 
 export function postProcessLLMPlaygroundRecordData(recordList: any[]): any[] {

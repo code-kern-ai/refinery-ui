@@ -12,7 +12,8 @@ export function postProcessingEmbeddings(embeddings: Embedding[], queuedEmbeddin
             id: task.id,
             name: task.taskInfo.embeddingName,
             custom: false,
-            type: task.taskInfo.embeddingType == EmbeddingType.ON_ATTRIBUTE ? EmbeddingType.ON_ATTRIBUTE : EmbeddingType.ON_TOKEN,
+            // type: task.taskInfo.embeddingType == EmbeddingType.ON_ATTRIBUTE ? EmbeddingType.ON_ATTRIBUTE : EmbeddingType.ON_TOKEN,
+            type: EmbeddingType.ON_ATTRIBUTE,
             state: EmbeddingState.QUEUED,
             progress: 0,
             dimension: 0,
@@ -24,7 +25,7 @@ export function postProcessingEmbeddings(embeddings: Embedding[], queuedEmbeddin
 
 export const GRANULARITY_TYPES_ARRAY = [
     { name: 'Attribute', value: EmbeddingType.ON_ATTRIBUTE },
-    { name: 'Token', value: EmbeddingType.ON_TOKEN }
+    // { name: 'Token', value: EmbeddingType.ON_TOKEN } 
 ];
 
 export function postProcessingEmbeddingPlatforms(platforms: EmbeddingPlatform[], organization: Organization) {
@@ -46,7 +47,8 @@ export function postProcessingEmbeddingPlatforms(platforms: EmbeddingPlatform[],
 export const platformNamesDict = {
     [PlatformType.HUGGING_FACE]: "Hugging Face",
     [PlatformType.OPEN_AI]: "OpenAI",
-    [PlatformType.AZURE]: "Azure"
+    [PlatformType.AZURE]: "Azure",
+    [PlatformType.PRIVATEMODE_AI]: "Private Mode AI"
 }
 
 export function postProcessingRecommendedEncoders(attributes: Attribute[], tokenizer: string, encoderSuggestions: any): { [embeddingId: string]: RecommendedEncoder } {
@@ -71,7 +73,7 @@ function buildExpectedEmbeddingName(data: any): string {
     let toReturn = data.targetAttribute.name;
     toReturn += "-" + (data.granularity.value == EmbeddingType.ON_ATTRIBUTE ? 'classification' : 'extraction');
     const platform = data.platform;
-    if (platform == PlatformType.HUGGING_FACE) {
+    if (platform == PlatformType.HUGGING_FACE || platform == PlatformType.PRIVATEMODE_AI) {
         toReturn += "-" + platform + "-" + data.model;
     } else if (platform == PlatformType.OPEN_AI || platform == PlatformType.AZURE) {
         toReturn += buildEmbeddingNameWithApiToken(data);
@@ -110,6 +112,8 @@ export function checkIfCreateEmbeddingIsDisabled(props: EmbeddingCreationEnabled
         checkFormFields = model == null || apiToken == null || apiToken == "" || !termsAccepted;
     } else if (platform.name == platformNamesDict[PlatformType.AZURE]) {
         checkFormFields = apiToken == null || apiToken == "" || url == null || url == "" || version == null || version == "" || !termsAccepted || !engine;
+    } else if (platform.name == platformNamesDict[PlatformType.PRIVATEMODE_AI]) {
+        checkFormFields = model == null || model == "" || !termsAccepted;
     }
     const data = {
         targetAttribute: props.targetAttribute,
