@@ -2,6 +2,7 @@ import { SearchGroupElement } from "@/src/types/components/projects/projectId/da
 import { SearchGroupItem, SearchItemType } from "@/src/types/components/projects/projectId/data-browser/search-groups";
 import { SearchOperator } from "@/src/types/components/projects/projectId/data-browser/search-operators";
 import { LabelingTask, LabelingTaskTarget } from "@/src/types/components/projects/projectId/settings/labeling-tasks";
+import { DataTypeEnum } from "@/src/types/shared/general";
 import { getOrderByDisplayName, nameForGroupKeyToString } from "@/submodules/javascript-functions/enums/enum-functions";
 import { InformationSourceType, SearchGroup, StaticOrderByKeys } from "@/submodules/javascript-functions/enums/enums";
 
@@ -233,8 +234,9 @@ export function orderByCreateSearchGroup(item, globalSearchGroupCount, attribute
 
 function orderByArray(attributesSortOrder: any[] = [], attributesDict: any) {
     let array = [];
-    for (let i = 1; i < attributesSortOrder.length; i++) {
-        array.push(getOrderByGroup(attributesDict[attributesSortOrder[i].key].name, true, -1)) //1, //-1 desc, 1 asc     
+    const finalAttributesSortOrder = attributesSortOrder.filter((a) => a.type !== DataTypeEnum.TEXT_LIST);
+    for (let i = 1; i < finalAttributesSortOrder.length; i++) {
+        array.push(getOrderByGroup(attributesDict[finalAttributesSortOrder[i].key].name, true, -1)) //1, //-1 desc, 1 asc
     }
     array.push(getOrderByGroup(StaticOrderByKeys.WEAK_SUPERVISION_CONFIDENCE, false, -1));
     array.push(getOrderByGroup(StaticOrderByKeys.RANDOM, false, -1));

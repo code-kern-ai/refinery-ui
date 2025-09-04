@@ -3,43 +3,55 @@ import { setModalStates } from "@/src/reduxStore/states/modal";
 import { selectConfiguration, updateConfigurationState } from "@/src/reduxStore/states/pages/data-browser";
 import { LineBreaksType } from "@/src/types/components/projects/projectId/data-browser/data-browser";
 import { ModalEnum } from "@/src/types/shared/modal";
+import { useCallback, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
 export default function ConfigurationModal() {
     const dispatch = useDispatch();
 
     const configuration = useSelector(selectConfiguration);
+    useEffect(() => {
+        const lineBreaks = localStorage.getItem('lineBreaks');
+        if (lineBreaks) {
+            dispatch(updateConfigurationState('lineBreaks', JSON.parse(lineBreaks) as LineBreaksType));
+        }
+    }, []);
 
-    function toggleConfigurationOption(field: string) {
+
+    const toggleConfigurationOption = useCallback((field: string) => {
         dispatch(updateConfigurationState(field, !configuration[field]));
         dispatch(setModalStates(ModalEnum.CONFIGURATION, { open: true }));
-    }
+    }, [configuration]);
 
-    function toggleLineBreaks() {
+    const toggleLineBreaks = useCallback(() => {
         if (configuration.lineBreaks == LineBreaksType.IS_PRE_WRAP || configuration.lineBreaks == LineBreaksType.IS_PRE_LINE) {
             dispatch(updateConfigurationState('lineBreaks', LineBreaksType.NORMAL));
             dispatch(setModalStates(ModalEnum.CONFIGURATION, { open: true }));
+            localStorage.setItem('lineBreaks', JSON.stringify(LineBreaksType.NORMAL));
 
         } else {
             dispatch(updateConfigurationState('lineBreaks', LineBreaksType.IS_PRE_WRAP));
             dispatch(setModalStates(ModalEnum.CONFIGURATION, { open: true }));
-
+            localStorage.setItem('lineBreaks', JSON.stringify(LineBreaksType.IS_PRE_WRAP));
         }
-    }
+    }, [configuration]);
 
-    function toggleLineBreaksPreWrap() {
+
+    const toggleLineBreaksPreWrap = useCallback(() => {
         if (configuration.lineBreaks === LineBreaksType.IS_PRE_WRAP) {
             dispatch(updateConfigurationState('lineBreaks', LineBreaksType.IS_PRE_LINE));
             dispatch(setModalStates(ModalEnum.CONFIGURATION, { open: true }));
+            localStorage.setItem('lineBreaks', JSON.stringify(LineBreaksType.IS_PRE_LINE));
 
         } else if (configuration.lineBreaks === LineBreaksType.IS_PRE_LINE) {
             dispatch(updateConfigurationState('lineBreaks', LineBreaksType.IS_PRE_WRAP));
             dispatch(setModalStates(ModalEnum.CONFIGURATION, { open: true }));
-
+            localStorage.setItem('lineBreaks', JSON.stringify(LineBreaksType.IS_PRE_WRAP));
         }
-    }
+    }, [configuration]);
 
-    function toggleSeparator() {
+
+    const toggleSeparator = useCallback(() => {
         if (configuration.separator === ',') {
             dispatch(updateConfigurationState('separator', '-'));
             dispatch(setModalStates(ModalEnum.CONFIGURATION, { open: true }));
@@ -47,9 +59,8 @@ export default function ConfigurationModal() {
         } else {
             dispatch(updateConfigurationState('separator', ','));
             dispatch(setModalStates(ModalEnum.CONFIGURATION, { open: true }));
-
         }
-    }
+    }, [configuration]);
 
     return (<Modal modalName={ModalEnum.CONFIGURATION}>
         <div className="flex flex-grow justify-center text-lg leading-6 text-gray-900 font-medium">View configuration </div>

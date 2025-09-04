@@ -95,8 +95,13 @@ export default function SimilaritySearchModal() {
         filterAttributesSS.forEach((attribute: string) => {
             const attributeType = attributes.find(att => att.name == attribute)?.dataType
             if (attributeType !== DataTypeEnum.INTEGER) {
-                operators = operators.filter(operator => operator !== FilterIntegrationOperator.BETWEEN);
-                tooltips = tooltips.filter(tooltip => tooltip !== getFilterIntegrationOperatorTooltip(FilterIntegrationOperator.BETWEEN));
+                if (attributeType == DataTypeEnum.TEXT_LIST) {
+                    operators = operators.filter(operator => operator !== FilterIntegrationOperator.BETWEEN && operator !== FilterIntegrationOperator.IN);
+                    tooltips = tooltips.filter(tooltip => tooltip !== getFilterIntegrationOperatorTooltip(FilterIntegrationOperator.BETWEEN) && tooltip !== getFilterIntegrationOperatorTooltip(FilterIntegrationOperator.IN));
+                } else {
+                    operators = operators.filter(operator => operator !== FilterIntegrationOperator.BETWEEN);
+                    tooltips = tooltips.filter(tooltip => tooltip !== getFilterIntegrationOperatorTooltip(FilterIntegrationOperator.BETWEEN));
+                }
             }
             operatorsCopy[attribute] = operators;
             tooltipsCopy[attribute] = tooltips;

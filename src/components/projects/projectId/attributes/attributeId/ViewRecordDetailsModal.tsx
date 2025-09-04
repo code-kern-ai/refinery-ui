@@ -4,13 +4,20 @@ import { ModalEnum } from "@/src/types/shared/modal";
 import { useSelector } from "react-redux";
 import style from '@/src/styles/components/projects/projectId/attribute-calculation.module.css';
 import { RecordDisplay } from "@/src/components/shared/record-display/RecordDisplay";
-import { DataTypeEnum } from "@/src/types/shared/general";
 import { ViewRecordDetailsModalProps } from "@/src/types/components/projects/projectId/settings/attribute-calculation";
 import { selectVisibleAttributesHeuristics } from "@/src/reduxStore/states/pages/settings";
+import { useMemo } from "react";
 
 export default function ViewRecordDetailsModal(props: ViewRecordDetailsModalProps) {
     const modalViewRecordDetails = useSelector(selectModal(ModalEnum.VIEW_RECORD_DETAILS));
     const attributes = useSelector(selectVisibleAttributesHeuristics);
+
+    const displayValue = useMemo(() => {
+        if (!props.sampleRecords || !modalViewRecordDetails.open) return null;
+        return Array.isArray(props.sampleRecords[modalViewRecordDetails.recordIdx].calculatedValue.value)
+            ? JSON.stringify(props.sampleRecords[modalViewRecordDetails.recordIdx].calculatedValue.value)
+            : String(props.sampleRecords[modalViewRecordDetails.recordIdx].calculatedValue.value);
+    }, [props.sampleRecords, modalViewRecordDetails.recordIdx, modalViewRecordDetails.open]);
 
     return (<>
         {modalViewRecordDetails.open && modalViewRecordDetails.record && props.sampleRecords && <>
@@ -23,13 +30,9 @@ export default function ViewRecordDetailsModal(props: ViewRecordDetailsModalProp
                         record={modalViewRecordDetails.record} />
                     <div className="text-sm leading-5 text-left text-gray-900 font-medium">Calculated value</div>
                     <div className="text-sm leading-5 text-left text-gray-500 font-normal whitespace-pre-line">
-                        {props.currentAttribute.dataType != DataTypeEnum.EMBEDDING_LIST ? <span>
-                            {props.sampleRecords[modalViewRecordDetails.recordIdx].calculatedValue.value}
-                        </span> : <div className="flex flex-col gap-y-2 divide-y">
-                            {props.sampleRecords[modalViewRecordDetails.recordIdx].calculatedValue.value.map((item: any) => <span key={item} className="mt-1">
-                                {item}
-                            </span>)}
-                        </div>}
+                        <div className="flex flex-col gap-y-2 divide-y">
+                            {displayValue}
+                        </div>
                     </div>
                 </div>
             </Modal>

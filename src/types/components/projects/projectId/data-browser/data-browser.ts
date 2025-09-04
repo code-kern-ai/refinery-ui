@@ -56,3 +56,11 @@ export type DataBrowserRecordsProps = {
     refetchNextRecords: () => void;
     clearSearchRequest: () => void;
 };
+
+export type DataBrowserSidebarProps = {
+    clearRequest: boolean;
+}
+
+export type SearchGroupsProps = {
+    clearRequest: boolean;
+};

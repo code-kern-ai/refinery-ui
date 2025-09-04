@@ -28,6 +28,7 @@ import { createLabel } from "@/src/services/base/labeling-tasks";
 import { addClassificationLabels, addExtractionLabel, deleteRecordLabelAssociationByIds, removeGoldStar, setGoldStar } from "@/src/services/base/labeling"
 import KernButton from "@/submodules/react-components/components/kern-button/KernButton"
 import { MemoIconAlertCircle, MemoIconAssembly, MemoIconBolt, MemoIconCode, MemoIconStar } from "@/submodules/react-components/components/kern-icons/icons"
+import { DataTypeEnum } from "@/src/types/shared/general"
 
 const L_VARS = getDefaultLabelingVars();
 
@@ -568,9 +569,20 @@ export default function LabelingSuiteLabeling() {
                                     }}
                                     setSelected={(start, end, e) => setSelected(attribute.id, start, end, e)} />) : (<>
                                         {(recordRequests.record.data[lVars.taskLookup[attribute.id].attribute.name] != null && recordRequests.record.data[lVars.taskLookup[attribute.id].attribute.name] !== '') ?
-                                            (<p className={`break-words text-sm leading-5 font-normal text-gray-500 ${settings.main.lineBreaks != LineBreaksType.NORMAL ? (settings.main.lineBreaks == LineBreaksType.IS_PRE_WRAP ? 'whitespace-pre-wrap' : 'whitespace-pre-line') : ''}`}>
-                                                {`${recordRequests.record.data[lVars.taskLookup[attribute.id].attribute.name]}`}
-                                            </p>) : (<>
+                                            (<>
+                                                {(attribute.dataType == DataTypeEnum.TEXT_LIST || attribute.dataType == DataTypeEnum.EMBEDDING_LIST) ? <div className="flex flex-col gap-y-1 divide-y w-fit">
+                                                    {recordRequests.record.data[lVars.taskLookup[attribute.id].attribute.name].map((text, index) => (
+                                                        <p key={index} className={`break-words text-sm leading-5 font-normal text-gray-500 ${settings.main.lineBreaks != LineBreaksType.NORMAL ? (settings.main.lineBreaks == LineBreaksType.IS_PRE_WRAP ? 'whitespace-pre-wrap' : 'whitespace-pre-line') : ''}`}>
+                                                            {text}
+                                                        </p>
+                                                    ))}
+                                                </div> :
+                                                    <p className={`break-words text-sm leading-5 font-normal text-gray-500 ${settings.main.lineBreaks != LineBreaksType.NORMAL ? (settings.main.lineBreaks == LineBreaksType.IS_PRE_WRAP ? 'whitespace-pre-wrap' : 'whitespace-pre-line') : ''}`}>
+                                                        {`${recordRequests.record.data[lVars.taskLookup[attribute.id].attribute.name]}`}
+                                                    </p>
+                                                }
+                                            </>
+                                            ) : (<>
                                                 <MemoIconAlertCircle className="text-yellow-700 inline-block h-5 w-5" />
                                                 <span className="text-gray-500 text-sm font-normal italic">Not present in the
                                                     record</span>

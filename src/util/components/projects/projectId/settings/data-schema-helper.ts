@@ -11,6 +11,7 @@ export const DATA_TYPES = [
     { name: 'Embedding List', value: 'EMBEDDING_LIST' },
     { name: 'LLM Response', value: 'LLM_RESPONSE' },
     { name: 'Permission', value: 'PERMISSION' },
+    { name: 'Text List', value: 'TEXT_LIST' }
 ];
 
 export const ATTRIBUTES_VISIBILITY_STATES = [
@@ -54,6 +55,7 @@ export function getColorForDataType(dataType): string {
         case DataTypeEnum.FLOAT: return 'purple';
         case DataTypeEnum.EMBEDDING_LIST: return 'rose';
         case DataTypeEnum.LLM_RESPONSE: return 'emerald';
+        case DataTypeEnum.TEXT_LIST: return 'teal';
         default: return 'gray';
     }
 }

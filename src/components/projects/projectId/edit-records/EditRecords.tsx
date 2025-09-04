@@ -97,7 +97,7 @@ export default function EditRecords() {
                                         </div>
                                     </div>
                                     <div className="text-gray-800 text-sm mb-4 overflow-anywhere flex">
-                                        {attribute.dataType == DataTypeEnum.EMBEDDING_LIST ? (<div className="flex flex-col gap-y-1 divide-y w-full">
+                                        {(attribute.dataType == DataTypeEnum.EMBEDDING_LIST || attribute.dataType == DataTypeEnum.TEXT_LIST) ? (<div className="flex flex-col gap-y-1 divide-y w-full">
                                             {record.data[attribute.name].map((item, subKey) => (<div key={subKey} className="pt-1">
                                                 {(record.id == erdData.editRecordId && !attribute.isPrimaryKey) ?
                                                     <EditField attribute={attribute} record={record} subKey={subKey} erdData={erdData} setErdData={(erdData) => setErdData(erdData)} /> : <>

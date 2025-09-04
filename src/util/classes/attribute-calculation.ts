@@ -59,6 +59,11 @@ async def ac(record):
     return llm_response.get("result") or "no result provided"
                     `
                     }
+                    case DataTypeEnum.TEXT_LIST: return {
+                        code: `def ac(record):
+    return ["Hello World"]
+                    `
+                    }
                     default: return {
                         code: `def ac(record):
     return "Hello World"
