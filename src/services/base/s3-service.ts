@@ -78,7 +78,7 @@ export function downloadFile(credentialBlock: any, isStringData: boolean = true)
             } else {
                 //new sdk can return readableStream or blob 
                 if (bodyContents instanceof ReadableStream) {
-                    bodyContents.transformToByteArray().then((data) => {
+                    bodyContents.transformToByteArray().then((data: any) => {
                         subscriber.next(new Blob([data]));
                     })
                 }
