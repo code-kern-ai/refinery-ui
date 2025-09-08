@@ -1,4 +1,5 @@
 import { FilterIntegrationOperator, SearchOperator } from "@/src/types/components/projects/projectId/data-browser/search-operators";
+import { DataTypeEnum } from "@/src/types/shared/general";
 
 export function getAttributeType(attributes: any[], attributeName: string) {
     return attributes.find(att => att.name == attributeName)?.type;

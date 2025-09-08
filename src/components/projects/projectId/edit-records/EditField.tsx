@@ -114,7 +114,7 @@ export default function EditField(props: EditFieldProps) {
                 type="checkbox"
                 className="w-6 "
             />}
-        {props.attribute.dataType == DataTypeEnum.EMBEDDING_LIST &&
+        {(props.attribute.dataType == DataTypeEnum.EMBEDDING_LIST || props.attribute.dataType == DataTypeEnum.TEXT_LIST) &&
             <textarea value={inputValue} ref={inputRef}
                 onChange={(e) => setInputValue(e.target.value)}
                 onInput={setDynamicStyles}

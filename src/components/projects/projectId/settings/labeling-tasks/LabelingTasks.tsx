@@ -1,5 +1,5 @@
 import { openModal, setModalStates } from "@/src/reduxStore/states/modal";
-import { selectLabelingTasksAll, setLabelingTasksAll } from "@/src/reduxStore/states/pages/settings";
+import { selectAttributes, selectLabelingTasksAll, setLabelingTasksAll } from "@/src/reduxStore/states/pages/settings";
 import { selectProjectId } from "@/src/reduxStore/states/project";
 import { LabelType, LabelTypeWithOnClick, LabelingTask, LabelingTaskTaskType, LabelingTaskWithOnClick } from "@/src/types/components/projects/projectId/settings/labeling-tasks";
 import { ModalEnum } from "@/src/types/shared/modal";
@@ -20,13 +20,15 @@ import { updateLabelingTask } from "@/src/services/base/labeling-tasks";
 import IconButton from "@/submodules/react-components/components/kern-button/IconButton";
 import KernButton from "@/submodules/react-components/components/kern-button/KernButton";
 import { MemoIconColorPicker, MemoIconPlus, MemoIconTrash } from "@/submodules/react-components/components/kern-icons/icons";
-import { useConsoleLog } from "@/submodules/react-components/hooks/useConsoleLog";
+import { DataTypeEnum } from "@/src/types/shared/general";
 
 export default function LabelingTasks() {
     const dispatch = useDispatch();
 
     const projectId = useSelector(selectProjectId);
     const labelingTasksSchema = useSelector(selectLabelingTasksAll);
+    const attributes = useSelector(selectAttributes);
+
 
     const [labelingTasksDropdownArray, setLabelingTasksDropdownArray] = useState<{ name: string, value: string }[]>([]);
 
@@ -103,9 +105,10 @@ export default function LabelingTasks() {
                 ...labelingTask,
                 onDelete: () => dispatch(setModalStates(ModalEnum.DELETE_LABELING_TASK, { taskId: labelingTask.id, open: true })),
                 labels: labelingTask.labels.map((label) => ({ ...label, onDelete: deleteLabel(labelingTask, label), onChangeColor: changeColorLabel(labelingTask, label) })),
+                attributeType: attributes.find(att => att.name == labelingTask.targetName)?.dataType
             }
         ))
-    }, [labelingTasksSchema]);
+    }, [labelingTasksSchema, attributes]);
 
 
     return (<div className="mt-8">
@@ -153,7 +156,7 @@ export default function LabelingTasks() {
                                     </td>
                                     <td className="whitespace-nowrap text-center px-3 py-2 text-sm text-gray-500">
                                         <KernDropdown options={labelingTasksDropdownArray} buttonName={labelingTaskToString(task.taskType)}
-                                            disabledOptions={[false, task.targetName === 'Full Record', false]} dropdownWidth="w-60" dropdownItemsClasses="w-60"
+                                            disabledOptions={[false, task.targetName === 'Full Record' || task.attributeType == DataTypeEnum.TEXT_LIST, false]} dropdownWidth="w-60" dropdownItemsClasses="w-60"
                                             selectedOption={(option: any) => updateLabelingTaskType(task, index, labelingTaskFromString(option.name))} />
                                     </td>
                                     <td className="flex flex-wrap justify-center items-center px-3 py-2 text-sm text-gray-500">

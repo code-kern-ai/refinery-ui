@@ -16,7 +16,7 @@ export default function SampleRecords(props: SampleRecordProps) {
                             <div className="divide-y divide-gray-200 bg-white" key={record.id}>
                                 <div className="flex-shrink-0 border-b border-gray-200 shadow-sm flex justify-between items-center">
                                     <div className="flex items-center text-xs leading-5 text-gray-500 font-normal mx-4 my-3 text-justify">
-                                        {record.fullRecordData[props.selectedAttribute]}
+                                        {Array.isArray(record.fullRecordData[props.selectedAttribute]) ? JSON.stringify(record.fullRecordData[props.selectedAttribute]) : record.fullRecordData[props.selectedAttribute]}
                                     </div>
                                     <div className="flex items-center justify-center mr-5 ml-auto">
                                         {Object.entries(record.calculatedLabelsResult).map(([key, value]: any) => (

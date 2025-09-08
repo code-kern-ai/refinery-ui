@@ -1,9 +1,9 @@
 import { selectAllUsers } from '@/src/reduxStore/states/general';
 import { setModalStates } from '@/src/reduxStore/states/modal';
-import { selectActiveSlice, selectAdditionalData, selectDataSlicesAll, setActiveDataSlice, setActiveSearchParams, setFullSearchStore, setIsTextHighlightNeeded, setRecordsInDisplay, setTextHighlight, updateAdditionalDataState } from '@/src/reduxStore/states/pages/data-browser';
+import { selectActiveSlice, selectAdditionalData, selectDataSlicesAll, setActiveDataSlice, setActiveSearchParams, setFullSearchStore, setIsTextHighlightNeeded, setRecordsInDisplay, setTextHighlight, setUniqueValuesDict, updateAdditionalDataState } from '@/src/reduxStore/states/pages/data-browser';
 import { selectProjectId } from '@/src/reduxStore/states/project';
 import style from '@/src/styles/components/projects/projectId/data-browser.module.css';
-import { DataSlice } from '@/src/types/components/projects/projectId/data-browser/data-browser';
+import { DataBrowserSidebarProps, DataSlice } from '@/src/types/components/projects/projectId/data-browser/data-browser';
 import { ModalEnum } from '@/src/types/shared/modal';
 import { updateSliceInfoHelper } from '@/src/util/components/projects/projectId/data-browser/data-browser-helper';
 import { Slice } from '@/submodules/javascript-functions/enums/enums';
@@ -17,7 +17,7 @@ import DataSliceInfoModal from './modals/DataSliceInfoModal';
 import MultilineTooltip from '@/src/components/shared/multilines-tooltip/MultilineTooltip';
 import { MemoIconAlertTriangle, MemoIconInfoCircle, MemoIconLayoutSidebar, MemoIconTrash } from '@/submodules/react-components/components/kern-icons/icons';
 
-export default function DataBrowserSidebar() {
+export default function DataBrowserSidebar(props: DataBrowserSidebarProps) {
     const dispatch = useDispatch();
 
     const projectId = useSelector(selectProjectId);
@@ -130,7 +130,7 @@ export default function DataBrowserSidebar() {
                 </div>
                 <span className="text-sm text-gray-400">You can filter and order all your data in the browser according to your needs. Selected filter criteria can be saved and used later on.</span>
 
-                <SearchGroups />
+                <SearchGroups clearRequest={props.clearRequest} />
             </div>}
         </div>
         <DeleteSliceModal />

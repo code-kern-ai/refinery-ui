@@ -40,16 +40,23 @@ export default function DataBrowser() {
     const activeSlice = useSelector(selectActiveSlice);
 
     const [searchRequest, setSearchRequest] = useState(SEARCH_REQUEST);
+    const [clearRequest, setClearRequest] = useState(false);
 
     useEffect(() => {
-        if (!projectId) return;
+        if (!projectId || !attributes) return;
         if (!users || !user) return;
         refetchDataSlicesAndProcess();
         refetchAttributesAndProcess();
         refetchLabelingTasksAndProcess();
         refetchEmbeddingsAndPostProcess();
-        refetchUniqueValuesAndProcess();
     }, [projectId, users, user]);
+
+    useEffect(() => {
+        if (!projectId || !attributes) return;
+        getUniqueValuesByAttributes(projectId, (res) => {
+            dispatch(setUniqueValuesDict(postProcessUniqueValues(res, attributes)));
+        });
+    }, [projectId, attributes]);
 
     useEffect(() => {
         if (!projectId || !labelingTasks || !recordList) return;
@@ -140,14 +147,9 @@ export default function DataBrowser() {
         setSearchRequest({ offset: searchRequest.offset + searchRequest.limit, limit: searchRequest.limit });
     }
 
-    function refetchUniqueValuesAndProcess() {
-        getUniqueValuesByAttributes(projectId, (res) => {
-            dispatch(setUniqueValuesDict(postProcessUniqueValues(res, attributes)));
-        });
-    }
-
     const setSearchRequestToInit = useCallback(() => {
         setSearchRequest(SEARCH_REQUEST);
+        setClearRequest(true);
     }, []);
 
     const handleWebsocketNotification = useCallback((msgParts: string[]) => {
@@ -171,7 +173,7 @@ export default function DataBrowser() {
 
     return (<>
         {projectId && <div className="flex flex-row h-full">
-            <DataBrowserSidebar />
+            <DataBrowserSidebar clearRequest={clearRequest} />
             <DataBrowserRecords refetchNextRecords={getNextRecords} clearSearchRequest={setSearchRequestToInit} />
         </div>}
     </>)

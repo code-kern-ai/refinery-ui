@@ -1,5 +1,5 @@
 import { openModal } from '@/src/reduxStore/states/modal';
-import { selectActiveSearchParams, selectActiveSlice, selectAdditionalData, selectRecords, selectSimilaritySearch, setActiveDataSlice, setActiveSearchParams, setIsTextHighlightNeeded, setRecordsInDisplay, setTextHighlight, updateAdditionalDataState } from '@/src/reduxStore/states/pages/data-browser';
+import { selectActiveSearchParams, selectActiveSlice, selectAdditionalData, selectRecords, selectSimilaritySearch, setActiveDataSlice, setActiveSearchParams, setFullSearchStore, setIsTextHighlightNeeded, setRecordsInDisplay, setTextHighlight, updateAdditionalDataState } from '@/src/reduxStore/states/pages/data-browser';
 import style from '@/src/styles/components/projects/projectId/data-browser.module.css';
 import { ModalEnum } from '@/src/types/shared/modal';
 import { TOOLTIPS_DICT } from '@/src/util/tooltip-constants';

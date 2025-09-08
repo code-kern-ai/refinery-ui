@@ -8,7 +8,7 @@ import { postProcessCurrentHeuristic, postProcessLastTaskLogs } from "@/src/util
 import { Tooltip } from "@nextui-org/react";
 import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
 import { postProcessLabelingTasksSchema } from "@/src/util/components/projects/projectId/settings/labeling-tasks-helper";
-import { selectVisibleAttributesHeuristics, selectLabelingTasksAll, setLabelingTasksAll, selectVisibleAttributesWithoutPermissions } from "@/src/reduxStore/states/pages/settings";
+import { selectLabelingTasksAll, setLabelingTasksAll, selectVisibleAttributesWithoutPermissions } from "@/src/reduxStore/states/pages/settings";
 import HeuristicsEditor from "../shared/HeuristicsEditor";
 import DangerZone from "@/src/components/shared/danger-zone/DangerZone";
 import HeuristicRunButtons from "../shared/HeuristicRunButtons";
