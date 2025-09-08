@@ -73,7 +73,7 @@ export default function EditField(props: EditFieldProps) {
         else setInputValue(props.record.data[props.attribute.name][props.subKey]);
     }, [props.record.data[props.attribute.name], props.subKey]);
 
-    if (!inputValue) return null;
+    if (inputValue == null) return null;
 
 
     return (<>
