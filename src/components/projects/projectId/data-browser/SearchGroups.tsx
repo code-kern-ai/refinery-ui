@@ -630,7 +630,7 @@ export default function SearchGroups(props: SearchGroupsProps) {
                                             }
                                         </div>
                                     </div>
-                                    {(uniqueValuesDict && uniqueValuesDict[groupItem['name']] && groupItem['operator'] != '' && groupItem['operator'] != 'BETWEEN' && groupItem['operator'] != 'IN' && groupItem['operator'] != 'IN WC' || saveAttributeType == DataTypeEnum.TEXT_LIST) ? (
+                                    {(uniqueValuesDict && uniqueValuesDict[groupItem['name']] && groupItem['operator'] != '' && groupItem['operator'] != 'BETWEEN' && groupItem['operator'] != 'IN' && groupItem['operator'] != 'IN WC') ? (
                                         <div className="my-2">
                                             <KernDropdown options={uniqueValuesDict[groupItem['name']]} buttonName={groupItem['searchValue'] ? groupItem['searchValue'] : 'Select value'}
                                                 selectedOption={(option: any) => selectValueDropdown(option, index, 'searchValue', group.key)} fontClass="font-dmMono" />

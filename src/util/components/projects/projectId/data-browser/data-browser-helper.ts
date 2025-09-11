@@ -178,12 +178,6 @@ export function postProcessUniqueValues(uniqueValues: any, attributesSortOrder: 
         const attributeType = attributesSortOrder.find(att => att.name == key)?.dataType;
         if (attributeType == DataTypeEnum.TEXT || attributeType == DataTypeEnum.LLM_RESPONSE) {
             delete uniqueValuesDict[key];
-        } else if (attributeType == DataTypeEnum.TEXT_LIST) {
-            const uniqueSet = new Set<string>();
-            for (const item of uniqueValuesDict[key]) {
-                JSON.parse(item).forEach(str => uniqueSet.add(str));
-            }
-            uniqueValuesDict[key] = Array.from(uniqueSet);
         }
     }
     return uniqueValuesDict;

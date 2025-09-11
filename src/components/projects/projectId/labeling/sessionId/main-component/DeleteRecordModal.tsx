@@ -1,7 +1,8 @@
 import Modal from "@/src/components/shared/modal/Modal";
 import { selectRecordRequestsRecord, updateRecordRequests } from "@/src/reduxStore/states/pages/labeling";
-import { selectProjectId } from "@/src/reduxStore/states/project";
+import { selectProjectId, setActiveProject } from "@/src/reduxStore/states/project";
 import { deleteRecordById } from "@/src/services/base/labeling";
+import { getProjectByProjectId } from "@/src/services/base/project";
 import { ModalButton, ModalEnum } from "@/src/types/shared/modal";
 import { LabelingSuiteManager } from "@/src/util/classes/labeling/manager";
 import { SessionManager } from "@/src/util/classes/labeling/session-manager";
@@ -25,6 +26,9 @@ export default function DeleteRecordModal() {
                 SessionManager.setCurrentRecordDeleted();
                 dispatch(updateRecordRequests('record', null));
                 LabelingSuiteManager.somethingLoading = false;
+                getProjectByProjectId(projectId, (res) => {
+                    dispatch(setActiveProject(res));
+                })
             } else {
                 console.log("Something went wrong with deletion of record:" + recordId);
             }
