@@ -2,6 +2,8 @@ import { useEffect } from "react";
 import { LocalStorageDropdown } from "@/submodules/react-components/components/LocalStorageDropdown";
 import { InputWithSlider } from "@/submodules/react-components/components/InputWithSlider";
 import { LLmPropsAzureFoundry } from "../types";
+import { Tooltip } from "@nextui-org/react";
+import { MemoIconInfoCircle } from "@/submodules/react-components/components/kern-icons/icons";
 
 
 export default function AzureFoundry(props: LLmPropsAzureFoundry) {
@@ -16,7 +18,7 @@ export default function AzureFoundry(props: LLmPropsAzureFoundry) {
     return (
         <div className='flex flex-col gap-y-6'>
             <div>
-                <label className="block mb-2 text-sm font-medium text-gray-900">Foundry URL</label>
+                <label className="mb-2 text-sm font-medium text-gray-900 flex flex-row items-center gap-x-2">Foundry URL <Tooltip content={<div>The URL provided by Azure ending with /openai/v1/ like:<br /><br />https://&#123;deployment&#125;.services.ai.azure.com/openai/v1/</div>} color="invert" placement="right"><MemoIconInfoCircle className="w-4 h-5" /></Tooltip></label>
                 <LocalStorageDropdown disabled={props.disabled} buttonName={props.llmConfig.apiBase ?? 'Select URL'} searchDefaultValue={props.llmConfig.apiBase} storageKey='AzureFoundryApiBase' onOptionSelected={(o) => props.setLlmConfig({ ...props.llmConfig, apiBase: o })} />
             </div>
             <div>
