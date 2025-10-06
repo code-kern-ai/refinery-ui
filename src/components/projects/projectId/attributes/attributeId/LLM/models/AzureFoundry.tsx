@@ -19,6 +19,10 @@ export default function AzureFoundry(props: LLmPropsAzureFoundry) {
                 <label className="block mb-2 text-sm font-medium text-gray-900">Foundry URL</label>
                 <LocalStorageDropdown disabled={props.disabled} buttonName={props.llmConfig.apiBase ?? 'Select URL'} searchDefaultValue={props.llmConfig.apiBase} storageKey='AzureFoundryApiBase' onOptionSelected={(o) => props.setLlmConfig({ ...props.llmConfig, apiBase: o })} />
             </div>
+            <div>
+                <label className="block mb-2 text-sm font-medium text-gray-900">Foundry Model</label>
+                <LocalStorageDropdown disabled={props.disabled} buttonName={props.llmConfig.model ?? 'Select Model'} searchDefaultValue={props.llmConfig.model} storageKey='AzureFoundryModel' onOptionSelected={(o) => props.setLlmConfig({ ...props.llmConfig, model: o })} />
+            </div>
             {props.onlyEssential ? null : <>
 
                 <div className="grid grid-cols-2 xl:grid-cols-3 gap-2">
