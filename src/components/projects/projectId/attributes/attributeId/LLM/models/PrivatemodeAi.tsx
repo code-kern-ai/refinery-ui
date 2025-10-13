@@ -3,12 +3,8 @@ import KernDropdown from "@/submodules/react-components/components/KernDropdown"
 import { InfoButton } from "@/submodules/react-components/components/InfoButton";
 import { InputWithSlider } from "@/submodules/react-components/components/InputWithSlider";
 import { LLmPropsPrivatemodeAI } from "../types";
+import { MODEL_MAP_FULL_NAME } from "@/submodules/javascript-functions/constants";
 
-
-export const MODEL_MAP_FULL_NAME = {
-    'Meta-Llama-3.3-70B': "ibnzterrell/Meta-Llama-3.3-70B-Instruct-AWQ-INT4",
-    'gemma-3-27b': "leon-se/gemma-3-27b-it-fp8-dynamic",
-}
 const REVERSE_MAP_FULL_NAME = Object.fromEntries(Object.entries(MODEL_MAP_FULL_NAME).map(([key, value]) => [value, key]));
 export const MODEL_OPTIONS = Object.keys(MODEL_MAP_FULL_NAME);
 const MODEL_MAP_FULL_NAME_OPTIONS = Object.keys(REVERSE_MAP_FULL_NAME);
