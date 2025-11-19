@@ -134,7 +134,7 @@ export default function AddNewEmbeddingModal() {
         setAcceptButton(acceptButtonCopy);
         setTermsAccepted(false);
         if (savePlatform == PlatformType.PRIVATEMODE_AI) {
-            setModel("intfloat/multilingual-e5-large-instruct");
+            setModel("qwen3-embedding-4b");
         } else setModel(null);
         setApiToken('');
     }
@@ -301,7 +301,7 @@ export default function AddNewEmbeddingModal() {
                         <Tooltip content={TOOLTIPS_DICT.PROJECT_SETTINGS.EMBEDDINGS.MODEL} placement="right" color="invert">
                             <span className="card-title mb-0 label-text flex"><span className="cursor-help underline filtersUnderline">Model</span></span>
                         </Tooltip>
-                        <input defaultValue="intfloat/multilingual-e5-large-instruct" disabled className="h-9 w-full text-sm border-gray-300 rounded-md placeholder-italic border text-gray-900 pl-4 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100 disabled:opacity-50" />
+                        <input defaultValue="qwen3-embedding-4b" disabled className="h-9 w-full text-sm border-gray-300 rounded-md placeholder-italic border text-gray-900 pl-4 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100 disabled:opacity-50" />
                     </>}
                 </div>
                 {platform && (platform.name == platformNamesDict[PlatformType.OPEN_AI] || platform.name == platformNamesDict[PlatformType.AZURE] || platform.name == platformNamesDict[PlatformType.PRIVATEMODE_AI]) && <div className="text-center mt-3">
