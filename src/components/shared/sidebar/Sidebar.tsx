@@ -181,7 +181,7 @@ export default function Sidebar() {
                                 <Tooltip placement="right" trigger="hover" color="invert" content={TOOLTIPS_DICT.SIDEBAR.VERSION_OVERVIEW}>
                                     <div onClick={requestVersionOverview} id="refineryVersion"
                                         className="z-50 tooltip tooltip-right cursor-pointer select-none text-white flex items-center mr-1">
-                                        v1.21.5
+                                        v1.22.0
                                         {hasUpdates && <Tooltip placement="right" trigger="hover" color="invert" content={TOOLTIPS_DICT.SIDEBAR.NEWER_VERSION_AVAILABLE} >
                                             <MemoIconAlertCircle className="h-5 w-5 text-yellow-700" />
                                         </Tooltip>}
