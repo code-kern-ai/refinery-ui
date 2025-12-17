@@ -227,6 +227,9 @@ const initialState: Modals = {
     [ModalEnum.DELETE_EVALUATION_RUN]: {
         open: false
     },
+    [ModalEnum.DELETE_KNOWLEDGE_GRAPH]: {
+        open: false
+    },
 };
 
 const modalSlice = createSlice({
