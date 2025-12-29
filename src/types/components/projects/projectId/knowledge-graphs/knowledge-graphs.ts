@@ -3,6 +3,7 @@ export type KnowledgeGraph = {
     name: string;
     description: string;
     type: KnowledgeGraphType;
+    selected: boolean;
 };
 
 

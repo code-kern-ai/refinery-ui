@@ -22,6 +22,7 @@ export default function CreateKnowledgeGraphModal() {
 
     const createKnowledgeGraphPost = useCallback(() => {
         createKnowledgeGraph(projectId, name, description, type, (res) => {
+            router.push(`/projects/${projectId}/knowledge-graphs/${res.id}?type=${type}`);
         });
     }, [name, description, type]);
 

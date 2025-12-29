@@ -10,9 +10,10 @@ import KernButton from "@/submodules/react-components/components/kern-button/Ker
 import { ChevronDownIcon } from "@heroicons/react/20/solid";
 import DeleteKnowledgeGraphModal from './DeleteKnowledgeGraphModal';
 import { KnowledgeGraphsHeaderProps, KnowledgeGraphType } from '@/src/types/components/projects/projectId/knowledge-graphs/knowledge-graphs';
-import { selectKnowledgeGraphsAll, setKnowledgeGraphType } from '@/src/reduxStore/states/pages/knowledge-graphs';
+import { selectKnowledgeGraphsAll, setAllKnowledgeGraphs, setKnowledgeGraphType } from '@/src/reduxStore/states/pages/knowledge-graphs';
 import { MemoIconPlus } from '@/submodules/react-components/components/kern-icons/icons';
 import CreateKnowledgeGraphModal from './CreateKnowledgeGraphModal';
+import { jsonCopy } from '@/submodules/javascript-functions/general';
 
 const KNOWLEDGE_GRAPHS_TYPES = Object.values(KnowledgeGraphType);
 const ACTIONS_DROPDOWN_OPTIONS = ['Select all', 'Deselect all', 'Delete selected'];
@@ -54,9 +55,11 @@ export default function KnowledgeGraphsHeader(props: KnowledgeGraphsHeaderProps)
     }, []);
 
     const selectKnowledgeGraphs = useCallback((checked: boolean) => {
-        knowledgeGraphs.forEach((knowledgeGraph, index) => {
-            knowledgeGraphs[index].selected = checked;
+        const knowledgeGraphsCopy = jsonCopy(knowledgeGraphs);
+        knowledgeGraphsCopy.forEach((knowledgeGraph, index) => {
+            knowledgeGraphsCopy[index].selected = checked;
         });
+        dispatch(setAllKnowledgeGraphs(knowledgeGraphsCopy));
         prepareSelectionList();
     }, [knowledgeGraphs]);
 
@@ -75,7 +78,8 @@ export default function KnowledgeGraphsHeader(props: KnowledgeGraphsHeaderProps)
     }, [knowledgeGraphs]);
 
     return (
-        <div className="flex-shrink-0 flex justify-end items-center">
+        <div className="flex-shrink-0 flex justify-end items-center mr-4">
+            <h3 className="text-lg font-medium leading-6 text-gray-900 flex-grow">Knowledge Graphs</h3>
             <div className="grid grid-cols-1 gap-x-4 xs:flex flex-row items-center mt-2 xl:mt-0 justify-end">
                 <KernButton
                     text="New knowledge graph"
@@ -83,18 +87,10 @@ export default function KnowledgeGraphsHeader(props: KnowledgeGraphsHeaderProps)
                     onClick={() => dispatch(openModal(ModalEnum.CREATE_KNOWLEDGE_GRAPH))}
                 />
 
-                {knowledgeGraphs && knowledgeGraphs.length > 0 ? (
+                {knowledgeGraphs && knowledgeGraphs.length > 0 && (
                     <KernDropdown options={ACTIONS_DROPDOWN_OPTIONS} buttonName="Actions" disabledOptions={[false, false, knowledgeGraphs.every((checked) => !checked.selected)]}
-                        selectedOption={(option: string) => executeOption(option)} dropdownClasses="mr-3" buttonClasses={`${style.actionsHeight} text-xs`} dropdownItemsWidth='w-40' dropdownWidth='w-32'
+                        selectedOption={(option: string) => executeOption(option)} dropdownClasses="mr-3" buttonClasses={`${style.actionsHeight} text-sm`} dropdownItemsWidth='w-40' dropdownWidth='w-32'
                         iconsArray={['IconSquareCheck', 'IconSquare', 'IconTrash']} />
-                ) : (
-                    <KernButton
-                        className="mr-3"
-                        disabled={true}
-                        text="Actions"
-                        tooltipPlacement="top"
-                        icon={ChevronDownIcon}
-                    />
                 )}
             </div>
 
