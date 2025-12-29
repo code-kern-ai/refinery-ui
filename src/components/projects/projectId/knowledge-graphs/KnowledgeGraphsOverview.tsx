@@ -1,6 +1,6 @@
 import { selectProjectId } from "@/src/reduxStore/states/project";
 import { useDispatch, useSelector } from "react-redux";
-import { useCallback } from "react";
+import { useCallback, useEffect } from "react";
 import { selectOrganizationId } from "@/src/reduxStore/states/general";
 import { useWebsocket } from "@/submodules/react-components/hooks/web-socket/useWebsocket";
 import { Application, CurrentPage } from "@/submodules/react-components/hooks/web-socket/constants";
@@ -15,11 +15,17 @@ export function KnowledgeGraphsOverview() {
     const projectId = useSelector(selectProjectId);
     const knowledgeGraphs = useSelector(selectKnowledgeGraphsAll);
 
+    useEffect(() => {
+        if (!projectId) return;
+        refetchKnowledgeGraphs();
+    }, [projectId]);
+
     const refetchKnowledgeGraphs = useCallback(() => {
         getKnowledgeGraphs(projectId, (res) => {
             dispatch(setAllKnowledgeGraphs(res));
         });
     }, [projectId]);
+
     const handleWebsocketNotification = useCallback((msgParts: string[]) => {
         if (['knowledge_graphs_created', 'knowledge_graphs_updated', 'knowledge_graphs_deleted'].includes(msgParts[1])) {
             refetchKnowledgeGraphs();

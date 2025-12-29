@@ -230,6 +230,9 @@ const initialState: Modals = {
     [ModalEnum.DELETE_KNOWLEDGE_GRAPH]: {
         open: false
     },
+    [ModalEnum.CREATE_KNOWLEDGE_GRAPH]: {
+        open: false
+    }
 };
 
 const modalSlice = createSlice({

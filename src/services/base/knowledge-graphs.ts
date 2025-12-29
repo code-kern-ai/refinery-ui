@@ -23,11 +23,12 @@ export function getKnowledgeGraph(knowledgeGraphId: string, onResult: (result: a
 }
 
 export function createKnowledgeGraph(projectId: string, name: string, description: string, type: string, onResult: (result: any) => void) {
+    const finalUrl = `${knowledgeGraphEndpoint}/`;
     const body = {
         projectId: projectId,
         name: name,
         description: description,
         type: type
     };
-    jsonFetchWrapper(knowledgeGraphEndpoint, FetchType.POST, onResult, JSON.stringify(convertCamelToSnakeCase(body)));
+    jsonFetchWrapper(finalUrl, FetchType.POST, onResult, JSON.stringify(convertCamelToSnakeCase(body)));
 }

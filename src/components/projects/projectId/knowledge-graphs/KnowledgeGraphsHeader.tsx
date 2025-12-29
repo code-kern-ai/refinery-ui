@@ -11,6 +11,8 @@ import { ChevronDownIcon } from "@heroicons/react/20/solid";
 import DeleteKnowledgeGraphModal from './DeleteKnowledgeGraphModal';
 import { KnowledgeGraphsHeaderProps, KnowledgeGraphType } from '@/src/types/components/projects/projectId/knowledge-graphs/knowledge-graphs';
 import { selectKnowledgeGraphsAll, setKnowledgeGraphType } from '@/src/reduxStore/states/pages/knowledge-graphs';
+import { MemoIconPlus } from '@/submodules/react-components/components/kern-icons/icons';
+import CreateKnowledgeGraphModal from './CreateKnowledgeGraphModal';
 
 const KNOWLEDGE_GRAPHS_TYPES = Object.values(KnowledgeGraphType);
 const ACTIONS_DROPDOWN_OPTIONS = ['Select all', 'Deselect all', 'Delete selected'];
@@ -20,6 +22,7 @@ export default function KnowledgeGraphsHeader(props: KnowledgeGraphsHeaderProps)
 
     const knowledgeGraphs = useSelector(selectKnowledgeGraphsAll);
     const modalDelete = useSelector(selectModal(ModalEnum.DELETE_KNOWLEDGE_GRAPH));
+    const modalCreate = useSelector(selectModal(ModalEnum.CREATE_KNOWLEDGE_GRAPH));
 
     const [selectionList, setSelectionList] = useState('');
     const [countSelected, setCountSelected] = useState(0);
@@ -73,10 +76,12 @@ export default function KnowledgeGraphsHeader(props: KnowledgeGraphsHeaderProps)
 
     return (
         <div className="flex-shrink-0 flex justify-end items-center">
-            <div className="grid grid-cols-1 gap-4 xs:flex xs:gap-0 flex-row items-center mt-2 xl:mt-0 justify-end">
-                <KernDropdown options={KNOWLEDGE_GRAPHS_TYPES} buttonName="New knowledge graph"
-                    selectedOption={(option: string) => executeOption(option)} buttonClasses={`${style.actionsHeight} text-xs whitespace-nowrap`} dropdownClasses="mr-3" dropdownItemsWidth='w-48' dropdownWidth='w-48'
-                    iconsArray={['IconCode', 'IconBolt']} useFillForIcons={[false, true]} />
+            <div className="grid grid-cols-1 gap-x-4 xs:flex flex-row items-center mt-2 xl:mt-0 justify-end">
+                <KernButton
+                    text="New knowledge graph"
+                    icon={MemoIconPlus}
+                    onClick={() => dispatch(openModal(ModalEnum.CREATE_KNOWLEDGE_GRAPH))}
+                />
 
                 {knowledgeGraphs && knowledgeGraphs.length > 0 ? (
                     <KernDropdown options={ACTIONS_DROPDOWN_OPTIONS} buttonName="Actions" disabledOptions={[false, false, knowledgeGraphs.every((checked) => !checked.selected)]}
@@ -94,6 +99,7 @@ export default function KnowledgeGraphsHeader(props: KnowledgeGraphsHeaderProps)
             </div>
 
             <DeleteKnowledgeGraphModal selectionList={selectionList} countSelected={countSelected} refetch={props.refetch} />
+            <CreateKnowledgeGraphModal />
         </div >
     )
 }
