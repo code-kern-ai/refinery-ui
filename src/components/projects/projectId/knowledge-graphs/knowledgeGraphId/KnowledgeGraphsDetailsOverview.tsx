@@ -1,12 +1,14 @@
 import { selectKnowledgeGraph, setActiveKnowledgeGraph, updateKnowledgeGraphsState } from "@/src/reduxStore/states/pages/knowledge-graphs";
 import { selectProjectId } from "@/src/reduxStore/states/project";
 import { getKnowledgeGraph, updateKnowledgeGraph } from "@/src/services/base/knowledge-graphs";
-import { KnowledgeGraphProperty } from "@/src/types/components/projects/projectId/knowledge-graphs/knowledge-graphs";
+import { KnowledgeGraphProperty, KnowledgeGraphType } from "@/src/types/components/projects/projectId/knowledge-graphs/knowledge-graphs";
 import KernButton from "@/submodules/react-components/components/kern-button/KernButton";
 import { MemoIconArrowLeft } from "@/submodules/react-components/components/kern-icons/icons";
 import { useRouter } from "next/router";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import LiveKnowledgeGraphDetailsOverview from "./LiveKnowledgeGraphDetailsOverview";
+import StableKnowledgeGraphDetailsOverview from "./StableKnowledgeGraphDetailsOverview";
 
 export default function KnowledgeGraphsDetailsOverview() {
     const router = useRouter();
@@ -130,6 +132,8 @@ export default function KnowledgeGraphsDetailsOverview() {
                         </div>
                     </div>
                 </div>
+                {currentKnowledgeGraph.type == KnowledgeGraphType.LIVE && <LiveKnowledgeGraphDetailsOverview />}
+                {currentKnowledgeGraph.type == KnowledgeGraphType.STABLE && <StableKnowledgeGraphDetailsOverview />}
             </div>
         </>}
     </div>

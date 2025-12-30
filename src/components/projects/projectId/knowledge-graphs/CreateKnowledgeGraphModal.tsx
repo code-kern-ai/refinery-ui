@@ -1,4 +1,5 @@
 import Modal from "@/src/components/shared/modal/Modal";
+import { selectKnowledgeGraphsAll } from "@/src/reduxStore/states/pages/knowledge-graphs";
 import { selectProjectId } from "@/src/reduxStore/states/project";
 import { createKnowledgeGraph } from "@/src/services/base/knowledge-graphs";
 import { KnowledgeGraphType } from "@/src/types/components/projects/projectId/knowledge-graphs/knowledge-graphs";
@@ -15,10 +16,17 @@ export default function CreateKnowledgeGraphModal() {
     const router = useRouter();
 
     const projectId = useSelector(selectProjectId);
+    const knowledgeGraphs = useSelector(selectKnowledgeGraphsAll);
 
     const [name, setName] = useState('');
     const [description, setDescription] = useState('');
     const [type, setType] = useState(null);
+    const [typeOptions, setTypeOptions] = useState<string[]>(TYPE_OPTIONS);
+
+    useEffect(() => {
+        const usedTypes = knowledgeGraphs.map(graph => graph.type);
+        setTypeOptions(TYPE_OPTIONS.filter(option => !usedTypes.includes(option)));
+    }, [knowledgeGraphs]);
 
     const createKnowledgeGraphPost = useCallback(() => {
         createKnowledgeGraph(projectId, name, description, type, (res) => {
@@ -50,7 +58,7 @@ export default function CreateKnowledgeGraphModal() {
             <div className="justify-self-start">
                 <span className="card-title mb-0 label-text text-left"><span className="underline filtersUnderline">Type</span></span>
             </div>
-            <KernDropdown options={TYPE_OPTIONS} buttonName={type ?? 'Select type'} selectedOption={setType} />
+            <KernDropdown options={typeOptions} buttonName={type ?? 'Select type'} selectedOption={setType} />
         </div>
     </Modal>
     )

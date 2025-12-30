@@ -17,6 +17,11 @@ export function getKnowledgeGraphs(projectId: string, onResult: (result: any) =>
     jsonFetchWrapper(finalUrl, FetchType.GET, onResult);
 }
 
+export function getKnowledgeGraphsDataStable(projectId: string, onResult: (result: any) => void) {
+    const finalUrl = `${knowledgeGraphEndpoint}/data/${projectId}`;
+    jsonFetchWrapper(finalUrl, FetchType.GET, onResult);
+}
+
 export function getKnowledgeGraph(knowledgeGraphId: string, onResult: (result: any) => void) {
     const finalUrl = `${knowledgeGraphEndpoint}/${knowledgeGraphId}`;
     jsonFetchWrapper(finalUrl, FetchType.GET, onResult);
