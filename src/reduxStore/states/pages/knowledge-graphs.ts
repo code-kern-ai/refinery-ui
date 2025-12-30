@@ -37,7 +37,22 @@ const knowledgeGraphsSlice = createSlice({
         },
         setKnowledgeGraphType(state, action: PayloadAction<KnowledgeGraphType>) {
             state.type = action.payload;
-        }
+        },
+        updateKnowledgeGraphsState: {
+            reducer(state, action: PayloadAction<any[]>) {
+                if (action.payload.length !== 2) throw new Error("updateKnowledgeGraphsState must be called with exactly 2 arguments");
+                const [knowledgeGraphId, changes] = action.payload;
+                if (state.active && state.active.id === knowledgeGraphId) changeAllFor(state.active, changes);
+                const lookupList = state.all.find((lookupList) => lookupList.id === knowledgeGraphId);
+                if (lookupList) changeAllFor(lookupList, changes);
+
+            },
+            prepare(knowledgeGraphId: string, changes: { [key: string]: any }) {
+                return {
+                    payload: [knowledgeGraphId, changes]
+                };
+            },
+        },
     },
 })
 
@@ -47,5 +62,5 @@ export const selectKnowledgeGraph = (state) => state.knowledgeGraphs.active;
 export const selectKnowledgeGraphsAll = (state) => state.knowledgeGraphs.all;
 export const selectKnowledgeGraphType = (state) => state.knowledgeGraphs.type;
 
-export const { setAllKnowledgeGraphs, setKnowledgeGraphType, setActiveKnowledgeGraph } = knowledgeGraphsSlice.actions;
+export const { setAllKnowledgeGraphs, setKnowledgeGraphType, setActiveKnowledgeGraph, updateKnowledgeGraphsState } = knowledgeGraphsSlice.actions;
 export const knowledgeGraphsReducer = knowledgeGraphsSlice.reducer;

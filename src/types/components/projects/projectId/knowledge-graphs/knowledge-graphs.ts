@@ -21,3 +21,8 @@ export enum KnowledgeGraphType {
     LIVE = 'LIVE',
     STABLE = 'STABLE',
 }
+
+export enum KnowledgeGraphProperty {
+    NAME = 'name',
+    DESCRIPTION = 'description',
+}
