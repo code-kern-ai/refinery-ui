@@ -1,10 +1,21 @@
+import { executeQuestion } from "@/src/services/base/knowledge-graphs";
 import { QuestionCatalogueOptions, QuestionType } from "@/src/types/components/projects/projectId/knowledge-graphs/knowledge-graphs";
+import KernButton from "@/submodules/react-components/components/kern-button/KernButton";
 import KernDropdown from "@/submodules/react-components/components/KernDropdown";
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 export default function LiveKnowledgeGraphDetailsOverview() {
     const [questionType, setQuestionType] = useState<QuestionType>(QuestionType.CATALOGUE);
     const [question, setQuestion] = useState("");
+    const [questionData, setQuestionData] = useState<any>(null);
+
+    useEffect(() => {
+        setQuestion("");
+    }, [questionType]);
+
+    const executeQuestionFunc = useCallback(() => {
+        executeQuestion(question, (res) => setQuestionData(res));
+    }, [question]);
 
     return <>
         <div className="flex items-center gap-x-4">
@@ -42,5 +53,6 @@ export default function LiveKnowledgeGraphDetailsOverview() {
                 placeholder="Type your custom question here..."
             />
         </div>}
+        <KernButton text="Execute" onClick={executeQuestionFunc} disabled={question === ''} className="mt-4" buttonColor="indigo" textColor="white" solidTheme />
     </>
 }

@@ -47,3 +47,11 @@ export function updateKnowledgeGraph(projectId: string, knowledgeGraphId: string
     };
     jsonFetchWrapper(finalUrl, FetchType.PUT, onResult, JSON.stringify(convertCamelToSnakeCase(body)));
 }
+
+export function executeQuestion(question: string, onResult: (result: any) => void) {
+    const finalUrl = `${knowledgeGraphEndpoint}/execute-question`;
+    const body = {
+        question: question
+    };
+    jsonFetchWrapper(finalUrl, FetchType.POST, onResult, JSON.stringify(convertCamelToSnakeCase(body)));
+}
