@@ -132,8 +132,10 @@ export default function KnowledgeGraphsDetailsOverview() {
                         </div>
                     </div>
                 </div>
-                {currentKnowledgeGraph.type == KnowledgeGraphType.LIVE && <LiveKnowledgeGraphDetailsOverview />}
-                {currentKnowledgeGraph.type == KnowledgeGraphType.STABLE && <StableKnowledgeGraphDetailsOverview />}
+                <div className="p-4">
+                    {currentKnowledgeGraph.type == KnowledgeGraphType.LIVE && <LiveKnowledgeGraphDetailsOverview />}
+                    {currentKnowledgeGraph.type == KnowledgeGraphType.STABLE && <StableKnowledgeGraphDetailsOverview />}
+                </div>
             </div>
         </>}
     </div>

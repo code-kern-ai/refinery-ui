@@ -1,8 +1,6 @@
 import { selectProjectId } from "@/src/reduxStore/states/project";
 import { getKnowledgeGraphsDataStable } from "@/src/services/base/knowledge-graphs";
-import { parseUTC } from "@/submodules/javascript-functions/date-parser";
-import { arrayToDict, formatBytes } from "@/submodules/javascript-functions/general";
-import { NotApplicableBadge } from "@/submodules/react-components/components/Badges";
+import { arrayToDict } from "@/submodules/javascript-functions/general";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useSelector } from "react-redux";
 import { useColumns } from "./useColumns";
@@ -26,9 +24,7 @@ export default function StableKnowledgeGraphDetailsOverview() {
 
     useEffect(() => {
         if (!projectId) return;
-        getKnowledgeGraphsDataStable(projectId, (result) => {
-            setStableData(result);
-        });
+        getKnowledgeGraphsDataStable(projectId, (result) => setStableData(result));
     }, [projectId]);
 
     useEffect(() => {
@@ -42,20 +38,7 @@ export default function StableKnowledgeGraphDetailsOverview() {
     }, [stableData]);
 
     useEffect(() => {
-        setVisibleHeaders(prev => {
-            const next = new Set(prev);
-            for (const col of next) {
-                if (!tableHeaders.includes(col)) {
-                    next.delete(col);
-                }
-            }
-            VISIBLE_KEYS_INTEGRATIONS.forEach(col => {
-                if (tableHeaders.includes(col)) {
-                    next.add(col);
-                }
-            });
-            return next;
-        });
+        setVisibleHeaders(new Set(VISIBLE_KEYS_INTEGRATIONS.filter(col => tableHeaders.includes(col))));
     }, [tableHeaders]);
 
     const toggleHeaders = useCallback((key: string) => {
@@ -75,7 +58,7 @@ export default function StableKnowledgeGraphDetailsOverview() {
         usersDict: usersDict
     });
 
-    return <div className="p-4">
+    return <>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-2 mb-4">
             {tableHeaders.map(header => (
                 <label key={header} className="flex items-center gap-2 text-sm cursor-pointer">
@@ -110,5 +93,5 @@ export default function StableKnowledgeGraphDetailsOverview() {
                 </table>}
             </div>
         </div>
-    </div>
+    </>
 }

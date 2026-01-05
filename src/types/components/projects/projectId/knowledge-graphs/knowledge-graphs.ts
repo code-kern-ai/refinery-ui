@@ -26,3 +26,12 @@ export enum KnowledgeGraphProperty {
     NAME = 'name',
     DESCRIPTION = 'description',
 }
+
+export enum QuestionType {
+    CATALOGUE = 'CATALOGUE',
+    CUSTOM = 'CUSTOM',
+}
+
+export enum QuestionCatalogueOptions {
+    OVERVIEW = "Provide an overview of the knowledge graph."
+}
