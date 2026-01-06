@@ -7,12 +7,14 @@ import { useColumns } from "./useColumns";
 import { selectAllUsers } from "@/src/reduxStore/states/general";
 import KernDropdown from "@/submodules/react-components/components/KernDropdown";
 import KernButton from "@/submodules/react-components/components/kern-button/KernButton";
-import { useConsoleLog } from "@/submodules/react-components/hooks/useConsoleLog";
 
 const VISIBLE_KEYS_INTEGRATIONS = ['createdBy', 'updatedBy', 'createdAt', 'updatedAt', 'runningId', 'errorMessage', 'extension', 'name', 'size', 'content'];
 const DATE_KEYS = ['createdAt', 'updatedAt', 'created', 'modified'];
 const USER_KEYS = ['createdBy', 'updatedBy'];
-const FILE_SIZE_KEYS = ['size'];
+const FILE_SIZE_KEYS = ['size', 'maxSize', 'sumSize', 'avgSize', 'minSize'];
+
+const getCheckedNames = <T extends { checked: boolean; name: string }>(items: T[]) => items.filter(i => i.checked).map(i => i.name);
+const getChecked = <T extends { checked: boolean; name: string }>(items: T[]) => items.map(i => i.checked);
 
 export default function StableKnowledgeGraphDetailsOverview() {
     const projectId = useSelector(selectProjectId);
@@ -51,21 +53,22 @@ export default function StableKnowledgeGraphDetailsOverview() {
     useEffect(() => {
         if (!stableData || stableData.length == 0) return;
         setSelectedHeaders(Object.keys(stableData[0]).map(key => ({ name: key, checked: VISIBLE_KEYS_INTEGRATIONS.includes(key) })));
-        setSelectedGroupBy(groupByOptions.map(option => ({ name: option, checked: false })));
-        setSelectedAggregateBy(aggregateByOptions.map(option => ({ name: option, checked: false })));
-        setSelectedAggregateFunctions(aggregateFunctionsOptions.map(option => ({ name: option, checked: false })));
+        setSelectedGroupBy(groupByOptions.map(option => {
+            const existing = selectedGroupBy.find(g => g.name === option);
+            return { name: option, checked: existing ? existing.checked : false };
+        }));
+        setSelectedAggregateBy(aggregateByOptions.map(option => {
+            const existing = selectedAggregateBy.find(a => a.name === option);
+            return { name: option, checked: existing ? existing.checked : false };
+        }));
+        setSelectedAggregateFunctions(aggregateFunctionsOptions.map(option => {
+            const existing = selectedAggregateFunctions.find(f => f.name === option);
+            return { name: option, checked: existing ? existing.checked : false };
+        }));
     }, [stableData, groupByOptions, aggregateByOptions, aggregateFunctionsOptions]);
 
-    const mappedHeadersByName = useMemo(() => {
-        return selectedHeaders.filter(h => h.checked).map(h => h.name);
-    }, [selectedHeaders]);
-
-    const mappedHeadersByChecked = useMemo(() => {
-        return selectedHeaders.map(h => h.checked);
-    }, [selectedHeaders]);
-
     const activeHeaders = useMemo(() => {
-        return selectedHeaders.filter(h => h.checked).map(h => h.name);
+        return getCheckedNames(selectedHeaders);
     }, [selectedHeaders]);
 
     const { renderCell } = useColumns({
@@ -75,14 +78,22 @@ export default function StableKnowledgeGraphDetailsOverview() {
         usersDict: usersDict
     });
 
+    const clearFilters = useCallback(() => {
+        setSearchTerm('');
+        setSelectedGroupBy(selectedGroupBy.map(g => ({ name: g.name, checked: false })));
+        setSelectedAggregateBy(selectedAggregateBy.map(a => ({ name: a.name, checked: false })));
+        setSelectedAggregateFunctions(selectedAggregateFunctions.map(f => ({ name: f.name, checked: false })));
+        getAndFilterKnowledgeGraphsDataStable();
+    }, []);
+
     return <>
         {stableData && <>
             <p className="text-lg font-medium leading-6 text-gray-700 mb-4">Filter data</p>
             <div className="flex flex-row items-center gap-x-4">
                 <div className="flex flex-col items-center">
                     <label className="text-sm text-gray-700">Group by:</label>
-                    <KernDropdown options={selectedGroupBy} buttonName={selectedGroupBy.filter(g => g.checked).map(g => g.name).join(', ') || 'Select group by'}
-                        hasCheckboxes={true} selectedCheckboxes={selectedGroupBy.map(g => g.checked)} selectedOption={setSelectedGroupBy} hasSelectAll={true} truncateButtonName={true}
+                    <KernDropdown options={selectedGroupBy} buttonName={getCheckedNames(selectedGroupBy).join(', ') || 'Select group by'}
+                        hasCheckboxes={true} selectedCheckboxes={getChecked(selectedGroupBy)} selectedOption={setSelectedGroupBy} hasSelectAll={true} truncateButtonName={true}
                         scrollAfterNOptions={10}
                         dropdownWidth="w-[300px]"
                         dropdownItemsClasses="w-[300px]" />
@@ -90,8 +101,8 @@ export default function StableKnowledgeGraphDetailsOverview() {
 
                 <div className="flex flex-col items-center">
                     <label className="text-sm text-gray-700">Aggregate by:</label>
-                    <KernDropdown options={selectedAggregateBy} buttonName={selectedAggregateBy.filter(a => a.checked).map(a => a.name).join(', ') || 'Select aggregate by'}
-                        hasCheckboxes={true} selectedCheckboxes={selectedAggregateBy.map(a => a.checked)} selectedOption={setSelectedAggregateBy} hasSelectAll={true} truncateButtonName={true}
+                    <KernDropdown options={selectedAggregateBy} buttonName={getCheckedNames(selectedAggregateBy).join(', ') || 'Select aggregate by'}
+                        hasCheckboxes={true} selectedCheckboxes={getChecked(selectedAggregateBy)} selectedOption={setSelectedAggregateBy} hasSelectAll={true} truncateButtonName={true}
                         scrollAfterNOptions={10}
                         dropdownWidth="w-[300px]"
                         dropdownItemsClasses="w-[300px]" />
@@ -99,8 +110,8 @@ export default function StableKnowledgeGraphDetailsOverview() {
 
                 <div className="flex flex-col items-center">
                     <label className="text-sm text-gray-700">Aggregate functions:</label>
-                    <KernDropdown options={selectedAggregateFunctions} buttonName={selectedAggregateFunctions.filter(f => f.checked).map(f => f.name).join(', ') || 'Select aggregate functions'}
-                        hasCheckboxes={true} selectedCheckboxes={selectedAggregateFunctions.map(f => f.checked)} selectedOption={setSelectedAggregateFunctions} hasSelectAll={true} truncateButtonName={true}
+                    <KernDropdown options={selectedAggregateFunctions} buttonName={getCheckedNames(selectedAggregateFunctions).join(', ') || 'Select aggregate functions'}
+                        hasCheckboxes={true} selectedCheckboxes={getChecked(selectedAggregateFunctions)} selectedOption={setSelectedAggregateFunctions} hasSelectAll={true} truncateButtonName={true}
                         scrollAfterNOptions={10}
                         dropdownWidth="w-[300px]"
                         dropdownItemsClasses="w-[300px]" />
@@ -109,20 +120,17 @@ export default function StableKnowledgeGraphDetailsOverview() {
                 <div className="flex flex-col items-center">
                     <label className="text-sm text-gray-700">Search term:</label>
                     <input type="text" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} placeholder="Enter text"
-                        className="block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" />
+                        className="block w-48 border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" />
                 </div>
                 <KernButton text="Apply" onClick={getAndFilterKnowledgeGraphsDataStable} className="mt-4" buttonColor="indigo" textColor="white" solidTheme />
-                <KernButton text="Clear filters" onClick={() => {
-                    setSearchTerm('');
-                    getAndFilterKnowledgeGraphsDataStable();
-                }} className="mt-4" buttonColor="gray" textColor="white" solidTheme />
+                <KernButton text="Clear" onClick={clearFilters} className="mt-4" buttonColor="gray" textColor="white" solidTheme />
             </div>
 
             <div className="flex flex-row items-center gap-x-4 mt-6">
                 <div className="flex flex-col items-center">
                     <label className="text-sm text-gray-700">Columns in records:</label>
-                    <KernDropdown options={selectedHeaders} buttonName={mappedHeadersByName.length > 0 ? mappedHeadersByName.join(', ') : 'Select columns'}
-                        hasCheckboxes={true} selectedCheckboxes={mappedHeadersByChecked} selectedOption={setSelectedHeaders} hasSelectAll={true} truncateButtonName={true}
+                    <KernDropdown options={selectedHeaders} buttonName={getCheckedNames(selectedHeaders).length > 0 ? getCheckedNames(selectedHeaders).join(', ') : 'Select columns'}
+                        hasCheckboxes={true} selectedCheckboxes={getChecked(selectedHeaders)} selectedOption={setSelectedHeaders} hasSelectAll={true} truncateButtonName={true}
                         scrollAfterNOptions={10}
                         dropdownWidth="w-[300px]"
                         dropdownItemsClasses="w-[300px]" />
