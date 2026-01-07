@@ -7,6 +7,12 @@ import { useColumns } from "./useColumns";
 import { selectAllUsers } from "@/src/reduxStore/states/general";
 import KernDropdown from "@/submodules/react-components/components/KernDropdown";
 import KernButton from "@/submodules/react-components/components/kern-button/KernButton";
+import KernTable from "@/submodules/react-components/components/kern-table/KernTable";
+import { camelCaseToWords } from "@/submodules/javascript-functions/case-types-parser";
+import useRefFor from "@/submodules/react-components/hooks/useRefFor";
+import { SortDirection, SortKeyIdx } from "@/submodules/react-components/types/sort";
+import { nextSortDirectionByIdx, sortBySortKeyIdx, sortPreppedArrayByIdx } from "@/submodules/react-components/helpers/sort-functions";
+import useRefState from "@/submodules/react-components/hooks/useRefState";
 
 const VISIBLE_KEYS_INTEGRATIONS = ['createdBy', 'updatedBy', 'createdAt', 'updatedAt', 'runningId', 'errorMessage', 'extension', 'name', 'size', 'content'];
 const DATE_KEYS = ['createdAt', 'updatedAt', 'created', 'modified'];
@@ -15,12 +21,14 @@ const FILE_SIZE_KEYS = ['size', 'maxSize', 'sumSize', 'avgSize', 'minSize'];
 
 const getCheckedNames = <T extends { checked: boolean; name: string }>(items: T[]) => items.filter(i => i.checked).map(i => i.name);
 const getChecked = <T extends { checked: boolean; name: string }>(items: T[]) => items.map(i => i.checked);
-
-type KnowledgeGraphDetailsProps = {
-    knowledgeGraphId: string;
+export const DEFAULT_SORT_KEY_STABLE_KG: SortKeyIdx = {
+    idx: 2, // 'createdAtDate',
+    dataType: 'string',
+    direction: SortDirection.DESC
 }
 
-export default function StableKnowledgeGraphDetailsOverview(props: KnowledgeGraphDetailsProps) {
+
+export default function StableKnowledgeGraphDetailsOverview() {
     const projectId = useSelector(selectProjectId);
     const users = useSelector(selectAllUsers);
     const usersDict = arrayToDict(users, 'id');
@@ -34,7 +42,9 @@ export default function StableKnowledgeGraphDetailsOverview(props: KnowledgeGrap
     const [selectedAggregateBy, setSelectedAggregateBy] = useState<{ name: string, checked: boolean }[]>([]);
     const [aggregateByOptions, setAggregateByOptions] = useState<string[]>([]);
     const [selectedAggregateFunctions, setSelectedAggregateFunctions] = useState<{ name: string, checked: boolean }[]>([]);
-    const [aggregateFunctionsOptions, setAggregateFunctionsOptions] = useState<string[]>();
+    const [aggregateFunctionsOptions, setAggregateFunctionsOptions] = useState<string[]>([]);
+    const { state: sortKey, setState: setSortKey, ref: sortKeyRef } = useRefState(DEFAULT_SORT_KEY_STABLE_KG);
+
 
     const getAndFilterKnowledgeGraphsDataStable = useCallback(() => {
         if (!projectId) return;
@@ -56,7 +66,12 @@ export default function StableKnowledgeGraphDetailsOverview(props: KnowledgeGrap
 
     useEffect(() => {
         if (!stableData || stableData.length == 0) return;
-        setSelectedHeaders(Object.keys(stableData[0]).map(key => ({ name: key, checked: VISIBLE_KEYS_INTEGRATIONS.includes(key) })));
+        const checkIfNoFilters = [...selectedGroupBy, ...selectedAggregateBy, ...selectedAggregateFunctions].every(f => !f.checked);
+        if (checkIfNoFilters) {
+            setSelectedHeaders(Object.keys(stableData[0]).map(key => ({ name: key, checked: VISIBLE_KEYS_INTEGRATIONS.includes(key) })));
+        } else {
+            setSelectedHeaders(Object.keys(stableData[0]).map(key => ({ name: key, checked: true })));
+        }
         setSelectedGroupBy(groupByOptions.map(option => {
             const existing = selectedGroupBy.find(g => g.name === option);
             return { name: option, checked: existing ? existing.checked : false };
@@ -65,11 +80,16 @@ export default function StableKnowledgeGraphDetailsOverview(props: KnowledgeGrap
             const existing = selectedAggregateBy.find(a => a.name === option);
             return { name: option, checked: existing ? existing.checked : false };
         }));
-        setSelectedAggregateFunctions(aggregateFunctionsOptions.map(option => {
+    }, [stableData, groupByOptions, aggregateByOptions]);
+
+    useEffect(() => {
+        const noneSelected = selectedAggregateBy.every(g => !g.checked);
+        const aggFunctions = noneSelected ? ['count'] : aggregateFunctionsOptions;
+        setSelectedAggregateFunctions(aggFunctions.map(option => {
             const existing = selectedAggregateFunctions.find(f => f.name === option);
             return { name: option, checked: existing ? existing.checked : false };
         }));
-    }, [stableData, groupByOptions, aggregateByOptions, aggregateFunctionsOptions]);
+    }, [selectedAggregateBy, aggregateFunctionsOptions]);
 
     const activeHeaders = useMemo(() => {
         return getCheckedNames(selectedHeaders);
@@ -83,6 +103,8 @@ export default function StableKnowledgeGraphDetailsOverview(props: KnowledgeGrap
     });
 
     const clearFilters = useCallback(() => {
+        setStableData(null);
+        setSelectedHeaders(selectedHeaders.map(h => ({ name: h.name, checked: VISIBLE_KEYS_INTEGRATIONS.includes(h.name) })));
         setSearchTerm('');
         setSelectedGroupBy(selectedGroupBy.map(g => ({ name: g.name, checked: false })));
         setSelectedAggregateBy(selectedAggregateBy.map(a => ({ name: a.name, checked: false })));
@@ -90,8 +112,48 @@ export default function StableKnowledgeGraphDetailsOverview(props: KnowledgeGrap
         getAndFilterKnowledgeGraphsDataStable();
     }, []);
 
+    const preparedData = useMemo(() => {
+        if (!stableData || stableData.length === 0 || !activeHeaders || activeHeaders.length === 0) return [];
+        const values = stableData.map((row: any) =>
+            activeHeaders.map((header) => renderCell(header, row[header]))
+        );
+        sortBySortKeyIdx(values, sortKeyRef.current)
+        return values;
+    }, [stableData, activeHeaders]);
+
+    const preparedHeaders = useMemo(() => {
+        return activeHeaders.map((header) => ({
+            column: camelCaseToWords(header),
+            id: header,
+            hasSort: true
+        }));
+    }, [activeHeaders]);
+
+    const preparedValuesRef = useRefFor(preparedData);
+
+    const tableConfig = useMemo(() => {
+        function sortByPropertyIdx(idx: number) {
+            if (!preparedValuesRef.current || preparedValuesRef.current.length === 0) return;
+
+            let newSortKey: SortKeyIdx;
+            if (nextSortDirectionByIdx(idx, sortKey) === SortDirection.NO_SORT) {
+                newSortKey = { ...DEFAULT_SORT_KEY_STABLE_KG };
+                if (sortKey.idx === newSortKey.idx) newSortKey.direction = SortDirection.ASC;
+                sortBySortKeyIdx(preparedValuesRef.current, newSortKey);
+            } else {
+                newSortKey = sortPreppedArrayByIdx(preparedValuesRef.current, idx, sortKey);
+            }
+            setSortKey(newSortKey);
+        }
+
+        return {
+            sortKeyIdx: sortKey,
+            onClickSortIdx: (idx: number) => sortByPropertyIdx(idx)
+        }
+    }, [sortKey])
+
     return <>
-        {stableData && <>
+        {preparedData && <>
             <p className="text-lg font-medium leading-6 text-gray-700 mb-4">Filter data</p>
             <div className="flex flex-row items-center gap-x-4">
                 <div className="flex flex-col items-center">
@@ -143,7 +205,7 @@ export default function StableKnowledgeGraphDetailsOverview(props: KnowledgeGrap
             </div>
             <div className="inline-block min-w-full align-middle mt-3">
                 <div className="overflow-hidden shadow ring-1 ring-black ring-opacity-5 md:rounded-lg" style={{ padding: '3px' }}>
-                    <table className="min-w-full divide-y divide-gray-300">
+                    {/* <table className="min-w-full divide-y divide-gray-300">
                         <thead className="bg-gray-50">
                             <tr>
                                 {activeHeaders.map(header => (
@@ -167,7 +229,12 @@ export default function StableKnowledgeGraphDetailsOverview(props: KnowledgeGrap
                                 </tr>
                             ))}
                         </tbody>
-                    </table>
+                    </table> */}
+                    <KernTable
+                        headers={preparedHeaders}
+                        values={preparedData}
+                        config={tableConfig}
+                    />
                 </div>
             </div>
         </>}

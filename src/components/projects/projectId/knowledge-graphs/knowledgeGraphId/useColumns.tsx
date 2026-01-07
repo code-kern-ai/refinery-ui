@@ -30,10 +30,10 @@ export function useColumns({ dateKeys = [], fileSizeKeys = [], userKeys = [], us
 
     const renderCell = useCallback((header: string, value: any) => {
         if (value === null || value === undefined) {
-            return <NotApplicableBadge />;
+            return { type: "text", value };
         }
         const formatter = formatters[header];
-        return formatter ? formatter(value) : String(value);
+        return { type: "text", value: formatter ? formatter(value) : String(value) };
     }, [formatters]);
 
     return { renderCell };

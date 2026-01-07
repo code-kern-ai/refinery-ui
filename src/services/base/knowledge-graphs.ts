@@ -54,8 +54,8 @@ export function updateKnowledgeGraph(projectId: string, knowledgeGraphId: string
     jsonFetchWrapper(finalUrl, FetchType.PUT, onResult, JSON.stringify(convertCamelToSnakeCase(body)));
 }
 
-export function executeQuestion(question: string, onResult: (result: any) => void) {
-    const finalUrl = `${knowledgeGraphEndpoint}/execute-question`;
+export function executeQuestion(knowledgeGraphId: string, question: string, onResult: (result: any) => void) {
+    const finalUrl = `${knowledgeGraphEndpoint}/${knowledgeGraphId}/execute-question`;
     const body = {
         question: question
     };
