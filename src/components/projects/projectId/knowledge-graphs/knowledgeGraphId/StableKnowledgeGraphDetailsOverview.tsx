@@ -16,7 +16,11 @@ const FILE_SIZE_KEYS = ['size', 'maxSize', 'sumSize', 'avgSize', 'minSize'];
 const getCheckedNames = <T extends { checked: boolean; name: string }>(items: T[]) => items.filter(i => i.checked).map(i => i.name);
 const getChecked = <T extends { checked: boolean; name: string }>(items: T[]) => items.map(i => i.checked);
 
-export default function StableKnowledgeGraphDetailsOverview() {
+type KnowledgeGraphDetailsProps = {
+    knowledgeGraphId: string;
+}
+
+export default function StableKnowledgeGraphDetailsOverview(props: KnowledgeGraphDetailsProps) {
     const projectId = useSelector(selectProjectId);
     const users = useSelector(selectAllUsers);
     const usersDict = arrayToDict(users, 'id');
