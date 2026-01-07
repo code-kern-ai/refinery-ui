@@ -125,7 +125,8 @@ export default function StableKnowledgeGraphDetailsOverview() {
         return activeHeaders.map((header) => ({
             column: camelCaseToWords(header),
             id: header,
-            hasSort: true
+            hasSort: true,
+            wrapWhitespace: true
         }));
     }, [activeHeaders]);
 
@@ -205,31 +206,6 @@ export default function StableKnowledgeGraphDetailsOverview() {
             </div>
             <div className="inline-block min-w-full align-middle mt-3">
                 <div className="overflow-hidden shadow ring-1 ring-black ring-opacity-5 md:rounded-lg" style={{ padding: '3px' }}>
-                    {/* <table className="min-w-full divide-y divide-gray-300">
-                        <thead className="bg-gray-50">
-                            <tr>
-                                {activeHeaders.map(header => (
-                                    <th key={header} className="border px-3 py-2 text-left text-sm font-medium">
-                                        {header}
-                                    </th>
-                                ))}
-                                {activeHeaders.length === 0 && <th className="border px-3 py-2 text-left text-sm font-medium text-gray-500">
-                                    No columns selected.
-                                </th>}
-                            </tr>
-                        </thead>
-                        <tbody className="divide-y divide-gray-200">
-                            {stableData && stableData.map((row: any, rowIndex: number) => (
-                                <tr key={rowIndex} className={rowIndex % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
-                                    {activeHeaders.map((header) => (
-                                        <td key={header} className="border px-3 py-2 text-sm text-gray-900">
-                                            {renderCell(header, row[header])}
-                                        </td>
-                                    ))}
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table> */}
                     <KernTable
                         headers={preparedHeaders}
                         values={preparedData}
