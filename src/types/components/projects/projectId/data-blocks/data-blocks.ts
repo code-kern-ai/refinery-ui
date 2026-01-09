@@ -1,28 +1,27 @@
-export type KnowledgeGraph = {
+export type DataBlock = {
     id: string;
     name: string;
     description: string;
-    type: KnowledgeGraphType;
+    type: DataBlockType;
     selected: boolean;
 };
 
-
-export type DeleteKnowledgeGraphModalProps = {
+export type DeleteDataBlockModalProps = {
     countSelected: number;
     selectionList: string;
     refetch: () => void;
 };
 
-export type KnowledgeGraphsHeaderProps = {
+export type DataBlocksHeaderProps = {
     refetch: () => void;
 }
 
-export enum KnowledgeGraphType {
+export enum DataBlockType {
     LIVE = 'LIVE',
     STABLE = 'STABLE',
 }
 
-export enum KnowledgeGraphProperty {
+export enum DataBlockProperty {
     NAME = 'name',
     DESCRIPTION = 'description',
 }

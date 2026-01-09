@@ -146,10 +146,10 @@ export default function Sidebar() {
                                         </div>}
                                         {user.role === UserRole.ENGINEER && <div
                                             className="flex items-center justify-center overflow-visible mt-9 2xl:mt-12">
-                                            <Tooltip placement="right" trigger="hover" color="invert" content={TOOLTIPS_DICT.SIDEBAR.KNOWLEDGE_GRAPHS}>
+                                            <Tooltip placement="right" trigger="hover" color="invert" content={TOOLTIPS_DICT.SIDEBAR.DATA_BLOCKS}>
                                                 <div className="relative z-50">
-                                                    <a href={`/refinery/projects/${project.id}/knowledge-graphs`} onClick={(e: any) => { e.preventDefault(); router.push(`/projects/${project.id}/knowledge-graphs`) }}
-                                                        className={`circle ${routeColor.knowledgeGraphs.active ? 'text-kernpurple' : 'text-white'}`}>
+                                                    <a href={`/refinery/projects/${project.id}/data-blocks`} onClick={(e: any) => { e.preventDefault(); router.push(`/projects/${project.id}/data-blocks`) }}
+                                                        className={`circle ${routeColor.dataBlocks.active ? 'text-kernpurple' : 'text-white'}`}>
                                                         <MemoIconSitemapFilled className="w-6 h-6" />
                                                     </a>
                                                 </div>

@@ -227,10 +227,10 @@ const initialState: Modals = {
     [ModalEnum.DELETE_EVALUATION_RUN]: {
         open: false
     },
-    [ModalEnum.DELETE_KNOWLEDGE_GRAPH]: {
+    [ModalEnum.DELETE_DATA_BLOCK]: {
         open: false
     },
-    [ModalEnum.CREATE_KNOWLEDGE_GRAPH]: {
+    [ModalEnum.CREATE_DATA_BLOCK]: {
         open: false
     }
 };

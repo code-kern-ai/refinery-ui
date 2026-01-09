@@ -1,8 +1,8 @@
 import Modal from "@/src/components/shared/modal/Modal";
-import { selectKnowledgeGraphsAll } from "@/src/reduxStore/states/pages/knowledge-graphs";
+import { selectDataBlocksAll } from "@/src/reduxStore/states/pages/data-blocks";
 import { selectProjectId } from "@/src/reduxStore/states/project";
-import { createKnowledgeGraph } from "@/src/services/base/knowledge-graphs";
-import { KnowledgeGraphType } from "@/src/types/components/projects/projectId/knowledge-graphs/knowledge-graphs";
+import { createDataBlock } from "@/src/services/base/data-blocks";
+import { DataBlockType } from "@/src/types/components/projects/projectId/data-blocks/data-blocks";
 import { ModalButton, ModalEnum } from "@/src/types/shared/modal";
 import KernDropdown from "@/submodules/react-components/components/KernDropdown";
 import { useRouter } from "next/router";
@@ -10,13 +10,13 @@ import { useCallback, useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 
 const ACCEPT_BUTTON = { buttonCaption: 'Create', useButton: true, disabled: true };
-const TYPE_OPTIONS = Object.values(KnowledgeGraphType)
+const TYPE_OPTIONS = Object.values(DataBlockType)
 
-export default function CreateKnowledgeGraphModal() {
+export default function CreateDataBlockModal() {
     const router = useRouter();
 
     const projectId = useSelector(selectProjectId);
-    const knowledgeGraphs = useSelector(selectKnowledgeGraphsAll);
+    const dataBlocks = useSelector(selectDataBlocksAll);
 
     const [name, setName] = useState('');
     const [description, setDescription] = useState('');
@@ -24,24 +24,24 @@ export default function CreateKnowledgeGraphModal() {
     const [typeOptions, setTypeOptions] = useState<string[]>(TYPE_OPTIONS);
 
     useEffect(() => {
-        const usedTypes = knowledgeGraphs.map(graph => graph.type);
+        const usedTypes = dataBlocks.map(block => block.type);
         setTypeOptions(TYPE_OPTIONS.filter(option => !usedTypes.includes(option)));
-    }, [knowledgeGraphs]);
+    }, [dataBlocks]);
 
-    const createKnowledgeGraphPost = useCallback(() => {
-        createKnowledgeGraph(projectId, name, description, type, (res) => {
-            router.push(`/projects/${projectId}/knowledge-graphs/${res.id}?type=${type}`);
+    const createDataBlockPost = useCallback(() => {
+        createDataBlock(projectId, name, description, type, (res) => {
+            router.push(`/projects/${projectId}/data-blocks/${res.id}?type=${type}`);
         });
     }, [name, description, type]);
 
     const [acceptButton, setAcceptButton] = useState<ModalButton>(ACCEPT_BUTTON);
 
     useEffect(() => {
-        setAcceptButton({ ...ACCEPT_BUTTON, emitFunction: createKnowledgeGraphPost, disabled: !name || !description || !type });
-    }, [name, description, type, createKnowledgeGraphPost]);
+        setAcceptButton({ ...ACCEPT_BUTTON, emitFunction: createDataBlockPost, disabled: !name || !description || !type });
+    }, [name, description, type, createDataBlockPost]);
 
-    return (<Modal modalName={ModalEnum.CREATE_KNOWLEDGE_GRAPH} acceptButton={acceptButton}>
-        <h1 className="text-lg text-gray-900 text-center mb-4">Add new knowledge graph</h1>
+    return (<Modal modalName={ModalEnum.CREATE_DATA_BLOCK} acceptButton={acceptButton}>
+        <h1 className="text-lg text-gray-900 text-center mb-4">Add new data block</h1>
         <div className="grid grid-cols-2 gap-2 items-center" style={{ gridTemplateColumns: 'max-content auto' }}>
             <div className="justify-self-start">
                 <span className="card-title mb-0 label-text text-left"><span className="underline filtersUnderline">Name</span></span>

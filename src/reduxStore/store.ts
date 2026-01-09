@@ -11,7 +11,7 @@ import { dataBrowserReducer } from './states/pages/data-browser';
 import { cacheReducer } from './states/cachedValues';
 import { labelingReducer } from './states/pages/labeling';
 import { tmpReducer } from './states/tmp';
-import { knowledgeGraphsReducer } from './states/pages/knowledge-graphs';
+import { dataBlocksReducer } from './states/pages/data-blocks';
 
 const store = configureStore({
     reducer: {
@@ -27,7 +27,7 @@ const store = configureStore({
         cache: cacheReducer,
         labeling: labelingReducer,
         tmp: tmpReducer,
-        knowledgeGraphs: knowledgeGraphsReducer,
+        dataBlocks: dataBlocksReducer,
     },
     devTools: process.env.IS_DEV == '1',
 });

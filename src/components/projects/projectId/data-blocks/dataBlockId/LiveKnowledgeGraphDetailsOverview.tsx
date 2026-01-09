@@ -1,30 +1,30 @@
-import { selectKnowledgeGraph } from "@/src/reduxStore/states/pages/knowledge-graphs";
-import { executeQuestion } from "@/src/services/base/knowledge-graphs";
-import { QuestionCatalogueOptions, QuestionType } from "@/src/types/components/projects/projectId/knowledge-graphs/knowledge-graphs";
+// import { selectKnowledgeGraph } from "@/src/reduxStore/states/pages/data-blocks";
+import { executeQuestion } from "@/src/services/base/data-blocks";
+import { QuestionCatalogueOptions, QuestionType } from "@/src/types/components/projects/projectId/data-blocks/data-blocks";
 import KernButton from "@/submodules/react-components/components/kern-button/KernButton";
 import KernDropdown from "@/submodules/react-components/components/KernDropdown";
 import { useCallback, useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 
 export default function LiveKnowledgeGraphDetailsOverview() {
-    const knowledgeGraphId = useSelector(selectKnowledgeGraph).id;
-    const [questionType, setQuestionType] = useState<QuestionType>(QuestionType.CATALOGUE);
-    const [question, setQuestion] = useState("");
-    const [questionData, setQuestionData] = useState<any>(null);
+    // const knowledgeGraphId = useSelector(selectKnowledgeGraph).id;
+    // const [questionType, setQuestionType] = useState<QuestionType>(QuestionType.CATALOGUE);
+    // const [question, setQuestion] = useState("");
+    // const [questionData, setQuestionData] = useState<any>(null);
 
-    useEffect(() => {
-        setQuestion("");
-    }, [questionType]);
+    // useEffect(() => {
+    //     setQuestion("");
+    // }, [questionType]);
 
-    const executeQuestionFunc = useCallback(() => {
-        executeQuestion(knowledgeGraphId, question, (res) => {
-            setQuestionData(res.answer);
-            setQuestion("");
-        });
-    }, [knowledgeGraphId, question]);
+    // const executeQuestionFunc = useCallback(() => {
+    //     executeQuestion(knowledgeGraphId, question, (res) => {
+    //         setQuestionData(res.answer);
+    //         setQuestion("");
+    //     });
+    // }, [knowledgeGraphId, question]);
 
     return <>
-        <div className="flex items-center gap-x-4">
+        {/* <div className="flex items-center gap-x-4">
             <div className="flex gap-1 items-center">
                 <input type="radio" id="question-catalogue" name="question-type" value="dynamic"
                     onChange={() => setQuestionType(QuestionType.CATALOGUE)} checked={questionType === QuestionType.CATALOGUE}
@@ -64,6 +64,6 @@ export default function LiveKnowledgeGraphDetailsOverview() {
         {questionData && <div className="mt-6 p-4 border border-gray-200 rounded bg-gray-50">
             <h3 className="text-lg font-medium mb-2">Question Result:</h3>
             <pre className="whitespace-pre-wrap text-sm text-gray-800">{questionData}</pre>
-        </div>}
+        </div>} */}
     </>
 }
