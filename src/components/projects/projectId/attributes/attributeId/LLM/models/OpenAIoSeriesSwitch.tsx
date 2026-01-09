@@ -9,7 +9,7 @@ export default function OpenAIoSeriesSwitch(props: OpenAIoSeriesSwitchProps) {
         <Switch.Group as="div" className="flex items-center justify-between">
             <span className="flex flex-row gap-x-1 items-center">
                 <Switch.Description as="span" className="text-sm font-medium text-gray-700 mr-2">
-                    o model series
+                    Reasoning model
                 </Switch.Description>
 
             </span>
