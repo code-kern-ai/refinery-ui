@@ -1,10 +1,13 @@
 import { SQLTemplates } from "@/src/types/components/projects/projectId/data-blocks/data-blocks";
 
-export const SQL_TEMPLATES_DICT = {
-    [SQLTemplates.BLANK_QUERY]: {
-        select_query: '',
-        where_query: '',
-        group_by_query: '',
-        order_by_query: '',
+export const getSQLTemplatesDict = (projectId: string) => {
+    return {
+        [SQLTemplates.BLANK_QUERY]: {
+            select_query: 'SELECT ',
+            from_query: 'FROM public.record',
+            where_query: `WHERE project_id = '${projectId}'`,
+            group_by_query: 'GROUP BY ',
+            order_by_query: 'ORDER BY ',
+        }
     }
 }

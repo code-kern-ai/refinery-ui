@@ -8,8 +8,9 @@ import { selectDataBlock, setActiveDataBlock, updateDataBlocksState } from "@/sr
 import { getDataBlock, updateDataBlock } from "@/src/services/base/data-blocks";
 import { DataBlockProperty, SQLTemplates } from "@/src/types/components/projects/projectId/data-blocks/data-blocks";
 import KernDropdown from "@/submodules/react-components/components/KernDropdown";
-import { SQL_TEMPLATES_DICT } from "@/src/util/components/projects/projectId/data-blocks/data-blocks";
+import { getSQLTemplatesDict } from "@/src/util/components/projects/projectId/data-blocks/data-blocks";
 import CopyToClipboard from "@/submodules/react-components/components/CopyToClipboard";
+import { testGroupByClause, testOrderByClause, testSelectClause, testWhereClause } from "@/src/services/base/misc";
 
 export default function DataBlocksDetailsOverview() {
     const router = useRouter();
@@ -23,7 +24,7 @@ export default function DataBlocksDetailsOverview() {
     const [isNameOpen, setIsNameOpen] = useState(false);
     const [isDescriptionOpen, setIsDescriptionOpen] = useState(false);
     const [sqlTemplate, setSQLTemplate] = useState<SQLTemplates>(SQLTemplates.BLANK_QUERY);
-    const [sqlTemplateState, setSQLTemplateState] = useState<any>(SQL_TEMPLATES_DICT[sqlTemplate]);
+    const [sqlTemplateState, setSQLTemplateState] = useState<any>({});
     const [previewText, setPreviewText] = useState('');
     const [isTestQuerySuccess, setIsTestQuerySuccess] = useState(false);
 
@@ -49,18 +50,17 @@ export default function DataBlocksDetailsOverview() {
     }, [currentDataBlock]);
 
     useEffect(() => {
-        if (!isInitializingRef.current) {
-            setSQLTemplateState(SQL_TEMPLATES_DICT[sqlTemplate]);
-        }
-    }, [sqlTemplate]);
+        if (!projectId || !sqlTemplate) return;
+        setSQLTemplateState(getSQLTemplatesDict(projectId)[sqlTemplate]);
+    }, [sqlTemplate, projectId]);
 
     useEffect(() => {
         const parts: string[] = [];
-        parts.push(`SELECT ${sqlTemplateState.select_query}`);
-        parts.push(`FROM public.record`);
-        parts.push(`WHERE project_id = '${projectId}' ${sqlTemplateState.where_query}`);
-        parts.push(`GROUP BY ${sqlTemplateState.group_by_query}`);
-        parts.push(`ORDER BY ${sqlTemplateState.order_by_query}`);
+        parts.push(`${sqlTemplateState.select_query}`);
+        parts.push(`${sqlTemplateState.from_query}`);
+        parts.push(`${sqlTemplateState.where_query}`);
+        parts.push(`${sqlTemplateState.group_by_query}`);
+        parts.push(`${sqlTemplateState.order_by_query}`);
         setPreviewText(parts.join('\n'));
     }, [sqlTemplateState]);
 
@@ -115,8 +115,25 @@ export default function DataBlocksDetailsOverview() {
     }, [currentDataBlock]);
 
     const testQuery = useCallback(() => {
-        setIsTestQuerySuccess(true);
-    }, []);
+        let error = "";
+        const done = [false, false, false, false];
+        testWhereClause(sqlTemplateState.where_query, (r) => {
+            if (!r.isValid) error += "Where clause is NOT valid: " + r.denyReason;
+            done[0] = true;
+        });
+        testOrderByClause(sqlTemplateState.order_by_query, (r2) => {
+            if (!r2.isValid) error += "Order By is NOT valid: " + r2.denyReason;
+            done[1] = true;
+        });
+        testSelectClause(sqlTemplateState.select_query, (r3) => {
+            if (!r3.isValid) error += "Select clause is NOT valid: " + r3.denyReason;
+            done[2] = true;
+        });
+        testGroupByClause(sqlTemplateState.group_by_query, (r4) => {
+            if (!r4.isValid) error += "Group By is NOT valid: " + r4.denyReason;
+            done[3] = true;
+        });
+    }, [sqlTemplateState]);
 
     const executeQuery = useCallback(() => {
     }, []);
@@ -213,7 +230,6 @@ export default function DataBlocksDetailsOverview() {
                                 text="Test query"
                                 onClick={testQuery}
                                 icon={MemoIconPlayerPlay}
-                                disabled={!sqlTemplateState.select_query || !sqlTemplateState.where_query || !sqlTemplateState.group_by_query || !sqlTemplateState.order_by_query}
                             />
                             <KernButton
                                 text="Execute query"
