@@ -9,6 +9,7 @@ import { getDataBlock, updateDataBlock } from "@/src/services/base/data-blocks";
 import { DataBlockProperty, SQLTemplates } from "@/src/types/components/projects/projectId/data-blocks/data-blocks";
 import KernDropdown from "@/submodules/react-components/components/KernDropdown";
 import { SQL_TEMPLATES_DICT } from "@/src/util/components/projects/projectId/data-blocks/data-blocks";
+import CopyToClipboard from "@/submodules/react-components/components/CopyToClipboard";
 
 export default function DataBlocksDetailsOverview() {
     const router = useRouter();
@@ -54,20 +55,12 @@ export default function DataBlocksDetailsOverview() {
     }, [sqlTemplate]);
 
     useEffect(() => {
-        if (!sqlTemplateState) return;
         const parts: string[] = [];
-        if (sqlTemplateState.select_query) {
-            parts.push(`${sqlTemplateState.select_query}`);
-        }
-        if (sqlTemplateState.where_query) {
-            parts.push(`${sqlTemplateState.where_query}`);
-        }
-        if (sqlTemplateState.group_by_query) {
-            parts.push(`${sqlTemplateState.group_by_query}`);
-        }
-        if (sqlTemplateState.order_by_query) {
-            parts.push(`${sqlTemplateState.order_by_query}`);
-        }
+        parts.push(`SELECT ${sqlTemplateState.select_query}`);
+        parts.push(`FROM public.record`);
+        parts.push(`WHERE project_id = '${projectId}' ${sqlTemplateState.where_query}`);
+        parts.push(`GROUP BY ${sqlTemplateState.group_by_query}`);
+        parts.push(`ORDER BY ${sqlTemplateState.order_by_query}`);
         setPreviewText(parts.join('\n'));
     }, [sqlTemplateState]);
 
@@ -186,28 +179,32 @@ export default function DataBlocksDetailsOverview() {
                 <div className="grid grid-cols-2 gap-4">
                     <div className="flex flex-col gap-4">
                         <div>
-                            <label htmlFor="select-query" className="text-sm leading-5 font-medium text-gray-700">Select query</label>
+                            <label htmlFor="select-query" className="text-sm leading-5 font-medium text-gray-700">Select</label>
                             <textarea id="select-query" value={sqlTemplateState.select_query} className="w-full border-gray-300 rounded-md placeholder-italic border text-gray-700 pl-4 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100"
                                 onChange={(e) => setSQLTemplateState({ ...sqlTemplateState, select_query: e.target.value })} />
                         </div>
                         <div>
-                            <label htmlFor="where-query" className="text-sm leading-5 font-medium text-gray-700">Where query</label>
+                            <label htmlFor="where-query" className="text-sm leading-5 font-medium text-gray-700">Where</label>
                             <textarea id="where-query" value={sqlTemplateState.where_query} className="w-full border-gray-300 rounded-md placeholder-italic border text-gray-700 pl-4 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100"
                                 onChange={(e) => setSQLTemplateState({ ...sqlTemplateState, where_query: e.target.value })} />
                         </div>
                         <div>
-                            <label htmlFor="group-by-query" className="text-sm leading-5 font-medium text-gray-700">Group by query</label>
+                            <label htmlFor="group-by-query" className="text-sm leading-5 font-medium text-gray-700">Group by</label>
                             <textarea id="group-by-query" value={sqlTemplateState.group_by_query} className="w-full border-gray-300 rounded-md placeholder-italic border text-gray-700 pl-4 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100"
                                 onChange={(e) => setSQLTemplateState({ ...sqlTemplateState, group_by_query: e.target.value })} />
                         </div>
                         <div>
-                            <label htmlFor="order-by-query" className="text-sm leading-5 font-medium text-gray-700">Order by query</label>
+                            <label htmlFor="order-by-query" className="text-sm leading-5 font-medium text-gray-700">Order by</label>
                             <textarea id="order-by-query" value={sqlTemplateState.order_by_query} className="w-full border-gray-300 rounded-md placeholder-italic border text-gray-700 pl-4 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100"
                                 onChange={(e) => setSQLTemplateState({ ...sqlTemplateState, order_by_query: e.target.value })} />
                         </div>
                     </div>
                     <div className="flex flex-col">
-                        <label htmlFor="preview-text" className="text-sm leading-5 font-medium text-gray-700">Preview query</label>
+                        <div className="flex flex-row gap-x-2 items-center">
+                            <label htmlFor="preview-text" className="text-sm leading-5 font-medium text-gray-700">Preview query</label>
+                            <CopyToClipboard nameToCopy={previewText} />
+                        </div>
+
                         <div className="bg-gray-100 p-4 rounded-md flex-1 min-h-0">
                             <pre className="whitespace-pre-wrap text-sm text-gray-800 h-full">{previewText}</pre>
                         </div>
