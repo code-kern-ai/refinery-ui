@@ -1,12 +1,14 @@
 import { selectProjectId } from "@/src/reduxStore/states/project";
 import KernButton from "@/submodules/react-components/components/kern-button/KernButton";
-import { MemoIconArrowLeft } from "@/submodules/react-components/components/kern-icons/icons";
+import { MemoIconArrowLeft, MemoIconPlayerPlay } from "@/submodules/react-components/components/kern-icons/icons";
 import { useRouter } from "next/router";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { selectDataBlock, setActiveDataBlock, updateDataBlocksState } from "@/src/reduxStore/states/pages/data-blocks";
 import { getDataBlock, updateDataBlock } from "@/src/services/base/data-blocks";
-import { DataBlockProperty } from "@/src/types/components/projects/projectId/data-blocks/data-blocks";
+import { DataBlockProperty, SQLTemplates } from "@/src/types/components/projects/projectId/data-blocks/data-blocks";
+import KernDropdown from "@/submodules/react-components/components/KernDropdown";
+import { SQL_TEMPLATES_DICT } from "@/src/util/components/projects/projectId/data-blocks/data-blocks";
 
 export default function DataBlocksDetailsOverview() {
     const router = useRouter();
@@ -19,10 +21,14 @@ export default function DataBlocksDetailsOverview() {
     const [isHeaderNormal, setIsHeaderNormal] = useState(true);
     const [isNameOpen, setIsNameOpen] = useState(false);
     const [isDescriptionOpen, setIsDescriptionOpen] = useState(false);
+    const [sqlTemplate, setSQLTemplate] = useState<SQLTemplates>(SQLTemplates.BLANK_QUERY);
+    const [sqlTemplateState, setSQLTemplateState] = useState<any>(SQL_TEMPLATES_DICT[sqlTemplate]);
+    const [previewText, setPreviewText] = useState('');
+    const [isTestQuerySuccess, setIsTestQuerySuccess] = useState(false);
 
     const nameRef = useRef<HTMLInputElement>(null);
     const descriptionRef = useRef<HTMLInputElement>(null);
-
+    const isInitializingRef = useRef(false);
 
     useEffect(() => {
         if (!dataBlockId) return;
@@ -30,6 +36,40 @@ export default function DataBlocksDetailsOverview() {
             dispatch(setActiveDataBlock(res));
         });
     }, [dataBlockId]);
+
+    useEffect(() => {
+        if (!currentDataBlock || !currentDataBlock.sqlConfig) return;
+        isInitializingRef.current = true;
+        setSQLTemplate(currentDataBlock.sqlConfig.template);
+        setSQLTemplateState(currentDataBlock.sqlConfig.config);
+        setTimeout(() => {
+            isInitializingRef.current = false;
+        }, 0);
+    }, [currentDataBlock]);
+
+    useEffect(() => {
+        if (!isInitializingRef.current) {
+            setSQLTemplateState(SQL_TEMPLATES_DICT[sqlTemplate]);
+        }
+    }, [sqlTemplate]);
+
+    useEffect(() => {
+        if (!sqlTemplateState) return;
+        const parts: string[] = [];
+        if (sqlTemplateState.select_query) {
+            parts.push(`${sqlTemplateState.select_query}`);
+        }
+        if (sqlTemplateState.where_query) {
+            parts.push(`${sqlTemplateState.where_query}`);
+        }
+        if (sqlTemplateState.group_by_query) {
+            parts.push(`${sqlTemplateState.group_by_query}`);
+        }
+        if (sqlTemplateState.order_by_query) {
+            parts.push(`${sqlTemplateState.order_by_query}`);
+        }
+        setPreviewText(parts.join('\n'));
+    }, [sqlTemplateState]);
 
     const onScrollEvent = useCallback((event: any) => {
         if (!(event.target instanceof HTMLElement)) return;
@@ -81,6 +121,13 @@ export default function DataBlocksDetailsOverview() {
         dispatch(setActiveDataBlock(updatedDataBlock));
     }, [currentDataBlock]);
 
+    const testQuery = useCallback(() => {
+        setIsTestQuerySuccess(true);
+    }, []);
+
+    const executeQuery = useCallback(() => {
+    }, []);
+
     return (projectId && <div className={`bg-white p-4 overflow-y-auto min-h-full h-[calc(100vh-4rem)] w-[calc(100vw-5rem)]`} onScroll={onScrollEvent}>
         {currentDataBlock && <>
             <div className={`sticky z-40 h-12 ${isHeaderNormal ? 'top-1' : '-top-5'}`}>
@@ -94,7 +141,8 @@ export default function DataBlocksDetailsOverview() {
                             <MemoIconArrowLeft className="h-5 w-5 inline-block text-green-800" />
                             <span className="leading-5">Go back</span>
                         </a>
-                        {!isHeaderNormal && <div className="mx-4 text-sm leading-5 font-medium text-gray-500 inline-block">{currentDataBlock.name}</div>}
+                        {isHeaderNormal && <span className="ml-4 text-sm leading-5 font-medium text-gray-500 inline-block">Type:{currentDataBlock.type}</span>}
+                        {!isHeaderNormal && <div className="mx-4 text-sm leading-5 font-medium text-gray-500 inline-block">{currentDataBlock.name} - <span className="text-gray-500">Type:{currentDataBlock.type}</span></div>}
                     </div>
                 </div>
             </div>
@@ -129,7 +177,57 @@ export default function DataBlocksDetailsOverview() {
                         </div>
                     </div>
                 </div>
-                <div className="p-4">
+                <div className="my-4">
+                    <div className="text-sm leading-5 font-medium text-gray-700">SQL template</div>
+                    <KernDropdown options={Object.values(SQLTemplates)}
+                        buttonName={sqlTemplate}
+                        selectedOption={setSQLTemplate} dropdownWidth="w-52" />
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                    <div className="flex flex-col gap-4">
+                        <div>
+                            <label htmlFor="select-query" className="text-sm leading-5 font-medium text-gray-700">Select query</label>
+                            <textarea id="select-query" value={sqlTemplateState.select_query} className="w-full border-gray-300 rounded-md placeholder-italic border text-gray-700 pl-4 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100"
+                                onChange={(e) => setSQLTemplateState({ ...sqlTemplateState, select_query: e.target.value })} />
+                        </div>
+                        <div>
+                            <label htmlFor="where-query" className="text-sm leading-5 font-medium text-gray-700">Where query</label>
+                            <textarea id="where-query" value={sqlTemplateState.where_query} className="w-full border-gray-300 rounded-md placeholder-italic border text-gray-700 pl-4 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100"
+                                onChange={(e) => setSQLTemplateState({ ...sqlTemplateState, where_query: e.target.value })} />
+                        </div>
+                        <div>
+                            <label htmlFor="group-by-query" className="text-sm leading-5 font-medium text-gray-700">Group by query</label>
+                            <textarea id="group-by-query" value={sqlTemplateState.group_by_query} className="w-full border-gray-300 rounded-md placeholder-italic border text-gray-700 pl-4 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100"
+                                onChange={(e) => setSQLTemplateState({ ...sqlTemplateState, group_by_query: e.target.value })} />
+                        </div>
+                        <div>
+                            <label htmlFor="order-by-query" className="text-sm leading-5 font-medium text-gray-700">Order by query</label>
+                            <textarea id="order-by-query" value={sqlTemplateState.order_by_query} className="w-full border-gray-300 rounded-md placeholder-italic border text-gray-700 pl-4 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100"
+                                onChange={(e) => setSQLTemplateState({ ...sqlTemplateState, order_by_query: e.target.value })} />
+                        </div>
+                    </div>
+                    <div className="flex flex-col">
+                        <label htmlFor="preview-text" className="text-sm leading-5 font-medium text-gray-700">Preview query</label>
+                        <div className="bg-gray-100 p-4 rounded-md flex-1 min-h-0">
+                            <pre className="whitespace-pre-wrap text-sm text-gray-800 h-full">{previewText}</pre>
+                        </div>
+                        <div className='flex flex-row gap-x-2 mt-2'>
+                            <KernButton
+                                text="Test query"
+                                onClick={testQuery}
+                                icon={MemoIconPlayerPlay}
+                                disabled={!sqlTemplateState.select_query || !sqlTemplateState.where_query || !sqlTemplateState.group_by_query || !sqlTemplateState.order_by_query}
+                            />
+                            <KernButton
+                                text="Execute query"
+                                disabled={!isTestQuerySuccess}
+                                onClick={executeQuery}
+                                buttonColor="indigo"
+                                textColor="white"
+                                solidTheme
+                            />
+                        </div>
+                    </div>
                 </div>
             </div>
         </>}

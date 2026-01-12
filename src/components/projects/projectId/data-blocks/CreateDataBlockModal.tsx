@@ -21,12 +21,6 @@ export default function CreateDataBlockModal() {
     const [name, setName] = useState('');
     const [description, setDescription] = useState('');
     const [type, setType] = useState(null);
-    const [typeOptions, setTypeOptions] = useState<string[]>(TYPE_OPTIONS);
-
-    useEffect(() => {
-        const usedTypes = dataBlocks.map(block => block.type);
-        setTypeOptions(TYPE_OPTIONS.filter(option => !usedTypes.includes(option)));
-    }, [dataBlocks]);
 
     const createDataBlockPost = useCallback(() => {
         createDataBlock(projectId, name, description, type, (res) => {
@@ -37,8 +31,8 @@ export default function CreateDataBlockModal() {
     const [acceptButton, setAcceptButton] = useState<ModalButton>(ACCEPT_BUTTON);
 
     useEffect(() => {
-        setAcceptButton({ ...ACCEPT_BUTTON, emitFunction: createDataBlockPost, disabled: !name || !description || !type });
-    }, [name, description, type, createDataBlockPost]);
+        setAcceptButton({ ...ACCEPT_BUTTON, emitFunction: createDataBlockPost, disabled: !name || !type });
+    }, [name, type, createDataBlockPost]);
 
     return (<Modal modalName={ModalEnum.CREATE_DATA_BLOCK} acceptButton={acceptButton}>
         <h1 className="text-lg text-gray-900 text-center mb-4">Add new data block</h1>
@@ -58,7 +52,7 @@ export default function CreateDataBlockModal() {
             <div className="justify-self-start">
                 <span className="card-title mb-0 label-text text-left"><span className="underline filtersUnderline">Type</span></span>
             </div>
-            <KernDropdown options={typeOptions} buttonName={type ?? 'Select type'} selectedOption={setType} />
+            <KernDropdown options={TYPE_OPTIONS} buttonName={type ?? 'Select type'} selectedOption={setType} />
         </div>
     </Modal>
     )

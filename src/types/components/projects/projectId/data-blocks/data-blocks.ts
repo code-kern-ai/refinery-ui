@@ -4,6 +4,11 @@ export type DataBlock = {
     description: string;
     type: DataBlockType;
     selected: boolean;
+    createdAt: string;
+    createdBy: string;
+    organizationId: string;
+    projectId: string;
+    sqlConfig: any;
 };
 
 export type DeleteDataBlockModalProps = {
@@ -31,6 +36,6 @@ export enum QuestionType {
     CUSTOM = 'CUSTOM',
 }
 
-export enum QuestionCatalogueOptions {
-    OVERVIEW = "Provide an overview of the knowledge graph."
+export enum SQLTemplates {
+    BLANK_QUERY = 'BLANK_QUERY'
 }
