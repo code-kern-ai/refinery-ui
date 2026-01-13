@@ -1,3 +1,5 @@
+import { LLMConfig } from "../settings/data-schema";
+
 export type DataBlock = {
     id: string;
     name: string;
@@ -11,10 +13,10 @@ export type DataBlock = {
     sqlConfig: {
         template: string,
         config: {
-            select_clause?: string,
-            where_clause?: string,
-            group_by_clause?: string,
-            order_by_clause?: string,
+            selectClause?: string,
+            whereClause?: string,
+            groupByClause?: string,
+            orderByClause?: string,
         }
     };
 };
@@ -46,4 +48,45 @@ export enum QuestionType {
 
 export enum SQLTemplates {
     BLANK_QUERY = 'BLANK_QUERY'
+}
+
+export type DataBlockColumn = {
+    id: string;
+    name: string;
+    dataType: string;
+    isPrimaryKey: boolean;
+    sourceCode: string;
+    userCreated: boolean;
+    state: string;
+    logs: string[];
+    relativePosition: number;
+    dataTypeName?: string;
+    visibilityIndex?: number;
+    active?: boolean;
+    negate?: boolean;
+    color?: string;
+    progress?: number;
+    sourceCodeToDisplay?: string;
+    saveSourceCode: boolean;
+    key?: string;
+    additionalConfig?: LLMConfig;
+}
+
+export enum DataBlockColumnState {
+    UPLOADED = 'UPLOADED',
+    AUTOMATICALLY_CREATED = 'AUTOMATICALLY_CREATED',
+    USABLE = 'USABLE',
+    RUNNING = 'RUNNING',
+    FAILED = 'FAILED',
+    QUEUED = 'QUEUED',
+    INITIAL = 'INITIAL',
+}
+
+export enum DataBlockColumnType {
+    CATEGORY = 'CATEGORY',
+    TEXT = 'TEXT',
+    INTEGER = 'INTEGER',
+    FLOAT = 'FLOAT',
+    BOOLEAN = 'BOOLEAN',
+    LLM_RESPONSE = 'LLM_RESPONSE',
 }

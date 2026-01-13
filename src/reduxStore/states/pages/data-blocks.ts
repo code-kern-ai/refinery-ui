@@ -1,4 +1,4 @@
-import { DataBlock, DataBlockType } from '@/src/types/components/projects/projectId/data-blocks/data-blocks';
+import { DataBlock, DataBlockColumn, DataBlockType } from '@/src/types/components/projects/projectId/data-blocks/data-blocks';
 import { createSlice } from '@reduxjs/toolkit'
 import type { PayloadAction } from '@reduxjs/toolkit'
 
@@ -6,6 +6,8 @@ type DataBlocksState = {
     all: DataBlock[];
     active: DataBlock | null;
     type: DataBlockType;
+    allDataBlockColumns: DataBlockColumn[];
+    activeDataBlockColumn: DataBlockColumn | null;
 }
 
 function getInitState(): DataBlocksState {
@@ -13,6 +15,8 @@ function getInitState(): DataBlocksState {
         all: [],
         active: null,
         type: null,
+        allDataBlockColumns: [],
+        activeDataBlockColumn: null,
     };
 }
 
@@ -52,6 +56,14 @@ const dataBlocksSlice = createSlice({
                 };
             },
         },
+        setActiveDataBlockColumn(state, action: PayloadAction<DataBlockColumn>) {
+            if (action.payload) state.activeDataBlockColumn = { ...action.payload };
+            else state.activeDataBlockColumn = null;
+        },
+        setAllDataBlockColumns(state, action: PayloadAction<DataBlockColumn[]>) {
+            if (action.payload) state.allDataBlockColumns = action.payload;
+            else state.allDataBlockColumns = [];
+        },
     },
 })
 
@@ -60,6 +72,8 @@ const dataBlocksSlice = createSlice({
 export const selectDataBlock = (state) => state.dataBlocks.active;
 export const selectDataBlocksAll = (state) => state.dataBlocks.all;
 export const selectDataBlockType = (state) => state.dataBlocks.type;
+export const selectActiveDataBlockColumn = (state) => state.dataBlocks.activeDataBlockColumn;
+export const selectDataBlockColumns = (state) => state.dataBlocks.allDataBlockColumns;
 
-export const { setAllDataBlocks, setDataBlockType, setActiveDataBlock, updateDataBlocksState } = dataBlocksSlice.actions;
+export const { setAllDataBlocks, setDataBlockType, setActiveDataBlock, updateDataBlocksState, setActiveDataBlockColumn, setAllDataBlockColumns } = dataBlocksSlice.actions;
 export const dataBlocksReducer = dataBlocksSlice.reducer;

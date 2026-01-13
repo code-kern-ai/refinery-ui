@@ -27,16 +27,16 @@ export default function DataBlocksDetailsOverview() {
     const [isDescriptionOpen, setIsDescriptionOpen] = useState(false);
     const [sqlTemplate, setSQLTemplate] = useState<SQLTemplates>(SQLTemplates.BLANK_QUERY);
     const [sqlTemplateState, setSQLTemplateState] = useState<any>({
-        select_clause: '',
-        where_clause: '',
-        group_by_clause: '',
-        order_by_clause: '',
+        selectClause: '',
+        whereClause: '',
+        groupByClause: '',
+        orderByClause: '',
     });
     const [sqlTemplatePreview, setSQLTemplatePreview] = useState<any>({
-        select_clause: '',
-        where_clause: '',
-        group_by_clause: '',
-        order_by_clause: '',
+        selectClause: '',
+        whereClause: '',
+        groupByClause: '',
+        orderByClause: '',
         from_clause: '',
     });
     const [previewText, setPreviewText] = useState('');
@@ -67,32 +67,32 @@ export default function DataBlocksDetailsOverview() {
         if (!projectId || !sqlTemplate) return;
         const preview = getSQLTemplatesDict(projectId)[sqlTemplate];
         setSQLTemplatePreview({
-            select_clause: preview.select_clause,
-            where_clause: preview.where_clause,
-            group_by_clause: preview.group_by_clause,
-            order_by_clause: preview.order_by_clause,
+            selectClause: preview.selectClause,
+            whereClause: preview.whereClause,
+            groupByClause: preview.groupByClause,
+            orderByClause: preview.orderByClause,
             from_clause: preview.from_clause,
         });
-        setPreviewText(preview.select_clause + '\n' + preview.from_clause + '\n' + preview.where_clause);
+        setPreviewText(preview.selectClause + '\n' + preview.from_clause + '\n' + preview.whereClause);
     }, [sqlTemplate, projectId]);
 
     useEffect(() => {
         if (!sqlTemplatePreview.from_clause) return;
-        let selectClause = sqlTemplatePreview.select_clause;
-        if (sqlTemplateState.select_clause.trim()) {
-            selectClause = sqlTemplatePreview.select_clause + sqlTemplateState.select_clause;
+        let selectClause = sqlTemplatePreview.selectClause;
+        if (sqlTemplateState.selectClause.trim()) {
+            selectClause = sqlTemplatePreview.selectClause + sqlTemplateState.selectClause;
         }
-        let whereClause = sqlTemplatePreview.where_clause;
-        if (sqlTemplateState.where_clause.trim()) {
-            whereClause = sqlTemplatePreview.where_clause + ' AND (' + sqlTemplateState.where_clause + ')';
+        let whereClause = sqlTemplatePreview.whereClause;
+        if (sqlTemplateState.whereClause.trim()) {
+            whereClause = sqlTemplatePreview.whereClause + ' AND (' + sqlTemplateState.whereClause + ')';
         }
         let groupByClause = '';
-        if (sqlTemplateState.group_by_clause.trim()) {
-            groupByClause = sqlTemplatePreview.group_by_clause + sqlTemplateState.group_by_clause;
+        if (sqlTemplateState.groupByClause.trim()) {
+            groupByClause = sqlTemplatePreview.groupByClause + sqlTemplateState.groupByClause;
         }
         let orderByClause = '';
-        if (sqlTemplateState.order_by_clause.trim()) {
-            orderByClause = sqlTemplatePreview.order_by_clause + sqlTemplateState.order_by_clause;
+        if (sqlTemplateState.orderByClause.trim()) {
+            orderByClause = sqlTemplatePreview.orderByClause + sqlTemplateState.orderByClause;
         }
         const clauses = [selectClause, sqlTemplatePreview.from_clause, whereClause, groupByClause, orderByClause].filter(clause => clause.trim() !== '');
         setPreviewText(clauses.join('\n'));
@@ -158,16 +158,16 @@ export default function DataBlocksDetailsOverview() {
             });
         };
         const observables: any = {
-            select: wrapCallbackAsObservable(testSelectClause, sqlTemplateState.select_clause),
+            select: wrapCallbackAsObservable(testSelectClause, sqlTemplateState.selectClause),
         };
-        if (sqlTemplateState.where_clause.trim()) {
-            observables.where = wrapCallbackAsObservable(testWhereClause, sqlTemplateState.where_clause);
+        if (sqlTemplateState.whereClause.trim()) {
+            observables.where = wrapCallbackAsObservable(testWhereClause, sqlTemplateState.whereClause);
         }
-        if (sqlTemplateState.order_by_clause.trim()) {
-            observables.orderBy = wrapCallbackAsObservable(testOrderByClause, sqlTemplateState.order_by_clause);
+        if (sqlTemplateState.orderByClause.trim()) {
+            observables.orderBy = wrapCallbackAsObservable(testOrderByClause, sqlTemplateState.orderByClause);
         }
-        if (sqlTemplateState.group_by_clause.trim()) {
-            observables.groupBy = wrapCallbackAsObservable(testGroupByClause, sqlTemplateState.group_by_clause);
+        if (sqlTemplateState.groupByClause.trim()) {
+            observables.groupBy = wrapCallbackAsObservable(testGroupByClause, sqlTemplateState.groupByClause);
         }
         forkJoin(observables).subscribe({
             next: (results: any) => {
@@ -252,23 +252,23 @@ export default function DataBlocksDetailsOverview() {
                     <div className="flex flex-col gap-4">
                         <div>
                             <label htmlFor="select-query" className="text-sm leading-5 font-medium text-gray-700">Select</label>
-                            <textarea id="select-query" value={sqlTemplateState.select_clause} className="w-full border-gray-300 rounded-md placeholder-italic border text-gray-700 pl-4 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100"
-                                onChange={(e) => setSQLTemplateState({ ...sqlTemplateState, select_clause: e.target.value })} />
+                            <textarea id="select-query" value={sqlTemplateState.selectClause} className="w-full border-gray-300 rounded-md placeholder-italic border text-gray-700 pl-4 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100"
+                                onChange={(e) => setSQLTemplateState({ ...sqlTemplateState, selectClause: e.target.value })} />
                         </div>
                         <div>
                             <label htmlFor="where-query" className="text-sm leading-5 font-medium text-gray-700">Where</label>
-                            <textarea id="where-query" value={sqlTemplateState.where_clause} className="w-full border-gray-300 rounded-md placeholder-italic border text-gray-700 pl-4 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100"
-                                onChange={(e) => setSQLTemplateState({ ...sqlTemplateState, where_clause: e.target.value })} />
+                            <textarea id="where-query" value={sqlTemplateState.whereClause} className="w-full border-gray-300 rounded-md placeholder-italic border text-gray-700 pl-4 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100"
+                                onChange={(e) => setSQLTemplateState({ ...sqlTemplateState, whereClause: e.target.value })} />
                         </div>
                         <div>
                             <label htmlFor="group-by-query" className="text-sm leading-5 font-medium text-gray-700">Group by</label>
-                            <textarea id="group-by-query" value={sqlTemplateState.group_by_clause} className="w-full border-gray-300 rounded-md placeholder-italic border text-gray-700 pl-4 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100"
-                                onChange={(e) => setSQLTemplateState({ ...sqlTemplateState, group_by_clause: e.target.value })} />
+                            <textarea id="group-by-query" value={sqlTemplateState.groupByClause} className="w-full border-gray-300 rounded-md placeholder-italic border text-gray-700 pl-4 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100"
+                                onChange={(e) => setSQLTemplateState({ ...sqlTemplateState, groupByClause: e.target.value })} />
                         </div>
                         <div>
                             <label htmlFor="order-by-query" className="text-sm leading-5 font-medium text-gray-700">Order by</label>
-                            <textarea id="order-by-query" value={sqlTemplateState.order_by_clause} className="w-full border-gray-300 rounded-md placeholder-italic border text-gray-700 pl-4 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100"
-                                onChange={(e) => setSQLTemplateState({ ...sqlTemplateState, order_by_clause: e.target.value })} />
+                            <textarea id="order-by-query" value={sqlTemplateState.orderByClause} className="w-full border-gray-300 rounded-md placeholder-italic border text-gray-700 pl-4 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100"
+                                onChange={(e) => setSQLTemplateState({ ...sqlTemplateState, orderByClause: e.target.value })} />
                         </div>
                     </div>
                     <div className="flex flex-col">
@@ -284,7 +284,7 @@ export default function DataBlocksDetailsOverview() {
                             <KernButton
                                 text="Test query"
                                 onClick={testQuery}
-                                disabled={!sqlTemplateState.select_clause.trim()}
+                                disabled={!sqlTemplateState.selectClause.trim()}
                                 icon={MemoIconPlayerPlay}
                             />
                             <KernButton
