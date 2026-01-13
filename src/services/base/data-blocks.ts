@@ -1,3 +1,4 @@
+import { SQLTemplates } from "@/src/types/components/projects/projectId/data-blocks/data-blocks";
 import { BACKEND_BASE_URI } from "./_settings";
 import { FetchType, jsonFetchWrapper } from "@/submodules/javascript-functions/basic-fetch";
 import { convertCamelToSnakeCase } from "@/submodules/javascript-functions/case-types-parser";
@@ -49,15 +50,18 @@ export function updateDataBlock(projectId: string, dataBlockId: string, name: st
     const body = {
         projectId: projectId,
         name: name,
-        description: description
+        description: description,
     };
     jsonFetchWrapper(finalUrl, FetchType.PUT, onResult, JSON.stringify(convertCamelToSnakeCase(body)));
 }
 
-export function executeQuestion(dataBlockId: string, question: string, onResult: (result: any) => void) {
-    const finalUrl = `${dataBlocksEndpoint}/${dataBlockId}/execute-question`;
+export function executeDataBlockQuery(dataBlockId: string, sqlTemplate: string, sqlTemplateState: object, onResult: (result: any) => void) {
+    const finalUrl = `${dataBlocksEndpoint}/query/${dataBlockId}`;
     const body = {
-        question: question
+        sqlConfig: {
+            template: sqlTemplate,
+            config: sqlTemplateState
+        },
     };
     jsonFetchWrapper(finalUrl, FetchType.POST, onResult, JSON.stringify(convertCamelToSnakeCase(body)));
 }

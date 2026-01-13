@@ -3,11 +3,11 @@ import { SQLTemplates } from "@/src/types/components/projects/projectId/data-blo
 export const getSQLTemplatesDict = (projectId: string) => {
     return {
         [SQLTemplates.BLANK_QUERY]: {
-            select_query: 'SELECT ',
-            from_query: 'FROM public.record r',
-            where_query: `WHERE project_id = '${projectId}'`,
-            group_by_query: 'GROUP BY ',
-            order_by_query: 'ORDER BY ',
+            select_clause: 'SELECT ',
+            from_clause: 'FROM public.record r',
+            where_clause: `WHERE project_id = '${projectId}'`,
+            group_by_clause: 'GROUP BY ',
+            order_by_clause: 'ORDER BY ',
         }
     }
 }

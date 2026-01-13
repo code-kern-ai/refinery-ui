@@ -8,7 +8,15 @@ export type DataBlock = {
     createdBy: string;
     organizationId: string;
     projectId: string;
-    sqlConfig: any;
+    sqlConfig: {
+        template: string,
+        config: {
+            select_clause?: string,
+            where_clause?: string,
+            group_by_clause?: string,
+            order_by_clause?: string,
+        }
+    };
 };
 
 export type DeleteDataBlockModalProps = {
