@@ -26,7 +26,19 @@ export default function DataBlocksDetailsOverview() {
     const [isNameOpen, setIsNameOpen] = useState(false);
     const [isDescriptionOpen, setIsDescriptionOpen] = useState(false);
     const [sqlTemplate, setSQLTemplate] = useState<SQLTemplates>(SQLTemplates.BLANK_QUERY);
-    const [sqlTemplateState, setSQLTemplateState] = useState<any>({});
+    const [sqlTemplateState, setSQLTemplateState] = useState<any>({
+        select_query: '',
+        where_query: '',
+        group_by_query: '',
+        order_by_query: '',
+    });
+    const [sqlTemplatePreview, setSQLTemplatePreview] = useState<any>({
+        select_query: '',
+        where_query: '',
+        group_by_query: '',
+        order_by_query: '',
+        from_query: '',
+    });
     const [previewText, setPreviewText] = useState('');
     const [isTestQuerySuccess, setIsTestQuerySuccess] = useState(false);
 
@@ -53,18 +65,38 @@ export default function DataBlocksDetailsOverview() {
 
     useEffect(() => {
         if (!projectId || !sqlTemplate) return;
-        setSQLTemplateState(getSQLTemplatesDict(projectId)[sqlTemplate]);
+        const preview = getSQLTemplatesDict(projectId)[sqlTemplate];
+        setSQLTemplatePreview({
+            select_query: preview.select_query,
+            where_query: preview.where_query,
+            group_by_query: preview.group_by_query,
+            order_by_query: preview.order_by_query,
+            from_query: preview.from_query,
+        });
+        setPreviewText(preview.select_query + '\n' + preview.from_query + '\n' + preview.where_query);
     }, [sqlTemplate, projectId]);
 
     useEffect(() => {
-        const parts: string[] = [];
-        parts.push(`${sqlTemplateState.select_query}`);
-        parts.push(`${sqlTemplateState.from_query}`);
-        parts.push(`${sqlTemplateState.where_query}`);
-        parts.push(`${sqlTemplateState.group_by_query}`);
-        parts.push(`${sqlTemplateState.order_by_query}`);
-        setPreviewText(parts.join('\n'));
-    }, [sqlTemplateState]);
+        if (!sqlTemplatePreview.from_query) return;
+        let selectClause = sqlTemplatePreview.select_query;
+        if (sqlTemplateState.select_query.trim()) {
+            selectClause = sqlTemplatePreview.select_query + sqlTemplateState.select_query;
+        }
+        let whereClause = sqlTemplatePreview.where_query;
+        if (sqlTemplateState.where_query.trim()) {
+            whereClause = sqlTemplatePreview.where_query + ' AND ' + sqlTemplateState.where_query;
+        }
+        let groupByClause = '';
+        if (sqlTemplateState.group_by_query.trim()) {
+            groupByClause = sqlTemplatePreview.group_by_query + sqlTemplateState.group_by_query;
+        }
+        let orderByClause = '';
+        if (sqlTemplateState.order_by_query.trim()) {
+            orderByClause = sqlTemplatePreview.order_by_query + sqlTemplateState.order_by_query;
+        }
+        const clauses = [selectClause, sqlTemplatePreview.from_query, whereClause, groupByClause, orderByClause].filter(clause => clause.trim() !== '');
+        setPreviewText(clauses.join('\n'));
+    }, [sqlTemplateState, sqlTemplatePreview]);
 
     const onScrollEvent = useCallback((event: any) => {
         if (!(event.target instanceof HTMLElement)) return;
@@ -125,28 +157,37 @@ export default function DataBlocksDetailsOverview() {
                 });
             });
         };
-        forkJoin({
-            where: wrapCallbackAsObservable(testWhereClause, sqlTemplateState.where_query),
-            orderBy: wrapCallbackAsObservable(testOrderByClause, sqlTemplateState.order_by_query),
+        let whereCondition = sqlTemplatePreview.where_query.replace(/^WHERE\s+/i, '');
+        if (sqlTemplateState.where_query.trim()) {
+            whereCondition = whereCondition + ' AND ' + sqlTemplateState.where_query;
+        }
+        const observables: any = {
+            where: wrapCallbackAsObservable(testWhereClause, whereCondition),
             select: wrapCallbackAsObservable(testSelectClause, sqlTemplateState.select_query),
-            groupBy: wrapCallbackAsObservable(testGroupByClause, sqlTemplateState.group_by_query),
-        }).subscribe({
-            next: (results) => {
+        };
+        if (sqlTemplateState.order_by_query.trim()) {
+            observables.orderBy = wrapCallbackAsObservable(testOrderByClause, sqlTemplateState.order_by_query);
+        }
+        if (sqlTemplateState.group_by_query.trim()) {
+            observables.groupBy = wrapCallbackAsObservable(testGroupByClause, sqlTemplateState.group_by_query);
+        }
+        forkJoin(observables).subscribe({
+            next: (results: any) => {
                 let error = '';
                 if (!results.where.isValid)
                     error += 'Where clause is NOT valid: ' + results.where.denyReason;
-                if (!results.orderBy.isValid)
+                if (results.orderBy && !results.orderBy.isValid)
                     error += 'Order By is NOT valid: ' + results.orderBy.denyReason;
                 if (!results.select.isValid)
                     error += 'Select clause is NOT valid: ' + results.select.denyReason;
-                if (!results.groupBy.isValid)
+                if (results.groupBy && !results.groupBy.isValid)
                     error += 'Group By is NOT valid: ' + results.groupBy.denyReason;
-                const isValid = Object.values(results).every(r => r.isValid);
+                const isValid = Object.values(results).every((r: any) => r.isValid);
                 setIsTestQuerySuccess(isValid);
                 alert(isValid ? "Everything is valid" : error);
             }
         });
-    }, [sqlTemplateState]);
+    }, [sqlTemplateState, sqlTemplatePreview]);
 
     const executeQuery = useCallback(() => {
     }, []);
@@ -242,6 +283,7 @@ export default function DataBlocksDetailsOverview() {
                             <KernButton
                                 text="Test query"
                                 onClick={testQuery}
+                                disabled={!sqlTemplateState.select_query.trim()}
                                 icon={MemoIconPlayerPlay}
                             />
                             <KernButton

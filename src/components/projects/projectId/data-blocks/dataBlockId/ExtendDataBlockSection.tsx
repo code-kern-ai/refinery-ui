@@ -4,6 +4,7 @@ import KernButton from "@/submodules/react-components/components/kern-button/Ker
 import { MemoIconPlus } from "@/submodules/react-components/components/kern-icons/icons";
 import KernTable from "@/submodules/react-components/components/kern-table/KernTable";
 import { useDispatch } from "react-redux";
+import CreateNewDataBlockColumn from "./CreateNewDataBlockColumn";
 
 export default function ExtendDataBlockSection() {
     const dispatch = useDispatch();
@@ -19,6 +20,8 @@ export default function ExtendDataBlockSection() {
                 />
             </div>
             <KernTable headers={[{ column: "Column", id: "column" }]} values={[]} />
+
+            <CreateNewDataBlockColumn />
         </div>
     );
 }
