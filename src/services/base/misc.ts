@@ -32,27 +32,27 @@ export function modelProviderDownloadModel(modelName: string, onResult: (result:
 
 export function testWhereClause(where: string, onResult: (result: any) => void) {
     const finalUrl = `${miscCognitionEndpoint}/test-where-clause`;
-    const body = { where };
+    const body = { where, isRefineryRequest: true };
 
     jsonFetchWrapper(finalUrl, FetchType.POST, onResult, JSON.stringify(body));
 }
 export function testOrderByClause(orderBy: string, onResult: (result: any) => void) {
     const finalUrl = `${miscCognitionEndpoint}/test-where-clause`;
-    const body = { orderBy };
+    const body = { orderBy, isRefineryRequest: true };
 
     jsonFetchWrapper(finalUrl, FetchType.POST, onResult, JSON.stringify(body));
 }
 
 export function testSelectClause(select: string, onResult: (result: any) => void) {
     const finalUrl = `${miscCognitionEndpoint}/test-where-clause`;
-    const body = { select };
+    const body = { select, isRefineryRequest: true };
 
     jsonFetchWrapper(finalUrl, FetchType.POST, onResult, JSON.stringify(body));
 }
 
 export function testGroupByClause(groupBy: string, onResult: (result: any) => void) {
     const finalUrl = `${miscCognitionEndpoint}/test-where-clause`;
-    const body = { groupBy };
+    const body = { groupBy, isRefineryRequest: true };
 
     jsonFetchWrapper(finalUrl, FetchType.POST, onResult, JSON.stringify(body));
 }

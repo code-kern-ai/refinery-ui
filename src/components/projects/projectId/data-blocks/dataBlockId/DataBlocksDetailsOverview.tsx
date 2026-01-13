@@ -84,7 +84,7 @@ export default function DataBlocksDetailsOverview() {
         }
         let whereClause = sqlTemplatePreview.where_query;
         if (sqlTemplateState.where_query.trim()) {
-            whereClause = sqlTemplatePreview.where_query + ' AND ' + sqlTemplateState.where_query;
+            whereClause = sqlTemplatePreview.where_query + ' AND (' + sqlTemplateState.where_query + ')';
         }
         let groupByClause = '';
         if (sqlTemplateState.group_by_query.trim()) {
@@ -157,14 +157,12 @@ export default function DataBlocksDetailsOverview() {
                 });
             });
         };
-        let whereCondition = sqlTemplatePreview.where_query.replace(/^WHERE\s+/i, '');
-        if (sqlTemplateState.where_query.trim()) {
-            whereCondition = whereCondition + ' AND ' + sqlTemplateState.where_query;
-        }
         const observables: any = {
-            where: wrapCallbackAsObservable(testWhereClause, whereCondition),
             select: wrapCallbackAsObservable(testSelectClause, sqlTemplateState.select_query),
         };
+        if (sqlTemplateState.where_query.trim()) {
+            observables.where = wrapCallbackAsObservable(testWhereClause, sqlTemplateState.where_query);
+        }
         if (sqlTemplateState.order_by_query.trim()) {
             observables.orderBy = wrapCallbackAsObservable(testOrderByClause, sqlTemplateState.order_by_query);
         }
@@ -174,14 +172,14 @@ export default function DataBlocksDetailsOverview() {
         forkJoin(observables).subscribe({
             next: (results: any) => {
                 let error = '';
-                if (!results.where.isValid)
-                    error += 'Where clause is NOT valid: ' + results.where.denyReason;
-                if (results.orderBy && !results.orderBy.isValid)
-                    error += 'Order By is NOT valid: ' + results.orderBy.denyReason;
                 if (!results.select.isValid)
-                    error += 'Select clause is NOT valid: ' + results.select.denyReason;
+                    error += 'SELECT clause is NOT valid: ' + results.select.denyReason;
+                if (results.where && !results.where.isValid)
+                    error += 'WHERE clause is NOT valid: ' + results.where.denyReason;
                 if (results.groupBy && !results.groupBy.isValid)
-                    error += 'Group By is NOT valid: ' + results.groupBy.denyReason;
+                    error += 'GROUP BY is NOT valid: ' + results.groupBy.denyReason;
+                if (results.orderBy && !results.orderBy.isValid)
+                    error += 'ORDER BY is NOT valid: ' + results.orderBy.denyReason;
                 const isValid = Object.values(results).every((r: any) => r.isValid);
                 setIsTestQuerySuccess(isValid);
                 alert(isValid ? "Everything is valid" : error);
