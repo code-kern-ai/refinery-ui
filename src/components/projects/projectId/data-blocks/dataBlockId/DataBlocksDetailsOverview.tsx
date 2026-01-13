@@ -6,11 +6,13 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { selectDataBlock, setActiveDataBlock, updateDataBlocksState } from "@/src/reduxStore/states/pages/data-blocks";
 import { getDataBlock, updateDataBlock } from "@/src/services/base/data-blocks";
-import { DataBlockProperty, SQLTemplates } from "@/src/types/components/projects/projectId/data-blocks/data-blocks";
+import { DataBlockProperty, DataBlockType, SQLTemplates } from "@/src/types/components/projects/projectId/data-blocks/data-blocks";
 import KernDropdown from "@/submodules/react-components/components/KernDropdown";
 import { getSQLTemplatesDict } from "@/src/util/components/projects/projectId/data-blocks/data-blocks";
 import CopyToClipboard from "@/submodules/react-components/components/CopyToClipboard";
 import { testGroupByClause, testOrderByClause, testSelectClause, testWhereClause } from "@/src/services/base/misc";
+import ExtendDataBlockSection from "./ExtendDataBlockSection";
+import { forkJoin, Observable } from "rxjs";
 
 export default function DataBlocksDetailsOverview() {
     const router = useRouter();
@@ -115,23 +117,34 @@ export default function DataBlocksDetailsOverview() {
     }, [currentDataBlock]);
 
     const testQuery = useCallback(() => {
-        let error = "";
-        const done = [false, false, false, false];
-        testWhereClause(sqlTemplateState.where_query, (r) => {
-            if (!r.isValid) error += "Where clause is NOT valid: " + r.denyReason;
-            done[0] = true;
-        });
-        testOrderByClause(sqlTemplateState.order_by_query, (r2) => {
-            if (!r2.isValid) error += "Order By is NOT valid: " + r2.denyReason;
-            done[1] = true;
-        });
-        testSelectClause(sqlTemplateState.select_query, (r3) => {
-            if (!r3.isValid) error += "Select clause is NOT valid: " + r3.denyReason;
-            done[2] = true;
-        });
-        testGroupByClause(sqlTemplateState.group_by_query, (r4) => {
-            if (!r4.isValid) error += "Group By is NOT valid: " + r4.denyReason;
-            done[3] = true;
+        const wrapCallbackAsObservable = <T,>(fn: (arg: T, callback: (result: any) => void) => void, arg: T): Observable<any> => {
+            return new Observable(observer => {
+                fn(arg, (result) => {
+                    observer.next(result);
+                    observer.complete();
+                });
+            });
+        };
+        forkJoin({
+            where: wrapCallbackAsObservable(testWhereClause, sqlTemplateState.where_query),
+            orderBy: wrapCallbackAsObservable(testOrderByClause, sqlTemplateState.order_by_query),
+            select: wrapCallbackAsObservable(testSelectClause, sqlTemplateState.select_query),
+            groupBy: wrapCallbackAsObservable(testGroupByClause, sqlTemplateState.group_by_query),
+        }).subscribe({
+            next: (results) => {
+                let error = '';
+                if (!results.where.isValid)
+                    error += 'Where clause is NOT valid: ' + results.where.denyReason;
+                if (!results.orderBy.isValid)
+                    error += 'Order By is NOT valid: ' + results.orderBy.denyReason;
+                if (!results.select.isValid)
+                    error += 'Select clause is NOT valid: ' + results.select.denyReason;
+                if (!results.groupBy.isValid)
+                    error += 'Group By is NOT valid: ' + results.groupBy.denyReason;
+                const isValid = Object.values(results).every(r => r.isValid);
+                setIsTestQuerySuccess(isValid);
+                alert(isValid ? "Everything is valid" : error);
+            }
         });
     }, [sqlTemplateState]);
 
@@ -242,6 +255,7 @@ export default function DataBlocksDetailsOverview() {
                         </div>
                     </div>
                 </div>
+                {currentDataBlock.type == DataBlockType.STABLE && <ExtendDataBlockSection />}
             </div>
         </>}
     </div>

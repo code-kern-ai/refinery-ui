@@ -232,6 +232,9 @@ const initialState: Modals = {
     },
     [ModalEnum.CREATE_DATA_BLOCK]: {
         open: false
+    },
+    [ModalEnum.CREATE_DATA_BLOCK_COLUMN]: {
+        open: false
     }
 };
 
