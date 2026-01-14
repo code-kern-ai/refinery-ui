@@ -15,6 +15,8 @@ import { useRouter } from "next/router";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { DATA_BLOCK_COLUMN_TYPES } from "@/src/util/components/projects/projectId/data-blocks/data-blocks";
+import { selectDataBlock, selectDataBlockColumns, updateDataBlocksState } from "@/src/reduxStore/states/pages/data-blocks";
+import { createDataBlockColumn } from "@/src/services/base/data-blocks";
 
 const ACCEPT_BUTTON = { buttonCaption: "Accept", useButton: true, disabled: true }
 
@@ -22,29 +24,35 @@ export default function CreateNewDataBlockColumn() {
     const router = useRouter();
     const dispatch = useDispatch();
 
-    const projectId = useSelector(selectProjectId);
     const modalNewDataBlockColumn = useSelector(selectModal(ModalEnum.CREATE_DATA_BLOCK_COLUMN));
-    // const dataBlockColumns = useSelector(selectAttributes);
+    const dataBlockColumns = useSelector(selectDataBlockColumns);
+    const dataBlockId = useSelector(selectDataBlock).id;
+    const sqlSchema = useSelector(selectDataBlock).sqlSchema;
 
     const [dataBlockColumnName, setDataBlockColumnName] = useState('');
     const [dataBlockColumnType, setDataBlockColumnType] = useState(DATA_TYPES[0]);
     const [duplicateNameExists, setDuplicateNameExists] = useState(false);
 
-    const createDataBlockColumn = useCallback(() => {
-
-    }, [dataBlockColumnName, dataBlockColumnType]);
+    const createDataBlockColumnFunc = useCallback(() => {
+        const sqlSchemaList = [...sqlSchema, {
+            columnName: dataBlockColumnName,
+            columnDataType: dataBlockColumnType.value
+        }]
+        createDataBlockColumn(dataBlockId, sqlSchemaList, (res) => {
+            console.log(res);
+        });
+    }, [dataBlockColumnName, dataBlockColumnType, dataBlockId, sqlSchema]);
 
     useEffect(() => {
-        setAcceptButton({ ...acceptButton, emitFunction: createDataBlockColumn, disabled: duplicateNameExists || dataBlockColumnName.trim() == "" || dataBlockColumnType == null });
+        setAcceptButton({ ...acceptButton, emitFunction: createDataBlockColumnFunc, disabled: duplicateNameExists || dataBlockColumnName.trim() == "" || dataBlockColumnType == null });
     }, [modalNewDataBlockColumn, dataBlockColumnName, dataBlockColumnType, duplicateNameExists]);
 
     const [acceptButton, setAcceptButton] = useState<ModalButton>(ACCEPT_BUTTON);
 
-    function handleAttributeName(value: string) {
-        // const checkName = attributes.some(attribute => attribute.name == valueToSave);
-        // setAttributeName(valueToSave);
-        // setDuplicateNameExists(checkName);
-    }
+    const handleDataBlockColumnName = useCallback((value: string) => {
+        setDataBlockColumnName(value);
+        setDuplicateNameExists(dataBlockColumns.some(column => column.columnName == value));
+    }, [dataBlockColumns]);
 
     return (<Modal modalName={ModalEnum.CREATE_DATA_BLOCK_COLUMN} acceptButton={acceptButton}>
         <div className="flex flex-grow justify-center text-lg leading-6 text-gray-900 font-medium">
@@ -55,7 +63,7 @@ export default function CreateNewDataBlockColumn() {
             <span className="card-title mb-0 label-text font-normal"><span className="underline filtersUnderline">Data block column name</span></span>
 
             <input type="text" value={dataBlockColumnName} onChange={(e: any) => setDataBlockColumnName(e.target.value)}
-                onKeyDown={(e) => { if (e.key == 'Enter') createDataBlockColumn() }}
+                onKeyDown={(e) => { if (e.key == 'Enter') createDataBlockColumnFunc() }}
                 className="h-9 w-full text-sm border-gray-300 rounded-md placeholder-italic border text-gray-900 pl-4 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100" placeholder="Enter a data block column name..." />
 
             <span className="card-title mb-0 label-text font-normal"><span className="underline filtersUnderline">Data block column type</span></span>

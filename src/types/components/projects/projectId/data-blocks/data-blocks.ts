@@ -70,6 +70,8 @@ export type DataBlockColumn = {
     saveSourceCode: boolean;
     key?: string;
     additionalConfig?: LLMConfig;
+    columnName: string;
+    columnDataType: string;
 }
 
 export enum DataBlockColumnState {

@@ -13,6 +13,7 @@ import CopyToClipboard from "@/submodules/react-components/components/CopyToClip
 import { testGroupByClause, testOrderByClause, testSelectClause, testWhereClause } from "@/src/services/base/misc";
 import ExtendDataBlockSection from "./ExtendDataBlockSection";
 import { forkJoin, Observable } from "rxjs";
+import DataBlockResultsSection from "./DataBlockResultsSection";
 
 export default function DataBlocksDetailsOverview() {
     const router = useRouter();
@@ -41,6 +42,7 @@ export default function DataBlocksDetailsOverview() {
     });
     const [previewText, setPreviewText] = useState('');
     const [isTestQuerySuccess, setIsTestQuerySuccess] = useState(false);
+    const [results, setResults] = useState<any[]>(null);
 
     const nameRef = useRef<HTMLInputElement>(null);
     const descriptionRef = useRef<HTMLInputElement>(null);
@@ -58,6 +60,7 @@ export default function DataBlocksDetailsOverview() {
         isInitializingRef.current = true;
         setSQLTemplate(currentDataBlock.sqlConfig.template);
         setSQLTemplateState(currentDataBlock.sqlConfig.config);
+        setResults(currentDataBlock.data);
         setTimeout(() => {
             isInitializingRef.current = false;
         }, 0);
@@ -188,10 +191,16 @@ export default function DataBlocksDetailsOverview() {
     }, [sqlTemplateState, sqlTemplatePreview]);
 
     const executeQuery = useCallback(() => {
-        executeDataBlockQuery(currentDataBlock.id, sqlTemplate, sqlTemplateState, (res) => {
-            console.log("Query executed:", res);
+        executeDataBlockQuery(currentDataBlock.id, sqlTemplate, sqlTemplateState, () => {
+            refetchDataBlockById();
         });
     }, [currentDataBlock, sqlTemplate, sqlTemplateState]);
+
+    const refetchDataBlockById = useCallback(() => {
+        getDataBlock(currentDataBlock.id, (res) => {
+            dispatch(setActiveDataBlock(res));
+        });
+    }, [currentDataBlock]);
 
     return (projectId && <div className={`bg-white p-4 overflow-y-auto min-h-full h-[calc(100vh-4rem)] w-[calc(100vw-5rem)]`} onScroll={onScrollEvent}>
         {currentDataBlock && <>
@@ -298,7 +307,10 @@ export default function DataBlocksDetailsOverview() {
                         </div>
                     </div>
                 </div>
-                {currentDataBlock.type == DataBlockType.STABLE && <ExtendDataBlockSection />}
+                {results && <>
+                    {currentDataBlock.type == DataBlockType.STABLE && <ExtendDataBlockSection />}
+                    <DataBlockResultsSection results={results} />
+                </>}
             </div>
         </>}
     </div>

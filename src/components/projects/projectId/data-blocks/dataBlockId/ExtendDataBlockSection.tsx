@@ -25,7 +25,12 @@ export default function ExtendDataBlockSection() {
                     icon={MemoIconPlus}
                 />
             </div>
-            <KernTable headers={DATA_BLOCKS_COLUMNS_TABLE_COLUMNS} values={preparedValues} />
+            <KernTable
+                headers={DATA_BLOCKS_COLUMNS_TABLE_COLUMNS}
+                values={preparedValues}
+                config={{
+                    addBorder: true,
+                }} />
 
             <CreateNewDataBlockColumn />
         </div>
