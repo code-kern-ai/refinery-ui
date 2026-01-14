@@ -66,7 +66,7 @@ export function executeDataBlockQuery(dataBlockId: string, sqlTemplate: string, 
     jsonFetchWrapper(finalUrl, FetchType.POST, onResult, JSON.stringify(convertCamelToSnakeCase(body)));
 }
 
-export function createDataBlockColumn(dataBlockId: string, sqlSchema: any, onResult: (result: any) => void) {
+export function createDataBlockColumn(dataBlockId: string, sqlSchema: any[], onResult: (result: any) => void) {
     const finalUrl = `${dataBlocksEndpoint}/${dataBlockId}`;
     const body = {
         sqlSchema: sqlSchema
