@@ -66,10 +66,12 @@ export function executeDataBlockQuery(dataBlockId: string, sqlTemplate: string, 
     jsonFetchWrapper(finalUrl, FetchType.POST, onResult, JSON.stringify(convertCamelToSnakeCase(body)));
 }
 
-export function createDataBlockColumn(dataBlockId: string, sqlSchema: any[], onResult: (result: any) => void) {
-    const finalUrl = `${dataBlocksEndpoint}/${dataBlockId}`;
+export function createDataBlockColumn(dataBlockId: string, name: string, dataType: string, onResult: (result: any) => void) {
+    const finalUrl = `${dataBlocksEndpoint}/${dataBlockId}/attributes`;
     const body = {
-        sqlSchema: sqlSchema
+        name: name,
+        dataType: dataType,
+        userCreated: true,
     };
-    jsonFetchWrapper(finalUrl, FetchType.PUT, onResult, JSON.stringify(convertCamelToSnakeCase(body)));
+    jsonFetchWrapper(finalUrl, FetchType.POST, onResult, JSON.stringify(convertCamelToSnakeCase(body)));
 }

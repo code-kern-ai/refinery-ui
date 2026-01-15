@@ -28,14 +28,10 @@ export default function CreateNewDataBlockColumn() {
     const [duplicateNameExists, setDuplicateNameExists] = useState(false);
 
     const createDataBlockColumnFunc = useCallback(() => {
-        const sqlSchemaList = [...sqlSchema, {
-            columnName: dataBlockColumnName,
-            columnDataType: dataBlockColumnType.value
-        }]
-        createDataBlockColumn(dataBlockId, sqlSchemaList, (res) => {
-            router.push(`/projects/${projectId}/data-blocks/${dataBlockId}/1`);
+        createDataBlockColumn(dataBlockId, dataBlockColumnName, dataBlockColumnType.value, (res) => {
+            router.push(`/projects/${projectId}/data-blocks/${dataBlockId}/${res.id}`);
         });
-    }, [dataBlockColumnName, dataBlockColumnType, dataBlockId, sqlSchema]);
+    }, [dataBlockColumnName, dataBlockColumnType, dataBlockId]);
 
     useEffect(() => {
         setAcceptButton({ ...acceptButton, emitFunction: createDataBlockColumnFunc, disabled: duplicateNameExists || dataBlockColumnName.trim() == "" || dataBlockColumnType == null });
