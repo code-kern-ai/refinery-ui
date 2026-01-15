@@ -42,8 +42,6 @@ export default function DataBlocksDetailsOverview() {
     });
     const [previewText, setPreviewText] = useState('');
     const [isTestQuerySuccess, setIsTestQuerySuccess] = useState(false);
-    const [results, setResults] = useState<any[]>(null);
-
     const nameRef = useRef<HTMLInputElement>(null);
     const descriptionRef = useRef<HTMLInputElement>(null);
     const isInitializingRef = useRef(false);
@@ -60,7 +58,6 @@ export default function DataBlocksDetailsOverview() {
         isInitializingRef.current = true;
         setSQLTemplate(currentDataBlock.sqlConfig.template);
         setSQLTemplateState(currentDataBlock.sqlConfig.config);
-        setResults(currentDataBlock.data);
         setTimeout(() => {
             isInitializingRef.current = false;
         }, 0);
@@ -307,9 +304,9 @@ export default function DataBlocksDetailsOverview() {
                         </div>
                     </div>
                 </div>
-                {results && <>
+                {currentDataBlock.data && <>
                     {currentDataBlock.type == DataBlockType.STABLE && <ExtendDataBlockSection />}
-                    <DataBlockResultsSection results={results} />
+                    <DataBlockResultsSection />
                 </>}
             </div>
         </>}

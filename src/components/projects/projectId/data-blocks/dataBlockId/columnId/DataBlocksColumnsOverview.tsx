@@ -34,9 +34,10 @@ import LLMResponseConfig from "../../../attributes/attributeId/LLMResponseConfig
 import { Editor } from "@monaco-editor/react";
 import LoadingIcon from "@/submodules/react-components/components/LoadingIcon";
 
-export default function DataBlocksColumnsOverview() {
+const EDITOR_OPTIONS = { theme: 'vs-light', language: 'python', readOnly: false };
 
-    const EDITOR_OPTIONS = { theme: 'vs-light', language: 'python', readOnly: false };
+
+export default function DataBlocksColumnsOverview() {
     const router = useRouter();
     const dispatch = useDispatch();
 

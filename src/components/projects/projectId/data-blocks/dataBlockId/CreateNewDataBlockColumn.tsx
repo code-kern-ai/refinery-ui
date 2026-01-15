@@ -1,21 +1,14 @@
 import Modal from "@/src/components/shared/modal/Modal"
-import { setCurrentPage } from "@/src/reduxStore/states/general";
 import { selectModal } from "@/src/reduxStore/states/modal";
-import { selectAttributes } from "@/src/reduxStore/states/pages/settings";
 import { selectProjectId } from "@/src/reduxStore/states/project";
-import { createAttribute } from "@/src/services/base/project-setting";
-import { CurrentPage } from "@/submodules/react-components/hooks/web-socket/constants";
 import { ModalButton, ModalEnum } from "@/src/types/shared/modal"
-import { DATA_TYPES, findFreeAttributeName } from "@/src/util/components/projects/projectId/settings/data-schema-helper";
-import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
-import { toPythonFunctionName } from "@/submodules/javascript-functions/python-functions-parser";
+import { DATA_TYPES } from "@/src/util/components/projects/projectId/settings/data-schema-helper";
 import KernDropdown from "@/submodules/react-components/components/KernDropdown";
-import { Tooltip } from "@nextui-org/react";
 import { useRouter } from "next/router";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { DATA_BLOCK_COLUMN_TYPES } from "@/src/util/components/projects/projectId/data-blocks/data-blocks";
-import { selectDataBlock, selectDataBlockColumns, updateDataBlocksState } from "@/src/reduxStore/states/pages/data-blocks";
+import { selectDataBlock, selectDataBlockColumns } from "@/src/reduxStore/states/pages/data-blocks";
 import { createDataBlockColumn } from "@/src/services/base/data-blocks";
 
 const ACCEPT_BUTTON = { buttonCaption: "Accept", useButton: true, disabled: true }
@@ -24,6 +17,7 @@ export default function CreateNewDataBlockColumn() {
     const router = useRouter();
     const dispatch = useDispatch();
 
+    const projectId = useSelector(selectProjectId);
     const modalNewDataBlockColumn = useSelector(selectModal(ModalEnum.CREATE_DATA_BLOCK_COLUMN));
     const dataBlockColumns = useSelector(selectDataBlockColumns);
     const dataBlockId = useSelector(selectDataBlock).id;
@@ -39,7 +33,7 @@ export default function CreateNewDataBlockColumn() {
             columnDataType: dataBlockColumnType.value
         }]
         createDataBlockColumn(dataBlockId, sqlSchemaList, (res) => {
-            console.log(res);
+            router.push(`/projects/${projectId}/data-blocks/${dataBlockId}/1`);
         });
     }, [dataBlockColumnName, dataBlockColumnType, dataBlockId, sqlSchema]);
 
@@ -62,7 +56,7 @@ export default function CreateNewDataBlockColumn() {
         <div className="grid grid-cols-2  gap-2 items-center" style={{ gridTemplateColumns: 'max-content auto' }}>
             <span className="card-title mb-0 label-text font-normal"><span className="underline filtersUnderline">Data block column name</span></span>
 
-            <input type="text" value={dataBlockColumnName} onChange={(e: any) => setDataBlockColumnName(e.target.value)}
+            <input type="text" value={dataBlockColumnName} onChange={(e: any) => handleDataBlockColumnName(e.target.value)}
                 onKeyDown={(e) => { if (e.key == 'Enter') createDataBlockColumnFunc() }}
                 className="h-9 w-full text-sm border-gray-300 rounded-md placeholder-italic border text-gray-900 pl-4 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100" placeholder="Enter a data block column name..." />
 
