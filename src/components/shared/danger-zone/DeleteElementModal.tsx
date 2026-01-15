@@ -12,6 +12,8 @@ import { useRouter } from "next/router";
 import { deleteHeuristicById } from "@/src/services/base/heuristic";
 import { deleteKnowledgeBase } from "@/src/services/base/lookup-lists";
 import { deleteUserAttribute } from "@/src/services/base/attribute";
+import { deleteDataBlockColumnById } from "@/src/services/base/data-blocks";
+import { selectDataBlock } from "@/src/reduxStore/states/pages/data-blocks";
 
 const ABORT_BUTTON = { buttonCaption: 'Delete', disabled: false, useButton: true };
 
@@ -20,6 +22,7 @@ export default function DeleteElementModal(props: DangerZoneProps) {
     const router = useRouter();
 
     const projectId = useSelector(selectProjectId);
+    const dataBlockId = useSelector(selectDataBlock).id;
     const modalDelete = useSelector(selectModal(ModalEnum.DELETE_ELEMENT));
 
     const [isDeleting, setIsDeleting] = useState(false);
@@ -47,6 +50,12 @@ export default function DeleteElementModal(props: DangerZoneProps) {
                     setIsDeleting(false);
                 });
                 router.push(`/projects/${projectId}/heuristics`);
+                break;
+            case DangerZoneEnum.DATA_BLOCK_COLUMN:
+                deleteDataBlockColumnById(dataBlockId, props.id, (res) => {
+                    setIsDeleting(false);
+                });
+                router.push(`/projects/${projectId}/data-blocks/${dataBlockId}`);
                 break;
         }
 
