@@ -75,3 +75,15 @@ export function createDataBlockColumn(dataBlockId: string, name: string, dataTyp
     };
     jsonFetchWrapper(finalUrl, FetchType.POST, onResult, JSON.stringify(convertCamelToSnakeCase(body)));
 }
+
+export function getDataBlockColumnByColumnId(dataBlockId: string, dataBlockColumnId: string, onResult: (result: any) => void) {
+    const finalUrl = `${dataBlocksEndpoint}/${dataBlockId}/attributes/${dataBlockColumnId}`;
+    jsonFetchWrapper(finalUrl, FetchType.GET, onResult);
+}
+
+export function updateDataBlockColumn(dataBlockId: string, dataBlockColumnId: string, onResult: (result: any) => void, dataType?: string, isPrimaryKey?: boolean, name?: string, sourceCode?: string, additionalConfig?: any) {
+    const finalUrl = `${dataBlocksEndpoint}/${dataBlockId}/attributes/${dataBlockColumnId}`;
+    const baseData: any = convertCamelToSnakeCase({ dataType, isPrimaryKey, name, sourceCode });
+    baseData.additional_config = additionalConfig;
+    jsonFetchWrapper(finalUrl, FetchType.POST, onResult, JSON.stringify(baseData));
+}

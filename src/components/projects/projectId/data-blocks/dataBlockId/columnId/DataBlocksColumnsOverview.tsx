@@ -1,5 +1,5 @@
 import DangerZone from "@/src/components/shared/danger-zone/DangerZone";
-import { selectDataBlockColumns } from "@/src/reduxStore/states/pages/data-blocks";
+import { selectDataBlock, selectDataBlockColumns, setActiveDataBlock, updateDataBlockColumnById } from "@/src/reduxStore/states/pages/data-blocks";
 import { selectAllLookupLists, setAllLookupLists } from "@/src/reduxStore/states/pages/lookup-lists";
 import { selectProjectId } from "@/src/reduxStore/states/project";
 import { getLookupListsByProjectId } from "@/src/services/base/lookup-lists";
@@ -33,6 +33,10 @@ import { LookupListWithOnClick } from "@/src/types/components/projects/projectId
 import LLMResponseConfig from "../../../attributes/attributeId/LLMResponseConfig";
 import { Editor } from "@monaco-editor/react";
 import LoadingIcon from "@/submodules/react-components/components/LoadingIcon";
+import { getDataBlock, getDataBlockColumnByColumnId, updateDataBlockColumn } from "@/src/services/base/data-blocks";
+import { useConsoleLog } from "@/submodules/react-components/hooks/useConsoleLog";
+import ExecutionContainer from "../../../attributes/attributeId/ExecutionContainer";
+import ContainerLogs from "@/src/components/shared/logs/ContainerLogs";
 
 const EDITOR_OPTIONS = { theme: 'vs-light', language: 'python', readOnly: false };
 
@@ -42,9 +46,8 @@ export default function DataBlocksColumnsOverview() {
     const dispatch = useDispatch();
 
     const projectId = useSelector(selectProjectId);
-    const dataBlockId = router.query.dataBlockId;
-    const dataBlockColumns = useSelector(selectDataBlockColumns);
-    const lookupLists = useSelector(selectAllLookupLists);
+    const dataBlock = useSelector(selectDataBlock);
+    const dataBlockColumns = dataBlock?.sqlSchema;
 
     const [currentDataBlockColumn, setCurrentDataBlockColumn] = useState<DataBlockColumn>(null);
     const [isHeaderNormal, setIsHeaderNormal] = useState(true);
@@ -61,45 +64,46 @@ export default function DataBlocksColumnsOverview() {
     const currentDataBlockColumnRef = useRefFor(currentDataBlockColumn);
     const debouncedConfig = useDebounce(additionalConfigTmp, 1000);
 
-    const updateDataBlockColumnName = useCallback((value: string, dataBlockColumnNameParam?: string) => {
+    const updateSourceCode = useCallback((value: string, dataBlockColumnNameParam?: string) => {
         var regMatch: any = getPythonFunctionRegExMatch(value);
         if (!regMatch) {
             console.log("Can't find python function name -- seems wrong -- better dont save");
             return;
         }
         const finalSourceCode = value.replace(regMatch[0], 'def ac(record)');
-        // updateDataBlockColumn(projectId, currentDataBlockColumn.id, (res) => {
+        updateDataBlockColumn(dataBlock.id, currentDataBlockColumn.id, (res) => {
 
-        // }, null, null, dataBlockColumnNameParam, finalSourceCode);
+        }, null, null, dataBlockColumnNameParam, finalSourceCode);
     }, [projectId, currentDataBlockColumn]);
 
     useEffect(() => setAdditionalConfigTmp(currentDataBlockColumn?.additionalConfig), [currentDataBlockColumn?.additionalConfig])
 
     useEffect(() => {
         if (!projectId) return;
-        if (lookupLists.length == 0) {
-            getLookupListsByProjectId(projectId, (res) => {
-                dispatch(setAllLookupLists(res));
-            });
-        }
-        // refetchLabelingTasksAndProcess();
         checkProjectTokenization();
     }, [projectId]);
 
     useEffect(() => {
-        if (currentDataBlockColumn || !projectId) return;
-        // getDataBlockColumnByColumnId(projectId, router.query.columnId as string, (dataBlockColumn) => {
-        //     const currentDataBlockColumn = postProcessCurrentDataBlockColumn(dataBlockColumn);
-        //     setCurrentDataBlockColumn(currentDataBlockColumn);
-        //     setEditorValue(currentDataBlockColumn?.sourceCodeToDisplay);
-        // });
-    }, [projectId, currentDataBlockColumn, router.query.columnId])
+        if (dataBlock) return;
+        getDataBlock(router.query.dataBlockId as string, (res) => {
+            dispatch(setActiveDataBlock(res));
+        });
+    }, [dataBlock, router.query.dataBlockId]);
+
+    useEffect(() => {
+        if (currentDataBlockColumn || !dataBlock) return;
+        getDataBlockColumnByColumnId(dataBlock.id, router.query.columnId as string, (dataBlockColumn) => {
+            const currentDataBlockColumn = postProcessCurrentDataBlockColumn(dataBlockColumn);
+            setCurrentDataBlockColumn(currentDataBlockColumn);
+            setEditorValue(currentDataBlockColumn?.sourceCodeToDisplay);
+        });
+    }, [dataBlock, currentDataBlockColumn, router.query.columnId])
 
 
     useEffect(() => {
         if (!currentDataBlockColumn) return;
         if (currentDataBlockColumn.saveSourceCode) {
-            // updateSourceCode(currentDataBlockColumn.sourceCode);
+            updateSourceCode(currentDataBlockColumn.sourceCode);
         }
         if (currentDataBlockColumn.state == DataBlockColumnState.USABLE || currentDataBlockColumn.state == DataBlockColumnState.RUNNING) {
             setEditorOptions({ ...EDITOR_OPTIONS, readOnly: true });
@@ -124,7 +128,7 @@ export default function DataBlocksColumnsOverview() {
             const regMatch: any = getPythonFunctionRegExMatch(editorValue);
             changeDataBlockColumnName(regMatch ? regMatch[2] : '');
             setCurrentDataBlockColumn({ ...currentDataBlockColumn, sourceCode: editorValue });
-            // updateSourceCode(editorValue);
+            updateSourceCode(editorValue);
             setCheckUnsavedChanges(false);
         });
         return () => {
@@ -136,17 +140,17 @@ export default function DataBlocksColumnsOverview() {
 
     useEffect(() => {
         if (!currentDataBlockColumnRef.current || !currentDataBlockColumnRef.current.additionalConfig || simpleDictCompare(currentDataBlockColumnRef.current?.additionalConfig, debouncedConfig)) return;
-        const attributeNew = { ...currentDataBlockColumn };
+        const dataBlockColumnNew = { ...currentDataBlockColumn };
         const finalConfig = { ...debouncedConfig };
         if (finalConfig.llmConfig && finalConfig.llmIdentifier == 'Azure Foundry') {
             delete finalConfig.llmConfig.openAioSeries;
         }
-        attributeNew.additionalConfig = { ...finalConfig };
-        // updateAttribute(projectId, currentDataBlockColumn.id, (res) => {
-        //     setCurrentDataBlockColumn(postProcessCurrentDataBlockColumn(attributeNew));
-        //     dispatch(updateAttributeById(attributeNew));
-        //     setEnableButton(true);
-        // }, null, null, null, null, null, finalConfig);
+        dataBlockColumnNew.additionalConfig = { ...finalConfig };
+        updateDataBlockColumn(dataBlock.id, currentDataBlockColumn.id, (res) => {
+            setCurrentDataBlockColumn(postProcessCurrentDataBlockColumn(dataBlockColumnNew));
+            dispatch(updateDataBlockColumnById(dataBlockColumnNew));
+            setEnableButton(true);
+        }, null, null, null, null, finalConfig);
 
     }, [debouncedConfig])
 
@@ -172,26 +176,26 @@ export default function DataBlocksColumnsOverview() {
             setDataBlockColumnName(currentDataBlockColumnRef.current.name);
             return;
         }
-        const attributeNew = { ...currentDataBlockColumnRef.current };
-        attributeNew.name = name;
-        attributeNew.saveSourceCode = false;
-        // updateAttribute(projectId, currentDataBlockColumnRef.current.id, (res) => {
-        //     setCurrentDataBlockColumn(postProcessCurrentDataBlockColumn(attributeNew));
-        //     setEditorValue(attributeNew.sourceCode.replace('def ac(record)', 'def ' + attributeNew.name + '(record)'));
-        //     dispatch(updateAttributeById(attributeNew));
-        //     setDuplicateNameExists(false);
-        // }, null, null, attributeNew.name);
+        const dataBlockColumnNew = { ...currentDataBlockColumnRef.current };
+        dataBlockColumnNew.name = name;
+        dataBlockColumnNew.saveSourceCode = false;
+        updateDataBlockColumn(dataBlock.id, currentDataBlockColumnRef.current.id, (res) => {
+            setCurrentDataBlockColumn(postProcessCurrentDataBlockColumn(dataBlockColumnNew));
+            setEditorValue(dataBlockColumnNew.sourceCode.replace('def ac(record)', 'def ' + dataBlockColumnNew.name + '(record)'));
+            dispatch(updateDataBlockColumnById(dataBlockColumnNew));
+            setDuplicateNameExists(false);
+        }, null, null, dataBlockColumnNew.name);
     }, []);
 
     const updateDataType = useCallback((option: { name: string, value: string }) => {
-        const attributeNew = { ...currentDataBlockColumnRef.current };
-        attributeNew.dataType = option.value;
-        attributeNew.dataTypeName = option.name;
-        attributeNew.saveSourceCode = false;
-        // updateAttribute(projectId, currentDataBlockColumnRef.current.id, (res) => {
-        //     setCurrentDataBlockColumn(postProcessCurrentDataBlockColumn(attributeNew));
-        //     dispatch(updateAttributeById(attributeNew));
-        // }, attributeNew.dataType);
+        const dataBlockColumnNew = { ...currentDataBlockColumnRef.current };
+        dataBlockColumnNew.dataType = option.value;
+        dataBlockColumnNew.dataTypeName = option.name;
+        dataBlockColumnNew.saveSourceCode = false;
+        updateDataBlockColumn(dataBlock.id, currentDataBlockColumnRef.current.id, (res) => {
+            setCurrentDataBlockColumn(postProcessCurrentDataBlockColumn(dataBlockColumnNew));
+            dispatch(updateDataBlockColumnById(dataBlockColumnNew));
+        }, dataBlockColumnNew.dataType);
     }, []);
 
     function onScrollEvent(event: any) {
@@ -209,39 +213,10 @@ export default function DataBlocksColumnsOverview() {
         });
     }
 
-    // function refetchLabelingTasksAndProcess() {
-    //     getLabelingTasksByProjectId(projectId, (res) => {
-    //         dispatch(setLabelingTasksAll(postProcessLabelingTasksSchema(res)));
-    //     });
-    // }
-
     const handleWebsocketNotification = useCallback((msgParts: string[]) => {
         if (!currentDataBlockColumn) return;
         if (!projectId) return;
-        if (msgParts[1] == 'calculate_attribute') {
-            if (msgParts[2] == 'progress' && msgParts[3] == currentDataBlockColumn.id) {
-                const currentDataBlockColumnCopy = { ...currentDataBlockColumn };
-                currentDataBlockColumnCopy.progress = Number(msgParts[4]);
-                currentDataBlockColumnCopy.state = DataBlockColumnState.RUNNING;
-                setCurrentDataBlockColumn(currentDataBlockColumnCopy);
-            } else {
-                // getAttributes(projectId, ['ALL'], (res) => {
-                //     dispatch(setAllAttributes(res));
-                // });
-                if (msgParts[2] == 'deleted') return
-                // getAttributeByAttributeId(projectId, currentDataBlockColumn?.id, (attribute) => {
-                //     if (!attribute) setCurrentDataBlockColumn(null);
-                //     else setCurrentDataBlockColumn(postProcessCurrentDataBlockColumn(attribute));
-                // });
-                if (msgParts[2] == "finished") {
-                    timer(2000).subscribe(() => checkProjectTokenization());
-                }
-            }
-        } else if (['knowledge_base_updated', 'knowledge_base_deleted', 'knowledge_base_created'].includes(msgParts[1])) {
-            getLookupListsByProjectId(projectId, (res) => {
-                dispatch(setAllLookupLists(res));
-            });
-        } else if (msgParts[1] == 'tokenization' && msgParts[2] == 'docbin') {
+        if (msgParts[1] == 'tokenization' && msgParts[2] == 'docbin') {
             if (msgParts[3] == 'progress') {
                 setTokenizationProgress(Number(msgParts[4]));
             } else if (msgParts[3] == 'state') {
@@ -255,24 +230,14 @@ export default function DataBlocksColumnsOverview() {
 
     const selectCodeTemplate = useCallback((option) => {
         if (!currentDataBlockColumnRef.current) return;
-        // updateSourceCode(LLM_CODE_TEMPLATE_EXAMPLES[option.value]);
+        updateSourceCode(LLM_CODE_TEMPLATE_EXAMPLES[option.value]);
         setEditorValue(LLM_CODE_TEMPLATE_EXAMPLES[option.value].replace('def ac(record)', 'def ' + currentDataBlockColumnRef.current.name + '(record)'));
     }, [])
 
     const orgId = useSelector(selectOrganizationId);
     useWebsocket(orgId, Application.REFINERY, CurrentPage.DATA_BLOCKS, handleWebsocketNotification, projectId);
 
-    const goBack = useCallback((e: React.MouseEvent) => {
-        e.preventDefault();
-        router.push(`/projects/${projectId}/settings`);
-    }, []);
-
     const copyToClipboardFunc = useCallback((name: string) => copyToClipboard(name), []);
-
-
-    const lookupListsFinal = useMemo(() => lookupLists.map((lookupList) => (
-        { ...lookupList, onClick: () => copyToClipboardFunc("from knowledge import " + lookupList.pythonVariable) }
-    )), [lookupLists]);
 
     const disabledOptions = useMemo(() => {
         if (!currentDataBlockColumn || currentDataBlockColumn.dataType == DataBlockColumnType.LLM_RESPONSE) return undefined;
@@ -284,7 +249,7 @@ export default function DataBlocksColumnsOverview() {
             <div className={`sticky z-40 h-12 ${isHeaderNormal ? 'top-1' : '-top-5'}`}>
                 <div className={`bg-white flex-grow ${isHeaderNormal ? '' : 'shadow'}`}>
                     <div className={`flex-row justify-start items-center inline-block ${isHeaderNormal ? 'p-0' : 'flex py-2'}`} style={{ transition: 'all .25s ease-in-out' }}>
-                        <a href={`/refinery/projects/${projectId}/data-blocks/${dataBlockId}`} onClick={goBack} className="text-green-800 text-sm font-medium">
+                        <a href={`/refinery/projects/${projectId}/data-blocks/${dataBlock.id}`} className="text-green-800 text-sm font-medium">
                             <MemoIconArrowLeft className="h-5 w-5 inline-block text-green-800" />
                             <span className="leading-5">Go back</span>
                         </a>
@@ -313,7 +278,7 @@ export default function DataBlocksColumnsOverview() {
                         </div>
                     </div>}
                 </div>
-                {duplicateNameExists && <div className="text-red-700 text-xs mt-2">Attribute name exists</div>}
+                {duplicateNameExists && <div className="text-red-700 text-xs mt-2">Data block column name exists</div>}
                 <div className="grid grid-cols-2 gap-2 items-center mt-8" style={{ gridTemplateColumns: 'max-content auto' }}>
                     <div className="text-sm leading-5 font-medium text-gray-700">Data type</div>
                     <div className="flex flex-row items-center">
@@ -338,28 +303,14 @@ export default function DataBlocksColumnsOverview() {
                                 : <InfoButton content="Set in backend" divPosition="right" infoButtonSize="sm" />}
                         </div>}
                     </div>
-                    <div className="text-sm leading-5 font-medium text-gray-700 inline-block">Attributes</div>
+                    <div className="text-sm leading-5 font-medium text-gray-700 inline-block">Data block columns</div>
                     <div className="flex flex-row items-center">
-                        {dataBlockColumns.length == 0 && <div className="text-sm font-normal text-gray-500">No usable attributes.</div>}
+                        {dataBlockColumns.length == 0 && <div className="text-sm font-normal text-gray-500">No usable data block columns.</div>}
                         {dataBlockColumns.map((dataBlockColumn: DataBlockColumn) => (
-                            <Tooltip key={dataBlockColumn.id} content={dataBlockColumn.dataTypeName + ' - ' + TOOLTIPS_DICT.GENERAL.CLICK_TO_COPY} color="invert" placement="top">
-                                <span onClick={() => copyToClipboardFunc(dataBlockColumn.name)}>
+                            <Tooltip key={dataBlockColumn.id} content={dataBlockColumn.columnDataType + ' - ' + TOOLTIPS_DICT.GENERAL.CLICK_TO_COPY} color="invert" placement="top">
+                                <span onClick={() => copyToClipboardFunc(dataBlockColumn.columnName)}>
                                     <div className={`cursor-pointer border items-center px-2 py-0.5 rounded text-xs font-medium text-center mr-2 ${'bg-' + dataBlockColumn.color + '-100'} ${'text-' + dataBlockColumn.color + '-700'} ${'border-' + dataBlockColumn.color + '-400'} ${'hover:bg-' + dataBlockColumn.color + '-200'}`}>
-                                        {dataBlockColumn.name}
-                                    </div>
-                                </span>
-                            </Tooltip>
-                        ))}
-                    </div>
-
-                    <div className="text-sm leading-5 font-medium text-gray-700 inline-block">
-                        {lookupListsFinal.length == 0 ? 'No lookup lists in project' : 'Lookup lists'}</div>
-                    <div className="flex flex-row items-center">
-                        {lookupListsFinal.map((lookupList: LookupListWithOnClick) => (
-                            <Tooltip key={lookupList.id} content={TOOLTIPS_DICT.GENERAL.IMPORT_STATEMENT} color="invert" placement="top">
-                                <span onClick={lookupList.onClick}>
-                                    <div className="cursor-pointer border items-center px-2 py-0.5 rounded text-xs font-medium text-center mr-2">
-                                        {lookupList.pythonVariable} - {lookupList.termCount}
+                                        {dataBlockColumn.columnName}
                                     </div>
                                 </span>
                             </Tooltip>
@@ -416,15 +367,15 @@ export default function DataBlocksColumnsOverview() {
                 </div>
 
 
-                {/* <ExecutionContainer currentDataBlockColumn={currentDataBlockColumn} tokenizationProgress={tokenizationProgress} enableRunButton={enableRunButton} checkUnsavedChanges={checkUnsavedChanges}
+                <ExecutionContainer currentAttribute={currentDataBlockColumn} tokenizationProgress={tokenizationProgress} enableRunButton={enableRunButton} checkUnsavedChanges={checkUnsavedChanges}
                     setEnabledButton={(value: boolean) => setEnableButton(value)}
-                    refetchcurrentDataBlockColumn={() => {
-                        getAttributeByAttributeId(projectId, currentDataBlockColumn?.id, (attribute) => {
-                            if (attribute == null) setCurrentDataBlockColumn(null);
-                            else setCurrentDataBlockColumn(postProcessCurrentDataBlockColumn(attribute));
+                    refetchCurrentAttribute={() => {
+                        getDataBlockColumnByColumnId(dataBlock.id, router.query.columnId as string, (dataBlockColumn) => {
+                            if (dataBlockColumn == null) setCurrentDataBlockColumn(null);
+                            else setCurrentDataBlockColumn(postProcessCurrentDataBlockColumn(dataBlockColumn));
                         });
                     }} />
-                <ContainerLogs logs={currentDataBlockColumn.logs} type="attribute" /> */}
+                <ContainerLogs logs={currentDataBlockColumn.logs} type="attribute" />
 
                 <div className="mt-8">
                     <div className="text-sm leading-5 font-medium text-gray-700 inline-block">Calculation progress</div>

@@ -54,6 +54,12 @@ const dataBlocksSlice = createSlice({
                 };
             },
         },
+        updateDataBlockColumnById(state, action: PayloadAction<DataBlockColumn>) {
+            if (action.payload) {
+                const index = state.allDataBlockColumns.findIndex((dataBlockColumn) => dataBlockColumn.id === action.payload.id);
+                if (index !== -1) state.allDataBlockColumns[index] = action.payload;
+            }
+        },
     },
 })
 
@@ -64,5 +70,5 @@ export const selectDataBlocksAll = (state) => state.dataBlocks.all;
 export const selectDataBlockType = (state) => state.dataBlocks.type;
 export const selectDataBlockColumns = (state) => state.dataBlocks.active.sqlSchema;
 
-export const { setAllDataBlocks, setDataBlockType, setActiveDataBlock, updateDataBlocksState } = dataBlocksSlice.actions;
+export const { setAllDataBlocks, setDataBlockType, setActiveDataBlock, updateDataBlocksState, updateDataBlockColumnById } = dataBlocksSlice.actions;
 export const dataBlocksReducer = dataBlocksSlice.reducer;

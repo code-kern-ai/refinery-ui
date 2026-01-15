@@ -10,6 +10,9 @@ import { useDispatch, useSelector } from "react-redux";
 import { DATA_BLOCK_COLUMN_TYPES } from "@/src/util/components/projects/projectId/data-blocks/data-blocks";
 import { selectDataBlock, selectDataBlockColumns } from "@/src/reduxStore/states/pages/data-blocks";
 import { createDataBlockColumn } from "@/src/services/base/data-blocks";
+import { setCurrentPage } from "@/src/reduxStore/states/general";
+import { CurrentPage } from "@/submodules/react-components/hooks/web-socket/constants";
+import { toPythonFunctionName } from "@/submodules/javascript-functions/python-functions-parser";
 
 const ACCEPT_BUTTON = { buttonCaption: "Accept", useButton: true, disabled: true }
 
@@ -29,7 +32,11 @@ export default function CreateNewDataBlockColumn() {
 
     const createDataBlockColumnFunc = useCallback(() => {
         createDataBlockColumn(dataBlockId, dataBlockColumnName, dataBlockColumnType.value, (res) => {
-            router.push(`/projects/${projectId}/data-blocks/${dataBlockId}/${res.id}`);
+            const id = res?.dataBlockColumnId;
+            if (id) {
+                dispatch(setCurrentPage(CurrentPage.DATA_BLOCKS_COLUMNS));
+                router.push(`/projects/${projectId}/data-blocks/${dataBlockId}/${id}`);
+            }
         });
     }, [dataBlockColumnName, dataBlockColumnType, dataBlockId]);
 
@@ -40,8 +47,10 @@ export default function CreateNewDataBlockColumn() {
     const [acceptButton, setAcceptButton] = useState<ModalButton>(ACCEPT_BUTTON);
 
     const handleDataBlockColumnName = useCallback((value: string) => {
-        setDataBlockColumnName(value);
-        setDuplicateNameExists(dataBlockColumns.some(column => column.columnName == value));
+        const valueToSave = toPythonFunctionName(value);
+        const checkName = dataBlockColumns.some(column => column.name == valueToSave);
+        setDataBlockColumnName(valueToSave);
+        setDuplicateNameExists(checkName);
     }, [dataBlockColumns]);
 
     return (<Modal modalName={ModalEnum.CREATE_DATA_BLOCK_COLUMN} acceptButton={acceptButton}>

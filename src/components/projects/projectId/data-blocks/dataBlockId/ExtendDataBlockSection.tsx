@@ -5,14 +5,30 @@ import { MemoIconPlus } from "@/submodules/react-components/components/kern-icon
 import KernTable from "@/submodules/react-components/components/kern-table/KernTable";
 import { useDispatch, useSelector } from "react-redux";
 import CreateNewDataBlockColumn from "./CreateNewDataBlockColumn";
-import { useMemo } from "react";
-import { selectDataBlockColumns } from "@/src/reduxStore/states/pages/data-blocks";
+import { useCallback, useMemo } from "react";
+import { selectDataBlock, selectDataBlockColumns } from "@/src/reduxStore/states/pages/data-blocks";
 import { DATA_BLOCKS_COLUMNS_TABLE_COLUMNS, prepareTableBodyDataBlocksColumns } from "@/src/util/table-preparations/data-blocks";
+import { selectProjectId } from "@/src/reduxStore/states/project";
+import { useRouter } from "next/router";
+import { CurrentPage } from "@/submodules/react-components/hooks/web-socket/constants";
+import { setCurrentPage } from "@/src/reduxStore/states/general";
 
 export default function ExtendDataBlockSection() {
+    const router = useRouter();
     const dispatch = useDispatch();
+
+    const projectId = useSelector(selectProjectId);
+    const dataBlockId = useSelector(selectDataBlock).id;
     const dataBlocksColumns = useSelector(selectDataBlockColumns);
-    const preparedValues = useMemo(() => prepareTableBodyDataBlocksColumns(dataBlocksColumns), [dataBlocksColumns]);
+
+    const onClickDetails = useCallback((dataBlockColumnId: string) => {
+        dispatch(setCurrentPage(CurrentPage.DATA_BLOCKS_COLUMNS));
+        router.push(`/projects/${projectId}/data-blocks/${dataBlockId}/${dataBlockColumnId}`);
+    }, [projectId, dataBlockId]);
+
+    const preparedValues = useMemo(() => {
+        return prepareTableBodyDataBlocksColumns(dataBlocksColumns, onClickDetails)
+    }, [dataBlocksColumns]);
 
     return (
         <div className="mt-8">
