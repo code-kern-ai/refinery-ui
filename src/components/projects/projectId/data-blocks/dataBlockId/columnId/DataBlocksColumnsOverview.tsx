@@ -65,6 +65,7 @@ export default function DataBlocksColumnsOverview() {
     const debouncedConfig = useDebounce(additionalConfigTmp, 1000);
 
     const updateSourceCode = useCallback((value: string, dataBlockColumnNameParam?: string) => {
+        if (!dataBlock?.id) return;
         var regMatch: any = getPythonFunctionRegExMatch(value);
         if (!regMatch) {
             console.log("Can't find python function name -- seems wrong -- better dont save");
@@ -74,7 +75,7 @@ export default function DataBlocksColumnsOverview() {
         updateDataBlockColumn(dataBlock.id, currentDataBlockColumn.id, (res) => {
 
         }, null, null, dataBlockColumnNameParam, finalSourceCode);
-    }, [projectId, currentDataBlockColumn]);
+    }, [currentDataBlockColumn, dataBlock?.id]);
 
     useEffect(() => setAdditionalConfigTmp(currentDataBlockColumn?.additionalConfig), [currentDataBlockColumn?.additionalConfig])
 
@@ -139,6 +140,7 @@ export default function DataBlocksColumnsOverview() {
 
 
     useEffect(() => {
+        if (!dataBlock?.id) return;
         if (!currentDataBlockColumnRef.current || !currentDataBlockColumnRef.current.additionalConfig || simpleDictCompare(currentDataBlockColumnRef.current?.additionalConfig, debouncedConfig)) return;
         const dataBlockColumnNew = { ...currentDataBlockColumn };
         const finalConfig = { ...debouncedConfig };
@@ -152,7 +154,7 @@ export default function DataBlocksColumnsOverview() {
             setEnableButton(true);
         }, null, null, null, null, finalConfig);
 
-    }, [debouncedConfig])
+    }, [debouncedConfig, dataBlock?.id])
 
     function openName(open: boolean) {
         setIsNameOpen(open);
@@ -170,6 +172,7 @@ export default function DataBlocksColumnsOverview() {
     const changeDataBlockColumnName = useCallback((name: string) => {
         if (name == currentDataBlockColumnRef.current.name) return;
         if (name == '') return;
+        if (!dataBlock?.id) return;
         const duplicateNameExists = dataBlockColumnsRef.current.find((attribute) => attribute.name == name);
         if (duplicateNameExists) {
             setDuplicateNameExists(true);
@@ -185,9 +188,10 @@ export default function DataBlocksColumnsOverview() {
             dispatch(updateDataBlockColumnById(dataBlockColumnNew));
             setDuplicateNameExists(false);
         }, null, null, dataBlockColumnNew.name);
-    }, []);
+    }, [dataBlock?.id]);
 
     const updateDataType = useCallback((option: { name: string, value: string }) => {
+        if (!dataBlock?.id) return;
         const dataBlockColumnNew = { ...currentDataBlockColumnRef.current };
         dataBlockColumnNew.dataType = option.value;
         dataBlockColumnNew.dataTypeName = option.name;
@@ -196,7 +200,7 @@ export default function DataBlocksColumnsOverview() {
             setCurrentDataBlockColumn(postProcessCurrentDataBlockColumn(dataBlockColumnNew));
             dispatch(updateDataBlockColumnById(dataBlockColumnNew));
         }, dataBlockColumnNew.dataType);
-    }, []);
+    }, [dataBlock?.id]);
 
     function onScrollEvent(event: any) {
         if (!(event.target instanceof HTMLElement)) return;
