@@ -10,7 +10,7 @@ import { DataBlockProperty, DataBlockType, SQLTemplates } from "@/src/types/comp
 import KernDropdown from "@/submodules/react-components/components/KernDropdown";
 import { getSQLTemplatesDict } from "@/src/util/components/projects/projectId/data-blocks/data-blocks";
 import CopyToClipboard from "@/submodules/react-components/components/CopyToClipboard";
-import { testGroupByClause, testOrderByClause, testSelectClause, testWhereClause } from "@/src/services/base/misc";
+import { testSQLClauses } from "@/src/services/base/misc";
 import ExtendDataBlockSection from "./ExtendDataBlockSection";
 import { forkJoin, Observable } from "rxjs";
 import DataBlockResultsSection from "./DataBlockResultsSection";
@@ -149,41 +149,33 @@ export default function DataBlocksDetailsOverview() {
     }, [currentDataBlock]);
 
     const testQuery = useCallback(() => {
-        const wrapCallbackAsObservable = <T,>(fn: (arg: T, callback: (result: any) => void) => void, arg: T): Observable<any> => {
-            return new Observable(observer => {
-                fn(arg, (result) => {
-                    observer.next(result);
-                    observer.complete();
-                });
-            });
-        };
-        const observables: any = {
-            select: wrapCallbackAsObservable(testSelectClause, sqlTemplateState.selectClause),
-        };
-        if (sqlTemplateState.whereClause.trim()) {
-            observables.where = wrapCallbackAsObservable(testWhereClause, sqlTemplateState.whereClause);
+        const sqlClauses = {
+            select: sqlTemplateState.selectClause,
+            where: sqlTemplateState.whereClause,
+            groupBy: sqlTemplateState.groupByClause,
+            orderBy: sqlTemplateState.orderByClause,
         }
-        if (sqlTemplateState.orderByClause.trim()) {
-            observables.orderBy = wrapCallbackAsObservable(testOrderByClause, sqlTemplateState.orderByClause);
-        }
-        if (sqlTemplateState.groupByClause.trim()) {
-            observables.groupBy = wrapCallbackAsObservable(testGroupByClause, sqlTemplateState.groupByClause);
-        }
-        forkJoin(observables).subscribe({
-            next: (results: any) => {
-                let error = '';
-                if (!results.select.isValid)
-                    error += 'SELECT clause is NOT valid: ' + results.select.denyReason;
-                if (results.where && !results.where.isValid)
-                    error += 'WHERE clause is NOT valid: ' + results.where.denyReason;
-                if (results.groupBy && !results.groupBy.isValid)
-                    error += 'GROUP BY is NOT valid: ' + results.groupBy.denyReason;
-                if (results.orderBy && !results.orderBy.isValid)
-                    error += 'ORDER BY is NOT valid: ' + results.orderBy.denyReason;
-                const isValid = Object.values(results).every((r: any) => r.isValid);
-                setIsTestQuerySuccess(isValid);
-                alert(isValid ? "Everything is valid" : error);
+        testSQLClauses(sqlClauses, (res) => {
+            if (res.isValid) {
+                setIsTestQuerySuccess(true);
+                alert('Everything is valid');
+                return;
             }
+            let error = '';
+            if (res.selectDenyReason) {
+                error += 'SELECT clause is NOT valid: ' + res.selectDenyReason;
+            }
+            if (res.whereDenyReason) {
+                error += 'WHERE clause is NOT valid: ' + res.whereDenyReason;
+            }
+            if (res.groupByDenyReason) {
+                error += 'GROUP BY is NOT valid: ' + res.groupByDenyReason;
+            }
+            if (res.orderByDenyReason) {
+                error += 'ORDER BY is NOT valid: ' + res.orderByDenyReason;
+            }
+            setIsTestQuerySuccess(false);
+            alert(error);
         });
     }, [sqlTemplateState, sqlTemplatePreview]);
 

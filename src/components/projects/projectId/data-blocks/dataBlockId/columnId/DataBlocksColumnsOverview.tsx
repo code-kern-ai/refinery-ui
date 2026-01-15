@@ -29,12 +29,10 @@ import { TOOLTIPS_DICT } from "@/src/util/tooltip-constants";
 import KernDropdown from "@/submodules/react-components/components/KernDropdown";
 import { LLM_PROVIDER_OPTIONS } from "@/src/util/components/projects/projectId/settings/attribute-calculation-helper";
 import { InfoButton } from "@/submodules/react-components/components/InfoButton";
-import { LookupListWithOnClick } from "@/src/types/components/projects/projectId/lookup-lists";
 import LLMResponseConfig from "../../../attributes/attributeId/LLMResponseConfig";
 import { Editor } from "@monaco-editor/react";
 import LoadingIcon from "@/submodules/react-components/components/LoadingIcon";
 import { getDataBlock, getDataBlockColumnByColumnId, updateDataBlockColumn } from "@/src/services/base/data-blocks";
-import { useConsoleLog } from "@/submodules/react-components/hooks/useConsoleLog";
 import ExecutionContainer from "../../../attributes/attributeId/ExecutionContainer";
 import ContainerLogs from "@/src/components/shared/logs/ContainerLogs";
 

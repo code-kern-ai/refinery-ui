@@ -1,5 +1,4 @@
 import { selectDataBlock } from "@/src/reduxStore/states/pages/data-blocks";
-import { useConsoleLog } from "@/submodules/react-components/hooks/useConsoleLog";
 import { useSelector } from "react-redux";
 import { DataBlockColumnType } from "@/src/types/components/projects/projectId/data-blocks/data-blocks";
 
@@ -65,9 +64,6 @@ function formatRowAsText(row: any, sqlSchema: any[]): string {
 
 export default function DataBlockResultsSection() {
     const currentDataBlock = useSelector(selectDataBlock);
-    useConsoleLog(currentDataBlock?.data, "currentDataBlock.data");
-    useConsoleLog(currentDataBlock?.sqlSchema, "currentDataBlock.sqlSchema");
-
     const sqlSchema = currentDataBlock?.sqlSchema || [];
     const rawData = currentDataBlock?.data;
 
