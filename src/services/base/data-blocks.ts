@@ -85,7 +85,7 @@ export function updateDataBlockColumn(dataBlockId: string, dataBlockColumnId: st
     const finalUrl = `${dataBlocksEndpoint}/${dataBlockId}/attributes/${dataBlockColumnId}`;
     const baseData: any = convertCamelToSnakeCase({ dataType, isPrimaryKey, name, sourceCode });
     baseData.additional_config = additionalConfig;
-    jsonFetchWrapper(finalUrl, FetchType.POST, onResult, JSON.stringify(baseData));
+    jsonFetchWrapper(finalUrl, FetchType.PUT, onResult, JSON.stringify(baseData));
 }
 
 export function deleteDataBlockColumnById(dataBlockId: string, dataBlockColumnId: string, onResult: (result: any) => void) {

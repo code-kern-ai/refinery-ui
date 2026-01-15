@@ -32,10 +32,9 @@ export default function CreateNewDataBlockColumn() {
 
     const createDataBlockColumnFunc = useCallback(() => {
         createDataBlockColumn(dataBlockId, dataBlockColumnName, dataBlockColumnType.value, (res) => {
-            const id = res?.dataBlockColumnId;
-            if (id) {
+            if (res?.id) {
                 dispatch(setCurrentPage(CurrentPage.DATA_BLOCKS_COLUMNS));
-                router.push(`/projects/${projectId}/data-blocks/${dataBlockId}/${id}`);
+                router.push(`/projects/${projectId}/data-blocks/${dataBlockId}/${res.id}`);
             }
         });
     }, [dataBlockColumnName, dataBlockColumnType, dataBlockId]);

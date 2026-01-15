@@ -22,7 +22,7 @@ export default function DeleteElementModal(props: DangerZoneProps) {
     const router = useRouter();
 
     const projectId = useSelector(selectProjectId);
-    const dataBlockId = useSelector(selectDataBlock).id;
+    const dataBlockId = useSelector(selectDataBlock)?.id;
     const modalDelete = useSelector(selectModal(ModalEnum.DELETE_ELEMENT));
 
     const [isDeleting, setIsDeleting] = useState(false);
