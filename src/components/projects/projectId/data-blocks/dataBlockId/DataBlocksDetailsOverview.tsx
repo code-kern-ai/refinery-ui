@@ -162,17 +162,20 @@ export default function DataBlocksDetailsOverview() {
                 return;
             }
             let error = '';
-            if (res.selectDenyReason) {
-                error += 'SELECT clause is NOT valid: ' + res.selectDenyReason;
+            if (res.denyReason.select) {
+                error += 'SELECT clause is NOT valid: ' + res.denyReason.select;
             }
-            if (res.whereDenyReason) {
-                error += 'WHERE clause is NOT valid: ' + res.whereDenyReason;
+            if (res.denyReason.where) {
+                error += 'WHERE clause is NOT valid: ' + res.denyReason.where;
             }
-            if (res.groupByDenyReason) {
-                error += 'GROUP BY is NOT valid: ' + res.groupByDenyReason;
+            if (res.denyReason.groupBy) {
+                error += 'GROUP BY is NOT valid: ' + res.denyReason.groupBy;
             }
-            if (res.orderByDenyReason) {
-                error += 'ORDER BY is NOT valid: ' + res.orderByDenyReason;
+            if (res.denyReason.orderBy) {
+                error += 'ORDER BY is NOT valid: ' + res.denyReason.orderBy;
+            }
+            if (res.denyReason.db_check) {
+                error += 'DB check is NOT valid: ' + res.denyReason.db_check;
             }
             setIsTestQuerySuccess(false);
             alert(error);
