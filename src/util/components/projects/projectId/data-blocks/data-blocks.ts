@@ -1,4 +1,4 @@
-import { DataBlockColumn, DataBlockColumnType, SQLTemplates } from "@/src/types/components/projects/projectId/data-blocks/data-blocks";
+import { DataBlockColumn, DataBlockColumnState, DataBlockColumnType, SQLTemplates } from "@/src/types/components/projects/projectId/data-blocks/data-blocks";
 import { AttributeCalculationExamples, AttributeCodeLookup } from "@/src/util/classes/attribute-calculation";
 import { jsonCopy } from "@/submodules/javascript-functions/general";
 import { parseContainerLogsData } from "@/submodules/javascript-functions/logs-parser";
@@ -51,4 +51,14 @@ export function postProcessCurrentDataBlockColumn(dataColumn: DataBlockColumn): 
     }
 
     return prepareDataColumn;
+}
+
+export const DATA_BLOCK_COLUMN_STATE_COLOR_DICT = {
+    [DataBlockColumnState.UPLOADED]: 'indigo',
+    [DataBlockColumnState.AUTOMATICALLY_CREATED]: 'indigo',
+    [DataBlockColumnState.USABLE]: 'green',
+    [DataBlockColumnState.RUNNING]: 'yellow',
+    [DataBlockColumnState.FAILED]: 'red',
+    [DataBlockColumnState.QUEUED]: 'gray',
+    [DataBlockColumnState.INITIAL]: 'gray',
 }

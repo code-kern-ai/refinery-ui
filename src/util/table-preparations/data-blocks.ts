@@ -1,5 +1,6 @@
-import { DataBlockColumn } from "@/src/types/components/projects/projectId/data-blocks/data-blocks";
+import { DataBlockColumn, DataBlockColumnState } from "@/src/types/components/projects/projectId/data-blocks/data-blocks";
 import { toTableColumnComponent, toTableColumnText } from "@/submodules/react-components/helpers/kern-table-helper";
+import { DATA_BLOCK_COLUMN_STATE_COLOR_DICT } from "../components/projects/projectId/data-blocks/data-blocks";
 
 export const DATA_BLOCKS_COLUMNS_TABLE_COLUMNS = [
     { column: 'Column Name', id: 'columnName' },
@@ -14,7 +15,7 @@ export function prepareTableBodyDataBlocksColumns(dataBlocksColumns: DataBlockCo
     return dataBlocksColumns.map(dataBlockColumn => [
         toTableColumnText(dataBlockColumn.columnName),
         toTableColumnText(dataBlockColumn.columnDataType),
-        toTableColumnText(dataBlockColumn.state),
+        toTableColumnComponent('TaskStateCell', undefined, { value: dataBlockColumn.state, color: DATA_BLOCK_COLUMN_STATE_COLOR_DICT[dataBlockColumn.state] }),
         toTableColumnComponent('DataBlockColumnDetailsCell', undefined, { userCreated: dataBlockColumn.userCreated, onClick: () => onClickDetails(dataBlockColumn.id) })
     ]);
 }

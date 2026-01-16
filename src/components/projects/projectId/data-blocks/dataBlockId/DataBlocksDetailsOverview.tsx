@@ -12,7 +12,6 @@ import { getSQLTemplatesDict } from "@/src/util/components/projects/projectId/da
 import CopyToClipboard from "@/submodules/react-components/components/CopyToClipboard";
 import { testSQLClauses } from "@/src/services/base/misc";
 import ExtendDataBlockSection from "./ExtendDataBlockSection";
-import { forkJoin, Observable } from "rxjs";
 import DataBlockResultsSection from "./DataBlockResultsSection";
 
 export default function DataBlocksDetailsOverview() {

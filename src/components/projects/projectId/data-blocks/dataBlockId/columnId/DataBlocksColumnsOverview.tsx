@@ -35,6 +35,7 @@ import LoadingIcon from "@/submodules/react-components/components/LoadingIcon";
 import { getDataBlock, getDataBlockColumnByColumnId, updateDataBlockColumn } from "@/src/services/base/data-blocks";
 import ExecutionContainer from "../../../attributes/attributeId/ExecutionContainer";
 import ContainerLogs from "@/src/components/shared/logs/ContainerLogs";
+import { getColorForDataType } from "@/src/util/components/projects/projectId/settings/data-schema-helper";
 
 const EDITOR_OPTIONS = { theme: 'vs-light', language: 'python', readOnly: false };
 
@@ -61,6 +62,16 @@ export default function DataBlocksColumnsOverview() {
 
     const currentDataBlockColumnRef = useRefFor(currentDataBlockColumn);
     const debouncedConfig = useDebounce(additionalConfigTmp, 1000);
+
+    const dataBlockColumnsFinal = useMemo(() => {
+        if (!dataBlockColumns) return [];
+        return dataBlockColumns.map((dataBlockColumn: DataBlockColumn) => {
+            return {
+                ...dataBlockColumn,
+                color: getColorForDataType(dataBlockColumn.columnDataType),
+            }
+        })
+    }, [dataBlockColumns]);
 
     const updateSourceCode = useCallback((value: string, dataBlockColumnNameParam?: string) => {
         if (!dataBlock?.id) return;
@@ -307,8 +318,8 @@ export default function DataBlocksColumnsOverview() {
                     </div>
                     <div className="text-sm leading-5 font-medium text-gray-700 inline-block">Data block columns</div>
                     <div className="flex flex-row items-center">
-                        {dataBlockColumns.length == 0 && <div className="text-sm font-normal text-gray-500">No usable data block columns.</div>}
-                        {dataBlockColumns.map((dataBlockColumn: DataBlockColumn) => (
+                        {dataBlockColumnsFinal.length == 0 && <div className="text-sm font-normal text-gray-500">No usable data block columns.</div>}
+                        {dataBlockColumnsFinal.map((dataBlockColumn: DataBlockColumn) => (
                             <Tooltip key={dataBlockColumn.id} content={dataBlockColumn.columnDataType + ' - ' + TOOLTIPS_DICT.GENERAL.CLICK_TO_COPY} color="invert" placement="top">
                                 <span onClick={() => copyToClipboardFunc(dataBlockColumn.columnName)}>
                                     <div className={`cursor-pointer border items-center px-2 py-0.5 rounded text-xs font-medium text-center mr-2 ${'bg-' + dataBlockColumn.color + '-100'} ${'text-' + dataBlockColumn.color + '-700'} ${'border-' + dataBlockColumn.color + '-400'} ${'hover:bg-' + dataBlockColumn.color + '-200'}`}>
