@@ -1,6 +1,7 @@
 import LoadingIcon from "@/submodules/react-components/components/LoadingIcon";
 import { setModalStates } from "@/src/reduxStore/states/modal";
 import { selectProjectId } from "@/src/reduxStore/states/project";
+import { selectDataBlock } from "@/src/reduxStore/states/pages/data-blocks";
 import { ExecutionContainerProps, SampleRecord } from "@/src/types/components/projects/projectId/settings/attribute-calculation";
 import { AttributeState } from "@/src/types/components/projects/projectId/settings/data-schema";
 import { ModalEnum } from "@/src/types/shared/modal";
@@ -20,6 +21,7 @@ import useRefFor from "@/submodules/react-components/hooks/useRefFor";
 
 export default function ExecutionContainer(props: ExecutionContainerProps) {
     const projectId = useSelector(selectProjectId);
+    const dataBlock = useSelector(selectDataBlock);
     const dispatch = useDispatch();
 
 
@@ -40,7 +42,7 @@ export default function ExecutionContainer(props: ExecutionContainerProps) {
     const calculateUserAttributeSampleRecords = useCallback(() => {
         if (requestedSomething) return;
         setRequestedSomething(true);
-        getSampleRecords(projectId, currentAttributesRef.current.id, (res) => {
+        getSampleRecords(projectId, currentAttributesRef.current.id, dataBlock?.id || null, (res) => {
             const sampleRecordsFinal = { ...res };
             setRequestedSomething(false);
             props.setEnabledButton(false);
@@ -53,7 +55,7 @@ export default function ExecutionContainer(props: ExecutionContainerProps) {
             setSampleRecords(sampleRecordsFinal);
             props.refetchCurrentAttribute();
         });
-    }, [projectId]);
+    }, [projectId, dataBlock?.id]);
 
     function recordByRecordId(recordId: string) {
         getRecordByRecordId(projectId, recordId, (res) => {

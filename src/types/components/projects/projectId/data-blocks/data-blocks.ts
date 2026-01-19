@@ -52,6 +52,7 @@ export enum SQLTemplates {
 
 export type DataBlockColumn = {
     id: string;
+    dataBlockId: string;
     name: string;
     dataType: string;
     isPrimaryKey: boolean;

@@ -3,6 +3,7 @@ import { BACKEND_BASE_URI } from "./_settings";
 import { convertCamelToSnakeCase } from "@/submodules/javascript-functions/case-types-parser";
 
 export const attributeEndpoint = `${BACKEND_BASE_URI}/api/v1/attribute`;
+export const dataBlocksEndpoint = `${BACKEND_BASE_URI}/api/v1/data-blocks`;
 
 export function getAttributes(projectId: string, stateFilter: string[], onResult: (result: any) => void) {
     const stateFilterQuery = new URLSearchParams()
@@ -16,8 +17,10 @@ export function getCheckCompositeKey(projectId: string, onResult: (result: any) 
     jsonFetchWrapper(finalUrl, FetchType.GET, onResult);
 }
 
-export function getSampleRecords(projectId: string, attributeId: string, onResult: (result: any) => void) {
-    const finalUrl = `${attributeEndpoint}/${projectId}/${attributeId}/sample-records`;
+export function getSampleRecords(projectId: string, attributeId: string, dataBlockId: string | null, onResult: (result: any) => void) {
+    let finalUrl = '';
+    if (dataBlockId) finalUrl = `${dataBlocksEndpoint}/${dataBlockId}/attributes/${attributeId}/sample-records`;
+    else finalUrl = `${attributeEndpoint}/${projectId}/${attributeId}/sample-records`;
     jsonFetchWrapper(finalUrl, FetchType.GET, onResult);
 }
 
