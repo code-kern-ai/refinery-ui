@@ -192,6 +192,7 @@ const initialState: Modals = {
     [ModalEnum.LLM_PLAYGROUND]: {
         open: false,
         attributeId: null,
+        dataBlockColumnId: null,
         apiKey: null,//since it's only available in the by id function this is passed along
     },
     [ModalEnum.EVALUATION_SET]: {

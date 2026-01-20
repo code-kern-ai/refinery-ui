@@ -20,6 +20,9 @@ import { TEMPLATE_EXAMPLES, TEMPLATE_OPTIONS } from "./llmTemplates";
 import { LLM_PROVIDER_OPTIONS, postProcessLLMPlaygroundRecordData } from "@/src/util/components/projects/projectId/settings/attribute-calculation-helper";
 import { MemoIconHandClick, MemoIconPlayCardStar, MemoIconPlayerPlay, MemoIconRefresh, MemoIconTerminal } from "@/submodules/react-components/components/kern-icons/icons";
 import { InfoButton } from "@/submodules/react-components/components/InfoButton";
+import { selectDataBlock, selectDataBlockColumns, selectDataBlockColumnsDict } from "@/src/reduxStore/states/pages/data-blocks";
+import { DataBlockColumnState } from "@/src/types/components/projects/projectId/data-blocks/data-blocks";
+import { runDataBlockColumnLlmPlayground, updateDataBlockColumn } from "@/src/services/base/data-blocks";
 
 const ACCEPT_BUTTON = { buttonCaption: "Use current values for attribute", useButton: true };
 const DISPLAY_STATES = [AttributeState.AUTOMATICALLY_CREATED, AttributeState.UPLOADED, AttributeState.USABLE]
@@ -27,7 +30,10 @@ const DISPLAY_STATES = [AttributeState.AUTOMATICALLY_CREATED, AttributeState.UPL
 export default function LLMPlaygroundModal() {
     const projectId = useSelector(selectProjectId);
     const attributeDict = useSelector(selectAttributesDict);
+    const dataBlockColumnsDict = useSelector(selectDataBlockColumnsDict);
     const attributes = useSelector(selectAttributes);
+    const dataBlockColumns = useSelector(selectDataBlockColumns);
+    const dataBlock = useSelector(selectDataBlock);
     const modal = useSelector(selectModal(ModalEnum.LLM_PLAYGROUND));
     const modalRef = useRefFor(modal);
 
@@ -80,7 +86,14 @@ export default function LLMPlaygroundModal() {
         if (finalConfig.llmConfig && finalConfig.llmIdentifier == 'Azure Foundry') {
             delete finalConfig.llmConfig.openAioSeries;
         }
-        runAttributeLlmPlayground(projectId, modalRef.current.attributeId, recordIds, finalConfig, (res) => {
+        if (modalRef.current.attributeId) runAttributeLlmPlayground(projectId, modalRef.current.attributeId, recordIds, finalConfig, (res) => {
+            let answer = ""
+            for (const id of recordIds) answer += "Answer: " + (res[id] || "No answer found") + "\n";
+            if (res["logs"]) answer += "\n---\nlogs:\n" + res["logs"].join("\n");
+            setLlmAnswer(answer);
+            setPlaygroundTestRunning(false);
+        });
+        if (modalRef.current.dataBlockColumnId) runDataBlockColumnLlmPlayground(dataBlock.id, modalRef.current.dataBlockColumnId, recordIds, finalConfig, (res) => {
             let answer = ""
             for (const id of recordIds) answer += "Answer: " + (res[id] || "No answer found") + "\n";
             if (res["logs"]) answer += "\n---\nlogs:\n" + res["logs"].join("\n");
@@ -92,11 +105,13 @@ export default function LLMPlaygroundModal() {
     useEffect(() => {
         if (!recordData || recordData?.length == 0) return;
         setInputRunningId(recordData[0].running_id);
-    }, [recordData]);
+    }, [recordData, dataBlock]);
 
     useEffect(() => {
         if (modal.open) {
-            const config = jsonCopy(attributeDict[modal.attributeId]?.additionalConfig);
+            let config = null;
+            if (modal.attributeId) config = jsonCopy(attributeDict[modal.attributeId]?.additionalConfig);
+            if (modal.dataBlockColumnId) config = jsonCopy(dataBlockColumnsDict[modal.dataBlockColumnId]?.additionalConfig);
             config.llmConfig.apiKey = modal.apiKey;
             setFullLlmConfig(config);
             get1RandomRecords();
@@ -113,17 +128,32 @@ export default function LLMPlaygroundModal() {
         updateAttribute(projectId, modalRef.current.attributeId, (res) => { }, null, null, null, null, null, config);
     }, []);
 
+    const copyToDataBlockColumnValues = useCallback(() => {
+        if (!fullLlmConfigRef.current || !modalRef.current) return;
+        const config = { ...fullLlmConfigRef.current };
+        updateDataBlockColumn(projectId, modalRef.current.dataBlockColumnId, (res) => { }, null, null, null, null, config);
+    }, []);
+
     useEffect(() => {
-        if (!attributeDict || !modal?.attributeId) return;
-        const attribute = attributeDict[modal.attributeId];
-        if (attribute.state == AttributeState.USABLE) setAcceptButton({ ...acceptButton, useButton: false });
-        else setAcceptButton({ ...acceptButton, emitFunction: copyToAttributeValues });
-    }, [copyToAttributeValues, attributeDict, modal?.attributeId]);
+        if ((!attributeDict || !modal?.attributeId) && (!dataBlockColumnsDict || !modal?.dataBlockColumnId)) return;
+        if (attributeDict && modal?.attributeId) {
+            const attribute = attributeDict[modal.attributeId];
+            if (attribute.state == AttributeState.USABLE) setAcceptButton({ ...acceptButton, useButton: false });
+            else setAcceptButton({ ...acceptButton, emitFunction: copyToAttributeValues });
+        }
+        if (dataBlockColumnsDict && modal?.dataBlockColumnId) {
+            const dataBlockColumn = dataBlockColumnsDict[modal.dataBlockColumnId];
+            if (dataBlockColumn.state == DataBlockColumnState.USABLE) setAcceptButton({ ...acceptButton, useButton: false });
+            else setAcceptButton({ ...acceptButton, emitFunction: copyToDataBlockColumnValues });
+        }
+    }, [copyToAttributeValues, attributeDict, modal?.attributeId, copyToDataBlockColumnValues, dataBlockColumnsDict, modal?.dataBlockColumnId]);
 
     const recordKeys = useMemo(() => {
-        if (!attributes) return [];
-        return attributes.filter(a => DISPLAY_STATES.includes(a.state)).map(a => ({ name: a.name, dataType: a.dataType }));
-    }, [attributes])
+        if (!attributes && !dataBlockColumns) return [];
+        if (attributes) return attributes.filter(a => DISPLAY_STATES.includes(a.state)).map(a => ({ name: a.name, dataType: a.dataType }));
+        if (dataBlockColumns) return dataBlockColumns.filter(a => DISPLAY_STATES.includes(a.state)).map(a => ({ name: a.name, dataType: a.dataType }));
+        return [];
+    }, [attributes, dataBlockColumns])
 
     const finalAcceptButton = useMemo(() => {
         if (playgroundTestRunning) return { ...acceptButton, disabled: true };
@@ -185,7 +215,7 @@ export default function LLMPlaygroundModal() {
                         : <InfoButton content="Set in backend" divPosition="right" infoButtonSize="sm" />}
 
                 </div>}
-                <LLMResponseConfig attributeId={modal.attributeId} fullLlmConfig={fullLlmConfig} setFullLlmConfig={setFullLlmConfig} noPlayground keepConfigOpen />
+                <LLMResponseConfig attributeId={modal.attributeId} dataBlockColumnId={modal.dataBlockColumnId} fullLlmConfig={fullLlmConfig} setFullLlmConfig={setFullLlmConfig} noPlayground keepConfigOpen />
                 <div className="h-2"></div>
                 <KernButton text="Test configuration" icon={MemoIconPlayerPlay} size="small" onClick={testConfigurationForRecordId} loading={playgroundTestRunning} />
                 {llmAnswer && <div className="border-b mb-10 border-gray-200 w-full align-top">

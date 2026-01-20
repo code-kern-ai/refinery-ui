@@ -1,5 +1,6 @@
 import { DataBlock, DataBlockColumn, DataBlockColumnState, DataBlockType } from '@/src/types/components/projects/projectId/data-blocks/data-blocks';
 import { AttributeState } from '@/src/types/components/projects/projectId/settings/data-schema';
+import { arrayToDict } from '@/submodules/javascript-functions/general';
 import { createSelector, createSlice } from '@reduxjs/toolkit'
 import type { PayloadAction } from '@reduxjs/toolkit'
 
@@ -73,8 +74,9 @@ const dataBlocksSlice = createSlice({
 export const selectDataBlock = (state) => state.dataBlocks.active;
 export const selectDataBlocksAll = (state) => state.dataBlocks.all;
 export const selectDataBlockType = (state) => state.dataBlocks.type;
-export const selectDataBlockColumns = (state) => state.dataBlocks.active.sqlSchema;
+export const selectDataBlockColumns = (state) => state.dataBlocks.active?.sqlSchema || [];
 export const selectUsableDataBlockColumns = (state) => state.dataBlocks.usableDataBlockColumns;
+export const selectDataBlockColumnsDict = createSelector([selectDataBlockColumns], (a): any => a ? arrayToDict(a, 'id') : null);
 
 export const { setAllDataBlocks, setDataBlockType, setActiveDataBlock, updateDataBlocksState, updateDataBlockColumnById } = dataBlocksSlice.actions;
 export const dataBlocksReducer = dataBlocksSlice.reducer;

@@ -95,3 +95,8 @@ export function deleteDataBlockColumnById(dataBlockId: string, dataBlockColumnId
     };
     jsonFetchWrapper(finalUrl, FetchType.DELETE, onResult, JSON.stringify(convertCamelToSnakeCase(body)));
 }
+
+export function runDataBlockColumnLlmPlayground(dataBlockId: string, dataBlockColumnId: string, recordIds: string[], llmConfig: any, onResult: (result: any) => void) {
+    const finalUrl = `${dataBlocksEndpoint}/${dataBlockId}/attributes/${dataBlockColumnId}/run-llm-playground`;
+    jsonFetchWrapper(finalUrl, FetchType.POST, onResult, JSON.stringify({ record_ids: recordIds, llm_config: llmConfig }));
+}

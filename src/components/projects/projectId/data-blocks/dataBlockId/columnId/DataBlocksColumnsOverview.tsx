@@ -332,7 +332,7 @@ export default function DataBlocksColumnsOverview() {
                 </div>
                 {
                     currentDataBlockColumn.dataType == DataBlockColumnType.LLM_RESPONSE &&
-                    <LLMResponseConfig disabled={currentDataBlockColumn.state == DataBlockColumnState.USABLE} attributeId={currentDataBlockColumn?.id} fullLlmConfig={additionalConfigTmp} setFullLlmConfig={setAdditionalConfigTmp} apiKey={additionalConfigTmp?.llmConfig.apiKey} noPlayground={currentDataBlockColumn.state == DataBlockColumnState.USABLE} />
+                    <LLMResponseConfig disabled={currentDataBlockColumn.state == DataBlockColumnState.USABLE} dataBlockColumnId={currentDataBlockColumn?.id} fullLlmConfig={additionalConfigTmp} setFullLlmConfig={setAdditionalConfigTmp} apiKey={additionalConfigTmp?.llmConfig.apiKey} noPlayground={currentDataBlockColumn.state == DataBlockColumnState.USABLE} />
                 }
                 <div className="flex flex-row items-center justify-between my-3">
                     <div className="flex flex-row flex-nowrap items-center">

@@ -9,7 +9,8 @@ import useRefFor from "@/submodules/react-components/hooks/useRefFor";
 
 
 type LLMResponsePlaygroundProps = {
-    attributeId: string;
+    attributeId?: string;
+    dataBlockColumnId?: string;
     apiKey?: string;
 }
 
@@ -17,9 +18,10 @@ export default function LLMResponsePlayground(props: LLMResponsePlaygroundProps)
     const dispatch = useDispatch();
 
     const attributeIdRef = useRefFor(props.attributeId);
+    const dataBlockColumnIdRef = useRefFor(props.dataBlockColumnId);
     const apiKeyRef = useRefFor(props.apiKey);
     const openLLMPlayground = useCallback(() => {
-        dispatch(setModalStates(ModalEnum.LLM_PLAYGROUND, { open: true, attributeId: attributeIdRef.current, apiKey: apiKeyRef.current }));
+        dispatch(setModalStates(ModalEnum.LLM_PLAYGROUND, { open: true, attributeId: attributeIdRef.current, dataBlockColumnId: dataBlockColumnIdRef.current, apiKey: apiKeyRef.current }));
     }, []);
 
     return (
