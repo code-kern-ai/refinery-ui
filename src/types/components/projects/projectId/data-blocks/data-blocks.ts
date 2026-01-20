@@ -19,6 +19,7 @@ export type DataBlock = {
             orderByClause?: string,
         }
     };
+    sqlSchema: DataBlockColumn[];
 };
 
 export type DeleteDataBlockModalProps = {

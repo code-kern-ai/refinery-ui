@@ -1,5 +1,5 @@
 import DangerZone from "@/src/components/shared/danger-zone/DangerZone";
-import { selectDataBlock, selectDataBlockColumns, setActiveDataBlock, updateDataBlockColumnById } from "@/src/reduxStore/states/pages/data-blocks";
+import { selectDataBlock, selectDataBlockColumns, selectUsableDataBlockColumns, setActiveDataBlock, updateDataBlockColumnById } from "@/src/reduxStore/states/pages/data-blocks";
 import { selectAllLookupLists, setAllLookupLists } from "@/src/reduxStore/states/pages/lookup-lists";
 import { selectProjectId } from "@/src/reduxStore/states/project";
 import { getLookupListsByProjectId } from "@/src/services/base/lookup-lists";
@@ -46,7 +46,7 @@ export default function DataBlocksColumnsOverview() {
 
     const projectId = useSelector(selectProjectId);
     const dataBlock = useSelector(selectDataBlock);
-    const dataBlockColumns = dataBlock?.sqlSchema;
+    const dataBlockColumns = useSelector(selectUsableDataBlockColumns);
 
     const [currentDataBlockColumn, setCurrentDataBlockColumn] = useState<DataBlockColumn>(null);
     const [isHeaderNormal, setIsHeaderNormal] = useState(true);

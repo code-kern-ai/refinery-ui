@@ -1,5 +1,6 @@
-import { DataBlock, DataBlockColumn, DataBlockType } from '@/src/types/components/projects/projectId/data-blocks/data-blocks';
-import { createSlice } from '@reduxjs/toolkit'
+import { DataBlock, DataBlockColumn, DataBlockColumnState, DataBlockType } from '@/src/types/components/projects/projectId/data-blocks/data-blocks';
+import { AttributeState } from '@/src/types/components/projects/projectId/settings/data-schema';
+import { createSelector, createSlice } from '@reduxjs/toolkit'
 import type { PayloadAction } from '@reduxjs/toolkit'
 
 type DataBlocksState = {
@@ -7,6 +8,7 @@ type DataBlocksState = {
     active: DataBlock | null;
     type: DataBlockType;
     allDataBlockColumns: DataBlockColumn[];
+    usableDataBlockColumns: DataBlockColumn[];
 }
 
 function getInitState(): DataBlocksState {
@@ -15,6 +17,7 @@ function getInitState(): DataBlocksState {
         active: null,
         type: null,
         allDataBlockColumns: [],
+        usableDataBlockColumns: [],
     };
 }
 
@@ -31,6 +34,8 @@ const dataBlocksSlice = createSlice({
         setActiveDataBlock(state, action: PayloadAction<DataBlock>) {
             if (action.payload) state.active = { ...action.payload };
             else state.active = null;
+            const filterFromAll = state.active.sqlSchema.filter((dataBlockColumn) => (dataBlockColumn.state === DataBlockColumnState.UPLOADED || dataBlockColumn.state === DataBlockColumnState.AUTOMATICALLY_CREATED || dataBlockColumn.state === DataBlockColumnState.USABLE));
+            state.usableDataBlockColumns = [...filterFromAll];
         },
         setAllDataBlocks(state, action: PayloadAction<DataBlock[]>) {
             if (action.payload) state.all = action.payload;
@@ -69,6 +74,7 @@ export const selectDataBlock = (state) => state.dataBlocks.active;
 export const selectDataBlocksAll = (state) => state.dataBlocks.all;
 export const selectDataBlockType = (state) => state.dataBlocks.type;
 export const selectDataBlockColumns = (state) => state.dataBlocks.active.sqlSchema;
+export const selectUsableDataBlockColumns = (state) => state.dataBlocks.usableDataBlockColumns;
 
 export const { setAllDataBlocks, setDataBlockType, setActiveDataBlock, updateDataBlocksState, updateDataBlockColumnById } = dataBlocksSlice.actions;
 export const dataBlocksReducer = dataBlocksSlice.reducer;
