@@ -1,8 +1,8 @@
 import { selectProjectId } from "@/src/reduxStore/states/project";
 import KernButton from "@/submodules/react-components/components/kern-button/KernButton";
-import { MemoIconArrowLeft, MemoIconPlayerPlay } from "@/submodules/react-components/components/kern-icons/icons";
+import { MemoIconAlertTriangleFilled, MemoIconArrowLeft, MemoIconPlayerPlay } from "@/submodules/react-components/components/kern-icons/icons";
 import { useRouter } from "next/router";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { selectDataBlock, setActiveDataBlock, updateDataBlocksState } from "@/src/reduxStore/states/pages/data-blocks";
 import { getDataBlock, updateDataBlock, executeDataBlockQuery } from "@/src/services/base/data-blocks";
@@ -13,6 +13,7 @@ import CopyToClipboard from "@/submodules/react-components/components/CopyToClip
 import { testSQLClauses } from "@/src/services/base/misc";
 import ExtendDataBlockSection from "./ExtendDataBlockSection";
 import DataBlockResultsSection from "./DataBlockResultsSection";
+import { Tooltip } from "@nextui-org/react";
 
 export default function DataBlocksDetailsOverview() {
     const router = useRouter();
@@ -193,6 +194,16 @@ export default function DataBlocksDetailsOverview() {
         });
     }, [currentDataBlock]);
 
+    const addWarning = useMemo(() => {
+        if (!currentDataBlock) return null;
+        if (currentDataBlock.type == DataBlockType.LIVE) return null;
+        const containsRecordId = sqlTemplateState.selectClause.includes('record_id');
+        if (!containsRecordId) return null;
+        return <Tooltip content="Warning: Column with the name record_id is used in the attribute calculation. Ensure that you don't use the column as alias " color="invert" placement="right" className="cursor-default">
+            <MemoIconAlertTriangleFilled className="inline-block text-yellow-400 h-5 w-5" />
+        </Tooltip>
+    }, [currentDataBlock?.type, sqlTemplateState.selectClause]);
+
     return (projectId && <div className={`bg-white p-4 overflow-y-auto min-h-full h-[calc(100vh-4rem)] w-[calc(100vw-5rem)]`} onScroll={onScrollEvent}>
         {currentDataBlock && <>
             <div className={`sticky z-40 h-12 ${isHeaderNormal ? 'top-1' : '-top-5'}`}>
@@ -251,7 +262,7 @@ export default function DataBlocksDetailsOverview() {
                 <div className="grid grid-cols-2 gap-4">
                     <div className="flex flex-col gap-4">
                         <div>
-                            <label htmlFor="select-query" className="text-sm leading-5 font-medium text-gray-700">Select</label>
+                            <label htmlFor="select-query" className="text-sm leading-5 font-medium text-gray-700">Select <span className="inline-block">{addWarning}</span></label>
                             <textarea id="select-query" value={sqlTemplateState.selectClause} className="w-full border-gray-300 rounded-md placeholder-italic border text-gray-700 pl-4 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100"
                                 onChange={(e) => setSQLTemplateState({ ...sqlTemplateState, selectClause: e.target.value })} />
                         </div>
