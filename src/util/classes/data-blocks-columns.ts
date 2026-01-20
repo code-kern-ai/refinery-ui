@@ -12,7 +12,7 @@ export class DataBlocksColumnsCodeLookup {
                     case DataTypeEnum.CATEGORY: return {
                         code: `def ac(record):
     # e.g. categorize the records conditional on the text length of a string attribute
-    text_length = len(record["str_attribute"].text)
+    text_length = len(record["str_attribute"])
     if text_length < 35:
         return "short"
     elif text_length < 70:
@@ -23,23 +23,24 @@ export class DataBlocksColumnsCodeLookup {
                     case DataTypeEnum.TEXT: return {
                         code: `def ac(record):
     # e.g. transform the string attribute to lower case
-    return record["str_attribute"].text.lower()
+    return record["str_attribute"].lower()
                     `}
                     case DataTypeEnum.BOOLEAN: return {
                         code: `def ac(record):
     # e.g. does the string attribute contain a digit
-    return any([token.is_digit for token in record["str_attribute"]])
+    return any([content.isdigit() for content in record["str_attribute"]])
                     `}
                     case DataTypeEnum.INTEGER: return {
                         code: `def ac(record):
     # e.g. length of the longest word in string attribute
-    word_length = [len(word) for word in record["str_attribute"]]
+    words = record["str_attribute"].split()
+    word_length = [len(word) for word in words]
     return max(word_length)
                     `}
                     case DataTypeEnum.FLOAT: return {
                         code: `def ac(record):
     # e.g. mean number of chars per word
-    words = record["str_attribute"].text.split()
+    words = record["str_attribute"].split()
     num_words = len(words)
     sum_word_lengths = sum([len(word) for word in words])
     return sum_word_lengths / num_words
