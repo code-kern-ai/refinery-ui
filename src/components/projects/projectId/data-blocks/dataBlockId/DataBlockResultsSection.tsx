@@ -46,8 +46,9 @@ function formatRowAsText(row: any, sqlSchema: any[]): string {
     if (!sqlSchema || sqlSchema.length === 0) {
         return JSON.stringify(row, null, 2);
     }
-
+    
     return sqlSchema.map((column: any) => {
+        console.log(row, sqlSchema);
         const columnName = column.columnName;
         const columnDataType = column.columnDataType || '';
         let cellValue = row[columnName];
@@ -65,7 +66,7 @@ function formatRowAsText(row: any, sqlSchema: any[]): string {
 export default function DataBlockResultsSection() {
     const currentDataBlock = useSelector(selectDataBlock);
     const sqlSchema = currentDataBlock?.sqlSchema || [];
-    const rawData = currentDataBlock?.data;
+    const rawData = currentDataBlock?.sqlData;
 
     let data: any[] = [];
     if (Array.isArray(rawData)) {

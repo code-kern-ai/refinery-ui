@@ -15,7 +15,7 @@ export default function ConfirmExecutionModal(props: ConfirmExecutionModalProps)
     const modalExecuteAll = useSelector(selectModal(ModalEnum.EXECUTE_ATTRIBUTE_CALCULATION));
 
     const calculateUserAttributeAllRecords = useCallback(() => {
-        calculateUserAttributeAllRecordsPost(projectId, { attributeId: props.currentAttributeId }, (res) => { });
+        calculateUserAttributeAllRecordsPost(projectId, { attributeId: props.currentAttributeId, dataBlockId: props.dataBlockId }, (res) => { });
     }, [modalExecuteAll]);
 
     useEffect(() => {

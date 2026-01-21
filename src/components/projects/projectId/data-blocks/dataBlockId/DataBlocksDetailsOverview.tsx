@@ -309,7 +309,7 @@ export default function DataBlocksDetailsOverview() {
                         </div>
                     </div>
                 </div>
-                {(currentDataBlock.data && currentDataBlock.data.length > 0) && <>
+                {(currentDataBlock.sqlData && currentDataBlock.sqlData.length > 0) && <>
                     {currentDataBlock.type == DataBlockType.STABLE && <ExtendDataBlockSection />}
                     <DataBlockResultsSection />
                 </>}

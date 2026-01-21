@@ -35,7 +35,7 @@ const dataBlocksSlice = createSlice({
         setActiveDataBlock(state, action: PayloadAction<DataBlock>) {
             if (action.payload) state.active = { ...action.payload };
             else state.active = null;
-            const filterFromAll = state.active.sqlSchema.filter((dataBlockColumn) => (dataBlockColumn.state === DataBlockColumnState.UPLOADED || dataBlockColumn.state === DataBlockColumnState.AUTOMATICALLY_CREATED || dataBlockColumn.state === DataBlockColumnState.USABLE));
+            const filterFromAll = state.active.sqlSchema?.filter((dataBlockColumn) => (dataBlockColumn.state === DataBlockColumnState.UPLOADED || dataBlockColumn.state === DataBlockColumnState.AUTOMATICALLY_CREATED || dataBlockColumn.state === DataBlockColumnState.USABLE));
             state.usableDataBlockColumns = [...filterFromAll];
         },
         setAllDataBlocks(state, action: PayloadAction<DataBlock[]>) {

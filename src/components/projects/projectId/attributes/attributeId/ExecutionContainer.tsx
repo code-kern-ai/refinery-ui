@@ -161,6 +161,6 @@ export default function ExecutionContainer(props: ExecutionContainerProps) {
         </div >}
 
         <ViewRecordDetailsModal currentAttribute={props.currentAttribute} sampleRecords={sampleRecordsFinal} />
-        <ConfirmExecutionModal currentAttributeId={props.currentAttribute.id} />
+        <ConfirmExecutionModal dataBlockId={'dataBlockId' in props.currentAttribute ? props.currentAttribute.dataBlockId : null} currentAttributeId={props.currentAttribute.id} />
     </div >)
 }

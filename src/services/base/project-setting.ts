@@ -68,7 +68,8 @@ export function updateAttribute(projectId: string, attributeId: string, onResult
 }
 
 export function calculateUserAttributeAllRecordsPost(projectId: string, options: {
-    attributeId: string
+    attributeId: string,
+    dataBlockId?: string | null
 }, onResult: (result: any) => void) {
     const finalUrl = `${projectSettingEndpoint}/${projectId}/calculate-user-attribute-all-records`;
     jsonFetchWrapper(finalUrl, FetchType.POST, onResult, JSON.stringify(convertCamelToSnakeCase(options)));

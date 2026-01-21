@@ -10,6 +10,7 @@ export type DataBlock = {
     createdBy: string;
     organizationId: string;
     projectId: string;
+    sqlData: object[];
     sqlConfig: {
         template: string,
         config: {

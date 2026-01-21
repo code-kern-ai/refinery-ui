@@ -38,4 +38,5 @@ export type ViewRecordDetailsModalProps = {
 
 export type ConfirmExecutionModalProps = {
     currentAttributeId: string;
+    dataBlockId?: string | null;
 }
