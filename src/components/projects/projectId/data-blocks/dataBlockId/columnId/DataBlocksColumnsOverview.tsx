@@ -227,8 +227,25 @@ export default function DataBlocksColumnsOverview() {
     }
 
     const handleWebsocketNotification = useCallback((msgParts: string[]) => {
-        if (!currentDataBlockColumn) return;
         if (!projectId) return;
+        if (!currentDataBlockColumn) return;
+        if (msgParts[1] == 'calculate_attribute') {
+            if (msgParts[2] == 'progress' && msgParts[3] == currentDataBlockColumn.id) {
+                const currentDataBlockColumnCopy = { ...currentDataBlockColumn };
+                currentDataBlockColumnCopy.progress = Number(msgParts[4]);
+                currentDataBlockColumnCopy.state = DataBlockColumnState.RUNNING;
+                dispatch(updateDataBlockColumnById(currentDataBlockColumnCopy));
+            } else {
+                if (msgParts[2] == 'deleted') return
+                getDataBlockColumnByColumnId(dataBlock.id, currentDataBlockColumn.id, (attribute) => {
+                    if (!attribute) setCurrentDataBlockColumn(null);
+                    else setCurrentDataBlockColumn(postProcessCurrentDataBlockColumn(attribute));
+                });
+                if (msgParts[2] == "finished") {
+                    timer(2000).subscribe(() => checkProjectTokenization());
+                }
+            }
+        }
         if (msgParts[1] == 'tokenization' && msgParts[2] == 'docbin') {
             if (msgParts[3] == 'progress') {
                 setTokenizationProgress(Number(msgParts[4]));
@@ -239,7 +256,7 @@ export default function DataBlocksColumnsOverview() {
                 }
             }
         }
-    }, [projectId, currentDataBlockColumn]);
+    }, [projectId, currentDataBlockColumn, dataBlock?.id]);
 
     const selectCodeTemplate = useCallback((option) => {
         if (!currentDataBlockColumnRef.current) return;

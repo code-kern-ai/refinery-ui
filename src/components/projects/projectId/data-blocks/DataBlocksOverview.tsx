@@ -1,9 +1,6 @@
 import { selectProjectId } from "@/src/reduxStore/states/project";
 import { useDispatch, useSelector } from "react-redux";
 import { useCallback, useEffect } from "react";
-import { selectOrganizationId } from "@/src/reduxStore/states/general";
-import { useWebsocket } from "@/submodules/react-components/hooks/web-socket/useWebsocket";
-import { Application, CurrentPage } from "@/submodules/react-components/hooks/web-socket/constants";
 import DataBlockHeader from "./DataBlockHeader";
 import { selectDataBlocksAll, setAllDataBlocks } from "@/src/reduxStore/states/pages/data-blocks";
 import { getDataBlocks } from "@/src/services/base/data-blocks";
@@ -26,14 +23,6 @@ export function DataBlocksOverview() {
         });
     }, [projectId]);
 
-    const handleWebsocketNotification = useCallback((msgParts: string[]) => {
-        if (['data_blocks_created', 'data_blocks_updated', 'data_blocks_deleted'].includes(msgParts[1])) {
-            refetchDataBlocks();
-        }
-    }, [projectId]);
-
-    const orgId = useSelector(selectOrganizationId);
-    useWebsocket(orgId, Application.REFINERY, CurrentPage.DATA_BLOCKS, handleWebsocketNotification, projectId);
 
     return (projectId && <div className="p-4 bg-gray-100 h-full flex-1 flex flex-col">
         <div className="w-full h-full -mr-4">
