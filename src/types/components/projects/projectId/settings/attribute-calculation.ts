@@ -32,7 +32,7 @@ export type Record = {
 }
 
 export type ViewRecordDetailsModalProps = {
-    currentAttribute: Attribute | DataBlockColumn;
+    currentAttribute?: Attribute | DataBlockColumn;
     sampleRecords: any;
 }
 

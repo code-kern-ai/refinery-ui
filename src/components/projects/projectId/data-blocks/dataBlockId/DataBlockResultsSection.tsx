@@ -46,9 +46,8 @@ function formatRowAsText(row: any, sqlSchema: any[]): string {
     if (!sqlSchema || sqlSchema.length === 0) {
         return JSON.stringify(row, null, 2);
     }
-    
+
     return sqlSchema.map((column: any) => {
-        console.log(row, sqlSchema);
         const columnName = column.columnName;
         const columnDataType = column.columnDataType || '';
         let cellValue = row[columnName];

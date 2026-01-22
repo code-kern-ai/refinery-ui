@@ -236,7 +236,11 @@ const initialState: Modals = {
     },
     [ModalEnum.CREATE_DATA_BLOCK_COLUMN]: {
         open: false
-    }
+    },
+    [ModalEnum.VIEW_RECORD_DETAILS_DATA_BLOCK_COLUMN]: {
+        open: false,
+        recordIdx: 0,
+    },
 };
 
 const modalSlice = createSlice({

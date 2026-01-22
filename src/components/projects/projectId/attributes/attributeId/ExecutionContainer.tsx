@@ -18,6 +18,7 @@ import { getSampleRecords } from "@/src/services/base/attribute";
 import { DataTypeEnum } from "@/src/types/shared/general";
 import KernButton from "@/submodules/react-components/components/kern-button/KernButton";
 import useRefFor from "@/submodules/react-components/hooks/useRefFor";
+import ViewRecordDetailsDataBlockColumnModal from "../../data-blocks/dataBlockId/columnId/ViewRecordDetailsDataBlockColumnModal";
 
 export default function ExecutionContainer(props: ExecutionContainerProps) {
     const projectId = useSelector(selectProjectId);
@@ -70,9 +71,12 @@ export default function ExecutionContainer(props: ExecutionContainerProps) {
 
     const sampleRecordsRef = useRefFor(sampleRecords);
     const viewRecordDetails = useCallback((index: number) => () => {
-        dispatch(setModalStates(ModalEnum.VIEW_RECORD_DETAILS, { open: true, recordIdx: index }));
-        recordByRecordId(sampleRecordsRef.current.recordIds[index]);
-    }, []);
+        if (dataBlock) dispatch(setModalStates(ModalEnum.VIEW_RECORD_DETAILS_DATA_BLOCK_COLUMN, { open: true, recordIdx: index }));
+        else {
+            dispatch(setModalStates(ModalEnum.VIEW_RECORD_DETAILS, { open: true, recordIdx: index }));
+            recordByRecordId(sampleRecordsRef.current.recordIds[index]);
+        }
+    }, [dataBlock]);
 
     const sampleRecordsFinal = useMemo(() => {
         if (sampleRecords && sampleRecords.calculatedAttributesDisplay) {
@@ -161,6 +165,7 @@ export default function ExecutionContainer(props: ExecutionContainerProps) {
         </div >}
 
         <ViewRecordDetailsModal currentAttribute={props.currentAttribute} sampleRecords={sampleRecordsFinal} />
-        <ConfirmExecutionModal dataBlockId={'dataBlockId' in props.currentAttribute ? props.currentAttribute.dataBlockId : null} currentAttributeId={props.currentAttribute.id} />
+        <ConfirmExecutionModal currentAttributeId={props.currentAttribute.id} dataBlockId={dataBlock?.id} />
+        <ViewRecordDetailsDataBlockColumnModal sampleRecords={sampleRecordsFinal} />
     </div >)
 }
