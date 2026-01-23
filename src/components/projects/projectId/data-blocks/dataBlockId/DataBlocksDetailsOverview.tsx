@@ -32,6 +32,7 @@ export default function DataBlocksDetailsOverview() {
         whereClause: '',
         groupByClause: '',
         orderByClause: '',
+        limitClause: 100,
     });
     const [sqlTemplatePreview, setSQLTemplatePreview] = useState<any>({
         selectClause: '',
@@ -39,6 +40,7 @@ export default function DataBlocksDetailsOverview() {
         groupByClause: '',
         orderByClause: '',
         from_clause: '',
+        limitClause: 100,
     });
     const [previewText, setPreviewText] = useState('');
     const [isTestQuerySuccess, setIsTestQuerySuccess] = useState(false);
@@ -72,8 +74,9 @@ export default function DataBlocksDetailsOverview() {
             groupByClause: preview.groupByClause,
             orderByClause: preview.orderByClause,
             from_clause: preview.from_clause,
+            limitClause: preview.limitClause,
         });
-        setPreviewText(preview.selectClause + '\n' + preview.from_clause + '\n' + preview.whereClause);
+        setPreviewText(preview.selectClause + '\n' + preview.from_clause + '\n' + preview.whereClause + '\n' + preview.limitClause);
     }, [sqlTemplate, projectId]);
 
     useEffect(() => {
@@ -94,7 +97,11 @@ export default function DataBlocksDetailsOverview() {
         if (sqlTemplateState.orderByClause.trim()) {
             orderByClause = sqlTemplatePreview.orderByClause + sqlTemplateState.orderByClause;
         }
-        const clauses = [selectClause, sqlTemplatePreview.from_clause, whereClause, groupByClause, orderByClause].filter(clause => clause.trim() !== '');
+        let limitClause = '';
+        if (sqlTemplateState.limitClause) {
+            limitClause = sqlTemplatePreview.limitClause + sqlTemplateState.limitClause;
+        }
+        const clauses = [selectClause, sqlTemplatePreview.from_clause, whereClause, groupByClause, orderByClause, limitClause].filter(clause => clause.trim() !== '');
         setPreviewText(clauses.join('\n'));
     }, [sqlTemplateState, sqlTemplatePreview]);
 
@@ -154,6 +161,7 @@ export default function DataBlocksDetailsOverview() {
             where: sqlTemplateState.whereClause,
             groupBy: sqlTemplateState.groupByClause,
             orderBy: sqlTemplateState.orderByClause,
+            limit: sqlTemplateState.limitClause,
         }
         validateSQLClauses(sqlClauses, (res) => {
             if (res.isValid) {
@@ -173,6 +181,9 @@ export default function DataBlocksDetailsOverview() {
             }
             if (res.denyReason.orderBy) {
                 error += 'ORDER BY is NOT valid: ' + res.denyReason.order_by;
+            }
+            if (res.denyReason.limit) {
+                error += 'LIMIT is NOT valid: ' + res.denyReason.limit;
             }
             if (res.denyReason.db_check) {
                 error += 'DB check is NOT valid: ' + res.denyReason.db_check;
@@ -280,6 +291,29 @@ export default function DataBlocksDetailsOverview() {
                             <label htmlFor="order-by-query" className="text-sm leading-5 font-medium text-gray-700">Order by</label>
                             <textarea id="order-by-query" value={sqlTemplateState.orderByClause} className="w-full border-gray-300 rounded-md placeholder-italic border text-gray-700 pl-4 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100"
                                 onChange={(e) => setSQLTemplateState({ ...sqlTemplateState, orderByClause: e.target.value })} />
+                        </div>
+                        <div>
+                            <label htmlFor="limit-query" className="text-sm leading-5 font-medium text-gray-700">Limit</label>
+                            <input
+                                id="limit-query"
+                                type="number"
+                                value={sqlTemplateState.limitClause ?? 100}
+                                min="1"
+                                max="100"
+                                className="w-full h-8 border-gray-300 rounded-md placeholder-italic border text-gray-700 pl-4 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100"
+                                onChange={(e) => {
+                                    const inputValue = e.target.value;
+                                    if (inputValue === '') {
+                                        setSQLTemplateState({ ...sqlTemplateState, limitClause: 100 });
+                                        return;
+                                    }
+                                    const numValue = parseInt(inputValue, 10);
+                                    if (!isNaN(numValue)) {
+                                        const clampedValue = Math.min(Math.max(1, numValue), 100);
+                                        setSQLTemplateState({ ...sqlTemplateState, limitClause: clampedValue });
+                                    }
+                                }}
+                            />
                         </div>
                     </div>
                     <div className="flex flex-col">

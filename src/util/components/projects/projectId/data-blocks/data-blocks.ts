@@ -12,6 +12,7 @@ export const getSQLTemplatesDict = (projectId: string) => {
             whereClause: `WHERE project_id = '${projectId}'`,
             groupByClause: 'GROUP BY ',
             orderByClause: 'ORDER BY ',
+            limitClause: 'LIMIT ',
         }
     }
 }
