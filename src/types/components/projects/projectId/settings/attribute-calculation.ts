@@ -8,6 +8,7 @@ export type ExecutionContainerProps = {
     checkUnsavedChanges: boolean;
     enableRunButton: boolean;
     setEnabledButton(value: boolean): void;
+    isDataBlockColumn?: boolean;
 }
 
 export type SampleRecord = {

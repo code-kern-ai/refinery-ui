@@ -15,7 +15,7 @@ export default function ViewRecordDetailsDataBlockColumnModal(props: ViewRecordD
 
     return (<>
         {modalViewRecordDetails.open && props.sampleRecords && <>
-            <Modal modalName={ModalEnum.VIEW_RECORD_DETAILS_DATA_BLOCK_COLUMN} className="md:max-w-5xl">
+            <Modal modalName={ModalEnum.VIEW_RECORD_DETAILS_DATA_BLOCK_COLUMN} className="md:max-w-3xl">
                 <h1 className="text-lg text-gray-900 mb-2 text-center">View details</h1>
 
                 <div className={`overflow-y-auto max-height-modal text-sm text-gray-500 my-2 ${style.scrollableSize}`}>

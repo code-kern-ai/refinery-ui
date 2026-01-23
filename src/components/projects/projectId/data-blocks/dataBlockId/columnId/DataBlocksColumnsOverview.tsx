@@ -404,7 +404,7 @@ export default function DataBlocksColumnsOverview() {
                             if (dataBlockColumn == null) setCurrentDataBlockColumn(null);
                             else setCurrentDataBlockColumn(postProcessCurrentDataBlockColumn(dataBlockColumn));
                         });
-                    }} />
+                    }} isDataBlockColumn />
                 <ContainerLogs logs={currentDataBlockColumn.logs} type="attribute" />
 
                 <div className="mt-8">

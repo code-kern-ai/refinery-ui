@@ -19,6 +19,8 @@ import { DataTypeEnum } from "@/src/types/shared/general";
 import KernButton from "@/submodules/react-components/components/kern-button/KernButton";
 import useRefFor from "@/submodules/react-components/hooks/useRefFor";
 import ViewRecordDetailsDataBlockColumnModal from "../../data-blocks/dataBlockId/columnId/ViewRecordDetailsDataBlockColumnModal";
+import { getRecordByRecordIdDataBlockColumn } from "@/src/services/base/data-blocks";
+
 
 export default function ExecutionContainer(props: ExecutionContainerProps) {
     const projectId = useSelector(selectProjectId);
@@ -43,7 +45,7 @@ export default function ExecutionContainer(props: ExecutionContainerProps) {
     const calculateUserAttributeSampleRecords = useCallback(() => {
         if (requestedSomething) return;
         setRequestedSomething(true);
-        getSampleRecords(projectId, currentAttributesRef.current.id, dataBlock?.id || null, (res) => {
+        getSampleRecords(projectId, currentAttributesRef.current.id, props.isDataBlockColumn ? dataBlock?.id : null, (res) => {
             const sampleRecordsFinal = { ...res };
             setRequestedSomething(false);
             props.setEnabledButton(false);
@@ -56,11 +58,18 @@ export default function ExecutionContainer(props: ExecutionContainerProps) {
             setSampleRecords(sampleRecordsFinal);
             props.refetchCurrentAttribute();
         });
-    }, [projectId, dataBlock?.id]);
+    }, [projectId, dataBlock?.id, props.isDataBlockColumn]);
 
     function recordByRecordId(recordId: string) {
         getRecordByRecordId(projectId, recordId, (res) => {
             dispatch(setModalStates(ModalEnum.VIEW_RECORD_DETAILS, { record: postProcessRecordByRecordId(res) }));
+        });
+    }
+
+
+    function recordByRecordIdDataBlockColumn(recordId: string) {
+        getRecordByRecordIdDataBlockColumn(dataBlock?.id, recordId, (res) => {
+            dispatch(setModalStates(ModalEnum.VIEW_RECORD_DETAILS_DATA_BLOCK_COLUMN, { record: res.data }));
         });
     }
 
@@ -71,12 +80,15 @@ export default function ExecutionContainer(props: ExecutionContainerProps) {
 
     const sampleRecordsRef = useRefFor(sampleRecords);
     const viewRecordDetails = useCallback((index: number) => () => {
-        if (dataBlock) dispatch(setModalStates(ModalEnum.VIEW_RECORD_DETAILS_DATA_BLOCK_COLUMN, { open: true, recordIdx: index }));
+        if (props.isDataBlockColumn) {
+            dispatch(setModalStates(ModalEnum.VIEW_RECORD_DETAILS_DATA_BLOCK_COLUMN, { open: true, recordIdx: index }));
+            recordByRecordIdDataBlockColumn(sampleRecordsRef.current.recordIds[index]);
+        }
         else {
             dispatch(setModalStates(ModalEnum.VIEW_RECORD_DETAILS, { open: true, recordIdx: index }));
             recordByRecordId(sampleRecordsRef.current.recordIds[index]);
         }
-    }, [dataBlock]);
+    }, [dataBlock, props.isDataBlockColumn]);
 
     const sampleRecordsFinal = useMemo(() => {
         if (sampleRecords && sampleRecords.calculatedAttributesDisplay) {

@@ -100,3 +100,8 @@ export function runDataBlockColumnLlmPlayground(dataBlockId: string, dataBlockCo
     const finalUrl = `${dataBlocksEndpoint}/${dataBlockId}/attributes/${dataBlockColumnId}/run-llm-playground`;
     jsonFetchWrapper(finalUrl, FetchType.POST, onResult, JSON.stringify({ record_ids: recordIds, llm_config: llmConfig }));
 }
+
+export function getRecordByRecordIdDataBlockColumn(dataBlockId: string, recordId: string, onResult: (result: any) => void) {
+    const finalUrl = `${dataBlocksEndpoint}/${dataBlockId}/record-by-record-id?record_id=${recordId}`;
+    jsonFetchWrapper(finalUrl, FetchType.GET, onResult);
+}
