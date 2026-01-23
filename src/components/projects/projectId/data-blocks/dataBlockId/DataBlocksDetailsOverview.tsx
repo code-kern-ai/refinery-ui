@@ -274,22 +274,22 @@ export default function DataBlocksDetailsOverview() {
                     <div className="flex flex-col gap-4">
                         <div>
                             <label htmlFor="select-query" className="text-sm leading-5 font-medium text-gray-700">Select <span className="inline-block">{addWarning}</span></label>
-                            <textarea id="select-query" value={sqlTemplateState.selectClause} className="w-full border-gray-300 rounded-md placeholder-italic border text-gray-700 pl-4 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100"
+                            <textarea id="select-query" value={sqlTemplateState.selectClause} className="w-full border-gray-300 rounded-md placeholder-italic border text-gray-700 pl-4 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100 no-ligatures"
                                 onChange={(e) => setSQLTemplateState({ ...sqlTemplateState, selectClause: e.target.value })} />
                         </div>
                         <div>
                             <label htmlFor="where-query" className="text-sm leading-5 font-medium text-gray-700">Where</label>
-                            <textarea id="where-query" value={sqlTemplateState.whereClause} className="w-full border-gray-300 rounded-md placeholder-italic border text-gray-700 pl-4 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100"
+                            <textarea id="where-query" value={sqlTemplateState.whereClause} className="w-full border-gray-300 rounded-md placeholder-italic border text-gray-700 pl-4 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100 no-ligatures"
                                 onChange={(e) => setSQLTemplateState({ ...sqlTemplateState, whereClause: e.target.value })} />
                         </div>
                         <div>
                             <label htmlFor="group-by-query" className="text-sm leading-5 font-medium text-gray-700">Group by</label>
-                            <textarea id="group-by-query" value={sqlTemplateState.groupByClause} className="w-full border-gray-300 rounded-md placeholder-italic border text-gray-700 pl-4 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100"
+                            <textarea id="group-by-query" value={sqlTemplateState.groupByClause} className="w-full border-gray-300 rounded-md placeholder-italic border text-gray-700 pl-4 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100 no-ligatures"
                                 onChange={(e) => setSQLTemplateState({ ...sqlTemplateState, groupByClause: e.target.value })} />
                         </div>
                         <div>
                             <label htmlFor="order-by-query" className="text-sm leading-5 font-medium text-gray-700">Order by</label>
-                            <textarea id="order-by-query" value={sqlTemplateState.orderByClause} className="w-full border-gray-300 rounded-md placeholder-italic border text-gray-700 pl-4 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100"
+                            <textarea id="order-by-query" value={sqlTemplateState.orderByClause} className="w-full border-gray-300 rounded-md placeholder-italic border text-gray-700 pl-4 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100 no-ligatures"
                                 onChange={(e) => setSQLTemplateState({ ...sqlTemplateState, orderByClause: e.target.value })} />
                         </div>
                         <div>
