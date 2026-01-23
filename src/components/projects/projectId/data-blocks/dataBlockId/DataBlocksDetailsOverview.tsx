@@ -10,7 +10,7 @@ import { DataBlockProperty, DataBlockType, SQLTemplates } from "@/src/types/comp
 import KernDropdown from "@/submodules/react-components/components/KernDropdown";
 import { getSQLTemplatesDict } from "@/src/util/components/projects/projectId/data-blocks/data-blocks";
 import CopyToClipboard from "@/submodules/react-components/components/CopyToClipboard";
-import { testSQLClauses } from "@/src/services/base/misc";
+import { validateSQLClauses } from "@/src/services/base/misc";
 import ExtendDataBlockSection from "./ExtendDataBlockSection";
 import DataBlockResultsSection from "./DataBlockResultsSection";
 import { Tooltip } from "@nextui-org/react";
@@ -148,14 +148,14 @@ export default function DataBlocksDetailsOverview() {
         dispatch(setActiveDataBlock(updatedDataBlock));
     }, [currentDataBlock]);
 
-    const testQuery = useCallback(() => {
+    const validateQuery = useCallback(() => {
         const sqlClauses = {
             select: sqlTemplateState.selectClause,
             where: sqlTemplateState.whereClause,
             groupBy: sqlTemplateState.groupByClause,
             orderBy: sqlTemplateState.orderByClause,
         }
-        testSQLClauses(sqlClauses, (res) => {
+        validateSQLClauses(sqlClauses, (res) => {
             if (res.isValid) {
                 setIsTestQuerySuccess(true);
                 alert('Everything is valid');
@@ -169,10 +169,10 @@ export default function DataBlocksDetailsOverview() {
                 error += 'WHERE clause is NOT valid: ' + res.denyReason.where;
             }
             if (res.denyReason.groupBy) {
-                error += 'GROUP BY is NOT valid: ' + res.denyReason.groupBy;
+                error += 'GROUP BY is NOT valid: ' + res.denyReason.group_by;
             }
             if (res.denyReason.orderBy) {
-                error += 'ORDER BY is NOT valid: ' + res.denyReason.orderBy;
+                error += 'ORDER BY is NOT valid: ' + res.denyReason.order_by;
             }
             if (res.denyReason.db_check) {
                 error += 'DB check is NOT valid: ' + res.denyReason.db_check;
@@ -293,8 +293,8 @@ export default function DataBlocksDetailsOverview() {
                         </div>
                         <div className='flex flex-row gap-x-2 mt-2'>
                             <KernButton
-                                text="Test query"
-                                onClick={testQuery}
+                                text="Validate query"
+                                onClick={validateQuery}
                                 disabled={!sqlTemplateState.selectClause.trim()}
                                 icon={MemoIconPlayerPlay}
                             />

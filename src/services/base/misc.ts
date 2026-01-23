@@ -30,7 +30,7 @@ export function modelProviderDownloadModel(modelName: string, onResult: (result:
     jsonFetchWrapper(finalUrl, FetchType.POST, onResult, JSON.stringify(convertCamelToSnakeCase({ modelName })));
 }
 
-export function testSQLClauses(sqlClauses: { select: string, where: string, groupBy: string, orderBy: string }, onResult: (result: any) => void) {
+export function validateSQLClauses(sqlClauses: { select: string, where: string, groupBy: string, orderBy: string }, onResult: (result: any) => void) {
     const finalUrl = `${miscCognitionEndpoint}/test-where-clause`;
     jsonFetchWrapper(finalUrl, FetchType.POST, onResult, JSON.stringify(sqlClauses));
 }   
