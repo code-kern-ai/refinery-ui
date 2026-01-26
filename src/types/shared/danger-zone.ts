@@ -2,6 +2,7 @@ export type DangerZoneProps = {
     elementType: string;
     name: string;
     id: string;
+    relatedDataBlocks?: string[];
 };
 
 // used with small letters because the same name is used in the display

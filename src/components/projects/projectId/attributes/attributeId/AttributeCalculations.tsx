@@ -519,7 +519,7 @@ export default function AttributeCalculation() {
                     </div>}
                 </div>
 
-                <DangerZone elementType={DangerZoneEnum.ATTRIBUTE} name={currentAttribute.name} id={currentAttribute.id} />
+                <DangerZone elementType={DangerZoneEnum.ATTRIBUTE} name={currentAttribute.name} id={currentAttribute.id} relatedDataBlocks={currentAttribute.relatedDataBlocks} />
             </div >
         </div >}
     </div >)
