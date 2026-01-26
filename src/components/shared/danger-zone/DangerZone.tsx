@@ -26,6 +26,6 @@ export default function DangerZone(props: DangerZoneProps) {
                 tooltipPlacement="right"
             />
         </div>
-        <DeleteElementModal id={props.id} name={props.name} elementType={props.elementType} />
+        <DeleteElementModal id={props.id} name={props.name} elementType={props.elementType} relatedDataBlocks={props.relatedDataBlocks} />
     </div >)
 }

@@ -1,7 +1,7 @@
 import { DangerZoneEnum, DangerZoneProps } from "@/src/types/shared/danger-zone";
 import Modal from "../modal/Modal";
 import { ModalButton, ModalEnum } from "@/src/types/shared/modal";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { selectModal } from "@/src/reduxStore/states/modal";
 import { useDispatch, useSelector } from "react-redux";
 import { removeFromAllAttributesById } from "@/src/reduxStore/states/pages/settings";
@@ -65,6 +65,10 @@ export default function DeleteElementModal(props: DangerZoneProps) {
         setAbortButton({ ...abortButton, emitFunction: deleteElement });
     }, [modalDelete]);
 
+    const relatedDataBlocksText = useMemo(() => {
+        return props.relatedDataBlocks.map((dataBlock) => `${dataBlock.name}`).join(', ');
+    }, [props.relatedDataBlocks]);
+
     const [abortButton, setAbortButton] = useState<ModalButton>(ABORT_BUTTON);
 
     return (<Modal modalName={ModalEnum.DELETE_ELEMENT} abortButton={abortButton}>
@@ -74,7 +78,7 @@ export default function DeleteElementModal(props: DangerZoneProps) {
             <p>This will delete all data associated with it, including labeling tasks.</p>
             {isDeleting && <LoadingIcon color="red" />}
             {props.elementType == DangerZoneEnum.ATTRIBUTE && props.relatedDataBlocks && props.relatedDataBlocks.length > 0 &&
-                <div className="text-red-500"> Warning: This attribute is used in the following data blocks: {props.relatedDataBlocks.map((dataBlock) => <span key={dataBlock.id}>{dataBlock.name}</span>).join(', ')}.</div>}
+                <div className="text-red-500"> Warning: This {props.elementType} is used in the following data blocks: {relatedDataBlocksText}.</div>}
         </div>
     </Modal >)
 }
