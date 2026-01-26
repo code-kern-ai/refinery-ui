@@ -17,12 +17,13 @@ import { DataTypeEnum } from "@/src/types/shared/general";
 import { runAttributeLlmPlayground } from "@/src/services/base/attribute";
 import { jsonCopy } from "@/submodules/javascript-functions/general";
 import { TEMPLATE_EXAMPLES, TEMPLATE_OPTIONS } from "./llmTemplates";
-import { LLM_PROVIDER_OPTIONS, postProcessLLMPlaygroundRecordData } from "@/src/util/components/projects/projectId/settings/attribute-calculation-helper";
+import { LLM_PROVIDER_OPTIONS, postProcessLLMPlaygroundRecordData, postProcessRecordByRecordId } from "@/src/util/components/projects/projectId/settings/attribute-calculation-helper";
 import { MemoIconHandClick, MemoIconPlayCardStar, MemoIconPlayerPlay, MemoIconRefresh, MemoIconTerminal } from "@/submodules/react-components/components/kern-icons/icons";
 import { InfoButton } from "@/submodules/react-components/components/InfoButton";
-import { selectDataBlock, selectDataBlockColumns, selectDataBlockColumnsDict } from "@/src/reduxStore/states/pages/data-blocks";
+import { selectDataBlock, selectDataBlockColumns, selectDataBlockColumnsDict, selectUsableDataBlockColumns } from "@/src/reduxStore/states/pages/data-blocks";
 import { DataBlockColumnState } from "@/src/types/components/projects/projectId/data-blocks/data-blocks";
-import { runDataBlockColumnLlmPlayground, updateDataBlockColumn } from "@/src/services/base/data-blocks";
+import { getRecordByRecordIdDataBlockColumn, runDataBlockColumnLlmPlayground, updateDataBlockColumn } from "@/src/services/base/data-blocks";
+import { RecordDisplay } from "@/src/components/shared/record-display/RecordDisplay";
 
 const ACCEPT_BUTTON = { buttonCaption: "Use current values for attribute", useButton: true };
 const DISPLAY_STATES = [AttributeState.AUTOMATICALLY_CREATED, AttributeState.UPLOADED, AttributeState.USABLE]
@@ -36,6 +37,7 @@ export default function LLMPlaygroundModal() {
     const dataBlock = useSelector(selectDataBlock);
     const modal = useSelector(selectModal(ModalEnum.LLM_PLAYGROUND));
     const modalRef = useRefFor(modal);
+    const usableDataBlockColumns = useSelector(selectUsableDataBlockColumns);
 
     const [playgroundTestRunning, setPlaygroundTestRunning] = useState(false);
     const [acceptButton, setAcceptButton] = useState<ModalButton>(ACCEPT_BUTTON);
@@ -43,11 +45,18 @@ export default function LLMPlaygroundModal() {
     const fullLlmConfigRef = useRefFor(fullLlmConfig);
 
     const [recordData, setRecordData] = useState<any[]>(null);
+    const [recordDataDataBlockColumn, setRecordDataDataBlockColumn] = useState(null);
     const recordDataRef = useRefFor(recordData);
     const [llmAnswer, setLlmAnswer] = useState<any>(null);
 
     const [inputRunningId, setInputRunningId] = useState('');
+    const [inputRecordId, setInputRecordId] = useState(1);
     const inputRunningIdRef = useRefFor(inputRunningId);
+    const inputRecordIdRef = useRefFor(inputRecordId);
+
+    useEffect(() => {
+        getByRecordIdDataBlockColumn(false);
+    }, [inputRecordId]);
 
     const searchAndSetWithFilter = useCallback((filter) => {
         searchRecordsExtended(projectId, filter, 0, 1, (res) => {
@@ -93,7 +102,7 @@ export default function LLMPlaygroundModal() {
             setLlmAnswer(answer);
             setPlaygroundTestRunning(false);
         });
-        if (modalRef.current.dataBlockColumnId) runDataBlockColumnLlmPlayground(dataBlock.id, modalRef.current.dataBlockColumnId, recordIds, finalConfig, (res) => {
+        if (modalRef.current.dataBlockColumnId) runDataBlockColumnLlmPlayground(dataBlock.id, modalRef.current.dataBlockColumnId, [inputRunningIdRef.current], finalConfig, (res) => {
             let answer = ""
             for (const id of recordIds) answer += "Answer: " + (res[id] || "No answer found") + "\n";
             if (res["logs"]) answer += "\n---\nlogs:\n" + res["logs"].join("\n");
@@ -160,6 +169,16 @@ export default function LLMPlaygroundModal() {
         return acceptButton;
     }, [acceptButton, playgroundTestRunning])
 
+    const getByRecordIdDataBlockColumn = useCallback((isRandom) => {
+        let recordId = inputRecordIdRef.current.toString();
+        if (isRandom) {
+            recordId = Math.floor(Math.random() * 100).toString();
+        }
+        getRecordByRecordIdDataBlockColumn(dataBlock?.id, recordId.toString(), (res) => {
+            setRecordDataDataBlockColumn(postProcessRecordByRecordId(res));
+        });
+    }, [dataBlock?.id]);
+
     return (<Modal modalName={ModalEnum.LLM_PLAYGROUND} acceptButton={finalAcceptButton} className="ml-10 md:max-w-[calc(100vw-15rem)]">
         <div className="pl-2 pr-5 max-h-[calc(100vh-15rem)] overflow-y-auto">
             <div className="flex flex-row items-center justify-center">
@@ -169,28 +188,46 @@ export default function LLMPlaygroundModal() {
             </div>
             <div className="text-left">
                 {recordData && <div className="">
-                    <div className="flex flex-row gap-x-2 items-center">
-                        <label className="block font-bold text-gray-900">Sample Record</label>
-                        <KernButton icon={MemoIconRefresh} text="Get Random" size="small" onClick={get1RandomRecords} />
-
-                        <input
-                            type="number"
-                            value={inputRunningId}
-                            onChange={(e) => setInputRunningId(e.target.value)}
-                            onFocus={(e) => e.target.select()}
-                            onKeyDown={(e) => e.key === 'Enter' && getByRunningId()}
-                            className="w-16 h-full text-right text-sm text-gray-900 border border-gray-200 rounded-lg align-top"
-                        />
-                        <KernButton disabled={!inputRunningId} icon={MemoIconHandClick} text="Get by running_id" size="small" onClick={getByRunningId} />
-                    </div>
-                    <div className="grid grid-cols-2 gap-2 text-sm max-h-52 overflow-y-auto" style={{ gridTemplateColumns: `max-content auto` }}>
-                        {recordKeys.map((rk) => <Fragment key={rk.name}>
-                            <label className="block font-bold text-gray-900">{rk.name}</label>
-                            {recordData.map((record) => (rk.dataType == DataTypeEnum.EMBEDDING_LIST || rk.dataType == DataTypeEnum.TEXT_LIST) ? <div key={record.running_id} className="flex flex-col divide-y divide-gray-200">
-                                {record[rk.name].map((li, idx) => <span key={idx} className="text-gray-700">{li}</span>)}
-                            </div> : <span key={record.running_id} className="text-gray-700">{record[rk.name]}</span>)}
-                        </Fragment>)}
-                    </div>
+                    {modal.attributeId ? <>
+                        <div className="flex flex-row gap-x-2 items-center">
+                            <label className="block font-bold text-gray-900">Sample Record</label>
+                            <KernButton icon={MemoIconRefresh} text="Get Random" size="small" onClick={get1RandomRecords} />
+                            <input
+                                type="number"
+                                value={inputRunningId}
+                                onChange={(e) => setInputRunningId(e.target.value)}
+                                onFocus={(e) => e.target.select()}
+                                onKeyDown={(e) => e.key === 'Enter' && getByRunningId()}
+                                className="w-16 h-full text-right text-sm text-gray-900 border border-gray-200 rounded-lg align-top"
+                            />
+                            <KernButton disabled={!inputRunningId} icon={MemoIconHandClick} text="Get by running_id" size="small" onClick={getByRunningId} />
+                        </div>
+                        <div className="grid grid-cols-2 gap-2 text-sm max-h-52 overflow-y-auto" style={{ gridTemplateColumns: `max-content auto` }}>
+                            {recordKeys.map((rk) => <Fragment key={rk.name}>
+                                <label className="block font-bold text-gray-900">{rk.name}</label>
+                                {recordData.map((record) => (rk.dataType == DataTypeEnum.EMBEDDING_LIST || rk.dataType == DataTypeEnum.TEXT_LIST) ? <div key={record.running_id} className="flex flex-col divide-y divide-gray-200">
+                                    {record[rk.name].map((li, idx) => <span key={idx} className="text-gray-700">{li}</span>)}
+                                </div> : <span key={record.running_id} className="text-gray-700">{record[rk.name]}</span>)}
+                            </Fragment>)}
+                        </div>
+                    </> : <>
+                        <div className="flex flex-row gap-x-2 items-center">
+                            <label className="block font-bold text-gray-900">Sample Record</label>
+                            <KernButton icon={MemoIconRefresh} text="Get Random" size="small" onClick={() => getByRecordIdDataBlockColumn(true)} />
+                            <input
+                                type="number"
+                                value={inputRecordId}
+                                onChange={(e) => setInputRecordId(Number(e.target.value))}
+                                onFocus={(e) => e.target.select()}
+                                onKeyDown={(e) => e.key === 'Enter' && getByRecordIdDataBlockColumn(false)}
+                                className="w-16 h-full text-right text-sm text-gray-900 border border-gray-200 rounded-lg align-top"
+                            />
+                            <KernButton disabled={!inputRunningId} icon={MemoIconHandClick} text="Get by record id" size="small" onClick={() => getByRecordIdDataBlockColumn(false)} />
+                        </div>
+                        <RecordDisplay
+                            attributes={usableDataBlockColumns}
+                            record={recordDataDataBlockColumn} />
+                    </>}
                 </div>}
                 <div className="my-2">
                     <KernDropdown

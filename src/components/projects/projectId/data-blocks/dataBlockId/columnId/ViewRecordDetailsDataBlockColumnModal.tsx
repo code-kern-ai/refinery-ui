@@ -1,27 +1,16 @@
 import Modal from "@/src/components/shared/modal/Modal";
 import { selectModal } from "@/src/reduxStore/states/modal";
 import { ModalEnum } from "@/src/types/shared/modal";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import style from '@/src/styles/components/projects/projectId/attribute-calculation.module.css';
 import { ViewRecordDetailsModalProps } from "@/src/types/components/projects/projectId/settings/attribute-calculation";
-import { useEffect, useMemo } from "react";
+import { useMemo } from "react";
 import { RecordDisplay } from "@/src/components/shared/record-display/RecordDisplay";
-import { selectVisibleAttributesHeuristics, setAllAttributes } from "@/src/reduxStore/states/pages/settings";
-import { getAttributes } from "@/src/services/base/attribute";
-import { selectProjectId } from "@/src/reduxStore/states/project";
+import { selectUsableDataBlockColumns } from "@/src/reduxStore/states/pages/data-blocks";
 
 export default function ViewRecordDetailsDataBlockColumnModal(props: ViewRecordDetailsModalProps) {
-    const dispatch = useDispatch();
     const modalViewRecordDetails = useSelector(selectModal(ModalEnum.VIEW_RECORD_DETAILS_DATA_BLOCK_COLUMN));
-    const projectId = useSelector(selectProjectId);
-    const attributes = useSelector(selectVisibleAttributesHeuristics);
-
-    useEffect(() => {
-        if (attributes.length > 0) return;
-        getAttributes(projectId, ['ALL'], (res) => {
-            dispatch(setAllAttributes(res));
-        });
-    }, [attributes])
+    const dataBlockColumns = useSelector(selectUsableDataBlockColumns);
 
     const displayValue = useMemo(() => {
         if (!props.sampleRecords || !modalViewRecordDetails.open) return null;
@@ -37,7 +26,7 @@ export default function ViewRecordDetailsDataBlockColumnModal(props: ViewRecordD
 
                 <div className={`overflow-y-auto max-height-modal text-sm text-gray-500 my-2 ${style.scrollableSize}`}>
                     <RecordDisplay
-                        attributes={attributes}
+                        attributes={dataBlockColumns}
                         record={modalViewRecordDetails.record} />
                     <div className="text-sm leading-5 text-left text-gray-900 font-medium">Calculated value</div>
                     <div className="text-sm leading-5 text-left text-gray-500 font-normal whitespace-pre-line">
