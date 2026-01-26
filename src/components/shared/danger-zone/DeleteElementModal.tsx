@@ -74,7 +74,7 @@ export default function DeleteElementModal(props: DangerZoneProps) {
             <p>This will delete all data associated with it, including labeling tasks.</p>
             {isDeleting && <LoadingIcon color="red" />}
             {props.elementType == DangerZoneEnum.ATTRIBUTE && props.relatedDataBlocks && props.relatedDataBlocks.length > 0 &&
-                <div className="text-red-500"> Warning: This attribute is used in the following data blocks: {props.relatedDataBlocks.join(', ')}.</div>}
+                <div className="text-red-500"> Warning: This attribute is used in the following data blocks: {props.relatedDataBlocks.map((dataBlock) => <span key={dataBlock.id}>{dataBlock.name}</span>).join(', ')}.</div>}
         </div>
     </Modal >)
 }
