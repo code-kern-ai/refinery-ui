@@ -102,7 +102,7 @@ export default function LLMPlaygroundModal() {
             setLlmAnswer(answer);
             setPlaygroundTestRunning(false);
         });
-        if (modalRef.current.dataBlockColumnId) runDataBlockColumnLlmPlayground(dataBlock.id, modalRef.current.dataBlockColumnId, [inputRunningIdRef.current], finalConfig, (res) => {
+        if (modalRef.current.dataBlockColumnId) runDataBlockColumnLlmPlayground(dataBlock.id, modalRef.current.dataBlockColumnId, [inputRunningIdRef.current.toString()], finalConfig, (res) => {
             let answer = ""
             for (const id of recordIds) answer += "Answer: " + (res[id] || "No answer found") + "\n";
             if (res["logs"]) answer += "\n---\nlogs:\n" + res["logs"].join("\n");
