@@ -215,6 +215,64 @@ export default function DataBlocksDetailsOverview() {
         </Tooltip>
     }, [currentDataBlock?.type, sqlTemplateState.selectClause]);
 
+    const parseSQLClause = useCallback((clause: string, keyword: string): { prefix: string; editable: string } => {
+        if (!clause.trim()) {
+            return { prefix: keyword, editable: '' };
+        }
+        const upperClause = clause.toUpperCase();
+        const upperKeyword = keyword.toUpperCase();
+        if (upperClause.startsWith(upperKeyword)) {
+            const prefix = clause.substring(0, keyword.length);
+            const editable = clause.substring(keyword.length).trim();
+            return { prefix, editable };
+        }
+
+        return { prefix: keyword, editable: clause };
+    }, []);
+
+    const setAndPrefillSQLTemplateState = useCallback((value: SQLTemplates) => {
+        setSQLTemplate(value);
+        if (!projectId) return;
+        const template = getSQLTemplatesDict(projectId)[value];
+        const selectParsed = parseSQLClause(template.selectClause, 'SELECT ');
+        let wherePrefix = template.whereClause;
+        let whereEditable = '';
+        if (template.whereClause && template.whereClause.trim()) {
+            wherePrefix = template.whereClause;
+            whereEditable = '';
+        }
+
+        const groupByParsed = parseSQLClause(template.groupByClause || '', 'GROUP BY ');
+        const orderByParsed = parseSQLClause(template.orderByClause || '', 'ORDER BY ');
+        let limitPrefix = 'LIMIT ';
+        let limitEditable = '';
+        if (template.limitClause && template.limitClause.trim()) {
+            const limitMatch = template.limitClause.match(/^LIMIT\s+(\d+)/i);
+            if (limitMatch) {
+                limitPrefix = 'LIMIT ';
+                limitEditable = limitMatch[1];
+            } else {
+                limitPrefix = template.limitClause;
+            }
+        }
+
+        setSQLTemplatePreview({
+            selectClause: selectParsed.prefix,
+            whereClause: wherePrefix,
+            groupByClause: groupByParsed.prefix,
+            orderByClause: orderByParsed.prefix,
+            from_clause: template.from_clause,
+            limitClause: limitPrefix,
+        });
+        setSQLTemplateState({
+            selectClause: selectParsed.editable,
+            whereClause: whereEditable,
+            groupByClause: groupByParsed.editable,
+            orderByClause: orderByParsed.editable,
+            limitClause: limitEditable ? parseInt(limitEditable, 10) : 100,
+        });
+    }, [projectId, parseSQLClause]);
+
     return (projectId && <div className={`bg-white p-4 overflow-y-auto min-h-full h-[calc(100vh-4rem)] w-[calc(100vw-5rem)]`} onScroll={onScrollEvent}>
         {currentDataBlock && <>
             <div className={`sticky z-40 h-12 ${isHeaderNormal ? 'top-1' : '-top-5'}`}>
@@ -268,7 +326,7 @@ export default function DataBlocksDetailsOverview() {
                     <div className="text-sm leading-5 font-medium text-gray-700">SQL template</div>
                     <KernDropdown options={Object.values(SQLTemplates)}
                         buttonName={sqlTemplate}
-                        selectedOption={setSQLTemplate} dropdownWidth="w-52" />
+                        selectedOption={setAndPrefillSQLTemplateState} dropdownWidth="w-52" />
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                     <div className="flex flex-col gap-4">

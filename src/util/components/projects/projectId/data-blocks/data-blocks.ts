@@ -13,6 +13,14 @@ export const getSQLTemplatesDict = (projectId: string) => {
             groupByClause: 'GROUP BY ',
             orderByClause: 'ORDER BY ',
             limitClause: 'LIMIT ',
+        },
+        [SQLTemplates.INTEGRATION_AUDIT]: {
+            selectClause: 'SELECT ((data->>\'metadata\')::json)->>\'sharepoint_created_by\' as created_by, ((data->>\'metadata\')::json)->>\'modified_by\' as modified_by, ((data->>\'metadata\')::json)->>\'created\' as created_at, ((data->>\'metadata\')::json)->>\'modified\' as modified_at, data->>\'source\' as file_path',
+            from_clause: 'FROM public.record r',
+            whereClause: `WHERE project_id = '${projectId}'`,
+            groupByClause: 'GROUP BY ',
+            orderByClause: 'ORDER BY ',
+            limitClause: 'LIMIT ',
         }
     }
 }

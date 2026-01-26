@@ -49,7 +49,8 @@ export enum QuestionType {
 }
 
 export enum SQLTemplates {
-    BLANK_QUERY = 'BLANK_QUERY'
+    BLANK_QUERY = 'BLANK_QUERY',
+    INTEGRATION_AUDIT = 'INTEGRATION_AUDIT',
 }
 
 export type DataBlockColumn = {
