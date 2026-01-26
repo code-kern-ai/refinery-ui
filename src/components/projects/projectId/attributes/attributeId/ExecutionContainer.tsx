@@ -69,7 +69,7 @@ export default function ExecutionContainer(props: ExecutionContainerProps) {
 
     function recordByRecordIdDataBlockColumn(recordId: string) {
         getRecordByRecordIdDataBlockColumn(dataBlock?.id, recordId, (res) => {
-            dispatch(setModalStates(ModalEnum.VIEW_RECORD_DETAILS_DATA_BLOCK_COLUMN, { record: res.data }));
+            dispatch(setModalStates(ModalEnum.VIEW_RECORD_DETAILS_DATA_BLOCK_COLUMN, { record: postProcessRecordByRecordId(res) }));
         });
     }
 
@@ -178,6 +178,6 @@ export default function ExecutionContainer(props: ExecutionContainerProps) {
 
         <ViewRecordDetailsModal currentAttribute={props.currentAttribute} sampleRecords={sampleRecordsFinal} />
         <ConfirmExecutionModal currentAttributeId={props.currentAttribute.id} dataBlockId={dataBlock?.id} />
-        <ViewRecordDetailsDataBlockColumnModal sampleRecords={sampleRecordsFinal} />
+        <ViewRecordDetailsDataBlockColumnModal currentAttribute={props.currentAttribute} sampleRecords={sampleRecordsFinal} />
     </div >)
 }

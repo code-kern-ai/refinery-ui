@@ -19,9 +19,6 @@ export default function ViewRecordDetailsModal(props: ViewRecordDetailsModalProp
             : String(props.sampleRecords[modalViewRecordDetails.recordIdx].calculatedValue.value);
     }, [props.sampleRecords, modalViewRecordDetails.recordIdx, modalViewRecordDetails.open]);
 
-    console.log(modalViewRecordDetails.record)
-    console.log(props.sampleRecords)
-
     return (<>
         {modalViewRecordDetails.open && modalViewRecordDetails.record && props.sampleRecords && <>
             <Modal modalName={ModalEnum.VIEW_RECORD_DETAILS} className="md:max-w-5xl">
