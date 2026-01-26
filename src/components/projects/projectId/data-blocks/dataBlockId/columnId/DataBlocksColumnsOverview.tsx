@@ -1,5 +1,5 @@
 import DangerZone from "@/src/components/shared/danger-zone/DangerZone";
-import { selectDataBlock, selectDataBlockColumns, selectUsableDataBlockColumns, setActiveDataBlock, updateDataBlockColumnById } from "@/src/reduxStore/states/pages/data-blocks";
+import { selectDataBlock, selectDataBlockColumns, selectUsableDataBlockColumns, setActiveDataBlock, setAllDataBlocks, updateDataBlockColumnById } from "@/src/reduxStore/states/pages/data-blocks";
 import { selectAllLookupLists, setAllLookupLists } from "@/src/reduxStore/states/pages/lookup-lists";
 import { selectProjectId } from "@/src/reduxStore/states/project";
 import { getLookupListsByProjectId } from "@/src/services/base/lookup-lists";
@@ -32,7 +32,7 @@ import { InfoButton } from "@/submodules/react-components/components/InfoButton"
 import LLMResponseConfig from "../../../attributes/attributeId/LLMResponseConfig";
 import { Editor } from "@monaco-editor/react";
 import LoadingIcon from "@/submodules/react-components/components/LoadingIcon";
-import { getDataBlock, getDataBlockColumnByColumnId, updateDataBlockColumn } from "@/src/services/base/data-blocks";
+import { getDataBlock, getDataBlockColumnByColumnId, getDataBlocks, updateDataBlockColumn } from "@/src/services/base/data-blocks";
 import ExecutionContainer from "../../../attributes/attributeId/ExecutionContainer";
 import ContainerLogs from "@/src/components/shared/logs/ContainerLogs";
 import { getColorForDataType } from "@/src/util/components/projects/projectId/settings/data-schema-helper";
@@ -236,6 +236,9 @@ export default function DataBlocksColumnsOverview() {
                 currentDataBlockColumnCopy.state = DataBlockColumnState.RUNNING;
                 dispatch(updateDataBlockColumnById(currentDataBlockColumnCopy));
             } else {
+                getDataBlock(dataBlock.id, (res) => {
+                    dispatch(setActiveDataBlock(res));
+                });
                 if (msgParts[2] == 'deleted') return
                 getDataBlockColumnByColumnId(dataBlock.id, currentDataBlockColumn.id, (attribute) => {
                     if (!attribute) setCurrentDataBlockColumn(null);

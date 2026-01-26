@@ -129,7 +129,7 @@ export default function LLMPlaygroundModal() {
             setRecordData(null);
             setLlmAnswer(null);
         }
-    }, [modal.open]);
+    }, [modal.open, dataBlockColumnsDict]);
 
 
     const copyToAttributeValues = useCallback(() => {
