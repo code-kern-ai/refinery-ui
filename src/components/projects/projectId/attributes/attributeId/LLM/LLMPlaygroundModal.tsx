@@ -55,8 +55,9 @@ export default function LLMPlaygroundModal() {
     const inputRecordIdRef = useRefFor(inputRecordId);
 
     useEffect(() => {
-        getByRecordIdDataBlockColumn(false);
-    }, [inputRecordId]);
+        if (modal.attributeId) return;
+        if (modal.dataBlockColumnId) getByRecordIdDataBlockColumn(false);
+    }, [inputRecordId, modal.attributeId, modal.dataBlockColumnId]);
 
     const searchAndSetWithFilter = useCallback((filter) => {
         searchRecordsExtended(projectId, filter, 0, 1, (res) => {
@@ -102,14 +103,14 @@ export default function LLMPlaygroundModal() {
             setLlmAnswer(answer);
             setPlaygroundTestRunning(false);
         });
-        if (modalRef.current.dataBlockColumnId) runDataBlockColumnLlmPlayground(dataBlock.id, modalRef.current.dataBlockColumnId, [inputRunningIdRef.current.toString()], finalConfig, (res) => {
+        if (modalRef.current.dataBlockColumnId) runDataBlockColumnLlmPlayground(dataBlock.id, modalRef.current.dataBlockColumnId, [inputRecordId.toString()], finalConfig, (res) => {
             let answer = ""
-            for (const id of recordIds) answer += "Answer: " + (res[id] || "No answer found") + "\n";
+            for (const id of [inputRecordId.toString()]) answer += "Answer: " + (res[id] || "No answer found") + "\n";
             if (res["logs"]) answer += "\n---\nlogs:\n" + res["logs"].join("\n");
             setLlmAnswer(answer);
             setPlaygroundTestRunning(false);
         });
-    }, []);
+    }, [inputRecordId]);
 
     useEffect(() => {
         if (!recordData || recordData?.length == 0) return;
@@ -140,8 +141,8 @@ export default function LLMPlaygroundModal() {
     const copyToDataBlockColumnValues = useCallback(() => {
         if (!fullLlmConfigRef.current || !modalRef.current) return;
         const config = { ...fullLlmConfigRef.current };
-        updateDataBlockColumn(projectId, modalRef.current.dataBlockColumnId, (res) => { }, null, null, null, null, config);
-    }, []);
+        updateDataBlockColumn(dataBlock.id, modalRef.current.dataBlockColumnId, (res) => { }, null, null, null, null, config);
+    }, [dataBlock?.id]);
 
     useEffect(() => {
         if ((!attributeDict || !modal?.attributeId) && (!dataBlockColumnsDict || !modal?.dataBlockColumnId)) return;
@@ -172,12 +173,14 @@ export default function LLMPlaygroundModal() {
     const getByRecordIdDataBlockColumn = useCallback((isRandom) => {
         let recordId = inputRecordIdRef.current.toString();
         if (isRandom) {
-            recordId = Math.floor(Math.random() * 100).toString();
+            const limit = dataBlock.sqlData.length; // Improvement: getting max record id from sqlData instead of sqlConfig
+            recordId = Math.floor(Math.random() * limit + 1).toString();
         }
         getRecordByRecordIdDataBlockColumn(dataBlock?.id, recordId.toString(), (res) => {
             setRecordDataDataBlockColumn(postProcessRecordByRecordId(res));
+            setInputRecordId(Number(recordId));
         });
-    }, [dataBlock?.id]);
+    }, [dataBlock?.id, dataBlock]);
 
     return (<Modal modalName={ModalEnum.LLM_PLAYGROUND} acceptButton={finalAcceptButton} className="ml-10 md:max-w-[calc(100vw-15rem)]">
         <div className="pl-2 pr-5 max-h-[calc(100vh-15rem)] overflow-y-auto">
@@ -216,8 +219,15 @@ export default function LLMPlaygroundModal() {
                             <KernButton icon={MemoIconRefresh} text="Get Random" size="small" onClick={() => getByRecordIdDataBlockColumn(true)} />
                             <input
                                 type="number"
+                                min={1}
+                                max={dataBlock?.sqlData?.length || 1}
                                 value={inputRecordId}
-                                onChange={(e) => setInputRecordId(Number(e.target.value))}
+                                onChange={(e) => {
+                                    const value = Number(e.target.value);
+                                    const maxValue = dataBlock?.sqlData?.length || 1;
+                                    const clampedValue = Math.max(1, Math.min(value, maxValue));
+                                    setInputRecordId(clampedValue);
+                                }}
                                 onFocus={(e) => e.target.select()}
                                 onKeyDown={(e) => e.key === 'Enter' && getByRecordIdDataBlockColumn(false)}
                                 className="w-16 h-full text-right text-sm text-gray-900 border border-gray-200 rounded-lg align-top"
