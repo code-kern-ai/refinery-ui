@@ -268,7 +268,7 @@ export default function DataBlocksColumnsOverview() {
     }, [])
 
     const orgId = useSelector(selectOrganizationId);
-    useWebsocket(orgId, Application.REFINERY, CurrentPage.DATA_BLOCKS, handleWebsocketNotification, projectId);
+    useWebsocket(orgId, Application.REFINERY, CurrentPage.DATA_BLOCKS_COLUMNS, handleWebsocketNotification, projectId);
 
     const copyToClipboardFunc = useCallback((name: string) => copyToClipboard(name), []);
 

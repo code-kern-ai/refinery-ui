@@ -14,6 +14,9 @@ import { validateSQLClauses } from "@/src/services/base/misc";
 import ExtendDataBlockSection from "./ExtendDataBlockSection";
 import DataBlockResultsSection from "./DataBlockResultsSection";
 import { Tooltip } from "@nextui-org/react";
+import { selectOrganizationId } from "@/src/reduxStore/states/general";
+import { useWebsocket } from "@/submodules/react-components/hooks/web-socket/useWebsocket";
+import { Application, CurrentPage } from "@/submodules/react-components/hooks/web-socket/constants";
 
 export default function DataBlocksDetailsOverview() {
     const router = useRouter();
@@ -272,6 +275,15 @@ export default function DataBlocksDetailsOverview() {
             limitClause: limitEditable ? parseInt(limitEditable, 10) : 100,
         });
     }, [projectId, parseSQLClause]);
+
+    const handleWebsocketNotification = useCallback((msgParts: string[]) => {
+        if (msgParts[1] == 'calculate_attribute') {
+            refetchDataBlockById();
+        }
+    }, [currentDataBlock]);
+
+    const orgId = useSelector(selectOrganizationId);
+    useWebsocket(orgId, Application.REFINERY, CurrentPage.DATA_BLOCKS_DETAILS, handleWebsocketNotification, projectId);
 
     return (projectId && <div className={`bg-white p-4 overflow-y-auto min-h-full h-[calc(100vh-4rem)] w-[calc(100vw-5rem)]`} onScroll={onScrollEvent}>
         {currentDataBlock && <>
