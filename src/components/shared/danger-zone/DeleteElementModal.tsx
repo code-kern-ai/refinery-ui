@@ -66,7 +66,7 @@ export default function DeleteElementModal(props: DangerZoneProps) {
     }, [modalDelete]);
 
     const relatedDataBlocksText = useMemo(() => {
-        return props.relatedDataBlocks.map((dataBlock) => `${dataBlock.name}`).join(', ');
+        return props.relatedDataBlocks?.map((dataBlock) => `${dataBlock.name}`).join(', ');
     }, [props.relatedDataBlocks]);
 
     const [abortButton, setAbortButton] = useState<ModalButton>(ABORT_BUTTON);
