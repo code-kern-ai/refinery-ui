@@ -47,6 +47,7 @@ export default function DataBlocksDetailsOverview() {
     });
     const [previewText, setPreviewText] = useState('');
     const [isTestQuerySuccess, setIsTestQuerySuccess] = useState(false);
+    const [isQueryExecuted, setIsQueryExecuted] = useState(false);
     const nameRef = useRef<HTMLInputElement>(null);
     const descriptionRef = useRef<HTMLInputElement>(null);
     const isInitializingRef = useRef(false);
@@ -159,6 +160,7 @@ export default function DataBlocksDetailsOverview() {
     }, [currentDataBlock]);
 
     const validateQuery = useCallback(() => {
+        setIsQueryExecuted(false);
         const sqlClauses = {
             select: sqlTemplateState.selectClause,
             where: sqlTemplateState.whereClause,
@@ -198,6 +200,7 @@ export default function DataBlocksDetailsOverview() {
 
     const executeQuery = useCallback(() => {
         executeDataBlockQuery(currentDataBlock.id, sqlTemplate, sqlTemplateState, () => {
+            setIsQueryExecuted(true);
             refetchDataBlockById();
         });
     }, [currentDataBlock, sqlTemplate, sqlTemplateState]);
@@ -395,7 +398,7 @@ export default function DataBlocksDetailsOverview() {
                         <div className="bg-gray-100 p-4 rounded-md flex-1 min-h-0">
                             <pre className="whitespace-pre-wrap text-sm text-gray-800 h-full">{previewText}</pre>
                         </div>
-                        <div className='flex flex-row gap-x-2 mt-2'>
+                        <div className='flex flex-row gap-x-2 mt-2 items-center'>
                             <KernButton
                                 text="Validate query"
                                 onClick={validateQuery}
@@ -404,12 +407,13 @@ export default function DataBlocksDetailsOverview() {
                             />
                             <KernButton
                                 text="Execute query"
-                                disabled={!isTestQuerySuccess}
+                                disabled={!isTestQuerySuccess || isQueryExecuted}
                                 onClick={executeQuery}
                                 buttonColor="indigo"
                                 textColor="white"
                                 solidTheme
                             />
+                            {isQueryExecuted && currentDataBlock.type == DataBlockType.LIVE && <div className="text-sm leading-5 font-medium text-green-700">Query executed, can be used</div>}
                         </div>
                     </div>
                 </div>
