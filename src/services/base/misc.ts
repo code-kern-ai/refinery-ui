@@ -1,9 +1,8 @@
 import { FetchType, jsonFetchWrapper } from "@/submodules/javascript-functions/basic-fetch";
-import { BACKEND_BASE_URI, BACKEND_COGNITION_BASE_URI } from "./_settings";
+import { BACKEND_BASE_URI } from "./_settings";
 import { convertCamelToSnakeCase } from "@/submodules/javascript-functions/case-types-parser";
 
 export const miscEndpoint = `${BACKEND_BASE_URI}/api/v1/misc`;
-export const miscCognitionEndpoint = `${BACKEND_COGNITION_BASE_URI}/api/v1/misc`;
 
 export function getIsAdmin(onResult: (result: any) => void) {
     const finalUrl = `${miscEndpoint}/is-admin`;
@@ -31,6 +30,6 @@ export function modelProviderDownloadModel(modelName: string, onResult: (result:
 }
 
 export function validateSQLClauses(sqlClauses: { select: string, where: string, groupBy: string, orderBy: string }, onResult: (result: any) => void) {
-    const finalUrl = `${miscCognitionEndpoint}/test-where-clause`;
+    const finalUrl = `${miscEndpoint}/test-where-clause`;
     jsonFetchWrapper(finalUrl, FetchType.POST, onResult, JSON.stringify(sqlClauses));
 }   
