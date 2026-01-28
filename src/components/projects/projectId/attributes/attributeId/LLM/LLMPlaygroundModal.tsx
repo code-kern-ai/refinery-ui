@@ -171,9 +171,9 @@ export default function LLMPlaygroundModal() {
     }, [acceptButton, playgroundTestRunning])
 
     const getByRecordIdDataBlockColumn = useCallback((isRandom) => {
-        let recordId = inputRecordIdRef.current.toString();
+        let recordId = String(inputRecordIdRef.current);
         if (isRandom) {
-            const limit = dataBlock.sqlData.length; // Improvement: getting max record id from sqlData instead of sqlConfig
+            const limit = dataBlock?.sqlData?.length ?? 100; // Improvement: getting max record id from sqlData instead of sqlConfig
             recordId = Math.floor(Math.random() * limit + 1).toString();
         }
         getRecordByRecordIdDataBlockColumn(dataBlock?.id, recordId.toString(), (res) => {
