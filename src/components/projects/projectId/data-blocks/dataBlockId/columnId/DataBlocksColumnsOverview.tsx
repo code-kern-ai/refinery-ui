@@ -95,10 +95,10 @@ export default function DataBlocksColumnsOverview() {
 
     useEffect(() => {
         if (dataBlock) return;
-        getDataBlock(router.query.dataBlockId as string, (res) => {
+        getDataBlock(projectId, router.query.dataBlockId as string, (res) => {
             dispatch(setActiveDataBlock(res));
         });
-    }, [dataBlock, router.query.dataBlockId]);
+    }, [projectId, dataBlock, router.query.dataBlockId]);
 
     useEffect(() => {
         if (currentDataBlockColumn || !dataBlock) return;
@@ -236,7 +236,7 @@ export default function DataBlocksColumnsOverview() {
                 currentDataBlockColumnCopy.state = DataBlockColumnState.RUNNING;
                 dispatch(updateDataBlockColumnById(currentDataBlockColumnCopy));
             } else {
-                getDataBlock(dataBlock.id, (res) => {
+                getDataBlock(projectId, dataBlock.id, (res) => {
                     dispatch(setActiveDataBlock(res));
                 });
                 if (msgParts[2] == 'deleted') return

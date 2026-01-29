@@ -2,7 +2,7 @@ import Modal from "@/src/components/shared/modal/Modal";
 import { selectModal } from "@/src/reduxStore/states/modal";
 import { selectDataBlocksAll } from "@/src/reduxStore/states/pages/data-blocks";
 import { selectProjectId } from "@/src/reduxStore/states/project";
-import { deleteDataBlockById } from "@/src/services/base/data-blocks";
+import { deleteDataBlockByIds } from "@/src/services/base/data-blocks";
 import { DeleteDataBlockModalProps } from "@/src/types/components/projects/projectId/data-blocks/data-blocks";
 import { ModalButton, ModalEnum } from "@/src/types/shared/modal";
 import { useCallback, useEffect, useState } from "react";
@@ -18,12 +18,9 @@ export default function DeleteDataBlockModal(props: DeleteDataBlockModalProps) {
     const [abortButton, setAbortButton] = useState<ModalButton>(ABORT_BUTTON);
 
     const deleteDataBlocks = useCallback(() => {
-        dataBlocks.forEach((dataBlock) => {
-            if (dataBlock.selected) {
-                deleteDataBlockById(projectId, dataBlock.id, (res) => {
-                    props.refetch();
-                })
-            }
+        const dataBlockIds = dataBlocks.filter((dataBlock) => dataBlock.selected).map((dataBlock) => dataBlock.id);
+        deleteDataBlockByIds(projectId, dataBlockIds, (res) => {
+            props.refetch();
         });
     }, [modalDelete]);
 

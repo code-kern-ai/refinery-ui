@@ -50,11 +50,11 @@ export default function DataBlocksDetailsOverview() {
     const isInitializingRef = useRef(false);
 
     useEffect(() => {
-        if (!dataBlockId) return;
-        getDataBlock(dataBlockId as string, (res) => {
+        if (!dataBlockId || !projectId) return;
+        getDataBlock(projectId, dataBlockId as string, (res) => {
             dispatch(setActiveDataBlock(res));
         });
-    }, [dataBlockId]);
+    }, [projectId, dataBlockId]);
 
     useEffect(() => {
         if (!currentDataBlock || !currentDataBlock.sqlConfig) return;
@@ -138,11 +138,11 @@ export default function DataBlocksDetailsOverview() {
     }, [currentDataBlock]);
 
     const saveDataBlock = useCallback(() => {
-        if (!currentDataBlock || currentDataBlock.name == "") return;
+        if (!currentDataBlock || !projectId || currentDataBlock.name == "") return;
         updateDataBlock(projectId, currentDataBlock.id, currentDataBlock.name, currentDataBlock.description, (res) => {
             dispatch(updateDataBlocksState(currentDataBlock.id, { name: currentDataBlock.name, description: currentDataBlock.description }));
         });
-    }, [currentDataBlock]);
+    }, [projectId, currentDataBlock]);
 
     const changeDataBlock = useCallback((value: string, property: string) => {
         if (!currentDataBlock) return;
@@ -196,17 +196,17 @@ export default function DataBlocksDetailsOverview() {
     }, [sqlTemplateState, sqlTemplatePreview]);
 
     const executeQuery = useCallback(() => {
-        executeDataBlockQuery(currentDataBlock.id, sqlTemplate, sqlTemplateState, () => {
+        executeDataBlockQuery(projectId, currentDataBlock.id, sqlTemplate, sqlTemplateState, () => {
             setIsQueryExecuted(true);
             refetchDataBlockById();
         });
-    }, [currentDataBlock, sqlTemplate, sqlTemplateState]);
+    }, [projectId, currentDataBlock, sqlTemplate, sqlTemplateState]);
 
     const refetchDataBlockById = useCallback(() => {
-        getDataBlock(currentDataBlock.id, (res) => {
+        getDataBlock(projectId, currentDataBlock.id, (res) => {
             dispatch(setActiveDataBlock(res));
         });
-    }, [currentDataBlock]);
+    }, [projectId, currentDataBlock]);
 
     const addWarning = useMemo(() => {
         if (!currentDataBlock) return null;

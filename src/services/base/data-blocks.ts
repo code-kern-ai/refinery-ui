@@ -5,12 +5,9 @@ import { convertCamelToSnakeCase } from "@/submodules/javascript-functions/case-
 
 export const dataBlocksEndpoint = `${BACKEND_BASE_URI}/api/v1/data-blocks`;
 
-export function deleteDataBlockById(projectId: string, dataBlockId: string, onResult: (result: any) => void) {
+export function deleteDataBlockByIds(projectId: string, dataBlockIds: string[], onResult: (result: any) => void) {
     const finalUrl = `${dataBlocksEndpoint}/${projectId}`;
-    const body = {
-        ids: [dataBlockId]
-    };
-    jsonFetchWrapper(finalUrl, FetchType.DELETE, onResult, JSON.stringify(convertCamelToSnakeCase(body)));
+    jsonFetchWrapper(finalUrl, FetchType.DELETE, onResult, JSON.stringify({ ids: dataBlockIds }));
 }
 
 export function getDataBlocks(projectId: string, onResult: (result: any) => void) {
@@ -18,26 +15,14 @@ export function getDataBlocks(projectId: string, onResult: (result: any) => void
     jsonFetchWrapper(finalUrl, FetchType.GET, onResult);
 }
 
-export function getDataBlocksDataStable(projectId: string, searchTerm: string, groupBy: string[], aggregateBy: string[], aggregateFunctions: string[], onResult: (result: any) => void) {
-    const finalUrl = `${dataBlocksEndpoint}/data/${projectId}`;
-    const body = {
-        searchTerm: searchTerm,
-        groupBy: groupBy,
-        aggregateBy: aggregateBy,
-        aggregateFunctions: aggregateFunctions
-    }
-    jsonFetchWrapper(finalUrl, FetchType.POST, onResult, JSON.stringify(body));
-}
-
-export function getDataBlock(dataBlockId: string, onResult: (result: any) => void) {
-    const finalUrl = `${dataBlocksEndpoint}/${dataBlockId}`;
+export function getDataBlock(projectId: string, dataBlockId: string, onResult: (result: any) => void) {
+    const finalUrl = `${dataBlocksEndpoint}/single/${projectId}/${dataBlockId}`;
     jsonFetchWrapper(finalUrl, FetchType.GET, onResult);
 }
 
 export function createDataBlock(projectId: string, name: string, description: string, type: string, onResult: (result: any) => void) {
-    const finalUrl = `${dataBlocksEndpoint}/`;
+    const finalUrl = `${dataBlocksEndpoint}/${projectId}`;
     const body = {
-        projectId: projectId,
         name: name,
         description: description,
         type: type
@@ -46,17 +31,16 @@ export function createDataBlock(projectId: string, name: string, description: st
 }
 
 export function updateDataBlock(projectId: string, dataBlockId: string, name: string, description: string, onResult: (result: any) => void) {
-    const finalUrl = `${dataBlocksEndpoint}/${dataBlockId}`;
+    const finalUrl = `${dataBlocksEndpoint}/project/${projectId}/${dataBlockId}`;
     const body = {
-        projectId: projectId,
         name: name,
         description: description,
     };
     jsonFetchWrapper(finalUrl, FetchType.PUT, onResult, JSON.stringify(convertCamelToSnakeCase(body)));
 }
 
-export function executeDataBlockQuery(dataBlockId: string, sqlTemplate: string, sqlTemplateState: object, onResult: (result: any) => void) {
-    const finalUrl = `${dataBlocksEndpoint}/query/${dataBlockId}`;
+export function executeDataBlockQuery(projectId: string, dataBlockId: string, sqlTemplate: string, sqlTemplateState: object, onResult: (result: any) => void) {
+    const finalUrl = `${dataBlocksEndpoint}/query/${projectId}/${dataBlockId}`;
     const body = {
         sqlConfig: {
             template: sqlTemplate,
@@ -93,7 +77,7 @@ export function deleteDataBlockColumnById(dataBlockId: string, dataBlockColumnId
     const body = {
         ids: [dataBlockColumnId]
     };
-    jsonFetchWrapper(finalUrl, FetchType.DELETE, onResult, JSON.stringify(convertCamelToSnakeCase(body)));
+    jsonFetchWrapper(finalUrl, FetchType.DELETE, onResult, JSON.stringify(body));
 }
 
 export function runDataBlockColumnLlmPlayground(dataBlockId: string, dataBlockColumnId: string, recordIds: string[], llmConfig: any, onResult: (result: any) => void) {
@@ -103,5 +87,10 @@ export function runDataBlockColumnLlmPlayground(dataBlockId: string, dataBlockCo
 
 export function getRecordByRecordIdDataBlockColumn(dataBlockId: string, recordId: string, onResult: (result: any) => void) {
     const finalUrl = `${dataBlocksEndpoint}/${dataBlockId}/record-by-record-id?record_id=${recordId}`;
+    jsonFetchWrapper(finalUrl, FetchType.GET, onResult);
+}
+
+export function getSampleRecordsDataBlockColumn(projectId: string, dataBlockId: string, dataBlockColumnId: string, onResult: (result: any) => void) {
+    const finalUrl = `${dataBlocksEndpoint}/${projectId}/${dataBlockId}/attributes/${dataBlockColumnId}/sample-records`;
     jsonFetchWrapper(finalUrl, FetchType.GET, onResult);
 }

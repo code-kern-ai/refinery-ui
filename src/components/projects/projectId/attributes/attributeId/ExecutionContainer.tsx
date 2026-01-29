@@ -19,20 +19,22 @@ import { DataTypeEnum } from "@/src/types/shared/general";
 import KernButton from "@/submodules/react-components/components/kern-button/KernButton";
 import useRefFor from "@/submodules/react-components/hooks/useRefFor";
 import ViewRecordDetailsDataBlockColumnModal from "../../data-blocks/dataBlockId/columnId/ViewRecordDetailsDataBlockColumnModal";
-import { getRecordByRecordIdDataBlockColumn } from "@/src/services/base/data-blocks";
+import { getRecordByRecordIdDataBlockColumn, getSampleRecordsDataBlockColumn } from "@/src/services/base/data-blocks";
 
 
 export default function ExecutionContainer(props: ExecutionContainerProps) {
-    const projectId = useSelector(selectProjectId);
-    const dataBlock = useSelector(selectDataBlock);
     const dispatch = useDispatch();
 
+    const projectId = useSelector(selectProjectId);
+    const dataBlock = useSelector(selectDataBlock);
 
     const [requestedSomething, setRequestedSomething] = useState(false);
     const [runOn10HasError, setRunOn10HasError] = useState(false);
     const [sampleRecords, setSampleRecords] = useState<SampleRecord>(null);
     const [checkIfAtLeastRunning, setCheckIfAtLeastRunning] = useState(false);
     const [checkIfAtLeastQueued, setCheckIfAtLeastQueued] = useState(false);
+    const currentAttributesRef = useRefFor(props.currentAttribute);
+
 
     useEffect(() => {
         if (props.enableRunButton) {
@@ -41,23 +43,33 @@ export default function ExecutionContainer(props: ExecutionContainerProps) {
         }
     }, [props.enableRunButton]);
 
-    const currentAttributesRef = useRefFor(props.currentAttribute);
+    const postProcessSampleRecords = useCallback((res: any) => {
+        const sampleRecordsFinal = { ...res };
+        setRequestedSomething(false);
+        props.setEnabledButton(false);
+        setRunOn10HasError(sampleRecordsFinal.calculatedAttributes.length > 0 ? false : true);
+        if (currentAttributesRef.current.dataType == DataTypeEnum.EMBEDDING_LIST || currentAttributesRef.current.dataType == DataTypeEnum.TEXT_LIST) {
+            sampleRecordsFinal.calculatedAttributesList = sampleRecordsFinal.calculatedAttributes.map((record: string) => JSON.parse(record));
+            sampleRecordsFinal.calculatedAttributesListDisplay = extendArrayElementsByUniqueId(sampleRecordsFinal.calculatedAttributesList);
+        }
+        sampleRecordsFinal.calculatedAttributesDisplay = extendArrayElementsByUniqueId(sampleRecordsFinal.calculatedAttributes);
+        setSampleRecords(sampleRecordsFinal);
+        props.refetchCurrentAttribute();
+    }, [props.setEnabledButton, props.refetchCurrentAttribute]);
+
     const calculateUserAttributeSampleRecords = useCallback(() => {
         if (requestedSomething) return;
         setRequestedSomething(true);
-        getSampleRecords(projectId, currentAttributesRef.current.id, props.isDataBlockColumn ? dataBlock?.id : null, (res) => {
-            const sampleRecordsFinal = { ...res };
-            setRequestedSomething(false);
-            props.setEnabledButton(false);
-            setRunOn10HasError(sampleRecordsFinal.calculatedAttributes.length > 0 ? false : true);
-            if (currentAttributesRef.current.dataType == DataTypeEnum.EMBEDDING_LIST || currentAttributesRef.current.dataType == DataTypeEnum.TEXT_LIST) {
-                sampleRecordsFinal.calculatedAttributesList = sampleRecordsFinal.calculatedAttributes.map((record: string) => JSON.parse(record));
-                sampleRecordsFinal.calculatedAttributesListDisplay = extendArrayElementsByUniqueId(sampleRecordsFinal.calculatedAttributesList);
-            }
-            sampleRecordsFinal.calculatedAttributesDisplay = extendArrayElementsByUniqueId(sampleRecordsFinal.calculatedAttributes);
-            setSampleRecords(sampleRecordsFinal);
-            props.refetchCurrentAttribute();
-        });
+        if (props.isDataBlockColumn) {
+            getSampleRecordsDataBlockColumn(projectId, dataBlock?.id, currentAttributesRef.current.id, (res) => {
+                postProcessSampleRecords(res);
+            });
+        }
+        else {
+            getSampleRecords(projectId, currentAttributesRef.current.id, (res) => {
+                postProcessSampleRecords(res);
+            });
+        }
     }, [projectId, dataBlock?.id, props.isDataBlockColumn]);
 
     function recordByRecordId(recordId: string) {

@@ -17,10 +17,8 @@ export function getCheckCompositeKey(projectId: string, onResult: (result: any) 
     jsonFetchWrapper(finalUrl, FetchType.GET, onResult);
 }
 
-export function getSampleRecords(projectId: string, attributeId: string, dataBlockId: string | null, onResult: (result: any) => void) {
-    let finalUrl = '';
-    if (dataBlockId) finalUrl = `${dataBlocksEndpoint}/${dataBlockId}/attributes/${attributeId}/sample-records`;
-    else finalUrl = `${attributeEndpoint}/${projectId}/${attributeId}/sample-records`;
+export function getSampleRecords(projectId: string, attributeId: string, onResult: (result: any) => void) {
+    const finalUrl = `${attributeEndpoint}/${projectId}/${attributeId}/sample-records`;
     jsonFetchWrapper(finalUrl, FetchType.GET, onResult);
 }
 
