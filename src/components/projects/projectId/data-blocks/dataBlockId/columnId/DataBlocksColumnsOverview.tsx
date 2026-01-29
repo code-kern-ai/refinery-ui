@@ -81,10 +81,10 @@ export default function DataBlocksColumnsOverview() {
             return;
         }
         const finalSourceCode = value.replace(regMatch[0], 'def ac(record)');
-        updateDataBlockColumn(dataBlock.id, currentDataBlockColumn.id, (res) => {
+        updateDataBlockColumn(projectId, dataBlock.id, currentDataBlockColumn.id, (res) => {
 
         }, null, null, dataBlockColumnNameParam, finalSourceCode);
-    }, [currentDataBlockColumn, dataBlock?.id]);
+    }, [projectId, currentDataBlockColumn, dataBlock?.id]);
 
     useEffect(() => setAdditionalConfigTmp(currentDataBlockColumn?.additionalConfig), [currentDataBlockColumn?.additionalConfig])
 
@@ -102,12 +102,12 @@ export default function DataBlocksColumnsOverview() {
 
     useEffect(() => {
         if (currentDataBlockColumn || !dataBlock) return;
-        getDataBlockColumnByColumnId(dataBlock.id, router.query.columnId as string, (dataBlockColumn) => {
+        getDataBlockColumnByColumnId(projectId, dataBlock.id, router.query.columnId as string, (dataBlockColumn) => {
             const currentDataBlockColumn = postProcessCurrentDataBlockColumn(dataBlockColumn);
             setCurrentDataBlockColumn(currentDataBlockColumn);
             setEditorValue(currentDataBlockColumn?.sourceCodeToDisplay);
         });
-    }, [dataBlock, currentDataBlockColumn, router.query.columnId])
+    }, [projectId, dataBlock, currentDataBlockColumn, router.query.columnId])
 
 
     useEffect(() => {
@@ -157,13 +157,13 @@ export default function DataBlocksColumnsOverview() {
             delete finalConfig.llmConfig.openAioSeries;
         }
         dataBlockColumnNew.additionalConfig = { ...finalConfig };
-        updateDataBlockColumn(dataBlock.id, currentDataBlockColumn.id, (res) => {
+        updateDataBlockColumn(projectId, dataBlock.id, currentDataBlockColumn.id, (res) => {
             setCurrentDataBlockColumn(postProcessCurrentDataBlockColumn(dataBlockColumnNew));
             dispatch(updateDataBlockColumnById(dataBlockColumnNew));
             setEnableButton(true);
         }, null, null, null, null, finalConfig);
 
-    }, [debouncedConfig, dataBlock?.id])
+    }, [projectId, debouncedConfig, dataBlock?.id])
 
     function openName(open: boolean) {
         setIsNameOpen(open);
@@ -191,13 +191,13 @@ export default function DataBlocksColumnsOverview() {
         const dataBlockColumnNew = { ...currentDataBlockColumnRef.current };
         dataBlockColumnNew.name = name;
         dataBlockColumnNew.saveSourceCode = false;
-        updateDataBlockColumn(dataBlock.id, currentDataBlockColumnRef.current.id, (res) => {
+        updateDataBlockColumn(projectId, dataBlock.id, currentDataBlockColumnRef.current.id, (res) => {
             setCurrentDataBlockColumn(postProcessCurrentDataBlockColumn(dataBlockColumnNew));
             setEditorValue(dataBlockColumnNew.sourceCode.replace('def ac(record)', 'def ' + dataBlockColumnNew.name + '(record)'));
             dispatch(updateDataBlockColumnById(dataBlockColumnNew));
             setDuplicateNameExists(false);
         }, null, null, dataBlockColumnNew.name);
-    }, [dataBlock?.id]);
+    }, [projectId, dataBlock?.id]);
 
     const updateDataType = useCallback((option: { name: string, value: string }) => {
         if (!dataBlock?.id) return;
@@ -205,11 +205,11 @@ export default function DataBlocksColumnsOverview() {
         dataBlockColumnNew.dataType = option.value;
         dataBlockColumnNew.dataTypeName = option.name;
         dataBlockColumnNew.saveSourceCode = false;
-        updateDataBlockColumn(dataBlock.id, currentDataBlockColumnRef.current.id, (res) => {
+        updateDataBlockColumn(projectId, dataBlock.id, currentDataBlockColumnRef.current.id, (res) => {
             setCurrentDataBlockColumn(postProcessCurrentDataBlockColumn(dataBlockColumnNew));
             dispatch(updateDataBlockColumnById(dataBlockColumnNew));
         }, dataBlockColumnNew.dataType);
-    }, [dataBlock?.id]);
+    }, [projectId, dataBlock?.id]);
 
     function onScrollEvent(event: any) {
         if (!(event.target instanceof HTMLElement)) return;
@@ -240,7 +240,7 @@ export default function DataBlocksColumnsOverview() {
                     dispatch(setActiveDataBlock(res));
                 });
                 if (msgParts[2] == 'deleted') return
-                getDataBlockColumnByColumnId(dataBlock.id, currentDataBlockColumn.id, (attribute) => {
+                getDataBlockColumnByColumnId(projectId, dataBlock.id, currentDataBlockColumn.id, (attribute) => {
                     if (!attribute) setCurrentDataBlockColumn(null);
                     else setCurrentDataBlockColumn(postProcessCurrentDataBlockColumn(attribute));
                 });
@@ -403,7 +403,7 @@ export default function DataBlocksColumnsOverview() {
                 <ExecutionContainer currentAttribute={currentDataBlockColumn} tokenizationProgress={tokenizationProgress} enableRunButton={enableRunButton} checkUnsavedChanges={checkUnsavedChanges}
                     setEnabledButton={(value: boolean) => setEnableButton(value)}
                     refetchCurrentAttribute={() => {
-                        getDataBlockColumnByColumnId(dataBlock.id, router.query.columnId as string, (dataBlockColumn) => {
+                        getDataBlockColumnByColumnId(projectId, dataBlock.id, router.query.columnId as string, (dataBlockColumn) => {
                             if (dataBlockColumn == null) setCurrentDataBlockColumn(null);
                             else setCurrentDataBlockColumn(postProcessCurrentDataBlockColumn(dataBlockColumn));
                         });

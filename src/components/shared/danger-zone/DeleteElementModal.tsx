@@ -52,7 +52,7 @@ export default function DeleteElementModal(props: DangerZoneProps) {
                 router.push(`/projects/${projectId}/heuristics`);
                 break;
             case DangerZoneEnum.DATA_BLOCK_COLUMN:
-                deleteDataBlockColumnById(dataBlockId, props.id, (res) => {
+                deleteDataBlockColumnById(projectId, dataBlockId, props.id, (res) => {
                     setIsDeleting(false);
                 });
                 router.push(`/projects/${projectId}/data-blocks/${dataBlockId}`);

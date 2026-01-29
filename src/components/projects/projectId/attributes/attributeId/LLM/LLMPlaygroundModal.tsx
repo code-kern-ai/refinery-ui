@@ -103,14 +103,14 @@ export default function LLMPlaygroundModal() {
             setLlmAnswer(answer);
             setPlaygroundTestRunning(false);
         });
-        if (modalRef.current.dataBlockColumnId) runDataBlockColumnLlmPlayground(dataBlock.id, modalRef.current.dataBlockColumnId, [inputRecordId.toString()], finalConfig, (res) => {
+        if (modalRef.current.dataBlockColumnId) runDataBlockColumnLlmPlayground(projectId, dataBlock.id, modalRef.current.dataBlockColumnId, [inputRecordId.toString()], finalConfig, (res) => {
             let answer = ""
             for (const id of [inputRecordId.toString()]) answer += "Answer: " + (res[id] || "No answer found") + "\n";
             if (res["logs"]) answer += "\n---\nlogs:\n" + res["logs"].join("\n");
             setLlmAnswer(answer);
             setPlaygroundTestRunning(false);
         });
-    }, [inputRecordId]);
+    }, [inputRecordId, projectId, dataBlock.id]);
 
     useEffect(() => {
         if (!recordData || recordData?.length == 0) return;
@@ -141,8 +141,8 @@ export default function LLMPlaygroundModal() {
     const copyToDataBlockColumnValues = useCallback(() => {
         if (!fullLlmConfigRef.current || !modalRef.current) return;
         const config = { ...fullLlmConfigRef.current };
-        updateDataBlockColumn(dataBlock.id, modalRef.current.dataBlockColumnId, (res) => { }, null, null, null, null, config);
-    }, [dataBlock?.id]);
+        updateDataBlockColumn(projectId, dataBlock.id, modalRef.current.dataBlockColumnId, (res) => { }, null, null, null, null, config);
+    }, [projectId, dataBlock?.id]);
 
     useEffect(() => {
         if ((!attributeDict || !modal?.attributeId) && (!dataBlockColumnsDict || !modal?.dataBlockColumnId)) return;
@@ -176,11 +176,11 @@ export default function LLMPlaygroundModal() {
             const limit = dataBlock?.sqlData?.length ?? 100; // Improvement: getting max record id from sqlData instead of sqlConfig
             recordId = Math.floor(Math.random() * limit + 1).toString();
         }
-        getRecordByRecordIdDataBlockColumn(dataBlock?.id, recordId.toString(), (res) => {
+        getRecordByRecordIdDataBlockColumn(projectId, dataBlock?.id, recordId.toString(), (res) => {
             setRecordDataDataBlockColumn(postProcessRecordByRecordId(res));
             setInputRecordId(Number(recordId));
         });
-    }, [dataBlock?.id, dataBlock]);
+    }, [projectId, dataBlock?.id, dataBlock]);
 
     return (<Modal modalName={ModalEnum.LLM_PLAYGROUND} acceptButton={finalAcceptButton} className="ml-10 md:max-w-[calc(100vw-15rem)]">
         <div className="pl-2 pr-5 max-h-[calc(100vh-15rem)] overflow-y-auto">

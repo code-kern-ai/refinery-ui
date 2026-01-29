@@ -31,13 +31,13 @@ export default function CreateNewDataBlockColumn() {
     const [acceptButton, setAcceptButton] = useState<ModalButton>(ACCEPT_BUTTON);
 
     const createDataBlockColumnFunc = useCallback(() => {
-        createDataBlockColumn(dataBlockId, dataBlockColumnName, dataBlockColumnType.value, (res) => {
+        createDataBlockColumn(projectId, dataBlockId, dataBlockColumnName, dataBlockColumnType.value, (res) => {
             if (res?.id) {
                 dispatch(setCurrentPage(CurrentPage.DATA_BLOCKS_COLUMNS));
                 router.push(`/projects/${projectId}/data-blocks/${dataBlockId}/${res.id}`);
             }
         });
-    }, [dataBlockColumnName, dataBlockColumnType, dataBlockId]);
+    }, [projectId, dataBlockColumnName, dataBlockColumnType, dataBlockId]);
 
     useEffect(() => {
         setAcceptButton({ ...acceptButton, emitFunction: createDataBlockColumnFunc, disabled: duplicateNameExists || dataBlockColumnName.trim() == "" || dataBlockColumnType == null });
