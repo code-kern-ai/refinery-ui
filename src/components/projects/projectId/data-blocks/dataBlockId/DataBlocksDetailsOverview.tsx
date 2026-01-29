@@ -1,6 +1,6 @@
 import { selectProjectId } from "@/src/reduxStore/states/project";
 import KernButton from "@/submodules/react-components/components/kern-button/KernButton";
-import { MemoIconAlertTriangleFilled, MemoIconArrowLeft, MemoIconPlayerPlay } from "@/submodules/react-components/components/kern-icons/icons";
+import { MemoIconAlertTriangleFilled, MemoIconArrowLeft, MemoIconInfoCircleFilled, MemoIconPlayerPlay } from "@/submodules/react-components/components/kern-icons/icons";
 import { useRouter } from "next/router";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -218,6 +218,12 @@ export default function DataBlocksDetailsOverview() {
         </Tooltip>
     }, [currentDataBlock?.type, sqlTemplateState.selectClause]);
 
+    const addInfo = useMemo(() => {
+        return <Tooltip content={<div className="no-ligatures">{`Queries need to be built like: data->>'<attribute_name>' to work (<attribute_name> does not work)`}</div>} color="invert" placement="right" className="cursor-default">
+            <MemoIconInfoCircleFilled className="inline-block text-blue-500 h-5 w-5" />
+        </Tooltip>
+    }, []);
+
     const parseSQLClause = useCallback((clause: string, keyword: string): { prefix: string; editable: string } => {
         if (!clause.trim()) {
             return { prefix: keyword, editable: '' };
@@ -334,7 +340,10 @@ export default function DataBlocksDetailsOverview() {
                     </div>
                 </div>
                 <div className="my-4">
-                    <div className="text-sm leading-5 font-medium text-gray-700">SQL template</div>
+                    <div className="text-sm leading-5 font-medium text-gray-700 items-center flex gap-x-2">
+                        SQL template
+                        {sqlTemplate == SQLTemplates.BLANK_QUERY && <span className="inline-block ">{addInfo}</span>}
+                    </div>
                     <KernDropdown options={Object.values(SQLTemplates)}
                         buttonName={sqlTemplate}
                         selectedOption={setAndPrefillSQLTemplateState} dropdownWidth="w-52" />

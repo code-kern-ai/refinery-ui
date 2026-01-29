@@ -19,7 +19,12 @@ export function DataBlocksOverview() {
 
     const refetchDataBlocks = useCallback(() => {
         getDataBlocks(projectId, (res) => {
-            dispatch(setAllDataBlocks(res));
+            // Ensure selected property is initialized for all data blocks
+            const dataBlocksWithSelection = res?.map((dataBlock: any) => ({
+                ...dataBlock,
+                selected: dataBlock.selected ?? false
+            })) || [];
+            dispatch(setAllDataBlocks(dataBlocksWithSelection));
         });
     }, [projectId]);
 

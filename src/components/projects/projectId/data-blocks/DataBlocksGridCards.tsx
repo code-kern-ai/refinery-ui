@@ -19,7 +19,7 @@ export default function DataBlocksGridCards() {
 
         dataBlocksCopy.forEach((dataBlock, index) => {
             if (dataBlock.id === dataBlockId) {
-                dataBlocksCopy[index].selected = !dataBlocks[index].selected;
+                dataBlocksCopy[index].selected = !(dataBlocks[index].selected ?? false);
             }
         });
         dispatch(setAllDataBlocks(dataBlocksCopy));
@@ -34,7 +34,7 @@ export default function DataBlocksGridCards() {
             <div className="relative flex space-x-3 items-center rounded-lg border border-gray-300 bg-white px-6 py-5 shadow-sm hover:border-gray-400">
                 <div className="h-full flex flex-col gap-2 items-center self-start">
                     <label htmlFor="data-block-checkbox" className="cursor-pointer flex justify-center">
-                        <input type="checkbox" className="cursor-pointer" name="data-block-checkbox" checked={dataBlock.selected} onChange={() => toggleDataBlock(dataBlock.id)} />
+                        <input type="checkbox" className="cursor-pointer" name="data-block-checkbox" checked={dataBlock.selected ?? false} onChange={() => toggleDataBlock(dataBlock.id)} />
                     </label>
                 </div>
 

@@ -23,10 +23,36 @@ export default function DataBlockHeader(props: DataBlocksHeaderProps) {
     const [selectionList, setSelectionList] = useState('');
     const [countSelected, setCountSelected] = useState(0);
 
+    const prepareSelectionList = useCallback(() => {
+        let selectionListFinal = '';
+        let countSelected = 0;
+        dataBlocks.forEach((dataBlock, index) => {
+            if (dataBlock.selected) {
+                selectionListFinal += dataBlocks[index].name;
+                selectionListFinal += '\n';
+                countSelected++;
+            }
+        });
+        setCountSelected(countSelected)
+        setSelectionList(selectionListFinal);
+    }, [dataBlocks]);
+
+    useEffect(() => {
+        prepareSelectionList();
+    }, [dataBlocks, prepareSelectionList]);
+
     useEffect(() => {
         if (!modalDelete) return;
         prepareSelectionList();
-    }, [modalDelete]);
+    }, [modalDelete, prepareSelectionList]);
+
+    const selectDataBlocks = useCallback((checked: boolean) => {
+        const dataBlocksCopy = jsonCopy(dataBlocks);
+        dataBlocksCopy.forEach((dataBlock, index) => {
+            dataBlocksCopy[index].selected = checked;
+        });
+        dispatch(setAllDataBlocks(dataBlocksCopy));
+    }, [dataBlocks, dispatch]);
 
     const executeOption = useCallback((option: string) => {
         switch (option) {
@@ -43,34 +69,10 @@ export default function DataBlockHeader(props: DataBlocksHeaderProps) {
                 selectDataBlocks(false);
                 break;
             case 'Delete selected':
-                prepareSelectionList();
                 dispatch(openModal(ModalEnum.DELETE_DATA_BLOCK));
                 break;
         }
-    }, []);
-
-    const selectDataBlocks = useCallback((checked: boolean) => {
-        const dataBlocksCopy = jsonCopy(dataBlocks);
-        dataBlocksCopy.forEach((dataBlock, index) => {
-            dataBlocksCopy[index].selected = checked;
-        });
-        dispatch(setAllDataBlocks(dataBlocksCopy));
-        prepareSelectionList();
-    }, [dataBlocks]);
-
-    const prepareSelectionList = useCallback(() => {
-        let selectionListFinal = '';
-        let countSelected = 0;
-        dataBlocks.forEach((dataBlock, index) => {
-            if (dataBlock.selected) {
-                selectionListFinal += dataBlocks[index].name;
-                selectionListFinal += '\n';
-                countSelected++;
-            }
-        });
-        setCountSelected(countSelected)
-        setSelectionList(selectionListFinal);
-    }, [dataBlocks]);
+    }, [dispatch, selectDataBlocks]);
 
     return (
         <div className="flex-shrink-0 flex justify-end items-center mr-4">
