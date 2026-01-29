@@ -68,7 +68,7 @@ export function getDataBlockColumnByColumnId(projectId: string, dataBlockId: str
 export function updateDataBlockColumn(projectId: string, dataBlockId: string, dataBlockColumnId: string, onResult: (result: any) => void, dataType?: string, isPrimaryKey?: boolean, name?: string, sourceCode?: string, additionalConfig?: any) {
     const finalUrl = `${dataBlocksEndpoint}/${projectId}/${dataBlockId}/attributes/${dataBlockColumnId}`;
     const baseData: any = convertCamelToSnakeCase({ dataType, isPrimaryKey, name, sourceCode });
-    baseData.additional_config = additionalConfig;
+    baseData.additional_config = additionalConfig; //assigned directly to prevent the conversion of sub dict values
     jsonFetchWrapper(finalUrl, FetchType.PUT, onResult, JSON.stringify(baseData));
 }
 

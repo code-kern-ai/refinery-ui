@@ -45,6 +45,7 @@ export default function DataBlocksColumnsOverview() {
     const dispatch = useDispatch();
 
     const projectId = useSelector(selectProjectId);
+    const orgId = useSelector(selectOrganizationId);
     const dataBlock = useSelector(selectDataBlock);
     const dataBlockColumns = useSelector(selectUsableDataBlockColumns);
 
@@ -229,7 +230,7 @@ export default function DataBlocksColumnsOverview() {
     const handleWebsocketNotification = useCallback((msgParts: string[]) => {
         if (!projectId) return;
         if (!currentDataBlockColumn) return;
-        if (msgParts[1] == 'calculate_attribute') {
+        if (msgParts[1] == 'data_block_calculate_attribute') {
             if (msgParts[2] == 'progress' && msgParts[3] == currentDataBlockColumn.id) {
                 const currentDataBlockColumnCopy = { ...currentDataBlockColumn };
                 currentDataBlockColumnCopy.progress = Number(msgParts[4]);
@@ -267,7 +268,6 @@ export default function DataBlocksColumnsOverview() {
         setEditorValue(LLM_CODE_TEMPLATE_EXAMPLES[option.value].replace('def ac(record)', 'def ' + currentDataBlockColumnRef.current.name + '(record)'));
     }, [])
 
-    const orgId = useSelector(selectOrganizationId);
     useWebsocket(orgId, Application.REFINERY, CurrentPage.DATA_BLOCKS_COLUMNS, handleWebsocketNotification, projectId);
 
     const copyToClipboardFunc = useCallback((name: string) => copyToClipboard(name), []);

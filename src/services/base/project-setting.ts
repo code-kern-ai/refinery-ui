@@ -63,7 +63,7 @@ export function createAttribute(projectId: string, name: string, dataType: strin
 export function updateAttribute(projectId: string, attributeId: string, onResult: (result: any) => void, dataType?: string, isPrimaryKey?: boolean, name?: string, sourceCode?: string, visibility?: string, additionalConfig?: any) {
     const finalUrl = `${projectSettingEndpoint}/${projectId}/update-attribute`;
     const baseData: any = convertCamelToSnakeCase({ attributeId, dataType, isPrimaryKey, name, sourceCode, visibility });
-    baseData.additional_config = additionalConfig;
+    baseData.additional_config = additionalConfig; //assigned directly to prevent the conversion of sub dict values
     jsonFetchWrapper(finalUrl, FetchType.POST, onResult, JSON.stringify(baseData));
 }
 
