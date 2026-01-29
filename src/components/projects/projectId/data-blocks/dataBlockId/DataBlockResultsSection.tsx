@@ -1,46 +1,7 @@
+import { memo } from "react";
 import { selectDataBlock } from "@/src/reduxStore/states/pages/data-blocks";
 import { useSelector } from "react-redux";
-import { DataBlockColumnType } from "@/src/types/components/projects/projectId/data-blocks/data-blocks";
-
-function formatValueByDataType(value: any, dataType: string): string {
-    if (value === null || value === undefined || value === '') {
-        return '';
-    }
-    if (typeof value === 'object') {
-        if (Array.isArray(value)) {
-            return JSON.stringify(value);
-        }
-        return JSON.stringify(value);
-    }
-
-    switch (dataType) {
-        case DataBlockColumnType.INTEGER:
-            if (typeof value === 'number') {
-                return Number.isInteger(value) ? value.toString() : Math.floor(value).toString();
-            }
-            const intValue = parseInt(value);
-            return !isNaN(intValue) ? intValue.toString() : String(value);
-        case DataBlockColumnType.FLOAT:
-            if (typeof value === 'number') {
-                return value.toString();
-            }
-            const floatValue = parseFloat(value);
-            return !isNaN(floatValue) ? floatValue.toString() : String(value);
-        case DataBlockColumnType.BOOLEAN:
-            if (typeof value === 'boolean') {
-                return value ? 'true' : 'false';
-            }
-            if (typeof value === 'string') {
-                return value.toLowerCase() === 'true' || value === '1' ? 'true' : 'false';
-            }
-            return value ? 'true' : 'false';
-        case DataBlockColumnType.TEXT:
-        case DataBlockColumnType.CATEGORY:
-        case DataBlockColumnType.LLM_RESPONSE:
-        default:
-            return String(value);
-    }
-}
+import { formatValueByDataType } from "@/src/util/components/projects/projectId/data-blocks/data-blocks";
 
 function formatRowAsText(row: any, sqlSchema: any[]): string {
     if (!sqlSchema || sqlSchema.length === 0) {
@@ -62,7 +23,7 @@ function formatRowAsText(row: any, sqlSchema: any[]): string {
     }).join(', ');
 }
 
-export default function DataBlockResultsSection() {
+function DataBlockResultsSection() {
     const currentDataBlock = useSelector(selectDataBlock);
     const sqlSchema = currentDataBlock?.sqlSchema || [];
     const rawData = currentDataBlock?.sqlData;
@@ -110,3 +71,5 @@ export default function DataBlockResultsSection() {
         </div>
     );
 }
+
+export default memo(DataBlockResultsSection);

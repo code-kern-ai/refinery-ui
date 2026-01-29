@@ -151,7 +151,7 @@ export default function DataBlocksColumnsOverview() {
     useEffect(() => {
         if (!dataBlock?.id) return;
         if (!currentDataBlockColumnRef.current || !currentDataBlockColumnRef.current.additionalConfig || simpleDictCompare(currentDataBlockColumnRef.current?.additionalConfig, debouncedConfig)) return;
-        const dataBlockColumnNew = { ...currentDataBlockColumn };
+        const dataBlockColumnNew = { ...currentDataBlockColumnRef.current };
         const finalConfig = { ...debouncedConfig };
         if (finalConfig.llmConfig && finalConfig.llmIdentifier == 'Azure Foundry') {
             delete finalConfig.llmConfig.openAioSeries;

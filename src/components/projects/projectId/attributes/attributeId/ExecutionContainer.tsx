@@ -67,11 +67,11 @@ export default function ExecutionContainer(props: ExecutionContainerProps) {
     }
 
 
-    function recordByRecordIdDataBlockColumn(recordId: string) {
+    const recordByRecordIdDataBlockColumn = useCallback((recordId: string) => {
         getRecordByRecordIdDataBlockColumn(dataBlock?.id, recordId, (res) => {
             dispatch(setModalStates(ModalEnum.VIEW_RECORD_DETAILS_DATA_BLOCK_COLUMN, { record: postProcessRecordByRecordId(res) }));
         });
-    }
+    }, [dataBlock?.id]);
 
     const requestedSomethingRef = useRefFor(requestedSomething);
     const executeAttribute = useCallback(() => {

@@ -24,11 +24,11 @@ export default function CreateNewDataBlockColumn() {
     const modalNewDataBlockColumn = useSelector(selectModal(ModalEnum.CREATE_DATA_BLOCK_COLUMN));
     const dataBlockColumns = useSelector(selectDataBlockColumns);
     const dataBlockId = useSelector(selectDataBlock).id;
-    const sqlSchema = useSelector(selectDataBlock).sqlSchema;
 
     const [dataBlockColumnName, setDataBlockColumnName] = useState('');
     const [dataBlockColumnType, setDataBlockColumnType] = useState(DATA_TYPES[0]);
     const [duplicateNameExists, setDuplicateNameExists] = useState(false);
+    const [acceptButton, setAcceptButton] = useState<ModalButton>(ACCEPT_BUTTON);
 
     const createDataBlockColumnFunc = useCallback(() => {
         createDataBlockColumn(dataBlockId, dataBlockColumnName, dataBlockColumnType.value, (res) => {
@@ -43,7 +43,6 @@ export default function CreateNewDataBlockColumn() {
         setAcceptButton({ ...acceptButton, emitFunction: createDataBlockColumnFunc, disabled: duplicateNameExists || dataBlockColumnName.trim() == "" || dataBlockColumnType == null });
     }, [modalNewDataBlockColumn, dataBlockColumnName, dataBlockColumnType, duplicateNameExists]);
 
-    const [acceptButton, setAcceptButton] = useState<ModalButton>(ACCEPT_BUTTON);
 
     const handleDataBlockColumnName = useCallback((value: string) => {
         const valueToSave = toPythonFunctionName(value);

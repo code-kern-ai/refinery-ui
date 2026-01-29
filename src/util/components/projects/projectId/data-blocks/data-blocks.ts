@@ -71,3 +71,43 @@ export const DATA_BLOCK_COLUMN_STATE_COLOR_DICT = {
     [DataBlockColumnState.QUEUED]: 'gray',
     [DataBlockColumnState.INITIAL]: 'gray',
 }
+
+export function formatValueByDataType(value: any, dataType: string): string {
+    if (value === null || value === undefined || value === '') {
+        return '';
+    }
+    if (typeof value === 'object') {
+        if (Array.isArray(value)) {
+            return JSON.stringify(value);
+        }
+        return JSON.stringify(value);
+    }
+
+    switch (dataType) {
+        case DataBlockColumnType.INTEGER:
+            if (typeof value === 'number') {
+                return Number.isInteger(value) ? value.toString() : Math.floor(value).toString();
+            }
+            const intValue = parseInt(value);
+            return !isNaN(intValue) ? intValue.toString() : String(value);
+        case DataBlockColumnType.FLOAT:
+            if (typeof value === 'number') {
+                return value.toString();
+            }
+            const floatValue = parseFloat(value);
+            return !isNaN(floatValue) ? floatValue.toString() : String(value);
+        case DataBlockColumnType.BOOLEAN:
+            if (typeof value === 'boolean') {
+                return value ? 'true' : 'false';
+            }
+            if (typeof value === 'string') {
+                return value.toLowerCase() === 'true' || value === '1' ? 'true' : 'false';
+            }
+            return value ? 'true' : 'false';
+        case DataBlockColumnType.TEXT:
+        case DataBlockColumnType.CATEGORY:
+        case DataBlockColumnType.LLM_RESPONSE:
+        default:
+            return String(value);
+    }
+}

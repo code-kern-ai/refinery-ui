@@ -18,33 +18,30 @@ import { selectOrganizationId } from "@/src/reduxStore/states/general";
 import { useWebsocket } from "@/submodules/react-components/hooks/web-socket/useWebsocket";
 import { Application, CurrentPage } from "@/submodules/react-components/hooks/web-socket/constants";
 
+const DEFAULT_SQL_TEMPLATE = {
+    selectClause: '',
+    whereClause: '',
+    groupByClause: '',
+    orderByClause: '',
+    limitClause: 100,
+    from_clause: '',
+}
+
 export default function DataBlocksDetailsOverview() {
     const router = useRouter();
     const dispatch = useDispatch();
 
     const dataBlockId = router.query.dataBlockId;
     const projectId = useSelector(selectProjectId);
+    const orgId = useSelector(selectOrganizationId);
     const currentDataBlock = useSelector(selectDataBlock);
 
     const [isHeaderNormal, setIsHeaderNormal] = useState(true);
     const [isNameOpen, setIsNameOpen] = useState(false);
     const [isDescriptionOpen, setIsDescriptionOpen] = useState(false);
     const [sqlTemplate, setSQLTemplate] = useState<SQLTemplates>(SQLTemplates.BLANK_QUERY);
-    const [sqlTemplateState, setSQLTemplateState] = useState<any>({
-        selectClause: '',
-        whereClause: '',
-        groupByClause: '',
-        orderByClause: '',
-        limitClause: 100,
-    });
-    const [sqlTemplatePreview, setSQLTemplatePreview] = useState<any>({
-        selectClause: '',
-        whereClause: '',
-        groupByClause: '',
-        orderByClause: '',
-        from_clause: '',
-        limitClause: 100,
-    });
+    const [sqlTemplateState, setSQLTemplateState] = useState<any>(DEFAULT_SQL_TEMPLATE);
+    const [sqlTemplatePreview, setSQLTemplatePreview] = useState<any>(DEFAULT_SQL_TEMPLATE);
     const [previewText, setPreviewText] = useState('');
     const [isTestQuerySuccess, setIsTestQuerySuccess] = useState(false);
     const [isQueryExecuted, setIsQueryExecuted] = useState(false);
@@ -216,7 +213,7 @@ export default function DataBlocksDetailsOverview() {
         if (currentDataBlock.type == DataBlockType.LIVE) return null;
         const containsRecordId = sqlTemplateState.selectClause.includes('record_id');
         if (!containsRecordId) return null;
-        return <Tooltip content="Warning: Column with the name record_id is used in the attribute calculation. Ensure that you don't use the column as alias " color="invert" placement="right" className="cursor-default">
+        return <Tooltip content="Warning: Column with the name record_id is used in the attribute calculation. Ensure that you don't use the column as alias" color="invert" placement="right" className="cursor-default">
             <MemoIconAlertTriangleFilled className="inline-block text-yellow-400 h-5 w-5" />
         </Tooltip>
     }, [currentDataBlock?.type, sqlTemplateState.selectClause]);
@@ -285,7 +282,6 @@ export default function DataBlocksDetailsOverview() {
         }
     }, [currentDataBlock]);
 
-    const orgId = useSelector(selectOrganizationId);
     useWebsocket(orgId, Application.REFINERY, CurrentPage.DATA_BLOCKS_DETAILS, handleWebsocketNotification, projectId);
 
     return (projectId && <div className={`bg-white p-4 overflow-y-auto min-h-full h-[calc(100vh-4rem)] w-[calc(100vw-5rem)]`} onScroll={onScrollEvent}>
