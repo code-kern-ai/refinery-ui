@@ -277,7 +277,7 @@ export default function DataBlocksDetailsOverview() {
     }, [projectId, parseSQLClause]);
 
     const handleWebsocketNotification = useCallback((msgParts: string[]) => {
-        if (msgParts[1] == 'data_block_calculate_attribute') {
+        if (msgParts[1] == 'calculate_attribute') {
             refetchDataBlockById();
         }
     }, [currentDataBlock]);

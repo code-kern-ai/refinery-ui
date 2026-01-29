@@ -54,7 +54,6 @@ export default function DataBlocksColumnsOverview() {
     const [isNameOpen, setIsNameOpen] = useState(false);
     const [duplicateNameExists, setDuplicateNameExists] = useState(false);
     const [editorOptions, setEditorOptions] = useState(EDITOR_OPTIONS);
-    const [tokenizationProgress, setTokenizationProgress] = useState(0);
     const [editorValue, setEditorValue] = useState('');
     const [dataBlockColumnName, setDataBlockColumnName] = useState('');
     const [checkUnsavedChanges, setCheckUnsavedChanges] = useState(false);
@@ -89,10 +88,6 @@ export default function DataBlocksColumnsOverview() {
 
     useEffect(() => setAdditionalConfigTmp(currentDataBlockColumn?.additionalConfig), [currentDataBlockColumn?.additionalConfig])
 
-    useEffect(() => {
-        if (!projectId) return;
-        checkProjectTokenization();
-    }, [projectId]);
 
     useEffect(() => {
         if (dataBlock) return;
@@ -221,16 +216,10 @@ export default function DataBlocksColumnsOverview() {
         }
     }
 
-    function checkProjectTokenization() {
-        getProjectTokenization(projectId, (res) => {
-            setTokenizationProgress(res?.progress);
-        });
-    }
-
     const handleWebsocketNotification = useCallback((msgParts: string[]) => {
         if (!projectId) return;
         if (!currentDataBlockColumn) return;
-        if (msgParts[1] == 'data_block_calculate_attribute') {
+        if (msgParts[1] == 'calculate_attribute') {
             if (msgParts[2] == 'progress' && msgParts[3] == currentDataBlockColumn.id) {
                 const currentDataBlockColumnCopy = { ...currentDataBlockColumn };
                 currentDataBlockColumnCopy.progress = Number(msgParts[4]);
@@ -245,19 +234,6 @@ export default function DataBlocksColumnsOverview() {
                     if (!attribute) setCurrentDataBlockColumn(null);
                     else setCurrentDataBlockColumn(postProcessCurrentDataBlockColumn(attribute));
                 });
-                if (msgParts[2] == "finished") {
-                    timer(2000).subscribe(() => checkProjectTokenization());
-                }
-            }
-        }
-        if (msgParts[1] == 'tokenization' && msgParts[2] == 'docbin') {
-            if (msgParts[3] == 'progress') {
-                setTokenizationProgress(Number(msgParts[4]));
-            } else if (msgParts[3] == 'state') {
-                if (msgParts[4] == 'IN_PROGRESS') setTokenizationProgress(0);
-                else if (msgParts[4] == 'FINISHED') {
-                    timer(2000).subscribe(() => checkProjectTokenization());
-                }
             }
         }
     }, [projectId, currentDataBlockColumn, dataBlock?.id]);
@@ -400,7 +376,7 @@ export default function DataBlocksColumnsOverview() {
                 </div>
 
 
-                <ExecutionContainer currentAttribute={currentDataBlockColumn} tokenizationProgress={tokenizationProgress} enableRunButton={enableRunButton} checkUnsavedChanges={checkUnsavedChanges}
+                <ExecutionContainer currentAttribute={currentDataBlockColumn} tokenizationProgress={1} enableRunButton={enableRunButton} checkUnsavedChanges={checkUnsavedChanges}
                     setEnabledButton={(value: boolean) => setEnableButton(value)}
                     refetchCurrentAttribute={() => {
                         getDataBlockColumnByColumnId(projectId, dataBlock.id, router.query.columnId as string, (dataBlockColumn) => {

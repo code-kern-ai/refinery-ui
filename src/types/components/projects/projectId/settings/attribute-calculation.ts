@@ -3,7 +3,7 @@ import { Attribute } from "./data-schema";
 
 export type ExecutionContainerProps = {
     currentAttribute: Attribute | DataBlockColumn;
-    tokenizationProgress: number;
+    tokenizationProgress?: number;
     refetchCurrentAttribute: () => void;
     checkUnsavedChanges: boolean;
     enableRunButton: boolean;
