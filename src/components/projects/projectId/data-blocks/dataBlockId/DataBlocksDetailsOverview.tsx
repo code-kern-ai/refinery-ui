@@ -8,7 +8,7 @@ import { selectDataBlock, setActiveDataBlock, updateDataBlocksState } from "@/sr
 import { getDataBlock, updateDataBlock, executeDataBlockQuery } from "@/src/services/base/data-blocks";
 import { DataBlockProperty, DataBlockType, SQLTemplates } from "@/src/types/components/projects/projectId/data-blocks/data-blocks";
 import KernDropdown from "@/submodules/react-components/components/KernDropdown";
-import { getSQLTemplatesDict } from "@/src/util/components/projects/projectId/data-blocks/data-blocks";
+import { getSQLTemplatesDict, SQL_TEMPLATES_TOOLTIPS_DICT } from "@/src/util/components/projects/projectId/data-blocks/data-blocks";
 import CopyToClipboard from "@/submodules/react-components/components/CopyToClipboard";
 import { validateSQLClauses } from "@/src/services/base/misc";
 import ExtendDataBlockSection from "./ExtendDataBlockSection";
@@ -258,11 +258,20 @@ export default function DataBlocksDetailsOverview() {
         }
         const template = getSQLTemplatesDict(projectId)[value];
         const selectParsed = parseSQLClause(template.selectClause, 'SELECT ');
-        let wherePrefix = template.whereClause;
+        let wherePrefix = 'WHERE ';
         let whereEditable = '';
         if (template.whereClause && template.whereClause.trim()) {
-            wherePrefix = template.whereClause;
-            whereEditable = '';
+            const escapedProjectId = projectId.replace(/'/g, "\\'");
+            const projectIdPattern = new RegExp(`^WHERE\\s+project_id\\s*=\\s*'${escapedProjectId}'`, 'i');
+            const match = template.whereClause.match(projectIdPattern);
+            if (match) {
+                wherePrefix = match[0];
+                const remaining = template.whereClause.substring(match[0].length).trim();
+                whereEditable = remaining.replace(/^\s*(AND|OR)\s+/i, '').trim();
+            } else {
+                wherePrefix = 'WHERE ';
+                whereEditable = template.whereClause.replace(/^WHERE\s+/i, '').trim();
+            }
         }
 
         const groupByParsed = parseSQLClause(template.groupByClause || '', 'GROUP BY ');
@@ -363,7 +372,9 @@ export default function DataBlocksDetailsOverview() {
                     </div>
                     <KernDropdown options={Object.values(SQLTemplates)}
                         buttonName={sqlTemplate}
-                        selectedOption={setAndPrefillSQLTemplateState} dropdownWidth="w-52" />
+                        tooltipArrayPlacement="right"
+                        tooltipsArray={SQL_TEMPLATES_TOOLTIPS_DICT}
+                        selectedOption={setAndPrefillSQLTemplateState} dropdownWidth="w-80" />
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                     <div className="flex flex-col gap-4">

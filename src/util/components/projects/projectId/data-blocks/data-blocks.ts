@@ -22,9 +22,103 @@ export const getSQLTemplatesDict = (projectId: string) => {
             groupByClause: 'GROUP BY ',
             orderByClause: 'ORDER BY ',
             limitClause: 'LIMIT ',
-        }
+        },
+        [SQLTemplates.MATCHABLE_CHUNKS_FOR_NAME]: {
+            selectClause: 'SELECT data->>\'name\' AS file_name, SUM(COALESCE(json_array_length(data->\'reference_chunks\'), 0)) AS chunk_count',
+            fromClause: 'FROM public.record r',
+            whereClause: `WHERE project_id = '${projectId}'`,
+            groupByClause: 'GROUP BY 1',
+            orderByClause: 'ORDER BY 2 DESC',
+            limitClause: 'LIMIT ',
+        },
+        [SQLTemplates.MULTIPLE_LANGUAGES]: {
+            selectClause: 'SELECT data->>\'Language\' AS language, COUNT(1) AS record_count',
+            fromClause: 'FROM public.record r',
+            whereClause: `WHERE project_id = '${projectId}'`,
+            groupByClause: 'GROUP BY 1',
+            orderByClause: 'ORDER BY 2 DESC',
+            limitClause: 'LIMIT ',
+        },
+        [SQLTemplates.AVERAGE_CHUNKS_PER_RECORD]: {
+            selectClause: 'SELECT AVG(json_array_length(data->\'reference_chunks\')) AS avg_chunks_per_file',
+            fromClause: 'FROM public.record r',
+            whereClause: `WHERE project_id = '${projectId}'`,
+            groupByClause: 'GROUP BY ',
+            orderByClause: 'ORDER BY ',
+            limitClause: 'LIMIT ',
+        },
+        [SQLTemplates.CHUNK_BUCKETS]: {
+            selectClause: `SELECT CASE
+    WHEN json_array_length(data->'reference_chunks') < 5 THEN '<5'
+    WHEN json_array_length(data->'reference_chunks') < 20 THEN '5–19'
+    WHEN json_array_length(data->'reference_chunks') < 50 THEN '20–49'
+    ELSE '50+'
+  END AS chunk_bucket,
+  COUNT(1) AS file_count`,
+            fromClause: 'FROM public.record r',
+            whereClause: `WHERE project_id = '${projectId}'`,
+            groupByClause: 'GROUP BY 1',
+            orderByClause: 'ORDER BY ',
+            limitClause: 'LIMIT ',
+        },
+        [SQLTemplates.AVG_LENGTH_AVG_CHUNK_COUNT]: {
+            selectClause: `SELECT data->>'name' AS file_name,
+    ROUND(AVG(LENGTH(data ->> 'reference'))) AS avg_reference_length,
+    ROUND(AVG(json_array_length(data -> 'reference_chunks'))) AS avg_chunk_count`,
+            fromClause: 'FROM public.record r',
+            whereClause: `WHERE project_id = '${projectId}'`,
+            groupByClause: 'GROUP BY 1',
+            orderByClause: 'ORDER BY 1',
+            limitClause: 'LIMIT ',
+        },
+        [SQLTemplates.WORD_COUNT]: {
+            selectClause: `SELECT (LENGTH(data->>'headline')
+   - LENGTH(REPLACE(data ->> 'headline', ' ', '')) + 1) AS word_count,
+            count(1)`,
+            fromClause: 'FROM public.record r',
+            whereClause: `WHERE project_id = '${projectId}'`,
+            groupByClause: 'GROUP BY 1',
+            orderByClause: 'ORDER BY 1',
+            limitClause: 'LIMIT ',
+        },
+        [SQLTemplates.FILE_MODIFIED_BY_OTHERS]: {
+            selectClause: `SELECT 
+  CASE
+    WHEN ((data->>'metadata')::json)->>'created_by'
+       = ((data->>'metadata')::json)->>'modified_by'
+    THEN 'self_modified'
+    ELSE 'modified_by_other'
+  END AS edit_type,
+  count(1)`,
+            fromClause: 'FROM public.record r',
+            whereClause: `WHERE project_id = '${projectId}'`,
+            groupByClause: 'GROUP BY 1',
+            orderByClause: 'ORDER BY ',
+            limitClause: 'LIMIT ',
+        },
+        [SQLTemplates.LIVE_QUERY_MODIFIED_LAST_WEEK]: {
+            selectClause: `SELECT array_agg(r.data->>'filename')`,
+            fromClause: 'FROM public.record r',
+            whereClause: `WHERE project_id = '${projectId}' AND (((r.data->>'metadata')::JSON->>'modified')::TIMESTAMP > CURRENT_DATE - INTERVAL '7 days')`,
+            groupByClause: 'GROUP BY ',
+            orderByClause: 'ORDER BY ',
+            limitClause: 'LIMIT 1',
+        },
     }
 }
+
+export const SQL_TEMPLATES_TOOLTIPS_DICT = [
+    'Empty fields for each clause', // SQLTemplates.BLANK_QUERY
+    'Audit integration data with basic information', // SQLTemplates.INTEGRATION_AUDIT,
+    'How many matchable chunks can be found for each name (classic RAG Projects)', // SQLTemplates.MATCHABLE_CHUNKS_FOR_NAME
+    'Do we have multiple languages?', // SQLTemplates.MULTIPLE_LANGUAGES,
+    'Average chunks per record (potentially file with grouping)', // SQLTemplates.AVERAGE_CHUNKS_PER_RECORD
+    'Chunk buckets (<5 might usually worth a look)', // SQLTemplates.CHUNK_BUCKETS,
+    'Avg length / chunk count per file', // SQLTemplates.AVG_LENGTH_AVG_CHUNK_COUNT
+    'Word count (change headline to reference if needed)', // SQLTemplates.WORD_COUNT
+    'Files modified by others (approximation since only last modified is collected)', // SQLTemplates.FILE_MODIFIED_BY_OTHERS
+    'Live query modified files in the last week', // SQLTemplates.LIVE_QUERY_MODIFIED_LAST_WEEK
+]
 
 export const DATA_BLOCK_COLUMN_TYPES = [
     { name: 'Category', value: DataBlockColumnType.CATEGORY },
