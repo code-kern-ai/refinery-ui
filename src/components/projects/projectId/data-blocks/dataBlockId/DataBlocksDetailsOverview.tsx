@@ -17,6 +17,7 @@ import { Tooltip } from "@nextui-org/react";
 import { selectOrganizationId } from "@/src/reduxStore/states/general";
 import { useWebsocket } from "@/submodules/react-components/hooks/web-socket/useWebsocket";
 import { Application, CurrentPage } from "@/submodules/react-components/hooks/web-socket/constants";
+import DataBlockLiveQueryResults from "./DataBlockLiveQueryResults";
 
 const DEFAULT_SQL_TEMPLATE = {
     selectClause: '',
@@ -45,6 +46,7 @@ export default function DataBlocksDetailsOverview() {
     const [previewText, setPreviewText] = useState('');
     const [isTestQuerySuccess, setIsTestQuerySuccess] = useState(false);
     const [isQueryExecuted, setIsQueryExecuted] = useState(false);
+    const [liveQueryData, setLiveQueryData] = useState<any[]>([]);
     const nameRef = useRef<HTMLInputElement>(null);
     const descriptionRef = useRef<HTMLInputElement>(null);
     const isInitializingRef = useRef(false);
@@ -199,7 +201,10 @@ export default function DataBlocksDetailsOverview() {
     }, [sqlTemplateState, sqlTemplatePreview]);
 
     const executeQuery = useCallback(() => {
-        executeDataBlockQuery(projectId, currentDataBlock.id, sqlTemplate, sqlTemplateState, () => {
+        executeDataBlockQuery(projectId, currentDataBlock.id, sqlTemplate, sqlTemplateState, (res) => {
+            if (currentDataBlock.type == DataBlockType.LIVE) {
+                setLiveQueryData(res);
+            }
             setIsQueryExecuted(true);
             refetchDataBlockById();
         });
@@ -454,6 +459,7 @@ export default function DataBlocksDetailsOverview() {
                     {currentDataBlock.type == DataBlockType.STABLE && <ExtendDataBlockSection />}
                     <DataBlockResultsSection />
                 </>}
+                {currentDataBlock.type == DataBlockType.LIVE && <DataBlockLiveQueryResults liveQueryData={liveQueryData} />}
             </div>
         </>}
     </div>
