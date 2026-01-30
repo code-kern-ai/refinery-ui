@@ -215,10 +215,15 @@ export default function DataBlocksDetailsOverview() {
         if (!currentDataBlock) return null;
         if (currentDataBlock.type == DataBlockType.LIVE) return null;
         const containsRecordId = sqlTemplateState.selectClause.includes('record_id');
-        if (!containsRecordId) return null;
-        return <Tooltip content="Warning: Column with the name record_id is used in the attribute calculation. Ensure that you don't use the column as alias" color="invert" placement="right" className="cursor-default">
-            <MemoIconAlertTriangleFilled className="inline-block text-yellow-400 h-5 w-5" />
-        </Tooltip>
+        const containsRunningId = sqlTemplateState.selectClause.includes('running_id');
+        return [
+            containsRecordId ? <Tooltip content="Warning: Column with the name record_id is used in the attribute calculation. Ensure that you don't use the column as alias" color="invert" placement="right" className="cursor-default">
+                <MemoIconAlertTriangleFilled className="inline-block text-yellow-400 h-5 w-5" />
+            </Tooltip> : null,
+            containsRunningId ? <Tooltip content="Warning: Column with the name running_id is used in the attribute calculation. Ensure that you don't use the column as alias" color="invert" placement="right" className="cursor-default">
+                <MemoIconAlertTriangleFilled className="inline-block text-yellow-400 h-5 w-5" />
+            </Tooltip> : null
+        ]
     }, [currentDataBlock?.type, sqlTemplateState.selectClause]);
 
     const addInfo = useMemo(() => {
