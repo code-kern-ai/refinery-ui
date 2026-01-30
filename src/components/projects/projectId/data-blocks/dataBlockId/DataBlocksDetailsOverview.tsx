@@ -24,7 +24,7 @@ const DEFAULT_SQL_TEMPLATE = {
     groupByClause: '',
     orderByClause: '',
     limitClause: 100,
-    from_clause: '',
+    fromClause: '',
 }
 
 export default function DataBlocksDetailsOverview() {
@@ -68,22 +68,25 @@ export default function DataBlocksDetailsOverview() {
 
     useEffect(() => {
         if (!projectId || !sqlTemplate) return;
+        if (isInitializingRef.current) return;
         const preview = getSQLTemplatesDict(projectId)[sqlTemplate];
         setSQLTemplatePreview({
             selectClause: preview.selectClause,
             whereClause: preview.whereClause,
             groupByClause: preview.groupByClause,
             orderByClause: preview.orderByClause,
-            from_clause: preview.from_clause,
+            fromClause: preview.fromClause,
             limitClause: preview.limitClause,
         });
-        setPreviewText(preview.selectClause + '\n' + preview.from_clause + '\n' + preview.whereClause + '\n' + preview.limitClause);
+        setPreviewText(preview.selectClause + '\n' + preview.fromClause + '\n' + preview.whereClause + '\n' + preview.limitClause);
     }, [sqlTemplate, projectId]);
 
     useEffect(() => {
-        if (!sqlTemplatePreview.from_clause) return;
+        if (!sqlTemplatePreview.fromClause) return;
         let selectClause = sqlTemplatePreview.selectClause;
-        if (sqlTemplateState.selectClause.trim()) {
+        const trimmedSelect = sqlTemplatePreview.selectClause.trim();
+        const isSelectPrefixOnly = trimmedSelect === 'SELECT' || trimmedSelect === '';
+        if (sqlTemplateState.selectClause.trim() && isSelectPrefixOnly) {
             selectClause = sqlTemplatePreview.selectClause + sqlTemplateState.selectClause;
         }
         let whereClause = sqlTemplatePreview.whereClause;
@@ -102,7 +105,7 @@ export default function DataBlocksDetailsOverview() {
         if (sqlTemplateState.limitClause) {
             limitClause = sqlTemplatePreview.limitClause + sqlTemplateState.limitClause;
         }
-        const clauses = [selectClause, sqlTemplatePreview.from_clause, whereClause, groupByClause, orderByClause, limitClause].filter(clause => clause.trim() !== '');
+        const clauses = [selectClause, sqlTemplatePreview.fromClause, whereClause, groupByClause, orderByClause, limitClause].filter(clause => clause.trim() !== '');
         setPreviewText(clauses.join('\n'));
     }, [sqlTemplateState, sqlTemplatePreview]);
 
@@ -240,8 +243,14 @@ export default function DataBlocksDetailsOverview() {
     }, []);
 
     const setAndPrefillSQLTemplateState = useCallback((value: SQLTemplates) => {
+        isInitializingRef.current = true;
         setSQLTemplate(value);
-        if (!projectId) return;
+        if (!projectId) {
+            setTimeout(() => {
+                isInitializingRef.current = false;
+            }, 0);
+            return;
+        }
         const template = getSQLTemplatesDict(projectId)[value];
         const selectParsed = parseSQLClause(template.selectClause, 'SELECT ');
         let wherePrefix = template.whereClause;
@@ -270,7 +279,7 @@ export default function DataBlocksDetailsOverview() {
             whereClause: wherePrefix,
             groupByClause: groupByParsed.prefix,
             orderByClause: orderByParsed.prefix,
-            from_clause: template.from_clause,
+            fromClause: template.fromClause,
             limitClause: limitPrefix,
         });
         setSQLTemplateState({
@@ -280,6 +289,9 @@ export default function DataBlocksDetailsOverview() {
             orderByClause: orderByParsed.editable,
             limitClause: limitEditable ? parseInt(limitEditable, 10) : 100,
         });
+        setTimeout(() => {
+            isInitializingRef.current = false;
+        }, 0);
     }, [projectId, parseSQLClause]);
 
     const handleWebsocketNotification = useCallback((msgParts: string[]) => {

@@ -4,11 +4,12 @@ import { jsonCopy } from "@/submodules/javascript-functions/general";
 import { parseContainerLogsData } from "@/submodules/javascript-functions/logs-parser";
 import { getPythonFunctionRegExMatch } from "@/submodules/javascript-functions/python-functions-parser";
 
+// These clauses are used just for the preview/formatting on the right side, they are never sent to the backend or changed by a user
 export const getSQLTemplatesDict = (projectId: string) => {
     return {
         [SQLTemplates.BLANK_QUERY]: {
             selectClause: 'SELECT ',
-            from_clause: 'FROM public.record r',
+            fromClause: 'FROM public.record r',
             whereClause: `WHERE project_id = '${projectId}'`,
             groupByClause: 'GROUP BY ',
             orderByClause: 'ORDER BY ',
@@ -16,7 +17,7 @@ export const getSQLTemplatesDict = (projectId: string) => {
         },
         [SQLTemplates.INTEGRATION_AUDIT]: {
             selectClause: 'SELECT ((data->>\'metadata\')::json)->>\'sharepoint_created_by\' as created_by, ((data->>\'metadata\')::json)->>\'modified_by\' as modified_by, ((data->>\'metadata\')::json)->>\'created\' as created_at, ((data->>\'metadata\')::json)->>\'modified\' as modified_at, data->>\'source\' as file_path',
-            from_clause: 'FROM public.record r',
+            fromClause: 'FROM public.record r',
             whereClause: `WHERE project_id = '${projectId}'`,
             groupByClause: 'GROUP BY ',
             orderByClause: 'ORDER BY ',
