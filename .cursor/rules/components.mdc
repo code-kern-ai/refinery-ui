@@ -1,0 +1,435 @@
+---
+description: Documentation for shared UI components from react-components submodule
+alwaysApply: true
+globs:
+  - "*"
+---
+
+# Shared UI Components
+
+Always check `submodules/react-components/` before creating new components.
+
+## Component Structure
+
+### Component File Organization
+
+Component files should only contain the component itself and prop type definitions. All other logic (helper functions, data transformations, utilities, etc.) should be extracted into a separate helper file.
+
+**File naming convention:**
+- Component file: `MyComponent.tsx`
+- Helper file: `MyComponent.helper.ts` or `helper.ts` (if in same directory)
+
+```typescript
+// ❌ BAD - All logic in component file
+// MyComponent.tsx
+type MyComponentProps {
+  data: Data[];
+}
+
+function MyComponent({ data }: MyComponentProps) {
+  // Complex data transformation logic
+  const processedData = data.map(item => {
+    // ... complex logic
+  });
+  
+  // Helper function
+  const calculateTotal = (items: Item[]) => {
+    // ... calculation logic
+  };
+  
+  // Component JSX
+  return <div>...</div>;
+}
+```
+
+```typescript
+// ✅ GOOD - Component file only contains component and props
+// MyComponent.tsx
+import { processData, calculateTotal } from "./MyComponent.helper";
+
+type MyComponentProps {
+  data: Data[];
+}
+
+function MyComponent({ data }: MyComponentProps) {
+  const processedData = processData(data);
+  const total = calculateTotal(processedData);
+  
+  return <div>...</div>;
+}
+```
+
+```typescript
+// ✅ GOOD - Helper file contains all logic
+// MyComponent.helper.ts
+export function processData(data: Data[]): ProcessedData[] {
+  return data.map(item => {
+    // ... complex logic
+  });
+}
+
+export function calculateTotal(items: Item[]): number {
+  // ... calculation logic
+}
+```
+
+**What belongs in helper files:**
+- Data transformation functions
+- Business logic calculations
+- Utility functions specific to the component
+- Complex data processing
+- Validation logic
+- Formatting functions
+
+**What stays in component file:**
+- Component function definition
+- Prop type definitions
+- React hooks (useState, useEffect, useCallback, etc.)
+- Component-specific event handlers (can call helper functions)
+- JSX rendering logic
+
+### Defaults for Complex Types
+
+Defaults for complex types (objects, arrays) must be defined outside the component function to prevent creating new references on every render, which causes unnecessary re-renders.
+
+```typescript
+// ❌ BAD - New object/array created on every render
+function MyComponent({ config }: MyComponentProps) {
+  const defaultConfig = { theme: 'dark', size: 'medium' };
+  const defaultOptions = ['Option 1', 'Option 2'];
+  const mergedConfig = { ...defaultConfig, ...config };
+  
+  return <div>...</div>;
+}
+```
+
+```typescript
+// ✅ GOOD - Defaults defined outside component
+const DEFAULT_CONFIG = { theme: 'dark', size: 'medium' };
+const DEFAULT_OPTIONS = ['Option 1', 'Option 2'];
+
+function MyComponent({ config }: MyComponentProps) {
+  const mergedConfig = { ...DEFAULT_CONFIG, ...config };
+  
+  return <div>...</div>;
+}
+```
+
+**When to define defaults outside:**
+- Object defaults: `const DEFAULT_CONFIG = { ... }`
+- Array defaults: `const DEFAULT_OPTIONS = [...]`
+- Complex type defaults used in props merging, function parameters, or state initialization
+
+**When defaults can stay inside:**
+- Simple primitive defaults (strings, numbers, booleans) used directly
+- Defaults that depend on props/state (use `useMemo` instead)
+
+### Type Definitions for Complex Types
+
+Complex types (objects, arrays with structure) should be defined as type definitions where needed or imported from existing type definitions. Avoid inline type definitions and `any` types.
+
+```typescript
+// ❌ BAD - Inline complex types
+function MyComponent({ data }: { data: { id: string; name: string; config: { theme: string; size: number } }[] }) {
+  const config = { theme: 'dark', size: 10 };
+  return <div>...</div>;
+}
+
+// ❌ BAD - Using any
+function processData(data: any[]) {
+  return data.map(item => item.value);
+}
+```
+
+```typescript
+// ✅ GOOD - Type definitions defined or imported
+type ItemConfig {
+  theme: string;
+  size: number;
+}
+
+type DataItem {
+  id: string;
+  name: string;
+  config: ItemConfig;
+}
+
+type MyComponentProps {
+  data: DataItem[];
+}
+
+function MyComponent({ data }: MyComponentProps) {
+  const config: ItemConfig = { theme: 'dark', size: 10 };
+  return <div>...</div>;
+}
+
+// ✅ GOOD - Imported from existing types
+import { DataItem } from "@/src/services/data";
+import { ItemConfig } from "@/src/types/config";
+
+function processData(data: DataItem[]) {
+  return data.map(item => item.value);
+}
+```
+
+**Best practices:**
+- Define types at the top of the file or in a separate types file
+- Import types from existing type definitions when available
+- Use descriptive names for complex types
+- Avoid `any` - use `unknown` if type is truly unknown, then narrow it
+- Reuse existing types rather than duplicating definitions
+
+### Code Conciseness
+
+Minimize code length while keeping it readable. Prefer concise one-liners for simple expressions, but maintain readability for complex logic.
+
+```typescript
+// ❌ BAD - Unnecessarily verbose
+const config = useMemo(() => ({
+    sortKey: sortState,
+    onClickSort: handleSort,
+    noEntriesText: 'No items found'
+}), [sortState, handleSort]);
+
+// ❌ BAD - Too verbose for simple object
+const merged = useMemo(() => {
+  return { ...defaultConfig, ...config };
+}, [defaultConfig, config]);
+```
+
+```typescript
+// ✅ GOOD - Concise one-liner when readable
+const config = useMemo(() => ({ sortKey: sortState, onClickSort: handleSort, noEntriesText: 'No items found' }), [sortState, handleSort]);
+
+// ✅ GOOD - Concise for simple merge
+const merged = useMemo(() => ({ ...defaultConfig, ...config }), [defaultConfig, config]);
+
+// ✅ GOOD - Multi-line when it improves readability
+const complexConfig = useMemo(() => ({
+  sortKey: sortState,
+  onClickSort: handleSort,
+  filters: activeFilters.map(f => ({ id: f.id, value: f.value })),
+  pagination: { page: currentPage, pageSize: itemsPerPage }
+}), [sortState, handleSort, activeFilters, currentPage, itemsPerPage]);
+```
+
+**Guidelines:**
+- Use one-liners for simple object/array literals with 2-3 properties
+- Use multi-line format when it improves readability (4+ properties, nested structures)
+- Balance conciseness with readability - don't sacrifice clarity for brevity
+- Complex logic should remain multi-line for maintainability
+
+### Order in the components:
+
+Use the following order when declaring new variables:
+
+1. router (`const router = useRouter();`)
+2. dispatch (`const dispatch = useDispatch();`)
+3. selectors (values from the store)
+4. states
+5. queries and mutations
+6. everything else (ex. references, constants.. )
+7. useEffect
+8. useCallback
+9. functions
+
+## Navigation
+
+### Router vs href
+
+Prefer router navigation (`router.push()`) over `href` for internal navigation. Router navigation is recognized as in-app navigation, while `href` triggers a full page reload and is treated as external navigation.
+
+```typescript
+import { useRouter } from "next/router";
+
+const router = useRouter();
+
+// ✅ Prefer router for internal navigation
+<button onClick={() => router.push('/projects/123')}>
+  View Project
+</button>
+
+// ❌ Avoid href for internal routes
+<a href="/projects/123">View Project</a>
+```
+
+## Buttons
+
+### KernButton
+
+Main customizable button component.
+
+```typescript
+import KernButton from "@/submodules/react-components/components/kern-button/KernButton";
+import { MemoIconDeviceFloppy } from "@/submodules/react-components/components/kern-icons/icons";
+
+<KernButton
+  text="Save"
+  icon={MemoIconDeviceFloppy}
+  iconColor="green"
+  buttonColor="green"
+  size="medium"           // 'small' | 'medium' | 'large' | 'solid-large'
+  loading={isLoading}
+  disabled={isDisabled}
+  tooltip="Save changes"
+  confirm={true}          // Shows checkmark briefly after click
+  onClick={handleSave}    // should be wrapped in useCallback
+/>
+```
+
+**Props:**
+- `text?: string` - Button text
+- `icon?: (props) => any` - Tabler icon component
+- `iconColor?: string` - Tailwind color name
+- `buttonColor?: string` - Tailwind color name
+- `solidTheme?: boolean` - Use solid background
+- `size?: 'small' | 'medium' | 'large' | 'solid-large'`
+- `loading?: boolean` - Show spinner
+- `disabled?: boolean`
+- `tooltip?: string`
+- `confirm?: boolean` - Show checkmark after click
+- `fullWidth?: boolean`
+
+**Other buttons:** `IconButton`, `ButtonAsText`, `SaveButton`
+
+## Tables
+
+### KernTable
+
+Feature-rich table with sorting and multiple cell types.
+
+```typescript
+import KernTable from "@/submodules/react-components/components/kern-table/KernTable";
+
+// Define stable references outside render or with useMemo
+const HEADERS = [
+    { id: 'name', column: 'Name', hasSort: true },
+    { id: 'status', column: 'Status' },
+    { id: 'actions', column: 'Actions' }
+];
+
+// In component - memoize values that include callbacks
+const tableValues = useMemo(() => [
+    [
+      { type: 'text', value: 'Item 1' },
+      { type: 'Component', component: 'BadgeCell', value: true },
+      { type: 'Component', component: 'DeleteCell', deleteEntity: handleDelete }
+    ]
+], [handleDelete]);
+
+const config = useMemo(() => ({ sortKey: sortState, onClickSort: handleSort, noEntriesText: 'No items found' }), [sortState, handleSort]);
+
+<KernTable headers={HEADERS} values={tableValues} config={config} />
+```
+
+**Cell Components:**
+- `BadgeCell` - Yes/No badge
+- `DeleteCell` - Delete button
+- `ViewCell` - View button
+- `IconCell` - Icon display
+- `LinkCell` - External link
+- `TruncateAndTooltipCell` - Truncated text with tooltip
+- `TaskStateCell` - Colored status badge
+- `@provided@` - Custom JSX via `jsx` prop
+
+## Dropdowns
+
+### KernDropdown
+
+Advanced dropdown with search, checkboxes, multi-select.
+
+```typescript
+import KernDropdown from "@/submodules/react-components/components/KernDropdown";
+
+// Define options outside component or useMemo
+const OPTIONS = ['Option 1', 'Option 2', 'Option 3'];
+
+// In component - wrap handler in useCallback
+const handleSelect = useCallback((option) => {
+    // handle selection
+}, []);
+
+<KernDropdown
+  options={OPTIONS}
+  buttonName="Select..."
+  selectedOption={handleSelect}
+  hasSearchBar={true}
+  hasCheckboxes={true}
+  hasSelectAll={true}
+  dropdownWidth="w-64"
+  scrollAfterNOptions={5}
+  disabled={false}
+/>
+```
+
+**Key Props:**
+- `options: any[]` - Dropdown options
+- `buttonName: string` - Closed state text
+- `selectedOption: (option) => void` - Selection callback
+- `hasSearchBar?: boolean` - Enable search
+- `hasCheckboxes?: boolean` - Multi-select mode
+- `hasSelectAll?: boolean` - Add "select all"
+- `scrollAfterNOptions?: number` - Enable scrolling
+- `tooltipsArray?: string[]` - Per-option tooltips
+- `iconsArray?: string[]` - Per-option icons
+
+## Other Components
+
+### Badges
+
+```typescript
+import { KernBadge, ActiveBadge, InactiveBadge, NotApplicableBadge } from "@/submodules/react-components/components/Badges";
+```
+
+### CopyToClipboard
+
+```typescript
+import CopyToClipboard from "@/submodules/react-components/components/CopyToClipboard";
+
+<CopyToClipboard nameToCopy="text to copy" />
+```
+
+### LoadingIcon
+
+```typescript
+import LoadingIcon from "@/submodules/react-components/components/LoadingIcon";
+
+<LoadingIcon color="green" size="large" />
+```
+
+### SwitchWithLabel
+
+```typescript
+import SwitchWithLabel from "@/submodules/react-components/components/SwitchWithLabel";
+
+// Wrap handler in useCallback
+const handleToggle = useCallback(() => {
+    setIsEnabled(prev => !prev);
+}, []);
+
+<SwitchWithLabel
+  checked={isEnabled}
+  onChange={handleToggle}
+  label="Enable feature"
+  tooltip="Optional warning tooltip"
+/>
+```
+
+### SVGIcon
+
+Dynamic icon component for Tabler icons.
+
+```typescript
+import SVGIcon from "@/submodules/react-components/components/SVGIcon";
+
+<SVGIcon icon="IconSettings" size={24} strokeWidth={2} />
+```
+
+### Other Available Components
+
+- `Pagination` - Page navigation
+- `NoTableEntriesYet` - Empty table state
+- `MultilineTooltipAuto` - Multi-line tooltips
+- `InputWithSlider` - Slider input
+- `InputWithClearIcon` - Clearable input
+- `AdminMessages` / `AppNotifications` - System messages

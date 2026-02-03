@@ -1,0 +1,55 @@
+---
+description: Quick reference for utility functions from javascript-functions submodule
+alwaysApply: true
+globs:
+  - "*"
+---
+
+# Utility Functions
+
+Check `submodules/javascript-functions/` before creating new utilities.
+
+**For detailed usage patterns and best practices, see:** `submodules/javascript-functions/.cursor/rules/guidelines.mdc`
+
+## Import Path
+
+```typescript
+import { functionName } from "@/submodules/javascript-functions/general";
+```
+
+## Quick Reference
+
+### CSS Utilities
+- `combineClassNames` - Combine CSS classes, filtering falsy values
+
+### Object & Array Utilities
+- `jsonCopy` - Deep clone objects via JSON serialization
+- `arrayToDict` - Convert array to dictionary by key property
+- `extendArrayElementsByUniqueId` - Add unique keys for React rendering (never use array indices as keys)
+- `transferNestedDict` - Transfer values between nested dictionaries
+- `objectIsEmpty` - Check if object has no properties
+- `isDict` - Check if value is a plain object
+
+### String Utilities
+- `capitalizeFirst` - Capitalize first letter, lowercase rest
+- `capitalizeFirstPerWord` - Capitalize first letter of each word
+- `copyToClipboard` - Copy text to clipboard
+- `convertCamelToSnakeCase`, `snakeCaseToCamelCase`, `camelCaseToWords`, `convertVarToCamel` - Case conversion
+
+### Formatting Utilities
+- `formatBytes` - Format file sizes for display
+- `percentRoundString` - Format percentages
+
+### Enum Utilities
+- `enumToArray` - Convert TypeScript enum to array of options
+
+### Validation Utilities
+- `isStringTrue` - Parse boolean-like strings
+- `tryParseJSON` - Safe JSON parsing
+
+### Other Utilities
+- `countOccurrences` - Count occurrences of substring
+- `removeArrayFromArray` - Remove elements from array
+- `getUserAvatarUri` - Generate avatar URI based on user name
+
+**For detailed usage examples and best practices, see:** `submodules/javascript-functions/.cursor/rules/guidelines.mdc`

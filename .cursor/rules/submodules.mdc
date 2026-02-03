@@ -1,0 +1,68 @@
+---
+description: Overview of shared submodules and their contents
+alwaysApply: true
+globs:
+  - "*"
+---
+
+# Submodules Overview
+
+This project uses three git submodules for shared code. **Always check submodules first** before creating new components, hooks, or utilities.
+
+## react-components
+
+**Path:** `submodules/react-components/`
+
+Shared UI components, hooks, and types used across projects.
+
+**Documentation:**
+- **Usage:** `.cursor/rules/components.mdc` - Component usage guide
+- **Hooks:** `.cursor/rules/hooks.mdc` - Hook usage guide
+- **Development:** `submodules/react-components/.cursor/rules/guidelines.mdc` - Development guidelines
+
+**Import pattern:**
+```typescript
+import KernButton from "@/submodules/react-components/components/kern-button/KernButton";
+import { useDebouncedState } from "@/submodules/react-components/hooks/useDebouncedState";
+```
+
+## javascript-functions
+
+**Path:** `submodules/javascript-functions/`
+
+Utility functions for data manipulation.
+
+**Documentation:**
+- **Usage:** `.cursor/rules/utilities.mdc` - Utility function usage guide
+- **Development:** `submodules/javascript-functions/.cursor/rules/guidelines.mdc` - Development guidelines and usage patterns
+
+**Import pattern:**
+```typescript
+import { combineClassNames } from "@/submodules/javascript-functions/general";
+```
+
+## tailwind-config
+
+**Path:** `submodules/tailwind-config/`
+
+Shared Tailwind CSS configuration.
+
+**Documentation:**
+- **Development:** `submodules/tailwind-config/.cursor/rules/guidelines.mdc` - Comprehensive Tailwind configuration guidelines
+
+**Usage:**
+The config is imported via presets in consuming applications:
+```javascript
+module.exports = {
+  presets: [
+    require('./submodules/tailwind-config/tailwind.config.js'),
+  ]
+}
+```
+
+## Best Practices
+
+1. **Always check submodules first** before creating new components, hooks, or utilities
+2. **Don't duplicate** - if it exists in submodules, use it
+3. **Propose additions** - if you need something reusable, consider adding it to the appropriate submodule
+4. **Submodule changes affect multiple projects** - be careful when modifying
