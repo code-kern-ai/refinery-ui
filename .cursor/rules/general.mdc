@@ -1,11 +1,11 @@
 ---
-description: General coding conventions and style guide for the Cognition UI project
+description: General coding conventions and style guide for the Refinery UI project
 alwaysApply: true
 globs:
   - "*"
 ---
 
-# Cognition UI - General Guidelines
+# Refinery UI - General Guidelines
 
 ## Project Overview
 
