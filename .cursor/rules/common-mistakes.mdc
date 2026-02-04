@@ -1,0 +1,531 @@
+---
+description: Common mistakes and performance anti-patterns to avoid
+alwaysApply: true
+globs:
+  - "*"
+---
+
+# Common Mistakes to Avoid
+
+These patterns have been identified from code reviews and hotfixes. Always check for these issues.
+
+---
+
+## Performance: Preventing Unnecessary Re-renders
+
+### 1. Icons Must Be Memoized
+
+**Problem:** Importing icons directly from `@tabler/icons-react` causes unnecessary re-renders because each render creates a new component reference.
+
+```typescript
+// BAD
+import { IconFileWord, IconCheck } from "@tabler/icons-react";
+<IconFileWord className="h-4 w-4" />
+```
+
+```typescript
+// GOOD
+import { MemoIconFileWord, MemoIconCheck } from "@/submodules/react-components/components/kern-icons/icons";
+<MemoIconFileWord className="h-4 w-4" />
+```
+
+**Rule:** Always use `MemoIcon*` from `kern-icons/icons.ts`. If an icon isn't available, add it there first with `memo()`.
+
+### 2. Wrap Event Handlers in useCallback
+
+**Problem:** Inline functions create new references on every render, causing child components to re-render.
+
+```typescript
+// BAD - new function reference every render
+<KernButton onClick={() => dispatch(openModal(ModalEnum.SETTINGS))} />
+
+// BAD - function defined in render without useCallback
+const handleClick = () => dispatch(openModal(ModalEnum.SETTINGS));
+<KernButton onClick={handleClick} />
+```
+
+```typescript
+// GOOD - stable function reference
+const handleClick = useCallback(() => {
+    dispatch(openModal(ModalEnum.SETTINGS));
+}, [dispatch]);
+
+<KernButton onClick={handleClick} />
+```
+
+### 3. Memoize Components with memo()
+
+**Problem:** Components re-render even when their props haven't changed.
+
+```typescript
+// BAD
+export default function Sidebar(props: SidebarProps) { ... }
+```
+
+```typescript
+// GOOD
+function Sidebar(props: SidebarProps) { ... }
+export default memo(Sidebar);
+```
+
+**When to use memo():** Sidebars, menus, toolbars, list items, and components that receive stable props but have expensive render logic.
+
+### 4. Use useMemo for Expensive Computations
+
+**Problem:** Expensive calculations or object/array creation runs on every render.
+
+```typescript
+// BAD - filter/map runs every render
+const filteredItems = items.filter(i => i.active).map(i => i.name);
+
+// BAD - new object every render
+const config = { theme: 'dark', size: props.size };
+```
+
+```typescript
+// GOOD - only recalculates when items changes
+const filteredItems = useMemo(() => 
+    items.filter(i => i.active).map(i => i.name),
+[items]);
+
+// GOOD - stable object reference
+const config = useMemo(() => ({ 
+    theme: 'dark', 
+    size: props.size 
+}), [props.size]);
+```
+
+**Note:** Simple expressions like `const x = a ? b : c` don't need useMemo.
+
+### 5. Define Constants Outside Components
+
+**Problem:** Arrays, objects, or values recreated on every render.
+
+```typescript
+// BAD - new array every render
+function MyComponent() {
+    const options = ['Option 1', 'Option 2'];
+    return <KernDropdown options={options} />;
+}
+```
+
+```typescript
+// GOOD - stable reference
+const OPTIONS = ['Option 1', 'Option 2'];
+
+function MyComponent() {
+    return <KernDropdown options={OPTIONS} />;
+}
+```
+
+### 6. Avoid Inline Object/Array Props
+
+**Problem:** Inline objects or arrays create new references every render.
+
+```typescript
+// BAD
+<MyComponent style={{ padding: 10 }} />
+<KernDropdown options={['a', 'b', 'c']} />
+```
+
+```typescript
+// GOOD - define outside or useMemo
+const STYLE = { padding: 10 };
+const OPTIONS = ['a', 'b', 'c'];
+
+<MyComponent style={STYLE} />
+<KernDropdown options={OPTIONS} />
+```
+
+---
+
+## Hooks: Correct Usage
+
+### 7. Include All Dependencies
+
+**Problem:** Missing dependencies cause stale data or infinite loops.
+
+```typescript
+// BAD - missing dependency
+useEffect(() => {
+    fetchData(organizationId);
+}, []); // organizationId changes won't trigger refetch
+
+// BAD - missing callback dependency
+const handleSave = useCallback(() => {
+    saveItem(itemId);
+}, []); // itemId changes won't be reflected
+```
+
+```typescript
+// GOOD
+useEffect(() => {
+    if (!organizationId) return;
+    fetchData(organizationId);
+}, [organizationId]);
+
+const handleSave = useCallback(() => {
+    saveItem(itemId);
+}, [itemId]);
+```
+
+### 8. Use useRefFor for Stable Callbacks
+
+**Problem:** Callbacks need access to current values but shouldn't re-create on every change.
+
+```typescript
+// BAD - callback recreated when someValue changes
+const handleClick = useCallback(() => {
+    doSomething(someValue);
+}, [someValue]); // changes often, causing re-renders
+
+// BAD - stale closure
+const handleClick = useCallback(() => {
+    doSomething(someValue); // someValue is stale!
+}, []);
+```
+
+```typescript
+// GOOD - stable callback with current value
+import useRefFor from "@/submodules/react-components/hooks/useRefFor";
+
+const someValueRef = useRefFor(someValue);
+
+const handleClick = useCallback(() => {
+    doSomething(someValueRef.current); // always current
+}, []); // stable reference
+```
+
+### 9. i18n: Depend on Language, Not t Function
+
+**Problem:** The `t` function reference changes, causing unnecessary recalculations.
+
+```typescript
+// BAD
+const { t } = useTranslation();
+const label = useMemo(() => t('myKey'), [t]); // t changes often
+```
+
+```typescript
+// GOOD
+const { t, i18n } = useTranslation();
+const label = useMemo(() => t('myKey'), [i18n.language]);
+```
+
+---
+
+## State Management
+
+### 10. Don't Duplicate Props into State
+
+**Problem:** Syncing prop to state causes bugs and extra renders.
+
+```typescript
+// BAD - unnecessary state duplication
+function Modal({ isOpen }) {
+    const [open, setOpen] = useState(isOpen);
+    useEffect(() => setOpen(isOpen), [isOpen]); // sync issues!
+    ...
+}
+```
+
+```typescript
+// GOOD - use prop directly
+function Modal({ isOpen, onClose }) {
+    // Use isOpen directly from props
+    if (!isOpen) return null;
+    ...
+}
+
+// GOOD - controlled component pattern
+function Modal({ open, setOpen }) {
+    // Parent controls state
+    ...
+}
+```
+
+### 11. Use Redux for Shared State
+
+**Problem:** Prop drilling through many components.
+
+```typescript
+// BAD - drilling through many levels
+<Parent value={value} setValue={setValue}>
+    <Child value={value} setValue={setValue}>
+        <GrandChild value={value} setValue={setValue}>
+```
+
+```typescript
+// GOOD - Redux for shared state
+const value = useSelector(selectValue);
+const dispatch = useDispatch();
+const handleChange = useCallback(() => {
+    dispatch(setValue(newValue));
+}, [dispatch, newValue]);
+```
+
+### 12. Don't Duplicate API Calls
+
+**Problem:** Multiple components fetch the same data independently.
+
+```typescript
+// BAD - each component fetches
+// ComponentA.tsx
+useEffect(() => { fetchEnvVars().then(setVars); }, []);
+// ComponentB.tsx  
+useEffect(() => { fetchEnvVars().then(setVars); }, []);
+```
+
+```typescript
+// GOOD - fetch once, share via Redux or props
+// Parent or config component fetches once
+// Children receive via selector or props
+const envVars = useSelector(selectEnvVars);
+```
+
+---
+
+## Code Quality
+
+### 13. Guard Against Null/Undefined
+
+**Problem:** Accessing properties on null/undefined values.
+
+```typescript
+// BAD
+useEffect(() => {
+    fetchData(user.organizationId); // crashes if user is null
+}, []);
+```
+
+```typescript
+// GOOD
+useEffect(() => {
+    if (!user?.organizationId) return;
+    fetchData(user.organizationId);
+}, [user?.organizationId]);
+```
+
+### 14. Import Enums from Submodules
+
+**Problem:** Duplicate enum definitions cause inconsistencies.
+
+```typescript
+// BAD - local duplicate
+import { StrategyStepType } from "@/src/util/enums";
+```
+
+```typescript
+// GOOD - shared source of truth
+import { StrategyStepType } from "@/submodules/javascript-functions/enums/enums";
+```
+
+### 15. Use Existing Types
+
+**Problem:** Recreating types that already exist.
+
+```typescript
+// BAD
+type MyStrategy = { id: string; name: string; steps: any[] };
+```
+
+```typescript
+// GOOD
+import { Strategy } from "@/src/services/strategies";
+```
+
+### 16. Use Existing Components
+
+**Problem:** Rebuilding components that exist in submodules.
+
+```typescript
+// BAD - custom implementation
+<div className="flex items-center">
+    <Switch checked={value} onChange={onChange} />
+    <span>{label}</span>
+</div>
+```
+
+```typescript
+// GOOD - use submodule component
+import SwitchWithLabel from "@/submodules/react-components/components/SwitchWithLabel";
+<SwitchWithLabel checked={value} onChange={onChange} label={label} />
+```
+
+**Check submodules for:** buttons, dropdowns, tables, switches, badges, modals, loading indicators.
+
+### 17. Use `T[]` Not `Array<T>`
+
+**Problem:** Inconsistent array type syntax.
+
+```typescript
+// BAD
+const items: Array<string> = [];
+const users: Array<User> = [];
+```
+
+```typescript
+// GOOD
+const items: string[] = [];
+const users: User[] = [];
+```
+
+### 18. Only Add Generic Types When Type Can't Be Inferred
+
+**Problem:** Unnecessary generic types when TypeScript can infer the type from the initial value.
+
+```typescript
+// BAD - unnecessary generic type
+const [modelName, setModelName] = useState<string>(''); // TypeScript knows it's string
+const [count, setCount] = useState<number>(0); // TypeScript knows it's number
+```
+
+```typescript
+// GOOD - let TypeScript infer from initial value
+const [modelName, setModelName] = useState(''); // inferred as string
+const [count, setCount] = useState(0); // inferred as number
+
+// GOOD - generic type needed when initial value doesn't specify type
+const [modelsList, setModelsList] = useState<string[]>([]); // empty array needs type
+const [user, setUser] = useState<User | null>(null); // null needs type
+const [data, setData] = useState<EpicObject | null>(null); // null needs type
+```
+
+**Rule:** Only add generic types when the initial value doesn't provide enough type information (empty arrays, null values, undefined).
+
+### 19. Remove Console Logs
+
+**Problem:** Debug logs in production code.
+
+```typescript
+// BAD
+console.log('debug:', value);
+console.log('user:', user);
+```
+
+```typescript
+// GOOD
+// Remove all console.log before committing
+// Use proper error handling or logging service if needed
+```
+
+### 20. Wrap I/O in Try-Catch
+
+**Problem:** File/network operations without error handling.
+
+```typescript
+// BAD
+const reader = new FileReader();
+reader.readAsText(file);
+```
+
+```typescript
+// GOOD
+try {
+    const reader = new FileReader();
+    reader.onerror = () => handleError('Failed to read file');
+    reader.onload = (e) => handleSuccess(e.target?.result);
+    reader.readAsText(file);
+} catch (error) {
+    handleError('Failed to initialize file reader');
+}
+```
+
+### 21. Modal Pattern: Pass Setter Directly
+
+**Problem:** Creating wrapper functions for simple state updates.
+
+```typescript
+// BAD - unnecessary wrapper
+const handleClose = () => setOpen(false);
+<Modal open={open} onClose={handleClose} />
+
+// ALSO BAD - inline function (new reference every render)
+<Modal open={open} onClose={() => setOpen(false)} />
+```
+
+```typescript
+// GOOD - pass setter directly when component supports it
+<Modal open={open} setOpen={setOpen} />
+
+// GOOD - useCallback if onClose signature is required
+const handleClose = useCallback(() => setOpen(false), []);
+<Modal open={open} onClose={handleClose} />
+```
+
+### 22. Tooltip Cursor: Use cursor-auto for Non-Clickable Elements
+
+**Problem:** Tooltip component defaults to `cursor-pointer`, which incorrectly suggests the element is clickable when it's only informational.
+
+```typescript
+// BAD - misleading pointer cursor on non-clickable tooltip
+<Tooltip text="This is informational only">
+  <span>Hover me</span>
+</Tooltip>
+```
+
+```typescript
+// GOOD - use cursor-auto for non-clickable tooltips
+<Tooltip className="cursor-auto" text="This is informational only">
+  <span>Hover me</span>
+</Tooltip>
+```
+
+**Rule:** Only use the default `cursor-pointer` when the tooltip wraps a clickable element. Use `cursor-auto` for informational tooltips on non-interactive elements.
+
+### 23. Boolean Props: Omit `={true}` and Omit Prop When `false`
+
+**Problem:** Explicitly passing `true` for boolean props is redundant. Passing `false` is unnecessary since omitting the prop defaults to `false`.
+
+```typescript
+// BAD - redundant true values
+<KernDropdown hasSearchBar={true} hasCheckboxes={true} disabled={true} />
+
+// BAD - unnecessary false prop
+<KernDropdown hasSearchBar={false} />
+```
+
+```typescript
+// GOOD - omit ={true}, just use the prop name
+<KernDropdown hasSearchBar hasCheckboxes disabled />
+
+// GOOD - omit prop entirely when false
+<KernDropdown /> // hasSearchBar defaults to false
+```
+
+**Rule:** For boolean props set to `true`, use the prop name without `={true}`. For `false`, omit the prop entirely.
+
+---
+
+## Quick Checklist
+
+Before submitting code:
+
+**Performance:**
+- [ ] Icons use `MemoIcon*` variants
+- [ ] Event handlers wrapped in `useCallback`
+- [ ] Heavy components wrapped in `memo()`
+- [ ] Expensive computations use `useMemo`
+- [ ] Constants defined outside components
+- [ ] No inline objects/arrays as props
+
+**Hooks:**
+- [ ] All dependencies listed in useEffect/useCallback/useMemo
+- [ ] Using `useRefFor` for stable callbacks needing current values
+- [ ] i18n depends on `i18n.language`, not `t`
+
+**State:**
+- [ ] Not duplicating props into state
+- [ ] Using Redux for deeply shared state
+- [ ] API calls not duplicated across components
+
+**Code Quality:**
+- [ ] Null/undefined guards in place
+- [ ] Enums imported from submodules
+- [ ] Using existing types and components
+- [ ] Generic types only when type can't be inferred from initial value
+- [ ] Boolean props omit `={true}` and omit prop when `false`
+- [ ] Tooltip uses `cursor-auto` for non-clickable elements
+- [ ] No console.log statements
+- [ ] I/O operations have error handling
+- [ ] Array types use `T[]` syntax

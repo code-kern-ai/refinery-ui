@@ -1,0 +1,622 @@
+---
+description: Documentation for shared UI components from react-components submodule
+alwaysApply: true
+globs:
+  - "*"
+---
+
+# Shared UI Components
+
+Always check `submodules/react-components/` before creating new components.
+
+## Component Structure
+
+### Component File Organization
+
+Component files should only contain the component itself. Prop type definitions should be in a separate types file, and all other logic (helper functions, data transformations, utilities, etc.) should be extracted into a separate helper file.
+
+**File naming convention:**
+- Component file: `MyComponent.tsx`
+- Types file: `my-component.types.ts` (kebab-case)
+- Helper file: `my-component-helper.ts` (kebab-case with `-helper` suffix)
+
+**Types file location:**
+- Types should be placed in `src/types/components/` following the same directory structure as the component
+- Example: Component at `src/components/projects/ProjectsList.tsx` → Types at `src/types/components/projects/projects-list.ts`
+
+**Helper file location:**
+- Helper files should be placed in `src/util/components/` following the same directory structure as the component
+- Example: Component at `src/components/projects/ProjectsList.tsx` → Helper at `src/util/components/projects/projects-list-helper.ts`
+- For shared helpers used across multiple components, place them in `src/util/shared/` with `-helper.ts` naming
+
+```typescript
+// ❌ BAD - All logic and types in component file
+// MyComponent.tsx
+type MyComponentProps {
+  data: Data[];
+}
+
+function MyComponent({ data }: MyComponentProps) {
+  // Complex data transformation logic
+  const processedData = data.map(item => {
+    // ... complex logic
+  });
+  
+  // Helper function
+  const calculateTotal = (items: Item[]) => {
+    // ... calculation logic
+  };
+  
+  // Component JSX
+  return <div>...</div>;
+}
+```
+
+```typescript
+// ✅ GOOD - Component file only contains component
+// src/components/projects/ProjectsList.tsx
+import { ProjectsListProps } from "@/src/types/components/projects/projects-list";
+import { processData, calculateTotal } from "@/src/util/components/projects/projects-list-helper";
+
+function ProjectsList({ data }: ProjectsListProps) {
+  const processedData = processData(data);
+  const total = calculateTotal(processedData);
+  
+  return <div>...</div>;
+}
+```
+
+```typescript
+// ✅ GOOD - Types file contains prop type definitions
+// src/types/components/projects/projects-list.ts
+export type ProjectsListProps = {
+  data: Data[];
+}
+
+export type DataItem = {
+  id: string;
+  name: string;
+  // ... other properties
+}
+```
+
+```typescript
+// ✅ GOOD - Helper file contains all logic
+// src/util/components/projects/projects-list-helper.ts
+export function processData(data: Data[]): ProcessedData[] {
+  return data.map(item => {
+    // ... complex logic
+  });
+}
+
+export function calculateTotal(items: Item[]): number {
+  // ... calculation logic
+}
+```
+
+**What belongs in types files:**
+- Component prop type definitions (`MyComponentProps`)
+- Related type definitions used by the component
+- Interface definitions specific to the component
+
+**What belongs in helper files:**
+- Data transformation functions
+- Business logic calculations
+- Utility functions specific to the component
+- Complex data processing
+- Validation logic
+- Formatting functions
+
+**What stays in component file:**
+- Component function definition
+- React hooks (useState, useEffect, useCallback, etc.)
+- Component-specific event handlers (can call helper functions)
+- JSX rendering logic
+
+### Defaults for Complex Types
+
+Defaults for complex types (objects, arrays) must be defined outside the component function to prevent creating new references on every render, which causes unnecessary re-renders.
+
+```typescript
+// ❌ BAD - New object/array created on every render
+function MyComponent({ config }: MyComponentProps) {
+  const defaultConfig = { theme: 'dark', size: 'medium' };
+  const defaultOptions = ['Option 1', 'Option 2'];
+  const mergedConfig = { ...defaultConfig, ...config };
+  
+  return <div>...</div>;
+}
+```
+
+```typescript
+// ✅ GOOD - Defaults defined outside component
+const DEFAULT_CONFIG = { theme: 'dark', size: 'medium' };
+const DEFAULT_OPTIONS = ['Option 1', 'Option 2'];
+
+function MyComponent({ config }: MyComponentProps) {
+  const mergedConfig = { ...DEFAULT_CONFIG, ...config };
+  
+  return <div>...</div>;
+}
+```
+
+**When to define defaults outside:**
+- Object defaults: `const DEFAULT_CONFIG = { ... }`
+- Array defaults: `const DEFAULT_OPTIONS = [...]`
+- Complex type defaults used in props merging, function parameters, or state initialization
+
+**When defaults can stay inside:**
+- Simple primitive defaults (strings, numbers, booleans) used directly
+- Defaults that depend on props/state (use `useMemo` instead)
+
+### Type Definitions for Complex Types
+
+Complex types (objects, arrays with structure) should be defined in the component's types file or imported from existing type definitions. Avoid inline type definitions and `any` types.
+
+```typescript
+// ❌ BAD - Inline complex types
+function MyComponent({ data }: { data: { id: string; name: string; config: { theme: string; size: number } }[] }) {
+  const config = { theme: 'dark', size: 10 };
+  return <div>...</div>;
+}
+
+// ❌ BAD - Types defined in component file
+// MyComponent.tsx
+type MyComponentProps {
+  data: DataItem[];
+}
+
+function MyComponent({ data }: MyComponentProps) {
+  return <div>...</div>;
+}
+
+// ❌ BAD - Using any
+function processData(data: any[]) {
+  return data.map(item => item.value);
+}
+```
+
+```typescript
+// ✅ GOOD - Types defined in separate types file
+// src/types/components/my-component/my-component.types.ts
+export type ItemConfig = {
+  theme: string;
+  size: number;
+}
+
+export type DataItem = {
+  id: string;
+  name: string;
+  config: ItemConfig;
+}
+
+export type MyComponentProps = {
+  data: DataItem[];
+}
+
+// MyComponent.tsx
+import { MyComponentProps, ItemConfig } from "@/src/types/components/my-component/my-component.types";
+
+function MyComponent({ data }: MyComponentProps) {
+  const config: ItemConfig = { theme: 'dark', size: 10 };
+  return <div>...</div>;
+}
+
+// ✅ GOOD - Imported from existing types
+import { DataItem } from "@/src/services/data";
+import { ItemConfig } from "@/src/types/config";
+
+function processData(data: DataItem[]) {
+  return data.map(item => item.value);
+}
+```
+
+**Best practices:**
+- Always define component prop types in the component's types file (`src/types/components/...`)
+- Import types from existing type definitions when available
+- Use descriptive names for complex types
+- Avoid `any` - use `unknown` if type is truly unknown, then narrow it
+- Reuse existing types rather than duplicating definitions
+- Follow the directory structure: component at `src/components/...` → types at `src/types/components/...`
+
+### Component Styles
+
+Component-specific styles should be defined as CSS modules in the `src/styles/components/` directory, following the same directory structure as the component.
+
+**File naming convention:**
+- Style file: `component-name.module.css` (kebab-case with `.module.css` extension)
+- Example: Component at `src/components/projects/ProjectsList.tsx` → Styles at `src/styles/components/projects/projects-list.module.css`
+
+**Style file location:**
+- Component-specific styles: `src/styles/components/` following the same directory structure as the component
+- Shared styles: `src/styles/shared/` for styles used across multiple components
+- Example: Component at `src/components/projects/ProjectsList.tsx` → Styles at `src/styles/components/projects/projects-list.module.css`
+
+**Import and usage:**
+```typescript
+// ✅ GOOD - Import CSS module
+import style from "@/src/styles/components/projects/projects-list.module.css";
+
+function ProjectsList() {
+  return (
+    <div className={style.scrollableSize}>
+      {/* Component content */}
+    </div>
+  );
+}
+```
+
+```css
+/* ✅ GOOD - CSS module with camelCase class names */
+/* src/styles/components/projects/projects-list.module.css */
+.scrollableSize {
+  max-height: calc(100vh - 150px);
+  overflow-y: auto;
+}
+
+.imageVideo {
+  display: block;
+  margin: 10px auto;
+}
+```
+
+```typescript
+// ❌ BAD - Inline styles or Tailwind classes for component-specific styling
+function ProjectsList() {
+  return (
+    <div style={{ maxHeight: 'calc(100vh - 150px)', overflowY: 'auto' }}>
+      {/* Avoid inline styles for component-specific styling */}
+    </div>
+  );
+}
+
+// ❌ BAD - Wrong import path or missing .module.css extension
+import style from "./projects-list.css"; // Missing .module
+import style from "@/styles/projects-list.module.css"; // Wrong path structure
+```
+
+**Best practices:**
+- Use CSS modules (`.module.css`) for component-specific styles
+- Import styles using absolute paths: `import style from "@/src/styles/components/..."`
+- Use camelCase for CSS class names (e.g., `scrollableSize`, `imageVideo`)
+- Access classes via `style.className` syntax
+- Place component-specific styles in `src/styles/components/` following component directory structure
+- Place shared styles in `src/styles/shared/` when used across multiple components
+- Prefer CSS modules over inline styles for component-specific styling
+- Use Tailwind classes for utility styling, CSS modules for component-specific complex styles
+
+### Code Conciseness
+
+Minimize code length while keeping it readable. Prefer concise one-liners for simple expressions, but maintain readability for complex logic.
+
+```typescript
+// ❌ BAD - Unnecessarily verbose
+const config = useMemo(() => ({
+    sortKey: sortState,
+    onClickSort: handleSort,
+    noEntriesText: 'No items found'
+}), [sortState, handleSort]);
+
+// ❌ BAD - Too verbose for simple object
+const merged = useMemo(() => {
+  return { ...defaultConfig, ...config };
+}, [defaultConfig, config]);
+```
+
+```typescript
+// ✅ GOOD - Concise one-liner when readable
+const config = useMemo(() => ({ sortKey: sortState, onClickSort: handleSort, noEntriesText: 'No items found' }), [sortState, handleSort]);
+
+// ✅ GOOD - Concise for simple merge
+const merged = useMemo(() => ({ ...defaultConfig, ...config }), [defaultConfig, config]);
+
+// ✅ GOOD - Multi-line when it improves readability
+const complexConfig = useMemo(() => ({
+  sortKey: sortState,
+  onClickSort: handleSort,
+  filters: activeFilters.map(f => ({ id: f.id, value: f.value })),
+  pagination: { page: currentPage, pageSize: itemsPerPage }
+}), [sortState, handleSort, activeFilters, currentPage, itemsPerPage]);
+```
+
+**Guidelines:**
+- Use one-liners for simple object/array literals with 2-3 properties
+- Use multi-line format when it improves readability (4+ properties, nested structures)
+- Balance conciseness with readability - don't sacrifice clarity for brevity
+- Complex logic should remain multi-line for maintainability
+
+### Order in the components:
+
+Use the following order when declaring new variables:
+
+1. router (`const router = useRouter();`)
+2. dispatch (`const dispatch = useDispatch();`)
+3. selectors (values from the store)
+4. states
+5. queries and mutations
+6. everything else (ex. references, constants.. )
+7. useEffect
+8. useCallback
+9. functions
+
+## Navigation
+
+### Router vs href
+
+Prefer router navigation (`router.push()`) over `href` for internal navigation. Router navigation is recognized as in-app navigation, while `href` triggers a full page reload and is treated as external navigation.
+
+```typescript
+import { useRouter } from "next/router";
+
+const router = useRouter();
+
+// ✅ Prefer router for internal navigation
+<button onClick={() => router.push('/projects/123')}>
+  View Project
+</button>
+
+// ❌ Avoid href for internal routes
+<a href="/projects/123">View Project</a>
+```
+
+## Modals
+
+### Redux-Based Modal System
+
+The application uses a Redux-based modal system. Modals are managed through Redux actions and selectors.
+
+### Opening and Closing Modals
+
+```typescript
+import { useDispatch } from "react-redux";
+import { openModal, closeModal, initModal } from "@/src/reduxStore/states/modal";
+import { ModalEnum } from "@/src/types/shared/modal";
+
+const dispatch = useDispatch();
+
+// ✅ Open modal
+const handleOpen = useCallback(() => {
+  dispatch(openModal(ModalEnum.CREATE_NEW_ATTRIBUTE));
+}, [dispatch]);
+
+// ✅ Close modal
+const handleClose = useCallback(() => {
+  dispatch(closeModal(ModalEnum.CREATE_NEW_ATTRIBUTE));
+}, [dispatch]);
+
+// ✅ Reset modal to initial state (use when closing to ensure clean state)
+const handleReset = useCallback(() => {
+  dispatch(initModal(ModalEnum.CREATE_NEW_ATTRIBUTE));
+}, [dispatch]);
+```
+
+### Reading Modal State
+
+```typescript
+import { useSelector } from "react-redux";
+import { selectModal } from "@/src/reduxStore/states/modal";
+import { ModalEnum } from "@/src/types/shared/modal";
+
+const modal = useSelector(selectModal(ModalEnum.CREATE_NEW_ATTRIBUTE));
+
+// Access modal state
+const isOpen = modal.open;
+const modalData = modal.someProperty; // modal-specific properties
+```
+
+### Using the Modal Component
+
+```typescript
+import Modal from "@/src/components/shared/modal/Modal";
+import { ModalEnum } from "@/src/types/shared/modal";
+
+// Basic usage
+<Modal modalName={ModalEnum.CREATE_NEW_ATTRIBUTE}>
+  <div>Modal content</div>
+</Modal>
+
+// With custom buttons
+<Modal 
+  modalName={ModalEnum.DELETE_PROJECT}
+  acceptButton={{
+    useButton: true,
+    buttonCaption: "Delete",
+    emitFunction: handleDelete,
+    closeAfterClick: true
+  }}
+  abortButton={{
+    useButton: true,
+    buttonCaption: "Cancel"
+  }}
+>
+  <div>Are you sure?</div>
+</Modal>
+```
+
+**Key points:**
+- Use `ModalEnum` for modal names (defined in `src/types/shared/modal.ts`)
+- Modal state is managed in Redux store
+- Use `openModal`/`closeModal` actions to control visibility
+- Use `selectModal` to read modal state
+- Modal component handles open/close state automatically via Redux
+
+## Buttons
+
+### KernButton
+
+Main customizable button component.
+
+```typescript
+import KernButton from "@/submodules/react-components/components/kern-button/KernButton";
+import { MemoIconDeviceFloppy } from "@/submodules/react-components/components/kern-icons/icons";
+
+<KernButton
+  text="Save"
+  icon={MemoIconDeviceFloppy}
+  iconColor="green"
+  buttonColor="green"
+  size="medium"           // 'small' | 'medium' | 'large' | 'solid-large'
+  loading={isLoading}
+  disabled={isDisabled}
+  tooltip="Save changes"
+  confirm={true}          // Shows checkmark briefly after click
+  onClick={handleSave}    // should be wrapped in useCallback
+/>
+```
+
+**Props:**
+- `text?: string` - Button text
+- `icon?: (props) => any` - Tabler icon component
+- `iconColor?: string` - Tailwind color name
+- `buttonColor?: string` - Tailwind color name
+- `solidTheme?: boolean` - Use solid background
+- `size?: 'small' | 'medium' | 'large' | 'solid-large'`
+- `loading?: boolean` - Show spinner
+- `disabled?: boolean`
+- `tooltip?: string`
+- `confirm?: boolean` - Show checkmark after click
+- `fullWidth?: boolean`
+
+**Other buttons:** `IconButton`, `ButtonAsText`, `SaveButton`
+
+## Tables
+
+### KernTable
+
+Feature-rich table with sorting and multiple cell types.
+
+```typescript
+import KernTable from "@/submodules/react-components/components/kern-table/KernTable";
+
+// Define stable references outside render or with useMemo
+const HEADERS = [
+    { id: 'name', column: 'Name', hasSort: true },
+    { id: 'status', column: 'Status' },
+    { id: 'actions', column: 'Actions' }
+];
+
+// In component - memoize values that include callbacks
+const tableValues = useMemo(() => [
+    [
+      { type: 'text', value: 'Item 1' },
+      { type: 'Component', component: 'BadgeCell', value: true },
+      { type: 'Component', component: 'DeleteCell', deleteEntity: handleDelete }
+    ]
+], [handleDelete]);
+
+const config = useMemo(() => ({ sortKey: sortState, onClickSort: handleSort, noEntriesText: 'No items found' }), [sortState, handleSort]);
+
+<KernTable headers={HEADERS} values={tableValues} config={config} />
+```
+
+**Cell Components:**
+- `BadgeCell` - Yes/No badge
+- `DeleteCell` - Delete button
+- `ViewCell` - View button
+- `IconCell` - Icon display
+- `LinkCell` - External link
+- `TruncateAndTooltipCell` - Truncated text with tooltip
+- `TaskStateCell` - Colored status badge
+- `@provided@` - Custom JSX via `jsx` prop
+
+## Dropdowns
+
+### KernDropdown
+
+Advanced dropdown with search, checkboxes, multi-select.
+
+```typescript
+import KernDropdown from "@/submodules/react-components/components/KernDropdown";
+
+// Define options outside component or useMemo
+const OPTIONS = ['Option 1', 'Option 2', 'Option 3'];
+
+// In component - wrap handler in useCallback
+const handleSelect = useCallback((option) => {
+    // handle selection
+}, []);
+
+<KernDropdown
+  options={OPTIONS}
+  buttonName="Select..."
+  selectedOption={handleSelect}
+  hasSearchBar={true}
+  hasCheckboxes={true}
+  hasSelectAll={true}
+  dropdownWidth="w-64"
+  scrollAfterNOptions={5}
+  disabled={false}
+/>
+```
+
+**Key Props:**
+- `options: any[]` - Dropdown options
+- `buttonName: string` - Closed state text
+- `selectedOption: (option) => void` - Selection callback
+- `hasSearchBar?: boolean` - Enable search
+- `hasCheckboxes?: boolean` - Multi-select mode
+- `hasSelectAll?: boolean` - Add "select all"
+- `scrollAfterNOptions?: number` - Enable scrolling
+- `tooltipsArray?: string[]` - Per-option tooltips
+- `iconsArray?: string[]` - Per-option icons
+
+## Other Components
+
+### Badges
+
+```typescript
+import { KernBadge, ActiveBadge, InactiveBadge, NotApplicableBadge } from "@/submodules/react-components/components/Badges";
+```
+
+### CopyToClipboard
+
+```typescript
+import CopyToClipboard from "@/submodules/react-components/components/CopyToClipboard";
+
+<CopyToClipboard nameToCopy="text to copy" />
+```
+
+### LoadingIcon
+
+```typescript
+import LoadingIcon from "@/submodules/react-components/components/LoadingIcon";
+
+<LoadingIcon color="green" size="large" />
+```
+
+### SwitchWithLabel
+
+```typescript
+import SwitchWithLabel from "@/submodules/react-components/components/SwitchWithLabel";
+
+// Wrap handler in useCallback
+const handleToggle = useCallback(() => {
+    setIsEnabled(prev => !prev);
+}, []);
+
+<SwitchWithLabel
+  checked={isEnabled}
+  onChange={handleToggle}
+  label="Enable feature"
+  tooltip="Optional warning tooltip"
+/>
+```
+
+### SVGIcon
+
+Dynamic icon component for Tabler icons.
+
+```typescript
+import SVGIcon from "@/submodules/react-components/components/SVGIcon";
+
+<SVGIcon icon="IconSettings" size={24} strokeWidth={2} />
+```
+
+### Other Available Components
+
+- `Pagination` - Page navigation
+- `NoTableEntriesYet` - Empty table state
+- `MultilineTooltipAuto` - Multi-line tooltips
+- `InputWithSlider` - Slider input
+- `InputWithClearIcon` - Clearable input
+- `AdminMessages` / `AppNotifications` - System messages
