@@ -1,4 +1,4 @@
-FROM registry.dev.kern.ai/code-kern-ai/refinery-parent-images:parent-image-updates-next
+FROM kernai/refinery-parent-images:v1.25.0-next
 
 WORKDIR /app
 COPY package*.json /app/
