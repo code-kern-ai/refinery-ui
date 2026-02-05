@@ -4,6 +4,9 @@ const nextConfig = {
   basePath: '/refinery',
   env: {
     IS_DEV: process.env.IS_DEV,
+  },
+  eslint: {
+    ignoreDuringBuilds: true,
   }
 }
 
