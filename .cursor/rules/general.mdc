@@ -1,0 +1,140 @@
+---
+description: General coding conventions and style guide for the Refinery UI project
+alwaysApply: true
+globs:
+  - "*"
+---
+
+# Refinery UI - General Guidelines
+
+## Project Overview
+
+This is a Next.js application with shared code in git submodules:
+- `submodules/react-components/` - Shared UI components and hooks
+- `submodules/javascript-functions/` - Utility functions
+- `submodules/tailwind-config/` - Shared Tailwind configuration
+
+## Directory Structure
+
+```
+src/
+├── components/     # Application-specific components
+├── pages/          # Next.js pages
+├── services/       # API service functions
+├── reduxStore/     # Redux state management
+├── util/           # Application-specific utilities
+├── i18n/           # Internationalization files
+└── styles/         # Global styles
+```
+
+## Code Style
+
+### Import Conventions
+
+Always use the `@/` alias for imports:
+
+```typescript
+// Submodule imports
+import KernButton from "@/submodules/react-components/components/kern-button/KernButton";
+import { combineClassNames } from "@/submodules/javascript-functions/general";
+import { MemoIconCheck } from "@/submodules/react-components/components/kern-icons/icons";
+
+// App imports
+import { useAppSelector } from "@/src/reduxStore/store";
+```
+
+### CSS Classes
+
+Always use `combineClassNames` for conditional classes:
+
+```typescript
+// Good
+className={combineClassNames("base-class", isActive && "active-class")}
+
+// Avoid
+className={`base-class ${isActive ? "active-class" : ""}`}
+```
+
+### TypeScript
+
+- Use explicit types for function parameters and return values
+- Prefer interfaces over types for object shapes
+- Use `readonly` for immutable properties
+
+## Key Dependencies
+
+- **UI Framework**: React with Next.js
+- **Styling**: Tailwind CSS
+- **State**: Redux Toolkit
+- **Icons**: `@tabler/icons-react` (always use `MemoIcon*` wrappers from `kern-icons/icons.ts`)
+- **UI Primitives**: `@headlessui/react`
+- **Tooltips**: `@nextui-org/react`
+
+## Service Functions
+
+Service functions in `src/services/` handle API requests using the fetch wrapper pattern.
+
+### Request Structure
+
+```typescript
+import { FetchType, jsonFetchWrapper } from "@/submodules/javascript-functions/basic-fetch";
+import { BACKEND_BASE_URI, REFINERY_BASE_URI } from "@/src/services/_settings";
+import { jsonFetchWrapperWithOrgCheck } from "@/src/services/orgIdCheckWrapper";
+
+// Define URL constants at the top
+const url = `${BACKEND_BASE_URI}/api/v1/projects/`;
+const refineryUrl = `${REFINERY_BASE_URI}/api/v1/organization`;
+
+// GET request
+export function getProjects(onResult: (result: any) => void, onError?: (response: any) => void) {
+    const finalUrl = url;
+    jsonFetchWrapper(finalUrl, FetchType.GET, onResult, undefined, undefined, onError);
+}
+
+// POST request with body
+export function createProject(name: string, description: string, onResult: (result: any) => void, onError?: (response: any) => void) {
+    const finalUrl = url;
+    const body = JSON.stringify({ name, description });
+    jsonFetchWrapper(finalUrl, FetchType.POST, onResult, body, undefined, onError);
+}
+
+// PUT request with body
+export function updateProject(id: string, updateData: any, onResult: (result: any) => void, onError?: (response: any) => void) {
+    const finalUrl = `${url}${id}`;
+    const body = JSON.stringify(updateData);
+    jsonFetchWrapper(finalUrl, FetchType.PUT, onResult, body, undefined, onError);
+}
+
+// DELETE request
+export function deleteProject(id: string, onResult: (result: any) => void, onError?: (response: any) => void) {
+    const finalUrl = `${url}${id}`;
+    jsonFetchWrapper(finalUrl, FetchType.DELETE, onResult, undefined, undefined, onError);
+}
+
+// DELETE request with body
+export function deleteManyProjects(ids: string[], onResult: (result: any) => void, onError?: (response: any) => void) {
+    const finalUrl = `${url}many`;
+    const body = JSON.stringify({ ids });
+    jsonFetchWrapper(finalUrl, FetchType.DELETE, onResult, body, undefined, onError);
+}
+
+// Using org check wrapper (for requests that need org ID validation)
+export function getOrgProjects(onResult: (result: any) => void) {
+    const finalUrl = `${refineryUrl}/projects`;
+    jsonFetchWrapperWithOrgCheck(finalUrl, FetchType.GET, onResult);
+}
+```
+
+**Key patterns:**
+- Use `jsonFetchWrapper` for JSON responses, `textFetchWrapper` for text responses
+- Parameters: `(url, FetchType, onResult, body?, headers?, onError?)`
+- Always stringify request bodies: `JSON.stringify({ ... })`
+- Use `jsonFetchWrapperWithOrgCheck` when org ID validation is needed
+- Define URL constants at the top of the file
+- Include `onError` callback for error handling when needed
+
+## Before Creating New Code
+
+1. **Check submodules first** - Components, hooks, and utilities likely already exist
+2. **Follow existing patterns** - Look at similar files in `src/components/` and `src/services/`
+3. **Use shared components** - Prefer `KernButton`, `KernDropdown`, `KernTable` over custom implementations

@@ -1,0 +1,165 @@
+---
+description: Documentation for shared React hooks from react-components submodule
+alwaysApply: true
+globs:
+  - "*"
+---
+
+# Shared React Hooks
+
+Check `submodules/react-components/hooks/` before creating new hooks.
+
+## State Management Hooks
+
+### useDebouncedState
+
+State with automatically debounced value.
+
+```typescript
+import { useDebouncedState } from "@/submodules/react-components/hooks/useDebouncedState";
+
+const [value, setValue, debouncedValue] = useDebouncedState<string>("", 250);
+
+// value updates immediately
+// debouncedValue updates 250ms after last setValue call
+```
+
+### useLocalStorage
+
+Persist state to localStorage with optional expiration.
+
+```typescript
+import { useLocalStorage } from "@/submodules/react-components/hooks/useLocalStorage";
+
+const [value, setValue] = useLocalStorage<string>(
+  "myKey",           // key within group
+  "myGroup",         // localStorage group name
+  3600,              // optional: expiration in seconds
+  "default"          // optional: default value
+);
+```
+
+### useRefState
+
+State accessible via ref - useful for callbacks and effects.
+
+```typescript
+import useRefState from "@/submodules/react-components/hooks/useRefState";
+```
+
+### useRefFor
+
+Create a ref that always tracks a value's current state.
+
+```typescript
+import useRefFor from "@/submodules/react-components/hooks/useRefFor";
+
+const valueRef = useRefFor(someValue);
+// valueRef.current always has the latest value
+// Useful in callbacks to avoid stale closures
+```
+
+## UI Hooks
+
+### useOnClickOutside
+
+Detect clicks outside an element.
+
+```typescript
+import useOnClickOutside from "@/submodules/react-components/hooks/useHooks/useOnClickOutside";
+
+const ref = useRef(null);
+
+// Wrap handler in useCallback for stable reference
+const handleClickOutside = useCallback(() => {
+    setIsOpen(false);
+}, []);
+
+useOnClickOutside(ref, handleClickOutside);
+
+return <div ref={ref}>...</div>;
+```
+
+### useDefaults
+
+Merge default props with provided props.
+
+```typescript
+import { useDefaults } from "@/submodules/react-components/hooks/useDefaults";
+
+const DEFAULTS = { size: 'medium', color: 'gray' };
+
+function MyComponent(props: MyProps) {
+  const [propsWithDefaults] = useDefaults<MyProps>(props, DEFAULTS);
+  // propsWithDefaults.size is 'medium' if not provided
+}
+```
+
+### useFocus
+
+Focus management for inputs.
+
+```typescript
+import useFocus from "@/submodules/react-components/hooks/useFocus";
+```
+
+### useForceRerender
+
+Force a component to rerender.
+
+```typescript
+import useForceRerender from "@/submodules/react-components/hooks/useForceRerender";
+
+const forceRerender = useForceRerender();
+// Call forceRerender() when needed
+```
+
+### useDebounce
+
+Debounce any value (lower-level than useDebouncedState).
+
+```typescript
+import useDebounce from "@/submodules/react-components/hooks/useHooks/useDebounce";
+
+const debouncedSearchTerm = useDebounce(searchTerm, 300);
+```
+
+## Enum Hooks
+
+### useEnumOptions
+
+Convert TypeScript enum to dropdown options.
+
+```typescript
+import useEnumOptions from "@/submodules/react-components/hooks/enums/useEnumOptions";
+
+enum Status { ACTIVE = 'active', INACTIVE = 'inactive' }
+
+const options = useEnumOptions<Status>(Status);
+// Returns: [{ name: 'active', value: 'active' }, { name: 'inactive', value: 'inactive' }]
+```
+
+### useEnumOptionsTranslated
+
+Enum options with i18n translation support.
+
+```typescript
+import useEnumOptionsTranslated from "@/submodules/react-components/hooks/enums/useEnumOptionsTranslated";
+```
+
+### useEnumState
+
+State constrained to enum values.
+
+```typescript
+import useEnumState from "@/submodules/react-components/hooks/enums/useEnumState";
+```
+
+## WebSocket Hooks
+
+Located in `hooks/web-socket/`:
+
+```typescript
+import { useWebsocket } from "@/submodules/react-components/hooks/web-socket/useWebsocket";
+import { WebSocketsService } from "@/submodules/react-components/hooks/web-socket/WebSocketsService";
+```
