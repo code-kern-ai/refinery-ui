@@ -18,6 +18,8 @@ import { selectOrganizationId } from "@/src/reduxStore/states/general";
 import { useWebsocket } from "@/submodules/react-components/hooks/web-socket/useWebsocket";
 import { Application, CurrentPage } from "@/submodules/react-components/hooks/web-socket/constants";
 import DataBlockLiveQueryResults from "./DataBlockLiveQueryResults";
+import { enumToArray } from "@/submodules/javascript-functions/general";
+import { caseType } from "@/submodules/javascript-functions/case-types-parser";
 
 const DEFAULT_SQL_TEMPLATE = {
     selectClause: '',
@@ -237,6 +239,13 @@ export default function DataBlocksDetailsOverview() {
         </Tooltip>
     }, []);
 
+    const sqlTemplateOptions = useMemo(() => enumToArray(SQLTemplates, { caseType: caseType.CAPITALIZE_FIRST_PER_WORD }), []);
+
+    const sqlTemplateDisplayName = useMemo(() => {
+        const option = sqlTemplateOptions.find(opt => opt.value === sqlTemplate);
+        return option?.name || sqlTemplate;
+    }, [sqlTemplate, sqlTemplateOptions]);
+
     const parseSQLClause = useCallback((clause: string, keyword: string): { prefix: string; editable: string } => {
         if (!clause.trim()) {
             return { prefix: keyword, editable: '' };
@@ -252,8 +261,9 @@ export default function DataBlocksDetailsOverview() {
         return { prefix: keyword, editable: clause };
     }, []);
 
-    const setAndPrefillSQLTemplateState = useCallback((value: SQLTemplates) => {
+    const setAndPrefillSQLTemplateState = useCallback((option: { name: string; value: SQLTemplates }) => {
         isInitializingRef.current = true;
+        const value = option.value;
         setSQLTemplate(value);
         if (!projectId) {
             setTimeout(() => {
@@ -375,8 +385,8 @@ export default function DataBlocksDetailsOverview() {
                         SQL template
                         {sqlTemplate == SQLTemplates.BLANK_QUERY && <span className="inline-block ">{addInfo}</span>}
                     </div>
-                    <KernDropdown options={Object.values(SQLTemplates)}
-                        buttonName={sqlTemplate}
+                    <KernDropdown options={sqlTemplateOptions}
+                        buttonName={sqlTemplateDisplayName}
                         tooltipArrayPlacement="right"
                         tooltipsArray={SQL_TEMPLATES_TOOLTIPS_DICT}
                         selectedOption={setAndPrefillSQLTemplateState} dropdownWidth="w-80" />

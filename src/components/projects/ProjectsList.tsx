@@ -17,6 +17,7 @@ import { useWebsocket } from "@/submodules/react-components/hooks/web-socket/use
 import { getAllProjects } from "@/src/services/base/project";
 import { getOverviewStats } from "@/src/services/base/organization";
 import { Application, CurrentPage } from "@/submodules/react-components/hooks/web-socket/constants";
+import { setActiveDataBlock } from "@/src/reduxStore/states/pages/data-blocks";
 
 export default function ProjectsList() {
     const dispatch = useDispatch();
@@ -37,6 +38,7 @@ export default function ProjectsList() {
         dispatch(setAllEmbeddings([]));
         dispatch(setDataSlices([]));
         dispatch(setComments(null));
+        dispatch(setActiveDataBlock(null));
     }, []);
 
     useEffect(() => {
