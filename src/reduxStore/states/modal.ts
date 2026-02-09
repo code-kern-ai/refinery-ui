@@ -192,6 +192,7 @@ const initialState: Modals = {
     [ModalEnum.LLM_PLAYGROUND]: {
         open: false,
         attributeId: null,
+        dataBlockColumnId: null,
         apiKey: null,//since it's only available in the by id function this is passed along
     },
     [ModalEnum.EVALUATION_SET]: {
@@ -226,6 +227,19 @@ const initialState: Modals = {
     },
     [ModalEnum.DELETE_EVALUATION_RUN]: {
         open: false
+    },
+    [ModalEnum.DELETE_DATA_BLOCK]: {
+        open: false
+    },
+    [ModalEnum.CREATE_DATA_BLOCK]: {
+        open: false
+    },
+    [ModalEnum.CREATE_DATA_BLOCK_COLUMN]: {
+        open: false
+    },
+    [ModalEnum.VIEW_RECORD_DETAILS_DATA_BLOCK_COLUMN]: {
+        open: false,
+        recordIdx: 0,
     },
 };
 

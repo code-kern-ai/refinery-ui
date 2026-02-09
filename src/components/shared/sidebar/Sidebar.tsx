@@ -14,7 +14,7 @@ import { CacheEnum, selectCachedValue } from '@/src/reduxStore/states/cachedValu
 import VersionOverviewModal from './VersionOverviewModal';
 import { setProjectIdSampleProject } from '@/src/reduxStore/states/tmp';
 import { getHasUpdates } from '@/src/services/base/misc';
-import { MemoIconAlertCircle, MemoIconBulb, MemoIconChartPie, MemoIconMaximize, MemoIconMinimize, MemoIconSettings, MemoIconTag, MemoIconTriangleSquareCircle } from '@/submodules/react-components/components/kern-icons/icons';
+import { MemoIconAlertCircle, MemoIconBulb, MemoIconChartPie, MemoIconMaximize, MemoIconMinimize, MemoIconSettings, MemoIconSitemapFilled, MemoIconTag, MemoIconTriangleSquareCircle } from '@/submodules/react-components/components/kern-icons/icons';
 
 export default function Sidebar() {
     const router = useRouter();
@@ -93,7 +93,7 @@ export default function Sidebar() {
                                         {user.role === UserRole.ENGINEER && <div
                                             className="flex items-center justify-center overflow-visible">
                                             <Tooltip placement="right" trigger="hover" color="invert" content={TOOLTIPS_DICT.SIDEBAR.OVERVIEW} className={`${project.numDataScaleUploaded == 0 ? 'pointer-events-none cursor-not-allowed' : 'cursor-pointer'}`}>
-                                                <div className={`relative z-50`}>
+                                                <div className="relative z-50">
                                                     <a href={`/refinery/projects/${project.id}/overview`} onClick={(e: any) => { e.preventDefault(); router.push(`/projects/${project.id}/overview`) }}
                                                         className={`${project.numDataScaleUploaded == 0 ? 'opacity-50 cursor-not-allowed' : 'opacity-100 cursor-pointer'} circle ${routeColor.overview.active ? 'text-kernpurple' : 'text-white'}`}>
                                                         <MemoIconChartPie className="w-6 h-6" />
@@ -104,7 +104,7 @@ export default function Sidebar() {
                                         {user.role === UserRole.ENGINEER && <div
                                             className="flex items-center justify-center overflow-visible mt-9 2xl:mt-12">
                                             <Tooltip placement="right" trigger="hover" color="invert" content={TOOLTIPS_DICT.SIDEBAR.DATA_BROWSER} className={`${project.numDataScaleUploaded == 0 ? 'pointer-events-none cursor-not-allowed' : 'cursor-pointer'}`}>
-                                                <div className={`relative z-50`}>
+                                                <div className="relative z-50">
                                                     <a href={`/refinery/projects/${project.id}/data-browser`} onClick={(e: any) => { e.preventDefault(); router.push(`/projects/${project.id}/data-browser`) }}
                                                         className={`${project.numDataScaleUploaded == 0 ? 'opacity-50 cursor-not-allowed' : 'opacity-100 cursor-pointer'} circle ${routeColor.data.active ? 'text-kernpurple' : 'text-white'}`}>
                                                         <MemoIconTriangleSquareCircle className="w-6 h-6" />
@@ -114,7 +114,7 @@ export default function Sidebar() {
                                         </div>}
                                         <div className={`flex items-center justify-center overflow-visible ${user?.role == 'ENGINEER' ? 'mt-9 2xl:mt-12' : ''}`}>
                                             <Tooltip placement="right" trigger="hover" color="invert" content={TOOLTIPS_DICT.SIDEBAR.LABELING} className={`${project.numDataScaleUploaded == 0 ? 'pointer-events-none cursor-not-allowed' : 'cursor-pointer'}`}>
-                                                <div className={`relative z-50`}>
+                                                <div className="relative z-50">
                                                     <a href={`/refinery/projects/${project.id}/labeling`} onClick={(e: any) => { e.preventDefault(); router.push(`/projects/${project.id}/labeling`) }}
                                                         className={`${project.numDataScaleUploaded == 0 ? 'opacity-50 cursor-not-allowed' : 'opacity-100 cursor-pointer'} circle ${routeColor.labeling.active ? 'text-kernpurple' : 'text-white'}`}>
                                                         <MemoIconTag className="w-6 h-6" />
@@ -125,7 +125,7 @@ export default function Sidebar() {
                                         {user.role === UserRole.ENGINEER && <div
                                             className="flex items-center justify-center overflow-visible mt-9 2xl:mt-12">
                                             <Tooltip placement="right" trigger="hover" color="invert" content={TOOLTIPS_DICT.SIDEBAR.HEURISTICS} className={`${project.numDataScaleUploaded == 0 ? 'pointer-events-none cursor-not-allowed' : 'cursor-pointer'}`}>
-                                                <div className={`relative z-50`}>
+                                                <div className="relative z-50">
                                                     <a href={`/refinery/projects/${project.id}/heuristics`} onClick={(e: any) => { e.preventDefault(); router.push(`/projects/${project.id}/heuristics`) }}
                                                         className={`${project.numDataScaleUploaded == 0 ? 'opacity-50 cursor-not-allowed' : 'opacity-100 cursor-pointer'} circle ${routeColor.heuristics.active ? 'text-kernpurple' : 'text-white'}`}>
                                                         <MemoIconBulb className="w-6 h-6" />
@@ -136,10 +136,21 @@ export default function Sidebar() {
                                         {user.role === UserRole.ENGINEER && <div
                                             className="flex items-center justify-center overflow-visible mt-9 2xl:mt-12">
                                             <Tooltip placement="right" trigger="hover" color="invert" content={TOOLTIPS_DICT.SIDEBAR.SETTINGS}>
-                                                <div className={`relative z-50`}>
+                                                <div className="relative z-50">
                                                     <a href={`/refinery/projects/${project.id}/settings`} onClick={(e: any) => { e.preventDefault(); router.push(`/projects/${project.id}/settings`) }}
                                                         className={`circle ${routeColor.settings.active ? 'text-kernpurple' : 'text-white'}`}>
                                                         <MemoIconSettings className="w-6 h-6" />
+                                                    </a>
+                                                </div>
+                                            </Tooltip>
+                                        </div>}
+                                        {user.role === UserRole.ENGINEER && <div
+                                            className="flex items-center justify-center overflow-visible mt-9 2xl:mt-12">
+                                            <Tooltip placement="right" trigger="hover" color="invert" content={TOOLTIPS_DICT.SIDEBAR.DATA_BLOCKS}>
+                                                <div className="relative z-50">
+                                                    <a href={`/refinery/projects/${project.id}/data-blocks`} onClick={(e: any) => { e.preventDefault(); router.push(`/projects/${project.id}/data-blocks`) }}
+                                                        className={`circle ${routeColor.dataBlocks.active ? 'text-kernpurple' : 'text-white'}`}>
+                                                        <MemoIconSitemapFilled className="w-6 h-6" />
                                                     </a>
                                                 </div>
                                             </Tooltip>

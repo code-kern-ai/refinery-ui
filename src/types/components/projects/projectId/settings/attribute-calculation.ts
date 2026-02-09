@@ -1,12 +1,14 @@
+import { DataBlockColumn } from "../data-blocks/data-blocks";
 import { Attribute } from "./data-schema";
 
 export type ExecutionContainerProps = {
-    currentAttribute: Attribute;
-    tokenizationProgress: number;
+    currentAttribute: Attribute | DataBlockColumn;
+    tokenizationProgress?: number;
     refetchCurrentAttribute: () => void;
     checkUnsavedChanges: boolean;
     enableRunButton: boolean;
     setEnabledButton(value: boolean): void;
+    isDataBlockColumn?: boolean;
 }
 
 export type SampleRecord = {
@@ -31,10 +33,11 @@ export type Record = {
 }
 
 export type ViewRecordDetailsModalProps = {
-    currentAttribute: Attribute;
+    currentAttribute: Attribute | DataBlockColumn;
     sampleRecords: any;
 }
 
 export type ConfirmExecutionModalProps = {
     currentAttributeId: string;
+    dataBlockId?: string | null;
 }

@@ -2,6 +2,7 @@ export type DangerZoneProps = {
     elementType: string;
     name: string;
     id: string;
+    relatedDataBlocks?: { id: string, name: string }[];
 };
 
 // used with small letters because the same name is used in the display
@@ -10,4 +11,5 @@ export enum DangerZoneEnum {
     LOOKUP_LIST = "lookup list",
     ACTIVE_LEARNING = "active learning",
     LABELING_FUNCTION = "labeling function",
+    DATA_BLOCK_COLUMN = "data block column",
 }

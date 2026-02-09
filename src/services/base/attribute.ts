@@ -3,6 +3,7 @@ import { BACKEND_BASE_URI } from "./_settings";
 import { convertCamelToSnakeCase } from "@/submodules/javascript-functions/case-types-parser";
 
 export const attributeEndpoint = `${BACKEND_BASE_URI}/api/v1/attribute`;
+export const dataBlocksEndpoint = `${BACKEND_BASE_URI}/api/v1/data-blocks`;
 
 export function getAttributes(projectId: string, stateFilter: string[], onResult: (result: any) => void) {
     const stateFilterQuery = new URLSearchParams()

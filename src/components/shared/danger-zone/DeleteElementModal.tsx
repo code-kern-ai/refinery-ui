@@ -1,7 +1,7 @@
 import { DangerZoneEnum, DangerZoneProps } from "@/src/types/shared/danger-zone";
 import Modal from "../modal/Modal";
 import { ModalButton, ModalEnum } from "@/src/types/shared/modal";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { selectModal } from "@/src/reduxStore/states/modal";
 import { useDispatch, useSelector } from "react-redux";
 import { removeFromAllAttributesById } from "@/src/reduxStore/states/pages/settings";
@@ -12,6 +12,8 @@ import { useRouter } from "next/router";
 import { deleteHeuristicById } from "@/src/services/base/heuristic";
 import { deleteKnowledgeBase } from "@/src/services/base/lookup-lists";
 import { deleteUserAttribute } from "@/src/services/base/attribute";
+import { deleteDataBlockColumnById } from "@/src/services/base/data-blocks";
+import { selectDataBlock } from "@/src/reduxStore/states/pages/data-blocks";
 
 const ABORT_BUTTON = { buttonCaption: 'Delete', disabled: false, useButton: true };
 
@@ -20,6 +22,7 @@ export default function DeleteElementModal(props: DangerZoneProps) {
     const router = useRouter();
 
     const projectId = useSelector(selectProjectId);
+    const dataBlockId = useSelector(selectDataBlock)?.id;
     const modalDelete = useSelector(selectModal(ModalEnum.DELETE_ELEMENT));
 
     const [isDeleting, setIsDeleting] = useState(false);
@@ -48,6 +51,12 @@ export default function DeleteElementModal(props: DangerZoneProps) {
                 });
                 router.push(`/projects/${projectId}/heuristics`);
                 break;
+            case DangerZoneEnum.DATA_BLOCK_COLUMN:
+                deleteDataBlockColumnById(projectId, dataBlockId, props.id, (res) => {
+                    setIsDeleting(false);
+                });
+                router.push(`/projects/${projectId}/data-blocks/${dataBlockId}`);
+                break;
         }
 
     }, [modalDelete]);
@@ -55,6 +64,10 @@ export default function DeleteElementModal(props: DangerZoneProps) {
     useEffect(() => {
         setAbortButton({ ...abortButton, emitFunction: deleteElement });
     }, [modalDelete]);
+
+    const relatedDataBlocksText = useMemo(() => {
+        return props.relatedDataBlocks?.map((dataBlock) => `${dataBlock.name}`).join(', ');
+    }, [props.relatedDataBlocks]);
 
     const [abortButton, setAbortButton] = useState<ModalButton>(ABORT_BUTTON);
 
@@ -64,6 +77,8 @@ export default function DeleteElementModal(props: DangerZoneProps) {
             Are you sure you want to delete this {props.elementType}?
             <p>This will delete all data associated with it, including labeling tasks.</p>
             {isDeleting && <LoadingIcon color="red" />}
+            {props.elementType == DangerZoneEnum.ATTRIBUTE && props.relatedDataBlocks && props.relatedDataBlocks.length > 0 &&
+                <div className="text-red-500"> Warning: This {props.elementType} is used in the following data blocks: {relatedDataBlocksText}.</div>}
         </div>
-    </Modal>)
+    </Modal >)
 }

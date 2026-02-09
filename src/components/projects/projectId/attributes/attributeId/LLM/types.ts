@@ -2,7 +2,8 @@ import { LLMConfig } from "@/src/types/components/projects/projectId/settings/da
 import { Dispatch, SetStateAction } from "react";
 
 export type LLMResponseConfigProps = {
-    attributeId: string;
+    attributeId?: string;
+    dataBlockColumnId?: string;
     fullLlmConfig: LLMConfig;
     setFullLlmConfig: Dispatch<SetStateAction<LLMConfig>>;
     disabled?: boolean;

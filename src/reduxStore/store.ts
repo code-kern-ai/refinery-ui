@@ -11,6 +11,7 @@ import { dataBrowserReducer } from './states/pages/data-browser';
 import { cacheReducer } from './states/cachedValues';
 import { labelingReducer } from './states/pages/labeling';
 import { tmpReducer } from './states/tmp';
+import { dataBlocksReducer } from './states/pages/data-blocks';
 
 const store = configureStore({
     reducer: {
@@ -25,7 +26,8 @@ const store = configureStore({
         dataBrowser: dataBrowserReducer,
         cache: cacheReducer,
         labeling: labelingReducer,
-        tmp: tmpReducer
+        tmp: tmpReducer,
+        dataBlocks: dataBlocksReducer,
     },
     devTools: process.env.IS_DEV == '1',
 });

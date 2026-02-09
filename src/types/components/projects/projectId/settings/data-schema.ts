@@ -44,6 +44,7 @@ export type Attribute = {
     saveSourceCode: boolean;
     key?: string;
     additionalConfig?: LLMConfig;
+    relatedDataBlocks?: { id: string, name: string }[];
 }
 
 export type AttributeWithOnClick = Attribute & {

@@ -11,6 +11,7 @@ export class RouteManager {
         labeling: { active: false, checkFor: ['labeling'] },
         heuristics: { active: false, checkFor: ['heuristics', 'lookup-lists', 'labeling-function', 'active-learning'] },
         settings: { active: false, checkFor: ['settings', 'attributes', 'upload-records', 'playground'] },
+        dataBlocks: { active: false, checkFor: ['data-blocks'] },
         admin: { active: false, checkFor: ['admin'] },
     }
 

@@ -28,3 +28,8 @@ export function modelProviderDownloadModel(modelName: string, onResult: (result:
     const finalUrl = `${miscEndpoint}/model-provider-download-model`;
     jsonFetchWrapper(finalUrl, FetchType.POST, onResult, JSON.stringify(convertCamelToSnakeCase({ modelName })));
 }
+
+export function validateSQLClauses(sqlClauses: { select: string, where: string, groupBy: string, orderBy: string }, onResult: (result: any) => void) {
+    const finalUrl = `${miscEndpoint}/test-where-clause`;
+    jsonFetchWrapper(finalUrl, FetchType.POST, onResult, JSON.stringify(sqlClauses));
+}   

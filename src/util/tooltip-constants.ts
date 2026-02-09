@@ -34,6 +34,7 @@ export const TOOLTIPS_DICT = {
         'LABELING': 'Labeling',
         'HEURISTICS': 'Heuristics',
         'SETTINGS': 'Settings',
+        'DATA_BLOCKS': 'Data Blocks',
         'ADMIN': 'Admin',
         'DOCUMENTATION': 'Documentation',
         'API': 'API',

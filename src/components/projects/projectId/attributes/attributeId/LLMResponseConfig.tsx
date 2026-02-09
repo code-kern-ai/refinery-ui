@@ -10,7 +10,7 @@ export default function LLMResponseConfig(props: LLMResponseConfigProps) {
     const [configOpen, setConfigOpen] = useState(true);
     const [fullConfigOpen, setFullConfigOpen] = useState(false);
 
-    if (!props.fullLlmConfig || !props.attributeId) return null;
+    if (!props.fullLlmConfig || (!props.attributeId && !props.dataBlockColumnId)) return null;
     return (
         <div className="mt-3 flex flex-col gap-y-2">
             <div className="flex flex-row flex-nowrap items-center gap-x-2">
@@ -18,7 +18,7 @@ export default function LLMResponseConfig(props: LLMResponseConfigProps) {
                 {!props.keepConfigOpen && <KernButton icon={MemoIconSettings} onClick={() => setConfigOpen((p) => !p)} size="small" />}
                 {configOpen && <KernButton icon={fullConfigOpen ? MemoIconAdjustmentsAlt : MemoIconAdjustmentsOff} onClick={() => setFullConfigOpen((p) => !p)} size="small" />}
 
-                {props.noPlayground ? null : <LLMResponsePlayground attributeId={props.attributeId} apiKey={props.apiKey} />}
+                {props.noPlayground ? null : <LLMResponsePlayground attributeId={props.attributeId} dataBlockColumnId={props.dataBlockColumnId} apiKey={props.apiKey} />}
 
             </div>
             <div className={`${configOpen ? 'block' : 'hidden'}`}>

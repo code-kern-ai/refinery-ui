@@ -8,9 +8,11 @@ import { useSelector } from "react-redux";
 import Highlight from "../highlight/Highlight";
 import { MemoIconAlertCircle } from "@/submodules/react-components/components/kern-icons/icons";
 import { postProcessAttributes, postProcessRecord } from "@/submodules/javascript-functions/post-process-functions";
+import { selectDataBlockColumnsDict } from "@/src/reduxStore/states/pages/data-blocks";
 
 export function RecordDisplay(props: any) {
     const attributesDict = useSelector(selectAttributesDict);
+    const dataBlockColumnsDict = useSelector(selectDataBlockColumnsDict);
     const configuration = useSelector(selectConfiguration);
     const textHighlight = useSelector(selectTextHighlight);
     const isTextHighlightNeeded = useSelector(selectIsTextHighlightNeeded)
@@ -30,6 +32,7 @@ export function RecordDisplay(props: any) {
             <div className="font-semibold text-sm text-gray-800">
                 <div className="flex flex-row items-center">
                     <span className="font-dmMono">{attributesDict[attribute.id]?.name}</span>
+                    {dataBlockColumnsDict[attribute.id] && <span className="font-dmMono">{dataBlockColumnsDict[attribute.id]?.columnName}</span>}
                 </div>
             </div>
             {attributesDict[attribute.id] && <div className="text-gray-800 text-sm mb-4 overflow-anywhere flex text-left">
@@ -48,8 +51,13 @@ export function RecordDisplay(props: any) {
                         additionalClasses={[configuration.lineBreaks == LineBreaksType.NORMAL ? '' : (configuration.lineBreaks == LineBreaksType.IS_PRE_WRAP ? 'whitespace-pre-wrap' : 'whitespace-pre-line')]}
                         searchForExtended={textHighlight[attribute.key]} />) : (<span className={configuration && configuration.lineBreaks != LineBreaksType.NORMAL ? (configuration.lineBreaks == LineBreaksType.IS_PRE_WRAP ? 'whitespace-pre-wrap' : 'whitespace-pre-line') : ''}>
                             {preparedRecord.data[attributesDict[attribute.key].name] != null && preparedRecord.data[attributesDict[attribute.key].name] !== '' ? preparedRecord.data[attributesDict[attribute.key].name] : <NotPresentInRecord />}
+
                         </span>)}
                 </>)}
+            </div>}
+
+            {dataBlockColumnsDict[attribute.id] && <div className="text-gray-800 text-sm mb-4 overflow-anywhere flex text-left">
+                {preparedRecord.data[dataBlockColumnsDict[attribute.key].columnName] != null && preparedRecord.data[dataBlockColumnsDict[attribute.key].columnName] !== '' ? preparedRecord.data[dataBlockColumnsDict[attribute.key].columnName] : <NotPresentInRecord />}
             </div>}
         </div>
         ))}
