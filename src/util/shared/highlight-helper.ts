@@ -1,4 +1,5 @@
 import { RegexMatch } from "@/src/types/shared/highlight";
+import { safeRegExp } from "./security-helper";
 
 export function rebuildText(text: string, finalRegex: RegExp[]) {
     if (!text) return;
@@ -66,11 +67,11 @@ export function buildRegexps(searchFor: string[] | string, matchCase: boolean | 
     }
     const toReturn = [];
     for (const search of searchFor) {
-        toReturn.push(new RegExp(search, matchCase ? 'g' : 'gi'));
+        toReturn.push(safeRegExp(search, matchCase ? 'g' : 'gi'));
     }
     return toReturn;
 }
 
 export function buildRegex(search: string, matchCase: boolean): RegExp {
-    return new RegExp(search, matchCase ? 'g' : 'gi')
+    return safeRegExp(search, matchCase ? 'g' : 'gi')
 }

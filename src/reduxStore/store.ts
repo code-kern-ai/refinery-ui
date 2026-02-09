@@ -12,6 +12,7 @@ import { cacheReducer } from './states/cachedValues';
 import { labelingReducer } from './states/pages/labeling';
 import { tmpReducer } from './states/tmp';
 import { dataBlocksReducer } from './states/pages/data-blocks';
+import { safeAccess } from '../util/shared/security-helper';
 
 const store = configureStore({
     reducer: {
@@ -39,7 +40,7 @@ export function getStoreSnapshotValue(access: string[]): any {
     const currentState = store.getState();
     let value = currentState;
     for (let i = 0; i < access.length; i++) {
-        value = value[access[i]];
+        value = safeAccess(value, access[i]);
     }
     return value;
 }

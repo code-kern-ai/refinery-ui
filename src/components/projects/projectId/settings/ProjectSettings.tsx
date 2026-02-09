@@ -184,7 +184,7 @@ export default function ProjectSettings() {
                                 embedding.progress = Number(msgParts[4]);
                                 dispatch(setAllEmbeddings(newEMbeddings.map((e) => e.id == embedding.id ? embedding : e)));
                             }
-                            else console.log("unknown websocket message in part 3:" + msgParts[3], "full message:", msgParts)
+                            else console.log("unknown websocket message in part 3:", msgParts[3], "full message:", msgParts)
                             return;
                         }
                     }

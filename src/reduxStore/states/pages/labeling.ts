@@ -1,6 +1,7 @@
 import { getDefaultLabelingSuiteSettings, postProcessRla, postProcessTokenizedRecords } from "@/src/util/components/projects/projectId/labeling/labeling-main-component-helper";
 import { postProcessRecordByRecordId } from "@/src/util/components/projects/projectId/settings/attribute-calculation-helper";
 import { arrayToDict } from "@/submodules/javascript-functions/general";
+import { safeAccess, safeSet } from "@/src/util/shared/security-helper";
 import { PayloadAction, createSelector, createSlice } from "@reduxjs/toolkit";
 import { Record } from "@/src/types/components/projects/projectId/settings/attribute-calculation";
 import { LabelingSuiteManager } from "@/src/util/classes/labeling/manager";
@@ -152,17 +153,17 @@ const labelingSlice = createSlice({
                 const keyParts = settingsPath.split('.');
                 const lastKey = keyParts.pop();
                 for (const key of keyParts) {
-                    if (!settings[key]) return;
-                    settings = settings[key];
+                    settings = safeAccess(settings, key);
+                    if (!settings) return;
                 }
 
-                const currentValue = settings[lastKey];
+                const currentValue = safeAccess(settings, lastKey);
                 if (currentValue != value) {
                     if (value === undefined) {
                         if (typeof currentValue === "boolean") value = !currentValue;
                         else throw Error("something isn't right")
                     }
-                    settings[lastKey] = value;
+                    safeSet(settings, lastKey, value);
                 }
 
                 if (componentType == ComponentType.MAIN) {
