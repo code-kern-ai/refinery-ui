@@ -1,5 +1,13 @@
 import { RegexMatch } from "@/src/types/shared/highlight";
 
+/**
+ * Escapes special regex characters so the string can be used as a literal in RegExp.
+ * Prevents ReDoS when search input is user-controlled.
+ */
+function escapeForLiteralRegex(str: string): string {
+    return str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
 export function rebuildText(text: string, finalRegex: RegExp[]) {
     if (!text) return;
     let parts = [];
@@ -66,11 +74,11 @@ export function buildRegexps(searchFor: string[] | string, matchCase: boolean | 
     }
     const toReturn = [];
     for (const search of searchFor) {
-        toReturn.push(new RegExp(search, matchCase ? 'g' : 'gi'));
+        toReturn.push(new RegExp(escapeForLiteralRegex(search), matchCase ? 'g' : 'gi'));
     }
     return toReturn;
 }
 
 export function buildRegex(search: string, matchCase: boolean): RegExp {
-    return new RegExp(search, matchCase ? 'g' : 'gi')
+    return new RegExp(escapeForLiteralRegex(search), matchCase ? 'g' : 'gi');
 }

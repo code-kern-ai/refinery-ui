@@ -16,6 +16,7 @@ import CryptedField from "../crypted-field/CryptedField";
 import { closeModal, selectModal } from "@/src/reduxStore/states/modal";
 import { ModalEnum } from "@/src/types/shared/modal";
 import KernDropdown from "@/submodules/react-components/components/KernDropdown";
+import { safeConsoleError } from "@/submodules/react-components/helpers/safe-console";
 import { useWebsocket } from "@/submodules/react-components/hooks/web-socket/useWebsocket";
 import { getUploadCredentialsAndId, getUploadTaskById, deleteProjectPost, createProjectPost, updateProjectTokenizer, updateProjectStatus } from "@/src/services/base/project";
 import { Application, CurrentPage, CurrentPageSubKey } from "@/submodules/react-components/hooks/web-socket/constants";
@@ -102,7 +103,7 @@ export default function Upload(props: UploadProps) {
                 UploadHelper.setUploadTask(uploadTaskSave);
             }
         } else {
-            console.log("unknown websocket message in part 3:" + msgParts[3], "full message:", msgParts)
+            safeConsoleError("unknown websocket message in part 3:", msgParts[3], "full message:", msgParts)
         }
     }, [props.uploadOptions?.deleteProjectOnFail, props.uploadOptions?.reloadOnFinish]);
 
