@@ -24,6 +24,7 @@ import { CommentDataManager } from "@/src/util/classes/comments";
 import CreateNewAttributeModal from "./CreateNewAttributeModal";
 import ProjectSnapshotExportModal from "./ProjectSnapshotExportModal";
 import { postProcessLabelingTasksSchema } from "@/src/util/components/projects/projectId/settings/labeling-tasks-helper";
+import { safeConsoleError } from "@/submodules/react-components/helpers/safe-log";
 import { useWebsocket } from "@/submodules/react-components/hooks/web-socket/useWebsocket";
 import { getLabelingTasksByProjectId, getProjectByProjectId, getProjectTokenization } from "@/src/services/base/project";
 import { getAllComments } from "@/src/services/base/comment";
@@ -184,7 +185,7 @@ export default function ProjectSettings() {
                                 embedding.progress = Number(msgParts[4]);
                                 dispatch(setAllEmbeddings(newEMbeddings.map((e) => e.id == embedding.id ? embedding : e)));
                             }
-                            else console.log("unknown websocket message in part 3:" + msgParts[3], "full message:", msgParts)
+                            else safeConsoleError("unknown websocket message in part 3", msgParts[3], "full message:", msgParts)
                             return;
                         }
                     }
