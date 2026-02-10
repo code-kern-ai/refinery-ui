@@ -1,3 +1,4 @@
+import { safeAccess } from "@/submodules/javascript-functions/general";
 import { configureStore } from '@reduxjs/toolkit';
 import { generalReducer } from './states/general';
 import { projectReducer } from './states/project';
@@ -39,7 +40,7 @@ export function getStoreSnapshotValue(access: string[]): any {
     const currentState = store.getState();
     let value = currentState;
     for (let i = 0; i < access.length; i++) {
-        value = value[access[i]];
+        value = safeAccess(value, access[i]);
     }
     return value;
 }
