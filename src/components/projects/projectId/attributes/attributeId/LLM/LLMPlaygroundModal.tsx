@@ -110,7 +110,7 @@ export default function LLMPlaygroundModal() {
             setLlmAnswer(answer);
             setPlaygroundTestRunning(false);
         });
-    }, [inputRecordId, projectId, dataBlock.id]);
+    }, [inputRecordId, projectId, dataBlock?.id]);
 
     useEffect(() => {
         if (!recordData || recordData?.length == 0) return;
