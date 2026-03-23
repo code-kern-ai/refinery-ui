@@ -48,7 +48,7 @@ export const platformNamesDict = {
     [PlatformType.HUGGING_FACE]: "Hugging Face",
     [PlatformType.OPEN_AI]: "OpenAI",
     [PlatformType.AZURE]: "Azure",
-    [PlatformType.PRIVATEMODE_AI]: "Private Mode AI"
+    [PlatformType.PRIVATEMODE_AI]: "Privatemode AI"
 }
 
 export function postProcessingRecommendedEncoders(attributes: Attribute[], tokenizer: string, encoderSuggestions: any): { [embeddingId: string]: RecommendedEncoder } {
