@@ -17,6 +17,7 @@ export type DataBlock = {
             selectClause?: string,
             whereClause?: string,
             groupByClause?: string,
+            havingClause?: string,
             orderByClause?: string,
         }
     };

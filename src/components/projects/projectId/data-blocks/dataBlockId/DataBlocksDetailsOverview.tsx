@@ -25,6 +25,7 @@ const DEFAULT_SQL_TEMPLATE = {
     selectClause: '',
     whereClause: '',
     groupByClause: '',
+    havingClause: '',
     orderByClause: '',
     limitClause: 100,
     fromClause: '',
@@ -64,7 +65,7 @@ export default function DataBlocksDetailsOverview() {
         if (!currentDataBlock || !currentDataBlock.sqlConfig) return;
         isInitializingRef.current = true;
         setSQLTemplate(currentDataBlock.sqlConfig.template);
-        setSQLTemplateState(currentDataBlock.sqlConfig.config);
+        setSQLTemplateState({ ...DEFAULT_SQL_TEMPLATE, ...currentDataBlock.sqlConfig.config });
         setTimeout(() => {
             isInitializingRef.current = false;
         }, 0);
@@ -78,6 +79,7 @@ export default function DataBlocksDetailsOverview() {
             selectClause: preview.selectClause,
             whereClause: preview.whereClause,
             groupByClause: preview.groupByClause,
+            havingClause: preview.havingClause ?? 'HAVING ',
             orderByClause: preview.orderByClause,
             fromClause: preview.fromClause,
             limitClause: preview.limitClause,
@@ -101,6 +103,10 @@ export default function DataBlocksDetailsOverview() {
         if (sqlTemplateState.groupByClause.trim()) {
             groupByClause = sqlTemplatePreview.groupByClause + sqlTemplateState.groupByClause;
         }
+        let havingClause = '';
+        if (sqlTemplateState.havingClause?.trim()) {
+            havingClause = sqlTemplatePreview.havingClause + sqlTemplateState.havingClause;
+        }
         let orderByClause = '';
         if (sqlTemplateState.orderByClause.trim()) {
             orderByClause = sqlTemplatePreview.orderByClause + sqlTemplateState.orderByClause;
@@ -109,7 +115,7 @@ export default function DataBlocksDetailsOverview() {
         if (sqlTemplateState.limitClause) {
             limitClause = sqlTemplatePreview.limitClause + sqlTemplateState.limitClause;
         }
-        const clauses = [selectClause, sqlTemplatePreview.fromClause, whereClause, groupByClause, orderByClause, limitClause].filter(clause => clause.trim() !== '');
+        const clauses = [selectClause, sqlTemplatePreview.fromClause, whereClause, groupByClause, havingClause, orderByClause, limitClause].filter(clause => clause.trim() !== '');
         setPreviewText(clauses.join('\n'));
     }, [sqlTemplateState, sqlTemplatePreview]);
 
@@ -169,6 +175,7 @@ export default function DataBlocksDetailsOverview() {
             select: sqlTemplateState.selectClause,
             where: sqlTemplateState.whereClause,
             groupBy: sqlTemplateState.groupByClause,
+            having: sqlTemplateState.havingClause ?? '',
             orderBy: sqlTemplateState.orderByClause,
             limit: sqlTemplateState.limitClause,
         }
@@ -178,24 +185,38 @@ export default function DataBlocksDetailsOverview() {
                 alert('Everything is valid');
                 return;
             }
+            const dr = res.denyReason;
+            if (dr == null) {
+                setIsTestQuerySuccess(false);
+                alert('Validation failed');
+                return;
+            }
+            if (typeof dr === 'string') {
+                setIsTestQuerySuccess(false);
+                alert(dr);
+                return;
+            }
             let error = '';
-            if (res.denyReason.select) {
-                error += 'SELECT clause is NOT valid: ' + res.denyReason.select;
+            if (dr.select) {
+                error += 'SELECT clause is NOT valid: ' + dr.select;
             }
-            if (res.denyReason.where) {
-                error += 'WHERE clause is NOT valid: ' + res.denyReason.where;
+            if (dr.where) {
+                error += 'WHERE clause is NOT valid: ' + dr.where;
             }
-            if (res.denyReason.groupBy) {
-                error += 'GROUP BY is NOT valid: ' + res.denyReason.group_by;
+            if (dr.group_by) {
+                error += 'GROUP BY is NOT valid: ' + dr.group_by;
             }
-            if (res.denyReason.orderBy) {
-                error += 'ORDER BY is NOT valid: ' + res.denyReason.order_by;
+            if (dr.having) {
+                error += 'HAVING clause is NOT valid: ' + dr.having;
             }
-            if (res.denyReason.limit) {
-                error += 'LIMIT is NOT valid: ' + res.denyReason.limit;
+            if (dr.order_by) {
+                error += 'ORDER BY is NOT valid: ' + dr.order_by;
             }
-            if (res.denyReason.db_check) {
-                error += 'DB check is NOT valid: ' + res.denyReason.db_check;
+            if (dr.limit) {
+                error += 'LIMIT is NOT valid: ' + dr.limit;
+            }
+            if (dr.db_check) {
+                error += 'DB check is NOT valid: ' + dr.db_check;
             }
             setIsTestQuerySuccess(false);
             alert(error);
@@ -290,6 +311,7 @@ export default function DataBlocksDetailsOverview() {
         }
 
         const groupByParsed = parseSQLClause(template.groupByClause || '', 'GROUP BY ');
+        const havingParsed = parseSQLClause(template.havingClause ?? '', 'HAVING ');
         const orderByParsed = parseSQLClause(template.orderByClause || '', 'ORDER BY ');
         let limitPrefix = 'LIMIT ';
         let limitEditable = '';
@@ -307,6 +329,7 @@ export default function DataBlocksDetailsOverview() {
             selectClause: selectParsed.prefix,
             whereClause: wherePrefix,
             groupByClause: groupByParsed.prefix,
+            havingClause: havingParsed.prefix,
             orderByClause: orderByParsed.prefix,
             fromClause: template.fromClause,
             limitClause: limitPrefix,
@@ -315,6 +338,7 @@ export default function DataBlocksDetailsOverview() {
             selectClause: selectParsed.editable,
             whereClause: whereEditable,
             groupByClause: groupByParsed.editable,
+            havingClause: havingParsed.editable,
             orderByClause: orderByParsed.editable,
             limitClause: limitEditable ? parseInt(limitEditable, 10) : 100,
         });
@@ -407,6 +431,11 @@ export default function DataBlocksDetailsOverview() {
                             <label htmlFor="group-by-query" className="text-sm leading-5 font-medium text-gray-700">Group by</label>
                             <textarea id="group-by-query" value={sqlTemplateState.groupByClause} className="w-full border-gray-300 rounded-md placeholder-italic border text-gray-700 pl-4 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100 no-ligatures"
                                 onChange={(e) => setSQLTemplateState({ ...sqlTemplateState, groupByClause: e.target.value })} />
+                        </div>
+                        <div>
+                            <label htmlFor="having-query" className="text-sm leading-5 font-medium text-gray-700">Having</label>
+                            <textarea id="having-query" value={sqlTemplateState.havingClause ?? ''} className="w-full border-gray-300 rounded-md placeholder-italic border text-gray-700 pl-4 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-100 no-ligatures"
+                                onChange={(e) => setSQLTemplateState({ ...sqlTemplateState, havingClause: e.target.value })} />
                         </div>
                         <div>
                             <label htmlFor="order-by-query" className="text-sm leading-5 font-medium text-gray-700">Order by</label>
