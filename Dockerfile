@@ -1,4 +1,4 @@
-FROM kernai/refinery-parent-images:v1.25.0-next
+FROM kernai/refinery-parent-images:v1.26.0-next
 
 WORKDIR /app
 COPY package*.json /app/
