@@ -34,9 +34,6 @@ const initialState: Modals = {
     [ModalEnum.SAMPLE_PROJECT_TITLE]: {
         open: false,
     },
-    [ModalEnum.VERSION_OVERVIEW]: {
-        open: false,
-    },
     [ModalEnum.CREATE_NEW_ATTRIBUTE]: {
         open: false
     },

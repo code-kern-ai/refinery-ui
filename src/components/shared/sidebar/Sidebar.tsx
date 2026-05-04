@@ -6,15 +6,10 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Tooltip } from '@nextui-org/react';
 import { useState } from 'react';
 import AppSelectionDropdown from '@/submodules/react-components/components/AppSelectionDropdown';
-import { ModalEnum } from '@/src/types/shared/modal';
-import { openModal } from '@/src/reduxStore/states/modal';
 import { useRouter } from 'next/router';
 import { TOOLTIPS_DICT } from '@/src/util/tooltip-constants';
-import { CacheEnum, selectCachedValue } from '@/src/reduxStore/states/cachedValues';
-import VersionOverviewModal from './VersionOverviewModal';
 import { setProjectIdSampleProject } from '@/src/reduxStore/states/tmp';
-import { getHasUpdates } from '@/src/services/base/misc';
-import { MemoIconAlertCircle, MemoIconBulb, MemoIconChartPie, MemoIconMaximize, MemoIconMinimize, MemoIconSettings, MemoIconSitemapFilled, MemoIconTag, MemoIconTriangleSquareCircle } from '@/submodules/react-components/components/kern-icons/icons';
+import { MemoIconBulb, MemoIconChartPie, MemoIconMaximize, MemoIconMinimize, MemoIconSettings, MemoIconSitemapFilled, MemoIconTag, MemoIconTriangleSquareCircle } from '@/submodules/react-components/components/kern-icons/icons';
 
 export default function Sidebar() {
     const router = useRouter();
@@ -23,10 +18,8 @@ export default function Sidebar() {
     const user = useSelector(selectUser);
     const project = useSelector(selectProject);
     const routeColor = useSelector(selectRouteColor);
-    const versionOverviewData = useSelector(selectCachedValue(CacheEnum.VERSION_OVERVIEW));
 
     const [isFullScreen, setIsFullScreen] = useState(false);
-    const [hasUpdates, setHasUpdates] = useState(false);
 
     function openFullScreen() {
         setIsFullScreen(true);
@@ -57,15 +50,6 @@ export default function Sidebar() {
         } else if ((document as any).msExitFullscreen) {
             /* IE/Edge */
             (document as any).msExitFullscreen();
-        }
-    }
-
-    function requestVersionOverview() {
-        dispatch(openModal(ModalEnum.VERSION_OVERVIEW));
-        if (versionOverviewData) {
-            getHasUpdates(res => {
-                setHasUpdates(res);
-            });
         }
     }
 
@@ -189,20 +173,14 @@ export default function Sidebar() {
                             </div>
 
                             <div className="flex-shrink-0 flex pt-3 justify-center">
-                                <Tooltip placement="right" trigger="hover" color="invert" content={TOOLTIPS_DICT.SIDEBAR.VERSION_OVERVIEW}>
-                                    <div onClick={requestVersionOverview} id="refineryVersion"
-                                        className="z-50 tooltip tooltip-right cursor-pointer select-none text-white flex items-center mr-1">
-                                        v1.23.0
-                                        {hasUpdates && <Tooltip placement="right" trigger="hover" color="invert" content={TOOLTIPS_DICT.SIDEBAR.NEWER_VERSION_AVAILABLE} >
-                                            <MemoIconAlertCircle className="h-5 w-5 text-yellow-700" />
-                                        </Tooltip>}
-                                    </div>
-                                </Tooltip>
+                                <div id="refineryVersion"
+                                    className="z-50 tooltip tooltip-right select-none text-white flex items-center mr-1">
+                                    v1.23.0
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
-                <VersionOverviewModal />
             </div >
         )
     )
