@@ -41,8 +41,6 @@ export const TOOLTIPS_DICT = {
         'JOIN_OUR_COMMUNITY': 'Join our community',
         'MAXIMIZE_SCREEN': 'Maximize screen',
         'MINIMIZE_SCREEN': 'Minimize screen',
-        'VERSION_OVERVIEW': 'Version overview',
-        'NEWER_VERSION_AVAILABLE': 'Newer version available',
         'LINUX/MAC': 'Linux/Mac',
         'PIP': 'Installed refinery with pip',
         'WINDOWS_TERMINAL': 'Windows Terminal',
