@@ -9,16 +9,6 @@ export function getIsAdmin(onResult: (result: any) => void) {
     jsonFetchWrapper(finalUrl, FetchType.GET, onResult);
 }
 
-export function getVersionOverview(onResult: (result: any) => void) {
-    const finalUrl = `${miscEndpoint}/version-overview`;
-    jsonFetchWrapper(finalUrl, FetchType.GET, onResult);
-}
-
-export function getHasUpdates(onResult: (result: any) => void) {
-    const finalUrl = `${miscEndpoint}/has-updates`;
-    jsonFetchWrapper(finalUrl, FetchType.GET, onResult);
-}
-
 export function modelProviderDeleteModel(modelName: string, onResult: (result: any) => void) {
     const finalUrl = `${miscEndpoint}/model-provider-delete-model`;
     jsonFetchWrapper(finalUrl, FetchType.DELETE, onResult, JSON.stringify(convertCamelToSnakeCase({ modelName })));
@@ -29,7 +19,7 @@ export function modelProviderDownloadModel(modelName: string, onResult: (result:
     jsonFetchWrapper(finalUrl, FetchType.POST, onResult, JSON.stringify(convertCamelToSnakeCase({ modelName })));
 }
 
-export function validateSQLClauses(sqlClauses: { select: string, where: string, groupBy: string, orderBy: string }, onResult: (result: any) => void) {
+export function validateSQLClauses(sqlClauses: { select: string, where: string, groupBy: string, having: string, orderBy: string, limit: number }, onResult: (result: any) => void) {
     const finalUrl = `${miscEndpoint}/test-where-clause`;
     jsonFetchWrapper(finalUrl, FetchType.POST, onResult, JSON.stringify(sqlClauses));
 }   

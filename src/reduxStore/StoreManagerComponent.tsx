@@ -11,11 +11,10 @@ import { CacheEnum, setCache } from "./states/cachedValues";
 import { postProcessingEncoders } from "../util/components/models-downloaded/models-downloaded-helper";
 import { checkWhitelistTokenizer } from "../util/components/projects/new-project/new-project-helper";
 import { ConfigManager } from "../services/base/config";
-import postprocessVersionOverview from "../util/shared/sidebar-helper";
 import { postProcessingEmbeddingPlatforms } from "../util/components/projects/projectId/settings/embeddings-helper";
 import { setDisplayUserRole } from "./states/pages/labeling";
 import { getProjectByProjectId } from "../services/base/project";
-import { getIsAdmin, getVersionOverview } from "../services/base/misc";
+import { getIsAdmin } from "../services/base/misc";
 import { getUserInfo, getOrganization, getOrganizationUsers } from "../services/base/organization";
 import { getAllTokenizerOptions, getEmbeddingPlatforms, getRecommendedEncoders } from "../services/base/embedding";
 import { UserRole } from "../types/shared/sidebar";
@@ -59,9 +58,6 @@ export function GlobalStoreDataComponent(props: React.PropsWithChildren) {
         });
 
         // Set cache
-        getVersionOverview((res) => {
-            dispatch(setCache(CacheEnum.VERSION_OVERVIEW, postprocessVersionOverview(res)));
-        });
         getEmbeddingPlatforms((res) => {
             dispatch(setCache(CacheEnum.EMBEDDING_PLATFORMS, postProcessingEmbeddingPlatforms(res, organization)))
         });
