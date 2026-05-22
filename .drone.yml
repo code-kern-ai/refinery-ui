@@ -12,8 +12,20 @@ steps:
       - git submodule init
       - 'git config --global url."https://github.com/".insteadOf git@github.com:'
       - "git submodule update --recursive"
+  - name: login dhi.io
+    image: docker:cli
+    environment:
+      DOCKER_USERNAME:
+        from_secret: dockerhub_username
+      DOCKER_PASSWORD:
+        from_secret: dockerhub_password
+    commands:
+      - echo "$DOCKER_PASSWORD" | docker login dhi.io -u "$DOCKER_USERNAME" --password-stdin
   - name: build and publish
     image: plugins/docker
+    depends_on:
+      - submodules
+      - login dhi.io
     settings:
       registry: registry.dev.kern.ai
       username:
@@ -75,8 +87,20 @@ steps:
       - git submodule init
       - 'git config --global url."https://github.com/".insteadOf git@github.com:'
       - "git submodule update --recursive"
+  - name: login dhi.io
+    image: docker:cli
+    environment:
+      DOCKER_USERNAME:
+        from_secret: dockerhub_username
+      DOCKER_PASSWORD:
+        from_secret: dockerhub_password
+    commands:
+      - echo "$DOCKER_PASSWORD" | docker login dhi.io -u "$DOCKER_USERNAME" --password-stdin
   - name: build and publish
     image: plugins/docker
+    depends_on:
+      - submodules
+      - login dhi.io
     settings:
       registry: registry.dev.kern.ai
       username:
@@ -110,8 +134,20 @@ steps:
       - git submodule init
       - 'git config --global url."https://github.com/".insteadOf git@github.com:'
       - "git submodule update --recursive"
+  - name: login dhi.io
+    image: docker:cli
+    environment:
+      DOCKER_USERNAME:
+        from_secret: dockerhub_username
+      DOCKER_PASSWORD:
+        from_secret: dockerhub_password
+    commands:
+      - echo "$DOCKER_PASSWORD" | docker login dhi.io -u "$DOCKER_USERNAME" --password-stdin
   - name: build and publish
     image: plugins/docker
+    depends_on:
+      - submodules
+      - login dhi.io
     settings:
       username:
         from_secret: dockerhub_username
@@ -139,8 +175,20 @@ steps:
       - git submodule init
       - 'git config --global url."https://github.com/".insteadOf git@github.com:'
       - "git submodule update --recursive"
+  - name: login dhi.io
+    image: docker:cli
+    environment:
+      DOCKER_USERNAME:
+        from_secret: dockerhub_username
+      DOCKER_PASSWORD:
+        from_secret: dockerhub_password
+    commands:
+      - echo "$DOCKER_PASSWORD" | docker login dhi.io -u "$DOCKER_USERNAME" --password-stdin
   - name: build and publish
     image: plugins/docker
+    depends_on:
+      - submodules
+      - login dhi.io
     settings:
       username:
         from_secret: dockerhub_username
