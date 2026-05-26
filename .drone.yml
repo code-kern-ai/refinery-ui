@@ -12,25 +12,20 @@ steps:
       - git submodule init
       - 'git config --global url."https://github.com/".insteadOf git@github.com:'
       - "git submodule update --recursive"
-  - name: login dhi.io
-    image: docker:cli
-    environment:
-      DOCKER_USERNAME:
-        from_secret: dockerhub_username
-      DOCKER_PASSWORD:
-        from_secret: dockerhub_password
-    commands:
-      - echo "$DOCKER_PASSWORD" | docker login dhi.io -u "$DOCKER_USERNAME" --password-stdin
   - name: build and publish
-    image: plugins/docker
+    image: plugins/docker:21.2.8-linux-amd64
     depends_on:
       - submodules
-      - login dhi.io
     settings:
       registry: registry.dev.kern.ai
       username:
         from_secret: docker_username
       password:
+        from_secret: docker_password
+      base_image_registry: registry.dev.kern.ai
+      base_image_username:
+        from_secret: docker_username
+      base_image_password:
         from_secret: docker_password
       repo: "registry.dev.kern.ai/${DRONE_REPO}"
       tags: ["${DRONE_COMMIT_SHA}", "${DRONE_COMMIT_BRANCH}"]
@@ -87,25 +82,20 @@ steps:
       - git submodule init
       - 'git config --global url."https://github.com/".insteadOf git@github.com:'
       - "git submodule update --recursive"
-  - name: login dhi.io
-    image: docker:cli
-    environment:
-      DOCKER_USERNAME:
-        from_secret: dockerhub_username
-      DOCKER_PASSWORD:
-        from_secret: dockerhub_password
-    commands:
-      - echo "$DOCKER_PASSWORD" | docker login dhi.io -u "$DOCKER_USERNAME" --password-stdin
   - name: build and publish
-    image: plugins/docker
+    image: plugins/docker:21.2.8-linux-amd64
     depends_on:
       - submodules
-      - login dhi.io
     settings:
       registry: registry.dev.kern.ai
       username:
         from_secret: docker_username
       password:
+        from_secret: docker_password
+      base_image_registry: registry.dev.kern.ai
+      base_image_username:
+        from_secret: docker_username
+      base_image_password:
         from_secret: docker_password
       repo: "registry.dev.kern.ai/${DRONE_REPO}"
       tags: ["${DRONE_COMMIT_SHA}_arm64", "${DRONE_COMMIT_BRANCH}_arm64"]
@@ -134,25 +124,20 @@ steps:
       - git submodule init
       - 'git config --global url."https://github.com/".insteadOf git@github.com:'
       - "git submodule update --recursive"
-  - name: login dhi.io
-    image: docker:cli
-    environment:
-      DOCKER_USERNAME:
-        from_secret: dockerhub_username
-      DOCKER_PASSWORD:
-        from_secret: dockerhub_password
-    commands:
-      - echo "$DOCKER_PASSWORD" | docker login dhi.io -u "$DOCKER_USERNAME" --password-stdin
   - name: build and publish
-    image: plugins/docker
+    image: plugins/docker:21.2.8-linux-amd64
     depends_on:
       - submodules
-      - login dhi.io
     settings:
       username:
         from_secret: dockerhub_username
       password:
         from_secret: dockerhub_password
+      base_image_registry: registry.dev.kern.ai
+      base_image_username:
+        from_secret: docker_username
+      base_image_password:
+        from_secret: docker_password
       repo: "kernai/${DRONE_REPO_NAME}"
       tag: "${DRONE_TAG}-drone-amd64"
 
@@ -175,25 +160,20 @@ steps:
       - git submodule init
       - 'git config --global url."https://github.com/".insteadOf git@github.com:'
       - "git submodule update --recursive"
-  - name: login dhi.io
-    image: docker:cli
-    environment:
-      DOCKER_USERNAME:
-        from_secret: dockerhub_username
-      DOCKER_PASSWORD:
-        from_secret: dockerhub_password
-    commands:
-      - echo "$DOCKER_PASSWORD" | docker login dhi.io -u "$DOCKER_USERNAME" --password-stdin
   - name: build and publish
-    image: plugins/docker
+    image: plugins/docker:21.2.8-linux-amd64
     depends_on:
       - submodules
-      - login dhi.io
     settings:
       username:
         from_secret: dockerhub_username
       password:
         from_secret: dockerhub_password
+      base_image_registry: registry.dev.kern.ai
+      base_image_username:
+        from_secret: docker_username
+      base_image_password:
+        from_secret: docker_password
       repo: "kernai/${DRONE_REPO_NAME}"
       tag: "${DRONE_TAG}-drone-arm64"
 
