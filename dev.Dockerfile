@@ -15,6 +15,4 @@ ENV WATCHPACK_POLLING=true
 
 RUN npm install --include=dev
 
-USER 65532:65532
-
-ENTRYPOINT ["/usr/local/bin/npm", "run", "dev"]
+ENTRYPOINT ["npm", "run", "dev"]
