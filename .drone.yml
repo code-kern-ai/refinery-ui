@@ -22,11 +22,6 @@ steps:
         from_secret: docker_username
       password:
         from_secret: docker_password
-      base_image_registry: dhi.io
-      base_image_username:
-        from_secret: docker_username
-      base_image_password:
-        from_secret: docker_password
       repo: "registry.dev.kern.ai/${DRONE_REPO}"
       tags: ["${DRONE_COMMIT_SHA}", "${DRONE_COMMIT_BRANCH}"]
       cache_from:
@@ -92,11 +87,6 @@ steps:
         from_secret: docker_username
       password:
         from_secret: docker_password
-      base_image_registry: dhi.io
-      base_image_username:
-        from_secret: docker_username
-      base_image_password:
-        from_secret: docker_password
       repo: "registry.dev.kern.ai/${DRONE_REPO}"
       tags: ["${DRONE_COMMIT_SHA}_arm64", "${DRONE_COMMIT_BRANCH}_arm64"]
       cache_from:
@@ -133,11 +123,6 @@ steps:
         from_secret: dockerhub_username
       password:
         from_secret: dockerhub_password
-      base_image_registry: dhi.io
-      base_image_username:
-        from_secret: docker_username
-      base_image_password:
-        from_secret: docker_password
       repo: "kernai/${DRONE_REPO_NAME}"
       tag: "${DRONE_TAG}-drone-amd64"
 
@@ -169,11 +154,6 @@ steps:
         from_secret: dockerhub_username
       password:
         from_secret: dockerhub_password
-      base_image_registry: dhi.io
-      base_image_username:
-        from_secret: docker_username
-      base_image_password:
-        from_secret: docker_password
       repo: "kernai/${DRONE_REPO_NAME}"
       tag: "${DRONE_TAG}-drone-arm64"
 
