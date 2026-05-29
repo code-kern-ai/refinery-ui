@@ -13,7 +13,7 @@ steps:
       - 'git config --global url."https://github.com/".insteadOf git@github.com:'
       - "git submodule update --recursive"
   - name: build and publish
-    image: plugins/docker:21.2.8-linux-amd64
+    image: plugins/docker
     depends_on:
       - submodules
     settings:
@@ -22,7 +22,7 @@ steps:
         from_secret: docker_username
       password:
         from_secret: docker_password
-      base_image_registry: registry.dev.kern.ai
+      base_image_registry: dhi.io
       base_image_username:
         from_secret: docker_username
       base_image_password:
@@ -83,7 +83,7 @@ steps:
       - 'git config --global url."https://github.com/".insteadOf git@github.com:'
       - "git submodule update --recursive"
   - name: build and publish
-    image: plugins/docker:21.2.8-linux-arm64
+    image: plugins/docker
     depends_on:
       - submodules
     settings:
@@ -92,7 +92,7 @@ steps:
         from_secret: docker_username
       password:
         from_secret: docker_password
-      base_image_registry: registry.dev.kern.ai
+      base_image_registry: dhi.io
       base_image_username:
         from_secret: docker_username
       base_image_password:
@@ -125,7 +125,7 @@ steps:
       - 'git config --global url."https://github.com/".insteadOf git@github.com:'
       - "git submodule update --recursive"
   - name: build and publish
-    image: plugins/docker:21.2.8-linux-amd64
+    image: plugins/docker
     depends_on:
       - submodules
     settings:
@@ -133,7 +133,7 @@ steps:
         from_secret: dockerhub_username
       password:
         from_secret: dockerhub_password
-      base_image_registry: registry.dev.kern.ai
+      base_image_registry: dhi.io
       base_image_username:
         from_secret: docker_username
       base_image_password:
@@ -161,7 +161,7 @@ steps:
       - 'git config --global url."https://github.com/".insteadOf git@github.com:'
       - "git submodule update --recursive"
   - name: build and publish
-    image: plugins/docker:21.2.8-linux-arm64
+    image: plugins/docker
     depends_on:
       - submodules
     settings:
@@ -169,7 +169,7 @@ steps:
         from_secret: dockerhub_username
       password:
         from_secret: dockerhub_password
-      base_image_registry: registry.dev.kern.ai
+      base_image_registry: dhi.io
       base_image_username:
         from_secret: docker_username
       base_image_password:
