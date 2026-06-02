@@ -1,4 +1,4 @@
-ARG PARENT_IMAGE=kernai/refinery-parent-images:v1.27.0-next
+ARG PARENT_IMAGE=registry.dev.kern.ai/code-kern-ai/refinery-parent-images:hardened-images-next
 ARG RUNTIME_PARENT_IMAGE=${PARENT_IMAGE}
 
 FROM ${PARENT_IMAGE} AS builder
@@ -32,6 +32,6 @@ COPY --from=builder --chown=65532:65532 /app/.next/standalone ./
 COPY --from=builder --chown=65532:65532 /app/public ./public
 COPY --from=builder --chown=65532:65532 /app/.next/static ./.next/static
 
-USER 65532:65532
+USER nonroot
 
 ENTRYPOINT ["node", "server.js"]
