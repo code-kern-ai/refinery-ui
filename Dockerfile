@@ -1,11 +1,10 @@
 ARG PARENT_IMAGE=registry.dev.kern.ai/code-kern-ai/refinery-parent-images:hardened-images-next
 ARG RUNTIME_PARENT_IMAGE=${PARENT_IMAGE}
+ARG DHI_NODE_BUILD=dhi.io/node:20-debian12-dev
 
-FROM ${PARENT_IMAGE} AS builder
+FROM ${DHI_NODE_BUILD} AS builder
 
 WORKDIR /app
-
-USER root
 
 COPY package*.json ./
 ENV NODE_ENV=production
