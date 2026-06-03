@@ -27,6 +27,7 @@ function changeAllFor(obj: any, changes: { [key: string]: any }) {
 }
 
 const initialState = getInitState();
+const EMPTY_DATA_BLOCK_COLUMNS: DataBlockColumn[] = [];
 
 const dataBlocksSlice = createSlice({
     name: 'dataBlocks',
@@ -78,7 +79,7 @@ const dataBlocksSlice = createSlice({
 export const selectDataBlock = (state) => state.dataBlocks.active;
 export const selectDataBlocksAll = (state) => state.dataBlocks.all;
 export const selectDataBlockType = (state) => state.dataBlocks.type;
-export const selectDataBlockColumns = (state) => state.dataBlocks.active?.sqlSchema || [];
+export const selectDataBlockColumns = (state) => state.dataBlocks.active?.sqlSchema || EMPTY_DATA_BLOCK_COLUMNS;
 export const selectUsableDataBlockColumns = (state) => state.dataBlocks.usableDataBlockColumns;
 export const selectDataBlockColumnsDict = createSelector([selectDataBlockColumns], (a): any => a ? arrayToDict(a, 'id') : null);
 
