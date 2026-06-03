@@ -31,6 +31,6 @@ COPY --from=builder --chown=65532:65532 /app/.next/standalone ./
 COPY --from=builder --chown=65532:65532 /app/public ./public
 COPY --from=builder --chown=65532:65532 /app/.next/static ./.next/static
 
-USER nonroot
+USER node
 
 ENTRYPOINT ["node", "server.js"]
