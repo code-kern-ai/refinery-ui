@@ -1,4 +1,4 @@
-ARG PARENT_IMAGE=registry.dev.kern.ai/code-kern-ai/refinery-parent-images:hardened-images-next
+ARG PARENT_IMAGE=kernai/refinery-parent-images:v2.0.0-next
 ARG RUNTIME_PARENT_IMAGE=${PARENT_IMAGE}
 ARG DHI_NODE_BUILD=dhi.io/node:20-debian12-dev
 
