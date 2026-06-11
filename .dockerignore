@@ -1,0 +1,12 @@
+.git
+submodules/**/.git
+.next
+node_modules
+.env*
+.cursor
+.github
+*.log
+npm-debug.log*
+dev.Dockerfile
+.drone.yml
+README.md

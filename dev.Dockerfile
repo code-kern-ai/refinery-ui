@@ -1,8 +1,11 @@
-FROM node:18
+ARG PARENT_IMAGE=registry.dev.kern.ai/code-kern-ai/refinery-parent-images:dev-next
+FROM ${PARENT_IMAGE}
 
 WORKDIR /app
 
 VOLUME ["/app"]
+
+USER root
 
 COPY package*.json /app/
 
