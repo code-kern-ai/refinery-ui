@@ -6,24 +6,21 @@ import { ModalButton, ModalEnum } from "@/src/types/shared/modal";
 import { useCallback, useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { calculateUserAttributeAllRecordsPost } from "@/src/services/base/project-setting";
-import { useRouter } from "next/router";
 
 const ACCEPT_BUTTON = { buttonCaption: 'Accept', useButton: true };
 
 
 export default function ConfirmExecutionModal(props: ConfirmExecutionModalProps) {
-    const router = useRouter();
     const projectId = useSelector(selectProjectId);
     const modalExecuteAll = useSelector(selectModal(ModalEnum.EXECUTE_ATTRIBUTE_CALCULATION));
 
     const calculateUserAttributeAllRecords = useCallback(() => {
-        const attributeId = props.dataBlockId ? router.query.columnId as string : props.currentAttributeId;
-        calculateUserAttributeAllRecordsPost(projectId, { attributeId: attributeId, dataBlockId: props.dataBlockId }, (res) => { });
-    }, [modalExecuteAll, props.currentAttributeId, props.dataBlockId]);
+        calculateUserAttributeAllRecordsPost(projectId, { attributeId: props.currentAttributeId, dataBlockId: props.dataBlockId }, (res) => { });
+    }, [projectId, props.currentAttributeId, props.dataBlockId]);
 
     useEffect(() => {
         setAcceptButton({ ...ACCEPT_BUTTON, emitFunction: calculateUserAttributeAllRecords, disabled: modalExecuteAll.requestedSomething });
-    }, [modalExecuteAll]);
+    }, [modalExecuteAll, calculateUserAttributeAllRecords]);
 
     const [acceptButton, setAcceptButton] = useState<ModalButton>(ACCEPT_BUTTON);
 
