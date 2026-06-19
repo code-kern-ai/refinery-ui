@@ -189,7 +189,7 @@ export default function ExecutionContainer(props: ExecutionContainerProps) {
         </div >}
 
         <ViewRecordDetailsModal currentAttribute={props.currentAttribute} sampleRecords={sampleRecordsFinal} />
-        <ConfirmExecutionModal currentAttributeId={props.currentAttribute.id} dataBlockId={dataBlock?.id} />
+        <ConfirmExecutionModal currentAttributeId={props.currentAttribute.id} dataBlockId={props.isDataBlockColumn ? dataBlock?.id : undefined} />
         <ViewRecordDetailsDataBlockColumnModal currentAttribute={props.currentAttribute} sampleRecords={sampleRecordsFinal} />
     </div >)
 }
