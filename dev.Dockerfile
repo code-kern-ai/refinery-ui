@@ -1,4 +1,4 @@
-ARG PARENT_IMAGE=registry.dev.kern.ai/code-kern-ai/refinery-parent-images:dev-next
+ARG PARENT_IMAGE=node:20-alpine
 FROM ${PARENT_IMAGE}
 
 WORKDIR /app
